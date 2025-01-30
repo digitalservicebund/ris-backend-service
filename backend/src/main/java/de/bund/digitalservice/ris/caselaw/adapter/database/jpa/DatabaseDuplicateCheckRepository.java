@@ -16,11 +16,19 @@ public interface DatabaseDuplicateCheckRepository
       nativeQuery = true,
       value =
           """
+    WITH filtered_file_numbers AS (
+        SELECT value AS value
+        FROM incremental_migration.file_number
+        WHERE value IN (:allFileNumbers)
+        GROUP BY value
+        HAVING COUNT(*) <= 50
+    )
+
     SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
-    WHERE upper(fileNumber.value) IN (:allFileNumbers)
+    WHERE upper(fileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND documentationUnit.decision_date IN (:allDates)
 
     UNION
@@ -31,7 +39,7 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = fileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_date deviatingDate
         ON documentationUnit.id = deviatingDate.documentation_unit_id
-    WHERE upper(fileNumber.value) IN (:allFileNumbers)
+    WHERE upper(fileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND deviatingDate.value IN (:allDates)
 
     UNION
@@ -40,7 +48,7 @@ public interface DatabaseDuplicateCheckRepository
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
-    WHERE upper(deviatingFileNumber.value) IN (:allFileNumbers)
+    WHERE upper(deviatingFileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND documentationUnit.decision_date IN (:allDates)
 
     UNION
@@ -51,7 +59,7 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_date deviatingDate
         ON documentationUnit.id = deviatingDate.documentation_unit_id
-    WHERE upper(deviatingFileNumber.value) IN (:allFileNumbers)
+    WHERE upper(deviatingFileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND deviatingDate.value IN (:allDates)
 
     UNION
@@ -62,7 +70,7 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = fileNumber.documentation_unit_id
       JOIN incremental_migration.court court
         ON documentationUnit.court_id = court.id
-    WHERE upper(fileNumber.value) IN (:allFileNumbers)
+    WHERE upper(fileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND court.id IN (:allCourtIds)
 
     UNION
@@ -73,7 +81,7 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
       JOIN incremental_migration.court court
         ON documentationUnit.court_id = court.id
-    WHERE upper(deviatingFileNumber.value) IN (:allFileNumbers)
+    WHERE upper(deviatingFileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND court.id IN (:allCourtIds)
 
     UNION
@@ -84,7 +92,7 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = fileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_court deviatingCourt
         ON documentationUnit.id = deviatingCourt.documentation_unit_id
-    WHERE upper(fileNumber.value) IN (:allFileNumbers)
+    WHERE upper(fileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND upper(deviatingCourt.value) IN (:allDeviatingCourts)
 
     UNION
@@ -95,7 +103,7 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_court deviatingCourt
         ON documentationUnit.id = deviatingCourt.documentation_unit_id
-    WHERE upper(deviatingFileNumber.value) IN (:allFileNumbers)
+    WHERE upper(deviatingFileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND upper(deviatingCourt.value) IN (:allDeviatingCourts)
 
     UNION
