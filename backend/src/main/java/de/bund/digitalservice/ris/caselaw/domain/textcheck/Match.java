@@ -5,6 +5,7 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record Match(
+    String word,
     String message,
     String shortMessage,
     CategoryType category,

@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.TextCheckResponseT
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse;
 import java.util.List;
 import java.util.UUID;
@@ -45,7 +46,7 @@ public class TextCheckController {
   }
 
   @GetMapping("{id}/text-check/all")
-  public ResponseEntity<TextCheckResponse> checkWholeDocumentationUnit(
+  public ResponseEntity<TextCheckAllResponse> checkWholeDocumentationUnit(
       @PathVariable("id") UUID id) {
     List<Match> allMatches;
 
@@ -55,6 +56,6 @@ public class TextCheckController {
       return ResponseEntity.internalServerError().build();
     }
 
-    return ResponseEntity.ok(TextCheckResponseTransformer.transformToDomain(allMatches));
+    return ResponseEntity.ok(TextCheckResponseTransformer.transformToAllDomain(allMatches));
   }
 }

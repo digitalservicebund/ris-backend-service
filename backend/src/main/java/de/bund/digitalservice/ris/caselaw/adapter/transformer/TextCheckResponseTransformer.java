@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.MatchBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Suggestion;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Type;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.Optional;
 public class TextCheckResponseTransformer {
   private TextCheckResponseTransformer() {}
 
-  public static TextCheckResponse transformToDomain(
+  public static TextCheckAllResponse transformToAllDomain(
       List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
     List<Suggestion> suggestions = new ArrayList<>();
     matches.forEach(
@@ -40,7 +41,12 @@ public class TextCheckResponseTransformer {
           suggestionOptional.ifPresent(suggestion -> suggestion.matches().add(match));
         });
 
-    return TextCheckResponse.builder().suggestions(suggestions).build();
+    return TextCheckAllResponse.builder().suggestions(suggestions).build();
+  }
+
+  public static TextCheckResponse transformToDomain(
+      List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
+    return TextCheckResponse.builder().matches(matches).build();
   }
 
   public static List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match>
@@ -60,15 +66,23 @@ public class TextCheckResponseTransformer {
         replacements.add(new Replacement(replacement.getValue()));
       }
 
+      if (match.getContext() != null) {
+        int startIndex = match.getContext().getOffset();
+        int endIndex = match.getContext().getOffset() + match.getContext().getLength();
+        String word = match.getContext().getText().substring(startIndex, endIndex);
+        matchBuilder
+            .word(word)
+            .context(
+                new Context(
+                    match.getContext().getText(),
+                    match.getContext().getOffset(),
+                    match.getContext().getLength()));
+      }
+
       matchBuilder
           .replacements(replacements)
           .offset(match.getOffset())
           .length(match.getLength())
-          .context(
-              new Context(
-                  match.getContext().getText(),
-                  match.getContext().getOffset(),
-                  match.getContext().getLength()))
           .sentence(match.getSentence())
           .type(new Type(match.getType().getTypeName()));
 

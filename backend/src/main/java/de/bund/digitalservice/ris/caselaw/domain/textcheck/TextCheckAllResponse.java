@@ -4,4 +4,4 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record TextCheckResponse(List<Match> matches) {}
+public record TextCheckAllResponse(List<Suggestion> suggestions) {}

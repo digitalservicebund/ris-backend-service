@@ -71,6 +71,10 @@ export interface LanguageToolResponse {
   suggestions: Suggestion[]
 }
 
+export interface TextCheckAllResponse {
+  suggestions: Suggestion[]
+}
+
 export interface Suggestion {
   word: string
   matches: Match[]
