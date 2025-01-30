@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -34,15 +35,17 @@ public class DuplicateRelationDTO {
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
-  private DuplicateRelationStatus status;
+  private DuplicateRelationStatus relationStatus;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("documentationUnitId1")
+  @JsonBackReference // Prevent infinite recursion
   @JoinColumn(name = "documentation_unit_id1")
   private DocumentationUnitDTO documentationUnit1;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("documentationUnitId2")
+  @JsonBackReference // Prevent infinite recursion
   @JoinColumn(name = "documentation_unit_id2")
   private DocumentationUnitDTO documentationUnit2;
 
