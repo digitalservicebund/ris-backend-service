@@ -65,10 +65,11 @@ export interface Match {
   ignoreForIncompleteSentence: boolean
   contextForSureMatch: number
   content: string
+  word: string
 }
 
-export interface LanguageToolResponse {
-  suggestions: Suggestion[]
+export interface TextCheckResponse {
+  matches: Match[]
 }
 
 export interface TextCheckAllResponse {

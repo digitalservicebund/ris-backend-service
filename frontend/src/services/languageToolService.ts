@@ -1,17 +1,15 @@
 import httpClient, { ServiceResponse } from "@/services/httpClient"
-import {
-  LanguageToolResponse,
-  TextCheckAllResponse,
-} from "@/types/languagetool"
+import { TextCheckAllResponse, TextCheckResponse } from "@/types/languagetool"
 
 interface LanguageToolService {
-  check(text: string): Promise<ServiceResponse<LanguageToolResponse>>
+  check(text: string): Promise<ServiceResponse<TextCheckResponse>>
+
   checkAll(id: string): Promise<ServiceResponse<TextCheckAllResponse>>
 }
 
 const service: LanguageToolService = {
   async check(text: string) {
-    return await httpClient.post<string, LanguageToolResponse>(
+    return await httpClient.post<string, TextCheckResponse>(
       `caselaw/documentunits/text-check`,
       {
         headers: {

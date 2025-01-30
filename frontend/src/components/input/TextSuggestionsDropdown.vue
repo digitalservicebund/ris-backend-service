@@ -22,21 +22,14 @@ function ignoreSuggestion() {
 
 <template>
   <div
-    class="flex flex-col flex-wrap items-start justify-start gap-16 border-2 border-solid border-blue-800 bg-white p-24"
+    class="flex min-w-[432px] flex-col flex-wrap items-start justify-start gap-16 border-2 border-solid border-blue-800 bg-white p-24"
   >
     <div class="flex flex-row gap-8">
-      <label class="font-bold"> word should be added </label>
-      <span> | </span>
-      <button
-        class="ds-link-01-bold whitespace-nowrap leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
-        @click="ignoreSuggestion"
-      >
-        Ignorieren
-      </button>
+      <label class="font-bold"> {{ match.word }} </label>
     </div>
 
     <p>{{ match.shortMessage || match.message }}</p>
-    <div class="flex w-full flex-row flex-wrap gap-24">
+    <div class="flex w-full flex-row flex-wrap gap-16">
       <div
         v-for="(replacement, i) in match.replacements"
         :key="i + replacement.value"
@@ -48,9 +41,16 @@ function ignoreSuggestion() {
           size="small"
           width="w-max"
           @click="acceptSuggestion(replacement)"
-        >
-        </TextButton>
+        />
       </div>
+      <TextButton
+        aria-label="Vorschlag ignorieren"
+        button-type="tertiary"
+        label="Ignorieren"
+        size="small"
+        width="w-max"
+        @click="ignoreSuggestion"
+      />
     </div>
   </div>
 </template>

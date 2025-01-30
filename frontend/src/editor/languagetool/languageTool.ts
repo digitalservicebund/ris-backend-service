@@ -6,8 +6,8 @@ import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/languageToolService"
 import {
   LanguageToolHelpingWords,
-  LanguageToolResponse,
   Match,
+  TextCheckResponse,
   TextNodesWithPosition,
 } from "@/types/languagetool"
 
@@ -90,13 +90,10 @@ export default class LanguageTool {
     text: string,
     originalFrom: number,
   ) => {
-    const languageToolCheckResponse: ServiceResponse<LanguageToolResponse> =
+    const languageToolCheckResponse: ServiceResponse<TextCheckResponse> =
       await languageToolService.check(text)
 
-    const matches =
-      languageToolCheckResponse.data?.suggestions.flatMap(
-        (suggestion) => suggestion.matches,
-      ) || []
+    const matches = languageToolCheckResponse.data?.matches
 
     const decorations: Decoration[] = []
 
