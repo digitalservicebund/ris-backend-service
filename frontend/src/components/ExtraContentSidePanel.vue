@@ -15,6 +15,7 @@ import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import DocumentUnit from "@/domain/documentUnit"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
@@ -25,7 +26,6 @@ import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
 import IconSpellCheck from "~icons/material-symbols/spellcheck"
 import IconImportCategories from "~icons/material-symbols/text-select-move-back-word"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 
 const props = defineProps<{
   documentUnit?: DocumentUnit

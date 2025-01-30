@@ -145,7 +145,7 @@ export const LanguageToolExtension = Extension.create<
             )
 
             if (this.options.automaticMode && this.options.textToolEnabled) {
-              this.storage.languageToolService.proofreadAndDecorateWholeDoc(
+              void this.storage.languageToolService.proofreadAndDecorateWholeDoc(
                 state.doc,
               )
             }
@@ -172,7 +172,7 @@ export const LanguageToolExtension = Extension.create<
 
             if (tr.docChanged && this.options.automaticMode) {
               if (!this.storage.languageToolService!.proofReadInitially)
-                this.storage.languageToolService!.debouncedProofreadAndDecorate(
+                void this.storage.languageToolService!.debouncedProofreadAndDecorate(
                   tr.doc,
                 )
               else {

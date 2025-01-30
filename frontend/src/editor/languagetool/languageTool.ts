@@ -10,6 +10,7 @@ import {
   TextCheckResponse,
   TextNodesWithPosition,
 } from "@/types/languagetool"
+import StringsUtil from "@/utils/stringsUtil"
 
 /**
  * Taken from
@@ -47,6 +48,8 @@ export default class LanguageTool {
   public decorationSet: DecorationSet
 
   public lastOriginalFrom = 0
+
+  readonly batchWordsLimit = 500
 
   public textNodesWithPosition: TextNodesWithPosition[] = []
 
@@ -93,7 +96,7 @@ export default class LanguageTool {
     const languageToolCheckResponse: ServiceResponse<TextCheckResponse> =
       await languageToolService.check(text)
 
-    const matches = languageToolCheckResponse.data?.matches
+    const matches = languageToolCheckResponse.data?.matches || []
 
     const decorations: Decoration[] = []
 
@@ -214,7 +217,7 @@ export default class LanguageTool {
 
     let finalText = ""
 
-    const chunksOf500Words: { from: number; text: string }[] = []
+    const textChunks: { from: number; text: string }[] = []
 
     let upperFrom = nodePos
     let newDataSet = true
@@ -235,10 +238,10 @@ export default class LanguageTool {
 
       finalText += text
 
-      if (this.moreThan500Words(finalText)) {
-        const updatedFrom = chunksOf500Words.length ? upperFrom : upperFrom + 1
+      if (this.hasTooManyWords(finalText)) {
+        const updatedFrom = textChunks.length ? upperFrom : upperFrom + 1
 
-        chunksOf500Words.push({
+        textChunks.push({
           from: updatedFrom,
           text: finalText,
         })
@@ -248,12 +251,12 @@ export default class LanguageTool {
       }
     }
 
-    chunksOf500Words.push({
-      from: chunksOf500Words.length ? upperFrom : 1,
+    textChunks.push({
+      from: textChunks.length ? upperFrom : 1,
       text: finalText,
     })
 
-    const requests = chunksOf500Words.map(({ text, from }) =>
+    const requests = textChunks.map(({ text, from }) =>
       this.getMatchAndSetDecorations(doc, text, from),
     )
 
@@ -293,7 +296,9 @@ export default class LanguageTool {
     this.editorView.dispatch(tr)
   }
 
-  public moreThan500Words = (s: string) => s.trim().split(/\s+/).length >= 500
+  public hasTooManyWords = (text: string): boolean => {
+    return StringsUtil.countWords(text) >= this.batchWordsLimit
+  }
 
   public debouncedMouseEventsListener = debounce(
     this.mouseEventsListener.bind(this),
