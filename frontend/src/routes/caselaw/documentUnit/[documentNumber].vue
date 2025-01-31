@@ -11,6 +11,7 @@ import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import useQuery from "@/composables/useQueryFromRoute"
 import DocumentUnit from "@/domain/documentUnit"
 import { ResponseError } from "@/services/httpClient"
@@ -24,6 +25,8 @@ const props = defineProps<{
 useHead({
   title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
 })
+
+const textCheck = useFeatureToggle("neuris.text-check")
 
 const store = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
@@ -119,6 +122,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
       extraContentSidePanelStore.setSidePanelMode("category-import")
       break
     case "t":
+      if (!textCheck.value) break
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("text-check")
       break

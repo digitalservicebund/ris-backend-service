@@ -56,8 +56,6 @@ const store = useDocumentUnitStore()
 const sessionStore = useSessionStore()
 const { env } = storeToRefs(sessionStore)
 
-const textCheck = useFeatureToggle("neuris.text-check")
-
 const categoriesRoute = computed(() => ({
   name: "caselaw-documentUnit-documentNumber-categories",
   params: { documentNumber: store.documentUnit!.documentNumber },
