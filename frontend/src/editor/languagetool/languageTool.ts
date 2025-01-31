@@ -94,7 +94,7 @@ export default class LanguageTool {
     originalFrom: number,
   ) => {
     let matches: Match[] = []
-    if (!StringsUtil.isEmpty(text)) {
+    if (!StringsUtil.isEmpty(text) && this.languageToolActive) {
       const languageToolCheckResponse: ServiceResponse<TextCheckResponse> =
         await languageToolService.check(text)
 

@@ -118,6 +118,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("category-import")
       break
+    case "t":
+      extraContentSidePanelStore.togglePanel(true)
+      extraContentSidePanelStore.setSidePanelMode("text-check")
+      break
     default:
       break
   }

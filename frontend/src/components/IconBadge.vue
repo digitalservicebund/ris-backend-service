@@ -6,16 +6,8 @@ defineProps<{
   icon?: Component
   color: string
   backgroundColor: string
+  marginX?: number
 }>()
-</script>
-
-<script lang="ts">
-export interface IconBadgeProps {
-  label: string
-  icon: Component
-  backgroundColor: string
-  color: string
-}
 </script>
 
 <template>
@@ -24,6 +16,8 @@ export interface IconBadgeProps {
     :class="backgroundColor"
   >
     <component :is="icon" class="inline-block" :class="color" />
-    <span class="mx-2 align-middle"> {{ label }}</span>
+    <span class="align-middle" :class="marginX ? `mx-${marginX}` : 'mx-2'">
+      {{ label }}
+    </span>
   </div>
 </template>

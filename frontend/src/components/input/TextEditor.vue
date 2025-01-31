@@ -19,8 +19,8 @@ import { Underline } from "@tiptap/extension-underline"
 import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
-import TextSuggestionDropdown from "@/components/input/TextSuggestionsDropdown.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
+import TextCheckModal from "@/components/text-check/TextCheckModal.vue"
 import {
   BorderNumber,
   BorderNumberContent,
@@ -39,11 +39,7 @@ import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
-import {
-  LanguageToolHelpingWords,
-  Match,
-  Replacement,
-} from "@/types/languagetool"
+import { LanguageToolHelpingWords, Match } from "@/types/languagetool"
 
 import "@/styles/language-tool.scss"
 
@@ -223,9 +219,9 @@ const updateMatch = (editor: Editor) => {
 
 // const updateHtml = () => navigator.clipboard.writeText(editor.getHTML())
 
-const acceptSuggestion = (sug: Replacement) => {
+const acceptSuggestion = (suggestion: string) => {
   if (matchRange.value != undefined) {
-    editor.commands.insertContentAt(matchRange.value, sug.value)
+    editor.commands.insertContentAt(matchRange.value, suggestion)
     editor.storage.languagetool.languageToolService.resetLanguageToolMatch()
   }
 }
@@ -320,7 +316,7 @@ const resizeObserver = new ResizeObserver((entries) => {
         :should-show="shouldShow"
         :tippy-options="{ placement: 'bottom', animation: 'fade' }"
       >
-        <TextSuggestionDropdown
+        <TextCheckModal
           v-if="match"
           :match="match"
           @suggestion:ignore="ignoreSuggestion"
