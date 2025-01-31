@@ -423,6 +423,7 @@ onBeforeUnmount(() => {
           >
             <div class="flex flex-grow flex-row gap-16">
               <TextInput
+                v-if="prefix"
                 id="citation prefix"
                 v-model="prefix"
                 aria-label="Zitatstelle Präfix"
@@ -440,6 +441,7 @@ onBeforeUnmount(() => {
                 @focus="validationStore.remove('citation')"
               ></TextInput>
               <TextInput
+                v-if="suffix"
                 id="citation suffix"
                 v-model="suffix"
                 aria-label="Zitatstelle Suffix"
