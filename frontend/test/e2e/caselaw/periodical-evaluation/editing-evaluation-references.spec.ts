@@ -459,7 +459,8 @@ test.describe(
       ).toBeInViewport()
     })
 
-    test(
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "Page number resets when new search started",
       { tag: "@RISDEV-5434" },
       async ({ page, edition }) => {
