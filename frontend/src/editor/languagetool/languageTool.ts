@@ -151,14 +151,16 @@ export default class LanguageTool {
     })
 
   public addEventListenersToDecorations = () => {
-    const decorations = document.querySelectorAll("span.lt")
+    if (document) {
+      const decorations = document.querySelectorAll("span.lt")
 
-    if (!decorations.length) return
+      if (!decorations.length) return
 
-    decorations.forEach((el) => {
-      el.addEventListener("mouseover", this.debouncedMouseEventsListener)
-      el.addEventListener("mouseenter", this.debouncedMouseEventsListener)
-    })
+      decorations.forEach((el) => {
+        el.addEventListener("mouseover", this.debouncedMouseEventsListener)
+        el.addEventListener("mouseenter", this.debouncedMouseEventsListener)
+      })
+    }
   }
 
   public mouseEventsListener = (e: Event) => {

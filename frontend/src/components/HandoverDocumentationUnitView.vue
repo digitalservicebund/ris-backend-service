@@ -603,7 +603,7 @@ const isPublishable = computed<boolean>(
       />
 
       <HandoverLanguageTool
-        v-if="textCheck"
+        v-if="false"
         :document-number="store.documentUnit!.documentNumber"
       />
 
