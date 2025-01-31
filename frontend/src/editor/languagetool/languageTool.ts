@@ -98,6 +98,16 @@ export default class LanguageTool {
 
     const matches = languageToolCheckResponse.data?.matches || []
 
+    this.transformMatchesToDecorationSet(matches, doc, text, originalFrom)
+    setTimeout(this.addEventListenersToDecorations, 100)
+  }
+
+  private transformMatchesToDecorationSet(
+    matches: Match[],
+    doc: PMNode,
+    text: string,
+    originalFrom: number,
+  ) {
     const decorations: Decoration[] = []
 
     for (const match of matches) {
@@ -123,8 +133,6 @@ export default class LanguageTool {
           true,
         ),
       )
-
-    setTimeout(this.addEventListenersToDecorations, 100)
   }
 
   private gimmeDecoration = (from: number, to: number, match: Match) =>
@@ -165,16 +173,11 @@ export default class LanguageTool {
 
   onNodeChanged = (doc: PMNode, text: string, originalFrom: number) => {
     if (originalFrom !== this.lastOriginalFrom)
-      this.getMatchAndSetDecorations(doc, text, originalFrom)
-    else this.debouncedGetMatchAndSetDecorations(doc, text, originalFrom)
+      void this.debouncedGetMatchAndSetDecorations(doc, text, originalFrom)
+    else void this.debouncedGetMatchAndSetDecorations(doc, text, originalFrom)
 
     this.lastOriginalFrom = originalFrom
   }
-
-  public debouncedGetMatchAndSetDecorations = debounce(
-    this.getMatchAndSetDecorations,
-    300,
-  )
 
   public proofreadAndDecorateWholeDoc = async (doc: PMNode, nodePos = 0) => {
     this.textNodesWithPosition = []
@@ -267,7 +270,8 @@ export default class LanguageTool {
           true,
         ),
       )
-    Promise.all(requests).then(() => {
+
+    void Promise.all(requests).then(() => {
       if (this.editorView)
         this.dispatch(
           this.editorView.state.tr.setMeta(
@@ -308,5 +312,10 @@ export default class LanguageTool {
   public debouncedProofreadAndDecorate = debounce(
     this.proofreadAndDecorateWholeDoc,
     500,
+  )
+
+  public debouncedGetMatchAndSetDecorations = debounce(
+    this.getMatchAndSetDecorations,
+    300,
   )
 }
