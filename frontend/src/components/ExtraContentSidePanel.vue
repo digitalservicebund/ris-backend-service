@@ -6,7 +6,6 @@ import { useRoute } from "vue-router"
 import AttachmentView from "@/components/AttachmentView.vue"
 import CategoryImport from "@/components/category-import/CategoryImport.vue"
 import ExtraContentExtraContentSidePanelMenu from "@/components/ExtraContentSidePanelMenu.vue"
-import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
@@ -140,7 +139,7 @@ onMounted(() => {
         @panel-mode:update="setSidePanelMode"
       />
       <div class="m-24">
-        <div v-if="store.panelMode === 'note'">
+        <div v-if="panelMode === 'note'">
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
@@ -151,42 +150,40 @@ onMounted(() => {
             />
           </InputField>
         </div>
-        <div v-if="store.panelMode === 'attachments'">
+        <div v-else-if="panelMode === 'attachments'">
           <AttachmentView
             v-if="
               props.documentUnit!.uuid &&
               props.documentUnit!.attachments &&
-              props.documentUnit!.attachments[store.currentAttachmentIndex]
-                ?.s3path
+              props.documentUnit!.attachments[currentAttachmentIndex]?.s3path
             "
             :document-unit-uuid="props.documentUnit!.uuid"
             :s3-path="
-              props.documentUnit!.attachments[store.currentAttachmentIndex]
-                .s3path
+              props.documentUnit!.attachments[currentAttachmentIndex].s3path
             "
           />
           <div v-else class="ds-label-01-reg">
             Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.
           </div>
         </div>
-        <FlexContainer
-          v-if="store.panelMode === 'preview'"
+        <div
+          v-else-if="panelMode === 'preview'"
           id="preview-container"
-          class="max-h-[70vh] overflow-auto"
+          class="flex max-h-[70vh] overflow-auto"
         >
           <DocumentUnitPreview
             :document-unit="props.documentUnit!"
             layout="narrow"
           />
-        </FlexContainer>
+        </div>
 
         <CategoryImport
-          v-if="store.panelMode === 'category-import'"
+          v-else-if="panelMode === 'category-import'"
           :document-number="importDocumentNumber"
         />
 
         <DocumentationUnitTextCheck
-          v-if="textCheck && store.panelMode === 'text-check'"
+          v-else-if="panelMode === 'text-check' && textCheck"
         />
       </div>
     </SideToggle>
