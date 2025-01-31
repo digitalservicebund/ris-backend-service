@@ -93,10 +93,18 @@ export default class LanguageTool {
     text: string,
     originalFrom: number,
   ) => {
-    const languageToolCheckResponse: ServiceResponse<TextCheckResponse> =
-      await languageToolService.check(text)
+    let matches: Match[] = []
+    if (!StringsUtil.isEmpty(text)) {
+      const languageToolCheckResponse: ServiceResponse<TextCheckResponse> =
+        await languageToolService.check(text)
 
-    const matches = languageToolCheckResponse.data?.matches || []
+      if (
+        languageToolCheckResponse.data &&
+        languageToolCheckResponse.data.matches
+      ) {
+        matches = languageToolCheckResponse.data.matches
+      }
+    }
 
     this.transformMatchesToDecorationSet(matches, doc, text, originalFrom)
     setTimeout(this.addEventListenersToDecorations, 100)
