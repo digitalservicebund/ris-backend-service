@@ -21,14 +21,14 @@ public interface DatabaseDuplicateCheckRepository
         FROM incremental_migration.file_number
         WHERE upper(value) IN (:allFileNumbers)
         GROUP BY value
-        HAVING COUNT(*) <= 50
+        HAVING COUNT(*) <= 20
     ),
     filtered_deviating_file_numbers AS (
         SELECT upper(value) AS value
         FROM incremental_migration.deviating_file_number
         WHERE upper(value) IN (:allFileNumbers)
         GROUP BY value
-        HAVING COUNT(*) <= 50
+        HAVING COUNT(*) <= 20
     ),
     file_numbers AS (
         SELECT value FROM filtered_file_numbers
