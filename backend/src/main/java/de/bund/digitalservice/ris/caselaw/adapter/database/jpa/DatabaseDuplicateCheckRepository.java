@@ -110,7 +110,7 @@ public interface DatabaseDuplicateCheckRepository
 
     SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
-    WHERE upper(documentationUnit.ecli) IN (:allEclis)
+    WHERE upper(documentationUnit.ecli) IN (:allEclis) AND documentationUnit.ecli != ''
 
     UNION
 
@@ -118,7 +118,7 @@ public interface DatabaseDuplicateCheckRepository
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.deviating_ecli deviatingEcli
         ON documentationUnit.id = deviatingEcli.documentation_unit_id
-    WHERE upper(deviatingEcli.value) IN (:allEclis)
+    WHERE upper(deviatingEcli.value) IN (:allEclis) AND deviatingEcli.value != ''
 """)
   List<DocumentationUnitIdDuplicateCheckDTO> findDuplicates(
       @Param("allFileNumbers") List<String> allFileNumbers,
