@@ -17,10 +17,10 @@ public interface DatabaseDuplicateCheckRepository
       value =
           """
     WITH filtered_file_numbers AS (
-        SELECT upper(value) AS value
+        SELECT upper(trim(value)) AS value
         FROM incremental_migration.file_number
-        WHERE upper(value) IN (:allFileNumbers)
-        GROUP BY value
+        WHERE upper(trim(value)) IN (:allFileNumbers)
+        GROUP BY upper(trim(value))
         HAVING COUNT(*) <= 50
     )
 
