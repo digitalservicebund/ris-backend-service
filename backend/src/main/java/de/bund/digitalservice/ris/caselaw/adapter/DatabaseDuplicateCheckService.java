@@ -58,7 +58,7 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
 
       List<DocumentationUnitIdDuplicateCheckDTO> duplicates =
           findPotentialDuplicates(documentationUnit);
-
+      log.info("Potential duplicates (size): " + duplicates.size());
       processDuplicates(documentationUnit, duplicates);
       removeObsoleteDuplicates(documentationUnit, duplicates);
     } catch (Exception e) {

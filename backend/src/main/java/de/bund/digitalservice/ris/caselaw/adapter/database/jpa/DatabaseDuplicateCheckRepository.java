@@ -24,7 +24,7 @@ public interface DatabaseDuplicateCheckRepository
         HAVING COUNT(*) <= 50
     ),
     filtered_deviating_file_numbers AS (
-        SELECT DISTINCT upper(value) AS value
+        SELECT upper(value) AS value
         FROM incremental_migration.deviating_file_number
         WHERE upper(value) IN (:allFileNumbers)
         GROUP BY value
