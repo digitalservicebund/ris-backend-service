@@ -12,7 +12,6 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import {
   DuplicateRelationStatus,
@@ -69,7 +68,6 @@ const previewError = ref()
 const errorMessage = computed(
   () => frontendError.value ?? previewError.value ?? props.errorMessage,
 )
-const isDuplicateFeatureActive = useFeatureToggle("neuris.duplicate-check")
 
 onMounted(async () => {
   // Save doc unit in case there are any unsaved local changes before fetching xml preview
@@ -328,7 +326,7 @@ const isPublishable = computed<boolean>(
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
     !!preview.value?.success &&
-    (pendingDuplicates.value.length === 0 || !isDuplicateFeatureActive.value),
+    pendingDuplicates.value.length === 0,
 )
 </script>
 
@@ -593,7 +591,6 @@ const isPublishable = computed<boolean>(
         </div>
       </div>
       <HandoverDuplicateCheckView
-        v-if="isDuplicateFeatureActive"
         :document-number="store.documentUnit!.documentNumber"
         :pending-duplicates="pendingDuplicates"
       />
