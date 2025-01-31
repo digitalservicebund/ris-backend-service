@@ -399,13 +399,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // CriteriaBuilder and CriteriaQuery setup
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<DocumentationUnitListItemDTO> criteriaQuery =
-        criteriaBuilder.createQuery(DocumentationUnitListItemDTO.class);
+    CriteriaQuery<DocumentationUnitDTO> criteriaQuery =
+        criteriaBuilder.createQuery(DocumentationUnitDTO.class);
     Root<DocumentationUnitDTO> root = criteriaQuery.from(DocumentationUnitDTO.class);
-
-    // Join for 'court' and 'fileNumber'
-    Join<DocumentationUnitDTO, Court> courtJoin = root.join("court", JoinType.LEFT);
-    Join<DocumentationUnitDTO, String> fileNumberJoin = root.join("fileNumbers", JoinType.LEFT);
 
     // Conditions setup
     Predicate conditions = criteriaBuilder.conjunction(); // Start with an empty conjunction (AND)
@@ -416,9 +412,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     LocalDate decisionDate = relatedDocumentationUnit.getDecisionDate();
     String fileNumber = relatedDocumentationUnit.getFileNumber();
     DocumentType documentType = relatedDocumentationUnit.getDocumentType();
-
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
+    Join<DocumentationUnitDTO, Court> courtJoin = root.join("court", JoinType.LEFT);
 
     // 1. Filter by document number
     if (documentNumberToExclude != null) {
@@ -453,6 +449,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // 5. Filter by file number
     if (fileNumber != null) {
+      Join<DocumentationUnitDTO, String> fileNumberJoin = root.join("fileNumbers", JoinType.LEFT);
       Predicate fileNumberPredicate =
           criteriaBuilder.like(
               criteriaBuilder.upper(fileNumberJoin.get("value")), fileNumber.toUpperCase() + "%");
@@ -501,19 +498,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     criteriaQuery.where(conditions);
 
     // Apply pagination
-    TypedQuery<DocumentationUnitListItemDTO> query = entityManager.createQuery(criteriaQuery);
+    TypedQuery<DocumentationUnitDTO> query = entityManager.createQuery(criteriaQuery);
     query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
     query.setMaxResults(pageable.getPageSize());
 
     // Get results and create Slice
-    List<DocumentationUnitListItemDTO> resultList = query.getResultList();
+    List<DocumentationUnitDTO> resultList = query.getResultList();
 
-    // The highest possible number of results - For page 0: 30, for page 1: 60, for page 2: 90, etc.
-    int maxResultsUpToCurrentPage = (pageable.getPageNumber() + 1) * pageable.getPageSize();
-    boolean hasNext = resultList.size() >= maxResultsUpToCurrentPage;
+    // The highest possible number of results - For page 0: 30, for page 1: 60, etc.
+    boolean hasNext = resultList.size() == pageable.getPageSize();
 
-    SliceImpl<DocumentationUnitListItemDTO> allResults =
-        new SliceImpl<>(resultList, pageable, hasNext);
+    SliceImpl<DocumentationUnitDTO> allResults = new SliceImpl<>(resultList, pageable, hasNext);
     return allResults.map(DocumentationUnitListItemTransformer::transformToRelatedDocumentation);
   }
 
