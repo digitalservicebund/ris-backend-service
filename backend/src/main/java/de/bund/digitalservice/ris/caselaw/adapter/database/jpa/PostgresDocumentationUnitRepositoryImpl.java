@@ -414,7 +414,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     DocumentType documentType = relatedDocumentationUnit.getDocumentType();
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
-    Join<DocumentationUnitDTO, Court> courtJoin = root.join("court", JoinType.LEFT);
 
     // 1. Filter by document number
     if (documentNumberToExclude != null) {
@@ -427,7 +426,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (courtType != null) {
       Predicate courtTypePredicate =
           criteriaBuilder.like(
-              criteriaBuilder.upper(courtJoin.get("type")), "%" + courtType.toUpperCase() + "%");
+              criteriaBuilder.upper(root.get("court").get("type")),
+              "%" + courtType.toUpperCase() + "%");
       conditions = criteriaBuilder.and(conditions, courtTypePredicate);
     }
 
@@ -435,7 +435,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (courtLocation != null) {
       Predicate courtLocationPredicate =
           criteriaBuilder.like(
-              criteriaBuilder.upper(courtJoin.get("location")),
+              criteriaBuilder.upper(root.get("court").get("location")),
               "%" + courtLocation.toUpperCase() + "%");
       conditions = criteriaBuilder.and(conditions, courtLocationPredicate);
     }
@@ -504,8 +504,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // Get results and create Slice
     List<DocumentationUnitDTO> resultList = query.getResultList();
-
-    // The highest possible number of results - For page 0: 30, for page 1: 60, etc.
     boolean hasNext = resultList.size() == pageable.getPageSize();
 
     SliceImpl<DocumentationUnitDTO> allResults = new SliceImpl<>(resultList, pageable, hasNext);
