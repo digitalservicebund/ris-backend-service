@@ -17,7 +17,7 @@ below.
 - [docker](https://docs.docker.com/get-docker/) - our container runtime (on macOS, the easiest way
   is to
   use [Docker Desktop](https://www.docker.com/products/docker-desktop/))
-- [gopass](https://www.gopass.pw/#install) - a tool to sync secrets
+- [1Password CLI](https://developer.1password.com/docs/cli/get-started/) - to access secrets
 - [Node.js](https://nodejs.org/en/) - JavaScript runtime & dependency management
 - [nodenv](https://github.com/nodenv/nodenv#installation) - manages the node.js environment
 
@@ -70,47 +70,7 @@ This will install a couple of Git hooks which are supposed to help you to:
 - commit properly formatted source code only (and not break the build otherwise)
 - write [conventional commit messages](https://chris.beams.io/posts/git-commit/)
 
-### Setup local environment
-
-For shared secrets required for development we're using `gopass`. To set up follow these steps:
-
-- If not done yet: generate a gpg keypair
-- Then export your public key: `gpg --armor --export --output my-name.gpg email@example.com`
-- Provide some team member the public GPG key with encryption capability (that team member will add you
-  as a recipient).
-
-Then, run:
-
-```bash
-gopass init
-
-gopass clone git@github.com:digitalservicebund/neuris-password-store.git neuris --sync gitcli
-```
-
-> **Note**
->
-> If there are any issues with this command, you need to clean the store and try again until it
-> works unfortunately ☹️. Be aware that this command removes ALL gopass stores from your machine, not only project
-> related ones:
->
-> ```
-> rm -rf ~/.local/share/gopass/stores
-> ```
-
-Try if you can get access:
-
-```bash
-gopass list neuris
-```
-
-Synchronize the password store:
-
-```bash
-gopass sync
-```
-
-Now you can generate a new `.env` file containing the secrets. When using a Yubikey you may asked multiple times for
-your pin:
+Now you can generate a new `.env` file containing the secrets. You will be asked to authorize requests to 1Password.
 
 ```bash
 ./run.sh env
