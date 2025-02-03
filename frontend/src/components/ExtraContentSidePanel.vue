@@ -130,9 +130,9 @@ onMounted(() => {
       @update:is-expanded="togglePanel"
     >
       <ExtraContentExtraContentSidePanelMenu
-        v-if="!hidePanelModeBar"
         :current-attachment-index="currentAttachmentIndex"
         :document-unit="props.documentUnit"
+        :hide-panel-mode-bar="props.hidePanelModeBar"
         :panel-mode="panelMode"
         :show-edit-button="props.showEditButton"
         @attachment-index:update="handleOnSelectAttachment"

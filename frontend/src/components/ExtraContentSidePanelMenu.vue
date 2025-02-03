@@ -17,6 +17,7 @@ const props = defineProps<{
   panelMode?: SelectablePanelContent
   documentUnit?: DocumentUnit
   showEditButton?: boolean
+  hidePanelModeBar?: boolean
   currentAttachmentIndex: number
 }>()
 
@@ -38,7 +39,7 @@ function emitAttachmentIndex(value: number) {
 
 <template>
   <div class="m-24 flex flex-row justify-between">
-    <div class="flex flex-row -space-x-2">
+    <div v-if="!hidePanelModeBar" class="flex flex-row -space-x-2">
       <Tooltip shortcut="n" text="Notiz">
         <TextButton
           id="note"
