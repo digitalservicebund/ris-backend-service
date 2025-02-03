@@ -11,6 +11,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +36,7 @@ public class TextCheckController {
       value = "/text-check",
       consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  // TODO: PreAutorize : blocked by a test
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<TextCheckResponse> check(
       @AuthenticationPrincipal OidcUser oidcUser, @RequestBody String text) {
     try {
@@ -46,6 +47,7 @@ public class TextCheckController {
   }
 
   @GetMapping("{id}/text-check/all")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<TextCheckAllResponse> checkWholeDocumentationUnit(
       @PathVariable("id") UUID id) {
     List<Match> allMatches;

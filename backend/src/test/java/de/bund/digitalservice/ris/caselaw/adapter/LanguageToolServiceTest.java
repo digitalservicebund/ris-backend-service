@@ -10,15 +10,12 @@ import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({LanguageToolService.class, LanguageToolConfig.class})
+@Import({LanguageToolConfig.class})
 class LanguageToolServiceTest {
-
-  @Autowired LanguageToolService service;
 
   @Test
   void testGetNoIndex_shouldReturnNoIndexTextRangesPositions() {
