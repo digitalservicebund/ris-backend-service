@@ -688,3 +688,34 @@ export async function searchForDocUnitWithFileNumberAndDecisionDate(
 
   await page.getByText("Suchen").click()
 }
+
+/**
+ * Navigate through the top extra content side panel bar
+ * Will throw an error if tried x times
+ * @param page
+ * @param locator
+ * @param type
+ * @param attemptCount
+ */
+export async function extraContentMenuKeyboardNavigator(
+  page: Page,
+  locator: Locator,
+  type: "Tab" | "Shift+Tab",
+  attemptCount = 7,
+) {
+  let previousDocumentButtonIsFocused = false
+  while (!previousDocumentButtonIsFocused) {
+    await page.keyboard.press(type)
+
+    try {
+      await expect(locator).toBeFocused({ timeout: 500 })
+      attemptCount++
+      previousDocumentButtonIsFocused = true
+    } catch {
+      attemptCount++
+      if (attemptCount > attemptCount) {
+        throw new Error(`Exceeded maximum allowed attempts (${attemptCount})`)
+      }
+    }
+  }
+}
