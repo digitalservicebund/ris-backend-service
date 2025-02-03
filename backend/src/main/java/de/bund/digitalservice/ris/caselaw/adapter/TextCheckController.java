@@ -40,7 +40,9 @@ public class TextCheckController {
   public ResponseEntity<TextCheckResponse> check(
       @AuthenticationPrincipal OidcUser oidcUser, @RequestBody String text) {
     try {
-      return ResponseEntity.ok(textCheckService.checkAsResponse(text));
+      return ResponseEntity.ok(
+          TextCheckResponseTransformer.transformToDomain(textCheckService.checkAsResponse(text)));
+
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

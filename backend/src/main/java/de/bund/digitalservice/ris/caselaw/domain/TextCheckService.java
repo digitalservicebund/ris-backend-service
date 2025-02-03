@@ -1,10 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.TextCheckResponseTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -30,9 +28,8 @@ public class TextCheckService {
     return requestTool(text);
   }
 
-  public TextCheckResponse checkAsResponse(String text) {
-    List<Match> matches = check(text);
-    return TextCheckResponseTransformer.transformToDomain(matches);
+  public List<Match> checkAsResponse(String text) {
+    return check(text);
   }
 
   protected List<Match> requestTool(String text) {
