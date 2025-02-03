@@ -132,9 +132,9 @@ onMounted(() => {
       <ExtraContentExtraContentSidePanelMenu
         v-if="!hidePanelModeBar"
         :current-attachment-index="currentAttachmentIndex"
-        :document-unit="documentUnit"
+        :document-unit="props.documentUnit"
         :panel-mode="panelMode"
-        :show-edit-button="documentUnit?.isEditable"
+        :show-edit-button="props.showEditButton"
         @attachment-index:update="handleOnSelectAttachment"
         @panel-mode:update="setSidePanelMode"
       />
