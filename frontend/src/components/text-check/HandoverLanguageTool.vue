@@ -26,12 +26,14 @@ const categoriesRoute = computed(() => ({
           <div>
             Es wurden Rechtschreibfehler identifiziert:
             <div>
-              <div class="grid grid-cols-[auto_1fr] gap-x-16 px-0">
-                <dt class="ds-label-02-bold self-center">Anzahl</dt>
-                <dd class="ds-body-02-reg">{{ matches.length }}</dd>
-                <dt class="ds-label-02-bold self-center">Rubrik</dt>
-                <dd class="ds-body-02-reg">Schlagwörter, Leitsatz, Gründe</dd>
-              </div>
+              <dl class="my-16">
+                <div class="grid grid-cols-[auto_1fr] gap-x-16 px-0">
+                  <dt class="ds-label-02-bold self-center">Anzahl</dt>
+                  <dd class="ds-body-02-reg">{{ matches.length }}</dd>
+                  <dt class="ds-label-02-bold self-center">Rubrik</dt>
+                  <dd class="ds-body-02-reg">Schlagwörter, Leitsatz, Gründe</dd>
+                </div>
+              </dl>
             </div>
           </div>
         </div>
