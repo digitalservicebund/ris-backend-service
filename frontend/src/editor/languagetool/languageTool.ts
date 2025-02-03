@@ -185,7 +185,7 @@ export default class LanguageTool {
 
   onNodeChanged = (doc: PMNode, text: string, originalFrom: number) => {
     if (originalFrom !== this.lastOriginalFrom)
-      void this.debouncedGetMatchAndSetDecorations(doc, text, originalFrom)
+      void this.getMatchAndSetDecorations(doc, text, originalFrom)
     else void this.debouncedGetMatchAndSetDecorations(doc, text, originalFrom)
 
     this.lastOriginalFrom = originalFrom
