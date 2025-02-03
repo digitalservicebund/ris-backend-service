@@ -3,7 +3,6 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
-import { beforeEach, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import NewEdition from "@/components/periodical-evaluation/PeriodicalEdition.vue"
 import LegalPeriodical from "@/domain/legalPeriodical"
@@ -71,7 +70,6 @@ async function renderComponent() {
 }
 
 describe("Legal periodical edition list", () => {
-  beforeEach(() => vi.restoreAllMocks())
   beforeAll(() => server.listen())
   afterAll(() => server.close())
   vi.spyOn(service, "get").mockImplementation(() =>

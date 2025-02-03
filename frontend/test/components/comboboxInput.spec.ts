@@ -1,9 +1,9 @@
 import { userEvent } from "@testing-library/user-event"
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { render, screen, fireEvent } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { ComboboxAttributes, ComboboxItem } from "@/components/input/types"
+import { ComboboxItem, ComboboxAttributes } from "@/components/input/types"
 import { Court } from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"
 
@@ -64,11 +64,7 @@ const debounceTimeout = 200
 describe("Combobox Element", () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
-  beforeEach(() =>
-    vi.useFakeTimers({
-      toFake: ["setTimeout", "clearTimeout", "Date"],
-    }),
-  )
+  beforeEach(() => vi.useFakeTimers())
   afterEach(() => {
     server.resetHandlers()
     vi.runOnlyPendingTimers()
