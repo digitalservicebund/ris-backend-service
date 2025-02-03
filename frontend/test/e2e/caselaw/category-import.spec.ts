@@ -1,8 +1,10 @@
 import { expect, Page } from "@playwright/test"
 import {
   fillActiveCitationInputs,
+  fillInput,
   fillNormInputs,
   navigateToCategories,
+  waitForInputValue,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 import SingleNorm from "@/domain/singleNorm"
@@ -48,12 +50,202 @@ test.describe("category import", () => {
         "@RISDEV-5887",
         "@RISDEV-5888",
         "@RISDEV-5721",
+        "@RISDEV-6067",
       ],
     },
     async ({ page, documentNumber }) => {
       await navigateToCategoryImport(page, documentNumber)
       await searchForDocumentUnitToImport(page, documentNumber)
-      await expect(page.getByText("Quellrubrik leer")).toHaveCount(17) // we have 17 importable categories
+      await expect(page.getByText("Quellrubrik leer")).toHaveCount(19) // we have 19 importable categories
+    },
+  )
+
+  // Fundstellen
+  test(
+    "import caselaw references",
+    { tag: ["@RISDEV-6067"] },
+    async ({ page, documentNumber, prefilledDocumentUnitWithReferences }) => {
+      await navigateToCategoryImport(page, documentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithReferences.documentNumber,
+        )
+
+        const caselawReferenceCitation = "MMG 2024, 1-2, Heft 1 (L)"
+
+        await expect(page.getByText(caselawReferenceCitation)).toBeHidden()
+
+        await expect(
+          page.getByLabel("Fundstellen übernehmen", { exact: true }),
+        ).toBeVisible()
+        await page.getByLabel("Fundstellen übernehmen", { exact: true }).click()
+        await expect(page.getByText(caselawReferenceCitation)).toBeVisible()
+
+        // Added Fundstelle + 1 new empty entry
+        await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("open Fundstellen tab", async () => {
+        await expect(
+          page.getByRole("heading", { name: "Fundstellen", exact: true }),
+        ).toBeInViewport()
+      })
+
+      await test.step("add new reference to source document", async () => {
+        await page.goto(
+          `/caselaw/documentunit/${prefilledDocumentUnitWithReferences.documentNumber}/references`,
+        )
+
+        await page
+          .getByTestId("caselaw-reference-list")
+          .getByLabel("Weitere Angabe")
+          .click()
+        await fillInput(page, "Periodikum", "MM")
+        await expect(
+          page.getByText("Magazin des Berliner Mieterverein e.V.", {
+            exact: true,
+          }),
+        ).toBeVisible()
+        await page.getByText("MM | Mieter Magazin", { exact: true }).click()
+        await waitForInputValue(page, "[aria-label='Periodikum']", "MM")
+
+        await fillInput(page, "Zitatstelle", "2024, 50-53, Heft 1")
+        await fillInput(page, "Klammernzusatz", "LT")
+
+        await page.locator("[aria-label='Fundstelle speichern']").click()
+        await expect(
+          page.getByText("MM 2024, 50-53, Heft 1 (LT)"),
+        ).toBeVisible()
+      })
+
+      await test.step("import into prefilled category does not override existing references", async () => {
+        await navigateToCategoryImport(page, documentNumber)
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithReferences.documentNumber,
+        )
+
+        const listEntryLocator = page
+          .getByTestId("caselaw-reference-list")
+          .getByLabel("Listen Eintrag")
+        await page.getByLabel("Fundstellen übernehmen", { exact: true }).click()
+        await expect(listEntryLocator).toHaveCount(2)
+        await expect(listEntryLocator.nth(0)).toHaveText(
+          "MMG 2024, 1-2, Heft 1 (L)sekundär",
+        )
+        await expect(listEntryLocator.nth(1)).toHaveText(
+          "MM 2024, 50-53, Heft 1 (LT)sekundär",
+        )
+      })
+    },
+  )
+
+  // Literatur Fundstellen
+  test(
+    "import literature references",
+    { tag: ["@RISDEV-6067"] },
+    async ({ page, documentNumber, prefilledDocumentUnitWithReferences }) => {
+      await navigateToCategoryImport(page, documentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithReferences.documentNumber,
+        )
+
+        const literatureReferenceCitation =
+          "MMG 2024, 3-4, Heft 1, Krümelmonster (Ean)"
+
+        await expect(page.getByText(literatureReferenceCitation)).toBeHidden()
+
+        await expect(
+          page.getByLabel("Literaturfundstellen übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Literaturfundstellen übernehmen").click()
+        await expect(page.getByText(literatureReferenceCitation)).toBeVisible()
+
+        // Added Fundstelle + 1 new empty entry
+        await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("open Fundstellen tab", async () => {
+        await expect(
+          page.getByRole("heading", { name: "Fundstellen", exact: true }),
+        ).toBeInViewport()
+      })
+
+      await test.step("add new literature reference to source document", async () => {
+        await page.goto(
+          `/caselaw/documentunit/${prefilledDocumentUnitWithReferences.documentNumber}/references`,
+        )
+
+        await page
+          .getByTestId("literature-reference-list")
+          .getByLabel("Weitere Angabe")
+          .click()
+        await fillInput(page, "Periodikum Literaturfundstelle", "MM")
+        await expect(
+          page.getByText("Magazin des Berliner Mieterverein e.V.", {
+            exact: true,
+          }),
+        ).toBeVisible()
+        await page.getByText("MM | Mieter Magazin", { exact: true }).click()
+        await waitForInputValue(
+          page,
+          "[aria-label='Periodikum Literaturfundstelle']",
+          "MM",
+        )
+
+        await fillInput(
+          page,
+          "Zitatstelle Literaturfundstelle",
+          "2024, 50-53, Heft 1",
+        )
+        await fillInput(page, "Autor Literaturfundstelle", "Einstein, Albert")
+        await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
+        await page.getByText("Ean", { exact: true }).click()
+        await waitForInputValue(
+          page,
+          "[aria-label='Dokumenttyp Literaturfundstelle']",
+          "Anmerkung",
+        )
+        await page
+          .locator("[aria-label='Literaturfundstelle speichern']")
+          .click()
+        await expect(
+          page.getByText("MM 2024, 50-53, Heft 1, Einstein, Albert (Ean)"),
+        ).toBeVisible()
+      })
+
+      await test.step("import into prefilled category does not override existing references", async () => {
+        await navigateToCategoryImport(page, documentNumber)
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithReferences.documentNumber,
+        )
+
+        const listEntryLocator = page
+          .getByTestId("literature-reference-list")
+          .getByLabel("Listen Eintrag")
+        await page.getByLabel("Literaturfundstellen übernehmen").click()
+        await expect(listEntryLocator).toHaveCount(2)
+        await expect(listEntryLocator.nth(0)).toHaveText(
+          "MMG 2024, 3-4, Heft 1, Krümelmonster (Ean)sekundär",
+        )
+        await expect(listEntryLocator.nth(1)).toHaveText(
+          "MM 2024, 50-53, Heft 1, Einstein, Albert (Ean)sekundär",
+        )
+      })
     },
   )
 
