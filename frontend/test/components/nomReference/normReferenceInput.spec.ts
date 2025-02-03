@@ -40,13 +40,15 @@ function renderComponent(options?: { modelValue?: NormReference }) {
 }
 
 describe("NormReferenceEntry", () => {
-  beforeEach(() => vi.restoreAllMocks())
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: "Ok" }),
+    )
+  })
   beforeAll(() => server.listen())
   afterAll(() => server.close())
 
-  vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: "Ok" }),
-  )
   it("render empty norm input group on initial load", async () => {
     renderComponent()
     expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
@@ -211,6 +213,9 @@ describe("NormReferenceEntry", () => {
   })
 
   it("validates invalid norm input on mount", async () => {
+    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: "Validation error" }),
+    )
     renderComponent({
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
@@ -229,6 +234,10 @@ describe("NormReferenceEntry", () => {
   })
 
   it("does not add norm with invalid single norm input", async () => {
+    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: "Validation error" }),
+    )
+
     renderComponent({
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
@@ -314,6 +323,9 @@ describe("NormReferenceEntry", () => {
   })
 
   it("new input removes error message", async () => {
+    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: "Validation error" }),
+    )
     const { user } = renderComponent({
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },

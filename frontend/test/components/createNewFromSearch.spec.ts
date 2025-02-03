@@ -50,7 +50,9 @@ describe("Create new documentation unit from search", () => {
   afterAll(() => server.close())
   beforeEach(() => {
     vi.restoreAllMocks()
-    vi.useFakeTimers()
+    vi.useFakeTimers({
+      toFake: ["setTimeout", "clearTimeout", "Date"],
+    })
   })
   afterEach(() => vi.useRealTimers())
 
