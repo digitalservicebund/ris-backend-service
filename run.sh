@@ -61,10 +61,6 @@ _start() {
 }
 
 _env() {
-  if ! command -v gopass > /dev/null 2>&1; then
-    fail "Setup requires gopass, please install first"
-    exit 1
-  fi
 
   if ! command -v op read op://Employee/AWS_ACCESS_KEY_ID/password > /dev/null 2>&1; then
     fail "Setup requires AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and AWS_BUCKET_NAME to be stored in 1Password. Please see Lookup Tables Initialization section in README.md "
@@ -72,24 +68,24 @@ _env() {
   fi
 
   cat > ./.env<< EOF
-GH_PACKAGES_REPOSITORY_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/username)
-GH_PACKAGES_REPOSITORY_TOKEN=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/token)
-OAUTH2_CLIENT_ISSUER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-dev-oauth2-client/issuer-uri)
-OAUTH2_CLIENT_ID=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-dev-oauth2-client/client-id)
-OAUTH2_CLIENT_SECRET=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-dev-oauth2-client/client-secret)
-E2E_TEST_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user/username)
-E2E_TEST_PASSWORD=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user/password)
-E2E_TEST_USER_BGH=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user-bgh/username)
-E2E_TEST_PASSWORD_BGH=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user-bgh/password)
-E2E_TEST_USER_EXTERNAL=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user-external/username)
-E2E_TEST_PASSWORD_EXTERNAL=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user-external/password)
+GH_PACKAGES_REPOSITORY_USER=$(op read "op://Team NeuRIS/Github Package Repository/username")
+GH_PACKAGES_REPOSITORY_TOKEN=$(op read "op://Team NeuRIS/Github Package Repository/credential")
+OAUTH2_CLIENT_ISSUER=$( op read "op://Team NeuRIS/neuris-local oauth client/issuer_url")
+OAUTH2_CLIENT_ID=$( op read "op://Team NeuRIS/neuris-local oauth client/username")
+OAUTH2_CLIENT_SECRET=$( op read "op://Team NeuRIS/neuris-local oauth client/credential")
+E2E_TEST_USER=$( op read "op://Team NeuRIS/staging e2e test user DS/username")
+E2E_TEST_PASSWORD=$( op read "op://Team NeuRIS/staging e2e test user DS/password")
+E2E_TEST_USER_BGH=$( op read "op://Team NeuRIS/e2e_test BGH neuris/username")
+E2E_TEST_PASSWORD_BGH=$( op read "op://Team NeuRIS/e2e_test BGH neuris/password-new")
+E2E_TEST_USER_EXTERNAL=$( op read "op://Team NeuRIS/Neuris Staging e2e Extern/username")
+E2E_TEST_PASSWORD_EXTERNAL=$( op read "op://Team NeuRIS/Neuris Staging e2e Extern/password-new")
 MY_UID=$(id -u)
 MY_GID=$(id -g)
 DB_URL=jdbc:postgresql://localhost:5432/postgres
 DB_USER=test
 DB_PASSWORD=test
-AWS_ACCESS_KEY_ID=$(op read op://Employee/AWS_ACCESS_KEY_ID/password)
-AWS_SECRET_ACCESS_KEY=$(op read op://Employee/AWS_SECRET_ACCESS_KEY/password)
+AWS_ACCESS_KEY_ID=$(op read "op://Employee/OTC/access_key_id")
+AWS_SECRET_ACCESS_KEY=$(op read "op://Employee/OTC/secret_access_key")
 AWS_BUCKET_NAME=neuris-migration-juris-data
 
 EOF
