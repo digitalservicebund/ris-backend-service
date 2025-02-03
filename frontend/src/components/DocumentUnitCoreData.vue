@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, toRefs, watch, ref, onMounted, onBeforeUnmount } from "vue"
+import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
@@ -12,7 +13,7 @@ import NestedComponent from "@/components/NestedComponents.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
-import { CoreData } from "@/domain/documentUnit"
+import { CoreData, SourceValue } from "@/domain/documentUnit"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 interface Props {
@@ -26,7 +27,12 @@ const emit = defineEmits<{
 const { modelValue } = toRefs(props)
 const validationStore =
   useValidationStore<
-    ["decisionDate", "yearsOfDispute", "deviatingDecisionDates"][number]
+    [
+      "decisionDate",
+      "yearsOfDispute",
+      "deviatingDecisionDates",
+      "source",
+    ][number]
   >()
 
 const parentWidth = ref(0)
@@ -50,12 +56,72 @@ const descendingPreviousProcedures = computed(() =>
     : undefined,
 )
 
+const sourceItems: DropdownItem[] = [
+  {
+    label: "unaufgefordert eingesandtes Original (O)",
+    value: SourceValue.UnaufgefordertesOriginal,
+  },
+  {
+    label: "angefordertes Original (A)",
+    value: SourceValue.AngefordertesOriginal,
+  },
+  {
+    label: "Zeitschriftenveröffentlichung (Z)",
+    value: SourceValue.Zeitschrift,
+  },
+  { label: "ohne Vorlage des Originals E-Mail (E)", value: SourceValue.Email },
+  {
+    label:
+      "Ländergerichte, EuG- und EuGH-Entscheidungen über jDV-Verfahren (L)",
+    value: SourceValue.LaenderEuGH,
+  },
+  { label: "Sonstige (S)", value: SourceValue.Sonstige },
+]
+
+const source = computed({
+  get: () =>
+    props.modelValue.source?.value
+      ? props.modelValue.source?.value
+      : (props.modelValue.source?.sourceRawValue ?? undefined),
+  set: (newValue) => {
+    if (Object.values(SourceValue).includes(newValue as SourceValue)) {
+      modelValue.value.source = {
+        ...modelValue.value.source,
+        value: newValue as SourceValue,
+      }
+    }
+  },
+})
+
 watch(
   modelValue,
   () => {
     emit("update:modelValue", modelValue.value)
   },
   { deep: true },
+)
+
+/**
+ * This updates the local norm with the updated model value from the props. It also stores a copy of the last saved
+ * model value, because the local norm might change in between. When the new model value is empty, all validation
+ * errors are resetted. If it has an amiguous norm reference, the validation store is updated. When the list of
+ * single norms is empty, a new empty single norm entry is added.
+ */
+watch(
+  () => props.modelValue,
+  () => {
+    if (
+      !!props.modelValue.source &&
+      !props.modelValue.source.value &&
+      !!props.modelValue.source.sourceRawValue
+    ) {
+      validationStore.add(
+        `"${props.modelValue.source.sourceRawValue}" ist keine gültige Quellenangabe`,
+        "source",
+      )
+    }
+  },
+  { immediate: true, deep: true },
 )
 
 onMounted(() => {
@@ -269,6 +335,35 @@ onBeforeUnmount(() => {
       </InputField>
 
       <InputField id="region" class="flex-col" label="Region">
+        <TextInput
+          id="region"
+          v-model="modelValue.region"
+          aria-label="Region"
+          class="ds-input-medium"
+          read-only
+          size="medium"
+        ></TextInput>
+      </InputField>
+    </div>
+    <div :class="layoutClass">
+      <InputField
+        id="source"
+        v-slot="slotProps"
+        label="Quelle"
+        :validation-error="validationStore.getByField('source')"
+      >
+        <DropdownInput
+          :id="slotProps.id"
+          v-model="source"
+          aria-label="Quelle"
+          :has-error="slotProps.hasError"
+          :items="sourceItems"
+          placeholder="Bitte auswählen"
+        />
+      </InputField>
+
+      <!-- Todo Eingangsart -->
+      <InputField id="region" class="flex-col" label="Eingangsart">
         <TextInput
           id="region"
           v-model="modelValue.region"

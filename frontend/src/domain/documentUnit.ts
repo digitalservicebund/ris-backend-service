@@ -33,6 +33,21 @@ export type CoreData = {
   region?: string
   yearsOfDispute?: string[]
   leadingDecisionNormReferences?: string[]
+  source?: Source
+}
+
+export enum SourceValue {
+  UnaufgefordertesOriginal = "O",
+  AngefordertesOriginal = "A",
+  Zeitschrift = "Z",
+  Email = "E",
+  LaenderEuGH = "L",
+  Sonstige = "S",
+}
+
+export type Source = {
+  value?: SourceValue
+  sourceRawValue?: string
 }
 
 export type ContentRelatedIndexing = {

@@ -20,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -36,6 +37,8 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import de.bund.digitalservice.ris.caselaw.domain.Source;
+import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
@@ -658,7 +661,31 @@ public class DocumentationUnitTransformer {
             .ecli(documentationUnitDTO.getEcli())
             .decisionDate(documentationUnitDTO.getDecisionDate())
             .appraisalBody(documentationUnitDTO.getJudicialBody())
-            .legalEffect(legalEffect == null ? null : legalEffect.getLabel());
+            .legalEffect(legalEffect == null ? null : legalEffect.getLabel())
+            .source(
+                documentationUnitDTO.getSource().stream()
+                    .max(Comparator.comparing(SourceDTO::getRank)) // Find the highest-ranked item
+                    .map(
+                        sourceDTO -> {
+                          SourceValue sourceValue = null;
+                          if (sourceDTO.getValue() != null) {
+                            try {
+                              // Attempt to convert the value to SourceValue
+                              sourceValue = SourceValue.valueOf(sourceDTO.getValue());
+                            } catch (IllegalArgumentException | NullPointerException e) {
+                              System.err.println("Invalid SourceValue: " + sourceDTO.getValue());
+                              // This should not be necessary after updating migration code &
+                              // backfilling
+                              sourceDTO.setSourceRawValue(sourceDTO.getValue());
+                            }
+                          }
+                          return Source.builder()
+                              .value(sourceValue) // Set the (valid) SourceValue, or null if invalid
+                              .sourceRawValue(
+                                  sourceDTO.getSourceRawValue()) // Ensure raw value is set
+                              .build();
+                        })
+                    .orElse(null));
 
     addInputTypesToDomain(documentationUnitDTO, coreDataBuilder);
     addFileNumbersToDomain(documentationUnitDTO, coreDataBuilder);
