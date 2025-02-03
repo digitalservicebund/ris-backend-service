@@ -22,7 +22,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "11.3.0"
-    id("io.sentry.jvm.gradle") version "4.14.1"
+    id("io.sentry.jvm.gradle") version "5.1.0"
 }
 
 group = "de.bund.digitalservice"
