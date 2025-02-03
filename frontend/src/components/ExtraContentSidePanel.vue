@@ -3,26 +3,19 @@ import { storeToRefs } from "pinia"
 import type { Component } from "vue"
 import { computed, onMounted } from "vue"
 import { useRoute } from "vue-router"
-import Tooltip from "./Tooltip.vue"
 import AttachmentView from "@/components/AttachmentView.vue"
 import CategoryImport from "@/components/category-import/CategoryImport.vue"
-import FileNavigator from "@/components/FileNavigator.vue"
-import FlexContainer from "@/components/FlexContainer.vue"
+import ExtraContentExtraContentSidePanelMenu from "@/components/ExtraContentSidePanelMenu.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
+import DocumentationUnitTextCheck from "@/components/text-check/DocumentationUnitTextCheck.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import DocumentUnit from "@/domain/documentUnit"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
-import IconAttachFile from "~icons/ic/baseline-attach-file"
-import IconEdit from "~icons/ic/outline-edit"
-import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
-import IconPreview from "~icons/ic/outline-remove-red-eye"
-import IconStickyNote from "~icons/ic/outline-sticky-note-2"
-import IconImportCategories from "~icons/material-symbols/text-select-move-back-word"
 
 const props = defineProps<{
   documentUnit?: DocumentUnit
@@ -35,7 +28,12 @@ const props = defineProps<{
 
 const store = useExtraContentSidePanelStore()
 
+const { panelMode, currentAttachmentIndex, importDocumentNumber } =
+  storeToRefs(store)
+
 const route = useRoute()
+
+const textCheck = useFeatureToggle("neuris.text-check")
 
 const hasNote = computed(() => {
   return !!props.documentUnit!.note && props.documentUnit!.note.length > 0
@@ -49,8 +47,6 @@ const hasAttachments = computed(() => {
 })
 
 const shortCut = computed(() => props.sidePanelShortcut ?? "<")
-
-const { importDocumentNumber } = storeToRefs(store)
 
 /**
  * Updates the local attachment index reference, which is used to display the selected attachment in the panel,
@@ -72,24 +68,10 @@ function selectAttachments(selectedIndex?: number) {
 }
 
 /**
- * Sets the panel content to "note", so that the notes text input field is displayed in the panel.
+ * Sets the panel content to selected mode
  */
-function selectNotes() {
-  store.setSidePanelMode("note")
-}
-
-/**
- * Sets the panel content to "preview", so that the document preview is displayed in the panel.
- */
-function selectPreview() {
-  store.setSidePanelMode("preview")
-}
-
-/**
- * Sets the panel content to "category-import", so that the category importer is displayed in the panel.
- */
-function selectImporter() {
-  store.setSidePanelMode("category-import")
+function setSidePanelMode(panelMode: SelectablePanelContent) {
+  store.setSidePanelMode(panelMode)
 }
 
 /**
@@ -108,7 +90,7 @@ function setDefaultState() {
   } else if (!props.documentUnit!.note && props.documentUnit!.hasAttachments) {
     selectAttachments()
   } else {
-    selectNotes()
+    setSidePanelMode("note")
   }
 }
 
@@ -147,111 +129,17 @@ onMounted(() => {
       tabindex="0"
       @update:is-expanded="togglePanel"
     >
-      <div class="m-24 flex flex-row justify-between">
-        <div v-if="!hidePanelModeBar" class="flex flex-row -space-x-2">
-          <Tooltip shortcut="n" text="Notiz">
-            <TextButton
-              id="note"
-              aria-label="Notiz anzeigen"
-              button-type="tertiary"
-              class="flex"
-              :class="store.panelMode === 'note' ? 'bg-blue-200' : ''"
-              data-testid="note-button"
-              :icon="IconStickyNote"
-              size="small"
-              @click="() => selectNotes()"
-            />
-          </Tooltip>
-          <Tooltip shortcut="d" text="Datei">
-            <TextButton
-              id="attachments"
-              aria-label="Dokumente anzeigen"
-              button-type="tertiary"
-              :class="store.panelMode === 'attachments' ? 'bg-blue-200' : ''"
-              data-testid="attachments-button"
-              :icon="IconAttachFile"
-              size="small"
-              @click="() => selectAttachments()"
-            />
-          </Tooltip>
-
-          <Tooltip shortcut="v" text="Vorschau">
-            <TextButton
-              id="preview"
-              aria-label="Vorschau anzeigen"
-              button-type="tertiary"
-              :class="store.panelMode === 'preview' ? 'bg-blue-200' : ''"
-              data-testid="preview-button"
-              :icon="IconPreview"
-              size="small"
-              @click="() => selectPreview()"
-            />
-          </Tooltip>
-
-          <Tooltip v-if="!hidePanelModeBar" shortcut="r" text="Rubriken-Import">
-            <TextButton
-              id="category-import"
-              aria-label="Rubriken-Import anzeigen"
-              button-type="tertiary"
-              :class="
-                store.panelMode === 'category-import' ? 'bg-blue-200' : ''
-              "
-              data-testid="category-import-button"
-              :icon="IconImportCategories"
-              size="small"
-              @click="() => selectImporter()"
-            />
-          </Tooltip>
-        </div>
-
-        <FileNavigator
-          v-if="store.panelMode === 'attachments'"
-          :attachments="props.documentUnit!.attachments"
-          :current-index="store.currentAttachmentIndex"
-          @select="handleOnSelectAttachment"
-        ></FileNavigator>
-        <div v-if="store.panelMode === 'preview'" class="ml-auto flex flex-row">
-          <Tooltip
-            v-if="props.documentUnit!.isEditable && showEditButton"
-            shortcut="b"
-            text="Bearbeiten"
-          >
-            <router-link
-              aria-label="Dokumentationseinheit in einem neuen Tab bearbeiten"
-              target="_blank"
-              :to="{
-                name: 'caselaw-documentUnit-documentNumber-categories',
-                params: {
-                  documentNumber: props.documentUnit!.documentNumber,
-                },
-              }"
-            >
-              <TextButton button-type="ghost" :icon="IconEdit" size="small" />
-            </router-link>
-          </Tooltip>
-          <Tooltip text="In neuem Tab öffnen">
-            <router-link
-              aria-label="Vorschau in neuem Tab öffnen"
-              target="_blank"
-              :to="{
-                name: 'caselaw-documentUnit-documentNumber-preview',
-                params: {
-                  documentNumber: props.documentUnit!.documentNumber,
-                },
-              }"
-            >
-              <TextButton
-                button-type="ghost"
-                :icon="IconOpenInNewTab"
-                size="small"
-              />
-            </router-link>
-          </Tooltip>
-        </div>
-      </div>
-
+      <ExtraContentExtraContentSidePanelMenu
+        v-if="!hidePanelModeBar"
+        :current-attachment-index="currentAttachmentIndex"
+        :document-unit="documentUnit"
+        :panel-mode="panelMode"
+        :show-edit-button="documentUnit?.isEditable"
+        @attachment-index:update="handleOnSelectAttachment"
+        @panel-mode:update="setSidePanelMode"
+      />
       <div class="m-24">
-        <div v-if="store.panelMode === 'note'">
+        <div v-if="panelMode === 'note'">
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
@@ -262,38 +150,40 @@ onMounted(() => {
             />
           </InputField>
         </div>
-        <div v-if="store.panelMode === 'attachments'">
+        <div v-else-if="panelMode === 'attachments'">
           <AttachmentView
             v-if="
               props.documentUnit!.uuid &&
               props.documentUnit!.attachments &&
-              props.documentUnit!.attachments[store.currentAttachmentIndex]
-                ?.s3path
+              props.documentUnit!.attachments[currentAttachmentIndex]?.s3path
             "
             :document-unit-uuid="props.documentUnit!.uuid"
             :s3-path="
-              props.documentUnit!.attachments[store.currentAttachmentIndex]
-                .s3path
+              props.documentUnit!.attachments[currentAttachmentIndex].s3path
             "
           />
           <div v-else class="ds-label-01-reg">
             Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.
           </div>
         </div>
-        <FlexContainer
-          v-if="store.panelMode === 'preview'"
+        <div
+          v-else-if="panelMode === 'preview'"
           id="preview-container"
-          class="max-h-[70vh] overflow-auto"
+          class="flex max-h-[70vh] overflow-auto"
         >
           <DocumentUnitPreview
             :document-unit="props.documentUnit!"
             layout="narrow"
           />
-        </FlexContainer>
+        </div>
 
         <CategoryImport
-          v-if="store.panelMode === 'category-import'"
+          v-else-if="panelMode === 'category-import'"
           :document-number="importDocumentNumber"
+        />
+
+        <DocumentationUnitTextCheck
+          v-else-if="panelMode === 'text-check' && textCheck"
         />
       </div>
     </SideToggle>
