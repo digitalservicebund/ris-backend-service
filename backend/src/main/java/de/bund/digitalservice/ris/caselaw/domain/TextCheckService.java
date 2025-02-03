@@ -2,22 +2,32 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.Context;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
+import org.jsoup.parser.Parser;
 
+@Slf4j
 public class TextCheckService {
-  private static final String NO_INDEX_ELEMENT = "noindex";
-
+  private static final String BORDER_NUMBER = "border-number";
+  private static final String CONTENT = "content";
   private final DocumentationUnitService documentationUnitService;
 
   public TextCheckService(DocumentationUnitService documentationUnitService) {
@@ -36,52 +46,6 @@ public class TextCheckService {
     throw new NotImplementedException();
   }
 
-  public static List<TextRange> findNoIndexPositions(Document doc) {
-    return findNoIndexPositions(doc, doc.text());
-  }
-
-  public static List<TextRange> findNoIndexPositions(Document doc, String plainText) {
-    List<TextRange> positions = new ArrayList<>();
-
-    Elements noIndexElements = doc.select(NO_INDEX_ELEMENT);
-
-    for (Element noIndexElement : noIndexElements) {
-      String noIndexText = noIndexElement.text();
-
-      int start = plainText.indexOf(noIndexText);
-      if (start != -1) {
-        int end = start + noIndexText.length();
-        positions.add(TextRange.builder().start(start).end(end).text(noIndexText).build());
-      }
-    }
-
-    return positions;
-  }
-
-  public static boolean matchIsBetweenNoIndexPosition(
-      Match match, List<TextRange> noIndexPositions) {
-    for (TextRange noIndexPosition : noIndexPositions) {
-      if (noIndexPosition.start() < match.offset()
-          && noIndexPosition.end() < match.offset() + match.length()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public static List<Match> removeNoIndexMatches(
-      List<Match> matches, Document doc, String plainText) {
-    var noIndexPositions = findNoIndexPositions(doc, plainText);
-
-    List<Match> list = new ArrayList<>();
-    for (Match match : matches) {
-      if (!matchIsBetweenNoIndexPosition(match, noIndexPositions)) {
-        list.add(match);
-      }
-    }
-    return list;
-  }
-
   public List<Match> checkWholeDocumentationUnit(UUID id)
       throws DocumentationUnitNotExistsException {
     List<Match> allMatches = new ArrayList<>();
@@ -97,6 +61,18 @@ public class TextCheckService {
     return allMatches;
   }
 
+  @SuppressWarnings("unused")
+  public List<Match> checkCategory(UUID id, CategoryType category)
+      throws DocumentationUnitNotExistsException {
+    DocumentationUnit documentationUnit = documentationUnitService.getByUuid(id);
+
+    if (Objects.requireNonNull(category) == CategoryType.DECISION_REASON) {
+      return checkDecisionReasonsByHTML(documentationUnit);
+    }
+
+    return Collections.emptyList();
+  }
+
   private List<Match> checkReasons(DocumentationUnit documentationUnit) {
     if (documentationUnit.longTexts().reasons() == null) {
       return Collections.emptyList();
@@ -104,10 +80,10 @@ public class TextCheckService {
 
     Document document = Jsoup.parse(documentationUnit.longTexts().reasons());
     document
-        .getElementsByTag("border-number")
+        .getElementsByTag(BORDER_NUMBER)
         .forEach(
             element -> {
-              Element newElement = element.getElementsByTag("content").first();
+              Element newElement = element.getElementsByTag(CONTENT).first();
               element.after(newElement.html());
               element.remove();
             });
@@ -117,6 +93,119 @@ public class TextCheckService {
         .toList();
   }
 
+  public List<Match> checkDecisionReasonsByHTML(DocumentationUnit documentationUnit) {
+    if (documentationUnit.longTexts().decisionReasons() == null) {
+      return Collections.emptyList();
+    }
+
+    Parser parser = Parser.htmlParser();
+    parser.setTrackPosition(true);
+    Document document = Jsoup.parse(documentationUnit.longTexts().decisionReasons(), parser);
+    StringBuilder stringBuilder = new StringBuilder();
+    Map<Integer, Integer> borderNumberOffset = new LinkedMap<>();
+    AtomicInteger lastOffset = new AtomicInteger(0);
+    document
+        .getElementsByTag("body")
+        .first()
+        .childNodes()
+        .forEach(child -> handleChildren(child, stringBuilder, borderNumberOffset, lastOffset, 1));
+
+    String cleanText = cleanUpSpaces(stringBuilder.toString());
+
+    return check(URLEncoder.encode(cleanText, StandardCharsets.UTF_8)).stream()
+        .map(match -> calculateRightPosition(match, borderNumberOffset))
+        .toList();
+  }
+
+  private Match calculateRightPosition(Match match, Map<Integer, Integer> borderNumberOffset) {
+    AtomicInteger lastOffset = new AtomicInteger(0);
+    borderNumberOffset.forEach(
+        (position, offset) -> {
+          if (position <= match.offset()) {
+            lastOffset.set(offset);
+          }
+        });
+
+    Context oldContext = match.context();
+    return match.toBuilder()
+        .offset(lastOffset.get() + match.offset())
+        .context(
+            new Context(
+                oldContext.text(), lastOffset.get() + oldContext.offset(), oldContext.length()))
+        .build();
+  }
+
+  private String cleanUpSpaces(String dirtyText) {
+    final AtomicBoolean spaceFound = new AtomicBoolean(false);
+    StringBuilder cleanText = new StringBuilder();
+    dirtyText
+        .chars()
+        .forEach(
+            ch -> {
+              if (spaceFound.get()) {
+                if (ch == ' ') {
+                  return;
+                } else {
+                  spaceFound.set(false);
+                }
+              } else {
+                if (ch == ' ') {
+                  spaceFound.set(true);
+                }
+              }
+              cleanText.append((char) ch);
+            });
+
+    return cleanText.toString().trim();
+  }
+
+  private void handleChildren(
+      Node child,
+      StringBuilder stringBuilder,
+      Map<Integer, Integer> borderNumberOffset,
+      AtomicInteger lastOffset,
+      int level) {
+    if (child.nodeName().equals(BORDER_NUMBER)) {
+      handleBorderNumber(child, stringBuilder, borderNumberOffset, lastOffset, level + 1);
+    } else {
+      log.info("{} node '{}' at {}", level, child.nodeName(), child.sourceRange());
+      if (child instanceof TextNode textNode) {
+        log.info("  text node content: '{}'", textNode.text());
+        stringBuilder.append(textNode.text());
+      } else {
+        child
+            .childNodes()
+            .forEach(
+                grandChild ->
+                    handleChildren(
+                        grandChild, stringBuilder, borderNumberOffset, lastOffset, level + 1));
+      }
+    }
+  }
+
+  private void handleBorderNumber(
+      Node borderNumber,
+      StringBuilder stringBuilder,
+      Map<Integer, Integer> borderNumberOffset,
+      AtomicInteger lastOffset,
+      int level) {
+    log.info("{} border number at {}", level, borderNumber.sourceRange());
+
+    Element borderNumberElement = (Element) borderNumber;
+    Element numberElement = borderNumberElement.getElementsByTag("number").first();
+    Element contentElement = borderNumberElement.getElementsByTag(CONTENT).first();
+
+    int position = stringBuilder.length();
+    lastOffset.set(lastOffset.addAndGet(numberElement.text().length() + 6));
+    borderNumberOffset.put(position, lastOffset.get());
+
+    contentElement
+        .children()
+        .forEach(
+            child ->
+                handleChildren(child, stringBuilder, borderNumberOffset, lastOffset, level + 1));
+  }
+
   private List<Match> checkCaseFacts(DocumentationUnit documentationUnit) {
     if (documentationUnit.longTexts().caseFacts() == null) {
       return Collections.emptyList();
@@ -124,10 +213,10 @@ public class TextCheckService {
 
     Document document = Jsoup.parse(documentationUnit.longTexts().caseFacts());
     document
-        .getElementsByTag("border-number")
+        .getElementsByTag(BORDER_NUMBER)
         .forEach(
             element -> {
-              Element newElement = element.getElementsByTag("content").first();
+              Element newElement = element.getElementsByTag(CONTENT).first();
               element.after(newElement.html());
               element.remove();
             });
@@ -145,10 +234,10 @@ public class TextCheckService {
 
     Document document = Jsoup.parse(documentationUnit.longTexts().decisionReasons());
     document
-        .getElementsByTag("border-number")
+        .getElementsByTag(BORDER_NUMBER)
         .forEach(
             element -> {
-              Element newElement = element.getElementsByTag("content").first();
+              Element newElement = element.getElementsByTag(CONTENT).first();
               element.after(newElement.html());
               element.remove();
             });

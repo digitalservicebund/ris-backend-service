@@ -44,8 +44,10 @@ public class TextCheckController {
           TextCheckResponseTransformer.transformToDomain(textCheckService.checkAsResponse(text)));
 
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      log.error("Text check failed", e);
     }
+
+    return ResponseEntity.internalServerError().build();
   }
 
   @GetMapping("{id}/text-check/all")
