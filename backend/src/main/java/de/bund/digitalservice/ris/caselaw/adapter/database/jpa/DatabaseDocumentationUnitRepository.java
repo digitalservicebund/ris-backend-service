@@ -48,6 +48,9 @@ public interface DatabaseDocumentationUnitRepository
       )
     )
    AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND documentationUnit.status.withError = TRUE)
+   AND (:withDuplicateWarning = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId
+      AND (duplicateRelation1.relationStatus = 'PENDING'
+      OR duplicateRelation2.relationStatus = 'PENDING'))
    ORDER BY
      (CASE WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.scheduledPublicationDateTime END) DESC NULLS LAST,
      (CASE WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.lastPublicationDateTime END) DESC NULLS LAST,
@@ -60,6 +63,10 @@ public interface DatabaseDocumentationUnitRepository
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.status status
+  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1
+    ON documentationUnit = duplicateRelation1.documentationUnit1
+  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2
+    ON documentationUnit = duplicateRelation2.documentationUnit2
   WHERE
   """
               + BASE_QUERY)
@@ -77,6 +84,7 @@ public interface DatabaseDocumentationUnitRepository
       @Param("status") PublicationStatus status,
       @Param("withErrorOnly") Boolean withErrorOnly,
       @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
+      @Param("withDuplicateWarning") Boolean withDuplicateWarning,
       @Param("pageable") Pageable pageable);
 
   @Query(
@@ -84,6 +92,10 @@ public interface DatabaseDocumentationUnitRepository
           """
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
+  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1
+    ON documentationUnit = duplicateRelation1.documentationUnit1
+  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2
+    ON documentationUnit = duplicateRelation2.documentationUnit2
   LEFT JOIN documentationUnit.fileNumbers fileNumber
   WHERE (upper(fileNumber.value) like upper(concat(:fileNumber,'%')))
   AND
@@ -104,6 +116,7 @@ public interface DatabaseDocumentationUnitRepository
       @Param("status") PublicationStatus status,
       @Param("withErrorOnly") Boolean withErrorOnly,
       @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
+      @Param("withDuplicateWarning") Boolean withDuplicateWarning,
       @Param("pageable") Pageable pageable);
 
   @Query(
@@ -111,6 +124,10 @@ public interface DatabaseDocumentationUnitRepository
           """
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
+  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1
+    ON documentationUnit = duplicateRelation1.documentationUnit1
+  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2
+    ON documentationUnit = duplicateRelation2.documentationUnit2
   LEFT JOIN documentationUnit.deviatingFileNumbers deviatingFileNumber
   WHERE (upper(deviatingFileNumber.value) like upper(concat(:fileNumber,'%')))
   AND
@@ -131,6 +148,7 @@ public interface DatabaseDocumentationUnitRepository
       PublicationStatus status,
       Boolean withErrorOnly,
       Boolean myDocOfficeOnly,
+      Boolean withDuplicateWarning,
       Pageable pageable);
 
   // temporarily needed for the ldml handover phase, can be removed once we integrate ldml

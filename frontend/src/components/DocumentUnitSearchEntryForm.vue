@@ -50,6 +50,7 @@ const myDocOfficeOnly = computed({
   set: (data) => {
     if (!data) {
       delete query.value.withError
+      delete query.value.withDuplicateWarning
       delete query.value.myDocOfficeOnly
       delete query.value.scheduledOnly
       delete query.value.publicationDate
@@ -80,6 +81,20 @@ const withError = computed({
       delete query.value.withError
     } else {
       query.value.withError = "true"
+    }
+  },
+})
+
+const withDuplicateWarning = computed({
+  get: () =>
+    query.value?.withDuplicateWarning
+      ? JSON.parse(query.value.withDuplicateWarning)
+      : false,
+  set: (data) => {
+    if (!data) {
+      delete query.value.withDuplicateWarning
+    } else {
+      query.value.withDuplicateWarning = "true"
     }
   },
 })
@@ -213,6 +228,7 @@ export type DocumentUnitSearchParameter =
   | "decisionDateEnd"
   | "withError"
   | "myDocOfficeOnly"
+  | "withDuplicateWarning"
 </script>
 
 <template>
@@ -432,6 +448,21 @@ export type DocumentUnitSearchParameter =
             @focus="resetErrors"
           />
         </InputField>
+        <InputField
+          v-if="myDocOfficeOnly"
+          id="withDuplicateWaring"
+          v-slot="{ id }"
+          label="Dublettenverdacht"
+          label-class="ds-label-01-reg"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <Checkbox
+            :id="id"
+            v-model="withDuplicateWarning"
+            aria-label="Dokumentationseinheiten mit Dublettenverdacht"
+            class="ds-checkbox-mini bg-white"
+            @focus="resetErrors"
+        /></InputField>
       </div>
       <div class="flex flex-row">
         <div class="flex flex-col gap-4">

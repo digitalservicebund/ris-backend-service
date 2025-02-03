@@ -35,18 +35,18 @@ public class DuplicateRelationDTO {
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
-  private DuplicateRelationStatus status;
+  private DuplicateRelationStatus relationStatus;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("documentationUnitId1")
-  @JoinColumn(name = "documentation_unit_id1")
   @JsonBackReference // Prevent infinite recursion
+  @JoinColumn(name = "documentation_unit_id1")
   private DocumentationUnitDTO documentationUnit1;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("documentationUnitId2")
-  @JoinColumn(name = "documentation_unit_id2")
   @JsonBackReference // Prevent infinite recursion
+  @JoinColumn(name = "documentation_unit_id2")
   private DocumentationUnitDTO documentationUnit2;
 
   @Getter

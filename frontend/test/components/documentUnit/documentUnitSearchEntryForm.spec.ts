@@ -118,6 +118,15 @@ describe("Documentunit search form", () => {
     expect(screen.getByLabelText("Terminiert Filter")).toBeVisible()
   })
 
+  test("click on 'Nur meine Dokstelle' renders 'Dublettenverdacht' checkbox", async () => {
+    const { user } = await renderComponent()
+    expect(screen.queryByLabelText("Dublettenverdacht")).not.toBeInTheDocument()
+
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+
+    expect(screen.getByLabelText("Dublettenverdacht")).toBeVisible()
+  })
+
   test("unchecking 'Nur meine Dokstelle' removes scheduled publication input", async () => {
     const { user } = await renderComponent()
 
