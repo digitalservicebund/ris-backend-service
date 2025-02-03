@@ -4,6 +4,7 @@ import {
   fillInput,
   fillNormInputs,
   navigateToCategories,
+  save,
   waitForInputValue,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
@@ -122,6 +123,7 @@ test.describe("category import", () => {
         await expect(
           page.getByText("MM 2024, 50-53, Heft 1 (LT)"),
         ).toBeVisible()
+        await save(page)
       })
 
       await test.step("import into prefilled category does not override existing references", async () => {
@@ -170,8 +172,11 @@ test.describe("category import", () => {
         await page.getByLabel("Literaturfundstellen übernehmen").click()
         await expect(page.getByText(literatureReferenceCitation)).toBeVisible()
 
-        // Added Fundstelle + 1 new empty entry
-        await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
+        await expect(
+          page
+            .getByTestId("literature-reference-list")
+            .getByLabel("Listen Eintrag"),
+        ).toHaveCount(1)
       })
 
       await test.step("show success badge", async () => {
@@ -225,6 +230,7 @@ test.describe("category import", () => {
         await expect(
           page.getByText("MM 2024, 50-53, Heft 1, Einstein, Albert (Ean)"),
         ).toBeVisible()
+        await save(page)
       })
 
       await test.step("import into prefilled category does not override existing references", async () => {
