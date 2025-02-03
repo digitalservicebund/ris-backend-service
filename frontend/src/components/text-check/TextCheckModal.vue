@@ -30,7 +30,7 @@ function getValues(replacements: Replacement[]) {
     class="flex min-w-[432px] flex-col flex-wrap items-start justify-start gap-16 border-2 border-solid border-blue-800 bg-white p-24"
   >
     <div class="flex flex-row gap-8">
-      <label class="font-bold"> {{ match.word }} </label>
+      <span class="font-bold"> {{ match.word }} </span>
     </div>
 
     <p>{{ match.shortMessage || match.message }}</p>

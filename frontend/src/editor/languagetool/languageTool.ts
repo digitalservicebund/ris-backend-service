@@ -98,12 +98,7 @@ export default class LanguageTool {
       const languageToolCheckResponse: ServiceResponse<TextCheckResponse> =
         await languageToolService.check(text)
 
-      if (
-        languageToolCheckResponse.data &&
-        languageToolCheckResponse.data.matches
-      ) {
-        matches = languageToolCheckResponse.data.matches
-      }
+      matches = languageToolCheckResponse.data?.matches || []
     }
 
     this.transformMatchesToDecorationSet(matches, doc, text, originalFrom)
@@ -143,7 +138,7 @@ export default class LanguageTool {
       )
   }
 
-  private gimmeDecoration = (from: number, to: number, match: Match) =>
+  private readonly gimmeDecoration = (from: number, to: number, match: Match) =>
     Decoration.inline(from, to, {
       class: `lt lt-${match.rule.issueType}`,
       nodeName: "span",
