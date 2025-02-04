@@ -332,9 +332,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
 
     var documentationUnitDTOOptional = repository.findById(documentationUnit.uuid());
-    if (documentationUnitDTOOptional.isEmpty()) {
-      return;
-    } else if (documentationUnitDTOOptional.get() instanceof PendingProceedingDTO) {
+    if (documentationUnitDTOOptional.isEmpty()
+        || documentationUnitDTOOptional.get() instanceof PendingProceedingDTO) {
       return; // Pending Proceedings don't have procedures
     }
     DecisionDTO decisionDTO = (DecisionDTO) documentationUnitDTOOptional.get();
