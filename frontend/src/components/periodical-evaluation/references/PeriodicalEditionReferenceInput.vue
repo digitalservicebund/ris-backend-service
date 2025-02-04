@@ -373,7 +373,7 @@ onBeforeUnmount(() => {
         :status="reference.documentationUnit.status"
         :summary="reference.documentationUnit.renderSummary"
       />
-      <div v-if="!isSaved" class="flex items-center gap-16">
+      <div class="flex items-center gap-16">
         <div class="flex items-center">
           <InputField
             id="caselaw"
@@ -531,7 +531,10 @@ onBeforeUnmount(() => {
         </InputField>
       </div>
 
-      <div v-if="!isSaved" id="documentationUnit">
+      <div
+        v-if="!reference?.documentationUnit?.hasForeignSource"
+        id="documentationUnit"
+      >
         <h2 class="ds-label-01-bold mb-16">Entscheidung hinzufügen</h2>
 
         <div class="flex flex-col gap-24">
@@ -549,7 +552,6 @@ onBeforeUnmount(() => {
                 clear-on-choosing-item
                 :has-error="slotProps.hasError"
                 :item-service="ComboboxItemService.getCourts"
-                :read-only="reference?.documentationUnit?.hasForeignSource"
                 @focus="validationStore.remove('court')"
               >
               </ComboboxInput>
@@ -570,7 +572,6 @@ onBeforeUnmount(() => {
                 aria-label="Entscheidungsdatum"
                 class="ds-input-medium"
                 :has-error="slotProps.hasError"
-                :read-only="reference?.documentationUnit?.hasForeignSource"
                 @focus="validationStore.remove('decisionDate')"
                 @update:validation-error="slotProps.updateValidationError"
               ></DateInput>
@@ -589,7 +590,6 @@ onBeforeUnmount(() => {
                 v-model="relatedDocumentationUnit.fileNumber"
                 aria-label="Aktenzeichen"
                 :has-error="slotProps.hasError"
-                :read-only="reference?.documentationUnit?.hasForeignSource"
                 size="medium"
                 @focus="validationStore.remove('fileNumber')"
               ></TextInput>
@@ -600,7 +600,6 @@ onBeforeUnmount(() => {
                 v-model="relatedDocumentationUnit.documentType"
                 aria-label="Dokumenttyp"
                 :item-service="ComboboxItemService.getDocumentTypes"
-                :read-only="reference?.documentationUnit?.hasForeignSource"
               ></ComboboxInput>
             </InputField>
           </div>
@@ -611,7 +610,7 @@ onBeforeUnmount(() => {
         <div>
           <div class="flex gap-16">
             <TextButton
-              v-if="!isSaved"
+              v-if="!isSaved && !reference?.documentationUnit?.hasForeignSource"
               aria-label="Nach Entscheidung suchen"
               button-type="primary"
               label="Suchen"
@@ -619,7 +618,7 @@ onBeforeUnmount(() => {
               @click="search"
             />
             <TextButton
-              v-if="isSaved"
+              v-if="isSaved || reference?.documentationUnit?.hasForeignSource"
               aria-label="Fundstelle vermerken"
               button-type="tertiary"
               data-testid="previous-decision-save-button"
@@ -629,7 +628,7 @@ onBeforeUnmount(() => {
               @click.stop="addReference(relatedDocumentationUnit)"
             />
             <TextButton
-              v-if="isSaved"
+              v-if="isSaved || reference?.documentationUnit?.hasForeignSource"
               aria-label="Abbrechen"
               button-type="ghost"
               label="Abbrechen"

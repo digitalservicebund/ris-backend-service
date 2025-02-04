@@ -169,8 +169,18 @@ function isSaved(entries: T[], entry?: T): boolean {
  * decides to click the save button in edit mode. The edit index is reset, to show list in summary mode.
  */
 async function updateModel(index: number) {
+  console.log(modelValueList.value)
   emit("update:modelValue", modelValueList.value)
   await toggleDisplayDefaultValue(true, index)
+}
+
+async function handleAddFromSummary(newEntry: T) {
+  if (displayDefaultValue.value) {
+    await toggleDisplayDefaultValue(false)
+  }
+  modelValueList.value.push(newEntry)
+
+  setEditEntry(newEntry)
 }
 
 /**
@@ -180,8 +190,7 @@ async function updateModel(index: number) {
 watch(
   () => props.modelValue,
   (newValue) => {
-    // Update modelValueList based on the newValue while keeping the edit item intact
-    modelValueList.value = [...newValue].map((item) =>
+    modelValueList.value = newValue.map((item) =>
       editEntry.value !== undefined && editEntry.value.equals(item)
         ? editEntry.value
         : item,
@@ -240,13 +249,16 @@ defineExpose({
           "
           class="flex scroll-m-64"
           :data="entry"
+          @add-new-entry="handleAddFromSummary"
         />
 
         <Tooltip text="Aufklappen">
-          <button
+          <TextButton
             id="editable-list-select-button"
-            class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
+            button-type="ghost"
             :data-testid="`list-entry-${index}`"
+            :icon="IconArrowDown"
+            size="small"
             @click="
               () => {
                 toggleDisplayDefaultValue(false)
@@ -259,9 +271,7 @@ defineExpose({
                 setEditEntry(entry as T)
               }
             "
-          >
-            <IconArrowDown />
-          </button>
+          />
         </Tooltip>
       </div>
 
