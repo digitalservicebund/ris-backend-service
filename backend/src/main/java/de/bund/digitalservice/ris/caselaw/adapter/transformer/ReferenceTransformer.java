@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
@@ -85,7 +84,7 @@ public class ReferenceTransformer {
     DocumentationUnitDTO documentationUnitDTO = null;
     if (reference.documentationUnit() != null) {
       documentationUnitDTO =
-          DecisionDTO.builder().id(reference.documentationUnit().getUuid()).build();
+          DocumentationUnitDTO.builder().id(reference.documentationUnit().getUuid()).build();
     }
 
     if (reference.referenceType().equals(ReferenceType.CASELAW)) {

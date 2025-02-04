@@ -28,7 +28,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -292,7 +291,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
                   .containsExactly("ECLI:DE:BGH:2023:210423UVZR86.22.0");
             });
 
-    DecisionDTO savedDTO = (DecisionDTO) repository.findById(dto.getId()).get();
+    DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
     assertThat(savedDTO.getEcli()).isEqualTo("ECLI:DE:BGH:2023:210423UVZR86.22.0");
   }
 
@@ -307,7 +306,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .ecli("oldEcli")
                 .documentationOffice(dsDocOffice));
@@ -331,7 +330,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
                   .containsExactly("ECLI:DE:BGH:2023:210423UVZR86.22.0");
             });
 
-    DecisionDTO savedDTO = (DecisionDTO) repository.findById(dto.getId()).get();
+    DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
     assertThat(savedDTO.getEcli()).isEqualTo("oldEcli");
   }
 
@@ -346,7 +345,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .legalEffect(LegalEffectDTO.JA) // file has "Nein"
                 .judicialBody("1. Senat") // file has "2. Senat"
@@ -384,7 +383,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
                           "BFH"));
             });
 
-    DecisionDTO savedDTO = (DecisionDTO) repository.findById(dto.getId()).get();
+    DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
     assertThat(savedDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA); // kept old value
     assertThat(savedDTO.getJudicialBody()).isEqualTo("1. Senat"); // kept old value
     assertThat(savedDTO.getCourt().getType())

@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
@@ -26,7 +25,7 @@ class NormReferenceTransformerTest {
   void testTransformToDTO_addingANewSingleNormToTheExistingNormAbbreviation() {
     DocumentationUnit documentationUnit = generateDocumentationUnit();
     DocumentationUnitDTO documentationUnitDTO =
-        DecisionDTO.builder().normReferences(new ArrayList<>()).build();
+        DocumentationUnitDTO.builder().normReferences(new ArrayList<>()).build();
     NormReferenceDTO normReferenceDTO1 =
         NormReferenceDTO.builder()
             .normAbbreviation(NormAbbreviationDTO.builder().id(NORM_ABBREVIATION_UUID_1).build())
@@ -55,7 +54,7 @@ class NormReferenceTransformerTest {
   void testTransformToDTO_addingANewSingleNormWithANewNormAbbreviation() {
     DocumentationUnit documentationUnit = generateDocumentationUnit();
     DocumentationUnitDTO documentationUnitDTO =
-        DecisionDTO.builder().normReferences(new ArrayList<>()).build();
+        DocumentationUnitDTO.builder().normReferences(new ArrayList<>()).build();
     NormReferenceDTO normReferenceDTO1 =
         NormReferenceDTO.builder()
             .normAbbreviation(NormAbbreviationDTO.builder().id(NORM_ABBREVIATION_UUID_1).build())
@@ -85,7 +84,7 @@ class NormReferenceTransformerTest {
       testTransformToDTO_withTwoNormReferencesWithDifferentNormAbbreviationAddingANewSingleNormToTheFirstNormAbbreviation() {
     DocumentationUnit documentationUnit = generateDocumentationUnit();
     DocumentationUnitDTO documentationUnitDTO =
-        DecisionDTO.builder().normReferences(new ArrayList<>()).build();
+        DocumentationUnitDTO.builder().normReferences(new ArrayList<>()).build();
     NormReferenceDTO normReferenceDTO1 =
         NormReferenceDTO.builder()
             .normAbbreviation(NormAbbreviationDTO.builder().id(NORM_ABBREVIATION_UUID_1).build())
@@ -124,7 +123,7 @@ class NormReferenceTransformerTest {
   void testTransformToDTO_removeAExistingSingleNorm() {
     DocumentationUnit documentationUnit = generateDocumentationUnit();
     DocumentationUnitDTO documentationUnitDTO =
-        DecisionDTO.builder().normReferences(new ArrayList<>()).build();
+        DocumentationUnitDTO.builder().normReferences(new ArrayList<>()).build();
     NormReferenceDTO normReferenceDTO1 =
         NormReferenceDTO.builder()
             .normAbbreviation(NormAbbreviationDTO.builder().id(NORM_ABBREVIATION_UUID_1).build())
@@ -147,7 +146,7 @@ class NormReferenceTransformerTest {
   void testTransformToDTO_removeAllExistingSingleNorm() {
     DocumentationUnit documentationUnit = generateDocumentationUnit();
     DocumentationUnitDTO documentationUnitDTO =
-        DecisionDTO.builder().normReferences(new ArrayList<>()).build();
+        DocumentationUnitDTO.builder().normReferences(new ArrayList<>()).build();
     NormReferenceDTO normReferenceDTO1 =
         NormReferenceDTO.builder()
             .normAbbreviation(NormAbbreviationDTO.builder().id(NORM_ABBREVIATION_UUID_1).build())
@@ -170,7 +169,7 @@ class NormReferenceTransformerTest {
   void testTransformToDTO_removeExistingNormAbbreviation() {
     DocumentationUnit documentationUnit = generateDocumentationUnit();
     DocumentationUnitDTO documentationUnitDTO =
-        DecisionDTO.builder().normReferences(new ArrayList<>()).build();
+        DocumentationUnitDTO.builder().normReferences(new ArrayList<>()).build();
     addNormReferenceToDTO(
         documentationUnitDTO, NORM_ABBREVIATION_UUID_1, 1, "single norm 1", "single norm 2");
 
@@ -217,7 +216,7 @@ class NormReferenceTransformerTest {
   }
 
   private DocumentationUnitDTO generateDocumentationUnitDTO() {
-    return DecisionDTO.builder()
+    return DocumentationUnitDTO.builder()
         .documentationOffice(DocumentationOfficeDTO.builder().build())
         .normReferences(new ArrayList<>())
         .build();

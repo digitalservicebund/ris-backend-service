@@ -131,7 +131,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     var documentationUnitDTO =
         repository.save(
             DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder()
+                DocumentationUnitDTO.builder()
                     .documentationOffice(
                         DocumentationOfficeTransformer.transformToDTO(
                             docUnit.coreData().documentationOffice()))
@@ -148,33 +148,27 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       referenceDTO.setDocumentationUnit(documentationUnitDTO);
     }
 
-    DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder = null;
-    if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
-      builder =
-          decisionDTO.toBuilder()
-              .source(
-                  source == null
-                      ? new ArrayList<>()
-                      : new ArrayList<>(
-                          List.of(
-                              SourceDTO.builder()
-                                  .rank(1)
-                                  .value(source)
-                                  .reference(referenceDTO)
-                                  .build())));
-    } else if (documentationUnitDTO instanceof PendingProceedingDTO pendingProceedingDTO) {
-      builder = pendingProceedingDTO.toBuilder();
-    }
-
-    builder.status(
-        StatusTransformer.transformToDTO(status).toBuilder()
-            .documentationUnit(documentationUnitDTO)
-            .createdAt(Instant.now())
-            .build());
-
     // saving a second time is necessary because status and reference need a reference to a
     // persisted documentation unit
-    DocumentationUnitDTO savedDocUnit = repository.save(builder.build());
+    DocumentationUnitDTO savedDocUnit =
+        repository.save(
+            documentationUnitDTO.toBuilder()
+                .status(
+                    StatusTransformer.transformToDTO(status).toBuilder()
+                        .documentationUnit(documentationUnitDTO)
+                        .createdAt(Instant.now())
+                        .build())
+                .source(
+                    source == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(
+                            List.of(
+                                SourceDTO.builder()
+                                    .rank(1)
+                                    .value(source)
+                                    .reference(referenceDTO)
+                                    .build())))
+                .build());
 
     return DocumentationUnitTransformer.transformToDomain(savedDocUnit);
   }
@@ -332,27 +326,27 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
 
     var documentationUnitDTOOptional = repository.findById(documentationUnit.uuid());
-    if (documentationUnitDTOOptional.isEmpty()
-        || documentationUnitDTOOptional.get() instanceof PendingProceedingDTO) {
-      return; // Pending Proceedings don't have procedures
+    if (documentationUnitDTOOptional.isEmpty()) {
+      return;
     }
-    DecisionDTO decisionDTO = (DecisionDTO) documentationUnitDTOOptional.get();
+    var documentationUnitDTO = documentationUnitDTOOptional.get();
     Procedure procedure = documentationUnit.coreData().procedure();
 
     ProcedureDTO procedureDTO =
-        getOrCreateProcedure(decisionDTO.getDocumentationOffice(), procedure);
+        getOrCreateProcedure(documentationUnitDTO.getDocumentationOffice(), procedure);
 
     boolean sameAsLast =
-        decisionDTO.getProcedure() != null && decisionDTO.getProcedure().equals(procedureDTO);
+        documentationUnitDTO.getProcedure() != null
+            && documentationUnitDTO.getProcedure().equals(procedureDTO);
 
     // add the previous procedure to the history
     if (procedureDTO != null && !sameAsLast) {
-      decisionDTO.getProcedureHistory().add(procedureDTO);
+      documentationUnitDTO.getProcedureHistory().add(procedureDTO);
     }
     // set new procedure
-    decisionDTO.setProcedure(procedureDTO);
+    documentationUnitDTO.setProcedure(procedureDTO);
 
-    repository.save(decisionDTO);
+    repository.save(documentationUnitDTO);
   }
 
   @Override

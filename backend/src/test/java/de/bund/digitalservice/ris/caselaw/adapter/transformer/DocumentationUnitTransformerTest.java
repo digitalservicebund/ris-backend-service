@@ -10,7 +10,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
@@ -18,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
@@ -73,11 +73,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 class DocumentationUnitTransformerTest {
   @Test
   void testTransformToDTO_withoutCoreData() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     DocumentationUnit updatedDomainObject = DocumentationUnit.builder().build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getProcedureHistory()).isEmpty();
     assertThat(documentationUnitDTO.getProcedure()).isNull();
@@ -93,31 +93,32 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withoutDecisionNames() {
-    DecisionDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     ShortTexts shortTexts = ShortTexts.builder().build();
     DocumentationUnit updatedDomainObject =
         DocumentationUnit.builder().shortTexts(shortTexts).build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getDecisionNames()).isEmpty();
   }
 
   @Test
   void testTransformToDTO_addLegalEffectWithCoreDataDeleted_shouldSetLegalEffectToNull() {
-    DecisionDTO currentDto = DecisionDTO.builder().court(CourtDTO.builder().build()).build();
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder().court(CourtDTO.builder().build()).build();
     DocumentationUnit updatedDomainObject = DocumentationUnit.builder().build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isNull();
   }
 
   @Test
   void testTransformToDTO_withBlankString_shouldConvertToNull() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().note("before change").build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().note("before change").build();
 
     DocumentationUnit updatedDomainObject = DocumentationUnit.builder().note("  ").build();
 
@@ -131,7 +132,7 @@ class DocumentationUnitTransformerTest {
   void
       testTransformToDTO_addLegalEffectWithCourtChangedAndNotSuperiorCourtAndLegalEffectNo_shouldSetLegalEffectToNo() {
     DocumentationUnitDTO currentDto =
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .court(
                 CourtDTO.builder()
                     .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
@@ -150,8 +151,8 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.NEIN);
   }
@@ -160,7 +161,7 @@ class DocumentationUnitTransformerTest {
   void
       testTransformToDTO_addLegalEffectWithCourtChangedAndNotSuperiorCourtAndLegalEffectNotSpecified_shouldSetLegalEffectToNotSpecified() {
     DocumentationUnitDTO currentDto =
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .court(
                 CourtDTO.builder()
                     .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
@@ -179,8 +180,8 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.KEINE_ANGABE);
   }
@@ -189,7 +190,7 @@ class DocumentationUnitTransformerTest {
   void
       testTransformToDTO_addLegalEffectWithCourtChangedAndNotSuperiorCourtAndLegalEffectYes_shouldSetLegalEffectToYes() {
     DocumentationUnitDTO currentDto =
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .court(
                 CourtDTO.builder()
                     .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
@@ -208,8 +209,8 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA);
   }
@@ -219,7 +220,7 @@ class DocumentationUnitTransformerTest {
   void testTransformToDTO_addLegalEffectWithCourtChangedAndSuperiorCourt_shouldSetLegalEffectToYes(
       String courtType) {
     DocumentationUnitDTO currentDto =
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .court(
                 CourtDTO.builder()
                     .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
@@ -238,23 +239,23 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA);
   }
 
   @Test
   void testTransformToDTO_withInputTypes() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     List<String> inputTypes = List.of("input types 1", "input types 3", "input types 2");
     DocumentationUnit updatedDomainObject =
         DocumentationUnit.builder()
             .coreData(CoreData.builder().inputTypes(inputTypes).build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getInputTypes())
         .usingRecursiveFieldByFieldElementComparator()
@@ -266,7 +267,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withOneNormReference() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     NormReference normReferenceInput =
         NormReference.builder()
             .normAbbreviation(
@@ -293,7 +294,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withOneNormReference_withLegalForce() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     NormReference normReferenceInput =
         NormReference.builder()
             .normAbbreviation(
@@ -336,7 +337,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withOneNormReference_withMultipleSingleNorms_withLegalForce() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     NormReference normReferenceInput =
         NormReference.builder()
             .normAbbreviation(
@@ -405,7 +406,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withMultipleNormReferences() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     NormReference normReferenceInput1 =
         NormReference.builder()
             .normAbbreviation(
@@ -468,7 +469,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withNormReference_withoutNormAbbreviation_throwsException() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     NormReference normReferenceInput =
         NormReference.builder()
             .singleNorms(List.of(SingleNorm.builder().singleNorm("single norm 1").build()))
@@ -493,7 +494,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withLeadingDecisionNormReferences() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     List<String> leadingDecisionNormReferences = List.of("BGB §1", "BGB §2", "BGB §3");
     DocumentationUnit updatedDomainObject =
         DocumentationUnit.builder()
@@ -508,8 +509,8 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLeadingDecisionNormReferences())
         .usingRecursiveFieldByFieldElementComparator()
@@ -522,7 +523,7 @@ class DocumentationUnitTransformerTest {
   @Test
   void testTransformToDTO_deletedLeadingDecisionNormReferences() {
     DocumentationUnitDTO currentDto =
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .court(
                 CourtDTO.builder()
                     .id(UUID.fromString("CCCCCCCC-2222-3333-4444-55555555555"))
@@ -550,15 +551,15 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLeadingDecisionNormReferences()).isEmpty();
   }
 
   @Test
   void testTransformToDTO_normalizesNonBreakingSpaces() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
 
     DocumentationUnit updatedDomainObject =
         DocumentationUnit.builder()
@@ -623,8 +624,8 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
     assertThat(documentationUnitDTO.getEcli()).isEqualTo("This is a test ecli with spaces");
     assertThat(documentationUnitDTO.getJudicialBody())
         .isEqualTo("This is a test appraisalBody with spaces");
@@ -690,10 +691,9 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder().build(), documentationUnit);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            DocumentationUnitDTO.builder().build(), documentationUnit);
 
     assertThat(documentationUnitDTO.getJobProfiles())
         .extracting("value")
@@ -708,10 +708,9 @@ class DocumentationUnitTransformerTest {
                 ContentRelatedIndexing.builder().dismissalTypes(List.of("type", "type")).build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder().build(), documentationUnit);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            DocumentationUnitDTO.builder().build(), documentationUnit);
 
     assertThat(documentationUnitDTO.getDismissalTypes())
         .extracting("value")
@@ -728,10 +727,9 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder().build(), documentationUnit);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            DocumentationUnitDTO.builder().build(), documentationUnit);
 
     assertThat(documentationUnitDTO.getDismissalGrounds())
         .extracting("value")
@@ -748,10 +746,9 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder().build(), documentationUnit);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            DocumentationUnitDTO.builder().build(), documentationUnit);
 
     assertThat(documentationUnitDTO.getCollectiveAgreements())
         .extracting("value")
@@ -771,10 +768,9 @@ class DocumentationUnitTransformerTest {
             .build();
 
     // Act
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder().build(), documentationUnit);
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            DocumentationUnitDTO.builder().build(), documentationUnit);
 
     // Assert
     assertThat(documentationUnitDTO.getParticipatingJudges()).hasSize(1);
@@ -789,7 +785,7 @@ class DocumentationUnitTransformerTest {
   void testTransformToDTO_withCaselawReferences() {
     var uuid = UUID.randomUUID();
     DocumentationUnitDTO currentDto =
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .caselawReferences(
                 List.of(
                     CaselawReferenceDTO.builder()
@@ -825,7 +821,7 @@ class DocumentationUnitTransformerTest {
   void testTransformToDTO_withLiteratureReferences() {
     var uuid = UUID.randomUUID();
     DocumentationUnitDTO currentDto =
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .literatureReferences(
                 List.of(
                     LiteratureReferenceDTO.builder()
@@ -1310,23 +1306,22 @@ class DocumentationUnitTransformerTest {
     assertThat(documentationUnit.note()).isNull();
   }
 
-  private DecisionDTO.DecisionDTOBuilder<?, ?> generateSimpleDTOBuilder() {
-    return DecisionDTO.builder()
+  private DocumentationUnitDTOBuilder generateSimpleDTOBuilder() {
+    return DocumentationUnitDTO.builder()
         .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("doc office").build());
   }
 
   @Test
   void testAddYearsOfDisputeToDTORanking() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
 
     CoreData.CoreDataBuilder coreDataBuilder = generateSimpleCoreDataBuilder();
     coreDataBuilder.yearsOfDispute(
         List.of(Year.now().minusYears(2), Year.now(), Year.now().minusYears(4)));
-    DecisionDTO documentationUnitDTO =
-        (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                currentDto,
-                generateSimpleDocumentationUnitBuilder().coreData(coreDataBuilder.build()).build());
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            currentDto,
+            generateSimpleDocumentationUnitBuilder().coreData(coreDataBuilder.build()).build());
 
     assertEquals(
         documentationUnitDTO.getYearsOfDispute().stream().map(YearOfDisputeDTO::getRank).toList(),

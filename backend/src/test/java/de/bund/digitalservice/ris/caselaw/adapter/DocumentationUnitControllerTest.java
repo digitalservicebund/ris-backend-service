@@ -22,7 +22,6 @@ import de.bund.digitalservice.ris.caselaw.DocumentationUnitControllerTestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -324,7 +323,7 @@ class DocumentationUnitControllerTest {
   @Test
   void testUpdateByUuid() throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentationUnitDTO =
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .id(TEST_UUID)
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
@@ -351,7 +350,7 @@ class DocumentationUnitControllerTest {
   @Disabled("fix and enable")
   void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentationUnitDTO =
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .id(TEST_UUID)
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
