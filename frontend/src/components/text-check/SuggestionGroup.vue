@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import IconBadge from "@/components/IconBadge.vue"
+import MatchLinkingButton from "@/components/text-check/MatchLinkingButton.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
 import { Suggestion } from "@/types/languagetool"
 
@@ -37,7 +38,7 @@ function getAllReplacementValues(suggestion: Suggestion) {
     class="flex flex-col gap-4 bg-blue-100 p-24"
     :class="[isSelected ? 'border-4 border-blue-900' : '']"
   >
-    <div class="flex flex-row gap-8">
+    <div class="flex flex-row items-center gap-8">
       <div class="ds-label-01-bold">
         {{ suggestion.word }}
       </div>
@@ -46,9 +47,9 @@ function getAllReplacementValues(suggestion: Suggestion) {
           background-color="bg-red-300"
           color="text-red-900"
           :label="suggestion.matches.length.toString()"
-          :margin-x="4"
         />
       </span>
+      <MatchLinkingButton :category="suggestion.matches[0].category" />
     </div>
 
     <div>
