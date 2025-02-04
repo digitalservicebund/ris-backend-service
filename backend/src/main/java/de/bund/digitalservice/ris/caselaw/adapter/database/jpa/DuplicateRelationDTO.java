@@ -41,13 +41,13 @@ public class DuplicateRelationDTO {
   @MapsId("documentationUnitId1")
   @JoinColumn(name = "documentation_unit_id1")
   @JsonBackReference // Prevent infinite recursion
-  private DocumentationUnitDTO documentationUnit1;
+  private DecisionDTO documentationUnit1;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("documentationUnitId2")
   @JoinColumn(name = "documentation_unit_id2")
   @JsonBackReference // Prevent infinite recursion
-  private DocumentationUnitDTO documentationUnit2;
+  private DecisionDTO documentationUnit2;
 
   @Getter
   @Setter

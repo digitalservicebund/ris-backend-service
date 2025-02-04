@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormReferenceRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
@@ -175,7 +176,7 @@ class SaveNormIntegrationTest {
     DocumentationUnitDTO savedDocumentationUnitDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DocumentationUnitDTO.builder()
+            DecisionDTO.builder()
                 .documentNumber("1234567890124")
                 .documentationOffice(documentationOfficeDTO)
                 .normReferences(
