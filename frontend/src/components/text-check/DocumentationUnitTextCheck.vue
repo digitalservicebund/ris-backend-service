@@ -29,7 +29,7 @@ const checkAll = async () => {
 }
 
 function acceptSuggestion(replacement: string) {
-  throw new Error("accept all not yet implemented")
+  throw new Error("accept all not yet implemented: " + replacement)
 }
 
 function ignoreSuggestion() {
