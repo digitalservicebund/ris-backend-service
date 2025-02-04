@@ -55,7 +55,7 @@ export default class LanguageTool {
 
   public proofReadInitially = false
 
-  public languageToolActive: boolean = true
+  public languageToolActive: boolean = false
 
   constructor(decorationSet: DecorationSet) {
     this.decorationSet = decorationSet
