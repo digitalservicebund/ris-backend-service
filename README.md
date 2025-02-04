@@ -10,7 +10,7 @@
 You need (or may want) the following CLI tools. For UNIX users, there is a prepared `Brewfile`, see
 below.
 
-**Necessary tools:**
+### Necessary tools:**
 
 - [lefthook](https://github.com/evilmartians/lefthook#install) - manages our git hooks
 - [Github CLI](https://cli.github.com/) - used by lefthook to check for pipeline status before push
@@ -21,11 +21,11 @@ below.
 - [Node.js](https://nodejs.org/en/) - JavaScript runtime & dependency management
 - [nodenv](https://github.com/nodenv/nodenv#installation) - manages the node.js environment
 
-**Backend only:**
+### Backend only:**
 
 - [java](https://developers.redhat.com/products/openjdk/install) - we use Java 21 in the backend
 
-**Optional, but recommended tools:**
+### Optional, but recommended tools:
 
 - [jq](https://github.com/stedolan/jq) - handy JSON Processor
 - [yq](https://github.com/mikefarah/yq) - handy YAML Processor
@@ -57,6 +57,36 @@ to `~/.zshrc`:
 eval "$(direnv hook zsh)"
 ```
 
+### GitHub and AWS Credentials for Lookup Table Initialization
+
+To be able to pull the `ris-data-migration` image, you need to log in to the GitHub Package Repository using your username and a
+credential token.
+
+If you don't have a personal access token,
+read [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic)
+on how to create one. Otherwise, you can replace `GitHub Personal Access Token for migration` with your 1PW item. Then:
+
+```shell
+op item create \
+    --category login \
+    --title "GitHub Personal Access Token for migration" \
+    'username=YOUR_GITHUB_USERNAME' \
+    'password=YOUR_PERSONAL_ACCESS_TOKEN'
+
+echo $(op read 'op://Employee/GitHub Personal Access Token for migration/password') | docker login ghcr.io -u $(op read 'op://Employee/GitHub Personal Access Token for migration/username') --password-stdin
+```
+
+The following step requires an OTC access token, read here for
+more [info](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials).
+
+To connect to your S3 bucket, ensure your AWS credentials are stored in 1Password, and then set the following
+environment variables in your shell:
+
+```shell
+op item edit 'OTC' aws_access_key_id=[your-access-key-id]
+op item edit 'OTC' aws_secret_access_key=[your-access-key-id]
+```
+
 ## Getting started
 
 To get started with development, run:
@@ -83,34 +113,6 @@ Now you can generate a new `.env` file containing the secrets. You will be asked
 ### Lookup Tables Initialization
 
 The caselaw application requires the initialization of lookup tables by the migration application image.
-
-#### Prerequisites
-
-To be able to pull the `ris-data-migration` image, log in to the GitHub Package Repository using your username and a
-credential token stored in 1Password (1PW):
-
-If you don't have a personal access token,
-read [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic)
-on how to create one. Then:
-
-```shell
-export CR_PAT=$(op read op://Employee/CR_PAT/password)
-echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin # Replace USERNAME with your GitHub username
-```
-
-The following step requires an OTC access token, read here for
-more [info](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials).
-
-To connect to your S3 bucket, ensure your AWS credentials are stored in 1Password, and then set the following
-environment variables in your shell:
-
-```shell
-op item edit 'OTC' aws_access_key_id=[your-access-key-id]
-op item edit 'OTC' aws_secret_access_key=[your-access-key-id]
-
-```
-
-#### Run Lookup Tables Initialization with Docker
 
 The following command will migrate the minimally required data (refdata and juris tables):
 
