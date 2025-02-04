@@ -74,14 +74,15 @@ public class DocumentationUnitTransformer {
    * @return a transformed database object containing the changes from the @param
    *     updatedDomainObject
    */
+  @SuppressWarnings("java:S6541")
   public static DocumentationUnitDTO transformToDTO(
       DocumentationUnitDTO currentDto, DocumentationUnit updatedDomainObject) {
 
     log.debug("transform database documentation unit '{}'", currentDto.getId());
 
     final var builder =
-        (currentDto instanceof DecisionDTO)
-            ? ((DecisionDTO) currentDto).toBuilder()
+        (currentDto instanceof DecisionDTO decisionDTO)
+            ? decisionDTO.toBuilder()
             : ((PendingProceedingDTO) currentDto).toBuilder();
 
     builder
@@ -486,7 +487,7 @@ public class DocumentationUnitTransformer {
   private static void addPreviousDecisions(
       DocumentationUnit updatedDomainObject,
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder) {
-    List<PreviousDecision> previousDecisions = updatedDomainObject.previousDecisions();
+    List<PreviousDecision> previousDecisions = updatedDomainObject.previousDecisions(); // NOSONAR
     if (previousDecisions != null) {
       AtomicInteger i = new AtomicInteger(1);
       builder.previousDecisions(
@@ -574,8 +575,8 @@ public class DocumentationUnitTransformer {
       return;
     }
 
-    List<DeviatingFileNumberDTO> deviatingFileNumberDTOs = new ArrayList<>();
-    List<String> deviatingFileNumbers = coreData.deviatingFileNumbers();
+    List<DeviatingFileNumberDTO> deviatingFileNumberDTOs = new ArrayList<>(); // NOSONAR
+    List<String> deviatingFileNumbers = coreData.deviatingFileNumbers(); // NOSONAR
 
     for (int i = 0; i < deviatingFileNumbers.size(); i++) {
       deviatingFileNumberDTOs.add(
@@ -594,8 +595,8 @@ public class DocumentationUnitTransformer {
       return;
     }
 
-    List<DeviatingDateDTO> deviatingDateDTOs = new ArrayList<>();
-    List<LocalDate> deviatingDecisionDates = coreData.deviatingDecisionDates();
+    List<DeviatingDateDTO> deviatingDateDTOs = new ArrayList<>(); // NOSONAR
+    List<LocalDate> deviatingDecisionDates = coreData.deviatingDecisionDates(); // NOSONAR
 
     for (int i = 0; i < deviatingDecisionDates.size(); i++) {
       deviatingDateDTOs.add(
@@ -611,8 +612,8 @@ public class DocumentationUnitTransformer {
       return;
     }
 
-    List<DeviatingCourtDTO> deviatingCourtDTOs = new ArrayList<>();
-    List<String> deviatingCourts = coreData.deviatingCourts();
+    List<DeviatingCourtDTO> deviatingCourtDTOs = new ArrayList<>(); // NOSONAR
+    List<String> deviatingCourts = coreData.deviatingCourts(); // NOSONAR
 
     for (int i = 0; i < deviatingCourts.size(); i++) {
       deviatingCourtDTOs.add(
@@ -650,8 +651,8 @@ public class DocumentationUnitTransformer {
       return;
     }
 
-    List<FileNumberDTO> fileNumberDTOs = new ArrayList<>();
-    List<String> fileNumbers = coreData.fileNumbers();
+    List<FileNumberDTO> fileNumberDTOs = new ArrayList<>(); // NOSONAR
+    List<String> fileNumbers = coreData.fileNumbers(); // NOSONAR
 
     for (int i = 0; i < fileNumbers.size(); i++) {
       fileNumberDTOs.add(
