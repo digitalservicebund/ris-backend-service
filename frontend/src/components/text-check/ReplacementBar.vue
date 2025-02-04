@@ -24,9 +24,8 @@ function ignoreSuggestion() {
   <div class="flex w-full flex-row flex-wrap gap-16">
     <div v-for="(replacement, i) in replacements" :key="i + replacement">
       <TextButton
-        :aria-label="`${replacement} übernehmen`"
+        aria-label="Vorschlag übernehmen"
         button-type="primary"
-        data-testid="suggestion-ignore-button"
         :label="replacement"
         size="small"
         width="w-max"
@@ -34,15 +33,10 @@ function ignoreSuggestion() {
       />
     </div>
     <TextButton
-      :aria-label="
-        replacementMode === 'single'
-          ? 'Vorschlag ignorieren'
-          : 'Vorschläge ignorieren'
-      "
+      aria-label="Vorschlag ignorieren"
       button-type="tertiary"
-      data-testid="suggestion-ignore-button"
       disabled
-      :label="replacementMode === 'single' ? 'Ignorieren ' : 'Alle ignorieren'"
+      :label="replacementMode === 'single' ? 'Ignorieren ' : 'Alle Ignorieren'"
       size="small"
       width="w-max"
       @click="ignoreSuggestion"

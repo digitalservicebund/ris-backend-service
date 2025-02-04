@@ -66,7 +66,6 @@ export interface Match {
   contextForSureMatch: number
   content: string
   word: string
-  category: string
 }
 
 export interface TextCheckResponse {
