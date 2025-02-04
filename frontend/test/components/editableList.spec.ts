@@ -29,15 +29,11 @@ async function renderComponent<T>(options?: {
   editComponent?: Component
   summaryComponent?: Component
   modelValue?: T[]
-  defaultValue?: T
-  disableMultiEntry?: boolean
 }) {
   const props: EditableListProps<T> = {
     editComponent: markRaw(options?.editComponent ?? DummyInputGroupVue),
     summaryComponent: markRaw(options?.summaryComponent ?? SummaryComponent),
     modelValue: options?.modelValue ?? listWithEntries.value,
-    defaultValue: options?.defaultValue ?? new DummyListItem(),
-    disableMultiEntry: options?.disableMultiEntry ?? false,
   }
 
   const user = userEvent.setup()

@@ -61,8 +61,6 @@ function generateUniqueSingleNormKey(singleNorm: SingleNorm): string {
     dateOfRelevance: singleNorm.dateOfRelevance ?? "",
   })
 }
-
-const defaultValue = new NormReference() as NormReference
 </script>
 <template>
   <div aria-label="Norm">
@@ -73,7 +71,6 @@ const defaultValue = new NormReference() as NormReference
       <div class="flex-1">
         <EditableList
           v-model="norms"
-          :default-value="defaultValue"
           :edit-component="NormReferenceInput"
           :summary-component="NormReferenceSummary"
         />

@@ -190,9 +190,6 @@ watch(
 )
 
 onMounted(() => {
-  if (props.modelValue?.isEmpty !== undefined) {
-    validateRequiredInput()
-  }
   activeCitation.value = new ActiveCitation({ ...props.modelValue })
 })
 </script>

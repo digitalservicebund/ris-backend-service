@@ -156,9 +156,6 @@ watch(
 )
 
 onMounted(async () => {
-  if (props.modelValue?.isEmpty !== undefined) {
-    await validateRequiredInput()
-  }
   previousDecision.value = new PreviousDecision({ ...props.modelValue })
 })
 </script>

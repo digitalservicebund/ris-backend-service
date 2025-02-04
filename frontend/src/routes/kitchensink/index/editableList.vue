@@ -19,7 +19,6 @@ function summerizer(dataEntry: EditableListItem) {
 
 const SummaryComponent = withSummarizer(summerizer)
 
-const defaultValue = new DummyListItem()
 const emptyList = ref([])
 
 const localModelValue = computed({
@@ -35,7 +34,6 @@ const localModelValue = computed({
     <KitchensinkStory name="With entries">
       <EditableList
         v-model="localModelValue"
-        :default-value="defaultValue"
         :edit-component="DummyInputGroup"
         :summary-component="SummaryComponent"
       />
@@ -43,7 +41,6 @@ const localModelValue = computed({
     <KitchensinkStory name="With no entries">
       <EditableList
         v-model="emptyList"
-        :default-value="defaultValue"
         :edit-component="DummyInputGroup"
         :summary-component="SummaryComponent"
       />

@@ -31,8 +31,6 @@ const references = computed({
   },
 })
 
-const defaultValue = new Reference() as Reference
-
 async function saveReferences(references: Reference[]) {
   store.edition!.references = references
   const response = await store.saveEdition()
@@ -100,7 +98,6 @@ watch(loadEditionIntervalCounter, async () => {
         <EditableList
           ref="editableListRef"
           v-model="references"
-          :default-value="defaultValue"
           :edit-component="PeriodicalEditionReferenceInput"
           :summary-component="PeriodicalEditionReferenceSummary"
         />

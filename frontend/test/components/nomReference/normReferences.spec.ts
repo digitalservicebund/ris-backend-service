@@ -4,6 +4,7 @@ import { render, screen } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { describe } from "vitest"
+import { createRouter, createWebHistory } from "vue-router"
 import NormReferences from "@/components/NormReferences.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
@@ -11,6 +12,7 @@ import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
+import routes from "~/test-helper/routes"
 
 const server = setupServer(
   http.get("/api/v1/caselaw/normabbreviation/search", () => {
@@ -23,6 +25,11 @@ const server = setupServer(
 
 function renderComponent(normReferences?: NormReference[]) {
   const user = userEvent.setup()
+
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: routes,
+  })
   return {
     user,
     ...render(NormReferences, {
@@ -42,6 +49,7 @@ function renderComponent(normReferences?: NormReference[]) {
               },
             }),
           ],
+          [router],
         ],
       },
     }),
@@ -59,6 +67,9 @@ function generateNormReference(options?: {
 }
 
 describe("Norm references", () => {
+  beforeEach(() => {
+    vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+  })
   beforeAll(() => server.listen())
   afterAll(() => server.close())
   it("renders empty norm reference in edit mode, when no norm references in list", async () => {

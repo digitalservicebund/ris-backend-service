@@ -4,7 +4,6 @@ import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
 import ActiveCitationSummary from "@/components/ActiveCitationSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
-import ActiveCitation from "@/domain/activeCitation"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
@@ -15,8 +14,6 @@ const activeCitations = computed({
     store.documentUnit!.contentRelatedIndexing.activeCitations = newValues
   },
 })
-
-const defaultValue = new ActiveCitation() as ActiveCitation
 </script>
 
 <template>
@@ -29,7 +26,6 @@ const defaultValue = new ActiveCitation() as ActiveCitation
     </h2>
     <EditableList
       v-model="activeCitations"
-      :default-value="defaultValue"
       :edit-component="ActiveCitationInput"
       :summary-component="ActiveCitationSummary"
     />

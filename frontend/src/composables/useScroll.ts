@@ -1,3 +1,4 @@
+import { Ref } from "vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 
@@ -11,6 +12,22 @@ export function useScroll() {
       const element = document.getElementById(id)
       if (element) {
         const elementPosition = element?.getBoundingClientRect().top
+        const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        })
+      }
+    })
+  }
+
+  async function scrollIntoViewportByRef(ref: Ref) {
+    // Wait until the ref is available
+    setTimeout(() => {
+      const element = ref.value
+      if (element) {
+        const elementPosition = element.getBoundingClientRect().top
         const offsetPosition = elementPosition + window.scrollY - headerOffset
 
         window.scrollTo({
@@ -46,6 +63,7 @@ export function useScroll() {
 
   return {
     scrollIntoViewportById,
+    scrollIntoViewportByRef,
     openSidePanelAndScrollToSection,
   }
 }
