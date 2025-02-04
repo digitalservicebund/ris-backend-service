@@ -74,7 +74,7 @@ public class DocumentationUnitTransformer {
    * @return a transformed database object containing the changes from the @param
    *     updatedDomainObject
    */
-  @SuppressWarnings("java:S6541")
+  @SuppressWarnings({"java:S6541", "java:S3776"})
   public static DocumentationUnitDTO transformToDTO(
       DocumentationUnitDTO currentDto, DocumentationUnit updatedDomainObject) {
 
