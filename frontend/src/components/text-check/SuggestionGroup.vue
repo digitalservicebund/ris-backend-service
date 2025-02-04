@@ -8,6 +8,19 @@ defineProps<{
   isSelected?: boolean
 }>()
 
+const emit = defineEmits<{
+  "suggestion:update": [value: string]
+  "suggestion:ignore": [void]
+}>()
+
+function acceptSuggestion(replacement: string) {
+  emit("suggestion:update", replacement)
+}
+
+function ignoreSuggestion() {
+  emit("suggestion:ignore")
+}
+
 function getAllReplacementValues(suggestion: Suggestion) {
   return [
     ...new Set(
@@ -48,6 +61,8 @@ function getAllReplacementValues(suggestion: Suggestion) {
     <ReplacementBar
       :replacement-mode="suggestion.matches.length > 1 ? 'multiple' : 'single'"
       :replacements="getAllReplacementValues(suggestion)"
+      @suggestion:ignore="ignoreSuggestion"
+      @suggestion:update="acceptSuggestion"
     />
   </div>
 </template>
