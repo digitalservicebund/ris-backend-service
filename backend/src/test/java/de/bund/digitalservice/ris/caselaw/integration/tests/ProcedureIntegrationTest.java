@@ -20,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
@@ -579,10 +578,10 @@ class ProcedureIntegrationTest {
 
   @Test
   void testSearch_withQuery_shouldReturnProceduresWithDateFirst() {
-    DecisionDTO documentationUnitDTO2 =
-        (DecisionDTO) documentationUnitRepository.findByDocumentNumber("docNumber00002").get();
-    DecisionDTO documentationUnitDTO3 =
-        (DecisionDTO) documentationUnitRepository.findByDocumentNumber("docNumber00003").get();
+    DocumentationUnitDTO documentationUnitDTO2 =
+        documentationUnitRepository.findByDocumentNumber("docNumber00002").get();
+    DocumentationUnitDTO documentationUnitDTO3 =
+        documentationUnitRepository.findByDocumentNumber("docNumber00003").get();
 
     addProcedureToDocUnit("with date", docUnitDTO);
 

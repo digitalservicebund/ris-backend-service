@@ -4,7 +4,6 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.EXTERN
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -36,7 +35,7 @@ public class EntityBuilderTestUtil {
   }
 
   public static DocumentationUnitDTO createTestDocumentationUnitDTO() {
-    return DecisionDTO.builder()
+    return DocumentationUnitDTO.builder()
         .id(UUID.fromString("e8c6f756-d6b2-4fa4-b751-e88c7c53bde4"))
         .documentNumber("YYTestDoc0013")
         .court(createTestCourtDTO())
@@ -107,7 +106,7 @@ public class EntityBuilderTestUtil {
       DatabaseDocumentationUnitRepository repository, DocumentationOfficeDTO documentationOffice) {
     return createAndSavePublishedDocumentationUnit(
         repository,
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .documentNumber(DEFAULT_DOCUMENT_NUMBER)
             .documentationOffice(documentationOffice),
         null);
@@ -121,20 +120,20 @@ public class EntityBuilderTestUtil {
 
     createAndSavePublishedDocumentationUnit(
         repository,
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .documentNumber(documentNumber)
             .documentationOffice(documentationOffice)
             .creatingDocumentationOffice(creatingDocumentationOffice),
         EXTERNAL_HANDOVER_PENDING);
   }
 
-  public static DecisionDTO createAndSavePublishedDocumentationUnit(
+  public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
       DatabaseDocumentationUnitRepository repository,
       DocumentationOfficeDTO documentationOffice,
       String documentNumber) {
     return createAndSavePublishedDocumentationUnit(
         repository,
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .documentNumber(documentNumber)
             .documentationOffice(documentationOffice),
         null);
@@ -142,24 +141,24 @@ public class EntityBuilderTestUtil {
 
   public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
       DatabaseDocumentationUnitRepository repository,
-      DecisionDTO.DecisionDTOBuilder<?, ?> builder) {
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder builder) {
     return createAndSavePublishedDocumentationUnit(repository, builder, null);
   }
 
-  public static DecisionDTO createAndSavePublishedDocumentationUnit(
+  public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
       DatabaseDocumentationUnitRepository repository,
-      DecisionDTO.DecisionDTOBuilder<?, ?> builder,
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder builder,
       PublicationStatus publicationStatus) {
     return createAndSavePublishedDocumentationUnit(repository, builder, publicationStatus, false);
   }
 
-  public static DecisionDTO createAndSavePublishedDocumentationUnit(
+  public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
       DatabaseDocumentationUnitRepository repository,
-      DecisionDTO.DecisionDTOBuilder<?, ?> builder,
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder builder,
       PublicationStatus publicationStatus,
       boolean errorStatus) {
 
-    DecisionDTO dto = repository.save(builder.build());
+    DocumentationUnitDTO dto = repository.save(builder.build());
 
     return repository.save(
         dto.toBuilder()

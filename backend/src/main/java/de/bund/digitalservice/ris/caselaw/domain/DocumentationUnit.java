@@ -15,13 +15,13 @@ import lombok.Builder;
  *     KORE00012024
  * @param attachments a list of attachments (e.g. .docx files)
  * @param coreData the core data (e.g. file number, decision date)
- * @param previousDecisions a list of previous decisions (Vorinstanz)
+ * @param previousDecisions a list of previous decisions
  * @param ensuingDecisions a list of ensuing decisions
- * @param shortTexts the short texts (Kurztexte)
- * @param longTexts the long texts (Langtexte)
+ * @param shortTexts the short texts (e.g. tenor, headnote)
+ * @param longTexts the long texts (e.g. reasons)
  * @param status the current status including publication and error status
- * @param note a note added to the documentation unit (Notiz)
- * @param contentRelatedIndexing the content related indexing data (Inhaltliche Erschließung)
+ * @param note a note added to the documentation unit
+ * @param contentRelatedIndexing the content related indexing data
  * @param caselawReferences a list of legal periodical caselaw references (Fundstellen)
  * @param literatureReferences a list of legal periodical literature references
  *     (Literaturfundstellen)
