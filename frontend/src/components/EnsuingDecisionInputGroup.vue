@@ -9,6 +9,7 @@ import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
+import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -29,6 +30,7 @@ const emit = defineEmits<{
 }>()
 
 const { scrollIntoViewportById } = useScroll()
+const { isSaved } = useIsSaved(props.modelValue, props.modelValueList)
 const lastSearchInput = ref(new EnsuingDecision())
 const lastSavedModelValue = ref(new EnsuingDecision({ ...props.modelValue }))
 const ensuingDecision = ref(new EnsuingDecision({ ...props.modelValue }))
@@ -46,19 +48,6 @@ const isPending = computed({
     if (value) ensuingDecision.value.decisionDate = undefined
     ensuingDecision.value.pending = value
   },
-})
-
-/**
- * Computed to check if entry was already saved
- */
-const isSaved = computed(() => {
-  return (
-    Array.isArray(props.modelValueList) &&
-    props.modelValueList.length > 0 &&
-    props.modelValueList.some(
-      (item) => props.modelValue && props.modelValue.id === item.id,
-    )
-  )
 })
 
 async function search() {

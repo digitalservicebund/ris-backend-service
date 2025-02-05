@@ -8,6 +8,7 @@ import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
+import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
@@ -29,6 +30,7 @@ const emit = defineEmits<{
 }>()
 
 const { scrollIntoViewportById } = useScroll()
+const { isSaved } = useIsSaved(props.modelValue, props.modelValueList)
 const lastSearchInput = ref(new ActiveCitation())
 const lastSavedModelValue = ref(new ActiveCitation({ ...props.modelValue }))
 const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
@@ -164,18 +166,6 @@ function updateDateFormatValidation(
     validationStore.add(validationError.message, "decisionDate")
   else validationStore.remove("decisionDate")
 }
-/**
- * Computed to check if entry was already saved
- */
-const isSaved = computed(() => {
-  return (
-    Array.isArray(props.modelValueList) &&
-    props.modelValueList.length > 0 &&
-    props.modelValueList.some(
-      (item) => props.modelValue && props.modelValue.id === item.id,
-    )
-  )
-})
 
 watch(
   activeCitation,

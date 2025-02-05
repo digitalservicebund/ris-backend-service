@@ -15,6 +15,7 @@ import PopupModal from "@/components/PopupModal.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
+import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit, {
@@ -33,7 +34,6 @@ import StringsUtil from "@/utils/stringsUtil"
 const props = defineProps<{
   modelValue?: Reference
   modelValueList: Reference[]
-  isSaved: boolean
 }>()
 const emit = defineEmits<{
   "update:modelValue": [value: Reference]
@@ -43,6 +43,7 @@ const emit = defineEmits<{
 }>()
 
 const { scrollIntoViewportById, openSidePanelAndScrollToSection } = useScroll()
+const { isSaved } = useIsSaved(props.modelValue, props.modelValueList)
 
 const store = useEditionStore()
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
@@ -190,7 +191,7 @@ async function addReference(decision: RelatedDocumentation) {
 
   const newReference: Reference = new Reference({
     id: reference.value.id,
-    citation: props.isSaved ? reference.value.citation : buildCitation(),
+    citation: isSaved.value ? reference.value.citation : buildCitation(),
     referenceSupplement: reference.value.referenceSupplement,
     author: reference.value.author,
     documentType: reference.value.documentType,

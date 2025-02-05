@@ -59,16 +59,6 @@ function isEditEntry(entry: T) {
 }
 
 /**
- * Method to check if entry is given in model value
- */
-function isSaved(entry?: T): boolean {
-  if (entry) {
-    return props.modelValue.some((item) => entry.id === item.id)
-  }
-  return false
-}
-
-/**
  * Resetting the edit to undefined, to show all list items in summary mode
  */
 async function cancelEdit() {
@@ -210,7 +200,6 @@ defineExpose({
         v-model="mergedValues[index]"
         class="py-24"
         :class="{ 'pt-0': index == 0 }"
-        :is-saved="isSaved(mergedValues[index])"
         :model-value-list="modelValueList"
         @add-entry="updateModel"
         @cancel-edit="cancelEdit"
