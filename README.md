@@ -73,7 +73,8 @@ op item create \
     'username=[your-github-username]' \
     'password=[your-personal-access-token]'
 
-echo $(op read 'op://Employee/GitHub Personal Access Token for migration/password') | docker login ghcr.io -u $(op read 'op://Employee/GitHub Personal Access Token for migration/username') --password-stdin
+echo $(op read 'op://Employee/GitHub Personal Access Token for migration/password')  \
+| docker login ghcr.io -u $(op read 'op://Employee/GitHub Personal Access Token for migration/username') --password-stdin
 ```
 
 The following step requires an OTC access token, read here for
@@ -123,7 +124,7 @@ in [compose.yaml](https://github.com/digitalservicebund/ris-backend-service/blob
 and then run:
 
 ```bash
-./run.sh -i
+./run.sh dev -i
 ```
 
 > Note: If you wish to migrate documentation units, use the instructions
