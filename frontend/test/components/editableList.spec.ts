@@ -177,20 +177,22 @@ describe("EditableList", () => {
   })
 
   describe("Scrolling behavior", () => {
-    it("scrolls to the item being edited after cancel", async () => {
+    it("scrolls editable list back into view after cancel", async () => {
       // Arrange
       const { user } = await renderComponent()
       const item = screen.getByTestId("list-entry-0")
       await user.click(item)
+      const scrollIntoViewMock = vi.fn()
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
 
       // Act
       await user.click(screen.getByLabelText("Abbrechen"))
 
       // Assert
-      expect(window.scrollTo).toHaveBeenCalledTimes(1)
+      expect(scrollIntoViewMock).toHaveBeenCalledTimes(1)
     })
 
-    it("scrolls to the item being edited after 'übernehmen''", async () => {
+    it("scrolls editable list back into view after 'übernehmen''", async () => {
       // Arrange
       const { user } = await renderComponent()
       const item = screen.getByTestId("list-entry-0")
@@ -198,25 +200,29 @@ describe("EditableList", () => {
       expect(screen.getByLabelText("Editier Input")).toBeVisible()
       await user.type(screen.getByLabelText("Editier Input"), "1")
       const button = screen.getByLabelText("Listeneintrag speichern")
+      const scrollIntoViewMock = vi.fn()
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
 
       // Act
       await user.click(button)
 
       // Assert
-      expect(window.scrollTo).toHaveBeenCalledTimes(1)
+      expect(scrollIntoViewMock).toHaveBeenCalledTimes(1)
     })
 
-    it("scrolls to editable list container if an item has been deleted", async () => {
+    it("scrolls editable list back into view if an item has been deleted", async () => {
       // Arrange
       const { user } = await renderComponent()
       const item = screen.getByTestId("list-entry-0")
       await user.click(item)
+      const scrollIntoViewMock = vi.fn()
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
 
       // Act
       await user.click(screen.getByLabelText("Eintrag löschen"))
 
       // Assert
-      expect(window.scrollTo).toHaveBeenCalledTimes(1)
+      expect(scrollIntoViewMock).toHaveBeenCalledTimes(1)
     })
   })
 })

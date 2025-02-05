@@ -29,7 +29,7 @@ const editEntry = ref<T | undefined>() as Ref<T | undefined>
 const modelValueList = ref<T[]>([...props.modelValue]) as Ref<T[]>
 const localNewEntry = ref<T | undefined>() as Ref<T | undefined>
 const editableListContainer = ref(null)
-const { scrollIntoViewportByRef, scrollIntoViewportById } = useScroll()
+const { scrollNearestRefIntoViewport } = useScroll()
 
 /**
  * Computed mergedValues is a computed helper list that ensure the update of the modelValue does not effect a local new value
@@ -73,7 +73,7 @@ function isSaved(entry?: T): boolean {
  */
 async function cancelEdit() {
   toggleNewEntry(false)
-  await scrollIntoViewportByRef(editableListContainer)
+  await scrollNearestRefIntoViewport(editableListContainer)
 }
 
 /**
@@ -88,17 +88,17 @@ async function removeEntry(entry: T) {
   )
   emit("update:modelValue", updatedEntries)
   setEditEntry()
-  await scrollIntoViewportByRef(editableListContainer)
+  await scrollNearestRefIntoViewport(editableListContainer)
 }
 
 /**
  * Updating the modelValue with the local modelValue list, is not propagated, until the user actively
  * decides to click the save button in edit mode. The edit index is reset, to show list in summary mode.
  */
-async function updateModel(index: number) {
+async function updateModel() {
   emit("update:modelValue", mergedValues.value)
   toggleNewEntry(true)
-  await scrollIntoViewportById(`summary-entry-${index}`)
+  await scrollNearestRefIntoViewport(editableListContainer)
 }
 
 async function handleAddFromSummary(newEntry: T) {
@@ -177,7 +177,6 @@ defineExpose({
       >
         <component
           :is="summaryComponent"
-          :id="`summary-entry-${index}`"
           class="flex scroll-m-64"
           :data="entry"
           @add-new-entry="handleAddFromSummary"
@@ -213,7 +212,7 @@ defineExpose({
         :class="{ 'pt-0': index == 0 }"
         :is-saved="isSaved(mergedValues[index])"
         :model-value-list="modelValueList"
-        @add-entry="updateModel(index)"
+        @add-entry="updateModel"
         @cancel-edit="cancelEdit"
         @remove-entry="removeEntry(entry as T)"
       />

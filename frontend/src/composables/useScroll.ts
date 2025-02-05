@@ -22,17 +22,12 @@ export function useScroll() {
     })
   }
 
-  async function scrollIntoViewportByRef(ref: Ref) {
-    // Wait until the ref is available
+  async function scrollNearestRefIntoViewport(ref: Ref) {
     setTimeout(() => {
       const element = ref.value
       if (element) {
-        const elementPosition = element.getBoundingClientRect().top
-        const offsetPosition = elementPosition + window.scrollY - headerOffset
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth",
+        element.scrollIntoView({
+          block: "nearest",
         })
       }
     })
@@ -63,7 +58,7 @@ export function useScroll() {
 
   return {
     scrollIntoViewportById,
-    scrollIntoViewportByRef,
+    scrollNearestRefIntoViewport,
     openSidePanelAndScrollToSection,
   }
 }
