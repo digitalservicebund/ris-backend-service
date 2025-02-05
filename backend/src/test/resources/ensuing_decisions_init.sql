@@ -56,6 +56,16 @@ values
   );
 
 insert into
+    incremental_migration.decision (id)
+values
+    (
+        '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
+    ),
+    (
+        'f13e7fe2-78a5-11ee-b962-0242ac120002'
+    );
+
+insert into
   incremental_migration.related_documentation (
     id,
     court_id,

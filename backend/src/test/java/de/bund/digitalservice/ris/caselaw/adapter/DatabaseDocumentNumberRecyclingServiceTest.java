@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
@@ -60,7 +61,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
   void addForRecycling_shouldNotSave_ifPrefixIsInvalid() {
 
     var documentationUnitDTO =
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .id(UUID.randomUUID())
             .documentNumber("KORE2" + Year.now() + "00037")
             .build();
@@ -77,9 +78,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
     when(repository.findFirstByAbbreviationAndYear(DEFAULT_DOCUMENTATION_OFFICE, Year.now()))
         .thenReturn(Optional.of(outdatedDeletedId));
     when(documentationUnitRepository.findById(documentationUnitDTO.getId()))
-        .thenReturn(
-            Optional.of(
-                DocumentationUnitDTO.builder().statusHistory(List.of(unpublished)).build()));
+        .thenReturn(Optional.of(DecisionDTO.builder().statusHistory(List.of(unpublished)).build()));
     when(repository.save(any())).thenReturn(generateDeletedDocumentationUnitDTO());
 
     assertThrows(
@@ -142,7 +141,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
       names = {"UNPUBLISHED", "EXTERNAL_HANDOVER_PENDING"})
   void addForRecycling_shouldSaveIfOnly_unpublished(PublicationStatus publicationStatus) {
     var documentationUnitDTO =
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .id(UUID.randomUUID())
             .documentNumber(generateDefaultDocumentNumber())
             .build();
@@ -179,8 +178,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
 
     when(documentationUnitRepository.findById(documentationUnitDTO.getId()))
         .thenReturn(
-            Optional.of(
-                DocumentationUnitDTO.builder().statusHistory(Collections.emptyList()).build()));
+            Optional.of(DecisionDTO.builder().statusHistory(Collections.emptyList()).build()));
 
     DocumentNumberRecyclingException exception =
         assertThrows(
@@ -204,10 +202,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
     when(documentationUnitRepository.findById(documentationUnitDTO.getId()))
         .thenReturn(
             Optional.of(
-                DocumentationUnitDTO.builder()
-                    .status(published)
-                    .statusHistory(List.of(published))
-                    .build()));
+                DecisionDTO.builder().status(published).statusHistory(List.of(published)).build()));
 
     when(repository.save(any())).thenReturn(generateDeletedDocumentationUnitDTO());
 
@@ -281,7 +276,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
   }
 
   private static DocumentationUnitDTO generateDocumentationUnitDto() {
-    return DocumentationUnitDTO.builder()
+    return DecisionDTO.builder()
         .id(UUID.randomUUID())
         .documentNumber(generateDefaultDocumentNumber())
         .build();

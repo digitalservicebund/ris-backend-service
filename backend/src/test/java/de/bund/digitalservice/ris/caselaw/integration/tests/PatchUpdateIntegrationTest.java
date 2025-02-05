@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedure
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRelatedDocumentationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
@@ -621,7 +622,7 @@ class PatchUpdateIntegrationTest {
       DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+      DecisionDTO dto = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
       dto.setEcli("initialEcli");
       repository.save(dto);
       TestTransaction.end();
@@ -728,7 +729,7 @@ class PatchUpdateIntegrationTest {
       DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+      DecisionDTO dto = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
       dto.setEcli("initialEcli");
       repository.save(dto);
       TestTransaction.end();
@@ -892,7 +893,7 @@ class PatchUpdateIntegrationTest {
       DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+      DecisionDTO dto = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
       dto.setEcli("initialEcli");
       repository.save(dto);
       TestTransaction.end();
@@ -3081,15 +3082,15 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
+      DecisionDTO documentationUnitDTO =
+          (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(documentationUnit.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isNull();
       assertThat(documentationUnitDTO.getPreviousDecisions())
           .extracting("documentNumber")
           .containsExactly(previousDecision.documentNumber());
-      documentationUnitDTO = repository.findById(previousDecision.uuid()).get();
+      documentationUnitDTO = (DecisionDTO) repository.findById(previousDecision.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(previousDecision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
@@ -3168,14 +3169,14 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = repository.findById(documentationUnit.uuid()).get();
+      documentationUnitDTO = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(documentationUnit.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isEqualTo("ecliUser2");
       assertThat(documentationUnitDTO.getPreviousDecisions())
           .extracting("documentNumber")
           .containsExactly(previousDecision.documentNumber());
-      documentationUnitDTO = repository.findById(previousDecision.uuid()).get();
+      documentationUnitDTO = (DecisionDTO) repository.findById(previousDecision.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(previousDecision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
@@ -3260,14 +3261,14 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = repository.findById(documentationUnit.uuid()).get();
+      documentationUnitDTO = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(documentationUnit.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isEqualTo("ecliUser2");
       assertThat(documentationUnitDTO.getPreviousDecisions())
           .extracting("documentNumber")
           .containsExactly(previousDecision.documentNumber());
-      documentationUnitDTO = repository.findById(previousDecision.uuid()).get();
+      documentationUnitDTO = (DecisionDTO) repository.findById(previousDecision.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(previousDecision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
@@ -3679,13 +3680,13 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
+      DecisionDTO documentationUnitDTO =
+          (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(documentationUnit.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isNull();
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
-      documentationUnitDTO = repository.findById(previousDecision.uuid()).get();
+      documentationUnitDTO = (DecisionDTO) repository.findById(previousDecision.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(previousDecision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
@@ -3733,12 +3734,12 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = repository.findById(documentationUnit.uuid()).get();
+      documentationUnitDTO = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(documentationUnit.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isEqualTo("ecliUser2");
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
-      documentationUnitDTO = repository.findById(previousDecision.uuid()).get();
+      documentationUnitDTO = (DecisionDTO) repository.findById(previousDecision.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(previousDecision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
@@ -3787,12 +3788,12 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = repository.findById(documentationUnit.uuid()).get();
+      documentationUnitDTO = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(documentationUnit.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isEqualTo("ecliUser2");
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
-      documentationUnitDTO = repository.findById(previousDecision.uuid()).get();
+      documentationUnitDTO = (DecisionDTO) repository.findById(previousDecision.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
           .isEqualTo(previousDecision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
@@ -4099,7 +4100,7 @@ class PatchUpdateIntegrationTest {
       // Arrange
       TestTransaction.flagForCommit();
       TestTransaction.end();
-      DocumentationUnitDTO docUnitDTO = repository.findByDocumentNumber("1234567890123").get();
+      DecisionDTO docUnitDTO = (DecisionDTO) repository.findByDocumentNumber("1234567890123").get();
       docUnitDTO.setHeadline("oldHeadline");
       docUnitDTO.setGuidingPrinciple("guidingPrinciple");
       repository.save(docUnitDTO);
@@ -4117,7 +4118,7 @@ class PatchUpdateIntegrationTest {
           .expectBody(RisJsonPatch.class);
 
       TestTransaction.start();
-      DocumentationUnitDTO result = repository.findById(docUnitDTO.getId()).get();
+      DecisionDTO result = (DecisionDTO) repository.findById(docUnitDTO.getId()).get();
 
       // Assert
       assertThat(result.getDecisionNames().get(0).getValue()).isEqualTo("decisionName");

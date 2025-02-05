@@ -15,8 +15,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl;
@@ -290,7 +290,7 @@ class LegalPeriodicalEditionIntegrationTest {
                                 .abbreviation("Ean")
                                 .build())
                         .documentationUnit(
-                            DocumentationUnitDTO.builder()
+                            DecisionDTO.builder()
                                 .id(docUnit.getId())
                                 .documentNumber("DOC_NUMBER")
                                 .build())
@@ -307,7 +307,7 @@ class LegalPeriodicalEditionIntegrationTest {
                                 .build())
                         .legalPeriodicalRawValue("B")
                         .documentationUnit(
-                            DocumentationUnitDTO.builder()
+                            DecisionDTO.builder()
                                 .id(docUnit.getId())
                                 .documentNumber("DOC_NUMBER")
                                 .build())
@@ -321,7 +321,7 @@ class LegalPeriodicalEditionIntegrationTest {
                         .legalPeriodicalRawValue("A")
                         .type("amtlich")
                         .documentationUnit(
-                            DocumentationUnitDTO.builder()
+                            DecisionDTO.builder()
                                 .id(docUnit.getId())
                                 .documentNumber("DOC_NUMBER")
                                 .build())
@@ -333,7 +333,7 @@ class LegalPeriodicalEditionIntegrationTest {
                         .type("amtlich")
                         .documentationUnitRank(2)
                         .documentationUnit(
-                            DocumentationUnitDTO.builder()
+                            DecisionDTO.builder()
                                 .id(docUnit.getId())
                                 .documentNumber("DOC_NUMBER")
                                 .build())
@@ -493,7 +493,7 @@ class LegalPeriodicalEditionIntegrationTest {
                                 .abbreviation("Ean")
                                 .build())
                         .documentationUnit(
-                            DocumentationUnitDTO.builder()
+                            DecisionDTO.builder()
                                 .id(docUnit.getId())
                                 .documentNumber("DOC_NUMBER")
                                 .build())
@@ -507,7 +507,7 @@ class LegalPeriodicalEditionIntegrationTest {
                         .legalPeriodicalRawValue("A")
                         .type("amtlich")
                         .documentationUnit(
-                            DocumentationUnitDTO.builder()
+                            DecisionDTO.builder()
                                 .id(docUnit.getId())
                                 .documentNumber("DOC_NUMBER")
                                 .build())
