@@ -27,7 +27,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -238,7 +237,7 @@ class PublishIntegrationTest {
                     .contains("Could not save changelog to bucket."));
   }
 
-  private DecisionDTO.DecisionDTOBuilder<?, ?> buildValidDocumentationUnit() {
+  private DocumentationUnitDTO.DocumentationUnitDTOBuilder buildValidDocumentationUnit() {
     CourtDTO court =
         databaseCourtRepository.saveAndFlush(
             CourtDTO.builder()
@@ -253,7 +252,7 @@ class PublishIntegrationTest {
         databaseDocumentTypeRepository.saveAndFlush(
             DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
 
-    return DecisionDTO.builder()
+    return DocumentationUnitDTO.builder()
         .documentNumber(DEFAULT_DOCUMENT_NUMBER)
         .documentType(docType)
         .documentationOffice(documentationOffice)

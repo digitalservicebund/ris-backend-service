@@ -25,7 +25,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -180,7 +179,7 @@ class PreviousDecisionIntegrationTest {
 
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .documentationOffice(documentationOfficeDTO)
             .documentNumber("documntnumber")
             .previousDecisions(
@@ -249,7 +248,7 @@ class PreviousDecisionIntegrationTest {
 
     var childDocumentationUnitDTO =
         repository.save(
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("abcdefghjikl")
                 .decisionDate(LocalDate.parse("2021-01-01"))
                 .documentationOffice(documentationOfficeDTO)
@@ -293,7 +292,7 @@ class PreviousDecisionIntegrationTest {
     DocumentationUnitDTO parentDocumentationUnitDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOfficeDTO)
                 .documentNumber("1234567890123")
                 .previousDecisions(
@@ -563,7 +562,7 @@ class PreviousDecisionIntegrationTest {
 
     return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .documentationOffice(documentOffice)
             .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
             .court(testCourt)

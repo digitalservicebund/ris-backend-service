@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
@@ -25,8 +24,8 @@ public class DuplicateRelationTransformer {
    *     requested
    */
   public static DuplicateRelation transformToDomain(
-      DuplicateRelationDTO duplicateRelationDTO, DecisionDTO current) {
-    DecisionDTO duplicate;
+      DuplicateRelationDTO duplicateRelationDTO, DocumentationUnitDTO current) {
+    DocumentationUnitDTO duplicate;
     if (duplicateRelationDTO.getDocumentationUnit1().getId().equals(current.getId())) {
       duplicate = duplicateRelationDTO.getDocumentationUnit2();
     } else {

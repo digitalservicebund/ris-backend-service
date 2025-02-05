@@ -18,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
@@ -130,7 +129,7 @@ class DeviatingObjectIntegrationTest {
   private DocumentationUnitDTO prepareDocumentationUnitDTOWithDeviatingFileNumbers() {
     return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .documentNumber("1234567890123")
             .documentationOffice(
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -327,7 +326,7 @@ class DeviatingObjectIntegrationTest {
   void testReadOfDeviatingECLI() {
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .documentNumber("1234567890123")
             .documentationOffice(
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -357,7 +356,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -400,7 +399,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -435,7 +434,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -477,7 +476,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -518,7 +517,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -560,7 +559,7 @@ class DeviatingObjectIntegrationTest {
   void testReadOfDeviatingCourts() {
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .documentNumber("1234567890123")
             .documentationOffice(
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -591,7 +590,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -634,7 +633,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -669,7 +668,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -712,7 +711,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -754,7 +753,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -798,7 +797,7 @@ class DeviatingObjectIntegrationTest {
 
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .documentNumber("1234567890123")
             .documentationOffice(
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -830,7 +829,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -884,7 +883,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -930,7 +929,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -976,7 +975,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
@@ -1021,7 +1020,7 @@ class DeviatingObjectIntegrationTest {
     var savedDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
