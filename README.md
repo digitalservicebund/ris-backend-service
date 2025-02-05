@@ -70,8 +70,8 @@ on how to create one. Otherwise, you can replace `GitHub Personal Access Token f
 op item create \
     --category login \
     --title "GitHub Personal Access Token for migration" \
-    'username=YOUR_GITHUB_USERNAME' \
-    'password=YOUR_PERSONAL_ACCESS_TOKEN'
+    'username=[your-github-username]' \
+    'password=[your-personal-access-token]'
 
 echo $(op read 'op://Employee/GitHub Personal Access Token for migration/password') | docker login ghcr.io -u $(op read 'op://Employee/GitHub Personal Access Token for migration/username') --password-stdin
 ```
