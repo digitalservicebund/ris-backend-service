@@ -93,7 +93,7 @@ To connect to the S3 bucket, store your AWS credentials in 1Password in the exis
 
 ```shell
 op item edit 'OTC' aws_access_key_id=[your-access-key-id]
-op item edit 'OTC' aws_secret_access_key=[your-access-key-id]
+op item edit 'OTC' aws_secret_access_key=[your-aws_secret_access_key]
 ```
 
 ## Getting started
