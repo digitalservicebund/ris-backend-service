@@ -17,7 +17,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumb
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
@@ -70,14 +69,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class DocumentationUnitTransformerTest {
+class DecisionTransformerTest {
   @Test
   void testTransformToDTO_withoutCoreData() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DecisionDTO currentDto = DecisionDTO.builder().build();
     DocumentationUnit updatedDomainObject = DocumentationUnit.builder().build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getProcedureHistory()).isEmpty();
     assertThat(documentationUnitDTO.getProcedure()).isNull();
@@ -99,7 +98,7 @@ class DocumentationUnitTransformerTest {
         DocumentationUnit.builder().shortTexts(shortTexts).build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getDecisionNames()).isEmpty();
   }
@@ -110,19 +109,19 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit updatedDomainObject = DocumentationUnit.builder().build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isNull();
   }
 
   @Test
   void testTransformToDTO_withBlankString_shouldConvertToNull() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().note("before change").build();
+    DecisionDTO currentDto = DecisionDTO.builder().note("before change").build();
 
     DocumentationUnit updatedDomainObject = DocumentationUnit.builder().note("  ").build();
 
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertNull(documentationUnitDTO.getNote());
   }
@@ -130,7 +129,7 @@ class DocumentationUnitTransformerTest {
   @Test
   void
       testTransformToDTO_addLegalEffectWithCourtChangedAndNotSuperiorCourtAndLegalEffectNo_shouldSetLegalEffectToNo() {
-    DocumentationUnitDTO currentDto =
+    DecisionDTO currentDto =
         DecisionDTO.builder()
             .court(
                 CourtDTO.builder()
@@ -151,7 +150,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.NEIN);
   }
@@ -159,7 +158,7 @@ class DocumentationUnitTransformerTest {
   @Test
   void
       testTransformToDTO_addLegalEffectWithCourtChangedAndNotSuperiorCourtAndLegalEffectNotSpecified_shouldSetLegalEffectToNotSpecified() {
-    DocumentationUnitDTO currentDto =
+    DecisionDTO currentDto =
         DecisionDTO.builder()
             .court(
                 CourtDTO.builder()
@@ -180,7 +179,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.KEINE_ANGABE);
   }
@@ -188,7 +187,7 @@ class DocumentationUnitTransformerTest {
   @Test
   void
       testTransformToDTO_addLegalEffectWithCourtChangedAndNotSuperiorCourtAndLegalEffectYes_shouldSetLegalEffectToYes() {
-    DocumentationUnitDTO currentDto =
+    DecisionDTO currentDto =
         DecisionDTO.builder()
             .court(
                 CourtDTO.builder()
@@ -209,7 +208,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA);
   }
@@ -218,7 +217,7 @@ class DocumentationUnitTransformerTest {
   @ValueSource(strings = {"BGH", "BVerwG", "BFH", "BVerfG", "BAG", "BSG"})
   void testTransformToDTO_addLegalEffectWithCourtChangedAndSuperiorCourt_shouldSetLegalEffectToYes(
       String courtType) {
-    DocumentationUnitDTO currentDto =
+    DecisionDTO currentDto =
         DecisionDTO.builder()
             .court(
                 CourtDTO.builder()
@@ -239,14 +238,14 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA);
   }
 
   @Test
   void testTransformToDTO_withInputTypes() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DecisionDTO currentDto = DecisionDTO.builder().build();
     List<String> inputTypes = List.of("input types 1", "input types 3", "input types 2");
     DocumentationUnit updatedDomainObject =
         DocumentationUnit.builder()
@@ -254,7 +253,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getInputTypes())
         .usingRecursiveFieldByFieldElementComparator()
@@ -266,7 +265,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withOneNormReference() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DecisionDTO currentDto = DecisionDTO.builder().build();
     NormReference normReferenceInput =
         NormReference.builder()
             .normAbbreviation(
@@ -282,8 +281,8 @@ class DocumentationUnitTransformerTest {
                 ContentRelatedIndexing.builder().norms(List.of(normReferenceInput)).build())
             .build();
 
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId())
         .isEqualTo(normReferenceInput.normAbbreviation().id());
@@ -293,7 +292,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withOneNormReference_withLegalForce() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DecisionDTO currentDto = DecisionDTO.builder().build();
     NormReference normReferenceInput =
         NormReference.builder()
             .normAbbreviation(
@@ -318,8 +317,8 @@ class DocumentationUnitTransformerTest {
                 ContentRelatedIndexing.builder().norms(List.of(normReferenceInput)).build())
             .build();
 
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getNormReferences().get(0).getLegalForce()).isNotNull();
     assertThat(
@@ -336,7 +335,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withOneNormReference_withMultipleSingleNorms_withLegalForce() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DecisionDTO currentDto = DecisionDTO.builder().build();
     NormReference normReferenceInput =
         NormReference.builder()
             .normAbbreviation(
@@ -369,8 +368,8 @@ class DocumentationUnitTransformerTest {
                 ContentRelatedIndexing.builder().norms(List.of(normReferenceInput)).build())
             .build();
 
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId())
         .isEqualTo(normReferenceInput.normAbbreviation().id());
@@ -405,7 +404,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withMultipleNormReferences() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DecisionDTO currentDto = DecisionDTO.builder().build();
     NormReference normReferenceInput1 =
         NormReference.builder()
             .normAbbreviation(
@@ -441,8 +440,8 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId())
         .isEqualTo(normReferenceInput1.normAbbreviation().id());
@@ -468,7 +467,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withNormReference_withoutNormAbbreviation_throwsException() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DecisionDTO currentDto = DecisionDTO.builder().build();
     NormReference normReferenceInput =
         NormReference.builder()
             .singleNorms(List.of(SingleNorm.builder().singleNorm("single norm 1").build()))
@@ -483,7 +482,7 @@ class DocumentationUnitTransformerTest {
     Exception exception =
         assertThrows(
             DocumentationUnitTransformerException.class,
-            () -> DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject));
+            () -> DecisionTransformer.transformToDTO(currentDto, updatedDomainObject));
 
     String expectedMessage = "Norm reference has no norm abbreviation, but is required.";
     String actualMessage = exception.getMessage();
@@ -493,7 +492,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withLeadingDecisionNormReferences() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DecisionDTO currentDto = DecisionDTO.builder().build();
     List<String> leadingDecisionNormReferences = List.of("BGB §1", "BGB §2", "BGB §3");
     DocumentationUnit updatedDomainObject =
         DocumentationUnit.builder()
@@ -509,7 +508,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLeadingDecisionNormReferences())
         .usingRecursiveFieldByFieldElementComparator()
@@ -521,7 +520,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_deletedLeadingDecisionNormReferences() {
-    DocumentationUnitDTO currentDto =
+    DecisionDTO currentDto =
         DecisionDTO.builder()
             .court(
                 CourtDTO.builder()
@@ -551,14 +550,14 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLeadingDecisionNormReferences()).isEmpty();
   }
 
   @Test
   void testTransformToDTO_normalizesNonBreakingSpaces() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DecisionDTO currentDto = DecisionDTO.builder().build();
 
     DocumentationUnit updatedDomainObject =
         DocumentationUnit.builder()
@@ -624,7 +623,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
     assertThat(documentationUnitDTO.getEcli()).isEqualTo("This is a test ecli with spaces");
     assertThat(documentationUnitDTO.getJudicialBody())
         .isEqualTo("This is a test appraisalBody with spaces");
@@ -692,8 +691,7 @@ class DocumentationUnitTransformerTest {
 
     DecisionDTO documentationUnitDTO =
         (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder().build(), documentationUnit);
+            DecisionTransformer.transformToDTO(DecisionDTO.builder().build(), documentationUnit);
 
     assertThat(documentationUnitDTO.getJobProfiles())
         .extracting("value")
@@ -710,8 +708,7 @@ class DocumentationUnitTransformerTest {
 
     DecisionDTO documentationUnitDTO =
         (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder().build(), documentationUnit);
+            DecisionTransformer.transformToDTO(DecisionDTO.builder().build(), documentationUnit);
 
     assertThat(documentationUnitDTO.getDismissalTypes())
         .extracting("value")
@@ -730,8 +727,7 @@ class DocumentationUnitTransformerTest {
 
     DecisionDTO documentationUnitDTO =
         (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder().build(), documentationUnit);
+            DecisionTransformer.transformToDTO(DecisionDTO.builder().build(), documentationUnit);
 
     assertThat(documentationUnitDTO.getDismissalGrounds())
         .extracting("value")
@@ -750,8 +746,7 @@ class DocumentationUnitTransformerTest {
 
     DecisionDTO documentationUnitDTO =
         (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder().build(), documentationUnit);
+            DecisionTransformer.transformToDTO(DecisionDTO.builder().build(), documentationUnit);
 
     assertThat(documentationUnitDTO.getCollectiveAgreements())
         .extracting("value")
@@ -773,8 +768,7 @@ class DocumentationUnitTransformerTest {
     // Act
     DecisionDTO documentationUnitDTO =
         (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
-                DecisionDTO.builder().build(), documentationUnit);
+            DecisionTransformer.transformToDTO(DecisionDTO.builder().build(), documentationUnit);
 
     // Assert
     assertThat(documentationUnitDTO.getParticipatingJudges()).hasSize(1);
@@ -788,7 +782,7 @@ class DocumentationUnitTransformerTest {
   @Test
   void testTransformToDTO_withCaselawReferences() {
     var uuid = UUID.randomUUID();
-    DocumentationUnitDTO currentDto =
+    DecisionDTO currentDto =
         DecisionDTO.builder()
             .caselawReferences(
                 List.of(
@@ -810,8 +804,8 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit updatedDomainObject =
         DocumentationUnit.builder().caselawReferences(updatedReferences).build();
 
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getCaselawReferences().getFirst().getDocumentationUnitRank())
         .isOne();
@@ -824,7 +818,7 @@ class DocumentationUnitTransformerTest {
   @Test
   void testTransformToDTO_withLiteratureReferences() {
     var uuid = UUID.randomUUID();
-    DocumentationUnitDTO currentDto =
+    DecisionDTO currentDto =
         DecisionDTO.builder()
             .literatureReferences(
                 List.of(
@@ -841,8 +835,8 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit updatedDomainObject =
         DocumentationUnit.builder().literatureReferences(updatedReferences).build();
 
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLiteratureReferences().getFirst().getDocumentationUnitRank())
         .isOne();
@@ -855,14 +849,14 @@ class DocumentationUnitTransformerTest {
   @Test
   void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentationUnit() {
 
-    assertThatThrownBy(() -> DocumentationUnitTransformer.transformToDomain(null))
+    assertThatThrownBy(() -> DecisionTransformer.transformToDomain(null))
         .isInstanceOf(DocumentationUnitTransformerException.class)
         .hasMessageContaining("Document unit is null and won't transform");
   }
 
   @Test
   void testTransformToDomain_withRegion_shouldSetRegion() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .regions(List.of(RegionDTO.builder().code("region").build()))
             .build();
@@ -872,14 +866,14 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
   void testTransformToDomain_withLegalEffectYes_shouldSetLegalEffectToYes() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.JA).build();
     DocumentationUnit expected =
         generateSimpleDocumentationUnitBuilder()
@@ -887,14 +881,14 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
   void testTransformToDomain_withLegalEffectNo_shouldSetLegalEffectToNo() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.NEIN).build();
     DocumentationUnit expected =
         generateSimpleDocumentationUnitBuilder()
@@ -902,14 +896,14 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
   void testTransformToDomain_withLegalEffectNotSpecified_shouldSetLegalEffectToNotSpecified() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.KEINE_ANGABE).build();
     DocumentationUnit expected =
         generateSimpleDocumentationUnitBuilder()
@@ -917,14 +911,14 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
   void testTransformToDomain_withLegalEffectWrongValue_shouldSetLegalEffectToNull() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.FALSCHE_ANGABE).build();
     DocumentationUnit expected =
         generateSimpleDocumentationUnitBuilder()
@@ -932,14 +926,14 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
   void testTransformToDomain_withEnsuingAndPendingDecisionsWithoutARank_shouldAddItToTheEnd() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .ensuingDecisions(
                 List.of(
@@ -962,21 +956,21 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
   void testTransformToDomain_textWithMultipleBorderNumberElements_shouldAddAllBorderNumbers() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .grounds(
                 "lorem ipsum<border-number><number>1</number><content>foo</content></border-number> dolor sit amet <border-number><number>2</number><content>bar</content></border-number>")
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.managementData().borderNumbers())
         .hasSize(2)
@@ -985,13 +979,13 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformScheduledPublicationDate_withDate_shouldAddScheduledPublicationDate() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .scheduledPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.managementData().scheduledPublicationDateTime())
         .isEqualTo("2022-01-23T18:25:14");
@@ -999,24 +993,24 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformScheduledPublicationDate_withoutDate_shouldNotAddScheduledPublicationDate() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder().scheduledPublicationDateTime(null).build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.managementData().scheduledPublicationDateTime()).isNull();
   }
 
   @Test
   void testTransformLastPublicationDate_withDate_shouldAddLastPublicationDate() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .lastPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.managementData().lastPublicationDateTime())
         .isEqualTo("2022-01-23T18:25:14");
@@ -1024,18 +1018,18 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformLastPublicationDate_withoutDate_shouldNotAddLastPublicationDate() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder().lastPublicationDateTime(null).build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.managementData().lastPublicationDateTime()).isNull();
   }
 
   @Test
   void testTransformToDomain_multipleTextsWithBorderNumberElements_shouldAddAllBorderNumbers() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .tenor(
                 "lorem ipsum <border-number><number>1</number><content>foo</content></border-number>")
@@ -1048,7 +1042,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.managementData().borderNumbers())
         .hasSize(4)
@@ -1057,11 +1051,11 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDomain_textWithoutBorderNumberElements_shouldNotAddBorderNumbers() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder().grounds("lorem ipsum dolor sit amet").build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.managementData().borderNumbers()).isEmpty();
   }
@@ -1069,21 +1063,21 @@ class DocumentationUnitTransformerTest {
   @Test
   void
       testTransformToDomain_textWithMalformedBorderNumberElement_shouldOnlyAddValidBorderNumbers() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .grounds(
                 "lorem ipsum<border-number><content>foo</content></border-number> dolor sit amet <border-number><number>2</number><content>bar</content></border-number>")
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.managementData().borderNumbers()).hasSize(1).containsExactly("2");
   }
 
   @Test
   void testTransformToDomain_shouldAddLeadingDecisionNormReferences() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .leadingDecisionNormReferences(
                 List.of(
@@ -1102,7 +1096,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.coreData().leadingDecisionNormReferences())
         .hasSize(3)
@@ -1111,7 +1105,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDomain_shouldTransformStatus() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .status(
                 StatusDTO.builder()
@@ -1122,7 +1116,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.status().publicationStatus())
         .isEqualTo(PublicationStatus.UNPUBLISHED);
@@ -1133,7 +1127,7 @@ class DocumentationUnitTransformerTest {
   void
       testTransformToDomain_withMultipleNormReferences_withSameNormAbbreviation_shouldGroupNorms() {
     UUID normAbbreviationId = UUID.randomUUID();
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .normReferences(
                 List.of(
@@ -1150,7 +1144,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(1);
     assertThat(documentationUnit.contentRelatedIndexing().norms().get(0).normAbbreviation().id())
@@ -1178,7 +1172,7 @@ class DocumentationUnitTransformerTest {
   @Test
   void
       testTransformToDomain_withMultipleNormReferences_withNoAbbreviation_withSameNAbbreviationRawValue_shouldGroupNorms() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .normReferences(
                 List.of(
@@ -1193,7 +1187,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(1);
     assertThat(
@@ -1225,7 +1219,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDomain_withMultipleNormReferences_withDifferentNormAbbreviation() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .normReferences(
                 List.of(
@@ -1242,7 +1236,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(2);
     assertThat(documentationUnit.contentRelatedIndexing().norms().get(0).normAbbreviation().id())
@@ -1271,41 +1265,40 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDomain_withNote_shouldAddNote() {
-    DocumentationUnitDTO documentationUnitDTO =
-        generateSimpleDTOBuilder().note("Beispiel Notiz").build();
+    DecisionDTO documentationUnitDTO = generateSimpleDTOBuilder().note("Beispiel Notiz").build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.note()).isEqualTo("Beispiel Notiz");
   }
 
   @Test
   void testTransformToDomain_withEmptyNote_shouldAddEmptyNote() {
-    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().note("").build();
+    DecisionDTO documentationUnitDTO = generateSimpleDTOBuilder().note("").build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.note()).isEmpty();
   }
 
   @Test
   void testTransformToDomain_withNullNote_shouldAddNullNote() {
-    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().note(null).build();
+    DecisionDTO documentationUnitDTO = generateSimpleDTOBuilder().note(null).build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.note()).isNull();
   }
 
   @Test
   void testTransformToDomain_withoutNote_shouldAddNoNote() {
-    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().build();
+    DecisionDTO documentationUnitDTO = generateSimpleDTOBuilder().build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.note()).isNull();
   }
@@ -1317,14 +1310,14 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testAddYearsOfDisputeToDTORanking() {
-    DocumentationUnitDTO currentDto = DecisionDTO.builder().build();
+    DecisionDTO currentDto = DecisionDTO.builder().build();
 
     CoreData.CoreDataBuilder coreDataBuilder = generateSimpleCoreDataBuilder();
     coreDataBuilder.yearsOfDispute(
         List.of(Year.now().minusYears(2), Year.now(), Year.now().minusYears(4)));
     DecisionDTO documentationUnitDTO =
         (DecisionDTO)
-            DocumentationUnitTransformer.transformToDTO(
+            DecisionTransformer.transformToDTO(
                 currentDto,
                 generateSimpleDocumentationUnitBuilder().coreData(coreDataBuilder.build()).build());
 
@@ -1335,13 +1328,13 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDomain_withJobProfiles_shouldAddJobProfiles() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .jobProfiles(List.of(JobProfileDTO.builder().value("job profile").build()))
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().jobProfiles())
         .containsExactly("job profile");
@@ -1349,14 +1342,14 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDomain_withCollectiveAgreements_shouldAddCollectiveAgreements() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .collectiveAgreements(
                 List.of(CollectiveAgreementDTO.builder().value("agreement").build()))
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().collectiveAgreements())
         .containsExactly("agreement");
@@ -1364,26 +1357,26 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDomain_withDismissalTypes_shouldAddDismissalTypes() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .dismissalTypes(List.of(DismissalTypesDTO.builder().value("type").build()))
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().dismissalTypes()).containsExactly("type");
   }
 
   @Test
   void testTransformToDomain_withDismissalGrounds_shouldAddDismissalGrounds() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .dismissalGrounds(List.of(DismissalGroundsDTO.builder().value("ground").build()))
             .build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().dismissalGrounds())
         .containsExactly("ground");
@@ -1391,22 +1384,22 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDomain_withLegislativeMandate_shouldLegislativeMandateBeTrue() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder().hasLegislativeMandate(true).build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().hasLegislativeMandate()).isTrue();
   }
 
   @Test
   void testTransformToDomain_withoutLegislativeMandate_shouldLegislativeMandateBeFalse() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder().hasLegislativeMandate(false).build();
 
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().hasLegislativeMandate()).isFalse();
   }
@@ -1419,14 +1412,14 @@ class DocumentationUnitTransformerTest {
     ParticipatingJudgeDTO participatingJudgeB =
         ParticipatingJudgeDTO.builder().name("Judge B").referencedOpinions("Opinion B").build();
 
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .participatingJudges(List.of(participatingJudgeA, participatingJudgeB))
             .build();
 
     // Act
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     // Assert
     assertThat(documentationUnit.longTexts().participatingJudges()).hasSize(2);
@@ -1449,7 +1442,7 @@ class DocumentationUnitTransformerTest {
   void testTransformToDomain_withoutParticipatingJudges_shouldAddEmptyList() {
     // Act
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(generateSimpleDTOBuilder().build());
+        DecisionTransformer.transformToDomain(generateSimpleDTOBuilder().build());
 
     // Assert
     assertThat(documentationUnit.longTexts().participatingJudges()).isEmpty();
@@ -1521,7 +1514,7 @@ class DocumentationUnitTransformerTest {
             .build();
     original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
 
-    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
 
     assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
   }
@@ -1548,7 +1541,7 @@ class DocumentationUnitTransformerTest {
             .build();
     original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
 
-    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
 
     assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
   }
@@ -1573,7 +1566,7 @@ class DocumentationUnitTransformerTest {
             .build();
     original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
 
-    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
 
     assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
   }
@@ -1600,7 +1593,7 @@ class DocumentationUnitTransformerTest {
             .build();
     original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
 
-    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
 
     assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
     assertThat(
@@ -1669,7 +1662,7 @@ class DocumentationUnitTransformerTest {
             .duplicateRelations1(Set.of(duplicateRelationship4, duplicateRelationship3))
             .build();
 
-    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
 
     var transformedRelations = documentationUnit.managementData().duplicateRelations();
     assertThat(transformedRelations).hasSize(5);
