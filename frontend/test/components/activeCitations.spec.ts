@@ -115,6 +115,7 @@ describe("active citations", () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
   beforeEach(() => {
+    window.HTMLElement.prototype.scrollIntoView = vi.fn()
     vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
       status: 200,
       data: true,

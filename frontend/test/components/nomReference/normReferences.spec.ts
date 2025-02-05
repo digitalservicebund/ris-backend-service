@@ -72,6 +72,7 @@ function generateNormReference(options?: {
 describe("Norm references", () => {
   beforeEach(() => {
     vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+    window.HTMLElement.prototype.scrollIntoView = vi.fn()
   })
   beforeAll(() => server.listen())
   afterAll(() => server.close())

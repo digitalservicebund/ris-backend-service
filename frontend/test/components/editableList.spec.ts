@@ -58,7 +58,7 @@ async function renderComponent<T>(options?: {
 
 describe("EditableList", () => {
   beforeEach(() => {
-    vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+    window.HTMLElement.prototype.scrollIntoView = vi.fn()
   })
   afterEach(() => {
     vi.resetAllMocks()
