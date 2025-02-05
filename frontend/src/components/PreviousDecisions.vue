@@ -24,6 +24,7 @@ const previousDecisions = computed({
         <div class="flex-1">
           <EditableList
             v-model="previousDecisions"
+            :create-entry="() => new PreviousDecision()"
             :edit-component="PreviousDecisionInputGroup"
             :summary-component="DocumentationUnitSummary"
           />

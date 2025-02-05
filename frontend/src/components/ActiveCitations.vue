@@ -4,6 +4,7 @@ import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
 import ActiveCitationSummary from "@/components/ActiveCitationSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
+import ActiveCitation from "@/domain/activeCitation"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
@@ -26,6 +27,7 @@ const activeCitations = computed({
     </h2>
     <EditableList
       v-model="activeCitations"
+      :create-entry="() => new ActiveCitation()"
       :edit-component="ActiveCitationInput"
       :summary-component="ActiveCitationSummary"
     />

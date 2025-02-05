@@ -2,6 +2,7 @@
 import DefaultSummary from "@/components/DefaultSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import ParticipatingJudgesInput from "@/components/ParticipatingJudgesInput.vue"
+import ParticipatingJudge from "@/domain/participatingJudge"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 defineProps<{
@@ -22,6 +23,7 @@ const store = useDocumentUnitStore()
       <div class="flex-1">
         <EditableList
           v-model="store.documentUnit!.longTexts.participatingJudges"
+          :create-entry="() => new ParticipatingJudge()"
           :edit-component="ParticipatingJudgesInput"
           :summary-component="DefaultSummary"
         />

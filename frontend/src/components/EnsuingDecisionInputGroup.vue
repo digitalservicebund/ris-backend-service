@@ -48,6 +48,19 @@ const isPending = computed({
   },
 })
 
+/**
+ * Computed to check if entry was already saved
+ */
+const isSaved = computed(() => {
+  return (
+    Array.isArray(props.modelValueList) &&
+    props.modelValueList.length > 0 &&
+    props.modelValueList.some(
+      (item) => props.modelValue && props.modelValue.id === item.id,
+    )
+  )
+})
+
 async function search() {
   isLoading.value = true
   const ensuingDecisionRef = new EnsuingDecision({
@@ -156,6 +169,10 @@ watch(
 )
 
 onMounted(() => {
+  // we don't want to validate on initial empty entries
+  if (isSaved.value) {
+    validateRequiredInput()
+  }
   ensuingDecision.value = new EnsuingDecision({ ...props.modelValue })
 })
 </script>

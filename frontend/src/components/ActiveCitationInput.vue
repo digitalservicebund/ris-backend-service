@@ -164,6 +164,18 @@ function updateDateFormatValidation(
     validationStore.add(validationError.message, "decisionDate")
   else validationStore.remove("decisionDate")
 }
+/**
+ * Computed to check if entry was already saved
+ */
+const isSaved = computed(() => {
+  return (
+    Array.isArray(props.modelValueList) &&
+    props.modelValueList.length > 0 &&
+    props.modelValueList.some(
+      (item) => props.modelValue && props.modelValue.id === item.id,
+    )
+  )
+})
 
 watch(
   activeCitation,
@@ -190,6 +202,10 @@ watch(
 )
 
 onMounted(() => {
+  // we don't want to validate on initial empty entries
+  if (isSaved.value) {
+    validateRequiredInput()
+  }
   activeCitation.value = new ActiveCitation({ ...props.modelValue })
 })
 </script>

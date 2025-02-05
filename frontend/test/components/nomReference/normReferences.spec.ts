@@ -61,7 +61,10 @@ function generateNormReference(options?: {
   singleNorms?: SingleNorm[]
 }) {
   return new NormReference({
-    normAbbreviation: options?.normAbbreviation ?? { abbreviation: "ABC" },
+    normAbbreviation: options?.normAbbreviation ?? {
+      id: crypto.randomUUID.toString(),
+      abbreviation: "ABC",
+    },
     singleNorms: options?.singleNorms ?? [],
   })
 }
@@ -118,9 +121,10 @@ describe("Norm references", () => {
     )
     const { user } = renderComponent([
       generateNormReference({
-        normAbbreviation: { abbreviation: "1000g-BefV" },
+        normAbbreviation: { id: "123", abbreviation: "1000g-BefV" },
       }),
     ])
+    expect(screen.queryByLabelText("RIS-Abkürzung")).not.toBeInTheDocument()
     await user.click(screen.getByLabelText("Weitere Angabe"))
 
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
@@ -139,7 +143,7 @@ describe("Norm references", () => {
     )
     const { user } = renderComponent([
       generateNormReference({
-        normAbbreviation: { abbreviation: "1000g-BefV" },
+        normAbbreviation: { id: "123", abbreviation: "1000g-BefV" },
       }),
       generateNormReference(),
     ])
@@ -165,6 +169,7 @@ describe("Norm references", () => {
     const { user } = renderComponent([
       generateNormReference({
         normAbbreviation: {
+          id: "123",
           abbreviation: "1000g-BefV",
         },
         singleNorms: [
@@ -207,6 +212,7 @@ describe("Norm references", () => {
       generateNormReference(),
       generateNormReference({
         normAbbreviation: {
+          id: "123",
           abbreviation: "1000g-BefV",
         },
       }),

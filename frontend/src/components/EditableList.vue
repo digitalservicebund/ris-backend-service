@@ -13,6 +13,7 @@ interface Props {
   editComponent: Component
   summaryComponent?: Component
   modelValue?: T[]
+  createEntry: () => T
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -28,7 +29,7 @@ const editEntry = ref<T | undefined>() as Ref<T | undefined>
 const modelValueList = ref<T[]>([...props.modelValue]) as Ref<T[]>
 const localNewEntry = ref<T | undefined>() as Ref<T | undefined>
 const editableListContainer = ref(null)
-const { scrollIntoViewportByRef } = useScroll()
+const { scrollIntoViewportByRef, scrollIntoViewportById } = useScroll()
 
 /**
  * Computed mergedValues is a computed helper list that ensure the update of the modelValue does not effect a local new value
@@ -47,6 +48,24 @@ const mergedValues = computed(() => {
  */
 function setEditEntry(entry?: T) {
   editEntry.value = entry
+}
+
+/**
+ * Returns if current entry is the one in edit mode
+ * @param entry
+ */
+function isEditEntry(entry: T) {
+  return editEntry.value && editEntry.value.id === entry.id
+}
+
+/**
+ * Method to check if entry is given in model value
+ */
+function isSaved(entry?: T): boolean {
+  if (entry) {
+    return props.modelValue.some((item) => entry.id === item.id)
+  }
+  return false
 }
 
 /**
@@ -73,22 +92,13 @@ async function removeEntry(entry: T) {
 }
 
 /**
- * Method to check if entry is given in model value
- */
-function isSaved(entry?: T): boolean {
-  if (entry) {
-    return props.modelValue.some((item) => entry.id === item.id)
-  }
-  return false
-}
-
-/**
  * Updating the modelValue with the local modelValue list, is not propagated, until the user actively
  * decides to click the save button in edit mode. The edit index is reset, to show list in summary mode.
  */
-async function updateModel() {
+async function updateModel(index: number) {
   emit("update:modelValue", mergedValues.value)
   toggleNewEntry(true)
+  await scrollIntoViewportById(`summary-entry-${index}`)
 }
 
 async function handleAddFromSummary(newEntry: T) {
@@ -98,7 +108,7 @@ async function handleAddFromSummary(newEntry: T) {
 
 function toggleNewEntry(shouldDisplay: boolean) {
   if (shouldDisplay) {
-    localNewEntry.value = {} as T
+    localNewEntry.value = props.createEntry()
     setEditEntry(localNewEntry.value)
   } else {
     localNewEntry.value = undefined
@@ -118,6 +128,7 @@ watch(
         ? editEntry.value
         : item,
     )
+    return modelValueList.value
   },
   {
     immediate: true,
@@ -131,7 +142,7 @@ watch(
 watch(
   () => modelValueList,
   async () => {
-    if (modelValueList.value.length == 0) {
+    if (modelValueList.value.length == 0 && !localNewEntry.value) {
       toggleNewEntry(true)
     }
   },
@@ -159,13 +170,14 @@ defineExpose({
       aria-label="Listen Eintrag"
     >
       <div
-        v-if="!(editEntry && editEntry.id === entry.id)"
+        v-if="!isEditEntry(entry)"
         :key="index"
         class="group flex gap-8 border-b-1 border-blue-300 py-16"
         :class="{ 'border-t-1': index == 0 }"
       >
         <component
           :is="summaryComponent"
+          :id="`summary-entry-${index}`"
           class="flex scroll-m-64"
           :data="entry"
           @add-new-entry="handleAddFromSummary"
@@ -201,7 +213,7 @@ defineExpose({
         :class="{ 'pt-0': index == 0 }"
         :is-saved="isSaved(mergedValues[index])"
         :model-value-list="modelValueList"
-        @add-entry="updateModel"
+        @add-entry="updateModel(index)"
         @cancel-edit="cancelEdit"
         @remove-entry="removeEntry(entry as T)"
       />

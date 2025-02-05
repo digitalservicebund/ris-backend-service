@@ -98,6 +98,7 @@ watch(loadEditionIntervalCounter, async () => {
         <EditableList
           ref="editableListRef"
           v-model="references"
+          :create-entry="() => new Reference()"
           :edit-component="PeriodicalEditionReferenceInput"
           :summary-component="PeriodicalEditionReferenceSummary"
         />

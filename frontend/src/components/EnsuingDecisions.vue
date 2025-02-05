@@ -22,6 +22,7 @@ const ensuingDecisions = computed({
       <div class="flex-1">
         <EditableList
           v-model="ensuingDecisions"
+          :create-entry="() => new EnsuingDecision()"
           :edit-component="EnsuingDecisionInputGroup"
           :summary-component="DocumentationUnitSummary"
         />

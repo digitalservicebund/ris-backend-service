@@ -34,6 +34,7 @@ const localModelValue = computed({
     <KitchensinkStory name="With entries">
       <EditableList
         v-model="localModelValue"
+        :create-entry="() => new DummyListItem()"
         :edit-component="DummyInputGroup"
         :summary-component="SummaryComponent"
       />
@@ -41,6 +42,7 @@ const localModelValue = computed({
     <KitchensinkStory name="With no entries">
       <EditableList
         v-model="emptyList"
+        :create-entry="() => new DummyListItem()"
         :edit-component="DummyInputGroup"
         :summary-component="SummaryComponent"
       />

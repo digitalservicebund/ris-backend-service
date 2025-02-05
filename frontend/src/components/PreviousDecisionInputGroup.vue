@@ -50,6 +50,19 @@ const dateUnknown = computed({
   },
 })
 
+/**
+ * Computed to check if entry was already saved
+ */
+const isSaved = computed(() => {
+  return (
+    Array.isArray(props.modelValueList) &&
+    props.modelValueList.length > 0 &&
+    props.modelValueList.some(
+      (item) => props.modelValue && props.modelValue.id === item.id,
+    )
+  )
+})
+
 async function search() {
   isLoading.value = true
   const previousDecisionRef = new PreviousDecision({
@@ -156,6 +169,10 @@ watch(
 )
 
 onMounted(async () => {
+  // don't validate on initial empty entries
+  if (isSaved.value) {
+    await validateRequiredInput()
+  }
   previousDecision.value = new PreviousDecision({ ...props.modelValue })
 })
 </script>

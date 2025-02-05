@@ -71,6 +71,7 @@ function generateUniqueSingleNormKey(singleNorm: SingleNorm): string {
       <div class="flex-1">
         <EditableList
           v-model="norms"
+          :create-entry="() => new NormReference()"
           :edit-component="NormReferenceInput"
           :summary-component="NormReferenceSummary"
         />
