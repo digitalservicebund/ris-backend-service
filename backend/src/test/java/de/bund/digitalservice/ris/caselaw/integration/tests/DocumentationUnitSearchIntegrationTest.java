@@ -23,9 +23,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
@@ -140,14 +140,14 @@ class DocumentationUnitSearchIntegrationTest {
 
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .documentNumber("MIGR202200012")
             .documentationOffice(docOfficeDTO)
             .fileNumbers(List.of(FileNumberDTO.builder().value("AkteM").rank(0L).build())));
 
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .documentNumber("NEUR202300008")
             .documentationOffice(docOfficeDTO)
             .fileNumbers(List.of(FileNumberDTO.builder().value("AkteY").rank(0L).build())));
@@ -190,7 +190,7 @@ class DocumentationUnitSearchIntegrationTest {
     for (LocalDate date : dates) {
       EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
           repository,
-          DocumentationUnitDTO.builder()
+          DecisionDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
               .decisionDate(date)
               .documentationOffice(docOfficeDTO));
@@ -233,7 +233,7 @@ class DocumentationUnitSearchIntegrationTest {
     for (LocalDateTime date : scheduledPublicationDates) {
       EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
           repository,
-          DocumentationUnitDTO.builder()
+          DecisionDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
               .scheduledPublicationDateTime(date)
               .documentationOffice(docOfficeDTO));
@@ -279,7 +279,7 @@ class DocumentationUnitSearchIntegrationTest {
     for (LocalDateTime date : scheduledPublicationDates) {
       EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
           repository,
-          DocumentationUnitDTO.builder()
+          DecisionDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
               .scheduledPublicationDateTime(date)
               .documentationOffice(docOfficeDTO));
@@ -333,7 +333,7 @@ class DocumentationUnitSearchIntegrationTest {
     for (LocalDateTime date : lastPublicationDates) {
       EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
           repository,
-          DocumentationUnitDTO.builder()
+          DecisionDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
               .lastPublicationDateTime(date)
               .scheduledPublicationDateTime(scheduledPublicationDates.get(index))
@@ -409,7 +409,7 @@ class DocumentationUnitSearchIntegrationTest {
     for (int i = 0; i < 10; i++) {
       EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
           repository,
-          DocumentationUnitDTO.builder()
+          DecisionDTO.builder()
               // index 0-4 get a "AB" docNumber
               .documentNumber((i <= 4 ? "AB" : "GE") + "123456780" + i)
               .documentationOffice(docOfficeDTO)
@@ -573,15 +573,15 @@ class DocumentationUnitSearchIntegrationTest {
         "classpath:procedures_init.sql",
       })
   void testSearch_withExternalAssignedUser_shouldReturnEditableAndNotDeletableDocumentationUnit() {
-    Optional<DocumentationUnitDTO> documentationUnitDTO =
-        repository.findByDocumentNumber("docNumber00002");
+    DecisionDTO documentationUnitDTO =
+        (DecisionDTO) repository.findByDocumentNumber("docNumber00002").get();
     Optional<ProcedureDTO> procedureDTO =
         procedureRepository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
     Optional<UserGroupDTO> userGroupDTO =
         userGroupRepository.findById(UUID.fromString("2b733549-d2cc-40f0-b7f3-9bfa9f3c1b89"));
-    documentationUnitDTO.get().setProcedureHistory(List.of(procedureDTO.get()));
-    documentationUnitDTO.get().setProcedure(procedureDTO.get());
-    repository.save(documentationUnitDTO.get());
+    documentationUnitDTO.setProcedureHistory(List.of(procedureDTO.get()));
+    documentationUnitDTO.setProcedure(procedureDTO.get());
+    repository.save(documentationUnitDTO);
 
     risWebTestClient
         .withDefaultLogin()
@@ -600,7 +600,7 @@ class DocumentationUnitSearchIntegrationTest {
         .get()
         .uri(
             "/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumber="
-                + documentationUnitDTO.get().getDocumentNumber())
+                + documentationUnitDTO.getDocumentNumber())
         .exchange()
         .expectStatus()
         .isOk()
@@ -609,7 +609,7 @@ class DocumentationUnitSearchIntegrationTest {
             response -> {
               assertThat(response.getResponseBody().getContent())
                   .extracting("documentNumber")
-                  .containsExactly(documentationUnitDTO.get().getDocumentNumber());
+                  .containsExactly(documentationUnitDTO.getDocumentNumber());
               assertThat(response.getResponseBody().getContent()).hasSize(1);
               assertThat(response.getResponseBody().getContent().get(0).isEditable()).isTrue();
               assertThat(response.getResponseBody().getContent().get(0).isDeletable()).isFalse();

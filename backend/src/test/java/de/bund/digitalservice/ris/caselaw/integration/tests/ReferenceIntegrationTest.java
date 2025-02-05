@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -280,9 +281,10 @@ class ReferenceIntegrationTest {
 
   @Test
   void testReferencesAndLiteratureCitationsCanBeDeleted() {
-    DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, documentationOffice);
+    DecisionDTO dto =
+        (DecisionDTO)
+            EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+                repository, documentationOffice);
 
     UUID referenceId = UUID.randomUUID();
     UUID literatureCitationId = UUID.randomUUID();

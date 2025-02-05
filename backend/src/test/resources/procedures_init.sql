@@ -23,6 +23,22 @@ VALUES
     '41e62dbc-e5b6-414f-91e2-0cfe559447d1'
   );
 
+INSERT INTO
+    incremental_migration.decision (id)
+VALUES
+    (
+        '16f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
+    ),
+    (
+        '26f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
+    ),
+    (
+        '36f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
+    ),
+    (
+        '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
+    );
+
 insert into
     incremental_migration.status (id, documentation_unit_id, publication_status, created_at, with_error)
 values

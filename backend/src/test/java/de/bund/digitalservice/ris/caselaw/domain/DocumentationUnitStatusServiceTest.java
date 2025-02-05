@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -54,7 +55,7 @@ class DocumentationUnitStatusServiceTest {
           throws DocumentationUnitNotExistsException {
 
     DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .id(TEST_UUID)
             .documentNumber(DOCUMENT_NUMBER)
             .status(
@@ -96,7 +97,7 @@ class DocumentationUnitStatusServiceTest {
   @Test
   void getLatestStatus() throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .id(TEST_UUID)
             .documentNumber(DOCUMENT_NUMBER)
             .status(
