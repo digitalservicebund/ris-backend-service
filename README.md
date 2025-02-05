@@ -57,7 +57,7 @@ to `~/.zshrc`:
 eval "$(direnv hook zsh)"
 ```
 
-### GitHub and AWS Credentials for Lookup Table Initialization
+### GitHub Credentials for Migration Image
 
 To be able to pull the `ris-data-migration` image, you need to log in to the GitHub Package Repository using your username and a
 credential token.
@@ -72,16 +72,24 @@ op item create \
     --title "GitHub Personal Access Token for migration" \
     'username=[your-github-username]' \
     'password=[your-personal-access-token]'
-
-echo $(op read 'op://Employee/GitHub Personal Access Token for migration/password')  \
-| docker login ghcr.io -u $(op read 'op://Employee/GitHub Personal Access Token for migration/username') --password-stdin
 ```
 
-The following step requires an OTC access token, read here for
-more [info](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials).
+The cli should print the created item.
+Now we login into docker using the 1Password item in order to be able to pull the migration image:
 
-To connect to your S3 bucket, ensure your AWS credentials are stored in 1Password, and then set the following
-environment variables in your shell:
+```shell
+echo $(op read 'op://Employee/GitHub Personal Access Token for migration/password') \
+| docker login ghcr.io \
+    -u $(op read 'op://Employee/GitHub Personal Access Token for migration/username') \
+    --password-stdin
+```
+You should see the message `Login Succeeded`. 
+
+### AWS Credentials for Lookup Table Initialization
+
+Accessing the s3 bucket contan OTC access token, read here on how to revtrieve one [info](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials).
+
+To connect to the S3 bucket, store your AWS credentials in 1Password in the existing OTC item:
 
 ```shell
 op item edit 'OTC' aws_access_key_id=[your-access-key-id]
