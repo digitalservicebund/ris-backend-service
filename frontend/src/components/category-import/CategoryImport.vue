@@ -8,7 +8,6 @@ import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import ActiveCitation from "@/domain/activeCitation"
 import DocumentUnit, {
   longTextLabels,
   shortTextLabels,
@@ -311,37 +310,27 @@ function importActiveCitations() {
   if (!source) return
 
   const targetActiveCitations =
-    store.documentUnit!.contentRelatedIndexing.activeCitations
-  if (targetActiveCitations) {
-    // consider as duplicate, if real reference found with same docnumber and citation
-    const uniqueImportableFieldsOfLaw = source
-      .filter(
-        (activeCitation) =>
-          !targetActiveCitations.find(
-            (entry) =>
-              entry.documentNumber === activeCitation.documentNumber &&
-              entry.citationType?.uuid === activeCitation.citationType?.uuid,
-          ),
-      )
-      .map(
-        (activeCitation) =>
-          new ActiveCitation({
-            ...activeCitation,
-            uuid: crypto.randomUUID(),
-            newEntry: true,
-          }),
-      )
-    targetActiveCitations.push(...uniqueImportableFieldsOfLaw)
-  } else {
-    store.documentUnit!.contentRelatedIndexing.activeCitations = source.map(
+    store.documentUnit!.contentRelatedIndexing.activeCitations ?? []
+
+  const uniqueImportableFieldsOfLaw = source
+    .filter(
       (activeCitation) =>
-        new ActiveCitation({
-          ...activeCitation,
-          uuid: crypto.randomUUID(),
-          newEntry: true,
-        }),
+        !targetActiveCitations.find(
+          (entry) =>
+            entry.documentNumber === activeCitation.documentNumber &&
+            entry.citationType?.uuid === activeCitation.citationType?.uuid,
+        ),
     )
-  }
+    .map((activeCitation) => ({
+      ...activeCitation,
+      uuid: crypto.randomUUID(),
+      newEntry: true,
+    }))
+
+  store.documentUnit!.contentRelatedIndexing.activeCitations = [
+    ...targetActiveCitations,
+    ...uniqueImportableFieldsOfLaw,
+  ]
 }
 
 function importParticipatingJudges() {
