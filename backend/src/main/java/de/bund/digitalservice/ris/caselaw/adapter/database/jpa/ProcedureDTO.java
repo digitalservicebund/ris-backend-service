@@ -47,7 +47,7 @@ public class ProcedureDTO {
 
   @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "current_procedure_id")
-  List<DocumentationUnitDTO> documentationUnits;
+  List<DecisionDTO> documentationUnits;
 
   @Include
   @ManyToOne()

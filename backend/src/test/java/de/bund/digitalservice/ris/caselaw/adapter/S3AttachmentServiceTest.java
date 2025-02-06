@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
 import java.io.ByteArrayOutputStream;
@@ -68,7 +69,7 @@ class S3AttachmentServiceTest {
 
   @BeforeEach
   void setup() {
-    documentationUnitDTO = DocumentationUnitDTO.builder().id(UUID.randomUUID()).build();
+    documentationUnitDTO = DecisionDTO.builder().id(UUID.randomUUID()).build();
     when(documentationUnitRepository.findById(documentationUnitDTO.getId()))
         .thenReturn(Optional.of(documentationUnitDTO));
 

@@ -3,8 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
@@ -27,10 +27,10 @@ public class DuplicateRelationTransformerTest {
 
     var decisionDate = LocalDate.of(2020, 1, 14);
 
-    DocumentationUnitDTO original =
-        DocumentationUnitDTO.builder().id(uuid1).documentNumber("documentNumber1").build();
-    DocumentationUnitDTO duplicate =
-        DocumentationUnitDTO.builder()
+    DecisionDTO original =
+        DecisionDTO.builder().id(uuid1).documentNumber("documentNumber1").build();
+    DecisionDTO duplicate =
+        DecisionDTO.builder()
             .id(uuid2)
             .documentNumber("documentNumber2")
             .status(StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
@@ -78,14 +78,14 @@ public class DuplicateRelationTransformerTest {
     UUID uuid1 = UUID.randomUUID();
     UUID uuid2 = UUID.randomUUID();
 
-    DocumentationUnitDTO documentationUnitDTO1 =
-        DocumentationUnitDTO.builder()
+    DecisionDTO documentationUnitDTO1 =
+        DecisionDTO.builder()
             .id(uuid1)
             .documentNumber("documentNumber1")
             .isJdvDuplicateCheckActive(true)
             .build();
-    DocumentationUnitDTO documentationUnitDTO2 =
-        DocumentationUnitDTO.builder()
+    DecisionDTO documentationUnitDTO2 =
+        DecisionDTO.builder()
             .id(uuid2)
             .documentNumber("documentNumber2")
             .isJdvDuplicateCheckActive(null)
@@ -124,14 +124,14 @@ public class DuplicateRelationTransformerTest {
     UUID uuid1 = UUID.randomUUID();
     UUID uuid2 = UUID.randomUUID();
 
-    DocumentationUnitDTO documentationUnitDTO1 =
-        DocumentationUnitDTO.builder()
+    DecisionDTO documentationUnitDTO1 =
+        DecisionDTO.builder()
             .id(uuid1)
             .documentNumber("documentNumber1")
             .isJdvDuplicateCheckActive(false)
             .build();
-    DocumentationUnitDTO documentationUnitDTO2 =
-        DocumentationUnitDTO.builder()
+    DecisionDTO documentationUnitDTO2 =
+        DecisionDTO.builder()
             .id(uuid2)
             .documentNumber("documentNumber2")
             .isJdvDuplicateCheckActive(true)
