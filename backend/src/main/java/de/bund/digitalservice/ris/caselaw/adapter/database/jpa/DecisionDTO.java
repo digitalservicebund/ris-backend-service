@@ -33,7 +33,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @ToString(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "decision", schema = "incremental_migration")

@@ -24,10 +24,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -323,14 +322,14 @@ class DocumentationUnitControllerTest {
 
   @Test
   void testUpdateByUuid() throws DocumentationUnitNotExistsException {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         DecisionDTO.builder()
             .id(TEST_UUID)
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .build();
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     when(service.updateDocumentationUnit(documentationUnit)).thenReturn(null);
 
@@ -350,14 +349,14 @@ class DocumentationUnitControllerTest {
   @Test
   @Disabled("fix and enable")
   void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         DecisionDTO.builder()
             .id(TEST_UUID)
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .build();
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     when(service.updateDocumentationUnit(documentationUnit)).thenReturn(documentationUnit);
     when(service.getByUuid(TEST_UUID)).thenReturn(documentationUnit);
