@@ -10,8 +10,6 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
-
-const defaultValue = new ParticipatingJudge()
 </script>
 
 <template>
@@ -25,7 +23,7 @@ const defaultValue = new ParticipatingJudge()
       <div class="flex-1">
         <EditableList
           v-model="store.documentUnit!.longTexts.participatingJudges"
-          :default-value="defaultValue"
+          :create-entry="() => new ParticipatingJudge()"
           :edit-component="ParticipatingJudgesInput"
           :summary-component="DefaultSummary"
         />

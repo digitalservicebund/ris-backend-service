@@ -46,7 +46,6 @@ function renderComponent() {
     ...render(PeriodicalEditionReferenceInput, {
       props: {
         modelValueList: [],
-        isSaved: false,
       },
       global: {
         directives: { "ctrl-enter": onSearchShortcutDirective },

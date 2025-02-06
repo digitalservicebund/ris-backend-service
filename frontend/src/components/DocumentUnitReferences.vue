@@ -23,8 +23,6 @@ const literatureReferences = computed({
     store.documentUnit!.literatureReferences = newValues
   },
 })
-
-const defaultValue = new Reference() as Reference
 </script>
 
 <template>
@@ -34,7 +32,7 @@ const defaultValue = new Reference() as Reference
       <div class="flex flex-row" data-testid="caselaw-reference-list">
         <EditableList
           v-model="caselawReferences"
-          :default-value="defaultValue"
+          :create-entry="() => new Reference()"
           :edit-component="DocumentUnitReferenceInput"
           :summary-component="ReferenceSummary"
         />
@@ -44,7 +42,7 @@ const defaultValue = new Reference() as Reference
       <div class="flex flex-row" data-testid="literature-reference-list">
         <EditableList
           v-model="literatureReferences"
-          :default-value="defaultValue"
+          :create-entry="() => new Reference()"
           :edit-component="DocumentUnitLiteratureReferenceInput"
           :summary-component="ReferenceSummary"
         />
