@@ -48,7 +48,7 @@ async function saveReferences(references: Reference[]) {
 }
 
 async function addNewEntry() {
-  await editableListRef.value.toggleDisplayDefaultValue(true)
+  await editableListRef.value.toggleNewEntry(true)
   const element = document.getElementById("reference-input")
   setTimeout(() => {
     if (!element) return

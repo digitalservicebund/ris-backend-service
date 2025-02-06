@@ -24,7 +24,7 @@ test.describe(
         const suffix = edition.suffix || ""
         await navigateToPeriodicalReferences(page, edition.id || "")
 
-        await test.step("Add docunit to periodical evaliation", async () => {
+        await test.step("Add reference to periodical evaluation", async () => {
           await searchForDocUnitWithFileNumberAndDecisionDate(
             page,
             fileNumber,
@@ -209,6 +209,7 @@ test.describe(
         tag: ["@RISDEV-6098"],
       },
       async ({ page, editionWithReferences, prefilledDocumentUnit }) => {
+        const suffix = editionWithReferences.suffix || ""
         await navigateToPeriodicalReferences(
           page,
           editionWithReferences.id || "",
@@ -262,6 +263,36 @@ test.describe(
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(5)
+        })
+
+        await test.step("Fill missing inputs and add as reference", async () => {
+          await fillInput(page, "Zitatstelle *", "6")
+          await fillInput(page, "Klammernzusatz", "L")
+          await page.getByLabel("Fundstelle vermerken").click()
+          await expect(
+            page.getByText(`MMG 2024, 6${suffix} (L)`, { exact: true }),
+          ).toBeVisible()
+          // 5 references + 1 new entry in edit mode with copied decision
+          await expect(
+            page.locator("[aria-label='Listen Eintrag']"),
+          ).toHaveCount(6)
+        })
+
+        await test.step("An added reference with copied decision can be edited, like any other reference (after saving)", async () => {
+          await page.getByTestId("list-entry-4").click()
+          await fillInput(page, "Klammernzusatz", "LT")
+          await page.getByLabel("Fundstelle vermerken").click()
+          await expect(
+            page.getByText(`MMG 2024, 6${suffix} (LT)`, { exact: true }),
+          ).toBeVisible()
+        })
+
+        await test.step("After saving switching between literature and caselaw is not possible anymore", async () => {
+          await page.getByTestId("list-entry-4").click()
+          await expect(
+            page.getByLabel("Rechtsprechung Fundstelle"),
+          ).toBeHidden()
+          await expect(page.getByLabel("Literatur Fundstelle")).toBeHidden()
         })
 
         await test.step("Click on delete removes the entry again", async () => {

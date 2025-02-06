@@ -374,7 +374,7 @@ onBeforeUnmount(() => {
         :status="reference.documentationUnit.status"
         :summary="reference.documentationUnit.renderSummary"
       />
-      <div class="flex items-center gap-16">
+      <div v-if="!isSaved" class="flex items-center gap-16">
         <div class="flex items-center">
           <InputField
             id="caselaw"
