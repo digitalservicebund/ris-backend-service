@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.StatusTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -46,7 +46,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -102,16 +101,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         repository
             .findByDocumentNumber(documentNumber)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-    return getDocumentationUnit(documentationUnit);
-  }
-
-  @Nullable
-  private static DocumentationUnit getDocumentationUnit(DocumentationUnitDTO documentationUnit) {
-    if (documentationUnit instanceof DecisionDTO decisionDTO) {
-      return DecisionTransformer.transformToDomain(decisionDTO);
-    }
-    // TODO other transformer
-    return null;
+    return DocumentationUnitTransformer.transformToDomain(documentationUnit);
   }
 
   @Override
@@ -130,7 +120,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   public DocumentationUnit findByUuid(UUID uuid) throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
-    return getDocumentationUnit(documentationUnit);
+    return DocumentationUnitTransformer.transformToDomain(documentationUnit);
   }
 
   @Override
@@ -140,8 +130,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     var documentationUnitDTO =
         repository.save(
-            DecisionTransformer.transformToDTO(
-                DecisionDTO.builder()
+            DocumentationUnitTransformer.transformToDTO(
+                DocumentationUnitDTO.builder()
                     .documentationOffice(
                         DocumentationOfficeTransformer.transformToDTO(
                             docUnit.coreData().documentationOffice()))
@@ -158,30 +148,29 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       referenceDTO.setDocumentationUnit(documentationUnitDTO);
     }
 
-    DecisionDTO.DecisionDTOBuilder<?, ?> builder =
-        documentationUnitDTO.toBuilder()
-            .source(
-                source == null
-                    ? new ArrayList<>()
-                    : new ArrayList<>(
-                        List.of(
-                            SourceDTO.builder()
-                                .rank(1)
-                                .value(source)
-                                .reference(referenceDTO)
-                                .build())));
-
-    builder.status(
-        StatusTransformer.transformToDTO(status).toBuilder()
-            .documentationUnit(documentationUnitDTO)
-            .createdAt(Instant.now())
-            .build());
-
     // saving a second time is necessary because status and reference need a reference to a
     // persisted documentation unit
-    DecisionDTO savedDocUnit = repository.save(builder.build());
+    DocumentationUnitDTO savedDocUnit =
+        repository.save(
+            documentationUnitDTO.toBuilder()
+                .status(
+                    StatusTransformer.transformToDTO(status).toBuilder()
+                        .documentationUnit(documentationUnitDTO)
+                        .createdAt(Instant.now())
+                        .build())
+                .source(
+                    source == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(
+                            List.of(
+                                SourceDTO.builder()
+                                    .rank(1)
+                                    .value(source)
+                                    .reference(referenceDTO)
+                                    .build())))
+                .build());
 
-    return DecisionTransformer.transformToDomain(savedDocUnit);
+    return DocumentationUnitTransformer.transformToDomain(savedDocUnit);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -223,11 +212,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // ---
 
     // Transform non-database-related properties
-    if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
-      documentationUnitDTO = DecisionTransformer.transformToDTO(decisionDTO, documentationUnit);
-      repository.save(documentationUnitDTO);
-    }
-    // TODO pending proceeding
+    documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(documentationUnitDTO, documentationUnit);
+    repository.save(documentationUnitDTO);
   }
 
   @Override
@@ -339,27 +326,27 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
 
     var documentationUnitDTOOptional = repository.findById(documentationUnit.uuid());
-    if (documentationUnitDTOOptional.isEmpty()
-        || documentationUnitDTOOptional.get() instanceof PendingProceedingDTO) {
-      return; // Pending Proceedings don't have procedures
+    if (documentationUnitDTOOptional.isEmpty()) {
+      return;
     }
-    DecisionDTO decisionDTO = (DecisionDTO) documentationUnitDTOOptional.get();
+    var documentationUnitDTO = documentationUnitDTOOptional.get();
     Procedure procedure = documentationUnit.coreData().procedure();
 
     ProcedureDTO procedureDTO =
-        getOrCreateProcedure(decisionDTO.getDocumentationOffice(), procedure);
+        getOrCreateProcedure(documentationUnitDTO.getDocumentationOffice(), procedure);
 
     boolean sameAsLast =
-        decisionDTO.getProcedure() != null && decisionDTO.getProcedure().equals(procedureDTO);
+        documentationUnitDTO.getProcedure() != null
+            && documentationUnitDTO.getProcedure().equals(procedureDTO);
 
     // add the previous procedure to the history
     if (procedureDTO != null && !sameAsLast) {
-      decisionDTO.getProcedureHistory().add(procedureDTO);
+      documentationUnitDTO.getProcedureHistory().add(procedureDTO);
     }
     // set new procedure
-    decisionDTO.setProcedure(procedureDTO);
+    documentationUnitDTO.setProcedure(procedureDTO);
 
-    repository.save(decisionDTO);
+    repository.save(documentationUnitDTO);
   }
 
   @Override
@@ -682,11 +669,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   public List<DocumentationUnit> getScheduledDocumentationUnitsDueNow() {
     return repository.getScheduledDocumentationUnitsDueNow().stream()
         .limit(50)
-        .filter(
-            documentationUnitDTO ->
-                documentationUnitDTO
-                    instanceof DecisionDTO) // TODO transform pending proceedings as well
-        .map(decision -> DecisionTransformer.transformToDomain((DecisionDTO) decision))
+        .map(DocumentationUnitTransformer::transformToDomain)
         .toList();
   }
 }

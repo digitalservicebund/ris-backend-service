@@ -3,9 +3,9 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
@@ -26,7 +26,7 @@ class DocumentationUnitListItemTransformerTest {
   void testTransformToDomain_shouldTransformAllFields() {
     UUID id = UUID.randomUUID();
     DocumentationUnitListItemDTO currentDto =
-        DecisionDTO.builder()
+        DocumentationUnitDTO.builder()
             .id(id)
             .note("a note")
             .court(CourtDTO.builder().type("LG").location("Berlin").build())
@@ -82,7 +82,8 @@ class DocumentationUnitListItemTransformerTest {
   void testTransformToDomain_withoutStatus_shouldTransformToNullStatus() {
     UUID id = UUID.randomUUID();
 
-    DocumentationUnitListItemDTO currentDto = DecisionDTO.builder().id(id).status(null).build();
+    DocumentationUnitListItemDTO currentDto =
+        DocumentationUnitDTO.builder().id(id).status(null).build();
 
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItemTransformer.transformToDomain(currentDto);
@@ -93,7 +94,8 @@ class DocumentationUnitListItemTransformerTest {
   @Test
   void testTransformToDomain_withoutNote_shouldHaveNoNote() {
     UUID id = UUID.randomUUID();
-    DocumentationUnitListItemDTO currentDto = DecisionDTO.builder().id(id).note(null).build();
+    DocumentationUnitListItemDTO currentDto =
+        DocumentationUnitDTO.builder().id(id).note(null).build();
 
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItemTransformer.transformToDomain(currentDto);

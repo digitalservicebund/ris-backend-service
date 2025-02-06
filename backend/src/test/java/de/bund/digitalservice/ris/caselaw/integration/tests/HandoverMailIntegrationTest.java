@@ -27,7 +27,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeri
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseXmlHandoverMailRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailAttachmentDTO;
@@ -199,7 +198,7 @@ class HandoverMailIntegrationTest {
     DocumentationUnitDTO savedDocumentationUnitDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentationOffice(docOffice)
                 .documentNumber(identifier)
                 .decisionDate(LocalDate.now()));
@@ -378,7 +377,7 @@ class HandoverMailIntegrationTest {
       entityId =
           repository
               .save(
-                  DecisionDTO.builder()
+                  DocumentationUnitDTO.builder()
                       .documentationOffice(docOffice)
                       .documentNumber("docnr12345678")
                       .build())
@@ -448,7 +447,7 @@ class HandoverMailIntegrationTest {
       entityId =
           EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
                   repository,
-                  DecisionDTO.builder()
+                  DocumentationUnitDTO.builder()
                       .documentationOffice(docOffice)
                       .documentNumber("docnr12345678"))
               .getId();

@@ -22,7 +22,7 @@ public class NormReferenceTransformer {
   /**
    * Transforms a NormReferenceDTO (Data Transfer Object) into a {@link NormReference} domain
    * object, before all NormReferences with the same normAbbreviation are being grouped into one
-   * NormReference object in the {@link DecisionTransformer}
+   * NormReference object in the {@link DocumentationUnitTransformer}
    *
    * @param normDTO The NormReferenceDTO to be transformed.
    * @return The NormReference domain object representing the transformed NormReferenceDTO.

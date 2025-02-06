@@ -7,7 +7,7 @@ where
 
 -- Delete any test-related records in the documentation_unit table
 delete from
-    incremental_migration.decision
+    incremental_migration.documentation_unit
 where
     current_procedure_id IN (
         SELECT
@@ -63,7 +63,11 @@ INSERT INTO
     document_number,
     document_type_id,
     documentation_office_id,
+    creating_documentation_office_id,
+    guiding_principle,
     judicial_body,
+    procedure,
+    tenor,
     last_publication_date_time,
     scheduled_publication_date_time
   )
@@ -97,7 +101,11 @@ VALUES
       WHERE
         abbreviation = 'BAG'
     ),
+    NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenor1',
     '2000-11-21 09:42:49.385920',
     NULL
   ),
@@ -115,6 +123,10 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
+    NULL,
+    NULL,
+    NULL,
     NULL,
     NULL,
     '2100-11-21 09:42:49.385920'
@@ -148,7 +160,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     NULL,
     '2100-11-30 19:46:49.385920'
   ),
@@ -182,7 +198,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     NULL,
     NULL
   ),
@@ -215,7 +235,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     '2001-11-21 09:42:49.385920',
     NULL
   ),
@@ -234,6 +258,10 @@ VALUES
         abbreviation = 'DS'
     ),
     NULL,
+    NULL,
+    NULL,
+    NULL,
+    'tenorx',
     '2002-11-21 09:42:49.385920',
     NULL
   ),
@@ -252,6 +280,10 @@ VALUES
         abbreviation = 'DS'
     ),
     NULL,
+    NULL,
+    NULL,
+    NULL,
+    'tenorx',
     NULL,
     NULL
   ),
@@ -276,7 +308,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     NULL,
     NULL
   ),
@@ -301,7 +337,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     NULL,
     NULL
   ),
@@ -334,7 +374,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     NULL,
     NULL
   ),
@@ -367,7 +411,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     NULL,
     NULL
   ),
@@ -400,7 +448,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     NULL,
     NULL
   ),
@@ -433,7 +485,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     NULL,
     '2100-11-21 19:42:49.385920'
   ),
@@ -467,7 +523,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+   NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     NULL,
     '2100-11-21 10:42:49.385920'
   ),
@@ -492,7 +552,11 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+   NULL,
+    'guiding principle',
     '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx',
     '2005-11-21 09:42:49.385920',
     NULL
   ),
@@ -517,235 +581,21 @@ VALUES
           WHERE
               abbreviation = 'BGH'
       ),
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_office
+          WHERE
+              abbreviation = 'DS'
+      ),
+      NULL,
+      NULL,
+      NULL,
       NULL,
       NULL,
       NULL
   );
-
-INSERT INTO
-    incremental_migration.decision (
-    id,
-    creating_documentation_office_id,
-    guiding_principle,
-    procedure,
-    tenor
-)
-VALUES
-    (
-        (SELECT
-        id
-        FROM
-        incremental_migration.documentation_unit
-        WHERE
-        document_number
-        = 'YYTestDoc0001'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenor'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0002'),
-        NULL,
-        NULL,
-        NULL,
-        NULL
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0003'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0004'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0005'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0006'),
-        NULL,
-        NULL,
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0007'),
-        NULL,
-        NULL,
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0008'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0009'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0010'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0011'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0012'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0013'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0014'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0015'),
-        NULL,
-        'guiding principle',
-        NULL,
-        'tenorx'
-    ),
-    (
-        (SELECT
-             id
-         FROM
-             incremental_migration.documentation_unit
-         WHERE
-             document_number
-                 = 'YYTestDoc0016'),
-        (
-            SELECT
-                id
-            FROM
-                incremental_migration.documentation_office
-            WHERE
-                abbreviation = 'DS'
-        ),
-        NULL,
-        NULL,
-        NULL
-    );
 
 INSERT INTO
   incremental_migration.status (
@@ -1076,11 +926,11 @@ WHERE document_number = 'YYTestDoc0016';
 
 
 UPDATE
-  incremental_migration.decision
+  incremental_migration.documentation_unit
 SET
   note = 'dies ist eine test notiz'
 WHERE
-  incremental_migration.decision.id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0015');
+  incremental_migration.documentation_unit.document_number = 'YYTestDoc0015';
 
 INSERT INTO
   incremental_migration.file_number (id, value, documentation_unit_id, rank)

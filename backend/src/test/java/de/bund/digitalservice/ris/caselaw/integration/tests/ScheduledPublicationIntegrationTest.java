@@ -26,7 +26,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
@@ -142,7 +141,7 @@ class ScheduledPublicationIntegrationTest {
     DocumentationUnitDTO docUnitDueNow =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             docUnitRepository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOffice)
                 .documentNumber("docnr123456_1")
                 .scheduledByEmail("test@example.local")
@@ -153,7 +152,7 @@ class ScheduledPublicationIntegrationTest {
     DocumentationUnitDTO docUnitScheduledForFuture =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             docUnitRepository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOffice)
                 .documentNumber("docnr123456_2")
                 .scheduledByEmail("test@example.local")
@@ -164,7 +163,7 @@ class ScheduledPublicationIntegrationTest {
     DocumentationUnitDTO docUnitWithFailingXmlExport =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             docUnitRepository,
-            DecisionDTO.builder()
+            DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOffice)
                 .documentNumber("docnr123456_3")
                 .scheduledByEmail("invalid-docunit@example.local")
