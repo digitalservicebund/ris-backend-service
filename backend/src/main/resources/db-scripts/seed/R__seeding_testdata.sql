@@ -59,7 +59,7 @@ INSERT INTO
   incremental_migration.documentation_unit (
     id,
     court_id,
-    decision_date,
+    date,
     document_number,
     document_type_id,
     documentation_office_id,
