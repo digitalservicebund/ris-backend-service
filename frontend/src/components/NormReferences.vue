@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
 import dayjs from "dayjs"
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import EditableList from "@/components/EditableList.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
@@ -12,6 +12,7 @@ import SingleNorm from "@/domain/singleNorm"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
+const editableList = ref()
 
 const norms = computed({
   get: () => store.documentUnit!.contentRelatedIndexing.norms,
@@ -29,7 +30,10 @@ const norms = computed({
         return true // Keep the value in the norms array
       },
     )
-    await store.updateDocumentUnit()
+    const response = await store.updateDocumentUnit()
+    if (response.data) {
+      editableList.value.toggleNewEntry(true)
+    }
   },
 })
 
@@ -70,6 +74,7 @@ function generateUniqueSingleNormKey(singleNorm: SingleNorm): string {
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList
+          ref="editableList"
           v-model="norms"
           :create-entry="() => new NormReference()"
           :edit-component="NormReferenceInput"
