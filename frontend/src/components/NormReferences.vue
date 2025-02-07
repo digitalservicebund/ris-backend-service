@@ -29,7 +29,6 @@ const norms = computed({
         return true // Keep the value in the norms array
       },
     )
-    await store.updateDocumentUnit()
   },
 })
 
