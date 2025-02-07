@@ -32,7 +32,7 @@ class DocumentationUnitListItemTransformerTest {
             .court(CourtDTO.builder().type("LG").location("Berlin").build())
             .documentType(DocumentTypeDTO.builder().abbreviation("Urt").build())
             .fileNumbers(List.of(FileNumberDTO.builder().value("1 BvR 1234/19").build()))
-            .decisionDate(LocalDate.parse("2021-01-01"))
+            .date(LocalDate.parse("2021-01-01"))
             .scheduledPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
             .lastPublicationDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
             .judicialBody("1. Senat")

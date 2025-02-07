@@ -52,8 +52,7 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
 
   private Long version;
 
-  @Column(name = "decision_date")
-  private LocalDate decisionDate;
+  @Column private LocalDate date;
 
   @Column(nullable = false, unique = true, updatable = false, name = "document_number")
   @NotBlank

@@ -192,7 +192,7 @@ class DocumentationUnitSearchIntegrationTest {
           repository,
           DecisionDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
-              .decisionDate(date)
+              .date(date)
               .documentationOffice(docOfficeDTO));
     }
 

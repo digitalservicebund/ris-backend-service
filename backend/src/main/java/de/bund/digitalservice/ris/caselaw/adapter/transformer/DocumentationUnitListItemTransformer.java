@@ -37,7 +37,7 @@ public class DocumentationUnitListItemTransformer {
     builder
         .uuid(documentationUnitListItemDTO.getId())
         .documentNumber(documentationUnitListItemDTO.getDocumentNumber())
-        .decisionDate(documentationUnitListItemDTO.getDecisionDate())
+        .decisionDate(documentationUnitListItemDTO.getDate())
         .scheduledPublicationDateTime(
             documentationUnitListItemDTO.getScheduledPublicationDateTime())
         .lastPublicationDateTime(documentationUnitListItemDTO.getLastPublicationDateTime())
@@ -114,7 +114,7 @@ public class DocumentationUnitListItemTransformer {
             .documentNumber(documentationUnitListItemDTO.getDocumentNumber())
             .court(CourtTransformer.transformToDomain(documentationUnitListItemDTO.getCourt()))
             .status(getStatus(documentationUnitListItemDTO))
-            .decisionDate(documentationUnitListItemDTO.getDecisionDate())
+            .decisionDate(documentationUnitListItemDTO.getDate())
             .documentType(
                 DocumentTypeTransformer.transformToDomain(
                     documentationUnitListItemDTO.getDocumentType()))

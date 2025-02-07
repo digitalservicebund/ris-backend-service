@@ -99,7 +99,7 @@ public class DecisionTransformer {
 
       builder
           .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
-          .decisionDate(coreData.decisionDate())
+          .date(coreData.decisionDate())
           .documentType(
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
@@ -122,7 +122,7 @@ public class DecisionTransformer {
     } else {
       builder
           .judicialBody(null)
-          .decisionDate(null)
+          .date(null)
           .court(null)
           .documentType(null)
           .documentationOffice(null)
@@ -680,7 +680,7 @@ public class DecisionTransformer {
                         || decisionDTO.getRegions().get(0) == null
                     ? null
                     : decisionDTO.getRegions().get(0).getCode())
-            .decisionDate(decisionDTO.getDecisionDate())
+            .decisionDate(decisionDTO.getDate())
             .appraisalBody(decisionDTO.getJudicialBody());
 
     addFileNumbersToDomain(decisionDTO, coreDataBuilder);

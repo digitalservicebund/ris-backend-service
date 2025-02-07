@@ -202,7 +202,7 @@ class HandoverMailIntegrationTest {
             DecisionDTO.builder()
                 .documentationOffice(docOffice)
                 .documentNumber(identifier)
-                .decisionDate(LocalDate.now()));
+                .date(LocalDate.now()));
     UUID entityId = savedDocumentationUnitDTO.getId();
 
     assertThat(repository.findAll()).hasSize(1);

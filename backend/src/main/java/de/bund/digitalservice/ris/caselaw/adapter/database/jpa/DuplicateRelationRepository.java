@@ -30,7 +30,7 @@ WITH
         SELECT documentation_unit_id as id, value
         FROM incremental_migration.deviating_date
         UNION ALL
-        SELECT id, decision_date as value
+        SELECT id, date as value
         FROM incremental_migration.documentation_unit),
      all_courts as(
         SELECT documentation_unit_id as id, court.id as value
@@ -116,7 +116,7 @@ WITH
         SELECT documentation_unit_id as id, value
         FROM incremental_migration.deviating_date
         UNION ALL
-        SELECT id, decision_date as value
+        SELECT id, date as value
         FROM incremental_migration.documentation_unit),
      all_courts as(
         SELECT documentation_unit_id as id, court.id as value

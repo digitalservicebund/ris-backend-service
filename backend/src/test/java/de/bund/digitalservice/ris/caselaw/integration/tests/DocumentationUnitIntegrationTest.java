@@ -876,7 +876,7 @@ class DocumentationUnitIntegrationTest {
           DecisionDTO.builder()
               .documentNumber(documentNumbers.get(i))
               .court(court)
-              .decisionDate(decisionDates.get(i))
+              .date(decisionDates.get(i))
               .documentationOffice(DocumentationOfficeDTO.builder().id(docOfficeIds.get(i)).build())
               .fileNumbers(
                   List.of(
@@ -998,7 +998,7 @@ class DocumentationUnitIntegrationTest {
         repository,
         DecisionDTO.builder()
             .documentNumber("documentNumber")
-            .decisionDate(LocalDate.parse("2021-01-02"))
+            .date(LocalDate.parse("2021-01-02"))
             .documentationOffice(documentationOffice)
             .fileNumbers(
                 List.of(FileNumberDTO.builder().value("Vf. 19-VIII-22 (e.A.)").rank(1L).build()))
@@ -1142,7 +1142,7 @@ class DocumentationUnitIntegrationTest {
             .documentationOffice(documentOffice)
             .creatingDocumentationOffice(creatingDocOffice)
             .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
-            .decisionDate(decisionDate)
+            .date(decisionDate)
             .documentationOffice(documentOffice)
             .fileNumbers(
                 fileNumbers == null

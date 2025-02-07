@@ -36,7 +36,7 @@ public class DuplicateRelationTransformerTest {
             .status(StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
             .documentType(DocumentTypeDTO.builder().label("Beschluss").build())
             .court(CourtDTO.builder().type("AG").location("Aachen").build())
-            .decisionDate(decisionDate)
+            .date(decisionDate)
             .fileNumbers(List.of(FileNumberDTO.builder().value("my-file-number-1").build()))
             .build();
 

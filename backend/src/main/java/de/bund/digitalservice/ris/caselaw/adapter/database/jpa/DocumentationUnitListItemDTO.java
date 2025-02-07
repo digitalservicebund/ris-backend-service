@@ -23,7 +23,7 @@ public interface DocumentationUnitListItemDTO {
 
   List<AttachmentDTO> getAttachments();
 
-  LocalDate getDecisionDate();
+  LocalDate getDate();
 
   LocalDateTime getLastPublicationDateTime();
 

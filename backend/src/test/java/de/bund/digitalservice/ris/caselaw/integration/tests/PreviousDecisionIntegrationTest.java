@@ -251,7 +251,7 @@ class PreviousDecisionIntegrationTest {
         repository.save(
             DecisionDTO.builder()
                 .documentNumber("abcdefghjikl")
-                .decisionDate(LocalDate.parse("2021-01-01"))
+                .date(LocalDate.parse("2021-01-01"))
                 .documentationOffice(documentationOfficeDTO)
                 .build());
 
@@ -567,7 +567,7 @@ class PreviousDecisionIntegrationTest {
             .documentationOffice(documentOffice)
             .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
             .court(testCourt)
-            .decisionDate(decisionDate)
+            .date(decisionDate)
             .documentType(documentTypeDTO)
             .documentationOffice(documentOffice)
             .fileNumbers(

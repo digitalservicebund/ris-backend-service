@@ -455,8 +455,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // 4. Filter by decision date
     if (decisionDate != null) {
-      Predicate decisionDatePredicate =
-          criteriaBuilder.equal(root.get("decisionDate"), decisionDate);
+      Predicate decisionDatePredicate = criteriaBuilder.equal(root.get("date"), decisionDate);
       conditions = criteriaBuilder.and(conditions, decisionDatePredicate);
     }
 
@@ -618,7 +617,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         allResults.stream()
             .sorted(
                 (o1, o2) -> {
-                  if (o1.getDecisionDate() != null && o2.getDecisionDate() != null) {
+                  if (o1.getDate() != null && o2.getDate() != null) {
                     return o1.getDocumentNumber().compareTo(o2.getDocumentNumber());
                   }
                   return 0;

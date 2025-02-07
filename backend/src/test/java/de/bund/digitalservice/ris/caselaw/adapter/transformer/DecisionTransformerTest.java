@@ -82,7 +82,7 @@ class DecisionTransformerTest {
     assertThat(documentationUnitDTO.getProcedure()).isNull();
     assertThat(documentationUnitDTO.getEcli()).isNull();
     assertThat(documentationUnitDTO.getJudicialBody()).isNull();
-    assertThat(documentationUnitDTO.getDecisionDate()).isNull();
+    assertThat(documentationUnitDTO.getDate()).isNull();
     assertThat(documentationUnitDTO.getScheduledPublicationDateTime()).isNull();
     assertThat(documentationUnitDTO.getLastPublicationDateTime()).isNull();
     assertThat(documentationUnitDTO.getCourt()).isNull();
@@ -1611,7 +1611,7 @@ class DecisionTransformerTest {
     var duplicate1 =
         generateSimpleDTOBuilder()
             .documentNumber("duplicate1")
-            .decisionDate(LocalDate.of(2020, 1, 1))
+            .date(LocalDate.of(2020, 1, 1))
             .id(UUID.randomUUID())
             .build();
     var duplicate2 =
@@ -1619,13 +1619,13 @@ class DecisionTransformerTest {
     var duplicate3 =
         generateSimpleDTOBuilder()
             .documentNumber("duplicate3")
-            .decisionDate(LocalDate.of(2021, 1, 1))
+            .date(LocalDate.of(2021, 1, 1))
             .id(UUID.randomUUID())
             .build();
     var duplicate4 =
         generateSimpleDTOBuilder()
             .documentNumber("duplicate4")
-            .decisionDate(LocalDate.of(2021, 1, 1))
+            .date(LocalDate.of(2021, 1, 1))
             .id(UUID.randomUUID())
             .build();
     var duplicate5 =

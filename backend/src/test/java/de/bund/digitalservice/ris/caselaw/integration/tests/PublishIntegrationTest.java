@@ -258,7 +258,7 @@ class PublishIntegrationTest {
         .documentType(docType)
         .documentationOffice(documentationOffice)
         .court(court)
-        .decisionDate(LocalDate.now())
+        .date(LocalDate.now())
         .legalEffect(LegalEffectDTO.JA)
         .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
         .grounds("lorem ipsum dolor sit amet");

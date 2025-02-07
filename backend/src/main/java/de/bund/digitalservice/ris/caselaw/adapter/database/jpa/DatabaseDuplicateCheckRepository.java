@@ -31,7 +31,7 @@ public interface DatabaseDuplicateCheckRepository
         JOIN incremental_migration.documentation_unit documentationUnit
         ON decision.id = documentationUnit.id
     WHERE upper(fileNumber.value) IN (SELECT value FROM filtered_file_numbers)
-      AND documentationUnit.decision_date IN (:allDates)
+      AND documentationUnit.date IN (:allDates)
 
     UNION
 
@@ -53,7 +53,7 @@ public interface DatabaseDuplicateCheckRepository
     JOIN incremental_migration.documentation_unit documentationUnit
         ON decision.id = documentationUnit.id
     WHERE upper(deviatingFileNumber.value) IN (SELECT value FROM filtered_file_numbers)
-      AND documentationUnit.decision_date IN (:allDates)
+      AND documentationUnit.date IN (:allDates)
 
     UNION
 

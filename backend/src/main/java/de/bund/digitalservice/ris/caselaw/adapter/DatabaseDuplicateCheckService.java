@@ -152,7 +152,7 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
   }
 
   private List<LocalDate> collectDecisionDates(DecisionDTO decisionDTO) {
-    var decisionDate = decisionDTO.getDecisionDate();
+    var decisionDate = decisionDTO.getDate();
     var deviatingDecisionDates = decisionDTO.getDeviatingDates();
     List<LocalDate> allDates = new ArrayList<>();
     if (decisionDate != null) {

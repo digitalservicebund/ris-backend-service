@@ -535,7 +535,7 @@ class DuplicateCheckFullIntegrationTest {
       assertThat(duplicateRelationRepository.findAll()).hasSize(3);
 
       // change decisionDate in second duplicate
-      duplicateDTO.setDecisionDate(LocalDate.of(2022, 2, 22));
+      duplicateDTO.setDate(LocalDate.of(2022, 2, 22));
       databaseDocumentationUnitRepository.save(duplicateDTO);
 
       // Act
