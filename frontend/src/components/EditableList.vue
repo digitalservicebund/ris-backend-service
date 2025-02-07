@@ -87,7 +87,7 @@ async function removeEntry(entry: T) {
  */
 async function updateModel() {
   emit("update:modelValue", mergedValues.value)
-  // toggleNewEntsry(true)
+  toggleNewEntry(true)
   await scrollNearestRefIntoViewport(editableListContainer)
 }
 
