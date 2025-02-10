@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
@@ -32,15 +32,12 @@ public class DuplicateRelationService {
     return relationRepository.findAllByDocUnitId(docUnitId);
   }
 
-  void create(
-      DocumentationUnitDTO docUnitA,
-      DocumentationUnitDTO docUnitB,
-      DuplicateRelationStatus status) {
+  void create(DecisionDTO docUnitA, DecisionDTO docUnitB, DuplicateRelationStatus status) {
     DuplicateRelationDTO.DuplicateRelationId duplicateRelationId =
         new DuplicateRelationDTO.DuplicateRelationId(docUnitA.getId(), docUnitB.getId());
 
-    DocumentationUnitDTO docUnit1;
-    DocumentationUnitDTO docUnit2;
+    DecisionDTO docUnit1;
+    DecisionDTO docUnit2;
     // duplicateRelationId determines the order of the two docUnits
     if (docUnitA.getId().equals(duplicateRelationId.getDocumentationUnitId1())) {
       docUnit1 = docUnitA;
@@ -72,5 +69,18 @@ public class DuplicateRelationService {
 
   void delete(DuplicateRelationDTO duplicateRelation) {
     relationRepository.delete(duplicateRelation);
+  }
+
+  void updateAllDuplicates() {
+    log.info("Updating all duplicate relations");
+    var removedRelations = this.relationRepository.removeObsoleteDuplicateRelations();
+    var insertedRelations = this.relationRepository.addMissingDuplicateRelations();
+    var ignoredRelations =
+        this.relationRepository.ignoreDuplicateRelationsWhenJdvDupCheckDisabled();
+    log.info(
+        "Updating duplicate relations finished: {} duplicates added, {} duplicates removed, {} duplicates set to ignored.",
+        insertedRelations,
+        removedRelations,
+        ignoredRelations);
   }
 }

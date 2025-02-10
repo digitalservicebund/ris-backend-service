@@ -1,3 +1,4 @@
+import { Ref } from "vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 
@@ -16,6 +17,17 @@ export function useScroll() {
         window.scrollTo({
           top: offsetPosition,
           behavior: "smooth",
+        })
+      }
+    })
+  }
+
+  async function scrollNearestRefIntoViewport(ref: Ref) {
+    setTimeout(() => {
+      const element = ref.value
+      if (element) {
+        element.scrollIntoView({
+          block: "nearest",
         })
       }
     })
@@ -46,6 +58,7 @@ export function useScroll() {
 
   return {
     scrollIntoViewportById,
+    scrollNearestRefIntoViewport,
     openSidePanelAndScrollToSection,
   }
 }

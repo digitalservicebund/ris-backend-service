@@ -30,7 +30,7 @@ function onEnter() {
 </script>
 
 <template>
-  <a href="javascript:void(0)" @click="onEnter">
+  <a href="javascript:void(0)" @keydown.enter="onEnter">
     <label :aria-label="ariaLabel" class="label" :for="id">
       <slot />
 

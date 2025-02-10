@@ -29,17 +29,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicateCheckRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -530,7 +529,7 @@ class DuplicateCheckIntegrationTest {
       assertThat(duplicateRelationRepository.findAll()).hasSize(2);
 
       // change decisionDate in second duplicate
-      duplicateDTO.setDecisionDate(LocalDate.of(2022, 2, 22));
+      duplicateDTO.setDate(LocalDate.of(2022, 2, 22));
       databaseDocumentationUnitRepository.save(duplicateDTO);
 
       // Act
@@ -833,7 +832,7 @@ class DuplicateCheckIntegrationTest {
               Optional.of(
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
-                      .deviatingCourts(List.of("BGH", "BVerfG"))
+                      .deviatingCourts(List.of("AG Aachen", "BVerfG"))
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -843,7 +842,7 @@ class DuplicateCheckIntegrationTest {
               Optional.of(
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
-                      .deviatingCourts(List.of("BGH"))
+                      .deviatingCourts(List.of("AG Aachen"))
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -952,7 +951,7 @@ class DuplicateCheckIntegrationTest {
               Optional.of(
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
-                      .deviatingCourts(List.of("BGH", "BVerfG"))
+                      .deviatingCourts(List.of("AG Aachen", "BVerfG"))
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -962,88 +961,7 @@ class DuplicateCheckIntegrationTest {
               Optional.of(
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
-                      .deviatingCourts(List.of("BGH"))
-                      .deviatingFileNumbers(List.of("AZ-123"))
-                      .build()));
-
-      // Act
-      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
-          .isEqualTo(duplicateDTO.getDocumentNumber());
-    }
-
-    @Test
-    void findDuplicates_withDocumentTypeAndFileNumber() throws DocumentationUnitNotExistsException {
-      // Arrange
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().get(0));
-      var docUnitToBeChecked =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .documentType(documentType)
-                      .fileNumbers(List.of("AZ-123"))
-                      .build()));
-
-      var duplicateDTO =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .documentType(documentType)
-                      .fileNumbers(List.of("AZ-123"))
-                      .build()));
-
-      // Act
-      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
-          .isEqualTo(duplicateDTO.getDocumentNumber());
-    }
-
-    @Test
-    void findDuplicates_withDocumentTypeAndDeviatingFileNumber()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().get(0));
-      var docUnitToBeChecked =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .documentType(documentType)
-                      .fileNumbers(List.of("AZ-123"))
-                      .build()));
-
-      var duplicateDTO =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .documentType(documentType)
+                      .deviatingCourts(List.of("AG Aachen"))
                       .deviatingFileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -1150,7 +1068,7 @@ class DuplicateCheckIntegrationTest {
       List<String> deviatingEclis,
       PublicationStatus publicationStatus) {}
 
-  private DocumentationUnitDTO generateNewDocumentationUnit(
+  private DecisionDTO generateNewDocumentationUnit(
       DocumentationOffice userDocOffice, Optional<CreationParameters> parameters)
       throws DocumentationUnitException {
 
@@ -1182,18 +1100,19 @@ class DuplicateCheckIntegrationTest {
             .build();
 
     var documentationUnitDTO =
-        repository.save(
-            DocumentationUnitTransformer.transformToDTO(
-                DocumentationUnitDTO.builder()
-                    .documentationOffice(
-                        DocumentationOfficeTransformer.transformToDTO(
-                            docUnit.coreData().documentationOffice()))
-                    .creatingDocumentationOffice(
-                        DocumentationOfficeTransformer.transformToDTO(
-                            docUnit.coreData().creatingDocOffice()))
-                    .isJdvDuplicateCheckActive(params.isJdvDuplicateCheckActive())
-                    .build(),
-                docUnit));
+        (DecisionDTO)
+            repository.save(
+                DecisionTransformer.transformToDTO(
+                    DecisionDTO.builder()
+                        .documentationOffice(
+                            DocumentationOfficeTransformer.transformToDTO(
+                                docUnit.coreData().documentationOffice()))
+                        .creatingDocumentationOffice(
+                            DocumentationOfficeTransformer.transformToDTO(
+                                docUnit.coreData().creatingDocOffice()))
+                        .isJdvDuplicateCheckActive(params.isJdvDuplicateCheckActive())
+                        .build(),
+                    docUnit));
 
     if (params.publicationStatus != null) {
       documentationUnitDTO =

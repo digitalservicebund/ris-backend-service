@@ -1,13 +1,16 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { describe } from "vitest"
 import { Component, markRaw, ref, h } from "vue"
 import { ComponentExposed } from "vue-component-type-helpers"
+import { createRouter, createWebHistory } from "vue-router"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import EditableListItem from "@/domain/editableListItem"
 import DummyInputGroupVue from "@/kitchensink/components/DummyInputGroup.vue"
 import DummyListItem from "@/kitchensink/domain/dummyListItem"
+import routes from "~/test-helper/routes"
 
 const listWithEntries = ref<DummyListItem[]>([
   new DummyListItem({ text: "foo", uuid: "123" }),
@@ -29,25 +32,37 @@ async function renderComponent<T>(options?: {
   editComponent?: Component
   summaryComponent?: Component
   modelValue?: T[]
-  defaultValue?: T
-  disableMultiEntry?: boolean
 }) {
   const props: EditableListProps<T> = {
     editComponent: markRaw(options?.editComponent ?? DummyInputGroupVue),
     summaryComponent: markRaw(options?.summaryComponent ?? SummaryComponent),
     modelValue: options?.modelValue ?? listWithEntries.value,
-    defaultValue: options?.defaultValue ?? new DummyListItem(),
-    disableMultiEntry: options?.disableMultiEntry ?? false,
+    createEntry: () => new DummyListItem(),
   }
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: routes,
+  })
 
   const user = userEvent.setup()
   return {
     user,
-    ...render(EditableList, { props }),
+    ...render(EditableList, {
+      props,
+      global: {
+        plugins: [[createTestingPinia({})], [router]],
+      },
+    }),
   }
 }
 
 describe("EditableList", () => {
+  beforeEach(() => {
+    window.HTMLElement.prototype.scrollIntoView = vi.fn()
+  })
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
   it("renders a summary per model entry on initial render with entries", async () => {
     await renderComponent()
 
@@ -162,13 +177,13 @@ describe("EditableList", () => {
   })
 
   describe("Scrolling behavior", () => {
-    it("scrolls to the item being edited after cancel", async () => {
+    it("scrolls editable list back into view after cancel", async () => {
       // Arrange
       const { user } = await renderComponent()
-      const scrollIntoViewMock = vi.fn()
       const item = screen.getByTestId("list-entry-0")
-      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
       await user.click(item)
+      const scrollIntoViewMock = vi.fn()
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
 
       // Act
       await user.click(screen.getByLabelText("Abbrechen"))
@@ -177,16 +192,16 @@ describe("EditableList", () => {
       expect(scrollIntoViewMock).toHaveBeenCalledTimes(1)
     })
 
-    it("scrolls to the item being edited after 'übernehmen''", async () => {
+    it("scrolls editable list back into view after 'übernehmen''", async () => {
       // Arrange
       const { user } = await renderComponent()
-      const scrollIntoViewMock = vi.fn()
       const item = screen.getByTestId("list-entry-0")
-      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
       await user.click(item)
       expect(screen.getByLabelText("Editier Input")).toBeVisible()
       await user.type(screen.getByLabelText("Editier Input"), "1")
       const button = screen.getByLabelText("Listeneintrag speichern")
+      const scrollIntoViewMock = vi.fn()
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
 
       // Act
       await user.click(button)
@@ -195,13 +210,13 @@ describe("EditableList", () => {
       expect(scrollIntoViewMock).toHaveBeenCalledTimes(1)
     })
 
-    it("scrolls to editable list container if an item has been deleted", async () => {
+    it("scrolls editable list back into view if an item has been deleted", async () => {
       // Arrange
       const { user } = await renderComponent()
-      const scrollIntoViewMock = vi.fn()
       const item = screen.getByTestId("list-entry-0")
-      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
       await user.click(item)
+      const scrollIntoViewMock = vi.fn()
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
 
       // Act
       await user.click(screen.getByLabelText("Eintrag löschen"))

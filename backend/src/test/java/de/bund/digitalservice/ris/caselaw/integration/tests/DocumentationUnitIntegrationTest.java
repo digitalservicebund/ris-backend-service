@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
@@ -368,7 +369,7 @@ class DocumentationUnitIntegrationTest {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DocumentationUnitDTO.builder()
+            DecisionDTO.builder()
                 .documentNumber("1234567890123")
                 .leadingDecisionNormReferences(
                     List.of(
@@ -611,9 +612,9 @@ class DocumentationUnitIntegrationTest {
 
   @Test
   void testDocumentTypeToSetIdFromLookuptable() {
-    var categoryA =
+    var categoryB =
         databaseDocumentCategoryRepository.saveAndFlush(
-            DocumentCategoryDTO.builder().label("A").build());
+            DocumentCategoryDTO.builder().label("B").build());
     var categoryR =
         databaseDocumentCategoryRepository.saveAndFlush(
             DocumentCategoryDTO.builder().label("R").build());
@@ -624,7 +625,7 @@ class DocumentationUnitIntegrationTest {
     databaseDocumentTypeRepository.save(
         DocumentTypeDTO.builder()
             .abbreviation("ABC")
-            .category(categoryA)
+            .category(categoryB)
             .label("ABC123")
             .multiple(true)
             .build());
@@ -702,7 +703,7 @@ class DocumentationUnitIntegrationTest {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
-            DocumentationUnitDTO.builder()
+            DecisionDTO.builder()
                 .documentNumber("1234567890123")
                 .documentType(docType)
                 .documentationOffice(documentationOffice));
@@ -759,7 +760,7 @@ class DocumentationUnitIntegrationTest {
       DocumentationUnitDTO dto =
           EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
               repository,
-              DocumentationUnitDTO.builder()
+              DecisionDTO.builder()
                   .documentNumber(randomDocNumber)
                   .court(court)
                   .documentationOffice(office));
@@ -872,10 +873,10 @@ class DocumentationUnitIntegrationTest {
 
       EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
           repository,
-          DocumentationUnitDTO.builder()
+          DecisionDTO.builder()
               .documentNumber(documentNumbers.get(i))
               .court(court)
-              .decisionDate(decisionDates.get(i))
+              .date(decisionDates.get(i))
               .documentationOffice(DocumentationOfficeDTO.builder().id(docOfficeIds.get(i)).build())
               .fileNumbers(
                   List.of(
@@ -995,9 +996,9 @@ class DocumentationUnitIntegrationTest {
 
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .documentNumber("documentNumber")
-            .decisionDate(LocalDate.parse("2021-01-02"))
+            .date(LocalDate.parse("2021-01-02"))
             .documentationOffice(documentationOffice)
             .fileNumbers(
                 List.of(FileNumberDTO.builder().value("Vf. 19-VIII-22 (e.A.)").rank(1L).build()))
@@ -1137,11 +1138,11 @@ class DocumentationUnitIntegrationTest {
 
     return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .documentationOffice(documentOffice)
             .creatingDocumentationOffice(creatingDocOffice)
             .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
-            .decisionDate(decisionDate)
+            .date(decisionDate)
             .documentationOffice(documentOffice)
             .fileNumbers(
                 fileNumbers == null
@@ -1156,7 +1157,7 @@ class DocumentationUnitIntegrationTest {
   @Test
   void testDeleteByUuid_withExistingReference_shouldNotRecycleDocumentNumberAfterFailedDeletion() {
     DocumentationUnitDTO referencedDTO =
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .documentNumber("ZZRE202400001")
             .documentationOffice(documentationOffice)
             .build();
@@ -1164,7 +1165,7 @@ class DocumentationUnitIntegrationTest {
 
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .documentNumber("ZZRE202400002")
             .documentationOffice(documentationOffice)
             .previousDecisions(
@@ -1196,7 +1197,7 @@ class DocumentationUnitIntegrationTest {
   void
       testGenerateNewDocumentationUnit_withDeletedDocumentNumberWhichExistAsDocumentationUnit_shouldRemoveDeletedDocumentsEntryAndGenerateANewDocumentNumber() {
     DocumentationUnitDTO referencedDTO =
-        DocumentationUnitDTO.builder()
+        DecisionDTO.builder()
             .documentNumber("ZZRE202400001")
             .documentationOffice(documentationOffice)
             .build();

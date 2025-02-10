@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue"
+import { useRouter } from "vue-router"
+
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
@@ -11,6 +13,7 @@ import DocumentUnit, {
   shortTextLabels,
 } from "@/domain/documentUnit"
 import NormReference from "@/domain/normReference"
+import Reference from "@/domain/reference"
 import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -25,6 +28,7 @@ const validationStore = useValidationStore<keyof typeof labels>()
 const documentNumber = ref<string>(props.documentNumber ?? "")
 const documentUnitToImport = ref<DocumentUnit | undefined>(undefined)
 const errorMessage = ref<string | undefined>(undefined)
+const router = useRouter()
 
 /**
  * Loads the document unit to import category data from.
@@ -44,6 +48,8 @@ async function searchForDocumentUnit() {
 }
 
 const labels = {
+  caselawReferences: "Fundstellen",
+  literatureReferences: "Literaturfundstellen",
   keywords: "Schlagwörter",
   fieldsOfLaw: "Sachgebiete",
   norms: "Normen",
@@ -54,7 +60,10 @@ const labels = {
 
 const hasContent = (key: keyof typeof labels): boolean => {
   if (documentUnitToImport.value)
-    if (key in documentUnitToImport.value.contentRelatedIndexing) {
+    if (key == "caselawReferences" || key == "literatureReferences") {
+      const object = documentUnitToImport.value[key]
+      return !!(Array.isArray(object) && object.length > 0)
+    } else if (key in documentUnitToImport.value.contentRelatedIndexing) {
       const object =
         documentUnitToImport.value.contentRelatedIndexing[
           key as keyof typeof documentUnitToImport.value.contentRelatedIndexing
@@ -105,6 +114,10 @@ const handleImport = async (key: keyof typeof labels) => {
   validationStore.reset()
 
   switch (key) {
+    case "caselawReferences":
+    case "literatureReferences":
+      importReferences(key)
+      break
     case "keywords":
       importKeywords()
       break
@@ -140,8 +153,70 @@ const handleImport = async (key: keyof typeof labels) => {
   const updateResponse = await store.updateDocumentUnit()
   if (updateResponse.error) {
     validationStore.add("Fehler beim Speichern der " + labels[key], key) // add an errormessage to the validationstore field with the key
+  } else if (key == "caselawReferences" || key == "literatureReferences") {
+    await router.push({
+      name: "caselaw-documentUnit-documentNumber-references",
+    })
   } else {
     scrollToCategory(key)
+  }
+}
+
+function importReferences(key: "caselawReferences" | "literatureReferences") {
+  const source = documentUnitToImport.value?.[key]
+  if (!source) return
+
+  const targetReferences = store.documentUnit![key]
+
+  if (targetReferences) {
+    const isDuplicate = (
+      entry: Reference,
+      reference: Reference,
+      key: string,
+    ) => {
+      const sameLegalPeriodical =
+        entry.legalPeriodical?.uuid === reference.legalPeriodical?.uuid ||
+        entry.legalPeriodicalRawValue === reference.legalPeriodicalRawValue
+
+      const sameCitation = entry.citation === reference.citation
+
+      const sameReferenceSupplement =
+        key !== "caselawReferences" ||
+        entry.referenceSupplement === reference.referenceSupplement
+
+      const sameAuthor =
+        key !== "literatureReferences" || entry.author === reference.author
+
+      const sameDocumentType =
+        key !== "literatureReferences" ||
+        entry.documentType?.uuid === reference.documentType?.uuid
+
+      return (
+        sameLegalPeriodical &&
+        sameCitation &&
+        sameReferenceSupplement &&
+        sameAuthor &&
+        sameDocumentType
+      )
+    }
+    const uniqueImportableReferences = source
+      .filter(
+        (reference) =>
+          !targetReferences.find((entry) => isDuplicate(entry, reference, key)),
+      )
+      .map(
+        (reference) => new Reference({ ...reference, id: crypto.randomUUID() }),
+      )
+
+    targetReferences.push(...uniqueImportableReferences)
+  } else {
+    store.documentUnit![key] = source.map(
+      (reference) =>
+        new Reference({
+          ...reference,
+          id: crypto.randomUUID(),
+        }),
+    )
   }
 }
 
@@ -187,10 +262,13 @@ function importNorms() {
   const targetNorms = store.documentUnit!.contentRelatedIndexing.norms
   if (targetNorms) {
     source.forEach((importableNorm) => {
-      const existingWithAbbreviation = targetNorms.find(
-        (existing) =>
-          existing.normAbbreviation?.abbreviation ===
-          importableNorm.normAbbreviation?.abbreviation,
+      // first check for abbreviation, then for raw value
+      const existingWithAbbreviation = targetNorms.find((existing) =>
+        importableNorm.normAbbreviation?.abbreviation != null
+          ? existing.normAbbreviation?.abbreviation ===
+            importableNorm.normAbbreviation?.abbreviation
+          : existing.normAbbreviationRawValue ===
+            importableNorm.normAbbreviationRawValue,
       )
       if (existingWithAbbreviation) {
         //import single norms into existing norm reference
@@ -232,10 +310,10 @@ function importActiveCitations() {
   if (!source) return
 
   const targetActiveCitations =
-    store.documentUnit!.contentRelatedIndexing.activeCitations
-  if (targetActiveCitations) {
-    // consider as duplicate, if real reference found with same docnumber and citation
-    const uniqueImportableFieldsOfLaw = source.filter(
+    store.documentUnit!.contentRelatedIndexing.activeCitations ?? []
+
+  const uniqueImportableFieldsOfLaw = source
+    .filter(
       (activeCitation) =>
         !targetActiveCitations.find(
           (entry) =>
@@ -243,10 +321,16 @@ function importActiveCitations() {
             entry.citationType?.uuid === activeCitation.citationType?.uuid,
         ),
     )
-    targetActiveCitations.push(...uniqueImportableFieldsOfLaw)
-  } else {
-    store.documentUnit!.contentRelatedIndexing.activeCitations = [...source]
-  }
+    .map((activeCitation) => ({
+      ...activeCitation,
+      uuid: crypto.randomUUID(),
+      newEntry: true,
+    }))
+
+  store.documentUnit!.contentRelatedIndexing.activeCitations = [
+    ...targetActiveCitations,
+    ...uniqueImportableFieldsOfLaw,
+  ]
 }
 
 function importParticipatingJudges() {

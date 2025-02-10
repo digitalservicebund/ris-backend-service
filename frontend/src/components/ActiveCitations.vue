@@ -15,8 +15,6 @@ const activeCitations = computed({
     store.documentUnit!.contentRelatedIndexing.activeCitations = newValues
   },
 })
-
-const defaultValue = new ActiveCitation() as ActiveCitation
 </script>
 
 <template>
@@ -29,7 +27,7 @@ const defaultValue = new ActiveCitation() as ActiveCitation
     </h2>
     <EditableList
       v-model="activeCitations"
-      :default-value="defaultValue"
+      :create-entry="() => new ActiveCitation()"
       :edit-component="ActiveCitationInput"
       :summary-component="ActiveCitationSummary"
     />

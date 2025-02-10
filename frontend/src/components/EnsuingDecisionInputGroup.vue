@@ -9,6 +9,7 @@ import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
+import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -29,6 +30,7 @@ const emit = defineEmits<{
 }>()
 
 const { scrollIntoViewportById } = useScroll()
+const { isSaved } = useIsSaved(props.modelValue, props.modelValueList)
 const lastSearchInput = ref(new EnsuingDecision())
 const lastSavedModelValue = ref(new EnsuingDecision({ ...props.modelValue }))
 const ensuingDecision = ref(new EnsuingDecision({ ...props.modelValue }))
@@ -155,14 +157,9 @@ watch(
   },
 )
 
-/*
-  On first mount, we don't need to validate. When the props.modelValue do not
-  have the isEmpty getter, we can be sure that it has not been initialized as
-  EnsuingDecision and is therefore the initial load. As soon as we are using
-  uuids, the check should be 'props.modelValue?.uuid !== undefined'
- */
 onMounted(() => {
-  if (props.modelValue?.isEmpty !== undefined) {
+  // we don't want to validate on initial empty entries
+  if (isSaved.value) {
     validateRequiredInput()
   }
   ensuingDecision.value = new EnsuingDecision({ ...props.modelValue })

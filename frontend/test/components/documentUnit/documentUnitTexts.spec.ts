@@ -1,10 +1,16 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
+import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
 import DocumentUnit, { LongTexts, ShortTexts } from "@/domain/documentUnit"
 import ParticipatingJudge from "@/domain/participatingJudge"
+import routes from "~/test-helper/routes"
 
 function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: routes,
+  })
   return render(DocumentUnitTexts, {
     global: {
       plugins: [
@@ -22,6 +28,7 @@ function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
             },
           }),
         ],
+        [router],
       ],
     },
   })

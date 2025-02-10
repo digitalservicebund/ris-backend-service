@@ -14,8 +14,6 @@ const ensuingDecisions = computed({
     store.documentUnit!.ensuingDecisions = newValues
   },
 })
-
-const defaultValue = new EnsuingDecision() as EnsuingDecision
 </script>
 <template>
   <div aria-label="Nachgehende Entscheidung">
@@ -24,7 +22,7 @@ const defaultValue = new EnsuingDecision() as EnsuingDecision
       <div class="flex-1">
         <EditableList
           v-model="ensuingDecisions"
-          :default-value="defaultValue"
+          :create-entry="() => new EnsuingDecision()"
           :edit-component="EnsuingDecisionInputGroup"
           :summary-component="DocumentationUnitSummary"
         />

@@ -141,8 +141,8 @@ describe("EnsuingDecisions", () => {
         },
       }),
     )
-
     vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+    window.HTMLElement.prototype.scrollIntoView = vi.fn()
   })
 
   it("renders empty ensuing decision in edit mode, when no ensuingDecisions in list", async () => {

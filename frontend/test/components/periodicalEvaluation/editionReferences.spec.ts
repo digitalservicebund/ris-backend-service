@@ -66,6 +66,7 @@ async function renderComponent(options?: { references?: Reference[] }) {
 
 describe("Legal periodical edition evaluation", () => {
   beforeEach(async () => {
+    window.HTMLElement.prototype.scrollIntoView = vi.fn()
     global.ResizeObserver = vi.fn().mockImplementation(() => ({
       observe: vi.fn(),
       unobserve: vi.fn(),

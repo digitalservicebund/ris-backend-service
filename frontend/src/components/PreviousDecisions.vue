@@ -14,8 +14,6 @@ const previousDecisions = computed({
     store.documentUnit!.previousDecisions = newValues
   },
 })
-
-const defaultValue = new PreviousDecision() as PreviousDecision
 </script>
 
 <template>
@@ -26,7 +24,7 @@ const defaultValue = new PreviousDecision() as PreviousDecision
         <div class="flex-1">
           <EditableList
             v-model="previousDecisions"
-            :default-value="defaultValue"
+            :create-entry="() => new PreviousDecision()"
             :edit-component="PreviousDecisionInputGroup"
             :summary-component="DocumentationUnitSummary"
           />

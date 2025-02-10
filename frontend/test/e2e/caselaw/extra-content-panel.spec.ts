@@ -1,13 +1,14 @@
 import { expect } from "@playwright/test"
 import {
+  extraContentMenuKeyboardNavigator,
   fillInput,
-  navigateToCategories,
   navigateToAttachments,
-  navigateToPreview,
+  navigateToCategories,
   navigateToHandover,
+  navigateToPreview,
   navigateToSearch,
-  uploadTestfile,
   save,
+  uploadTestfile,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 
@@ -318,12 +319,13 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
 
         await test.step("test document selection with keyboard", async () => {
           // skip preview button & category import button
-          await page.keyboard.press("Tab")
-          await page.keyboard.press("Tab")
-          await page.keyboard.press("Tab")
-          await expect(
+
+          await extraContentMenuKeyboardNavigator(
+            page,
             page.getByRole("button", { name: "Vorheriges Dokument anzeigen" }),
-          ).toBeFocused()
+            "Tab",
+          )
+
           await page.keyboard.press("Tab")
           await expect(
             page.getByRole("button", { name: "Nächstes Dokument anzeigen" }),
@@ -344,10 +346,11 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
         })
 
         await test.step("select category import with keyboard", async () => {
-          await page.keyboard.press("Shift+Tab")
-          await expect(
+          await extraContentMenuKeyboardNavigator(
+            page,
             page.getByRole("button", { name: "Rubriken-Import anzeigen" }),
-          ).toBeFocused()
+            "Shift+Tab",
+          )
           await page.keyboard.press("Enter")
           await expect(page.getByText("Rubriken importieren")).toBeVisible()
         })
@@ -364,11 +367,11 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
         })
 
         await test.step("open preview in new tab with keyboard", async () => {
-          await page.keyboard.press("Tab")
-          await page.keyboard.press("Tab")
-          await expect(
+          await extraContentMenuKeyboardNavigator(
+            page,
             page.getByRole("link", { name: "Vorschau in neuem Tab öffnen" }),
-          ).toBeFocused()
+            "Tab",
+          )
 
           const newTabPromise = page.context().waitForEvent("page")
           await page.keyboard.press("Enter")

@@ -1,3 +1,6 @@
-CVE-2024-47535
-CVE-2024-45337
-CVE-2024-45338
+CVE-2024-45336
+CVE-2024-45341
+// json-smart, we are not affected
+CVE-2024-57699
+// go package for github action, only needed for build process
+CVE-2025-22866

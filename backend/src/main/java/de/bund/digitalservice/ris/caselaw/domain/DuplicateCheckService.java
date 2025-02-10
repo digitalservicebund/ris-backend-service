@@ -5,6 +5,8 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotE
 public interface DuplicateCheckService {
   void checkDuplicates(String docNumber);
 
+  void checkAllDuplicates();
+
   String updateDuplicateStatus(
       String docNumberOrigin, String docNumberDuplicate, DuplicateRelationStatus status)
       throws DocumentationUnitNotExistsException;

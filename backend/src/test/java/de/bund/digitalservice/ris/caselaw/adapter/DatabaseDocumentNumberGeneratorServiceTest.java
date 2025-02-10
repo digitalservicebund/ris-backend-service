@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
@@ -53,10 +54,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     var nextDocumentNumber = generateDefaultDocumentNumber();
 
     DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder()
-            .id(UUID.randomUUID())
-            .documentNumber(nextDocumentNumber)
-            .build();
+        DecisionDTO.builder().id(UUID.randomUUID()).documentNumber(nextDocumentNumber).build();
 
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
@@ -81,10 +79,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     var nextDocumentNumber = generateDefaultDocumentNumber();
 
     DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder()
-            .id(UUID.randomUUID())
-            .documentNumber(nextDocumentNumber)
-            .build();
+        DecisionDTO.builder().id(UUID.randomUUID()).documentNumber(nextDocumentNumber).build();
 
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
