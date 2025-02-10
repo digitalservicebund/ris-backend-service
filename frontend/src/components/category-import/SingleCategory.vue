@@ -41,7 +41,7 @@ function handleClick() {
       />
       <span
         class="ds-label-01-reg"
-        :class="hasContent ? 'text-blue-800' : 'text-gray-900'"
+        :class="hasContent && importable ? 'text-blue-800' : 'text-gray-900'"
         >{{ label }}</span
       >
       <IconBadge
