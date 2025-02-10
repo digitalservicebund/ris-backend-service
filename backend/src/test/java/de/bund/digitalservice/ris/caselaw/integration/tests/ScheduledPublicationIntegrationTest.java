@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
@@ -141,35 +142,35 @@ class ScheduledPublicationIntegrationTest {
     DocumentationUnitDTO docUnitDueNow =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             docUnitRepository,
-            DocumentationUnitDTO.builder()
+            DecisionDTO.builder()
                 .documentationOffice(documentationOffice)
                 .documentNumber("docnr123456_1")
                 .scheduledByEmail("test@example.local")
                 .scheduledPublicationDateTime(LocalDateTime.now())
-                .decisionDate(LocalDate.now()));
+                .date(LocalDate.now()));
 
     // Doc unit is not yet due -> will not be touched
     DocumentationUnitDTO docUnitScheduledForFuture =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             docUnitRepository,
-            DocumentationUnitDTO.builder()
+            DecisionDTO.builder()
                 .documentationOffice(documentationOffice)
                 .documentNumber("docnr123456_2")
                 .scheduledByEmail("test@example.local")
                 .scheduledPublicationDateTime(LocalDateTime.now().plusMinutes(3))
-                .decisionDate(LocalDate.now()));
+                .date(LocalDate.now()));
 
     // Invalid doc unit will be unscheduled + send error notification
     DocumentationUnitDTO docUnitWithFailingXmlExport =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             docUnitRepository,
-            DocumentationUnitDTO.builder()
+            DecisionDTO.builder()
                 .documentationOffice(documentationOffice)
                 .documentNumber("docnr123456_3")
                 .scheduledByEmail("invalid-docunit@example.local")
                 .scheduledPublicationDateTime(LocalDateTime.now().minusMinutes(3))
                 // Missing decision date let's MockXmlExporter fail
-                .decisionDate(null));
+                .date(null));
     // The assertion might take longer -> record now beforehand.
     LocalDateTime now = LocalDateTime.now();
 

@@ -9,4 +9,8 @@ export default class StringsUtil {
   ): string {
     return words.filter((item) => !this.isEmpty(item)).join(separator)
   }
+
+  public static readonly countWords = (text: string): number => {
+    return text.trim().split(/\s+/).length
+  }
 }

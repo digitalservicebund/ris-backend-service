@@ -48,7 +48,12 @@ function renderComponent(options?: {
 describe("Create new documentation unit from search", () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
-  beforeEach(() => vi.useFakeTimers())
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    vi.useFakeTimers({
+      toFake: ["setTimeout", "clearTimeout", "Date"],
+    })
+  })
   afterEach(() => vi.useRealTimers())
 
   it("renders empty responsible docoffice combobox when no docOffice is given", async () => {

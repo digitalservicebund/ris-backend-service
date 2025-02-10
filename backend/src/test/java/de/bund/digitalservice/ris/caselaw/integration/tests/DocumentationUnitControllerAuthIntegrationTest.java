@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
@@ -162,7 +163,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
       docUnitOffice = ccRisOffice;
     }
 
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, createNewDocumentationUnitDTO(docUnitOffice), publicationStatus);
 
@@ -238,7 +239,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
 
   @Test
   void testUnpublishedDocumentationUnitIsForbiddenForOtherOffice() {
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO documentationUnitDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, createNewDocumentationUnitDTO(ccRisOffice), UNPUBLISHED);
 
@@ -302,17 +303,16 @@ class DocumentationUnitControllerAuthIntegrationTest {
                     .isEqualTo(documentationUnitDTO.getId()));
   }
 
-  private DocumentationUnitDTO.DocumentationUnitDTOBuilder createNewDocumentationUnitDTO(
+  private DecisionDTO.DecisionDTOBuilder createNewDocumentationUnitDTO(
       DocumentationOfficeDTO documentationOffice) {
     String documentNumber =
         new Random().ints(13, 0, 10).mapToObj(Integer::toString).collect(Collectors.joining());
-    return DocumentationUnitDTO.builder()
+    return DecisionDTO.builder()
         .documentNumber(documentNumber)
         .documentationOffice(documentationOffice);
   }
 
-  private void saveStatus(
-      DocumentationUnitDTO documentationUnitDTO, Instant createdAt, Status status) {
+  private void saveStatus(DecisionDTO documentationUnitDTO, Instant createdAt, Status status) {
     repository.save(
         documentationUnitDTO.toBuilder()
             .status(

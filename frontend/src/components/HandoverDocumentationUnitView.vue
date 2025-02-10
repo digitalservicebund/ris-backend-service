@@ -11,6 +11,7 @@ import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
+import HandoverLanguageTool from "@/components/text-check/HandoverLanguageTool.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
@@ -220,6 +221,7 @@ const missingNormsFields = ref(
 )
 
 const showHandoverModal = ref(false)
+
 function confirmHandoverDialog() {
   emits("handoverDocument")
   showHandoverModal.value = false
@@ -597,8 +599,13 @@ const isPublishable = computed<boolean>(
         :document-number="store.documentUnit!.documentNumber"
         :pending-duplicates="pendingDuplicates"
       />
-      <div class="border-b-1 border-b-gray-400"></div>
 
+      <HandoverLanguageTool
+        v-if="false"
+        :document-number="store.documentUnit!.documentNumber"
+      />
+
+      <div class="border-b-1 border-b-gray-400"></div>
       <ExpandableContent
         v-if="
           !fieldsMissing &&

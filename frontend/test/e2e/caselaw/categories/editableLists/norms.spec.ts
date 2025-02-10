@@ -56,10 +56,10 @@ test.describe("norm", () => {
       normAbbreviation: "PBefG",
     })
     await container.getByLabel("Norm speichern").click()
-    await save(page)
 
     // the third list item is a default list entry
     await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
+    await save(page)
     await page.reload()
     // the default list entry is not shown on reload page
     await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
@@ -364,7 +364,6 @@ test.describe("norm", () => {
       const saveNormButton = normContainer.getByLabel("Norm speichern")
       await saveNormButton.click()
 
-      await save(page)
       await expect(page.getByText("Nichtig (Brandenburg)")).toBeVisible()
 
       // edit legal force
@@ -380,7 +379,6 @@ test.describe("norm", () => {
 
       await saveNormButton.click()
 
-      await save(page)
       await expect(page.getByText("Vereinbar (Berlin (Ost))")).toBeVisible()
 
       // remove legal force
@@ -390,7 +388,6 @@ test.describe("norm", () => {
       await clearInput(page, "Gesetzeskraft Geltungsbereich")
 
       await saveNormButton.click()
-      await save(page)
       await expect(page.getByText("Vereinbar (Berlin (Ost))")).toBeHidden()
     })
 
@@ -425,7 +422,6 @@ test.describe("norm", () => {
       const saveNormButton = normContainer.getByLabel("Norm speichern")
       await saveNormButton.click()
 
-      await save(page)
       await expect(page.getByText("Fehlende Daten")).toBeVisible()
 
       // enter edit mode
@@ -449,7 +445,6 @@ test.describe("norm", () => {
 
       await saveNormButton.click()
 
-      await save(page)
       await expect(page.getByText("Vereinbar (Berlin (Ost))")).toBeVisible()
     })
   })
@@ -480,8 +475,6 @@ test.describe("norm", () => {
     saveNormButton = normContainer.getByLabel("Norm speichern")
     await saveNormButton.click()
 
-    await save(page)
-
     await fillNormInputs(page, {
       normAbbreviation: "KBErrG",
       singleNorms: [{ singleNorm: "§ 8" } as SingleNorm],
@@ -503,8 +496,6 @@ test.describe("norm", () => {
     await expect(page.locator("text=PBefG, § 123")).toBeHidden()
     await expect(page.locator("text=BGB, § 1")).toBeVisible()
     await expect(page.locator("text=KBErrG, § 8")).toBeVisible()
-
-    await save(page)
 
     await normContainer.getByTestId("list-entry-0").click()
 

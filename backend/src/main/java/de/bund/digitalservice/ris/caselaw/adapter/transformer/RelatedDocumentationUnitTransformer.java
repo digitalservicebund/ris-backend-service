@@ -25,7 +25,7 @@ public class RelatedDocumentationUnitTransformer {
         .uuid(documentationUnitDTO.getId())
         .documentNumber(documentationUnitDTO.getDocumentNumber())
         .court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()))
-        .decisionDate(documentationUnitDTO.getDecisionDate())
+        .decisionDate(documentationUnitDTO.getDate())
         .fileNumber(
             documentationUnitDTO.getFileNumbers().stream()
                 .findFirst()

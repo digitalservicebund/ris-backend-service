@@ -24,8 +24,8 @@ public interface DatabaseDocumentationUnitRepository
    AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
    AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
    AND (cast(:decisionDate as date) IS NULL
-       OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.decisionDate = :decisionDate)
-       OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))
+       OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.date = :decisionDate)
+       OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.date BETWEEN :decisionDate AND :decisionDateEnd))
    AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND documentationUnit.documentationOffice.id = :documentationOfficeId))
    AND (:scheduledOnly = FALSE OR cast(documentationUnit.scheduledPublicationDateTime as date) IS NOT NULL)
    AND (cast(:publicationDate as date) IS NULL
@@ -54,7 +54,7 @@ public interface DatabaseDocumentationUnitRepository
    ORDER BY
      (CASE WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.scheduledPublicationDateTime END) DESC NULLS LAST,
      (CASE WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.lastPublicationDateTime END) DESC NULLS LAST,
-     documentationUnit.decisionDate DESC NULLS LAST
+     documentationUnit.date DESC NULLS LAST
 """;
 
   @Query(

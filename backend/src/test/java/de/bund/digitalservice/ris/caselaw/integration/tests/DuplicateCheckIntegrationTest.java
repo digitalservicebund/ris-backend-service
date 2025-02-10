@@ -29,16 +29,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicateCheckRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -529,7 +529,7 @@ class DuplicateCheckIntegrationTest {
       assertThat(duplicateRelationRepository.findAll()).hasSize(2);
 
       // change decisionDate in second duplicate
-      duplicateDTO.setDecisionDate(LocalDate.of(2022, 2, 22));
+      duplicateDTO.setDate(LocalDate.of(2022, 2, 22));
       databaseDocumentationUnitRepository.save(duplicateDTO);
 
       // Act
@@ -1069,7 +1069,7 @@ class DuplicateCheckIntegrationTest {
       List<String> deviatingEclis,
       PublicationStatus publicationStatus) {}
 
-  private DocumentationUnitDTO generateNewDocumentationUnit(
+  private DecisionDTO generateNewDocumentationUnit(
       DocumentationOffice userDocOffice, Optional<CreationParameters> parameters)
       throws DocumentationUnitException {
 
@@ -1101,18 +1101,19 @@ class DuplicateCheckIntegrationTest {
             .build();
 
     var documentationUnitDTO =
-        repository.save(
-            DocumentationUnitTransformer.transformToDTO(
-                DocumentationUnitDTO.builder()
-                    .documentationOffice(
-                        DocumentationOfficeTransformer.transformToDTO(
-                            docUnit.coreData().documentationOffice()))
-                    .creatingDocumentationOffice(
-                        DocumentationOfficeTransformer.transformToDTO(
-                            docUnit.coreData().creatingDocOffice()))
-                    .isJdvDuplicateCheckActive(params.isJdvDuplicateCheckActive())
-                    .build(),
-                docUnit));
+        (DecisionDTO)
+            repository.save(
+                DecisionTransformer.transformToDTO(
+                    DecisionDTO.builder()
+                        .documentationOffice(
+                            DocumentationOfficeTransformer.transformToDTO(
+                                docUnit.coreData().documentationOffice()))
+                        .creatingDocumentationOffice(
+                            DocumentationOfficeTransformer.transformToDTO(
+                                docUnit.coreData().creatingDocOffice()))
+                        .isJdvDuplicateCheckActive(params.isJdvDuplicateCheckActive())
+                        .build(),
+                    docUnit));
 
     if (params.publicationStatus != null) {
       documentationUnitDTO =

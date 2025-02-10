@@ -31,8 +31,6 @@ const references = computed({
   },
 })
 
-const defaultValue = new Reference() as Reference
-
 async function saveReferences(references: Reference[]) {
   store.edition!.references = references
   const response = await store.saveEdition()
@@ -50,7 +48,7 @@ async function saveReferences(references: Reference[]) {
 }
 
 async function addNewEntry() {
-  await editableListRef.value.toggleDisplayDefaultValue(true)
+  await editableListRef.value.toggleNewEntry(true)
   const element = document.getElementById("reference-input")
   setTimeout(() => {
     if (!element) return
@@ -100,7 +98,7 @@ watch(loadEditionIntervalCounter, async () => {
         <EditableList
           ref="editableListRef"
           v-model="references"
-          :default-value="defaultValue"
+          :create-entry="() => new Reference()"
           :edit-component="PeriodicalEditionReferenceInput"
           :summary-component="PeriodicalEditionReferenceSummary"
         />
