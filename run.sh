@@ -51,6 +51,7 @@ EOF
 _init() {
   _setup_git_hooks
   _setup_direnv
+  _env
 }
 
 _start() {
@@ -84,8 +85,8 @@ MY_GID=$(id -g)
 DB_URL=jdbc:postgresql://localhost:5432/postgres
 DB_USER=test
 DB_PASSWORD=test
-AWS_ACCESS_KEY_ID=$(op read "op://Employee/OTC/access_key_id")
-AWS_SECRET_ACCESS_KEY=$(op read "op://Employee/OTC/secret_access_key")
+AWS_ACCESS_KEY_ID=$(op read "op://Employee/NeuRIS S3/access-key-id")
+AWS_SECRET_ACCESS_KEY=$(op read "op://Employee/NeuRIS S3/secret-access-key")
 AWS_BUCKET_NAME=neuris-migration-juris-data
 
 EOF
@@ -112,6 +113,7 @@ _dev() {
   for arg in "$@"; do
     case $arg in
       -i|--init)
+        echo $GH_PACKAGES_REPOSITORY_TOKEN | docker login ghcr.io -u $GH_PACKAGES_REPOSITORY_USER --password-stdin
         services="initialization"
         ;;
       -n|--no-backend)
@@ -168,8 +170,7 @@ _help() {
   echo "Usage: ./run.sh [command]"
   echo ""
   echo "Available commands:"
-  echo "init                  Set up repository for development"
-  echo "env                   Provide shell env build/test tooling"
+  echo "init                  Initialize development environment (git hooks, env vars)"
   echo "dev                   Start full-stack development environment with loopup table initialization"
   echo "                      Add '-n' or '--no-backend' to start everything but backend and initialization"
   echo "                      Add '-i' or '--init' to only initialize the lookup tables (read ./migration_image.md for prerequisites)"
@@ -183,7 +184,6 @@ _help() {
 cmd="${1:-}"
 case "$cmd" in
   "init") _init ;;
-  "env") _env ;;
   "dev")
     shift
     _dev "$@";;

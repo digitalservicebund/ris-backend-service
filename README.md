@@ -57,43 +57,16 @@ to `~/.zshrc`:
 eval "$(direnv hook zsh)"
 ```
 
-### GitHub Credentials for Migration Image
+### S3 Credentials for Lookup Table Initialization
 
-To be able to pull the `ris-data-migration` image, you need to log in to the GitHub Package Repository using your username and a
-credential token.
+The lookup table initialization in your local environment will be performed with data provided by a s3 bucket. Read [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials) on how to revtrieve credentials for it. 
 
-If you don't have a personal access token,
-read [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic)
-on how to create one. Otherwise, you can replace `GitHub Personal Access Token for migration` with your 1PW item. Then:
+Then, store the credentials in 1Password:
 
 ```shell
-op item create \
-    --category login \
-    --title "GitHub Personal Access Token for migration" \
-    'username=[your-github-username]' \
-    'password=[your-personal-access-token]'
-```
-
-The cli should print the created item.
-Now we login into docker using the 1Password item in order to be able to pull the migration image:
-
-```shell
-echo $(op read 'op://Employee/GitHub Personal Access Token for migration/password') \
-| docker login ghcr.io \
-    -u $(op read 'op://Employee/GitHub Personal Access Token for migration/username') \
-    --password-stdin
-```
-You should see the message `Login Succeeded`. 
-
-### AWS Credentials for Lookup Table Initialization
-
-Accessing the s3 bucket contan OTC access token, read here on how to revtrieve one [info](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials).
-
-To connect to the S3 bucket, store your AWS credentials in 1Password in the existing OTC item:
-
-```shell
-op item edit 'OTC' aws_access_key_id=[your-access-key-id]
-op item edit 'OTC' aws_secret_access_key=[your-aws_secret_access_key]
+op item create --category login --title 'NeuRIS S3' \
+'access-key-id=[your-access-key-id]' \
+'secret-access-key=[your-secret-access-key]'
 ```
 
 ## Getting started
@@ -108,12 +81,9 @@ This will install a couple of Git hooks which are supposed to help you to:
 
 - commit properly formatted source code only (and not break the build otherwise)
 - write [conventional commit messages](https://chris.beams.io/posts/git-commit/)
+- not accidentally push on a failing pipeline
 
-Now you can generate a new `.env` file containing the secrets. You will be asked to authorize requests to 1Password.
-
-```bash
-./run.sh env
-```
+Also, it creates a new `.env` file containing the secrets. You will be asked to authorize requests to 1Password.
 
 > **Note**
 >
