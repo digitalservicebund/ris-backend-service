@@ -121,6 +121,7 @@ public class DecisionTransformer {
       addDeviationCourts(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
       addDeviatingFileNumbers(builder, coreData);
+      addSource(currentDto, builder, coreData);
 
     } else {
       builder
@@ -194,6 +195,27 @@ public class DecisionTransformer {
     addLiteratureReferences(updatedDomainObject, builder, currentDto);
 
     return builder.build();
+  }
+
+  private static void addSource(
+      DecisionDTO currentDto, DecisionDTOBuilder<?, ?> builder, CoreData coreData) {
+    if (coreData.source() != null) {
+      List<SourceDTO> existingSources =
+          currentDto.getSource() != null
+              ? new ArrayList<>(currentDto.getSource())
+              : new ArrayList<>();
+      Integer rank = existingSources.size() + 1;
+
+      // Create new SourceDTO
+      SourceDTO newSource =
+          SourceDTO.builder().value(coreData.source().value().toString()).rank(rank).build();
+
+      // Add new source to the builder
+      List<SourceDTO> updatedSources =
+          new ArrayList<>(currentDto.getSource()); // Copy existing sources
+      updatedSources.add(newSource);
+      builder.source(updatedSources); // Update builder with new list
+    }
   }
 
   private static void addCaselawReferences(

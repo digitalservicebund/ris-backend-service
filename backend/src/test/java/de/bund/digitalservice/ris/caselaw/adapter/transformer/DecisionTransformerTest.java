@@ -31,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudg
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
@@ -51,6 +52,8 @@ import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import de.bund.digitalservice.ris.caselaw.domain.Source;
+import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
@@ -844,6 +847,94 @@ class DecisionTransformerTest {
         .isEqualTo(3);
     assertThat(documentationUnitDTO.getLiteratureReferences().getFirst().getEdition().getName())
         .isEqualTo("Foo");
+  }
+
+  @Test
+  void testTransformToDTO_withSource_withNoExistingSource() {
+    DecisionDTO currentDto = DecisionDTO.builder().build();
+
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
+            .coreData(
+                CoreData.builder().source(Source.builder().value(SourceValue.E).build()).build())
+            .build();
+
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(documentationUnitDTO.getSource().getFirst().getRank()).isOne();
+    assertThat(documentationUnitDTO.getSource().getFirst().getValue()).isEqualTo("E");
+    assertThat(documentationUnitDTO.getSource().getFirst().getSourceRawValue()).isEqualTo(null);
+  }
+
+  @Test
+  void testTransformToDTO_withSource_withExistingSource() {
+    List<SourceDTO> existingSources =
+        List.of(SourceDTO.builder().value("A").rank(1).build()); // Example list
+
+    DecisionDTO currentDto = DecisionDTO.builder().source(existingSources).build();
+
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
+            .coreData(
+                CoreData.builder().source(Source.builder().value(SourceValue.E).build()).build())
+            .build();
+
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(documentationUnitDTO.getSource().getLast().getRank()).isEqualTo(2);
+    assertThat(documentationUnitDTO.getSource().getLast().getValue()).isEqualTo("E");
+  }
+
+  @Test
+  void testTransformToDomain_withNoSources() {
+    DecisionDTO decisionDTO = DecisionDTO.builder().build();
+
+    DocumentationUnit domainObject = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(domainObject.coreData().source()).isNull();
+  }
+
+  @Test
+  void testTransformToDomain_withOneValidSource() {
+    DecisionDTO decisionDTO =
+        DecisionDTO.builder()
+            .source(List.of(SourceDTO.builder().value("A").rank(1).build()))
+            .build();
+
+    DocumentationUnit domainObject = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(domainObject.coreData().source().value()).isEqualTo(SourceValue.A);
+    assertThat(domainObject.coreData().source().sourceRawValue()).isNull();
+  }
+
+  @Test
+  void testTransformToDomain_withMultipleSources_shouldPickHighestRank() {
+    DecisionDTO decisionDTO =
+        DecisionDTO.builder()
+            .source(
+                List.of(
+                    SourceDTO.builder().value("O").rank(1).build(),
+                    SourceDTO.builder().value("Z").rank(3).build(),
+                    SourceDTO.builder().value("A").rank(2).build()))
+            .build();
+
+    DocumentationUnit domainObject = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(domainObject.coreData().source().value()).isEqualTo(SourceValue.Z);
+    assertThat(domainObject.coreData().source().sourceRawValue()).isNull();
+  }
+
+  @Test
+  void testTransformToDomain_withInvalidSourceValue_shouldSetRawValue() {
+    DecisionDTO decisionDTO =
+        DecisionDTO.builder()
+            .source(List.of(SourceDTO.builder().value("INVALID").rank(1).build()))
+            .build();
+
+    DocumentationUnit domainObject = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(domainObject.coreData().source().value()).isNull();
+    assertThat(domainObject.coreData().source().sourceRawValue()).isEqualTo("INVALID");
   }
 
   @Test

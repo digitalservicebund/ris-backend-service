@@ -218,19 +218,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                   .build();
         }
       }
-      if (documentationUnit.coreData().source() != null) {
-        Integer rank = documentationUnitDTO.getSource().size() + 1;
-        documentationUnitDTO
-            .getSource()
-            .add(
-                SourceDTO.builder()
-                    .value(documentationUnit.coreData().source().value().toString())
-                    .rank(rank)
-                    .build());
-      }
     }
-
-    // ---
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
