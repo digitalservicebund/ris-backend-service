@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -204,21 +203,4 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   @Builder.Default
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
-
-  @OneToMany(mappedBy = "documentationUnit1", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JsonManagedReference // Prevent infinite recursion
-  @Builder.Default
-  private Set<DuplicateRelationDTO> duplicateRelations1 = new HashSet<>();
-
-  @OneToMany(mappedBy = "documentationUnit2", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JsonManagedReference // Prevent infinite recursion
-  @Builder.Default
-  private Set<DuplicateRelationDTO> duplicateRelations2 = new HashSet<>();
-
-  /**
-   * This field represents the "Dupcode ausschalten" functionality from the jDV. It is set to false
-   * in the migration if the duplicate check should be ignored.
-   */
-  @Column(name = "duplicate_check")
-  private Boolean isJdvDuplicateCheckActive;
 }
