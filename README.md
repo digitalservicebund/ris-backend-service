@@ -10,22 +10,22 @@
 You need (or may want) the following CLI tools. For UNIX users, there is a prepared `Brewfile`, see
 below.
 
-**Necessary tools:**
+### Necessary tools:**
 
 - [lefthook](https://github.com/evilmartians/lefthook#install) - manages our git hooks
 - [Github CLI](https://cli.github.com/) - used by lefthook to check for pipeline status before push
 - [docker](https://docs.docker.com/get-docker/) - our container runtime (on macOS, the easiest way
   is to
   use [Docker Desktop](https://www.docker.com/products/docker-desktop/))
-- [gopass](https://www.gopass.pw/#install) - a tool to sync secrets
+- [1Password CLI](https://developer.1password.com/docs/cli/get-started/) - to access secrets
 - [Node.js](https://nodejs.org/en/) - JavaScript runtime & dependency management
 - [nodenv](https://github.com/nodenv/nodenv#installation) - manages the node.js environment
 
-**Backend only:**
+### Backend only:**
 
 - [java](https://developers.redhat.com/products/openjdk/install) - we use Java 21 in the backend
 
-**Optional, but recommended tools:**
+### Optional, but recommended tools:
 
 - [jq](https://github.com/stedolan/jq) - handy JSON Processor
 - [yq](https://github.com/mikefarah/yq) - handy YAML Processor
@@ -57,6 +57,18 @@ to `~/.zshrc`:
 eval "$(direnv hook zsh)"
 ```
 
+### S3 Credentials for Lookup Table Initialization
+
+The lookup table initialization in your local environment will be performed with data provided by a s3 bucket. Read [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials) on how to revtrieve credentials for it. 
+
+Then, store the credentials in 1Password:
+
+```shell
+op item create --category login --title 'NeuRIS S3' \
+'access-key-id=[your-access-key-id]' \
+'secret-access-key=[your-secret-access-key]'
+```
+
 ## Getting started
 
 To get started with development, run:
@@ -69,52 +81,9 @@ This will install a couple of Git hooks which are supposed to help you to:
 
 - commit properly formatted source code only (and not break the build otherwise)
 - write [conventional commit messages](https://chris.beams.io/posts/git-commit/)
+- not accidentally push on a failing pipeline
 
-### Setup local environment
-
-For shared secrets required for development we're using `gopass`. To set up follow these steps:
-
-- If not done yet: generate a gpg keypair
-- Then export your public key: `gpg --armor --export --output my-name.gpg email@example.com`
-- Provide some team member the public GPG key with encryption capability (that team member will add you
-  as a recipient).
-
-Then, run:
-
-```bash
-gopass init
-
-gopass clone git@github.com:digitalservicebund/neuris-password-store.git neuris --sync gitcli
-```
-
-> **Note**
->
-> If there are any issues with this command, you need to clean the store and try again until it
-> works unfortunately ☹️. Be aware that this command removes ALL gopass stores from your machine, not only project
-> related ones:
->
-> ```
-> rm -rf ~/.local/share/gopass/stores
-> ```
-
-Try if you can get access:
-
-```bash
-gopass list neuris
-```
-
-Synchronize the password store:
-
-```bash
-gopass sync
-```
-
-Now you can generate a new `.env` file containing the secrets. When using a Yubikey you may asked multiple times for
-your pin:
-
-```bash
-./run.sh env
-```
+Also, it creates a new `.env` file containing the secrets. You will be asked to authorize requests to 1Password.
 
 > **Note**
 >
@@ -123,34 +92,6 @@ your pin:
 ### Lookup Tables Initialization
 
 The caselaw application requires the initialization of lookup tables by the migration application image.
-
-#### Prerequisites
-
-To be able to pull the `ris-data-migration` image, log in to the GitHub Package Repository using your username and a
-credential token stored in 1Password (1PW):
-
-If you don't have a personal access token,
-read [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic)
-on how to create one. Then:
-
-```shell
-export CR_PAT=$(op read op://Employee/CR_PAT/password)
-echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin # Replace USERNAME with your GitHub username
-```
-
-The following step requires an OTC access token, read here for
-more [info](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials).
-
-To connect to your S3 bucket, ensure your AWS credentials are stored in 1Password, and then set the following
-environment variables in your shell:
-
-```shell
-op item edit 'OTC' aws_access_key_id=[your-access-key-id]
-op item edit 'OTC' aws_secret_access_key=[your-access-key-id]
-
-```
-
-#### Run Lookup Tables Initialization with Docker
 
 The following command will migrate the minimally required data (refdata and juris tables):
 
@@ -161,7 +102,7 @@ in [compose.yaml](https://github.com/digitalservicebund/ris-backend-service/blob
 and then run:
 
 ```bash
-./run.sh -i
+./run.sh dev -i
 ```
 
 > Note: If you wish to migrate documentation units, use the instructions

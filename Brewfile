@@ -3,7 +3,7 @@ brew "lefthook"
 brew "gh"
 tap "homebrew/cask"
 cask "docker"
-brew "gopass"
+brew "1password-cli"
 brew "direnv"
 brew "nodenv"
 

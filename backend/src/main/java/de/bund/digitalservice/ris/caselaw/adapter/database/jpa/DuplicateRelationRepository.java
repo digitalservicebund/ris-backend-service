@@ -205,7 +205,7 @@ WHERE duplicate_relation.documentation_unit_id1 IS NULL;
           """
 UPDATE incremental_migration.duplicate_relation drel
 SET status = 'IGNORED'
-FROM incremental_migration.decision d1, incremental_migration.decision  d2
+FROM incremental_migration.documentation_unit d1, incremental_migration.documentation_unit  d2
 WHERE drel.status = 'PENDING'
   AND drel.documentation_unit_id1 = d1.id AND drel.documentation_unit_id2 = d2.id
   AND (d1.duplicate_check = FALSE OR d2.duplicate_check = FALSE);
