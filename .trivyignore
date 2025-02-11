@@ -4,3 +4,6 @@ CVE-2024-45341
 CVE-2024-57699
 // go package for github action, only needed for build process
 CVE-2025-22866
+
+// netty version 4.7.118 needed 11.02.2024
+CVE-2025-24970

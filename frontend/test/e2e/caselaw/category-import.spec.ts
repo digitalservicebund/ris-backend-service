@@ -43,7 +43,7 @@ test.describe("category import", () => {
   )
 
   test(
-    "disable import for empty categories",
+    "disable import for empty source categories",
     {
       tag: [
         "@RISDEV-5720",
@@ -55,9 +55,32 @@ test.describe("category import", () => {
       ],
     },
     async ({ page, documentNumber }) => {
-      await navigateToCategoryImport(page, documentNumber)
-      await searchForDocumentUnitToImport(page, documentNumber)
-      await expect(page.getByText("Quellrubrik leer")).toHaveCount(19) // we have 19 importable categories
+      await test.step("disable import for empty source categories", async () => {
+        await navigateToCategoryImport(page, documentNumber)
+        await searchForDocumentUnitToImport(page, documentNumber)
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(19) // we have 19 importable categories
+      })
+    },
+  )
+
+  test(
+    "disable import for prefilled text categories in target document",
+    {
+      tag: ["@RISDEV-6067"],
+    },
+    async ({ page, prefilledDocumentUnitWithTexts }) => {
+      await test.step("disable import for prefilled text categories in target document", async () => {
+        await navigateToCategoryImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(12) // we have 12 non-importable categories, if target category already filled
+      })
     },
   )
 
@@ -570,25 +593,6 @@ test.describe("category import", () => {
           page.getByLabel("Kurztexte").getByText("Titelzeile", { exact: true }),
         ).toBeInViewport()
       })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(
-          page.getByLabel("Titelzeile übernehmen", { exact: true }),
-        ).toBeDisabled()
-        // Click the input field and clear its content
-        const input = page.getByTestId("Titelzeile")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(page.getByText("Test Titelzeile")).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(
-          page.getByLabel("Titelzeile übernehmen", {
-            exact: true,
-          }),
-        ).toBeEnabled()
-      })
     },
   )
 
@@ -619,25 +623,6 @@ test.describe("category import", () => {
         await expect(
           page.getByLabel("Kurztexte").getByText("Leitsatz", { exact: true }),
         ).toBeInViewport()
-      })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(
-          page.getByLabel("Leitsatz übernehmen", { exact: true }),
-        ).toBeDisabled()
-        // Click the input field and clear its content
-        const input = page.getByTestId("Leitsatz")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(page.getByText("Test Leitsatz")).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(
-          page.getByLabel("Leitsatz übernehmen", {
-            exact: true,
-          }),
-        ).toBeEnabled()
       })
     },
   )
@@ -675,25 +660,6 @@ test.describe("category import", () => {
             .getByText("Orientierungssatz", { exact: true }),
         ).toBeInViewport()
       })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(
-          page.getByLabel("Orientierungssatz übernehmen", { exact: true }),
-        ).toBeDisabled()
-        // Click the input field and clear its content
-        const input = page.getByTestId("Orientierungssatz")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(page.getByText("Test Orientierungssatz")).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(
-          page.getByLabel("Orientierungssatz übernehmen", {
-            exact: true,
-          }),
-        ).toBeEnabled()
-      })
     },
   )
 
@@ -730,25 +696,6 @@ test.describe("category import", () => {
             .getByText("Sonstiger Orientierungssatz", { exact: true }),
         ).toBeInViewport()
       })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(
-          page.getByLabel("Sonstiger Orientierungssatz übernehmen"),
-        ).toBeDisabled()
-        // Click the input field and clear its content
-        const input = page.getByTestId("Sonstiger Orientierungssatz")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(
-          page.getByText("Test Sonstiger Orientierungssatz"),
-        ).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(
-          page.getByLabel("Sonstiger Orientierungssatz übernehmen"),
-        ).toBeEnabled()
-      })
     },
   )
 
@@ -780,19 +727,6 @@ test.describe("category import", () => {
         await expect(
           page.getByLabel("Langtexte").getByText("Tenor", { exact: true }),
         ).toBeInViewport()
-      })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(page.getByLabel("Tenor übernehmen")).toBeDisabled()
-        // Click the input field and clear its content
-        const input = page.getByTestId("Tenor")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(page.getByText("Test Tenor")).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(page.getByLabel("Tenor übernehmen")).toBeEnabled()
       })
     },
   )
@@ -826,24 +760,6 @@ test.describe("category import", () => {
           page.getByLabel("Langtexte").getByText("Gründe", { exact: true }),
         ).toBeInViewport()
       })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(
-          page.getByLabel("Gründe übernehmen", { exact: true }),
-        ).toBeDisabled()
-
-        // Click the input field and clear its content
-        const input = page.getByTestId("Gründe")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(page.getByText("Test Gründe")).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(
-          page.getByLabel("Gründe übernehmen", { exact: true }),
-        ).toBeEnabled()
-      })
     },
   )
 
@@ -873,19 +789,6 @@ test.describe("category import", () => {
         await expect(
           page.getByLabel("Langtexte").getByText("Tatbestand", { exact: true }),
         ).toBeInViewport()
-      })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(page.getByLabel("Tatbestand übernehmen")).toBeDisabled()
-        // Click the input field and clear its content
-        const input = page.getByTestId("Tatbestand")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(page.getByText("Test Tatbestand")).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(page.getByLabel("Tatbestand übernehmen")).toBeEnabled()
       })
     },
   )
@@ -921,23 +824,6 @@ test.describe("category import", () => {
             .getByText("Entscheidungsgründe", { exact: true }),
         ).toBeInViewport()
       })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(
-          page.getByLabel("Entscheidungsgründe übernehmen"),
-        ).toBeDisabled()
-        // Click the input field and clear its content
-        const input = page.getByTestId("Entscheidungsgründe")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(page.getByText("Test Entscheidungsgründe")).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(
-          page.getByLabel("Entscheidungsgründe übernehmen"),
-        ).toBeEnabled()
-      })
     },
   )
 
@@ -972,23 +858,6 @@ test.describe("category import", () => {
             .getByText("Abweichende Meinung", { exact: true }),
         ).toBeInViewport()
       })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(
-          page.getByLabel("Abweichende Meinung übernehmen"),
-        ).toBeDisabled()
-        // Click the input field and clear its content
-        const input = page.getByTestId("Abweichende Meinung")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(page.getByText("Test Abweichende Meinung")).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(
-          page.getByLabel("Abweichende Meinung übernehmen"),
-        ).toBeEnabled()
-      })
     },
   )
 
@@ -1020,20 +889,6 @@ test.describe("category import", () => {
         await expect(
           page.getByLabel("Langtexte").getByText("Mitwirkende Richter"),
         ).toBeInViewport()
-      })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(
-          page.getByLabel("Mitwirkende Richter übernehmen"),
-        ).toBeDisabled()
-        await page
-          .getByTestId("Mitwirkende Richter")
-          .getByTestId("list-entry-0")
-          .click()
-        await page.getByLabel("Eintrag löschen").click()
-        await expect(
-          page.getByLabel("Mitwirkende Richter übernehmen"),
-        ).toBeEnabled()
       })
     },
   )
@@ -1069,23 +924,6 @@ test.describe("category import", () => {
             .getByText("Sonstiger Langtext", { exact: true }),
         ).toBeInViewport()
       })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(
-          page.getByLabel("Sonstiger Langtext übernehmen"),
-        ).toBeDisabled()
-        // Click the input field and clear its content
-        const input = page.getByTestId("Sonstiger Langtext")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(page.getByText("Test Sonstiger Langtext")).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(
-          page.getByLabel("Sonstiger Langtext übernehmen"),
-        ).toBeEnabled()
-      })
     },
   )
 
@@ -1115,19 +953,6 @@ test.describe("category import", () => {
         await expect(
           page.getByLabel("Langtexte").getByText("Gliederung", { exact: true }),
         ).toBeInViewport()
-      })
-
-      await test.step("import not possible anymore, when target category filled", async () => {
-        await expect(page.getByLabel("Gliederung übernehmen")).toBeDisabled()
-        // Click the input field and clear its content
-        const input = page.getByTestId("Gliederung")
-        await input.click()
-        await page.keyboard.press("ControlOrMeta+A")
-        await page.keyboard.press("ControlOrMeta+Backspace")
-        await expect(page.getByText("Test Gliederung")).toBeHidden()
-
-        // Check if the button becomes enabled again after clearing
-        await expect(page.getByLabel("Gliederung übernehmen")).toBeEnabled()
       })
     },
   )
