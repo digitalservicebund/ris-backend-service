@@ -49,7 +49,7 @@ public class DuplicateRelationService {
 
     var newRelation =
         DuplicateRelationDTO.builder()
-            .relationStatus(status)
+            .status(status)
             .documentationUnit1(docUnit1)
             .documentationUnit2(docUnit2)
             .id(duplicateRelationId)
@@ -63,7 +63,7 @@ public class DuplicateRelationService {
   }
 
   void setStatus(DuplicateRelationDTO duplicateRelation, DuplicateRelationStatus status) {
-    duplicateRelation.setRelationStatus(status);
+    duplicateRelation.setStatus(status);
     relationRepository.save(duplicateRelation);
   }
 

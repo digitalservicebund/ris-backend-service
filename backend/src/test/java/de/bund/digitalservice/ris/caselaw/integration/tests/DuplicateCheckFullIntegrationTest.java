@@ -672,8 +672,7 @@ class DuplicateCheckFullIntegrationTest {
       duplicateCheckService.checkAllDuplicates();
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       var pendingDuplicateRelation = duplicateRelationRepository.findAll().getFirst();
-      assertThat(pendingDuplicateRelation.getRelationStatus())
-          .isEqualTo(DuplicateRelationStatus.PENDING);
+      assertThat(pendingDuplicateRelation.getStatus()).isEqualTo(DuplicateRelationStatus.PENDING);
 
       // Act
       duplicateCheckService.updateDuplicateStatus(

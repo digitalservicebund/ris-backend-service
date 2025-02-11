@@ -52,7 +52,7 @@ public class DuplicateRelationTransformer {
 
     return DuplicateRelation.builder()
         .documentNumber(duplicate.getDocumentNumber())
-        .status(duplicateRelationDTO.getRelationStatus())
+        .status(duplicateRelationDTO.getStatus())
         .decisionDate(duplicate.getDate())
         .courtLabel(courtLabel)
         .documentType(documentTypeLabel)
