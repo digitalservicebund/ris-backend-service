@@ -17,4 +17,5 @@ public record DocumentationUnitSearchInput(
     boolean scheduledOnly,
     DocumentationOffice documentationOffice,
     Status status,
-    boolean myDocOfficeOnly) {}
+    boolean myDocOfficeOnly,
+    boolean withDuplicateWarning) {}
