@@ -21,7 +21,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.3.0"
+    id("org.flywaydb.flyway") version "11.3.1"
     id("io.sentry.jvm.gradle") version "5.1.0"
 }
 
@@ -164,7 +164,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.0")
 
     // CVE-2024-50379
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.35")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.29.3")
 
@@ -187,7 +187,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
-    implementation("com.icegreen:greenmail:2.1.2")
+    implementation("com.icegreen:greenmail:2.1.3")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.26") {
@@ -208,8 +208,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.14.3")
-    implementation("io.micrometer:micrometer-core:1.14.3")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.4")
+    implementation("io.micrometer:micrometer-core:1.14.4")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
@@ -223,10 +223,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.10.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.3.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.3.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.3.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.3.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -234,9 +234,9 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.15.2")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.2")
+    testImplementation("io.projectreactor:reactor-test:3.7.3")
     testImplementation("org.springframework.security:spring-security-test:6.4.2")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
