@@ -338,18 +338,6 @@ onBeforeUnmount(() => {
           placeholder="Bitte auswählen"
         />
       </InputField>
-
-      <!-- Todo Eingangsart -->
-      <InputField id="region" class="flex-col" label="Eingangsart">
-        <TextInput
-          id="region"
-          v-model="modelValue.region"
-          aria-label="Region"
-          class="ds-input-medium"
-          read-only
-          size="medium"
-        ></TextInput>
-      </InputField>
     </div>
     <div>
       <InputField
