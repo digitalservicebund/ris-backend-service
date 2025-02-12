@@ -158,15 +158,21 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
+        exclude(group = "net.minidev", module = "json-smart")
+    }
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.2")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.0")
 
-    // CVE-2024-50379
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.35")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.29.3")
+
+    // CVE-2024-57699
+    implementation("net.minidev:json-smart:2.5.2")
+
+    // CVE-2025-24970
+    implementation("io.netty:netty-handler:4.1.118.Final")
 
     implementation("org.postgresql:postgresql:42.7.5")
 
