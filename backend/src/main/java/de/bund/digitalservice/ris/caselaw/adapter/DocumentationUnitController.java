@@ -222,7 +222,6 @@ public class DocumentationUnitController {
       @RequestParam(value = "publicationStatus") Optional<String> publicationStatus,
       @RequestParam(value = "withError") Optional<Boolean> withError,
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
-      @RequestParam(value = "withDuplicateWarning") Optional<Boolean> withDuplicateWarning,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     return service.searchByDocumentationUnitSearchInput(
@@ -238,8 +237,7 @@ public class DocumentationUnitController {
         scheduledOnly,
         publicationStatus,
         withError,
-        myDocOfficeOnly,
-        withDuplicateWarning);
+        myDocOfficeOnly);
   }
 
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
