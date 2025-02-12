@@ -570,7 +570,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // file number
     if (fileNumber != null) {
-      root.join("fileNumbers", JoinType.LEFT);
       conditions = addFileNumberFilter(criteriaBuilder, root, fileNumber, conditions);
     }
 
@@ -643,37 +642,37 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       String courtType,
       String courtLocation,
       Predicate conditions) {
-    Join<DocumentationUnitDTO, String> courtJoin = root.join("court", JoinType.LEFT);
     // Filter by court type
     if (courtType != null) {
-      conditions = addCourtTypeFilter(criteriaBuilder, courtJoin, courtType, conditions);
+      conditions = addCourtTypeFilter(criteriaBuilder, root, courtType, conditions);
     }
     // Filter by court location
     if (courtLocation != null) {
-      conditions = addCourtLocationFilter(criteriaBuilder, courtJoin, courtLocation, conditions);
+      conditions = addCourtLocationFilter(criteriaBuilder, root, courtLocation, conditions);
     }
     return conditions;
   }
 
   private static Predicate addCourtTypeFilter(
       CriteriaBuilder criteriaBuilder,
-      Join<DocumentationUnitDTO, String> courtJoin,
+      Root<DocumentationUnitDTO> root,
       String courtType,
       Predicate conditions) {
     Predicate courtTypePredicate =
-        criteriaBuilder.like(criteriaBuilder.upper(courtJoin.get("type")), courtType.toUpperCase());
+        criteriaBuilder.like(
+            criteriaBuilder.upper(root.get("court").get("type")), courtType.toUpperCase());
     conditions = criteriaBuilder.and(conditions, courtTypePredicate);
     return conditions;
   }
 
   private static Predicate addCourtLocationFilter(
       CriteriaBuilder criteriaBuilder,
-      Join<DocumentationUnitDTO, String> courtJoin,
+      Root<DocumentationUnitDTO> root,
       String courtLocation,
       Predicate conditions) {
     Predicate courtLocationPredicate =
         criteriaBuilder.like(
-            criteriaBuilder.upper(courtJoin.get("location")), courtLocation.toUpperCase());
+            criteriaBuilder.upper(root.get("court").get("location")), courtLocation.toUpperCase());
     conditions = criteriaBuilder.and(conditions, courtLocationPredicate);
     return conditions;
   }
@@ -743,19 +742,18 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       PublicationStatus status,
       UUID documentationOfficeId,
       Predicate conditions) {
-    Join<DocumentationUnitDTO, String> statusJoin = root.join(STATUS, JoinType.LEFT);
-    Predicate fileNumberPredicate =
+    Predicate statusPredicate =
         criteriaBuilder.and(
             criteriaBuilder.equal(
-                criteriaBuilder.upper(statusJoin.get(PUBLICATION_STATUS)), status.toString()),
+                criteriaBuilder.upper(root.get(STATUS).get(PUBLICATION_STATUS)), status.toString()),
             criteriaBuilder.or(
                 criteriaBuilder
-                    .in(statusJoin.get(PUBLICATION_STATUS))
+                    .in(root.get(STATUS).get(PUBLICATION_STATUS))
                     .value(PublicationStatus.PUBLISHED)
                     .value(PublicationStatus.PUBLISHING),
                 criteriaBuilder.equal(
                     root.get(DOCUMENTATION_OFFICE).get("id"), documentationOfficeId)));
-    conditions = criteriaBuilder.and(conditions, fileNumberPredicate);
+    conditions = criteriaBuilder.and(conditions, statusPredicate);
     return conditions;
   }
 
@@ -764,15 +762,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Root<DocumentationUnitDTO> root,
       UUID documentationOfficeId,
       Predicate conditions) {
-    Join<DocumentationUnitDTO, String> statusJoin = root.join(STATUS, JoinType.LEFT);
-    Predicate permissionsPredicate =
+    Predicate permissionPredicate =
         criteriaBuilder.or(
             criteriaBuilder.equal(root.get(DOCUMENTATION_OFFICE).get("id"), documentationOfficeId),
             criteriaBuilder
-                .in(statusJoin.get(PUBLICATION_STATUS))
+                .in(root.get(STATUS).get(PUBLICATION_STATUS))
                 .value(PublicationStatus.PUBLISHED)
                 .value(PublicationStatus.PUBLISHING));
-    conditions = criteriaBuilder.and(conditions, permissionsPredicate);
+    conditions = criteriaBuilder.and(conditions, permissionPredicate);
     return conditions;
   }
 
@@ -815,11 +812,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Root<DocumentationUnitDTO> root,
       UUID documentationOfficeId,
       Predicate conditions) {
-    Join<DocumentationUnitDTO, String> statusJoin = root.join(STATUS, JoinType.LEFT);
     Predicate errorPredicate =
         criteriaBuilder.and(
             criteriaBuilder.equal(root.get(DOCUMENTATION_OFFICE).get("id"), documentationOfficeId),
-            criteriaBuilder.isTrue(statusJoin.get("withError")));
+            criteriaBuilder.isTrue(root.get(STATUS).get("withError")));
     conditions = criteriaBuilder.and(conditions, errorPredicate);
     return conditions;
   }
@@ -833,7 +829,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         root.join("duplicateRelations1", JoinType.LEFT);
     Join<DocumentationUnitDTO, DuplicateRelationDTO> duplicateRelation2 =
         root.join("duplicateRelations2", JoinType.LEFT);
-    Predicate errorPredicate =
+    Predicate duplicatePredicate =
         criteriaBuilder.and(
             criteriaBuilder.equal(root.get(DOCUMENTATION_OFFICE).get("id"), documentationOfficeId),
             criteriaBuilder.or(
@@ -843,7 +839,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                 criteriaBuilder.equal(
                     duplicateRelation2.get(STATUS),
                     criteriaBuilder.literal(DuplicateRelationStatus.PENDING))));
-    conditions = criteriaBuilder.and(conditions, errorPredicate);
+    conditions = criteriaBuilder.and(conditions, duplicatePredicate);
     return conditions;
   }
 
@@ -871,11 +867,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Root<DocumentationUnitDTO> root,
       String documentNumber,
       Predicate conditions) {
-    Predicate courtTypePredicate =
+    Predicate documentNumberPredicate =
         criteriaBuilder.like(
             criteriaBuilder.upper(root.get(DOCUMENT_NUMBER)),
             "%" + documentNumber.toUpperCase() + "%");
-    conditions = criteriaBuilder.and(conditions, courtTypePredicate);
+    conditions = criteriaBuilder.and(conditions, documentNumberPredicate);
     return conditions;
   }
 
