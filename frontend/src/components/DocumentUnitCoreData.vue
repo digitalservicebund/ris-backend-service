@@ -101,29 +101,6 @@ watch(
   { deep: true },
 )
 
-/**
- * This updates the local norm with the updated model value from the props. It also stores a copy of the last saved
- * model value, because the local norm might change in between. When the new model value is empty, all validation
- * errors are resetted. If it has an amiguous norm reference, the validation store is updated. When the list of
- * single norms is empty, a new empty single norm entry is added.
- */
-watch(
-  () => props.modelValue,
-  () => {
-    if (
-      !!props.modelValue.source &&
-      !props.modelValue.source.value &&
-      !!props.modelValue.source.sourceRawValue
-    ) {
-      validationStore.add(
-        `"${props.modelValue.source.sourceRawValue}" ist keine gültige Quellenangabe`,
-        "source",
-      )
-    }
-  },
-  { immediate: true, deep: true },
-)
-
 onMounted(() => {
   if (!parentRef.value) return
   resizeObserver.observe(parentRef.value)
