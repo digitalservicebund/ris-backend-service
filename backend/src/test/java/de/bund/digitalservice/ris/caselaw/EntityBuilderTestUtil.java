@@ -9,7 +9,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JurisdictionTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -50,6 +52,7 @@ public class EntityBuilderTestUtil {
         .type("BGH")
         .label("BGH Berlin")
         .location("Berlin")
+        .region("BE")
         .build();
   }
 
@@ -58,6 +61,8 @@ public class EntityBuilderTestUtil {
         .id(UUID.fromString("4e254f62-ce83-43fa-86c5-ecd9caa1d610"))
         .type("BGH")
         .location("Berlin")
+        .jurisdictionType(JurisdictionTypeDTO.builder().build())
+        .region(RegionDTO.builder().code("BE").build())
         .jurisId(0)
         .build();
   }

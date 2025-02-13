@@ -291,7 +291,6 @@ class XmlExporterTest {
         .deviatingCourts(List.of("deviating court 1", "deviating court 2"))
         .deviatingFileNumbers(List.of("deviating file number 1", "deviating file number 2"))
         .fileNumbers(List.of("file number 1", "file number 2"))
-        .region("region")
         .legalEffect("ja")
         .documentType(DocumentType.builder().jurisShortcut("dt").label("document type").build())
         .appraisalBody("appraisal body")

@@ -673,13 +673,6 @@ public class DecisionTransformer {
             .creatingDocOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     decisionDTO.getCreatingDocumentationOffice()))
-            // TODO multiple regions
-            .region(
-                decisionDTO.getRegions() == null
-                        || decisionDTO.getRegions().isEmpty()
-                        || decisionDTO.getRegions().get(0) == null
-                    ? null
-                    : decisionDTO.getRegions().get(0).getCode())
             .decisionDate(decisionDTO.getDate())
             .appraisalBody(decisionDTO.getJudicialBody());
 

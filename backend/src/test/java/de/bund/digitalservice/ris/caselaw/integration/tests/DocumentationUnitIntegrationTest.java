@@ -606,7 +606,7 @@ class DocumentationUnitIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().coreData().region()).isEqualTo("DEU");
+              assertThat(response.getResponseBody().coreData().court().region()).isEqualTo("DEU");
             });
   }
 

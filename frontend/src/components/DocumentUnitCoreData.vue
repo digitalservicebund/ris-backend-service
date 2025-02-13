@@ -50,6 +50,14 @@ const descendingPreviousProcedures = computed(() =>
     : undefined,
 )
 
+const jurisdictionType = computed(() =>
+  modelValue.value.court ? modelValue.value.court.jurisdictionType : "",
+)
+
+const region = computed(() =>
+  modelValue.value.court ? modelValue.value.court.region : "",
+)
+
 watch(
   modelValue,
   () => {
@@ -268,18 +276,6 @@ onBeforeUnmount(() => {
         />
       </InputField>
 
-      <InputField id="region" class="flex-col" label="Region">
-        <TextInput
-          id="region"
-          v-model="modelValue.region"
-          aria-label="Region"
-          class="ds-input-medium"
-          read-only
-          size="medium"
-        ></TextInput>
-      </InputField>
-    </div>
-    <div>
       <InputField
         id="yearsOfDispute"
         v-slot="slotProps"
@@ -295,6 +291,34 @@ onBeforeUnmount(() => {
           @focus="validationStore.remove('yearsOfDispute')"
           @update:validation-error="slotProps.updateValidationError"
         ></ChipsYearInput>
+      </InputField>
+    </div>
+    <div :class="layoutClass">
+      <InputField
+        id="jurisdictionType"
+        class="flex-col"
+        label="Gerichtsbarkeit"
+      >
+        <TextInput
+          id="jurisdictionType"
+          v-model="jurisdictionType"
+          aria-label="Gerichtsbarkeit"
+          class="ds-input-medium"
+          data-test-id="jurisdiction-type"
+          read-only
+          size="medium"
+        ></TextInput>
+      </InputField>
+
+      <InputField id="region" class="flex-col" label="Region">
+        <TextInput
+          id="region"
+          v-model="region"
+          aria-label="Region"
+          class="ds-input-medium"
+          read-only
+          size="medium"
+        ></TextInput>
       </InputField>
     </div>
 

@@ -57,7 +57,14 @@ class DocumentationUnitListItemTransformerTest {
     // basic data
     assertThat(documentationUnitListItem.note()).isEqualTo("a note");
     assertThat(documentationUnitListItem.court())
-        .isEqualTo(Court.builder().type("LG").location("Berlin").label("LG Berlin").build());
+        .isEqualTo(
+            Court.builder()
+                .type("LG")
+                .location("Berlin")
+                .label("LG Berlin")
+                .jurisdictionType("")
+                .region("")
+                .build());
     assertThat(documentationUnitListItem.documentType())
         .isEqualTo(DocumentType.builder().jurisShortcut("Urt").build());
     assertThat(documentationUnitListItem.fileNumber()).isEqualTo("1 BvR 1234/19");

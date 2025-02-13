@@ -101,9 +101,29 @@ defineProps<{
       <PreviewCategory>Rechtskraft</PreviewCategory>
       <PreviewContent>{{ coreData.legalEffect }}</PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="coreData.region">
+    <PreviewRow
+      v-if="coreData.yearsOfDispute && coreData.yearsOfDispute.length > 0"
+    >
+      <PreviewCategory>Streitjahr</PreviewCategory>
+      <PreviewContent>
+        <FlexContainer
+          v-for="yearOfDispute in coreData.yearsOfDispute"
+          :key="yearOfDispute"
+          flex-direction="flex-col"
+        >
+          <FlexItem> {{ yearOfDispute }}</FlexItem>
+        </FlexContainer>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.court?.jurisdictionType">
+      <PreviewCategory>Gerichtsbarkeit</PreviewCategory>
+      <PreviewContent>
+        {{ coreData.court.jurisdictionType }}
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.court?.region">
       <PreviewCategory>Region</PreviewCategory>
-      <PreviewContent>{{ coreData.region }}</PreviewContent>
+      <PreviewContent>{{ coreData.court.region }}</PreviewContent>
     </PreviewRow>
     <PreviewRow
       v-if="
@@ -119,20 +139,6 @@ defineProps<{
           flex-direction="flex-col"
         >
           <FlexItem> {{ leadingDecisionNormReference }}</FlexItem>
-        </FlexContainer>
-      </PreviewContent>
-    </PreviewRow>
-    <PreviewRow
-      v-if="coreData.yearsOfDispute && coreData.yearsOfDispute.length > 0"
-    >
-      <PreviewCategory>Streitjahr</PreviewCategory>
-      <PreviewContent>
-        <FlexContainer
-          v-for="yearOfDispute in coreData.yearsOfDispute"
-          :key="yearOfDispute"
-          flex-direction="flex-col"
-        >
-          <FlexItem> {{ yearOfDispute }}</FlexItem>
         </FlexContainer>
       </PreviewContent>
     </PreviewRow>

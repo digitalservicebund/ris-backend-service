@@ -21,6 +21,8 @@ describe("preview core data", () => {
     renderComponent({
       court: {
         label: "BVerfG",
+        jurisdictionType: "Verfassungsgerichtsbarkeit",
+        region: "DEU",
       },
       leadingDecisionNormReferences: ["NSW WEG $ 14 (BGH-intern)"],
       deviatingCourts: ["BGH"],
@@ -42,7 +44,6 @@ describe("preview core data", () => {
       },
       previousProcedures: ["vorgang-0"],
       legalEffect: "Ja",
-      region: "gfs",
       yearsOfDispute: ["2023"],
     })
 
@@ -63,6 +64,7 @@ describe("preview core data", () => {
     expect(await screen.findByText("Vorgang")).toBeInTheDocument()
     expect(await screen.findByText("Vorgangshistorie")).toBeInTheDocument()
     expect(await screen.findByText("Rechtskraft")).toBeInTheDocument()
+    expect(await screen.findByText("Gerichtsbarkeit")).toBeInTheDocument()
     expect(await screen.findByText("Region")).toBeInTheDocument()
     expect(await screen.findByText("BGH Nachschlagewerk")).toBeInTheDocument()
     expect(await screen.findByText("Streitjahr")).toBeInTheDocument()
@@ -113,6 +115,7 @@ describe("preview core data", () => {
         "Rechtskraft",
         "Region",
         "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -133,6 +136,7 @@ describe("preview core data", () => {
         "Rechtskraft",
         "Region",
         "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -152,6 +156,8 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -171,6 +177,8 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -190,6 +198,8 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -209,6 +219,8 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -228,6 +240,8 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -247,6 +261,8 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -266,6 +282,8 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -285,6 +303,8 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -310,6 +330,8 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -329,6 +351,8 @@ describe("preview core data", () => {
         "Vorgang",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
@@ -348,13 +372,14 @@ describe("preview core data", () => {
         "Vorgang",
         "Vorgangshistorie",
         "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
       "Region",
-      { region: "BRD" },
+      { court: { label: "foo", region: "BRD" } },
       [
-        "Gericht",
         "Fehlerhaftes Gericht",
         "Aktenzeichen",
         "Abweichendes Aktenzeichen",
@@ -367,13 +392,14 @@ describe("preview core data", () => {
         "Vorgang",
         "Vorgangshistorie",
         "Rechtskraft",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
       ],
     ],
     [
-      "Region",
-      { region: "BRD" },
+      "Gerichtsbarkeit",
+      { court: { label: "foo", jurisdictionType: "foo" } },
       [
-        "Gericht",
         "Fehlerhaftes Gericht",
         "Aktenzeichen",
         "Abweichendes Aktenzeichen",
@@ -386,6 +412,28 @@ describe("preview core data", () => {
         "Vorgang",
         "Vorgangshistorie",
         "Rechtskraft",
+        "Region",
+        "BGH Nachschlagewerk",
+      ],
+    ],
+    [
+      "BGH Nachschlagewerk",
+      { leadingDecisionNormReferences: ["NSW WEG $ 14 (BGH-intern)"] },
+      [
+        "Fehlerhaftes Gericht",
+        "Aktenzeichen",
+        "Abweichendes Aktenzeichen",
+        "Entscheidungsdatum",
+        "Abweichendes Entscheidungsdatum",
+        "Spruchkörper",
+        "Dokumenttyp",
+        "ECLI",
+        "Abweichender ECLI",
+        "Vorgang",
+        "Vorgangshistorie",
+        "Rechtskraft",
+        "Region",
+        "Gerichtsbarkeit",
       ],
     ],
   ])(
