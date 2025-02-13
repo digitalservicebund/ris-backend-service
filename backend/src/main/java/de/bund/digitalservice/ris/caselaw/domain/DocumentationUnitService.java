@@ -156,8 +156,7 @@ public class DocumentationUnitService {
       Optional<Boolean> scheduledOnly,
       Optional<String> publicationStatus,
       Optional<Boolean> withError,
-      Optional<Boolean> myDocOfficeOnly,
-      Optional<Boolean> withDuplicateWarning) {
+      Optional<Boolean> myDocOfficeOnly) {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
@@ -178,7 +177,6 @@ public class DocumentationUnitService {
                         .build()
                     : null)
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
-            .withDuplicateWarning(withDuplicateWarning.orElse(false))
             .build();
 
     Slice<DocumentationUnitListItem> documentationUnitListItems =
