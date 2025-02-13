@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -31,24 +32,23 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -61,6 +61,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Slf4j
 @Primary
+@SuppressWarnings("java:S6539")
 public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUnitRepository {
   private final DatabaseDocumentationUnitRepository repository;
   private final DatabaseCourtRepository databaseCourtRepository;
@@ -71,6 +72,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
   private final UserService userService;
   private final EntityManager entityManager;
+
+  private static final String STATUS = "status";
+  private static final String PUBLICATION_STATUS = "publicationStatus";
+  private static final String DOCUMENT_NUMBER = "documentNumber";
+  private static final String SCHEDULED_PUBLICATION_DATE_TIME = "scheduledPublicationDateTime";
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -428,75 +434,43 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
-    // 1. Filter by document number
+    // 1. Filter by excluded document number
     if (documentNumberToExclude != null) {
       Predicate documentNumberPredicate =
-          criteriaBuilder.notEqual(root.get("documentNumber"), documentNumberToExclude);
+          criteriaBuilder.notEqual(root.get(DOCUMENT_NUMBER), documentNumberToExclude);
       conditions = criteriaBuilder.and(conditions, documentNumberPredicate);
     }
 
-    // 2. Filter by court type
-    if (courtType != null) {
-      Predicate courtTypePredicate =
-          criteriaBuilder.like(
-              criteriaBuilder.upper(root.get("court").get("type")),
-              "%" + courtType.toUpperCase() + "%");
-      conditions = criteriaBuilder.and(conditions, courtTypePredicate);
+    // 2. Filter by court
+    if (courtType != null || courtLocation != null) {
+      conditions = addCourtFilter(criteriaBuilder, root, courtType, courtLocation, conditions);
     }
 
-    // 3. Filter by court location
-    if (courtLocation != null) {
-      Predicate courtLocationPredicate =
-          criteriaBuilder.like(
-              criteriaBuilder.upper(root.get("court").get("location")),
-              "%" + courtLocation.toUpperCase() + "%");
-      conditions = criteriaBuilder.and(conditions, courtLocationPredicate);
-    }
-
-    // 4. Filter by decision date
+    // 3. Filter by decision date
     if (decisionDate != null) {
-      Predicate decisionDatePredicate = criteriaBuilder.equal(root.get("date"), decisionDate);
-      conditions = criteriaBuilder.and(conditions, decisionDatePredicate);
+      conditions = addDecisionDateFilter(criteriaBuilder, root, decisionDate, null, conditions);
     }
 
-    // 5. Filter by file number
+    // 4. Filter by file number
     if (fileNumber != null) {
-      Join<DocumentationUnitDTO, String> fileNumberJoin = root.join("fileNumbers", JoinType.LEFT);
-      Predicate fileNumberPredicate =
-          criteriaBuilder.like(
-              criteriaBuilder.upper(fileNumberJoin.get("value")), fileNumber.toUpperCase() + "%");
-      conditions = criteriaBuilder.and(conditions, fileNumberPredicate);
+      conditions = addFileNumberFilter(criteriaBuilder, root, fileNumber, conditions);
     }
 
-    // 6. Filter by document type
+    // 5. Filter by document type
     if (documentType != null) {
-      Predicate documentTypePredicate =
-          criteriaBuilder.equal(
-              root.get("documentType"), DocumentTypeTransformer.transformToDTO(documentType));
-      conditions = criteriaBuilder.and(conditions, documentTypePredicate);
+      conditions = addDocumentTypeFilter(criteriaBuilder, root, documentType, conditions);
     }
+
+    // 6. Filter by documentation office
+    Predicate documentationOfficeIdPredicate =
+        getDocumentationOfficePredicate(criteriaBuilder, root, documentationOfficeDTO);
 
     // 7. Filter by publication status
-    final String PUBLICATION_STATUS = "publicationStatus";
-    final String STATUS = "status";
-    Predicate documentationOfficeIdPredicate =
-        criteriaBuilder.equal(
-            root.get("documentationOffice").get("id"), documentationOfficeDTO.getId());
+    Predicate publicationStatusPredicate = getPublicationStatusPredicate(criteriaBuilder, root);
 
-    Predicate publicationStatusPredicate =
-        criteriaBuilder.or(
-            criteriaBuilder.equal(
-                root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHED),
-            criteriaBuilder.equal(
-                root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHING));
-
+    // 8. Filter by external handover
     Predicate externalHandoverPendingPredicate =
-        criteriaBuilder.and(
-            criteriaBuilder.equal(
-                root.get(STATUS).get(PUBLICATION_STATUS),
-                PublicationStatus.EXTERNAL_HANDOVER_PENDING),
-            criteriaBuilder.equal(
-                root.get("creatingDocumentationOffice").get("id"), documentationOfficeDTO.getId()));
+        getExternalHandoverPendingPredicate(criteriaBuilder, root, documentationOfficeDTO);
 
     Predicate finalPredicate =
         criteriaBuilder.or(
@@ -507,127 +481,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     conditions = criteriaBuilder.and(conditions, finalPredicate);
 
     // Apply conditions to query
-    criteriaQuery.where(conditions);
-
-    // Apply pagination
-    TypedQuery<DocumentationUnitDTO> query = entityManager.createQuery(criteriaQuery);
-    query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
-    query.setMaxResults(pageable.getPageSize());
-
-    // Get results and create Slice
-    List<DocumentationUnitDTO> resultList = query.getResultList();
-    boolean hasNext = resultList.size() == pageable.getPageSize();
-
-    SliceImpl<DocumentationUnitDTO> allResults = new SliceImpl<>(resultList, pageable, hasNext);
+    SliceImpl<DocumentationUnitDTO> allResults =
+        getPaginatedResults(pageable, criteriaQuery, conditions);
     return allResults.map(DocumentationUnitListItemTransformer::transformToRelatedDocumentation);
-  }
-
-  @NotNull
-  @SuppressWarnings("java:S107")
-  private Slice<DocumentationUnitListItemDTO> getDocumentationUnitSearchResultDTOS(
-      Pageable pageable,
-      String courtType,
-      String courtLocation,
-      String documentNumber,
-      String fileNumber,
-      LocalDate decisionDate,
-      LocalDate decisionDateEnd,
-      LocalDate publicationDate,
-      Boolean scheduledOnly,
-      PublicationStatus status,
-      Boolean withError,
-      Boolean myDocOfficeOnly,
-      DocumentationOfficeDTO documentationOfficeDTO) {
-    if ((fileNumber == null || fileNumber.trim().isEmpty())) {
-      return repository.searchByDocumentationUnitSearchInput(
-          documentationOfficeDTO.getId(),
-          documentNumber,
-          courtType,
-          courtLocation,
-          decisionDate,
-          decisionDateEnd,
-          publicationDate,
-          scheduledOnly,
-          status,
-          withError,
-          myDocOfficeOnly,
-          pageable);
-    }
-
-    // The highest possible number of results - For page 0: 30, for page 1: 60, for page 2: 90, etc.
-    int maxResultsUpToCurrentPage = (pageable.getPageNumber() + 1) * pageable.getPageSize();
-
-    // We need to start with index 0 because we collect 3 results sets, each of the desired size of
-    // the page. Then we sort the full ist and cut it to the page size (possibly leaving 2x page
-    // size results behind). If we don't always start with index 0, we might miss results.
-    // This approach could even be better if we replace the next/previous with a "load more" button
-    Pageable fixedPageRequest = PageRequest.of(0, maxResultsUpToCurrentPage);
-
-    Slice<DocumentationUnitListItemDTO> fileNumberResults = new SliceImpl<>(List.of());
-    Slice<DocumentationUnitListItemDTO> deviatingFileNumberResults = new SliceImpl<>(List.of());
-
-    if (!fileNumber.trim().isEmpty()) {
-      fileNumberResults =
-          repository.searchByDocumentationUnitSearchInputFileNumber(
-              documentationOfficeDTO.getId(),
-              documentNumber,
-              fileNumber.trim(),
-              courtType,
-              courtLocation,
-              decisionDate,
-              decisionDateEnd,
-              publicationDate,
-              scheduledOnly,
-              status,
-              withError,
-              myDocOfficeOnly,
-              fixedPageRequest);
-
-      deviatingFileNumberResults =
-          repository.searchByDocumentationUnitSearchInputDeviatingFileNumber(
-              documentationOfficeDTO.getId(),
-              documentNumber,
-              fileNumber.trim(),
-              courtType,
-              courtLocation,
-              decisionDate,
-              decisionDateEnd,
-              publicationDate,
-              scheduledOnly,
-              status,
-              withError,
-              myDocOfficeOnly,
-              fixedPageRequest);
-    }
-
-    Set<DocumentationUnitListItemDTO> allResults = new HashSet<>();
-
-    allResults.addAll(fileNumberResults.getContent());
-    allResults.addAll(deviatingFileNumberResults.getContent());
-
-    // We can provide entries for a next page if ...
-    // A) we already have collected more results than fit on the current page, or
-    // B) at least one of the queries has more results
-    boolean hasNext =
-        allResults.size() >= maxResultsUpToCurrentPage
-            || fileNumberResults.hasNext()
-            || deviatingFileNumberResults.hasNext();
-
-    return new SliceImpl<>(
-        allResults.stream()
-            .sorted(
-                (o1, o2) -> {
-                  if (o1.getDate() != null && o2.getDate() != null) {
-                    return o1.getDocumentNumber().compareTo(o2.getDocumentNumber());
-                  }
-                  return 0;
-                })
-            .toList()
-            .subList(
-                pageable.getPageNumber() * pageable.getPageSize(),
-                Math.min(allResults.size(), maxResultsUpToCurrentPage)),
-        pageable,
-        hasNext);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -645,23 +501,21 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     Boolean withError =
         Optional.ofNullable(searchInput.status()).map(Status::withError).orElse(false);
 
-    Slice<DocumentationUnitListItemDTO> allResults =
-        getDocumentationUnitSearchResultDTOS(
-            pageable,
-            searchInput.courtType(),
-            searchInput.courtLocation(),
-            searchInput.documentNumber(),
-            searchInput.fileNumber(),
-            searchInput.decisionDate(),
-            searchInput.decisionDateEnd(),
-            searchInput.publicationDate(),
-            searchInput.scheduledOnly(),
-            searchInput.status() != null ? searchInput.status().publicationStatus() : null,
-            withError,
-            searchInput.myDocOfficeOnly(),
-            documentationOfficeDTO);
-
-    return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);
+    return getDocumentationUnitSearchResultDTOS(
+        pageable,
+        searchInput.courtType(),
+        searchInput.courtLocation(),
+        searchInput.documentNumber(),
+        searchInput.fileNumber(),
+        searchInput.decisionDate(),
+        searchInput.decisionDateEnd(),
+        searchInput.publicationDate(),
+        searchInput.scheduledOnly(),
+        searchInput.status() != null ? searchInput.status().publicationStatus() : null,
+        withError,
+        searchInput.myDocOfficeOnly(),
+        searchInput.withDuplicateWarning(),
+        documentationOfficeDTO);
   }
 
   @Override
@@ -681,11 +535,356 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   public List<DocumentationUnit> getScheduledDocumentationUnitsDueNow() {
     return repository.getScheduledDocumentationUnitsDueNow().stream()
         .limit(50)
-        .filter(
-            documentationUnitDTO ->
-                documentationUnitDTO
-                    instanceof DecisionDTO) // TODO transform pending proceedings as well
+        .filter(DecisionDTO.class::isInstance) // TODO transform pending proceedings as well
         .map(decision -> DecisionTransformer.transformToDomain((DecisionDTO) decision))
         .toList();
+  }
+
+  @NotNull
+  @SuppressWarnings({"java:S107", "java:S3776"})
+  private Slice<DocumentationUnitListItem> getDocumentationUnitSearchResultDTOS(
+      Pageable pageable,
+      String courtType,
+      String courtLocation,
+      String documentNumber,
+      String fileNumber,
+      LocalDate decisionDate,
+      LocalDate decisionDateEnd,
+      LocalDate publicationDate,
+      Boolean scheduledOnly,
+      PublicationStatus status,
+      Boolean withError,
+      Boolean myDocOfficeOnly,
+      Boolean withDuplicateWarning,
+      DocumentationOfficeDTO documentationOfficeDTO) {
+
+    // CriteriaBuilder and CriteriaQuery setup
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<DocumentationUnitDTO> criteriaQuery =
+        criteriaBuilder.createQuery(DocumentationUnitDTO.class);
+    Root<DocumentationUnitDTO> root = criteriaQuery.from(DocumentationUnitDTO.class);
+
+    // Conditions setup
+    Predicate conditions = criteriaBuilder.conjunction(); // Start with an empty conjunction (AND)
+
+    Join<DocumentationUnitDTO, StatusDTO> statusJoin = root.join(STATUS, JoinType.LEFT);
+
+    Predicate documentationOfficePredicate =
+        getDocumentationOfficePredicate(criteriaBuilder, root, documentationOfficeDTO);
+    Predicate publishedPredicate = getPublishedPredicate(statusJoin, criteriaBuilder);
+    Predicate statusPredicate = getStatusPredicate(statusJoin, criteriaBuilder, status);
+    Predicate withErrorPredicate = getWithErrorPredicate(statusJoin, criteriaBuilder);
+
+    // file number
+    if (fileNumber != null) {
+      conditions = addFileNumberFilter(criteriaBuilder, root, fileNumber, conditions);
+    }
+
+    // court
+    if (courtType != null || courtLocation != null) {
+      conditions = addCourtFilter(criteriaBuilder, root, courtType, courtLocation, conditions);
+    }
+
+    // decision date
+    if (decisionDate != null) {
+      conditions =
+          addDecisionDateFilter(criteriaBuilder, root, decisionDate, decisionDateEnd, conditions);
+    }
+
+    // documentNumber
+    if (documentNumber != null) {
+      conditions = addDocumentNumberFilter(criteriaBuilder, root, documentNumber, conditions);
+    }
+
+    // my docOffice only
+    if (Boolean.TRUE.equals(myDocOfficeOnly)) {
+      conditions = criteriaBuilder.and(conditions, documentationOfficePredicate);
+
+      // status
+      if (status != null) {
+        conditions = criteriaBuilder.and(conditions, criteriaBuilder.and(statusPredicate));
+      }
+
+      // scheduled only
+      if (Boolean.TRUE.equals(scheduledOnly)) {
+        conditions = addScheduledFilter(criteriaBuilder, root, conditions);
+      }
+
+      // publicationDate filter
+      if (publicationDate != null) {
+        conditions = addPublicationDateFilter(criteriaBuilder, root, publicationDate, conditions);
+      }
+
+      // with error
+      if (Boolean.TRUE.equals(withError)) {
+        conditions = criteriaBuilder.and(conditions, withErrorPredicate);
+      }
+
+      // duplicate warning
+      if (Boolean.TRUE.equals(withDuplicateWarning)) {
+        conditions = addDuplicateFilter(criteriaBuilder, root, conditions);
+      }
+    } else {
+      // status
+      if (status == PublicationStatus.PUBLISHED || status == PublicationStatus.PUBLISHING) {
+        conditions = criteriaBuilder.and(conditions, criteriaBuilder.and(statusPredicate));
+      } else if (status != null) {
+        conditions =
+            criteriaBuilder.and(
+                conditions, criteriaBuilder.and(statusPredicate, documentationOfficePredicate));
+      } else {
+        // permission
+        Predicate permissionPredicate =
+            criteriaBuilder.or(documentationOfficePredicate, publishedPredicate);
+        conditions = criteriaBuilder.and(conditions, permissionPredicate);
+      }
+    }
+
+    // ORDER
+    orderResults(publicationDate, scheduledOnly, criteriaBuilder, root, criteriaQuery);
+
+    SliceImpl<DocumentationUnitDTO> allResults =
+        getPaginatedResults(pageable, criteriaQuery, conditions);
+    return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);
+  }
+
+  private static Predicate addCourtFilter(
+      CriteriaBuilder criteriaBuilder,
+      Root<DocumentationUnitDTO> root,
+      String courtType,
+      String courtLocation,
+      Predicate conditions) {
+    Join<DocumentationUnitDTO, String> courtJoin = root.join("court", JoinType.LEFT);
+    // Filter by court type
+    if (courtType != null) {
+      conditions = addCourtTypeFilter(criteriaBuilder, courtJoin, courtType, conditions);
+    }
+    // Filter by court location
+    if (courtLocation != null) {
+      conditions = addCourtLocationFilter(criteriaBuilder, courtJoin, courtLocation, conditions);
+    }
+    return conditions;
+  }
+
+  private static Predicate addCourtTypeFilter(
+      CriteriaBuilder criteriaBuilder,
+      Join<DocumentationUnitDTO, String> courtJoin,
+      String courtType,
+      Predicate conditions) {
+    Predicate courtTypePredicate =
+        criteriaBuilder.like(criteriaBuilder.upper(courtJoin.get("type")), courtType.toUpperCase());
+    conditions = criteriaBuilder.and(conditions, courtTypePredicate);
+    return conditions;
+  }
+
+  private static Predicate addCourtLocationFilter(
+      CriteriaBuilder criteriaBuilder,
+      Join<DocumentationUnitDTO, String> courtJoin,
+      String courtLocation,
+      Predicate conditions) {
+    Predicate courtLocationPredicate =
+        criteriaBuilder.like(
+            criteriaBuilder.upper(courtJoin.get("location")), courtLocation.toUpperCase());
+    conditions = criteriaBuilder.and(conditions, courtLocationPredicate);
+    return conditions;
+  }
+
+  private static Predicate getExternalHandoverPendingPredicate(
+      CriteriaBuilder criteriaBuilder,
+      Root<DocumentationUnitDTO> root,
+      DocumentationOfficeDTO documentationOfficeDTO) {
+    return criteriaBuilder.and(
+        criteriaBuilder.equal(
+            root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.EXTERNAL_HANDOVER_PENDING),
+        criteriaBuilder.equal(
+            root.get("creatingDocumentationOffice").get("id"), documentationOfficeDTO.getId()));
+  }
+
+  private static Predicate getPublicationStatusPredicate(
+      CriteriaBuilder criteriaBuilder, Root<DocumentationUnitDTO> root) {
+    return criteriaBuilder.or(
+        criteriaBuilder.equal(
+            root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHED),
+        criteriaBuilder.equal(
+            root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHING));
+  }
+
+  private static Predicate getDocumentationOfficePredicate(
+      CriteriaBuilder criteriaBuilder,
+      Root<DocumentationUnitDTO> root,
+      DocumentationOfficeDTO documentationOfficeDTO) {
+    return criteriaBuilder.equal(
+        root.get("documentationOffice").get("id"), documentationOfficeDTO.getId());
+  }
+
+  private static Predicate getPublishedPredicate(
+      Join<DocumentationUnitDTO, StatusDTO> statusJoin, CriteriaBuilder criteriaBuilder) {
+    Predicate statusCondition =
+        statusJoin
+            .get(PUBLICATION_STATUS)
+            .in(PublicationStatus.PUBLISHED, PublicationStatus.PUBLISHING);
+    return criteriaBuilder.and(statusCondition);
+  }
+
+  private static Predicate getStatusPredicate(
+      Join<DocumentationUnitDTO, StatusDTO> statusJoin,
+      CriteriaBuilder criteriaBuilder,
+      PublicationStatus status) {
+    Predicate statusCondition = statusJoin.get(PUBLICATION_STATUS).in(status);
+    return criteriaBuilder.and(statusCondition);
+  }
+
+  private static Predicate getWithErrorPredicate(
+      Join<DocumentationUnitDTO, StatusDTO> statusJoin, CriteriaBuilder criteriaBuilder) {
+    Predicate statusCondition = criteriaBuilder.isTrue(statusJoin.get("withError"));
+    return criteriaBuilder.and(statusCondition);
+  }
+
+  private static Predicate addDocumentTypeFilter(
+      CriteriaBuilder criteriaBuilder,
+      Root<DocumentationUnitDTO> root,
+      DocumentType documentType,
+      Predicate conditions) {
+    Predicate documentTypePredicate =
+        criteriaBuilder.equal(
+            root.get("documentType"), DocumentTypeTransformer.transformToDTO(documentType));
+    conditions = criteriaBuilder.and(conditions, documentTypePredicate);
+    return conditions;
+  }
+
+  private static Predicate addFileNumberFilter(
+      CriteriaBuilder criteriaBuilder,
+      Root<DocumentationUnitDTO> root,
+      String fileNumber,
+      Predicate conditions) {
+    Join<DocumentationUnitDTO, DeviatingFileNumberDTO> deviatingFileNumberJoin =
+        root.join("deviatingFileNumbers", JoinType.LEFT);
+    Join<DocumentationUnitDTO, String> fileNumberJoin = root.join("fileNumbers", JoinType.LEFT);
+    Predicate fileNumberPredicate =
+        criteriaBuilder.or(
+            criteriaBuilder.like(
+                criteriaBuilder.upper(fileNumberJoin.get("value")), fileNumber.toUpperCase() + "%"),
+            criteriaBuilder.like(
+                criteriaBuilder.upper(deviatingFileNumberJoin.get("value")),
+                fileNumber.toUpperCase() + "%"));
+    conditions = criteriaBuilder.and(conditions, fileNumberPredicate);
+    return conditions;
+  }
+
+  private static Predicate addDecisionDateFilter(
+      CriteriaBuilder criteriaBuilder,
+      Root<DocumentationUnitDTO> root,
+      LocalDate decisionDate,
+      LocalDate decisionDateEnd,
+      Predicate conditions) {
+    Predicate decisionDatePredicate = criteriaBuilder.equal(root.get("date"), decisionDate);
+    if (decisionDateEnd != null) {
+      decisionDatePredicate =
+          criteriaBuilder.between(root.get("date"), decisionDate, decisionDateEnd);
+    }
+    conditions = criteriaBuilder.and(conditions, decisionDatePredicate);
+    return conditions;
+  }
+
+  private static Predicate addScheduledFilter(
+      CriteriaBuilder criteriaBuilder, Root<DocumentationUnitDTO> root, Predicate conditions) {
+    Predicate scheduledPredicate =
+        criteriaBuilder.isNotNull(root.get(SCHEDULED_PUBLICATION_DATE_TIME));
+    conditions = criteriaBuilder.and(conditions, scheduledPredicate);
+    return conditions;
+  }
+
+  private static Predicate addDuplicateFilter(
+      CriteriaBuilder criteriaBuilder, Root<DocumentationUnitDTO> root, Predicate conditions) {
+    Join<DocumentationUnitDTO, DuplicateRelationDTO> duplicateRelation1 =
+        root.join("duplicateRelations1", JoinType.LEFT);
+    Join<DocumentationUnitDTO, DuplicateRelationDTO> duplicateRelation2 =
+        root.join("duplicateRelations2", JoinType.LEFT);
+    Predicate duplicatePredicate =
+        criteriaBuilder.or(
+            criteriaBuilder.equal(
+                duplicateRelation1.get(STATUS),
+                criteriaBuilder.literal(DuplicateRelationStatus.PENDING)),
+            criteriaBuilder.equal(
+                duplicateRelation2.get(STATUS),
+                criteriaBuilder.literal(DuplicateRelationStatus.PENDING)));
+    conditions = criteriaBuilder.and(conditions, duplicatePredicate);
+    return conditions;
+  }
+
+  private static Predicate addPublicationDateFilter(
+      CriteriaBuilder criteriaBuilder,
+      Root<DocumentationUnitDTO> root,
+      LocalDate publicationDate,
+      Predicate conditions) {
+    Predicate publicationDatePredicate =
+        criteriaBuilder.or(
+            criteriaBuilder.equal(
+                criteriaBuilder.function(
+                    "DATE", LocalDate.class, root.get(SCHEDULED_PUBLICATION_DATE_TIME)),
+                publicationDate),
+            criteriaBuilder.equal(
+                criteriaBuilder.function(
+                    "DATE", LocalDate.class, root.get("lastPublicationDateTime")),
+                publicationDate));
+    conditions = criteriaBuilder.and(conditions, publicationDatePredicate);
+    return conditions;
+  }
+
+  private static Predicate addDocumentNumberFilter(
+      CriteriaBuilder criteriaBuilder,
+      Root<DocumentationUnitDTO> root,
+      String documentNumber,
+      Predicate conditions) {
+    Predicate documentNumberPredicate =
+        criteriaBuilder.like(
+            criteriaBuilder.upper(root.get(DOCUMENT_NUMBER)),
+            "%" + documentNumber.toUpperCase() + "%");
+    conditions = criteriaBuilder.and(conditions, documentNumberPredicate);
+    return conditions;
+  }
+
+  private static void orderResults(
+      LocalDate publicationDate,
+      Boolean scheduledOnly,
+      CriteriaBuilder criteriaBuilder,
+      Root<DocumentationUnitDTO> root,
+      CriteriaQuery<DocumentationUnitDTO> criteriaQuery) {
+    List<Order> orderList = new ArrayList<>();
+    final Date minDate = new Date(0L);
+
+    if (Boolean.TRUE.equals(scheduledOnly) || publicationDate != null) {
+      orderList.add(
+          criteriaBuilder.desc(
+              // NULL values - last - WORKAROUND
+              criteriaBuilder.coalesce(root.get(SCHEDULED_PUBLICATION_DATE_TIME), minDate)));
+      orderList.add(
+          criteriaBuilder.desc(
+              // NULL values - last - WORKAROUND
+              criteriaBuilder.coalesce(root.get("lastPublicationDateTime"), minDate)));
+    }
+    orderList.add(
+        criteriaBuilder.desc(
+            // NULL values - last - WORKAROUND
+            criteriaBuilder.coalesce(root.get("date"), minDate)));
+    orderList.add(criteriaBuilder.asc(root.get(DOCUMENT_NUMBER)));
+    criteriaQuery.orderBy(orderList);
+  }
+
+  private SliceImpl<DocumentationUnitDTO> getPaginatedResults(
+      Pageable pageable, CriteriaQuery<DocumentationUnitDTO> criteriaQuery, Predicate conditions) {
+    // Apply conditions to query
+    criteriaQuery.where(conditions);
+
+    // Apply pagination
+    TypedQuery<DocumentationUnitDTO> query = entityManager.createQuery(criteriaQuery);
+    query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
+    query.setMaxResults(pageable.getPageSize());
+
+    // Get results and create Slice
+    List<DocumentationUnitDTO> resultList = query.getResultList();
+    boolean hasNext = resultList.size() == pageable.getPageSize();
+
+    return new SliceImpl<>(resultList, pageable, hasNext);
   }
 }
