@@ -69,14 +69,14 @@ class CourtTransformerTest {
     Court court =
         CourtTransformer.transformToDomain(CourtDTO.builder().jurisdictionType(null).build());
 
-    assertThat(court.jurisdictionType()).isEqualTo("");
+    assertThat(court.jurisdictionType()).isEmpty();
   }
 
   @Test
   void noJurisdictionType_shouldTransformToEmptyString() {
     Court court = CourtTransformer.transformToDomain(CourtDTO.builder().build());
 
-    assertThat(court.jurisdictionType()).isEqualTo("");
+    assertThat(court.jurisdictionType()).isEmpty();
   }
 
   @Test
