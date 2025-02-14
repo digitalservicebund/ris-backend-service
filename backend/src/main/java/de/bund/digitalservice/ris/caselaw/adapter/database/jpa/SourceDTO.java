@@ -33,6 +33,7 @@ public class SourceDTO {
   // change this to SourceValue after updating migration code & backfilling
   private String value;
 
+  @Size(max = 1000)
   @Column(name = "source_raw_value")
   private String sourceRawValue;
 
