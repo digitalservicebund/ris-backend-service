@@ -232,7 +232,8 @@ class DocumentationUnitServiceTest {
         .when(repository)
         .delete(DocumentationUnit.builder().build());
 
-    Assertions.assertThrows(IllegalArgumentException.class, () -> service.deleteByUuid(TEST_UUID));
+    Assertions.assertThrows(
+        DocumentationUnitDeletionException.class, () -> service.deleteByUuid(TEST_UUID));
 
     verify(repository, times(2)).findByUuid(TEST_UUID);
   }
