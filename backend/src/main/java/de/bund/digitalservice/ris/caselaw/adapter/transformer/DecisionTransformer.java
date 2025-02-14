@@ -209,11 +209,9 @@ public class DecisionTransformer {
       // Create new SourceDTO
       SourceDTO newSource = SourceDTO.builder().value(coreData.source().value()).rank(rank).build();
 
-      // Add new source to the builder
-      List<SourceDTO> updatedSources =
-          new ArrayList<>(currentDto.getSource()); // Copy existing sources
-      updatedSources.add(newSource);
-      builder.source(updatedSources); // Update builder with new list
+      // Add to existing sources
+      existingSources.add(newSource);
+      builder.source(existingSources); // Update builder with new list
     }
   }
 
