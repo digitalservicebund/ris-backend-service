@@ -73,7 +73,7 @@ public class DocumentationUnitListItemTransformer {
                                     referenceDTO.getLegalPeriodicalRawValue()
                                         + " "
                                         + referenceDTO.getCitation())
-                            .orElse(String.valueOf(source.getValue())))
+                            .orElse(source.getValue()))
                 .collect(Collectors.joining(", ")));
     return builder.build();
   }

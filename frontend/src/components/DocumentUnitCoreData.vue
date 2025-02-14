@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, toRefs, watch, ref, onMounted, onBeforeUnmount } from "vue"
-import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
@@ -13,7 +12,7 @@ import NestedComponent from "@/components/NestedComponents.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
-import { CoreData, SourceValue } from "@/domain/documentUnit"
+import { CoreData } from "@/domain/documentUnit"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 interface Props {
@@ -27,12 +26,7 @@ const emit = defineEmits<{
 const { modelValue } = toRefs(props)
 const validationStore =
   useValidationStore<
-    [
-      "decisionDate",
-      "yearsOfDispute",
-      "deviatingDecisionDates",
-      "source",
-    ][number]
+    ["decisionDate", "yearsOfDispute", "deviatingDecisionDates"][number]
   >()
 
 const parentWidth = ref(0)
@@ -63,43 +57,6 @@ const jurisdictionType = computed(() =>
 const region = computed(() =>
   modelValue.value.court ? modelValue.value.court.region : "",
 )
-
-const sourceItems: DropdownItem[] = [
-  {
-    label: "unaufgefordert eingesandtes Original (O)",
-    value: SourceValue.UnaufgefordertesOriginal,
-  },
-  {
-    label: "angefordertes Original (A)",
-    value: SourceValue.AngefordertesOriginal,
-  },
-  {
-    label: "Zeitschriftenveröffentlichung (Z)",
-    value: SourceValue.Zeitschrift,
-  },
-  { label: "ohne Vorlage des Originals E-Mail (E)", value: SourceValue.Email },
-  {
-    label:
-      "Ländergerichte, EuG- und EuGH-Entscheidungen über jDV-Verfahren (L)",
-    value: SourceValue.LaenderEuGH,
-  },
-  { label: "Sonstige (S)", value: SourceValue.Sonstige },
-]
-
-const source = computed({
-  get: () =>
-    props.modelValue.source?.value
-      ? props.modelValue.source?.value
-      : (props.modelValue.source?.sourceRawValue ?? undefined),
-  set: (newValue) => {
-    if (Object.values(SourceValue).includes(newValue as SourceValue)) {
-      modelValue.value.source = {
-        ...modelValue.value.source,
-        value: newValue as SourceValue,
-      }
-    }
-  },
-})
 
 watch(
   modelValue,
@@ -334,23 +291,6 @@ onBeforeUnmount(() => {
           @focus="validationStore.remove('yearsOfDispute')"
           @update:validation-error="slotProps.updateValidationError"
         ></ChipsYearInput>
-      </InputField>
-    </div>
-    <div :class="layoutClass">
-      <InputField
-        id="source"
-        v-slot="slotProps"
-        label="Quelle"
-        :validation-error="validationStore.getByField('source')"
-      >
-        <DropdownInput
-          :id="slotProps.id"
-          v-model="source"
-          aria-label="Quelle"
-          :has-error="slotProps.hasError"
-          :items="sourceItems"
-          placeholder="Bitte auswählen"
-        />
       </InputField>
     </div>
     <div :class="layoutClass">

@@ -32,7 +32,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
@@ -44,13 +43,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -72,12 +69,9 @@ import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.Reference;
-import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
-import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -97,7 +91,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -158,7 +151,6 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseRegionRepository regionRepository;
   @Autowired private DatabaseDeletedDocumentationIdsRepository deletedDocumentationIdsRepository;
   @Autowired private AuthService authService;
-  @Autowired private DatabaseLegalPeriodicalRepository legalPeriodicalRepository;
 
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
@@ -1271,47 +1263,6 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isForbidden();
-  }
-
-  @Test
-  void testGenerateNewDocumentationUnit_withReferenceInParameters_shouldSetSource() {
-    LegalPeriodicalDTO legalPeriodical =
-        legalPeriodicalRepository.save(
-            LegalPeriodicalDTO.builder()
-                .abbreviation("ABC")
-                .primaryReference(true)
-                .title("Longer title")
-                .build());
-    when(documentNumberPatternConfig.getDocumentNumberPatterns())
-        .thenReturn(Map.of("DS", "ZZREYYYY*****"));
-
-    DocumentationUnitCreationParameters parameters =
-        DocumentationUnitCreationParameters.builder()
-            .reference(
-                Reference.builder()
-                    .id(UUID.randomUUID())
-                    .referenceType(ReferenceType.CASELAW)
-                    .legalPeriodical(LegalPeriodicalTransformer.transformToDomain(legalPeriodical))
-                    .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
-                    .citation("test")
-                    .build())
-            .build();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/new")
-        .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(parameters)
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(DocumentationUnit.class)
-        .consumeWith(
-            response ->
-                assertThat(response.getResponseBody())
-                    .extracting("coreData.source.value")
-                    .isEqualTo(SourceValue.Z));
   }
 
   @Test

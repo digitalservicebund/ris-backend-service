@@ -20,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -37,8 +36,6 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
-import de.bund.digitalservice.ris.caselaw.domain.Source;
-import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
@@ -121,7 +118,6 @@ public class DecisionTransformer {
       addDeviationCourts(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
       addDeviatingFileNumbers(builder, coreData);
-      addSource(currentDto, builder, coreData);
 
     } else {
       builder
@@ -195,24 +191,6 @@ public class DecisionTransformer {
     addLiteratureReferences(updatedDomainObject, builder, currentDto);
 
     return builder.build();
-  }
-
-  private static void addSource(
-      DecisionDTO currentDto, DecisionDTOBuilder<?, ?> builder, CoreData coreData) {
-    if (coreData.source() != null) {
-      List<SourceDTO> existingSources =
-          currentDto.getSource() != null
-              ? new ArrayList<>(currentDto.getSource())
-              : new ArrayList<>();
-      Integer rank = existingSources.size() + 1;
-
-      // Create new SourceDTO
-      SourceDTO newSource = SourceDTO.builder().value(coreData.source().value()).rank(rank).build();
-
-      // Add to existing sources
-      existingSources.add(newSource);
-      builder.source(existingSources); // Update builder with new list
-    }
   }
 
   private static void addCaselawReferences(
@@ -695,26 +673,6 @@ public class DecisionTransformer {
             .creatingDocOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     decisionDTO.getCreatingDocumentationOffice()))
-            .source(
-                decisionDTO.getSource().stream()
-                    .max(Comparator.comparing(SourceDTO::getRank)) // Find the highest-ranked item
-                    .map(
-                        sourceDTO -> {
-                          SourceValue sourceValue = null;
-                          if (sourceDTO.getValue() != null) {
-                            try {
-                              sourceValue = sourceDTO.getValue();
-                            } catch (IllegalArgumentException | NullPointerException e) {
-                              System.err.println("Invalid SourceValue: " + sourceDTO.getValue());
-                            }
-                          }
-                          return Source.builder()
-                              .value(sourceValue) // Set the (valid) SourceValue, or null if invalid
-                              .sourceRawValue(
-                                  sourceDTO.getSourceRawValue()) // Ensure raw value is set
-                              .build();
-                        })
-                    .orElse(null))
             .decisionDate(decisionDTO.getDate())
             .appraisalBody(decisionDTO.getJudicialBody());
 

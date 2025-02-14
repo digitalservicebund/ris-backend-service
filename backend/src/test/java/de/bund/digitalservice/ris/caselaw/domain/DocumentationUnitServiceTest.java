@@ -83,7 +83,8 @@ class DocumentationUnitServiceTest {
         DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any())).thenReturn(documentationUnit);
+    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
+        .thenReturn(documentationUnit);
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
     // Can we use a captor to check if the document number was correctly created?
@@ -109,6 +110,7 @@ class DocumentationUnitServiceTest {
                 .publicationStatus(PublicationStatus.UNPUBLISHED)
                 .withError(false)
                 .build(),
+            null,
             null);
   }
 
@@ -136,7 +138,8 @@ class DocumentationUnitServiceTest {
                     .build())
             .build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any())).thenReturn(documentationUnit);
+    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
+        .thenReturn(documentationUnit);
 
     when(documentNumberService.generateDocumentNumber(designatedDocumentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
@@ -169,7 +172,10 @@ class DocumentationUnitServiceTest {
                 .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
                 .withError(false)
                 .build(),
-            parameters.reference());
+            parameters.reference(),
+            parameters.reference().legalPeriodical().abbreviation()
+                + " "
+                + parameters.reference().citation());
   }
 
   @Test
@@ -177,7 +183,7 @@ class DocumentationUnitServiceTest {
     when(repository.findByDocumentNumber("ABCDE20220001"))
         .thenReturn(DocumentationUnit.builder().build());
     var documentationUnit = service.getByDocumentNumber("ABCDE20220001");
-    assertEquals(DocumentationUnit.class, documentationUnit.getClass());
+    assertEquals(documentationUnit.getClass(), DocumentationUnit.class);
 
     verify(repository).findByDocumentNumber("ABCDE20220001");
   }
