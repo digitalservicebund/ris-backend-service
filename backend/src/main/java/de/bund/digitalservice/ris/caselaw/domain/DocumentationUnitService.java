@@ -262,14 +262,7 @@ public class DocumentationUnitService {
       attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentationUnitId);
 
     saveForRecycling(documentationUnit);
-    try {
-      repository.delete(documentationUnit);
-    } catch (Exception e) {
-      log.error("Could not delete documentation unit from database {}", documentationUnitId, e);
-      throw new DocumentationUnitDeletionException(
-          "Could not delete documentation unit from database");
-    }
-
+    repository.delete(documentationUnit);
     return "Dokumentationseinheit gelöscht: " + documentationUnitId;
   }
 
@@ -442,10 +435,7 @@ public class DocumentationUnitService {
           documentationUnit.coreData().documentationOffice().abbreviation());
 
     } catch (Exception e) {
-      log.info(
-          "Won't recycle document number {}: {}",
-          documentationUnit.documentNumber(),
-          e.getMessage());
+      log.info("Won´t recycle the document number: {}", e.getMessage());
     }
   }
 
