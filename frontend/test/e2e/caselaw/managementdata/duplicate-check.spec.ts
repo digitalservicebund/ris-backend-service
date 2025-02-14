@@ -301,6 +301,7 @@ test.describe(
               page,
               prefilledDocumentUnit,
             )
+            await save(page)
             await navigateToCategories(
               page,
               secondPrefilledDocumentUnit.documentNumber,
