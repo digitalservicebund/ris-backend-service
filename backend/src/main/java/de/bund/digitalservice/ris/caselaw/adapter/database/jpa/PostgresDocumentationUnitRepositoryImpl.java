@@ -159,12 +159,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       referenceDTO.setDocumentationUnit(documentationUnitDTO);
 
       // if created from reference, the source is always 'Z' (Zeitschrift)
-      sources.add(
-          SourceDTO.builder()
-              .rank(1)
-              .value(String.valueOf(SourceValue.Z))
-              .reference(referenceDTO)
-              .build());
+      sources.add(SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
     }
 
     DecisionDTO.DecisionDTOBuilder<?, ?> builder =

@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
@@ -41,8 +42,8 @@ class DocumentationUnitListItemTransformerTest {
                 DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .source(
                 List.of(
-                    SourceDTO.builder().value("NJW").build(),
-                    SourceDTO.builder().value("o").build()))
+                    SourceDTO.builder().value(SourceValue.E).build(),
+                    SourceDTO.builder().value(SourceValue.O).build()))
             .status(
                 StatusDTO.builder()
                     .createdAt(Instant.now())
@@ -71,7 +72,7 @@ class DocumentationUnitListItemTransformerTest {
     // source and creating doc office
     assertThat(documentationUnitListItem.creatingDocumentationOffice().abbreviation())
         .isEqualTo("DS");
-    assertThat(documentationUnitListItem.source()).isEqualTo("NJW, o");
+    assertThat(documentationUnitListItem.source()).isEqualTo("E, O");
     // status
     assertThat(documentationUnitListItem.status().publicationStatus())
         .isEqualTo(PublicationStatus.PUBLISHED);

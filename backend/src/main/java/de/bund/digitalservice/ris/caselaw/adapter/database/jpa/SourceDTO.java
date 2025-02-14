@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,9 +30,7 @@ public class SourceDTO {
 
   @NotNull private Integer rank;
 
-  @Size(max = 1000)
-  // change this to SourceValue after updating migration code & backfilling
-  private String value;
+  private SourceValue value;
 
   @Size(max = 1000)
   @Column(name = "source_raw_value")

@@ -207,8 +207,7 @@ public class DecisionTransformer {
       Integer rank = existingSources.size() + 1;
 
       // Create new SourceDTO
-      SourceDTO newSource =
-          SourceDTO.builder().value(coreData.source().value().toString()).rank(rank).build();
+      SourceDTO newSource = SourceDTO.builder().value(coreData.source().value()).rank(rank).build();
 
       // Add new source to the builder
       List<SourceDTO> updatedSources =
@@ -713,13 +712,9 @@ public class DecisionTransformer {
                           SourceValue sourceValue = null;
                           if (sourceDTO.getValue() != null) {
                             try {
-                              // Attempt to convert the value to SourceValue
-                              sourceValue = SourceValue.valueOf(sourceDTO.getValue());
+                              sourceValue = sourceDTO.getValue();
                             } catch (IllegalArgumentException | NullPointerException e) {
                               System.err.println("Invalid SourceValue: " + sourceDTO.getValue());
-                              // This should not be necessary after updating migration code &
-                              // backfilling
-                              sourceDTO.setSourceRawValue(sourceDTO.getValue());
                             }
                           }
                           return Source.builder()

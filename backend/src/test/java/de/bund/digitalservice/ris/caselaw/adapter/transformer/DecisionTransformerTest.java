@@ -862,14 +862,14 @@ class DecisionTransformerTest {
     DecisionDTO documentationUnitDTO =
         DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
     assertThat(documentationUnitDTO.getSource().getFirst().getRank()).isOne();
-    assertThat(documentationUnitDTO.getSource().getFirst().getValue()).isEqualTo("E");
+    assertThat(documentationUnitDTO.getSource().getFirst().getValue()).isEqualTo(SourceValue.E);
     assertThat(documentationUnitDTO.getSource().getFirst().getSourceRawValue()).isEqualTo(null);
   }
 
   @Test
   void testTransformToDTO_withSource_withExistingSource() {
     List<SourceDTO> existingSources =
-        List.of(SourceDTO.builder().value("A").rank(1).build()); // Example list
+        List.of(SourceDTO.builder().value(SourceValue.A).rank(1).build()); // Example list
 
     DecisionDTO currentDto = DecisionDTO.builder().source(existingSources).build();
 
@@ -882,7 +882,7 @@ class DecisionTransformerTest {
     DecisionDTO documentationUnitDTO =
         DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
     assertThat(documentationUnitDTO.getSource().getLast().getRank()).isEqualTo(2);
-    assertThat(documentationUnitDTO.getSource().getLast().getValue()).isEqualTo("E");
+    assertThat(documentationUnitDTO.getSource().getLast().getValue()).isEqualTo(SourceValue.E);
   }
 
   @Test
@@ -898,7 +898,7 @@ class DecisionTransformerTest {
   void testTransformToDomain_withOneValidSource() {
     DecisionDTO decisionDTO =
         DecisionDTO.builder()
-            .source(List.of(SourceDTO.builder().value("A").rank(1).build()))
+            .source(List.of(SourceDTO.builder().value(SourceValue.A).rank(1).build()))
             .build();
 
     DocumentationUnit domainObject = DecisionTransformer.transformToDomain(decisionDTO);
@@ -913,28 +913,15 @@ class DecisionTransformerTest {
         DecisionDTO.builder()
             .source(
                 List.of(
-                    SourceDTO.builder().value("O").rank(1).build(),
-                    SourceDTO.builder().value("Z").rank(3).build(),
-                    SourceDTO.builder().value("A").rank(2).build()))
+                    SourceDTO.builder().value(SourceValue.O).rank(1).build(),
+                    SourceDTO.builder().value(SourceValue.Z).rank(3).build(),
+                    SourceDTO.builder().value(SourceValue.A).rank(2).build()))
             .build();
 
     DocumentationUnit domainObject = DecisionTransformer.transformToDomain(decisionDTO);
 
     assertThat(domainObject.coreData().source().value()).isEqualTo(SourceValue.Z);
     assertThat(domainObject.coreData().source().sourceRawValue()).isNull();
-  }
-
-  @Test
-  void testTransformToDomain_withInvalidSourceValue_shouldSetRawValue() {
-    DecisionDTO decisionDTO =
-        DecisionDTO.builder()
-            .source(List.of(SourceDTO.builder().value("INVALID").rank(1).build()))
-            .build();
-
-    DocumentationUnit domainObject = DecisionTransformer.transformToDomain(decisionDTO);
-
-    assertThat(domainObject.coreData().source().value()).isNull();
-    assertThat(domainObject.coreData().source().sourceRawValue()).isEqualTo("INVALID");
   }
 
   @Test
