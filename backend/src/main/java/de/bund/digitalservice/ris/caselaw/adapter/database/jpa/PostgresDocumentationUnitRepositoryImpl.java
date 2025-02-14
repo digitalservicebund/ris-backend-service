@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -136,7 +137,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit docUnit, Status status, Reference createdFromReference, String source) {
+      DocumentationUnit docUnit, Status status, Reference createdFromReference) {
 
     var documentationUnitDTO =
         repository.save(
@@ -151,31 +152,24 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                     .build(),
                 docUnit));
 
-    ReferenceDTO referenceDTO = null;
+    List<SourceDTO> sources = new ArrayList<>();
     if (createdFromReference != null) {
-      referenceDTO = ReferenceTransformer.transformToDTO(createdFromReference);
+      ReferenceDTO referenceDTO = ReferenceTransformer.transformToDTO(createdFromReference);
       referenceDTO.setDocumentationUnitRank(0);
       referenceDTO.setDocumentationUnit(documentationUnitDTO);
+
+      // if created from reference, the source is always 'Z' (Zeitschrift)
+      sources.add(SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
     }
 
     DecisionDTO.DecisionDTOBuilder<?, ?> builder =
         documentationUnitDTO.toBuilder()
-            .source(
-                source == null
-                    ? new ArrayList<>()
-                    : new ArrayList<>(
-                        List.of(
-                            SourceDTO.builder()
-                                .rank(1)
-                                .value(source)
-                                .reference(referenceDTO)
-                                .build())));
-
-    builder.status(
-        StatusTransformer.transformToDTO(status).toBuilder()
-            .documentationUnit(documentationUnitDTO)
-            .createdAt(Instant.now())
-            .build());
+            .source(sources)
+            .status(
+                StatusTransformer.transformToDTO(status).toBuilder()
+                    .documentationUnit(documentationUnitDTO)
+                    .createdAt(Instant.now())
+                    .build());
 
     // saving a second time is necessary because status and reference need a reference to a
     // persisted documentation unit
@@ -219,8 +213,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         }
       }
     }
-
-    // ---
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {

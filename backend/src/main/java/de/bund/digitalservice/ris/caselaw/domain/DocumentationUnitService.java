@@ -121,15 +121,7 @@ public class DocumentationUnitService {
             .build();
 
     var newDocumentationUnit =
-        repository.createNewDocumentationUnit(
-            docUnit,
-            status,
-            params.reference(),
-            params.reference() != null && params.reference().legalPeriodical() != null
-                ? params.reference().legalPeriodical().abbreviation()
-                    + " "
-                    + params.reference().citation()
-                : null);
+        repository.createNewDocumentationUnit(docUnit, status, params.reference());
 
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
     return newDocumentationUnit;
