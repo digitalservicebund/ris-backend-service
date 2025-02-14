@@ -35,7 +35,7 @@ public class DuplicateRelationDTO {
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
-  private DuplicateRelationStatus status;
+  private DuplicateRelationStatus relationStatus;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("documentationUnitId1")

@@ -552,6 +552,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           status,
           withError,
           myDocOfficeOnly,
+          withDuplicateWarning,
           pageable);
     }
 
@@ -582,6 +583,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               status,
               withError,
               myDocOfficeOnly,
+              withDuplicateWarning,
               fixedPageRequest);
 
       deviatingFileNumberResults =
@@ -598,6 +600,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               status,
               withError,
               myDocOfficeOnly,
+              withDuplicateWarning,
               fixedPageRequest);
     }
 
