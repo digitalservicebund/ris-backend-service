@@ -148,7 +148,8 @@ public class DocumentationUnitService {
       Optional<Boolean> scheduledOnly,
       Optional<String> publicationStatus,
       Optional<Boolean> withError,
-      Optional<Boolean> myDocOfficeOnly) {
+      Optional<Boolean> myDocOfficeOnly,
+      Optional<Boolean> withDuplicateWarning) {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
@@ -169,6 +170,7 @@ public class DocumentationUnitService {
                         .build()
                     : null)
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
+            .withDuplicateWarning(withDuplicateWarning.orElse(false))
             .build();
 
     Slice<DocumentationUnitListItem> documentationUnitListItems =
@@ -252,7 +254,14 @@ public class DocumentationUnitService {
       attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentationUnitId);
 
     saveForRecycling(documentationUnit);
-    repository.delete(documentationUnit);
+    try {
+      repository.delete(documentationUnit);
+    } catch (Exception e) {
+      log.error("Could not delete documentation unit from database {}", documentationUnitId, e);
+      throw new DocumentationUnitDeletionException(
+          "Could not delete documentation unit from database");
+    }
+
     return "Dokumentationseinheit gelöscht: " + documentationUnitId;
   }
 
@@ -425,7 +434,10 @@ public class DocumentationUnitService {
           documentationUnit.coreData().documentationOffice().abbreviation());
 
     } catch (Exception e) {
-      log.info("Won´t recycle the document number: {}", e.getMessage());
+      log.info(
+          "Won't recycle document number {}: {}",
+          documentationUnit.documentNumber(),
+          e.getMessage());
     }
   }
 

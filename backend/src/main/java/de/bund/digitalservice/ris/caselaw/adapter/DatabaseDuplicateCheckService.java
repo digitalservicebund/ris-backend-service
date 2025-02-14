@@ -262,7 +262,7 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
       boolean isJDVDuplicateCheckActive, Optional<DuplicateRelationDTO> existingRelation) {
     return !isJDVDuplicateCheckActive
         && existingRelation.isPresent()
-        && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus());
+        && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getRelationStatus());
   }
 
   private void removeObsoleteDuplicates(

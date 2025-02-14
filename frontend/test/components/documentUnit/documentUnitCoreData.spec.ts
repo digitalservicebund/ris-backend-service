@@ -108,4 +108,19 @@ describe("Core Data", () => {
     await user.type(screen.getByLabelText("Streitjahr"), "2023{enter}")
     expect(onUpdate).toHaveBeenCalledWith({ yearsOfDispute: ["2023"] })
   })
+
+  test("renders jurisdiction type", async () => {
+    const coreData = {
+      court: {
+        label: "BGH",
+        jurisdictionType: "Ordentliche Gerichtsbarkeit",
+      },
+    }
+
+    renderComponent({ modelValue: coreData })
+    expect(screen.getByTestId("jurisdiction-type")).toBeVisible()
+    expect(screen.getByLabelText("Gerichtsbarkeit")).toHaveValue(
+      "Ordentliche Gerichtsbarkeit",
+    )
+  })
 })

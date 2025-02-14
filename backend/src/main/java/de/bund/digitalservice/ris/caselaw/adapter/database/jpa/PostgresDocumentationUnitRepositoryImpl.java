@@ -529,6 +529,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       PublicationStatus status,
       Boolean withError,
       Boolean myDocOfficeOnly,
+      Boolean withDuplicateWarning,
       DocumentationOfficeDTO documentationOfficeDTO) {
     if ((fileNumber == null || fileNumber.trim().isEmpty())) {
       return repository.searchByDocumentationUnitSearchInput(
@@ -543,6 +544,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           status,
           withError,
           myDocOfficeOnly,
+          withDuplicateWarning,
           pageable);
     }
 
@@ -573,6 +575,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               status,
               withError,
               myDocOfficeOnly,
+              withDuplicateWarning,
               fixedPageRequest);
 
       deviatingFileNumberResults =
@@ -589,6 +592,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               status,
               withError,
               myDocOfficeOnly,
+              withDuplicateWarning,
               fixedPageRequest);
     }
 
@@ -651,6 +655,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             searchInput.status() != null ? searchInput.status().publicationStatus() : null,
             withError,
             searchInput.myDocOfficeOnly(),
+            searchInput.withDuplicateWarning(),
             documentationOfficeDTO);
 
     return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);
@@ -673,10 +678,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   public List<DocumentationUnit> getScheduledDocumentationUnitsDueNow() {
     return repository.getScheduledDocumentationUnitsDueNow().stream()
         .limit(50)
-        .filter(
-            documentationUnitDTO ->
-                documentationUnitDTO
-                    instanceof DecisionDTO) // TODO transform pending proceedings as well
+        .filter(DecisionDTO.class::isInstance) // TODO transform pending proceedings as well
         .map(decision -> DecisionTransformer.transformToDomain((DecisionDTO) decision))
         .toList();
   }

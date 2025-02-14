@@ -226,7 +226,8 @@ class DocumentationUnitServiceTest {
         .when(repository)
         .delete(DocumentationUnit.builder().build());
 
-    Assertions.assertThrows(IllegalArgumentException.class, () -> service.deleteByUuid(TEST_UUID));
+    Assertions.assertThrows(
+        DocumentationUnitDeletionException.class, () -> service.deleteByUuid(TEST_UUID));
 
     verify(repository, times(2)).findByUuid(TEST_UUID);
   }
@@ -412,6 +413,7 @@ class DocumentationUnitServiceTest {
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
+        Optional.empty(),
         Optional.empty());
     verify(repository)
         .searchByDocumentationUnitSearchInput(pageRequest, oidcUser, documentationUnitSearchInput);
@@ -438,6 +440,7 @@ class DocumentationUnitServiceTest {
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courttype\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courtlocation\u180Ewith\u2060spaces"),
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),

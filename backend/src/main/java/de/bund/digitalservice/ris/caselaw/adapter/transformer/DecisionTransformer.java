@@ -697,13 +697,6 @@ public class DecisionTransformer {
             .creatingDocOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     decisionDTO.getCreatingDocumentationOffice()))
-            // TODO multiple regions
-            .region(
-                decisionDTO.getRegions() == null
-                        || decisionDTO.getRegions().isEmpty()
-                        || decisionDTO.getRegions().get(0) == null
-                    ? null
-                    : decisionDTO.getRegions().get(0).getCode())
             .source(
                 decisionDTO.getSource().stream()
                     .max(Comparator.comparing(SourceDTO::getRank)) // Find the highest-ranked item

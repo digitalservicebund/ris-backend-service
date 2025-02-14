@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JurisdictionTypeD
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -61,5 +62,32 @@ class CourtTransformerTest {
 
     Court court = CourtTransformer.transformToDomain(courtDTO);
     assertThat(court).extracting("type", "location", "label").containsExactly(type, null, type);
+  }
+
+  @Test
+  void nullJurisdictionType_shouldTransformToEmptyString() {
+    Court court =
+        CourtTransformer.transformToDomain(CourtDTO.builder().jurisdictionType(null).build());
+
+    assertThat(court.jurisdictionType()).isEmpty();
+  }
+
+  @Test
+  void noJurisdictionType_shouldTransformToEmptyString() {
+    Court court = CourtTransformer.transformToDomain(CourtDTO.builder().build());
+
+    assertThat(court.jurisdictionType()).isEmpty();
+  }
+
+  @Test
+  void jurisdictionType_shouldTransformToString() {
+    Court court =
+        CourtTransformer.transformToDomain(
+            CourtDTO.builder()
+                .jurisdictionType(
+                    JurisdictionTypeDTO.builder().label("Ordentliche Gerichtsbarkeit").build())
+                .build());
+
+    assertThat(court.jurisdictionType()).isEqualTo("Ordentliche Gerichtsbarkeit");
   }
 }

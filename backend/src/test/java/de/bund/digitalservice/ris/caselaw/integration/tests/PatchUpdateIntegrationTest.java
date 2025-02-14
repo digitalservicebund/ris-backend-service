@@ -1760,6 +1760,8 @@ class PatchUpdateIntegrationTest {
                   .location("Detmold")
                   .label("LG Detmold")
                   .id(court1Id)
+                  .jurisdictionType("")
+                  .region("NW")
                   .build(),
               JsonNode.class);
       List<JsonPatchOperation> operationsUser1 =
@@ -1781,15 +1783,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
-
-                assertThat(responsePatch.patch().getOperations().get(0))
-                    .isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation =
-                    (ReplaceOperation) responsePatch.patch().getOperations().get(0);
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isEqualTo("NW");
-
+                assertThat(responsePatch.patch().getOperations()).isEmpty();
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1818,9 +1812,8 @@ class PatchUpdateIntegrationTest {
                   "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
                       + "{\"id\":\""
                       + court1Id
-                      + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"));
+                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
+                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"));
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -1840,19 +1833,13 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(1);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
                 assertThat(addOperation.getValue()).isEqualTo(courtAsNode);
-
-                operation = responsePatch.patch().getOperations().get(1);
-                assertThat(operation).isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isEqualTo("NW");
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -1882,9 +1869,8 @@ class PatchUpdateIntegrationTest {
                   "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
                       + "{\"id\":\""
                       + court1Id
-                      + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"));
+                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
+                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"));
       TestTransaction.end();
     }
 
@@ -1903,6 +1889,8 @@ class PatchUpdateIntegrationTest {
                   .type("LG")
                   .location("Detmold")
                   .label("LG Detmold")
+                  .jurisdictionType("")
+                  .region("NW")
                   .id(court1Id)
                   .build(),
               JsonNode.class);
@@ -1925,14 +1913,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
-
-                assertThat(responsePatch.patch().getOperations().get(0))
-                    .isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation =
-                    (ReplaceOperation) responsePatch.patch().getOperations().get(0);
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isEqualTo("NW");
+                assertThat(responsePatch.patch().getOperations()).isEmpty();
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -1962,9 +1943,8 @@ class PatchUpdateIntegrationTest {
                   "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
                       + "{\"id\":\""
                       + court1Id
-                      + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"));
+                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
+                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"));
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -1986,19 +1966,13 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(1);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
                 assertThat(addOperation.getValue()).isEqualTo(courtAsNode);
-
-                operation = responsePatch.patch().getOperations().get(1);
-                assertThat(operation).isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isEqualTo("NW");
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -2029,9 +2003,8 @@ class PatchUpdateIntegrationTest {
                   "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
                       + "{\"id\":\""
                       + court1Id
-                      + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"),
+                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
+                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"),
               Tuple.tuple(
                   1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
       TestTransaction.end();
@@ -2090,9 +2063,8 @@ class PatchUpdateIntegrationTest {
                   "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
                       + "{\"id\":\""
                       + court1Id
-                      + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"),
+                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
+                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"),
               Tuple.tuple(
                   1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
       TestTransaction.end();
@@ -2113,6 +2085,8 @@ class PatchUpdateIntegrationTest {
                   .type("LG")
                   .location("Detmold")
                   .label("LG Detmold")
+                  .jurisdictionType("")
+                  .region("NW")
                   .id(court1Id)
                   .build(),
               JsonNode.class);
@@ -2135,15 +2109,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
-
-                assertThat(responsePatch.patch().getOperations().get(0))
-                    .isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation =
-                    (ReplaceOperation) responsePatch.patch().getOperations().get(0);
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isEqualTo("NW");
-
+                assertThat(responsePatch.patch().getOperations()).isEmpty();
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -2172,9 +2138,8 @@ class PatchUpdateIntegrationTest {
                   "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
                       + "{\"id\":\""
                       + court1Id
-                      + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"));
+                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
+                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"));
       TestTransaction.end();
 
       JsonNode court2AsNode =
@@ -2200,7 +2165,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(2);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
@@ -2212,12 +2177,6 @@ class PatchUpdateIntegrationTest {
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
                 assertThat(addOperation.getValue()).isEqualTo(court1AsNode);
-
-                operation = responsePatch.patch().getOperations().get(2);
-                assertThat(operation).isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isEqualTo("NW");
 
                 assertThat(responsePatch.errorPaths()).containsExactly("/coreData/court");
               });
@@ -2247,9 +2206,8 @@ class PatchUpdateIntegrationTest {
                   "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
                       + "{\"id\":\""
                       + court1Id
-                      + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"));
+                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
+                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"));
       TestTransaction.end();
     }
   }
@@ -2292,15 +2250,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
-
-                assertThat(responsePatch.patch().getOperations().get(0))
-                    .isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation =
-                    (ReplaceOperation) responsePatch.patch().getOperations().get(0);
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isNull();
-
+                assertThat(responsePatch.patch().getOperations()).isEmpty();
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -2319,11 +2269,7 @@ class PatchUpdateIntegrationTest {
               documentationUnit.uuid(), 0L);
       assertThat(patches)
           .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"remove\",\"path\":\"/coreData/court\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":null}]"));
+          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -2343,18 +2289,19 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(1);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation addOperation = (RemoveOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
 
-                operation = responsePatch.patch().getOperations().get(1);
-                assertThat(operation).isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isNull();
+                //                operation = responsePatch.patch().getOperations().get(1);
+                //                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                //                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                //
+                // assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
+                //                assertThat(replaceOperation.getValue().textValue()).isNull();
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -2374,11 +2321,7 @@ class PatchUpdateIntegrationTest {
               documentationUnit.uuid(), 0L);
       assertThat(patches)
           .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"remove\",\"path\":\"/coreData/court\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":null}]"));
+          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
       TestTransaction.end();
     }
 
@@ -2418,15 +2361,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
-
-                assertThat(responsePatch.patch().getOperations().get(0))
-                    .isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation =
-                    (ReplaceOperation) responsePatch.patch().getOperations().get(0);
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isNull();
-
+                assertThat(responsePatch.patch().getOperations()).isEmpty();
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -2445,11 +2380,7 @@ class PatchUpdateIntegrationTest {
               documentationUnit.uuid(), 0L);
       assertThat(patches)
           .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"remove\",\"path\":\"/coreData/court\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":null}]"));
+          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -2471,18 +2402,12 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(1);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation addOperation = (RemoveOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
-
-                operation = responsePatch.patch().getOperations().get(1);
-                assertThat(operation).isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isNull();
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -2504,10 +2429,7 @@ class PatchUpdateIntegrationTest {
       assertThat(patches)
           .extracting("documentationUnitVersion", "patch")
           .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"remove\",\"path\":\"/coreData/court\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":null}]"),
+              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"),
               Tuple.tuple(
                   1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
       TestTransaction.end();
@@ -2557,10 +2479,7 @@ class PatchUpdateIntegrationTest {
       assertThat(patches)
           .extracting("documentationUnitVersion", "patch")
           .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"remove\",\"path\":\"/coreData/court\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":null}]"),
+              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"),
               Tuple.tuple(
                   1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
       TestTransaction.end();
@@ -2602,15 +2521,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
-
-                assertThat(responsePatch.patch().getOperations().get(0))
-                    .isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation =
-                    (ReplaceOperation) responsePatch.patch().getOperations().get(0);
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isNull();
-
+                assertThat(responsePatch.patch().getOperations()).isEmpty();
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -2629,11 +2540,7 @@ class PatchUpdateIntegrationTest {
               documentationUnit.uuid(), 0L);
       assertThat(patches)
           .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"remove\",\"path\":\"/coreData/court\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":null}]"));
+          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 = List.of(new RemoveOperation("/coreData/court"));
@@ -2654,7 +2561,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(2);
 
                 // next iteration: handle add operation with null values
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
@@ -2667,12 +2574,6 @@ class PatchUpdateIntegrationTest {
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/court");
-
-                operation = responsePatch.patch().getOperations().get(2);
-                assertThat(operation).isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isNull();
 
                 assertThat(responsePatch.errorPaths()).containsExactly("/coreData/court");
               });
@@ -2692,11 +2593,7 @@ class PatchUpdateIntegrationTest {
               documentationUnit.uuid(), 0L);
       assertThat(patches)
           .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"remove\",\"path\":\"/coreData/court\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":null}]"));
+          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
       TestTransaction.end();
     }
 
@@ -2736,15 +2633,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
-
-                assertThat(responsePatch.patch().getOperations().get(0))
-                    .isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation =
-                    (ReplaceOperation) responsePatch.patch().getOperations().get(0);
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isNull();
-
+                assertThat(responsePatch.patch().getOperations()).isEmpty();
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -2763,11 +2652,7 @@ class PatchUpdateIntegrationTest {
               documentationUnit.uuid(), 0L);
       assertThat(patches)
           .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"remove\",\"path\":\"/coreData/court\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":null}]"));
+          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
       TestTransaction.end();
 
       JsonNode court2AsNode = objectMapper.convertValue(Court.builder().build(), JsonNode.class);
@@ -2792,7 +2677,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(4);
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
@@ -2810,12 +2695,6 @@ class PatchUpdateIntegrationTest {
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/court");
-
-                operation = responsePatch.patch().getOperations().get(3);
-                assertThat(operation).isInstanceOf(ReplaceOperation.class);
-                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isNull();
 
                 assertThat(responsePatch.errorPaths()).containsExactly("/coreData/court");
               });
@@ -2835,11 +2714,7 @@ class PatchUpdateIntegrationTest {
               documentationUnit.uuid(), 0L);
       assertThat(patches)
           .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"remove\",\"path\":\"/coreData/court\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":null}]"));
+          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
       TestTransaction.end();
     }
   }

@@ -24,6 +24,11 @@ public class CourtTransformer {
                     ? DocumentationOfficeTransformer.transformToDomain(
                         courtDTO.getJurisdictionType().getDocumentationOffice())
                     : null)
+            .jurisdictionType(
+                courtDTO.getJurisdictionType() != null
+                    ? courtDTO.getJurisdictionType().getLabel()
+                    : "")
+            .region(courtDTO.getRegion() != null ? courtDTO.getRegion().getCode() : "")
             .revoked(revoked);
 
     if (Boolean.TRUE.equals(courtDTO.isSuperiorCourt())) {

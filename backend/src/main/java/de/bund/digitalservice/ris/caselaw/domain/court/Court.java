@@ -11,4 +11,6 @@ public record Court(
     String location,
     String label,
     String revoked,
+    String jurisdictionType,
+    String region,
     DocumentationOffice responsibleDocOffice) {}

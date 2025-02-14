@@ -30,7 +30,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
@@ -930,23 +929,6 @@ class DecisionTransformerTest {
     assertThatThrownBy(() -> DecisionTransformer.transformToDomain(null))
         .isInstanceOf(DocumentationUnitTransformerException.class)
         .hasMessageContaining("Document unit is null and won't transform");
-  }
-
-  @Test
-  void testTransformToDomain_withRegion_shouldSetRegion() {
-    DecisionDTO documentationUnitDTO =
-        generateSimpleDTOBuilder()
-            .regions(List.of(RegionDTO.builder().code("region").build()))
-            .build();
-    DocumentationUnit expected =
-        generateSimpleDocumentationUnitBuilder()
-            .coreData(generateSimpleCoreDataBuilder().region("region").build())
-            .build();
-
-    DocumentationUnit documentationUnit =
-        DecisionTransformer.transformToDomain(documentationUnitDTO);
-
-    assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test

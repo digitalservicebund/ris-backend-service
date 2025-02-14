@@ -479,4 +479,33 @@ test.describe("core data", () => {
       })
     },
   )
+
+  test(
+    "updates jurisdiction type on court selection",
+    {
+      tag: ["@RISDEV-6379"],
+    },
+    async ({ page, documentNumber }) => {
+      await navigateToCategories(page, documentNumber)
+      const jurisidictionType = page.locator("[aria-label='Gerichtsbarkeit']")
+
+      await test.step("Gerichtsbarkeit ist initial nicht ausgefüllt", async () => {
+        await expect(jurisidictionType).toHaveValue("")
+      })
+
+      await test.step("Auswahl eines Gerichts mit Gerichtsbarkeit - Gerichtsbarkeit wird angezeigt", async () => {
+        await page.locator("[aria-label='Gericht']").fill("AG Aalen")
+        await page.getByText("AG Aalen").click()
+        await expect(jurisidictionType).toHaveValue(
+          "Ordentliche Gerichtsbarkeit",
+        )
+      })
+
+      await test.step("Auswahl eines Gerichts ohne Gerichtsbarkeit - Gerichtsbarkeit wird nicht angezeigt", async () => {
+        await page.locator("[aria-label='Gericht']").fill("GStA")
+        await page.getByText("GStA Berlin").click()
+        await expect(jurisidictionType).toHaveValue("")
+      })
+    },
+  )
 })

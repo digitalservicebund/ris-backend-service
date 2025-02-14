@@ -30,7 +30,6 @@ export type CoreData = {
   inputTypes?: string[]
   documentationOffice?: DocumentationOffice
   creatingDocOffice?: DocumentationOffice
-  region?: string
   yearsOfDispute?: string[]
   leadingDecisionNormReferences?: string[]
   source?: Source
@@ -73,6 +72,8 @@ export type Court = {
   location?: string
   label: string
   revoked?: string
+  jurisdictionType?: string
+  region?: string
   responsibleDocOffice?: DocumentationOffice
 }
 
