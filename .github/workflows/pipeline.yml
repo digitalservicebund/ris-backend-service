@@ -496,7 +496,7 @@ jobs:
     uses: ./.github/workflows/_playwright-test.yml
     with:
       subproject: "all"
-      browser: "chrome"
+      browser: "queries" # uses the 'queries' project
       mode: "queries"
       runs: 1
       workers: 1
