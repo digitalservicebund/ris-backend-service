@@ -73,7 +73,7 @@
     "fast-json-patch": "^3.1.1",
     "immer": "^10.1.1",
     "maska": "^3.1.0",
-    "pinia": "^2.3.1",
+    "pinia": "^3.0.1",
     "lodash": "^4.17.21",
     "resize-observer-polyfill": "^1.5.1",
     "tippy.js": "^6.3.7",
