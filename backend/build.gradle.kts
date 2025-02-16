@@ -21,7 +21,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.3.1"
+    id("org.flywaydb.flyway") version "11.3.2"
     id("io.sentry.jvm.gradle") version "5.2.0"
 }
 
@@ -223,16 +223,16 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.13.0")
     implementation("org.jsoup:jsoup:1.18.3")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.2.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.2.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.3.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.3.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.10.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.3.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.3.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.3.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.3.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
