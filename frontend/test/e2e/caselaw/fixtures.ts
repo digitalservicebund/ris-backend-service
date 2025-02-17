@@ -27,6 +27,7 @@ type MyFixtures = {
   foreignDocumentationUnit: DocumentUnitListEntry
   prefilledDocumentUnitWithReferences: DocumentUnit
   prefilledDocumentUnitWithTexts: DocumentUnit
+  prefilledDocumentUnitWithManyReferences: DocumentUnit
 }
 
 export const caselawTest = test.extend<MyFixtures>({
@@ -191,6 +192,175 @@ export const caselawTest = test.extend<MyFixtures>({
             },
           ],
           literatureReferences: [
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 3-4, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              author: "Krümelmonster",
+              documentType: literatureDocumentType?.[0],
+              referenceType: "literature",
+            },
+          ],
+        },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    await use(await updateResponse.json())
+
+    const deleteResponse = await request.delete(
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
+      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    )
+    if (!deleteResponse.ok()) {
+      throw Error(`DocumentUnit with number ${prefilledDocumentUnit.documentNumber} couldn't be deleted:
+      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
+    }
+  },
+
+  prefilledDocumentUnitWithManyReferences: async (
+    { request, context },
+    use,
+  ) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    })
+    const prefilledDocumentUnit = await response.json()
+
+    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    const court = await courtResponse.json()
+
+    const documentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const literatureDocumentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes/dependent-literature?q=Ean`,
+    )
+    const literatureDocumentType = await literatureDocumentTypeResponse.json()
+
+    const legalPeriodicalResponse = await request.get(
+      `api/v1/caselaw/legalperiodicals?q=MMG`,
+    )
+    const legalPeriodical = await legalPeriodicalResponse.json()
+
+    const updateResponse = await request.put(
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
+      {
+        data: {
+          ...prefilledDocumentUnit,
+          coreData: {
+            ...prefilledDocumentUnit.coreData,
+            court: court?.[0],
+            documentType: documentType?.[0],
+            fileNumbers: [generateString()],
+            decisionDate: "2019-12-31",
+            appraisalBody: "1. Senat, 2. Kammer",
+          },
+          shortTexts: {
+            headnote: "testHeadnote",
+            guidingPrinciple: "guidingPrinciple",
+          },
+          caselawReferences: [
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 1-2, Heft 1",
+              referenceSupplement: "L",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              referenceType: "caselaw",
+            },
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 1-2, Heft 1",
+              referenceSupplement: "L",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              referenceType: "caselaw",
+            },
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 1-2, Heft 1",
+              referenceSupplement: "L",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              referenceType: "caselaw",
+            },
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 1-2, Heft 1",
+              referenceSupplement: "L",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              referenceType: "caselaw",
+            },
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 1-2, Heft 1",
+              referenceSupplement: "L",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              referenceType: "caselaw",
+            },
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 1-2, Heft 1",
+              referenceSupplement: "L",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              referenceType: "caselaw",
+            },
+          ],
+          literatureReferences: [
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 3-4, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              author: "Krümelmonster",
+              documentType: literatureDocumentType?.[0],
+              referenceType: "literature",
+            },
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 3-4, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              author: "Krümelmonster",
+              documentType: literatureDocumentType?.[0],
+              referenceType: "literature",
+            },
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 3-4, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              author: "Krümelmonster",
+              documentType: literatureDocumentType?.[0],
+              referenceType: "literature",
+            },
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 3-4, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              author: "Krümelmonster",
+              documentType: literatureDocumentType?.[0],
+              referenceType: "literature",
+            },
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 3-4, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              author: "Krümelmonster",
+              documentType: literatureDocumentType?.[0],
+              referenceType: "literature",
+            },
             {
               id: crypto.randomUUID(),
               citation: "2024, 3-4, Heft 1",

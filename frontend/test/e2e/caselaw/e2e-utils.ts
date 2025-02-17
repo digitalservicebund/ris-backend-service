@@ -79,7 +79,9 @@ export const navigateToReferences = async (
     const baseUrl = `/caselaw/documentunit/${documentNumber}/references`
 
     await page.goto(baseUrl)
-    await expect(page.getByLabel("Periodikum", { exact: true })).toBeVisible()
+    await expect(
+      page.getByRole("heading", { name: "Fundstellen", exact: true }),
+    ).toBeVisible()
   })
 }
 

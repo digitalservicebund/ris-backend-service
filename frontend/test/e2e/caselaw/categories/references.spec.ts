@@ -186,7 +186,12 @@ test.describe(
 
           await page.reload()
 
-          await expect(page.getByLabel("Listen Eintrag")).not.toBeAttached()
+          //only reference input list item is shown (input is a list entry in editable list)
+          await expect(
+            page
+              .getByTestId("caselaw-reference-list")
+              .getByLabel("Listen Eintrag"),
+          ).toHaveCount(1)
         })
       },
     )
@@ -520,6 +525,72 @@ test.describe(
             "AllMBl 2024, 2, Bilen, Ulviye (Ean)" +
               "GVBl BB 01/2025, 4-6, Kästner, Erich (Ebs)",
           )
+        })
+      },
+    )
+
+    test(
+      "Click on 'Weitere Angabe' on top of caselaw references list, scrolls to the bottom and adds new entry",
+      {
+        tag: ["@RISDEV-6378"],
+      },
+      async ({ page, prefilledDocumentUnitWithManyReferences }) => {
+        await test.step("Click on 'Weitere Angabe' on top of references list", async () => {
+          await navigateToReferences(
+            page,
+            prefilledDocumentUnitWithManyReferences.documentNumber || "",
+          )
+          await expect(
+            page
+              .getByTestId("caselaw-reference-list")
+              .getByLabel("Listen Eintrag"),
+          ).toHaveCount(6)
+          await page.getByLabel("Weitere Angabe Rechtsprechung Top").click()
+        })
+
+        await test.step("adds new entry, scrolls to new entry", async () => {
+          await expect(
+            page
+              .getByTestId("caselaw-reference-list")
+              .getByLabel("Listen Eintrag"),
+          ).toHaveCount(7)
+
+          await expect(
+            page.locator('[data-testid="caselaw-reference-input"]'),
+          ).toBeInViewport()
+        })
+      },
+    )
+
+    test(
+      "Click on 'Weitere Angabe' on top of literature references list, scrolls to the bottom and adds new entry",
+      {
+        tag: ["@RISDEV-6378"],
+      },
+      async ({ page, prefilledDocumentUnitWithManyReferences }) => {
+        await test.step("Click on 'Weitere Angabe' on top of literature references list", async () => {
+          await navigateToReferences(
+            page,
+            prefilledDocumentUnitWithManyReferences.documentNumber || "",
+          )
+          await expect(
+            page
+              .getByTestId("literature-reference-list")
+              .getByLabel("Listen Eintrag"),
+          ).toHaveCount(6)
+          await page.getByLabel("Weitere Angabe Literatur Top").click()
+        })
+
+        await test.step("adds new entry, scrolls to new entry", async () => {
+          await expect(
+            page
+              .getByTestId("literature-reference-list")
+              .getByLabel("Listen Eintrag"),
+          ).toHaveCount(7)
+
+          await expect(
+            page.locator('[data-testid="literature-reference-input"]'),
+          ).toBeInViewport()
         })
       },
     )

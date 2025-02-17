@@ -92,7 +92,11 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col gap-24">
+  <div
+    id="literature-reference-input"
+    class="flex flex-col gap-24"
+    data-testid="literature-reference-input"
+  >
     <InputField
       id="legalPeriodical"
       v-slot="slotProps"
