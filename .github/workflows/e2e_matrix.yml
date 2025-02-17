@@ -10,9 +10,8 @@ jobs:
         browser: [chromium, firefox]
         mode: [e2e]
         include:
-          - subproject: a11y
+          - mode: a11y
             browser: chromium
-            mode: a11y
     uses: ./.github/workflows/_playwright-test.yml
     with:
       subproject: ${{ matrix.subproject }}
