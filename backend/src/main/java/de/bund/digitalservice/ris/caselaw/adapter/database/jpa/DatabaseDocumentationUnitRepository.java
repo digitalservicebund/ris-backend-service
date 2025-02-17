@@ -48,10 +48,14 @@ public interface DatabaseDocumentationUnitRepository
       )
     )
    AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND documentationUnit.status.withError = TRUE)
-    AND (:withDuplicateWarning = FALSE
-       OR (documentationUnit.documentationOffice.id = :documentationOfficeId
-       AND (duplicateRelation1.relationStatus = 'PENDING'
-       OR duplicateRelation2.relationStatus = 'PENDING')))
+   AND (:withDuplicateWarning = FALSE
+    OR (documentationUnit.documentationOffice.id = :documentationOfficeId
+      AND (EXISTS (SELECT 1 FROM DuplicateRelationDTO duplicateRelation1
+              WHERE documentationUnit.id = duplicateRelation1.documentationUnit1.id
+              AND duplicateRelation1.relationStatus = 'PENDING')
+      OR EXISTS (SELECT 1 FROM DuplicateRelationDTO duplicateRelation2
+              WHERE documentationUnit.id = duplicateRelation2.documentationUnit2.id
+              AND duplicateRelation2.relationStatus = 'PENDING'))))
    ORDER BY
      (CASE WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.scheduledPublicationDateTime END) DESC NULLS LAST,
      (CASE WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.lastPublicationDateTime END) DESC NULLS LAST,
@@ -64,8 +68,6 @@ public interface DatabaseDocumentationUnitRepository
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.status status
-  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1 ON (:withDuplicateWarning = TRUE)
-  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2 ON (:withDuplicateWarning = TRUE)
   WHERE
   """
               + BASE_QUERY)
@@ -92,8 +94,6 @@ public interface DatabaseDocumentationUnitRepository
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.fileNumbers fileNumber
-  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1 ON (:withDuplicateWarning = TRUE)
-  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2 ON (:withDuplicateWarning = TRUE)
   WHERE (upper(fileNumber.value) like upper(concat(:fileNumber,'%')))
   AND
   """
@@ -122,8 +122,6 @@ public interface DatabaseDocumentationUnitRepository
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.deviatingFileNumbers deviatingFileNumber
-  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1 ON (:withDuplicateWarning = TRUE)
-  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2 ON (:withDuplicateWarning = TRUE)
   WHERE (upper(deviatingFileNumber.value) like upper(concat(:fileNumber,'%')))
   AND
   """
