@@ -3,7 +3,6 @@ import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { Stubs } from "@vue/test-utils/dist/types"
 import { beforeEach } from "vitest"
-import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
 import DocumentUnit, { DuplicateRelationStatus } from "@/domain/documentUnit"
@@ -12,7 +11,6 @@ import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
-import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import routes from "~/test-helper/routes"
 
@@ -67,10 +65,6 @@ describe("HandoverDocumentationUnitView:", () => {
         xml: "<xml>all good</xml>",
         success: true,
       }),
-    })
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
     })
   })
   describe("renders plausibility check", () => {
@@ -406,9 +400,6 @@ describe("HandoverDocumentationUnitView:", () => {
         }),
       })
 
-      // wait for feature flag to be loaded, can be removed when flag is removed.
-      await nextTick()
-
       expect(
         screen.getByText("Es besteht Dublettenverdacht."),
       ).toBeInTheDocument()
@@ -450,9 +441,6 @@ describe("HandoverDocumentationUnitView:", () => {
           },
         }),
       })
-
-      // wait for feature flag to be loaded, can be removed when flag is removed.
-      await nextTick()
 
       expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
       expect(
@@ -720,7 +708,7 @@ describe("HandoverDocumentationUnitView:", () => {
       },
     })
 
-    // Wait for feature flag to be set in onMounted
+    // Wait for XML Vorschau
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(container).toHaveTextContent(
