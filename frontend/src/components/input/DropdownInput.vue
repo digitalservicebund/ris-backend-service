@@ -7,6 +7,7 @@ const props = defineProps<{
   modelValue?: DropdownInputModelType
   placeholder?: string
   readOnly?: boolean
+  hasError?: boolean
   isSmall?: boolean
 }>()
 
@@ -17,18 +18,29 @@ const emit = defineEmits<{
 const localModelValue = computed({
   get: () => props.modelValue ?? "",
   set: (value) => {
-    emit("update:modelValue", value)
+    // Emit only if value is in the dropdown items
+    if (props.items.some((item) => item.value === value)) {
+      emit("update:modelValue", value)
+    }
   },
 })
 
 const conditionalClasses = computed(() => ({
-  "ds-select-small": props.isSmall,
+  "has-error": props.hasError,
   "ds-select-medium": !props.isSmall,
 }))
 
 const hasPlaceholder = computed(() =>
   Boolean(!props.modelValue && props.placeholder),
 )
+
+// Compute the display value for the dropdown, if modelValue is not in the options
+const displayValue = computed(() => {
+  const selectedItem = props.items.find(
+    (item) => item.value === props.modelValue,
+  )
+  return selectedItem ? selectedItem.label : props.modelValue // Fallback to raw value if not found
+})
 </script>
 
 <template>
@@ -47,6 +59,13 @@ const hasPlaceholder = computed(() =>
     </option>
     <option v-for="item in items" :key="item.value" :value="item.value">
       {{ item.label }}
+    </option>
+    <!-- Special case: Display the model value, also if it's not in the options (raw value) -->
+    <option
+      v-if="modelValue && !items.some((item) => item.value === modelValue)"
+      :value="modelValue"
+    >
+      {{ displayValue }}
     </option>
   </select>
 </template>

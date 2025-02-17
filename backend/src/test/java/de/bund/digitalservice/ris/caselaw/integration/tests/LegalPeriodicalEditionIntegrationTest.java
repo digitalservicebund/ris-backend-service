@@ -43,6 +43,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
@@ -658,7 +659,7 @@ class LegalPeriodicalEditionIntegrationTest {
                                     .legalPeriodical(
                                         LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
                                     .build())
-                            .value("ABC 2024, 3")
+                            .value(SourceValue.Z)
                             .build())))
             .build());
 
@@ -752,7 +753,7 @@ class LegalPeriodicalEditionIntegrationTest {
                                     .legalPeriodical(
                                         LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
                                     .build())
-                            .value("ABC 2024, 3")
+                            .value(SourceValue.Z)
                             .build())))
             .build());
 

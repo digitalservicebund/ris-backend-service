@@ -39,14 +39,10 @@ public interface DocumentationUnitRepository {
    * @param documentationUnit the documentation unit to create
    * @param status the status of the new documentation unit
    * @param createdFromReference the reference the documentation unit is created from
-   * @param source the source of the new documentation unit
    * @return the new documentation unit
    */
   DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit documentationUnit,
-      Status status,
-      Reference createdFromReference,
-      String source);
+      DocumentationUnit documentationUnit, Status status, Reference createdFromReference);
 
   /**
    * Save a documentation unit
