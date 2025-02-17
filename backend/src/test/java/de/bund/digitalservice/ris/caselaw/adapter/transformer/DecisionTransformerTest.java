@@ -862,7 +862,7 @@ class DecisionTransformerTest {
         DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
     assertThat(documentationUnitDTO.getSource().getFirst().getRank()).isOne();
     assertThat(documentationUnitDTO.getSource().getFirst().getValue()).isEqualTo(SourceValue.E);
-    assertThat(documentationUnitDTO.getSource().getFirst().getSourceRawValue()).isEqualTo(null);
+    assertThat(documentationUnitDTO.getSource().getFirst().getSourceRawValue()).isNull();
   }
 
   @Test
