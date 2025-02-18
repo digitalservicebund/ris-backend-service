@@ -928,7 +928,8 @@ public class DecisionTransformer {
             .map(StatusDTO::getPublicationStatus)
             .orElse(null);
     return original.getDocumentationOffice().equals(duplicate.getDocumentationOffice())
-        || PublicationStatus.PUBLISHED.equals(duplicateStatus);
+        || PublicationStatus.PUBLISHED.equals(duplicateStatus)
+        || PublicationStatus.PUBLISHING.equals(duplicateStatus);
   }
 
   /**
