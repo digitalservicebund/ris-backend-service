@@ -34,16 +34,11 @@ export class NodeHelper implements NodeHelperInterface {
     return Array.from(itemsToReturn.values())
   }
 
-  saveToLocal(node: FieldOfLaw) {
-    this.nodes.set(node.identifier, node)
-  }
-
   extractNodes(
     itemsToReturn: Map<string, FieldOfLaw>,
     node: FieldOfLaw,
   ): Map<string, FieldOfLaw> {
     itemsToReturn.set(node.identifier, node)
-    //this.saveToLocal(node)
     if (node.children.length > 0) {
       for (const child of node.children) {
         this.extractNodes(itemsToReturn, child)
