@@ -5,7 +5,7 @@ name: Manual Playwright test
 on:
   workflow_dispatch:
     inputs:
-      browser:
+      project:
         description: "Playwright project"
         required: true
         type: choice
