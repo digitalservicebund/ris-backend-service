@@ -1,21 +1,14 @@
 on:
   workflow_call:
     inputs:
-      browser:
+      project:
         required: false
         type: string
         default: chromium
-      mode:
-        required: false
-        type: string
-        default: e2e
       runs:
         required: false
         type: string
         default: "1"
-      subproject:
-        required: false
-        type: string
       workers:
         required: false
         type: string
@@ -60,9 +53,10 @@ jobs:
       - name: Install playwright browsers
 #        if: steps.cache-browser-binaries.outputs.cache-hit != 'true'
         run: |
-          npx --yes playwright install --with-deps ${{ inputs.browser }}
+          browser= ${{ inputs.project == 'firefox' && 'firefox' || 'chromium' }}
+          npx --yes playwright install --with-deps $browser
         working-directory: ./frontend
-      - name: Run ${{ inputs.mode }} tests in ${{ inputs.browser }}
+      - name: Run ${{ inputs.project }} tests
         env:
           E2E_BASE_URL: ${{ secrets.STAGING_URL }}
           E2E_TEST_USER: ${{ secrets.E2E_TEST_USER }}
@@ -76,25 +70,22 @@ jobs:
           GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
         run: |
-          echo "Running ${{ inputs.mode }} ${{ inputs.subproject || '' }} tests ${{ inputs.runs }} times"
-
-          test_target=${{ inputs.mode }}
-          if [[ ${{ inputs.subproject || 'all' }} != 'all' ]]; then
-            test_target=${{ inputs.mode }}:${{ inputs.subproject }}
-          fi
+          echo "Running ${{ inputs.project }} tests ${{ inputs.runs }} times"
 
           workers_config=""
           if [[ ${{ inputs.workers || 'default' }} != 'default' ]]; then
             workers_config="--workers=${{ inputs.workers }}"
           fi
 
-          npm run test:"$test_target" -- --project ${{ inputs.browser }} --repeat-each ${{ inputs.runs}} $workers_config --retries=3 --max-failures=5
+          reporter_config=${{ inputs.project == 'queries' && '--reporter=./test/queries/queries_log_reporter.ts' || '' }}
+
+          npx playwright --project ${{ inputs.project }} --repeat-each ${{ inputs.runs}} $reporter_config $workers_config --retries=3 --max-failures=5
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
         uses: actions/upload-artifact@v4
         if: ${{ failure() }}
         with:
-          name: failed-${{ inputs.mode }}-tests-${{ inputs.browser }}
+          name: failed-${{ inputs.project }}-tests
           path: |
             ./frontend/test-results/**/*.png
             ./frontend/test-results/**/trace.zip
@@ -106,21 +97,21 @@ jobs:
             curl -X POST ${{ secrets.E2E_TEST_METRICS_ENDPOINT }} \
                   -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  -d "{\"test\": \"${test_title}\", \"file\": \"${test_file}\", \"status\": \"${test_status}\", \"githubRunId\": \"${{ github.run_id }}\", \"browser\": \"${{ inputs.browser }}\"}"
+                  -d "{\"test\": \"${test_title}\", \"file\": \"${test_file}\", \"status\": \"${test_status}\", \"githubRunId\": \"${{ github.run_id }}\", \"browser\": \"${{ inputs.project }}\"}"
           done
         working-directory: ./frontend
       - name: Upload json reports
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: test-results-${{ inputs.mode }}-${{ inputs.subproject }}-${{ inputs.browser }}
+          name: test-results-${{ inputs.project }}
           path: ./frontend/test-results.json
           retention-days: 1
       - name: Upload test result blobs reports
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: test-results-blob-${{ inputs.mode }}-${{ inputs.subproject }}-${{ inputs.browser }}
+          name: test-results-blob-${{ inputs.project }}
           path: ./frontend/blob-report/test-report.zip
           retention-days: 5
       - name: Send status to Slack

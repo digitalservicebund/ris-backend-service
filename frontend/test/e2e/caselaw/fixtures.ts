@@ -537,7 +537,7 @@ export const caselawTest = test.extend<MyFixtures>({
 
   pageWithBghUser: async ({ browser }, use) => {
     const bghContext = await browser.newContext({
-      storageState: `test/e2e/shared/.auth/user_bgh.json`,
+      storageState: `test/e2e/caselaw/.auth/user_bgh.json`,
     })
     const pageWithBghUser = await bghContext.newPage()
 
@@ -549,7 +549,7 @@ export const caselawTest = test.extend<MyFixtures>({
 
   pageWithExternalUser: async ({ browser }, use) => {
     const externalContext = await browser.newContext({
-      storageState: `test/e2e/shared/.auth/user_external.json`,
+      storageState: `test/e2e/caselaw/.auth/user_external.json`,
     })
     const pageWithExternalUser = await externalContext.newPage()
 
@@ -561,7 +561,7 @@ export const caselawTest = test.extend<MyFixtures>({
 
   prefilledDocumentUnitBgh: async ({ request, browser }, use) => {
     const context = await browser.newContext({
-      storageState: `test/e2e/shared/.auth/user_bgh.json`,
+      storageState: `test/e2e/caselaw/.auth/user_bgh.json`,
     })
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")

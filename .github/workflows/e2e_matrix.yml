@@ -6,15 +6,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        subproject: [caselaw, shared]
-        browser: [chromium, firefox]
-        mode: [e2e]
-        include:
-          - mode: a11y
-            browser: chromium
+        project: [chromium, firefox, a11y]
     uses: ./.github/workflows/_playwright-test.yml
     with:
-      subproject: ${{ matrix.subproject }}
-      browser: ${{ matrix.browser }}
-      mode: ${{ matrix.mode }}
+      project: ${{ matrix.project }}
     secrets: inherit

@@ -29,18 +29,20 @@ const config = defineConfig({
     },
     {
       name: "chromium",
+      testDir: "./test/e2e",
       use: {
         ...devices["Desktop Chrome"],
         channel: "chrome",
-        storageState: "test/e2e/shared/.auth/user.json",
+        storageState: "test/e2e/caselaw/.auth/user.json",
       },
       dependencies: ["setup"],
     },
     {
       name: "firefox",
+      testDir: "./test/e2e",
       use: {
         ...devices["Desktop Firefox"],
-        storageState: "test/e2e/shared/.auth/user.json",
+        storageState: "test/e2e/caselaw/.auth/user.json",
       },
       dependencies: ["setup"],
     },
@@ -50,7 +52,7 @@ const config = defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         channel: "chrome",
-        storageState: "test/e2e/shared/.auth/user.json",
+        storageState: "test/e2e/caselaw/.auth/user.json",
       },
       dependencies: ["setup"],
     },
@@ -60,7 +62,7 @@ const config = defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         channel: "chrome",
-        storageState: "test/e2e/shared/.auth/user.json",
+        storageState: "test/e2e/caselaw/.auth/user.json",
       },
       dependencies: ["setup"],
     },
