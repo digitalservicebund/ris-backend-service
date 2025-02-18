@@ -5,27 +5,15 @@ name: Manual Playwright test
 on:
   workflow_dispatch:
     inputs:
-      browser:
-        description: "Playwright browser engine"
+      project:
+        description: "Playwright project"
         required: true
         type: choice
         options:
           - chromium
           - firefox
-      mode:
-        description: "Type of tests"
-        required: true
-        type: choice
-        options:
-          - e2e
           - a11y
-      subproject:
-        description: "Subproject"
-        required: false
-        type: choice
-        options:
-          - caselaw
-          - all
+          - queries
       runs:
         description: "Number of subsequent runs"
         required: false
@@ -38,8 +26,6 @@ jobs:
   playwright-test:
     uses: ./.github/workflows/_playwright-test.yml
     with:
-      browser: ${{ inputs.browser || 'chromium' }}
-      mode: ${{ inputs.mode || 'e2e' }}
+      project: ${{ inputs.project || 'chromium' }}
       runs: ${{ inputs.runs || '1' }}
-      subproject: ${{ inputs.subproject }}
     secrets: inherit

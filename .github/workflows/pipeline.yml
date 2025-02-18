@@ -495,8 +495,7 @@ jobs:
     needs: [ e2e-tests, prep-playwright-tests ]
     uses: ./.github/workflows/_playwright-test.yml
     with:
-      browser: "chromium"
-      mode: "queries"
+      project: "queries"
       runs: 1
       workers: 1
     secrets: inherit

@@ -1,4 +1,4 @@
-import { expect, Locator, Page, Request } from "@playwright/test"
+import { expect, Locator, Page, Request, JSHandle } from "@playwright/test"
 import { Browser } from "playwright"
 import { caselawTest as test } from "./fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
@@ -720,4 +720,28 @@ export async function extraContentMenuKeyboardNavigator(
       }
     }
   }
+}
+
+export async function createDataTransfer(
+  page: Page,
+  fileContent: Buffer,
+  fileName: string,
+  fileType: string,
+): Promise<JSHandle<DataTransfer>> {
+  return page.evaluateHandle(
+    async ({ buffer, fileName, fileType }) => {
+      const blob = await fetch(buffer).then((value) => value.blob())
+      const file = new File([blob], fileName, { type: fileType })
+      const data = new DataTransfer()
+      data.items.add(file)
+      return data
+    },
+    {
+      buffer: `data:application/octet-stream;base64,${fileContent.toString(
+        "base64",
+      )}`,
+      fileName,
+      fileType,
+    },
+  )
 }
