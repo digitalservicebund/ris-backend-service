@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
-import { CoreData } from "@/domain/documentUnit"
+import { CoreData, SourceValue } from "@/domain/documentUnit"
 
 function renderComponent(coreData: CoreData) {
   return render(PreviewCoreData, {
@@ -45,6 +45,7 @@ describe("preview core data", () => {
       previousProcedures: ["vorgang-0"],
       legalEffect: "Ja",
       yearsOfDispute: ["2023"],
+      source: { value: SourceValue.Zeitschrift },
     })
 
     expect(await screen.findByText("Gericht")).toBeInTheDocument()
@@ -68,6 +69,14 @@ describe("preview core data", () => {
     expect(await screen.findByText("Region")).toBeInTheDocument()
     expect(await screen.findByText("BGH Nachschlagewerk")).toBeInTheDocument()
     expect(await screen.findByText("Streitjahr")).toBeInTheDocument()
+    expect(await screen.findByText("Quelle")).toBeInTheDocument()
+    expect(await screen.findByText("Z")).toBeInTheDocument()
+    expect(await screen.findByText("Gerichtsbarkeit")).toBeInTheDocument()
+    expect(
+      await screen.findByText("Verfassungsgerichtsbarkeit"),
+    ).toBeInTheDocument()
+    expect(await screen.findByText("Region")).toBeInTheDocument()
+    expect(await screen.findByText("DEU")).toBeInTheDocument()
   })
 
   test("do not render empty list", async () => {

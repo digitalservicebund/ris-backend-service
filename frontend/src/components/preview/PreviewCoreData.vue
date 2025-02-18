@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
+import { computed } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
@@ -7,9 +8,15 @@ import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 import { CoreData } from "@/domain/documentUnit"
 
-defineProps<{
+const props = defineProps<{
   coreData: CoreData
 }>()
+
+const sourceValue = computed(() =>
+  props.coreData.source
+    ? (props.coreData.source.value ?? props.coreData.source.sourceRawValue)
+    : undefined,
+)
 </script>
 
 <template>
@@ -113,6 +120,12 @@ defineProps<{
         >
           <FlexItem> {{ yearOfDispute }}</FlexItem>
         </FlexContainer>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="sourceValue">
+      <PreviewCategory>Quelle</PreviewCategory>
+      <PreviewContent>
+        {{ sourceValue }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.court?.jurisdictionType">
