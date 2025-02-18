@@ -59,7 +59,7 @@ class AuthIntegrationTest {
   @MockitoBean private ProcedureService procedureService;
 
   @BeforeEach
-  public void beforeEach() {
+  void beforeEach() {
     doReturn(
             List.of(
                 UserGroup.builder()

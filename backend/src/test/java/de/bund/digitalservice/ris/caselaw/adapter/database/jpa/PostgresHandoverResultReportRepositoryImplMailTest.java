@@ -23,7 +23,7 @@ class PostgresHandoverResultReportRepositoryImplMailTest {
   @MockitoBean private DatabaseHandoverReportRepository handoverReportRepository;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     this.reportRepository = new PostgresHandoverReportRepositoryImpl(handoverReportRepository);
   }
 
