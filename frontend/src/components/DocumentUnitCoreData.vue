@@ -44,7 +44,7 @@ const resizeObserver: ResizeObserver | null = new ResizeObserver((entries) => {
 })
 
 const layoutClass = computed(() =>
-  parentWidth.value < 768 ? "flex flex-col gap-24" : "flex flex-row gap-24",
+  parentWidth.value < 400 ? "flex flex-col gap-24" : "flex flex-row gap-24",
 )
 
 /**
