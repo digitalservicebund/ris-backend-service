@@ -79,7 +79,7 @@ jobs:
 
           reporter_config=${{ inputs.project == 'queries' && '--reporter=./test/queries/queries_log_reporter.ts' || '' }}
 
-          npx playwright --project=${{ inputs.project }} --repeat-each ${{ inputs.runs}} $reporter_config $workers_config --retries=3 --max-failures=5
+          npx playwright test --project ${{ inputs.project }} --repeat-each ${{ inputs.runs}} $reporter_config $workers_config --retries=3 --max-failures=5
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
         uses: actions/upload-artifact@v4
