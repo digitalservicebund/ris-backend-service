@@ -54,7 +54,7 @@ jobs:
 #        if: steps.cache-browser-binaries.outputs.cache-hit != 'true'
         run: |
           browser= ${{ inputs.project == 'firefox' && 'firefox' || 'chromium' }}
-          npx --yes playwright install --with-deps $browser
+          npx --yes playwright install --with-deps
         working-directory: ./frontend
       - name: Run ${{ inputs.project }} tests
         env:
