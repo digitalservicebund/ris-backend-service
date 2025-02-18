@@ -1665,6 +1665,39 @@ class DecisionTransformerTest {
   }
 
   @Test
+  void
+      testTransformToDomain_withPublishingDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var publishedStatus =
+        StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHING).build();
+    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+    var unpublishedDuplicateFromOtherDocOffice =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate")
+            .documentationOffice(otherDocOffice)
+            .id(UUID.randomUUID())
+            .status(publishedStatus)
+            .build();
+    var duplicateRelationship =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
+            .documentationUnit2(original)
+            .build();
+    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+
+    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+
+    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+    assertThat(
+            documentationUnit.managementData().duplicateRelations().stream()
+                .findFirst()
+                .get()
+                .documentNumber())
+        .isEqualTo("duplicate");
+  }
+
+  @Test
   void testTransformToDomain_withMultipleDuplicateWarnings_shouldSortByDecisionDateAndDocNumber() {
     var original =
         generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
