@@ -3,7 +3,9 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import io.getunleash.Unleash;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class UnleashService implements FeatureToggleService {
   private final Unleash unleash;
   private final String environment;
@@ -20,6 +22,7 @@ public class UnleashService implements FeatureToggleService {
 
   @Override
   public boolean isEnabled(String toggleName) {
+    log.info("Searching for: {} in {}", toggleName, environment);
     return unleash.isEnabled(toggleName + "." + environment);
   }
 }
