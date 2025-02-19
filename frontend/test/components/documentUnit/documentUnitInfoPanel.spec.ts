@@ -1,6 +1,5 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
-import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import DocumentUnit, {
@@ -8,7 +7,6 @@ import DocumentUnit, {
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"
-import FeatureToggleService from "@/services/featureToggleService"
 import routes from "~/test-helper/routes"
 
 function renderComponent(options?: {
@@ -59,13 +57,6 @@ function renderComponent(options?: {
 }
 
 describe("documentUnit InfoPanel", () => {
-  beforeAll(() => {
-    vi.spyOn(FeatureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
-  })
-
   it("renders heading if given", async () => {
     renderComponent({ heading: "test heading" })
 
@@ -106,9 +97,6 @@ describe("documentUnit InfoPanel", () => {
       ],
     })
 
-    // Wait for feature flag
-    await nextTick()
-
     expect(await screen.findByText("Dublettenverdacht")).toBeInTheDocument()
     expect(screen.getByRole("link")).toHaveTextContent("Bitte prüfen")
   })
@@ -125,9 +113,6 @@ describe("documentUnit InfoPanel", () => {
       ],
     })
 
-    // Wait for feature flag
-    await nextTick()
-
     expect(await screen.findByText("Dublettenverdacht")).toBeInTheDocument()
     expect(screen.queryByRole("link")).not.toBeInTheDocument()
   })
@@ -142,9 +127,6 @@ describe("documentUnit InfoPanel", () => {
         },
       ],
     })
-
-    // Wait for feature flag
-    await nextTick()
 
     expect(screen.queryByText("Dublettenverdacht")).not.toBeInTheDocument()
   })
