@@ -224,4 +224,7 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
    */
   @Column(name = "duplicate_check")
   private Boolean isJdvDuplicateCheckActive;
+
+  @OneToOne(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
+  private OriginalXmlDTO originalXml;
 }
