@@ -748,6 +748,30 @@ VALUES
     );
 
 INSERT INTO
+    incremental_migration.source (
+    id,
+    value,
+    documentation_unit_id,
+    rank,
+    source_raw_value
+)
+VALUES
+    (
+        gen_random_uuid (),
+        null,
+        (
+            SELECT
+                id
+            FROM
+                incremental_migration.documentation_unit
+            WHERE
+                document_number = 'YYTestDoc0001'
+        ),
+     1,
+     'legacy value'
+    );
+
+INSERT INTO
   incremental_migration.status (
     id,
     created_at,

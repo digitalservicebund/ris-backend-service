@@ -307,6 +307,53 @@ test.describe("core data", () => {
   })
 
   test(
+    "source dropdown",
+    {
+      tag: ["@RISDEV-6381"],
+    },
+    async ({ page, documentNumber }) => {
+      await test.step("source can be selected via dropdown", async () => {
+        await navigateToCategories(page, documentNumber)
+
+        const dropdown = page.getByLabel("Quelle")
+        await expect(dropdown).toHaveValue("")
+
+        const expectedOptions = [
+          { label: "unaufgefordert eingesandtes Original (O)" },
+          { label: "angefordertes Original (A)" },
+          { label: "Zeitschriftenveröffentlichung (Z)" },
+          { label: "ohne Vorlage des Originals E-Mail (E)" },
+          {
+            label:
+              "Ländergerichte, EuG- und EuGH-Entscheidungen über jDV-Verfahren (L)",
+          },
+          { label: "Sonstige (S)" },
+        ]
+        for (const option of expectedOptions) {
+          await expect(dropdown).toContainText(option.label)
+        }
+
+        await dropdown.selectOption({
+          label: "Zeitschriftenveröffentlichung (Z)",
+        })
+        await expect(dropdown).toHaveValue("Z")
+      })
+      await test.step("source dropdown with legacy data as display value, can not be reselected", async () => {
+        await navigateToCategories(page, "YYTestDoc0001")
+
+        const dropdown = page.getByLabel("Quelle")
+        await expect(dropdown).toContainText("legacy value")
+
+        await dropdown.selectOption({
+          label: "Zeitschriftenveröffentlichung (Z)",
+        })
+        await expect(dropdown).toHaveValue("Z")
+        await expect(dropdown).not.toContainText("legacy value")
+      })
+    },
+  )
+
+  test(
     "core data is hidden for external user",
     {
       annotation: {

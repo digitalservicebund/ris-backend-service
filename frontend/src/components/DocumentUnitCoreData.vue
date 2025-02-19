@@ -88,9 +88,10 @@ const sourceItems: DropdownItem[] = [
 
 const source = computed({
   get: () =>
-    props.modelValue.source?.value
-      ? props.modelValue.source?.value
-      : (props.modelValue.source?.sourceRawValue ?? undefined),
+    props.modelValue.source
+      ? (props.modelValue.source.value ??
+        props.modelValue.source?.sourceRawValue)
+      : undefined,
   set: (newValue) => {
     if (Object.values(SourceValue).includes(newValue as SourceValue)) {
       modelValue.value.source = {

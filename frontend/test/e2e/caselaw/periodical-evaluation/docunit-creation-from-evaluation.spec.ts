@@ -522,12 +522,10 @@ test.describe(
       },
     )
 
-    // Flaky, needs some clarification
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
+    test(
       "Allow creation from periodical evaluation for foreign docoffice",
       {
-        tag: ["@RISDEV-4832", "@RSIDEV-4980"],
+        tag: ["@RISDEV-4832", "@RISDEV-4980, @RISDEV-6381"],
         annotation: {
           type: "story",
           description:
@@ -613,6 +611,19 @@ test.describe(
             documentNumber,
             edition,
           )
+        })
+
+        await test.step("Created documentation unit's source is automatically set to 'Z'", async () => {
+          const pagePromise = pageWithBghUser.context().waitForEvent("page")
+          await pageWithBghUser
+            .getByLabel("Dokumentationseinheit ansehen")
+            .click()
+          const newTab = await pagePromise
+          await expect(newTab).toHaveURL(
+            /\/caselaw\/documentunit\/[A-Z0-9]{13}\/preview$/,
+          )
+          await expect(newTab.getByText("Quelle")).toBeVisible()
+          await expect(newTab.getByText("Z", { exact: true })).toBeVisible()
         })
 
         await test.step("Created DocUnit is deleted when reference is deleted", async () => {

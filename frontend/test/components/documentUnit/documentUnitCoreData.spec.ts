@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import DocumentUnit, { CoreData } from "@/domain/documentUnit"
+import DocumentUnit, { CoreData, SourceValue } from "@/domain/documentUnit"
 
 type CoreDataProps = InstanceType<typeof DocumentUnitCoreData>["$props"]
 
@@ -122,5 +122,34 @@ describe("Core Data", () => {
     expect(screen.getByLabelText("Gerichtsbarkeit")).toHaveValue(
       "Ordentliche Gerichtsbarkeit",
     )
+  })
+
+  test("renders source", async () => {
+    const coreData = {
+      source: {
+        value: SourceValue.AngefordertesOriginal,
+      },
+    }
+
+    renderComponent({ modelValue: coreData })
+    expect(screen.getByTestId("jurisdiction-type")).toBeVisible()
+    expect(screen.getByLabelText("Quelle")).toHaveValue(
+      SourceValue.AngefordertesOriginal,
+    )
+  })
+  test("updates source", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+    })
+
+    const input = screen.getByLabelText("Quelle")
+
+    await user.selectOptions(input, SourceValue.Zeitschrift)
+    expect(onUpdate).toHaveBeenCalledWith({
+      source: {
+        value: SourceValue.Zeitschrift,
+      },
+    })
   })
 })
