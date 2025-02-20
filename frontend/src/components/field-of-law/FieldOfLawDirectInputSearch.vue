@@ -9,7 +9,9 @@ const emit = defineEmits<{
 }>()
 const fieldOfLawNode = ref()
 watch(fieldOfLawNode, () => {
-  emit("add-to-list", fieldOfLawNode.value as FieldOfLaw)
+  // Clearing the Dropdown can emit undefined, so we only add to list if the value is set.
+  if (fieldOfLawNode.value)
+    emit("add-to-list", fieldOfLawNode.value as FieldOfLaw)
 })
 </script>
 
