@@ -522,16 +522,10 @@ test.describe(
       },
     )
 
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
+    test(
       "Allow creation from periodical evaluation for foreign docoffice",
       {
         tag: ["@RISDEV-4832", "@RISDEV-4980, @RISDEV-6381"],
-        annotation: {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4832",
-        },
       },
       async ({ page, pageWithBghUser, edition }) => {
         await navigateToPeriodicalReferences(page, edition.id ?? "")
@@ -539,6 +533,9 @@ test.describe(
         let documentNumber = ""
 
         await test.step("After searching, the responsible docoffice is evaluated and a documentation unit can be created", async () => {
+          await fillInput(page, "Zitatstelle *", "12")
+          await expect(page.getByLabel("Zitatstelle *")).toHaveValue("12")
+          await fillInput(page, "Klammernzusatz", "L")
           await searchForDocUnit(
             page,
             "AG Aachen",
@@ -556,7 +553,6 @@ test.describe(
           ).toHaveValue("BGH")
         })
 
-        // flaky because Error: browserContext.waitForEvent: Test timeout of 120000ms exceeded.
         const pagePromise = page.context().waitForEvent("page")
         await page.getByText("Übernehmen und weiter bearbeiten").click()
         const newTab = await pagePromise
