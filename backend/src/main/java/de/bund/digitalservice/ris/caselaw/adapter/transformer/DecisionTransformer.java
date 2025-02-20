@@ -194,7 +194,26 @@ public class DecisionTransformer {
     addCaselawReferences(updatedDomainObject, builder, currentDto);
     addLiteratureReferences(updatedDomainObject, builder, currentDto);
 
-    return builder.build();
+    // if the source reference has been deleted, remove the link to the source
+    var docUnit = builder.build();
+    if (docUnit.getSource() != null
+        && !docUnit.getSource().isEmpty()
+        && (docUnit.getCaselawReferences().isEmpty()
+            || !docUnit
+                .getSource()
+                .getFirst()
+                .getReference()
+                .equals(docUnit.getCaselawReferences().getFirst()))
+        && (docUnit.getLiteratureReferences().isEmpty()
+            || !docUnit
+                .getSource()
+                .getFirst()
+                .getReference()
+                .equals(docUnit.getLiteratureReferences().getFirst()))) {
+      docUnit.getSource().getFirst().setReference(null);
+    }
+
+    return docUnit;
   }
 
   private static void addSource(
