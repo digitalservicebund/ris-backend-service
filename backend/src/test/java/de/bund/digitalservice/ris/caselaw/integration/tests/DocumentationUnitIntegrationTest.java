@@ -367,6 +367,7 @@ class DocumentationUnitIntegrationTest {
         .consumeWith(response -> assertThat(response.getResponseBody()).isNotNull());
 
     assertThat(repository.findAll()).isEmpty();
+    assertThat(originalXmlRepository.findAll()).isEmpty();
   }
 
   @Test
