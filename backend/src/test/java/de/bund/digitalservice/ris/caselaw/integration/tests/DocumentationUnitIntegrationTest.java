@@ -6,6 +6,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLIS
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +46,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
@@ -67,7 +70,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
@@ -86,11 +91,11 @@ import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisBodySpec;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -119,6 +124,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberRecyclingService.class,
       DatabaseDocumentationUnitStatusService.class,
       DatabaseProcedureService.class,
+      HandoverService.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresJPAConfig.class,
@@ -157,9 +163,11 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseRegionRepository regionRepository;
   @Autowired private DatabaseDeletedDocumentationIdsRepository deletedDocumentationIdsRepository;
-  @Autowired private AuthService authService;
   @Autowired private DatabaseLegalPeriodicalRepository legalPeriodicalRepository;
-
+  @Autowired private OriginalXmlRepository originalXmlRepository;
+  @Autowired private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+  @Autowired private AuthService authService;
+  @Autowired private HandoverService handoverService;
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
   @MockitoBean private DocxConverterService docxConverterService;
@@ -167,10 +175,10 @@ class DocumentationUnitIntegrationTest {
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private HandoverReportRepository handoverReportRepository;
   @MockitoBean private LdmlExporterService ldmlExporterService;
-  @MockitoBean private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -194,6 +202,7 @@ class DocumentationUnitIntegrationTest {
     fileNumberRepository.deleteAll();
     repository.deleteAll();
     databaseDocumentTypeRepository.deleteAll();
+    databaseDocumentNumberRepository.deleteAll();
   }
 
   @Test
@@ -261,9 +270,11 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  void testDocumentationUnitDeletionAndRecyclingOfDocumentNumber() {
+  void test_deleteDocumentationUnit_shouldRecycleDocumentNumber() {
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "XXRE0******YY"));
+    when(documentNumberPatternConfig.hasValidPattern(anyString(), anyString()))
+        .thenReturn(Boolean.TRUE);
 
     risWebTestClient
         .withDefaultLogin()
@@ -309,6 +320,53 @@ class DocumentationUnitIntegrationTest {
               assertThat(response.getResponseBody().documentNumber())
                   .isEqualTo(reusableDocumentNumber);
             });
+  }
+
+  @Test
+  void test_deleteMigratedDocumentationUnit_shouldSucceed() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "XXRE0******YY"));
+    when(documentNumberPatternConfig.hasValidPattern(anyString(), anyString()))
+        .thenReturn(Boolean.TRUE);
+    when(mailService.getHandoverResult(any(), any())).thenReturn(List.of());
+    when(handoverReportRepository.getAllByEntityId(any())).thenReturn(List.of());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/new")
+        .exchange()
+        .expectStatus()
+        .isCreated()
+        .expectBody(DocumentationUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE0");
+            });
+
+    assertThat(repository.findAll()).hasSize(1);
+    var deletedDocumentationUnit = repository.findAll().get(0);
+    var original =
+        OriginalXmlDTO.builder()
+            .documentationUnitId(deletedDocumentationUnit.getId())
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .content("<?xml version=\"1.0\" encoding=\"UTF-8\"?><juris-r></juris-r>")
+            .build();
+    originalXmlRepository.save(original);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + deletedDocumentationUnit.getId())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(response -> assertThat(response.getResponseBody()).isNotNull());
+
+    assertThat(repository.findAll()).isEmpty();
   }
 
   @Test
@@ -1218,18 +1276,14 @@ class DocumentationUnitIntegrationTest {
             .year(DateUtil.getYear())
             .build();
     deletedDocumentationIdsRepository.save(deletedDocumentationUnitDTO);
-
+    databaseDocumentNumberRepository.save(
+        DocumentNumberDTO.builder()
+            .documentationOfficeAbbreviation("DS")
+            .lastNumber(1)
+            .year(DateUtil.getYear())
+            .build());
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "ZZREYYYY*****"));
-    when(databaseDocumentNumberRepository.findByDocumentationOfficeAbbreviationAndYear(
-            "DS", DateUtil.getYear()))
-        .thenReturn(
-            Optional.of(
-                DocumentNumberDTO.builder()
-                    .documentationOfficeAbbreviation("DS")
-                    .lastNumber(1)
-                    .year(DateUtil.getYear())
-                    .build()));
 
     risWebTestClient
         .withDefaultLogin()
