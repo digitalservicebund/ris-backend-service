@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
+import { getCategoryLabel } from "@/components/text-check/categoryLabels"
 import Tooltip from "@/components/Tooltip.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
@@ -19,7 +20,7 @@ function categoriesRoute(category: string) {
 </script>
 
 <template>
-  <Tooltip text="Zum Rechtschreibfehler springen">
+  <Tooltip :text="`Zu ${getCategoryLabel(category)} springen`">
     <RouterLink :to="categoriesRoute(category)">
       <button
         aria-label="jump-to-match"

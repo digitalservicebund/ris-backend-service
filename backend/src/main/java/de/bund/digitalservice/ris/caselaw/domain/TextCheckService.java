@@ -56,6 +56,9 @@ public class TextCheckService {
       allMatches.addAll(checkReasons(documentationUnit));
       allMatches.addAll(checkCaseFacts(documentationUnit));
       allMatches.addAll(checkDecisionReasons(documentationUnit));
+      allMatches.addAll(checkTenor(documentationUnit));
+      allMatches.addAll(checkHeadNote(documentationUnit));
+      allMatches.addAll(checkGuidingPrinciple(documentationUnit));
     }
 
     return allMatches;
@@ -73,24 +76,20 @@ public class TextCheckService {
     return Collections.emptyList();
   }
 
+  private List<Match> checkGuidingPrinciple(DocumentationUnit documentationUnit) {
+    return checkText(documentationUnit.longTexts().tenor(), CategoryType.GUIDING_PRINCIPLE);
+  }
+
+  private List<Match> checkTenor(DocumentationUnit documentationUnit) {
+    return checkText(documentationUnit.longTexts().tenor(), CategoryType.TENOR);
+  }
+
+  private List<Match> checkHeadNote(DocumentationUnit documentationUnit) {
+    return checkText(documentationUnit.shortTexts().headnote(), CategoryType.HEADNOTE);
+  }
+
   private List<Match> checkReasons(DocumentationUnit documentationUnit) {
-    if (documentationUnit.longTexts().reasons() == null) {
-      return Collections.emptyList();
-    }
-
-    Document document = Jsoup.parse(documentationUnit.longTexts().reasons());
-    document
-        .getElementsByTag(BORDER_NUMBER)
-        .forEach(
-            element -> {
-              Element newElement = element.getElementsByTag(CONTENT).first();
-              element.after(newElement.html());
-              element.remove();
-            });
-
-    return check(URLEncoder.encode(document.text(), StandardCharsets.UTF_8)).stream()
-        .map(match -> match.toBuilder().category(CategoryType.REASONS).build())
-        .toList();
+    return checkText(documentationUnit.longTexts().reasons(), CategoryType.REASONS);
   }
 
   public List<Match> checkDecisionReasonsByHTML(DocumentationUnit documentationUnit) {
@@ -210,20 +209,7 @@ public class TextCheckService {
     if (documentationUnit.longTexts().caseFacts() == null) {
       return Collections.emptyList();
     }
-
-    Document document = Jsoup.parse(documentationUnit.longTexts().caseFacts());
-    document
-        .getElementsByTag(BORDER_NUMBER)
-        .forEach(
-            element -> {
-              Element newElement = element.getElementsByTag(CONTENT).first();
-              element.after(newElement.html());
-              element.remove();
-            });
-
-    return check(URLEncoder.encode(document.text(), StandardCharsets.UTF_8)).stream()
-        .map(match -> match.toBuilder().category(CategoryType.CASE_FACTS).build())
-        .toList();
+    return checkText(documentationUnit.longTexts().caseFacts(), CategoryType.CASE_FACTS);
   }
 
   private List<Match> checkDecisionReasons(DocumentationUnit documentationUnit) {
@@ -232,7 +218,14 @@ public class TextCheckService {
       return Collections.emptyList();
     }
 
-    Document document = Jsoup.parse(documentationUnit.longTexts().decisionReasons());
+    return checkText(documentationUnit.longTexts().decisionReasons(), CategoryType.DECISION_REASON);
+  }
+
+  private List<Match> checkText(String text, CategoryType categoryType) {
+    if (text == null) {
+      return Collections.emptyList();
+    }
+    Document document = Jsoup.parse(text);
     document
         .getElementsByTag(BORDER_NUMBER)
         .forEach(
@@ -243,7 +236,7 @@ public class TextCheckService {
             });
 
     return check(URLEncoder.encode(document.text(), StandardCharsets.UTF_8)).stream()
-        .map(match -> match.toBuilder().category(CategoryType.DECISION_REASON).build())
+        .map(match -> match.toBuilder().category(categoryType).build())
         .toList();
   }
 }

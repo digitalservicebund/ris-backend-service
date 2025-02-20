@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { getCategoryLabel } from "./categoryLabels"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import PrevNextNavigation from "@/components/PrevNextNavigation.vue"
-import Attachment from "@/domain/attachment"
+import { Match } from "@/types/languagetool"
 
 const props = defineProps<{
-  attachments: Attachment[]
+  matches: Match[]
   currentIndex: number
 }>()
 
@@ -13,16 +14,13 @@ const emit = defineEmits<(event: "select", index: number) => void>()
 </script>
 
 <template>
-  <FlexContainer
-    v-if="attachments.length > 1"
-    class="float-end items-center gap-4"
-  >
+  <FlexContainer v-if="matches.length > 1" class="float-end items-center gap-4">
     <FlexItem class="ds-label-01-bold self-center">
-      {{ props.attachments[currentIndex]?.name }}
+      {{ getCategoryLabel(props.matches[currentIndex]?.category) }}
     </FlexItem>
     <PrevNextNavigation
       :current-index="props.currentIndex"
-      :list="props.attachments"
+      :list="props.matches"
       @select="(index) => emit('select', index)"
     />
   </FlexContainer>
