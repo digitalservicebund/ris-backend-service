@@ -5,10 +5,12 @@ import lombok.Getter;
 
 @Getter
 public enum CategoryType {
-  REASONS("Gründe"),
-  CASE_FACTS("Tatbestand"),
-  DECISION_REASON("Entscheidungsgründe");
-
+  REASONS("reasons"),
+  CASE_FACTS("caseFacts"),
+  DECISION_REASON("decisionReason"),
+  HEADNOTE("headnote"),
+  GUIDING_PRINCIPLE("guidingPrinciple"),
+  TENOR("tenor");
   @JsonValue private final String name;
 
   CategoryType(String name) {
