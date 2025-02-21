@@ -161,6 +161,68 @@ public class LdmlExporterService {
     }
   }
 
+  /**
+   * Publish the documentation unit by transforming it to valid LDML and putting the resulting XML
+   * file into a bucket together, specifying which documentation unit has been added or updated.
+   *
+   * @param documentNumber the documentation unit that should be published
+   * @throws DocumentationUnitNotExistsException if the documentation unit with the given id could
+   *     not be found in the database
+   * @throws LdmlTransformationException if the documentation unit could not be transformed to valid
+   *     LDML
+   * @throws PublishException if the changelog file could not be created or either of the files
+   *     could not be saved in the bucket
+   */
+  public void publishDocumentationUnit(String documentNumber)
+      throws DocumentationUnitNotExistsException {
+    DocumentationUnit documentationUnit =
+        documentationUnitRepository.findByDocumentNumber(documentNumber);
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(
+            documentationUnit, documentBuilderFactory);
+
+    if (ldml.isEmpty()) {
+      throw new LdmlTransformationException(
+          "Could not transform documentation unit to LDML.", null);
+    }
+
+    Optional<String> fileContent = ldmlToString(ldml.get());
+    if (fileContent.isEmpty()) {
+      throw new LdmlTransformationException(
+          "Could not transform documentation unit to valid LDML.", null);
+    }
+
+    try {
+      ldmlBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
+      log.info("LDML for documentation unit {} successfully published.", ldml.get().getUniqueId());
+    } catch (BucketException e) {
+      log.error("Could not save LDML to bucket", e);
+      throw new PublishException("Could not save LDML to bucket.", e);
+    }
+  }
+
+  public void deleteDocumentationUnit(String documentNumber) {
+    try {
+      ldmlBucket.delete(documentNumber + ".xml");
+    } catch (BucketException e) {
+      log.error("Could not delete LDML from bucket, docNumber: {}", documentNumber, e);
+    }
+  }
+
+  public void uploadChangelog(
+      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers) {
+    Changelog changelog = new Changelog(publishedDocumentNumbers, deletedDocumentNumbers);
+
+    try {
+      String changelogString = objectMapper.writeValueAsString(changelog);
+      ldmlBucket.save(
+          "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json",
+          changelogString);
+    } catch (IOException e) {
+      log.error("Could not upload changelog file.", e);
+    }
+  }
+
   @Async
   public void exportSampleLdmls() throws IOException {
     List<String> documentNumbers =

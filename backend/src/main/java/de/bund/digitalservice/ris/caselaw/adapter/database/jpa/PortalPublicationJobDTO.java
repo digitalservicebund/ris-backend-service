@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,13 +27,14 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @Entity
 @Table(name = "portal_publication_job", schema = "incremental_migration")
-public abstract class PortalPublicationJobDTO {
+public class PortalPublicationJobDTO {
 
   @Id @GeneratedValue @Include private UUID id;
 
-  @Column private LocalDate createdAt;
+  @Column(name = "created_at")
+  private Instant createdAt;
 
-  @Column(nullable = false, unique = true, updatable = false, name = "document_number")
+  @Column(nullable = false, updatable = false, name = "document_number")
   @NotBlank
   @Include
   private String documentNumber;
