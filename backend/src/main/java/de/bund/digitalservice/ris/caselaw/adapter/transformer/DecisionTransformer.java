@@ -199,30 +199,34 @@ public class DecisionTransformer {
 
   private static void addSource(
       DecisionDTO currentDto, DecisionDTOBuilder<?, ?> builder, DocumentationUnit decision) {
-    if (decision.coreData().source() != null) {
-      List<SourceDTO> existingSources =
-          currentDto.getSource() != null
-              ? new ArrayList<>(currentDto.getSource())
-              : new ArrayList<>();
-
-      // if the source reference is not included in reference lists (= has been deleted), remove the
-      // link to the source
-      if (!existingSources.isEmpty()
-          && existingSources.getFirst().getReference() != null
-          && !decisionContainsReferenceWithId(
-              decision, existingSources.getFirst().getReference().getId())) {
-        existingSources.getFirst().setReference(null);
-      }
-
-      Integer rank = existingSources.size() + 1;
-      // Create new SourceDTO
-      SourceDTO newSource =
-          SourceDTO.builder().value(decision.coreData().source().value()).rank(rank).build();
-
-      // Add to existing sources
-      existingSources.add(newSource);
-      builder.source(existingSources); // Update builder with new list
+    if (decision.coreData().source() == null) {
+      return;
     }
+
+    List<SourceDTO> existingSources =
+        currentDto.getSource() != null
+            ? new ArrayList<>(currentDto.getSource())
+            : new ArrayList<>();
+
+    // Check if the first existing source has a reference and remove if it has been deleted in
+    // domain object
+    if (!existingSources.isEmpty()) {
+      SourceDTO firstSource = existingSources.getFirst();
+      var reference = firstSource.getReference();
+
+      if (reference != null && !decisionContainsReferenceWithId(decision, reference.getId())) {
+        firstSource.setReference(null); // Otherwise the source can not be deleted
+      }
+    }
+
+    Integer rank = existingSources.size() + 1;
+    // Create new SourceDTO
+    SourceDTO newSource =
+        SourceDTO.builder().value(decision.coreData().source().value()).rank(rank).build();
+
+    // Add to existing sources
+    existingSources.add(newSource);
+    builder.source(existingSources); // Update builder with new list
   }
 
   private static boolean decisionContainsReferenceWithId(
