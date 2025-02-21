@@ -221,6 +221,11 @@ public class DocumentationUnitService {
     return repository.findByDocumentNumber(documentNumber);
   }
 
+  public PendingProceeding getPendingProceedingByDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException {
+    return repository.findPendingProceedingByDocumentNumber(documentNumber);
+  }
+
   public DocumentationUnit getByUuid(UUID documentationUnitId)
       throws DocumentationUnitNotExistsException {
     return repository.findByUuid(documentationUnitId);
