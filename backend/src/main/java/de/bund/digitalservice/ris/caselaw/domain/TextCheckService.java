@@ -77,7 +77,8 @@ public class TextCheckService {
   }
 
   private List<Match> checkGuidingPrinciple(DocumentationUnit documentationUnit) {
-    return checkText(documentationUnit.longTexts().tenor(), CategoryType.GUIDING_PRINCIPLE);
+    return checkText(
+        documentationUnit.shortTexts().guidingPrinciple(), CategoryType.GUIDING_PRINCIPLE);
   }
 
   private List<Match> checkTenor(DocumentationUnit documentationUnit) {

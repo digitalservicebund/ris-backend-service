@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { nextTick } from "vue"
+import { Component, nextTick } from "vue"
 import TextEditor from "../input/TextEditor.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
@@ -11,6 +11,7 @@ interface Props {
   shouldShowButton: boolean
   modelValue?: string
   fieldSize?: TextAreaInputAttributes["fieldSize"]
+  registerTextEditorRef: (key: string, el: Component | null) => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -43,6 +44,7 @@ async function focusEditor() {
 
       <TextEditor
         :id="id"
+        :ref="(el) => registerTextEditorRef(id, el)"
         :aria-label="label"
         class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
         editable

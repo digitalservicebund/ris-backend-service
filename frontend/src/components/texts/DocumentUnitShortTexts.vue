@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { Component } from "vue"
 import { computed } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
@@ -6,6 +7,10 @@ import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLin
 import { shortTextLabels } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
+
+defineProps<{
+  registerTextEditorRef: (key: string, el: Component | null) => void
+}>()
 
 const store = useDocumentUnitStore()
 
@@ -91,6 +96,7 @@ const otherHeadnote = computed({
 
       <TextEditorCategory
         id="headline"
+        v-bind="{ registerTextEditorRef }"
         v-model="headline"
         editable
         field-size="small"
@@ -100,6 +106,7 @@ const otherHeadnote = computed({
 
       <TextEditorCategory
         id="guidingPrinciple"
+        v-bind="{ registerTextEditorRef }"
         v-model="guidingPrinciple"
         editable
         :label="shortTextLabels.guidingPrinciple"
@@ -109,6 +116,7 @@ const otherHeadnote = computed({
       />
 
       <TextEditorCategory
+        v-bind="{ registerTextEditorRef }"
         id="headnote"
         v-model="headnote"
         editable
@@ -118,6 +126,7 @@ const otherHeadnote = computed({
 
       <TextEditorCategory
         id="otherHeadnote"
+        v-bind="{ registerTextEditorRef }"
         v-model="otherHeadnote"
         editable
         :label="shortTextLabels.otherHeadnote"
