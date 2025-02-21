@@ -15,6 +15,7 @@ import DocumentationUnitTextCheck from "@/components/text-check/DocumentationUni
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import DocumentUnit from "@/domain/documentUnit"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
+import { Match } from "@/types/languagetool"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 
 const props = defineProps<{
@@ -24,6 +25,7 @@ const props = defineProps<{
   sidePanelMode?: SelectablePanelContent
   sidePanelShortcut?: string
   icon?: Component
+  jumpToMatch: (match: Match) => void
 }>()
 
 const store = useExtraContentSidePanelStore()
@@ -184,6 +186,7 @@ onMounted(() => {
 
         <DocumentationUnitTextCheck
           v-else-if="panelMode === 'text-check' && textCheck"
+          v-bind="{ jumpToMatch }"
         />
       </div>
     </SideToggle>

@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { useHead } from "@unhead/vue"
 import { storeToRefs } from "pinia"
-import { onBeforeUnmount, onMounted, ref, Ref } from "vue"
+import type { Component } from "vue"
+import { onBeforeUnmount, onMounted, Ref, ref } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
+import type { TextEditor } from "@/components/input/TextEditor.vue"
 import { ValidationError } from "@/components/input/types"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
@@ -17,6 +19,7 @@ import DocumentUnit from "@/domain/documentUnit"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
+import { Match } from "@/types/languagetool"
 
 const props = defineProps<{
   documentNumber: string
@@ -85,6 +88,20 @@ async function attachmentsUploaded(anySuccessful: boolean) {
   }
 }
 
+const textEditorRefs = ref<Record<string, TextEditor | null>>({})
+
+/**
+ * Gets text category as a key and add its text editor ref to the ref list
+ * @param textCategory
+ * @param textEditorComponent
+ */
+const registerTextEditorRef = (
+  textCategory: string,
+  textEditorComponent: Component,
+) => {
+  textEditorRefs.value[textCategory] = textEditorComponent
+}
+
 const handleKeyDown = (event: KeyboardEvent) => {
   // List of tag names where shortcuts should be disabled
   const tagName = (event.target as HTMLElement).tagName.toLowerCase()
@@ -129,6 +146,14 @@ const handleKeyDown = (event: KeyboardEvent) => {
     default:
       break
   }
+}
+
+/**
+ * Jump to the corresponding text editor and opens the match menu
+ * @param match
+ */
+function jumpToMatch(match: Match) {
+  textEditorRefs.value[match.category].jumpToMatch(match)
 }
 
 onBeforeUnmount(() => {
@@ -185,14 +210,16 @@ onMounted(async () => {
                 route.path.includes('preview')
               )
             "
+            v-bind="{ jumpToMatch }"
             :document-unit="documentUnit"
           ></ExtraContentSidePanel>
           <router-view
-            :validation-errors="validationErrors"
+            v-bind="{ registerTextEditorRef }"
             @attachment-index-deleted="attachmentIndexDeleted"
             @attachment-index-selected="attachmentIndexSelected"
             @attachments-uploaded="attachmentsUploaded"
-          />
+          >
+          </router-view>
         </FlexContainer>
       </div>
     </div>

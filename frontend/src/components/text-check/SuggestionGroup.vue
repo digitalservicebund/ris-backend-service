@@ -4,16 +4,18 @@ import IconBadge from "@/components/IconBadge.vue"
 import MatchLinkingButton from "@/components/text-check/MatchLinkingButton.vue"
 import MatchNavigator from "@/components/text-check/MatchNavigator.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
-import { Replacement, Suggestion } from "@/types/languagetool"
+import { Match, Replacement, Suggestion } from "@/types/languagetool"
 
 const props = defineProps<{
   suggestion: Suggestion
   isSelected?: boolean
+  jumpToMatch: (match: Match) => void
 }>()
 
 const emit = defineEmits<{
   "suggestion:update": [value: string]
   "suggestion:ignore": [void]
+  jumpToMatch: [value: Match]
 }>()
 
 const currentIndex = ref(0)
@@ -53,7 +55,7 @@ function updateCurrentIndex(index: number) {
             :label="suggestion.matches.length.toString()"
           />
         </span>
-        <MatchLinkingButton :category="selectedMatch.category" />
+        <MatchLinkingButton v-bind="{ jumpToMatch }" :match="selectedMatch" />
       </div>
       <MatchNavigator
         :current-index="currentIndex"
@@ -73,6 +75,7 @@ function updateCurrentIndex(index: number) {
       v-if="selectedMatch.replacements"
       :replacement-mode="suggestion.matches.length > 1 ? 'multiple' : 'single'"
       :replacements="getValues(selectedMatch.replacements)"
+      @jump-to-match="(match: Match) => emit('jumpToMatch', match)"
       @suggestion:ignore="ignoreSuggestion"
       @suggestion:update="acceptSuggestion"
     />

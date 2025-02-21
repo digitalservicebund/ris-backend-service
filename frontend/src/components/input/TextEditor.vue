@@ -273,6 +273,13 @@ const resizeObserver = new ResizeObserver((entries) => {
     containerWidth.value = entry.contentRect.width
   }
 })
+
+function jumpToMatch(selectedMatch: Match) {
+  match.value = editor.storage.languagetool.languageToolService.match
+  matchRange.value = editor.storage.languagetool.languageToolService.matchRange
+}
+
+defineExpose({ jumpToMatch })
 </script>
 
 <template>

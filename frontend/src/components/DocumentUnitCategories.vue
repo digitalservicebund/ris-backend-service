@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
+import type { Component } from "vue"
 import { computed, ref, toRefs, watch } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
@@ -14,6 +15,10 @@ import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+
+defineProps<{
+  registerTextEditorRef: (key: string, el: Component | null) => void
+}>()
 
 const route = useRoute()
 const { hash: routeHash } = toRefs(route)
@@ -87,6 +92,10 @@ const isInternalUser = useInternalUser()
     <DocumentUnitContentRelatedIndexing
       :id="DocumentUnitCategoriesEnum.CONTENT_RELATED_INDEXING"
     />
-    <DocumentUnitTexts :id="DocumentUnitCategoriesEnum.TEXTS" />
+    <DocumentUnitTexts
+      v-bind="{ registerTextEditorRef }"
+      :id="DocumentUnitCategoriesEnum.TEXTS"
+      :text-editor-refs="registerTextEditorRef"
+    />
   </FlexItem>
 </template>
