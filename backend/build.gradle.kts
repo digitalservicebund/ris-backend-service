@@ -11,7 +11,7 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.4.2"
+    id("org.springframework.boot") version "3.4.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.0.2"
     id("org.sonarqube") version "6.0.1.5171"
@@ -21,7 +21,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.3.2"
+    id("org.flywaydb.flyway") version "11.3.3"
     id("io.sentry.jvm.gradle") version "5.2.0"
 }
 
@@ -148,7 +148,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.20.4"
+    val testContainersVersion = "1.20.5"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -161,7 +161,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.2")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.3")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.0")
 
@@ -229,10 +229,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.10.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.3.2"
+    val flywayCore = "org.flywaydb:flyway-core:11.3.3"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.3.2")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.3.3")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -241,7 +241,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.3")
-    testImplementation("org.springframework.security:spring-security-test:6.4.2")
+    testImplementation("org.springframework.security:spring-security-test:6.4.3")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
