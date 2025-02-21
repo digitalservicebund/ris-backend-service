@@ -121,7 +121,7 @@ public class DecisionTransformer {
       addDeviationCourts(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
       addDeviatingFileNumbers(builder, coreData);
-      addSource(currentDto, builder, coreData);
+      addSource(currentDto, builder, updatedDomainObject);
 
     } else {
       builder
@@ -194,44 +194,49 @@ public class DecisionTransformer {
     addCaselawReferences(updatedDomainObject, builder, currentDto);
     addLiteratureReferences(updatedDomainObject, builder, currentDto);
 
-    // if the source reference has been deleted, remove the link to the source
-    var docUnit = builder.build();
-    if (docUnit.getSource() != null
-        && !docUnit.getSource().isEmpty()
-        && (docUnit.getCaselawReferences().isEmpty()
-            || !docUnit
-                .getSource()
-                .getFirst()
-                .getReference()
-                .equals(docUnit.getCaselawReferences().getFirst()))
-        && (docUnit.getLiteratureReferences().isEmpty()
-            || !docUnit
-                .getSource()
-                .getFirst()
-                .getReference()
-                .equals(docUnit.getLiteratureReferences().getFirst()))) {
-      docUnit.getSource().getFirst().setReference(null);
-    }
-
-    return docUnit;
+    return builder.build();
   }
 
   private static void addSource(
-      DecisionDTO currentDto, DecisionDTOBuilder<?, ?> builder, CoreData coreData) {
-    if (coreData.source() != null) {
+      DecisionDTO currentDto, DecisionDTOBuilder<?, ?> builder, DocumentationUnit decision) {
+    if (decision.coreData().source() != null) {
       List<SourceDTO> existingSources =
           currentDto.getSource() != null
               ? new ArrayList<>(currentDto.getSource())
               : new ArrayList<>();
-      Integer rank = existingSources.size() + 1;
 
+      // if the source reference is not included in reference lists (= has been deleted), remove the
+      // link to the source
+      if (!existingSources.isEmpty()
+          && !decisionContainsReferenceWithId(
+              decision, existingSources.getFirst().getReference().getId())) {
+        existingSources.getFirst().setReference(null);
+      }
+
+      Integer rank = existingSources.size() + 1;
       // Create new SourceDTO
-      SourceDTO newSource = SourceDTO.builder().value(coreData.source().value()).rank(rank).build();
+      SourceDTO newSource =
+          SourceDTO.builder().value(decision.coreData().source().value()).rank(rank).build();
 
       // Add to existing sources
       existingSources.add(newSource);
       builder.source(existingSources); // Update builder with new list
     }
+  }
+
+  private static boolean decisionContainsReferenceWithId(
+      DocumentationUnit decisionDTO, UUID referenceID) {
+    boolean caselawReferencesContainId =
+        decisionDTO.caselawReferences() != null
+            && !decisionDTO.caselawReferences().isEmpty()
+            && referenceID.equals(decisionDTO.caselawReferences().getFirst().id());
+
+    boolean literatureReferencesContainId =
+        decisionDTO.literatureReferences() != null
+            && !decisionDTO.literatureReferences().isEmpty()
+            && referenceID.equals(decisionDTO.literatureReferences().getFirst().id());
+
+    return caselawReferencesContainId || literatureReferencesContainId;
   }
 
   private static void addCaselawReferences(

@@ -69,6 +69,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class DecisionTransformerTest {
@@ -78,7 +79,7 @@ class DecisionTransformerTest {
     DocumentationUnit updatedDomainObject = DocumentationUnit.builder().build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getProcedureHistory()).isEmpty();
     assertThat(documentationUnitDTO.getProcedure()).isNull();
@@ -100,7 +101,7 @@ class DecisionTransformerTest {
         DocumentationUnit.builder().shortTexts(shortTexts).build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getDecisionNames()).isEmpty();
   }
@@ -111,7 +112,7 @@ class DecisionTransformerTest {
     DocumentationUnit updatedDomainObject = DocumentationUnit.builder().build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isNull();
   }
@@ -152,7 +153,7 @@ class DecisionTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.NEIN);
   }
@@ -240,7 +241,7 @@ class DecisionTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA);
   }
@@ -255,7 +256,7 @@ class DecisionTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getInputTypes())
         .usingRecursiveFieldByFieldElementComparator()
@@ -286,10 +287,10 @@ class DecisionTransformerTest {
     DecisionDTO documentationUnitDTO =
         DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
-    assertThat(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId())
+    assertThat(documentationUnitDTO.getNormReferences().getFirst().getNormAbbreviation().getId())
         .isEqualTo(normReferenceInput.normAbbreviation().id());
-    assertThat(documentationUnitDTO.getNormReferences().get(0).getSingleNorm())
-        .isEqualTo(normReferenceInput.singleNorms().get(0).singleNorm());
+    assertThat(documentationUnitDTO.getNormReferences().getFirst().getSingleNorm())
+        .isEqualTo(normReferenceInput.singleNorms().getFirst().singleNorm());
   }
 
   @Test
@@ -322,17 +323,18 @@ class DecisionTransformerTest {
     DecisionDTO documentationUnitDTO =
         DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
-    assertThat(documentationUnitDTO.getNormReferences().get(0).getLegalForce()).isNotNull();
+    assertThat(documentationUnitDTO.getNormReferences().getFirst().getLegalForce()).isNotNull();
     assertThat(
             documentationUnitDTO
                 .getNormReferences()
-                .get(0)
+                .getFirst()
                 .getLegalForce()
                 .getLegalForceType()
                 .getId())
-        .isEqualTo(normReferenceInput.singleNorms().get(0).legalForce().type().id());
-    assertThat(documentationUnitDTO.getNormReferences().get(0).getLegalForce().getRegion().getId())
-        .isEqualTo(normReferenceInput.singleNorms().get(0).legalForce().region().id());
+        .isEqualTo(normReferenceInput.singleNorms().getFirst().legalForce().type().id());
+    assertThat(
+            documentationUnitDTO.getNormReferences().getFirst().getLegalForce().getRegion().getId())
+        .isEqualTo(normReferenceInput.singleNorms().getFirst().legalForce().region().id());
   }
 
   @Test
@@ -373,21 +375,22 @@ class DecisionTransformerTest {
     DecisionDTO documentationUnitDTO =
         DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
-    assertThat(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId())
+    assertThat(documentationUnitDTO.getNormReferences().getFirst().getNormAbbreviation().getId())
         .isEqualTo(normReferenceInput.normAbbreviation().id());
-    assertThat(documentationUnitDTO.getNormReferences().get(0).getSingleNorm())
-        .isEqualTo(normReferenceInput.singleNorms().get(0).singleNorm());
-    assertThat(documentationUnitDTO.getNormReferences().get(0).getLegalForce()).isNotNull();
+    assertThat(documentationUnitDTO.getNormReferences().getFirst().getSingleNorm())
+        .isEqualTo(normReferenceInput.singleNorms().getFirst().singleNorm());
+    assertThat(documentationUnitDTO.getNormReferences().getFirst().getLegalForce()).isNotNull();
     assertThat(
             documentationUnitDTO
                 .getNormReferences()
-                .get(0)
+                .getFirst()
                 .getLegalForce()
                 .getLegalForceType()
                 .getId())
-        .isEqualTo(normReferenceInput.singleNorms().get(0).legalForce().type().id());
-    assertThat(documentationUnitDTO.getNormReferences().get(0).getLegalForce().getRegion().getId())
-        .isEqualTo(normReferenceInput.singleNorms().get(0).legalForce().region().id());
+        .isEqualTo(normReferenceInput.singleNorms().getFirst().legalForce().type().id());
+    assertThat(
+            documentationUnitDTO.getNormReferences().getFirst().getLegalForce().getRegion().getId())
+        .isEqualTo(normReferenceInput.singleNorms().getFirst().legalForce().region().id());
 
     assertThat(documentationUnitDTO.getNormReferences().get(1).getSingleNorm())
         .isEqualTo(normReferenceInput.singleNorms().get(1).singleNorm());
@@ -445,15 +448,15 @@ class DecisionTransformerTest {
     DecisionDTO documentationUnitDTO =
         DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
-    assertThat(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId())
+    assertThat(documentationUnitDTO.getNormReferences().getFirst().getNormAbbreviation().getId())
         .isEqualTo(normReferenceInput1.normAbbreviation().id());
-    assertThat(documentationUnitDTO.getNormReferences().get(0).getSingleNorm())
-        .isEqualTo(normReferenceInput1.singleNorms().get(0).singleNorm());
+    assertThat(documentationUnitDTO.getNormReferences().getFirst().getSingleNorm())
+        .isEqualTo(normReferenceInput1.singleNorms().getFirst().singleNorm());
 
     assertThat(documentationUnitDTO.getNormReferences().get(1).getNormAbbreviation().getId())
         .isEqualTo(normReferenceInput2.normAbbreviation().id());
     assertThat(documentationUnitDTO.getNormReferences().get(1).getSingleNorm())
-        .isEqualTo(normReferenceInput2.singleNorms().get(0).singleNorm());
+        .isEqualTo(normReferenceInput2.singleNorms().getFirst().singleNorm());
     assertThat(documentationUnitDTO.getNormReferences().get(1).getLegalForce()).isNotNull();
     assertThat(
             documentationUnitDTO
@@ -462,9 +465,9 @@ class DecisionTransformerTest {
                 .getLegalForce()
                 .getLegalForceType()
                 .getId())
-        .isEqualTo(normReferenceInput2.singleNorms().get(0).legalForce().type().id());
+        .isEqualTo(normReferenceInput2.singleNorms().getFirst().legalForce().type().id());
     assertThat(documentationUnitDTO.getNormReferences().get(1).getLegalForce().getRegion().getId())
-        .isEqualTo(normReferenceInput2.singleNorms().get(0).legalForce().region().id());
+        .isEqualTo(normReferenceInput2.singleNorms().getFirst().legalForce().region().id());
   }
 
   @Test
@@ -510,7 +513,7 @@ class DecisionTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLeadingDecisionNormReferences())
         .usingRecursiveFieldByFieldElementComparator()
@@ -552,7 +555,7 @@ class DecisionTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLeadingDecisionNormReferences()).isEmpty();
   }
@@ -625,7 +628,7 @@ class DecisionTransformerTest {
             .build();
 
     DecisionDTO documentationUnitDTO =
-        (DecisionDTO) DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
     assertThat(documentationUnitDTO.getEcli()).isEqualTo("This is a test ecli with spaces");
     assertThat(documentationUnitDTO.getJudicialBody())
         .isEqualTo("This is a test appraisalBody with spaces");
@@ -777,7 +780,7 @@ class DecisionTransformerTest {
     assertThat(documentationUnitDTO.getParticipatingJudges())
         .extracting("name")
         .containsExactly("Judge A");
-    assertThat(documentationUnitDTO.getParticipatingJudges().get(0).getReferencedOpinions())
+    assertThat(documentationUnitDTO.getParticipatingJudges().getFirst().getReferencedOpinions())
         .isNull();
   }
 
@@ -921,6 +924,87 @@ class DecisionTransformerTest {
 
     assertThat(domainObject.coreData().source().value()).isEqualTo(SourceValue.Z);
     assertThat(domainObject.coreData().source().sourceRawValue()).isNull();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = ReferenceType.class,
+      names = {"CASELAW", "LITERATURE"})
+  void testTransformToDTO_withSourceReferenceIsNotIncludedInReferences_shouldRemoveLinkToReference(
+      ReferenceType referenceType) {
+    var referenceId = UUID.randomUUID();
+    List<SourceDTO> existingSourcesWithReference =
+        List.of(
+            SourceDTO.builder()
+                .value(SourceValue.A)
+                .rank(1)
+                .reference(
+                    referenceType.equals(ReferenceType.CASELAW)
+                        ? CaselawReferenceDTO.builder().id(referenceId).build()
+                        : LiteratureReferenceDTO.builder().id(referenceId).build())
+                .build());
+
+    DecisionDTO currentDto = DecisionDTO.builder().source(existingSourcesWithReference).build();
+
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
+            .coreData(
+                CoreData.builder().source(Source.builder().value(SourceValue.A).build()).build())
+            .build();
+
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(documentationUnitDTO.getSource().getFirst().getReference()).isNull();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = ReferenceType.class,
+      names = {"CASELAW", "LITERATURE"})
+  void testTransformToDTO_withSourceReferenceIsIncludedInReferences_shouldKeepLinkToReference(
+      ReferenceType referenceType) {
+    var referenceId = UUID.randomUUID();
+    List<SourceDTO> existingSourcesWithReference =
+        List.of(
+            SourceDTO.builder()
+                .value(SourceValue.A)
+                .rank(1)
+                .reference(
+                    referenceType.equals(ReferenceType.CASELAW)
+                        ? CaselawReferenceDTO.builder()
+                            .id(referenceId)
+                            .type("amtlich")
+                            .documentationUnitRank(1)
+                            .build()
+                        : LiteratureReferenceDTO.builder()
+                            .id(referenceId)
+                            .documentationUnitRank(1)
+                            .build())
+                .build());
+
+    DecisionDTO currentDto = DecisionDTO.builder().source(existingSourcesWithReference).build();
+
+    var references =
+        List.of(
+            Reference.builder()
+                .id(referenceId)
+                .referenceType(referenceType)
+                .primaryReference(true)
+                .build());
+
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
+            .coreData(
+                CoreData.builder().source(Source.builder().value(SourceValue.A).build()).build())
+            .caselawReferences(referenceType.equals(ReferenceType.CASELAW) ? references : null)
+            .literatureReferences(
+                referenceType.equals(ReferenceType.LITERATURE) ? references : null)
+            .build();
+
+    DecisionDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(documentationUnitDTO.getSource().getFirst().getReference().getId())
+        .isEqualTo(referenceId);
   }
 
   @Test
@@ -1207,22 +1291,23 @@ class DecisionTransformerTest {
         DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(1);
-    assertThat(documentationUnit.contentRelatedIndexing().norms().get(0).normAbbreviation().id())
+    assertThat(
+            documentationUnit.contentRelatedIndexing().norms().getFirst().normAbbreviation().id())
         .isEqualTo(normAbbreviationId);
     assertThat(
             documentationUnit
                 .contentRelatedIndexing()
                 .norms()
-                .get(0)
+                .getFirst()
                 .singleNorms()
-                .get(0)
+                .getFirst()
                 .singleNorm())
         .isEqualTo("single norm 1");
     assertThat(
             documentationUnit
                 .contentRelatedIndexing()
                 .norms()
-                .get(0)
+                .getFirst()
                 .singleNorms()
                 .get(1)
                 .singleNorm())
@@ -1299,17 +1384,19 @@ class DecisionTransformerTest {
         DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(2);
-    assertThat(documentationUnit.contentRelatedIndexing().norms().get(0).normAbbreviation().id())
-        .isEqualTo(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId());
+    assertThat(
+            documentationUnit.contentRelatedIndexing().norms().getFirst().normAbbreviation().id())
+        .isEqualTo(
+            documentationUnitDTO.getNormReferences().getFirst().getNormAbbreviation().getId());
     assertThat(documentationUnit.contentRelatedIndexing().norms().get(1).normAbbreviation().id())
         .isEqualTo(documentationUnitDTO.getNormReferences().get(1).getNormAbbreviation().getId());
     assertThat(
             documentationUnit
                 .contentRelatedIndexing()
                 .norms()
-                .get(0)
+                .getFirst()
                 .singleNorms()
-                .get(0)
+                .getFirst()
                 .singleNorm())
         .isEqualTo("single norm 1");
     assertThat(
@@ -1318,7 +1405,7 @@ class DecisionTransformerTest {
                 .norms()
                 .get(1)
                 .singleNorms()
-                .get(0)
+                .getFirst()
                 .singleNorm())
         .isEqualTo("single norm 2");
   }
@@ -1483,11 +1570,11 @@ class DecisionTransformerTest {
 
     // Assert
     assertThat(documentationUnit.longTexts().participatingJudges()).hasSize(2);
-    assertThat(documentationUnit.longTexts().participatingJudges().get(0).id())
+    assertThat(documentationUnit.longTexts().participatingJudges().getFirst().id())
         .isEqualTo(participatingJudgeA.getId());
-    assertThat(documentationUnit.longTexts().participatingJudges().get(0).name())
+    assertThat(documentationUnit.longTexts().participatingJudges().getFirst().name())
         .isEqualTo(participatingJudgeA.getName());
-    assertThat(documentationUnit.longTexts().participatingJudges().get(0).referencedOpinions())
+    assertThat(documentationUnit.longTexts().participatingJudges().getFirst().referencedOpinions())
         .isEqualTo(participatingJudgeA.getReferencedOpinions());
     assertThat(documentationUnit.longTexts().participatingJudges().get(1).id())
         .isEqualTo(participatingJudgeB.getId());

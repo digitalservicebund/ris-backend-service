@@ -5,7 +5,9 @@ import {
   fillInput,
   navigateToPeriodicalReferences,
   navigateToPreview,
+  navigateToReferences,
   navigateToSearch,
+  save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
@@ -192,7 +194,7 @@ test.describe(
       },
     )
     test(
-      "Docoffice not automatically assigned with empty court, can be updated by user",
+      "Docoffice is empty and has to be set manually when new decision has empty court",
       {
         tag: ["@RISDEV-4999", "@RISDEV-4853"],
         annotation: {
@@ -273,6 +275,44 @@ test.describe(
           await expect(
             newTab.locator("[aria-label='Rechtskraft']"),
           ).toHaveValue("Keine Angabe")
+        })
+
+        // this test has nothing to do with the other test steps
+        // it belongs to RISDEV-5898 and was added here to optimize test execution
+        await test.step("Source references can be deleted", async () => {
+          await navigateToReferences(page, documentNumber)
+
+          const referenceSummary = `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`
+
+          await expect(
+            page.getByText(referenceSummary, {
+              exact: true,
+            }),
+          ).toBeVisible()
+
+          await page.getByTestId("list-entry-0").first().click()
+          await page.locator("[aria-label='Eintrag löschen']").click()
+
+          await expect(
+            page.getByText(referenceSummary, {
+              exact: true,
+            }),
+          ).toBeHidden()
+
+          await save(page)
+          await page.reload()
+
+          //only reference input list item is shown (input is a list entry in editable list)
+          await expect(
+            page
+              .getByTestId("caselaw-reference-list")
+              .getByLabel("Listen Eintrag"),
+          ).toHaveCount(1)
+
+          await navigateToPeriodicalReferences(page, edition.id ?? "")
+
+          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(page.getByText(documentNumber)).toBeHidden()
         })
 
         await deleteDocumentUnit(page, documentNumber)
