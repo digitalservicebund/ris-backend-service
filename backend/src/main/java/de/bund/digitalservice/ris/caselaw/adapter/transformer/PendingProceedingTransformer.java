@@ -76,7 +76,12 @@ public class PendingProceedingTransformer {
                 ? new ArrayList<>()
                 : pendingProceedingDTO.getLiteratureReferences().stream()
                     .map(ReferenceTransformer::transformToDomain)
-                    .toList());
+                    .toList())
+        .resolutionNote(pendingProceedingDTO.getResolutionNote())
+        .isResolved(pendingProceedingDTO.isResolved())
+        .legalIssue(pendingProceedingDTO.getLegalIssue())
+        .admissionOfAppeal(pendingProceedingDTO.getAdmissionOfAppeal())
+        .appellant(pendingProceedingDTO.getAppellant());
 
     addStatusToDomain(pendingProceedingDTO, builder);
 
@@ -153,14 +158,14 @@ public class PendingProceedingTransformer {
    * of NormReferenceDTOs with the same normAbbreviation are grouped into one NormReference, with a
    * list of {@link SingleNorm}.
    *
-   * @param documentationUnitDTO The documentation unit DTO containing norm references to be added.
+   * @param pendingProceedingDTO The documentation unit DTO containing norm references to be added.
    * @return A list of NormReference objects representing the added norm references.
    */
   private static List<NormReference> addNormReferencesToDomain(
-      PendingProceedingDTO documentationUnitDTO) {
+      PendingProceedingDTO pendingProceedingDTO) {
     List<NormReference> normReferences = new ArrayList<>();
 
-    documentationUnitDTO
+    pendingProceedingDTO
         .getNormReferences()
         .forEach(
             normReferenceDTO -> {
@@ -212,7 +217,7 @@ public class PendingProceedingTransformer {
 
     // Handle cases where both abbreviation and raw value are null
     normReferences.addAll(
-        documentationUnitDTO.getNormReferences().stream()
+        pendingProceedingDTO.getNormReferences().stream()
             .filter(
                 normReferenceDTO ->
                     normReferenceDTO.getNormAbbreviation() == null
@@ -224,58 +229,58 @@ public class PendingProceedingTransformer {
   }
 
   private static void addStatusToDomain(
-      PendingProceedingDTO documentationUnitDTO,
+      PendingProceedingDTO pendingProceedingDTO,
       PendingProceeding.PendingProceedingBuilder builder) {
-    builder.status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus()));
+    builder.status(StatusTransformer.transformToDomain(pendingProceedingDTO.getStatus()));
   }
 
   private static void addPreviousDecisionsToDomain(
-      PendingProceedingDTO documentationUnitDTO,
+      PendingProceedingDTO pendingProceedingDTO,
       PendingProceeding.PendingProceedingBuilder builder) {
-    if (documentationUnitDTO.getPreviousDecisions() == null) {
+    if (pendingProceedingDTO.getPreviousDecisions() == null) {
       return;
     }
 
     builder.previousDecisions(
-        documentationUnitDTO.getPreviousDecisions().stream()
+        pendingProceedingDTO.getPreviousDecisions().stream()
             .map(PreviousDecisionTransformer::transformToDomain)
             .toList());
   }
 
   private static void addDeviatingCourtsToDomain(
-      PendingProceedingDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
-    if (documentationUnitDTO.getDeviatingCourts() == null) {
+      PendingProceedingDTO pendingProceedingDTO, CoreDataBuilder coreDataBuilder) {
+    if (pendingProceedingDTO.getDeviatingCourts() == null) {
       return;
     }
 
     List<String> deviatingCourts =
-        documentationUnitDTO.getDeviatingCourts().stream()
+        pendingProceedingDTO.getDeviatingCourts().stream()
             .map(DeviatingCourtDTO::getValue)
             .toList();
     coreDataBuilder.deviatingCourts(deviatingCourts);
   }
 
   private static void addDeviatingFileNumbersToDomain(
-      PendingProceedingDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
-    if (documentationUnitDTO.getDeviatingFileNumbers() == null) {
+      PendingProceedingDTO pendingProceedingDTO, CoreDataBuilder coreDataBuilder) {
+    if (pendingProceedingDTO.getDeviatingFileNumbers() == null) {
       return;
     }
 
     List<String> deviatingFileNumbers =
-        documentationUnitDTO.getDeviatingFileNumbers().stream()
+        pendingProceedingDTO.getDeviatingFileNumbers().stream()
             .map(DeviatingFileNumberDTO::getValue)
             .toList();
     coreDataBuilder.deviatingFileNumbers(deviatingFileNumbers);
   }
 
   private static void addFileNumbersToDomain(
-      PendingProceedingDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
-    if (documentationUnitDTO.getFileNumbers() == null) {
+      PendingProceedingDTO pendingProceedingDTO, CoreDataBuilder coreDataBuilder) {
+    if (pendingProceedingDTO.getFileNumbers() == null) {
       return;
     }
 
     List<String> fileNumbers =
-        documentationUnitDTO.getFileNumbers().stream().map(FileNumberDTO::getValue).toList();
+        pendingProceedingDTO.getFileNumbers().stream().map(FileNumberDTO::getValue).toList();
     coreDataBuilder.fileNumbers(fileNumbers);
   }
 }

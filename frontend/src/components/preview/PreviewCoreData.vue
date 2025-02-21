@@ -10,6 +10,7 @@ import { CoreData } from "@/domain/documentUnit"
 
 const props = defineProps<{
   coreData: CoreData
+  dateLabel: string
 }>()
 
 const sourceValue = computed(() =>
@@ -54,7 +55,7 @@ const sourceValue = computed(() =>
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.decisionDate">
-      <PreviewCategory>Entscheidungsdatum</PreviewCategory>
+      <PreviewCategory>{{ dateLabel }}</PreviewCategory>
       <PreviewContent
         >{{ dayjs(coreData.decisionDate).format("DD.MM.YYYY") }}
       </PreviewContent>
@@ -65,7 +66,7 @@ const sourceValue = computed(() =>
         coreData.deviatingDecisionDates.length > 0
       "
     >
-      <PreviewCategory>Abweichendes Entscheidungsdatum</PreviewCategory>
+      <PreviewCategory>Abweichendes {{ dateLabel }}</PreviewCategory>
       <PreviewContent>
         <div v-for="item in coreData.deviatingDecisionDates" :key="item">
           {{ dayjs(item).format("DD.MM.YYYY") }}

@@ -42,7 +42,10 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
       Vorschau erstellt am {{ dayjs(new Date()).format("DD.MM.YYYY") }} um
       {{ dayjs(new Date()).format("HH:mm:ss") }}
     </p>
-    <PreviewCoreData :core-data="documentUnit.coreData" />
+    <PreviewCoreData
+      :core-data="documentUnit.coreData"
+      date-label="Entscheidungsdatum"
+    />
     <PreviewNote :note="documentUnit.note" />
     <PreviewCaselawReferences
       :caselaw-references="documentUnit.caselawReferences as Reference[]"

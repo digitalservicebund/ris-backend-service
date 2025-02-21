@@ -18,9 +18,15 @@ import lombok.Builder;
  * @param shortTexts the short texts (Kurztexte)
  * @param status the current status including publication and error status
  * @param contentRelatedIndexing the content related indexing data (Inhaltliche Erschließung)
- * @param caselawReferences a list of legal periodical caselaw references (Fundstellen)
+ * @param caselawReferences a list of legal periodical caselaw references
+ *     (Rechtsprechungsfundstellen)
  * @param literatureReferences a list of legal periodical literature references
  *     (Literaturfundstellen)
+ * @param resolutionNote the resolution note (Erledigungsvermerk)
+ * @param isResolved the resolution status (Erledigung)
+ * @param legalIssue the legal issue (Rechtsfrage)
+ * @param admissionOfAppeal the admission of appeal (Rechtsmittelzulassung)
+ * @param appellant the appellant (Rechtsmittelführer)
  */
 @Builder(toBuilder = true)
 public record PendingProceeding(
@@ -34,4 +40,9 @@ public record PendingProceeding(
     Status status,
     ContentRelatedIndexing contentRelatedIndexing,
     List<Reference> caselawReferences,
-    List<Reference> literatureReferences) {}
+    List<Reference> literatureReferences,
+    String resolutionNote,
+    boolean isResolved,
+    String legalIssue,
+    String admissionOfAppeal,
+    String appellant) {}
