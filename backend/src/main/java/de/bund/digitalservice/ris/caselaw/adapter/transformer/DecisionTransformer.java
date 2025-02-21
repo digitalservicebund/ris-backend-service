@@ -226,16 +226,16 @@ public class DecisionTransformer {
   }
 
   private static boolean decisionContainsReferenceWithId(
-      DocumentationUnit decisionDTO, UUID referenceID) {
+      DocumentationUnit docUnit, UUID referenceID) {
     boolean caselawReferencesContainId =
-        decisionDTO.caselawReferences() != null
-            && !decisionDTO.caselawReferences().isEmpty()
-            && referenceID.equals(decisionDTO.caselawReferences().getFirst().id());
+        docUnit.caselawReferences() != null
+            && !docUnit.caselawReferences().isEmpty()
+            && referenceID.equals(docUnit.caselawReferences().getFirst().id());
 
     boolean literatureReferencesContainId =
-        decisionDTO.literatureReferences() != null
-            && !decisionDTO.literatureReferences().isEmpty()
-            && referenceID.equals(decisionDTO.literatureReferences().getFirst().id());
+        docUnit.literatureReferences() != null
+            && !docUnit.literatureReferences().isEmpty()
+            && referenceID.equals(docUnit.literatureReferences().getFirst().id());
 
     return caselawReferencesContainId || literatureReferencesContainId;
   }
@@ -921,22 +921,19 @@ public class DecisionTransformer {
   }
 
   @NotNull
-  private static List<DuplicateRelation> transformDuplicateRelations(
-      DecisionDTO documentationUnitDTO) {
+  private static List<DuplicateRelation> transformDuplicateRelations(DecisionDTO decisionDTO) {
     return Stream.concat(
-            documentationUnitDTO.getDuplicateRelations1().stream()
+            decisionDTO.getDuplicateRelations1().stream()
                 .filter(
                     relation ->
                         isPublishedDuplicateOrSameDocOffice(
-                            documentationUnitDTO, relation.getDocumentationUnit2())),
-            documentationUnitDTO.getDuplicateRelations2().stream()
+                            decisionDTO, relation.getDocumentationUnit2())),
+            decisionDTO.getDuplicateRelations2().stream()
                 .filter(
                     relation ->
                         isPublishedDuplicateOrSameDocOffice(
-                            documentationUnitDTO, relation.getDocumentationUnit1())))
-        .map(
-            relation ->
-                DuplicateRelationTransformer.transformToDomain(relation, documentationUnitDTO))
+                            decisionDTO, relation.getDocumentationUnit1())))
+        .map(relation -> DuplicateRelationTransformer.transformToDomain(relation, decisionDTO))
         .sorted(
             Comparator.comparing(
                     (DuplicateRelation relation) ->
@@ -962,13 +959,13 @@ public class DecisionTransformer {
    * of NormReferenceDTOs with the same normAbbreviation are grouped into one NormReference, with a
    * list of {@link SingleNorm}.
    *
-   * @param documentationUnitDTO The documentation unit DTO containing norm references to be added.
+   * @param decisionDTO The documentation unit DTO containing norm references to be added.
    * @return A list of NormReference objects representing the added norm references.
    */
-  private static List<NormReference> addNormReferencesToDomain(DecisionDTO documentationUnitDTO) {
+  private static List<NormReference> addNormReferencesToDomain(DecisionDTO decisionDTO) {
     List<NormReference> normReferences = new ArrayList<>();
 
-    documentationUnitDTO
+    decisionDTO
         .getNormReferences()
         .forEach(
             normReferenceDTO -> {
@@ -1020,7 +1017,7 @@ public class DecisionTransformer {
 
     // Handle cases where both abbreviation and raw value are null
     normReferences.addAll(
-        documentationUnitDTO.getNormReferences().stream()
+        decisionDTO.getNormReferences().stream()
             .filter(
                 normReferenceDTO ->
                     normReferenceDTO.getNormAbbreviation() == null
@@ -1032,38 +1029,38 @@ public class DecisionTransformer {
   }
 
   private static void addOriginalFileDocuments(
-      DecisionDTO documentationUnitDTO, DocumentationUnit.DocumentationUnitBuilder builder) {
+      DecisionDTO decisionDTO, DocumentationUnit.DocumentationUnitBuilder builder) {
     builder.attachments(
-        documentationUnitDTO.getAttachments().stream()
+        decisionDTO.getAttachments().stream()
             .map(AttachmentTransformer::transformToDomain)
             .toList());
   }
 
   private static void addStatusToDomain(
-      DecisionDTO documentationUnitDTO, DocumentationUnit.DocumentationUnitBuilder builder) {
-    builder.status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus()));
+      DecisionDTO decisionDTO, DocumentationUnit.DocumentationUnitBuilder builder) {
+    builder.status(StatusTransformer.transformToDomain(decisionDTO.getStatus()));
   }
 
   private static void addPreviousDecisionsToDomain(
-      DecisionDTO documentationUnitDTO, DocumentationUnit.DocumentationUnitBuilder builder) {
-    if (documentationUnitDTO.getPreviousDecisions() == null) {
+      DecisionDTO decisionDTO, DocumentationUnit.DocumentationUnitBuilder builder) {
+    if (decisionDTO.getPreviousDecisions() == null) {
       return;
     }
 
     builder.previousDecisions(
-        documentationUnitDTO.getPreviousDecisions().stream()
+        decisionDTO.getPreviousDecisions().stream()
             .map(PreviousDecisionTransformer::transformToDomain)
             .toList());
   }
 
   private static void addDeviatingDecisionDatesToDomain(
-      DecisionDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
-    if (documentationUnitDTO.getDeviatingDates() == null) {
+      DecisionDTO decisionDTO, CoreDataBuilder coreDataBuilder) {
+    if (decisionDTO.getDeviatingDates() == null) {
       return;
     }
 
     List<LocalDate> deviatingDecisionDates =
-        documentationUnitDTO.getDeviatingDates().stream().map(DeviatingDateDTO::getValue).toList();
+        decisionDTO.getDeviatingDates().stream().map(DeviatingDateDTO::getValue).toList();
     coreDataBuilder.deviatingDecisionDates(deviatingDecisionDates);
   }
 
@@ -1079,26 +1076,24 @@ public class DecisionTransformer {
   }
 
   private static void addDeviatingCourtsToDomain(
-      DecisionDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
-    if (documentationUnitDTO.getDeviatingCourts() == null) {
+      DecisionDTO decisionDTO, CoreDataBuilder coreDataBuilder) {
+    if (decisionDTO.getDeviatingCourts() == null) {
       return;
     }
 
     List<String> deviatingCourts =
-        documentationUnitDTO.getDeviatingCourts().stream()
-            .map(DeviatingCourtDTO::getValue)
-            .toList();
+        decisionDTO.getDeviatingCourts().stream().map(DeviatingCourtDTO::getValue).toList();
     coreDataBuilder.deviatingCourts(deviatingCourts);
   }
 
   private static void addDeviatingFileNumbersToDomain(
-      DecisionDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
-    if (documentationUnitDTO.getDeviatingFileNumbers() == null) {
+      DecisionDTO decisionDTO, CoreDataBuilder coreDataBuilder) {
+    if (decisionDTO.getDeviatingFileNumbers() == null) {
       return;
     }
 
     List<String> deviatingFileNumbers =
-        documentationUnitDTO.getDeviatingFileNumbers().stream()
+        decisionDTO.getDeviatingFileNumbers().stream()
             .map(DeviatingFileNumberDTO::getValue)
             .toList();
     coreDataBuilder.deviatingFileNumbers(deviatingFileNumbers);
@@ -1116,13 +1111,13 @@ public class DecisionTransformer {
   }
 
   private static void addFileNumbersToDomain(
-      DecisionDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
-    if (documentationUnitDTO.getFileNumbers() == null) {
+      DecisionDTO decisionDTO, CoreDataBuilder coreDataBuilder) {
+    if (decisionDTO.getFileNumbers() == null) {
       return;
     }
 
     List<String> fileNumbers =
-        documentationUnitDTO.getFileNumbers().stream().map(FileNumberDTO::getValue).toList();
+        decisionDTO.getFileNumbers().stream().map(FileNumberDTO::getValue).toList();
     coreDataBuilder.fileNumbers(fileNumbers);
   }
 
