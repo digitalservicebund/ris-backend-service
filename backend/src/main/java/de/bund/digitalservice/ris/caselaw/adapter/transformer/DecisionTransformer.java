@@ -208,6 +208,7 @@ public class DecisionTransformer {
       // if the source reference is not included in reference lists (= has been deleted), remove the
       // link to the source
       if (!existingSources.isEmpty()
+          && existingSources.getFirst().getReference() != null
           && !decisionContainsReferenceWithId(
               decision, existingSources.getFirst().getReference().getId())) {
         existingSources.getFirst().setReference(null);
