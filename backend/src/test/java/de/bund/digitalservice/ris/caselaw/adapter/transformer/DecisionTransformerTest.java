@@ -883,6 +883,8 @@ class DecisionTransformerTest {
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
     assertThat(decisionDTO.getSource().getFirst().getReference()).isNull();
+    assertThat(decisionDTO.getCaselawReferences()).isEmpty();
+    assertThat(decisionDTO.getLiteratureReferences()).isEmpty();
   }
 
   @ParameterizedTest
@@ -931,6 +933,10 @@ class DecisionTransformerTest {
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
     assertThat(decisionDTO.getSource().getFirst().getReference().getId()).isEqualTo(referenceId);
+    if (referenceType.equals(ReferenceType.CASELAW))
+      assertThat(decisionDTO.getCaselawReferences()).isNotEmpty();
+    else if (referenceType.equals(ReferenceType.LITERATURE))
+      assertThat(decisionDTO.getLiteratureReferences()).isNotEmpty();
   }
 
   @Test

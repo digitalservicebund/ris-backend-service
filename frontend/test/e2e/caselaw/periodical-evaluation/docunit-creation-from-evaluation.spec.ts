@@ -196,11 +196,11 @@ test.describe(
     test(
       "Docoffice is empty and has to be set manually when new decision has empty court",
       {
-        tag: ["@RISDEV-4999", "@RISDEV-4853"],
+        tag: ["@RISDEV-4999", "@RISDEV-4853", "@RISDEV-5898"],
         annotation: {
           type: "story",
           description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4999, https://digitalservicebund.atlassian.net/browse/RISDEV-4853",
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4999, https://digitalservicebund.atlassian.net/browse/RISDEV-4853, https://digitalservicebund.atlassian.net/browse/RISDEV-5898",
         },
       },
       async ({ page, edition }) => {
