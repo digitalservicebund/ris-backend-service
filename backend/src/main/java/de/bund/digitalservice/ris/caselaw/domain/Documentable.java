@@ -3,9 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * The domain model interface for a DocumentationUnit, a caselaw decision or a pending proceeding
- */
+/** The shared domain model interface for a caselaw decision or a pending proceeding */
 public interface Documentable {
 
   public UUID uuid();

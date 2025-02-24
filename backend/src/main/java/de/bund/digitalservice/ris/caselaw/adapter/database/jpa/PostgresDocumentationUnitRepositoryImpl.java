@@ -120,11 +120,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Transactional(transactionManager = "jpaTransactionManager")
   public PendingProceeding findPendingProceedingByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException {
-    var documentationUnit =
+    var pendingProceeding =
         repository
             .findByDocumentNumber(documentNumber)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-    return getPendingProceeding(documentationUnit);
+    return getPendingProceeding(pendingProceeding);
   }
 
   @Nullable
