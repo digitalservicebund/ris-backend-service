@@ -8,7 +8,7 @@ import {
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
-test.describe("preview", () => {
+test.describe("preview decision", () => {
   test("display preview, check that fields are filled with values from categories", async ({
     page,
     prefilledDocumentUnit,

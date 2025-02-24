@@ -15,7 +15,9 @@ import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
-import { LongTexts } from "@/domain/documentUnit"
+import { ContentRelatedIndexing, LongTexts } from "@/domain/documentUnit"
+import EnsuingDecision from "@/domain/ensuingDecision"
+import PreviousDecision from "@/domain/previousDecision"
 import Reference from "@/domain/reference"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -53,9 +55,15 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewLiteratureReferences
       :literature-references="documentUnit.literatureReferences as Reference[]"
     />
-    <PreviewProceedingDecisions />
-    <PreviewContentRelatedIndexing />
-
+    <PreviewProceedingDecisions
+      :ensuing-decisions="documentUnit.ensuingDecisions as EnsuingDecision[]"
+      :previous-decisions="documentUnit.previousDecisions as PreviousDecision[]"
+    />
+    <PreviewContentRelatedIndexing
+      :content-related-indexing="
+        documentUnit.contentRelatedIndexing as ContentRelatedIndexing
+      "
+    />
     <PreviewShortTexts
       :short-texts="documentUnit.shortTexts"
       :valid-border-numbers="documentUnit.managementData.borderNumbers"

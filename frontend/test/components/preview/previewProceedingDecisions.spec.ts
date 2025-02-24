@@ -1,8 +1,6 @@
-import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
-import DocumentUnit from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 
@@ -14,22 +12,11 @@ function renderComponent(
 ) {
   return {
     ...render(PreviewProceedingDecisions, {
+      props: {
+        previousDecisions: options.previousDecisions ?? [],
+        ensuingDecisions: options.ensuingDecisions ?? [],
+      },
       global: {
-        plugins: [
-          [
-            createTestingPinia({
-              initialState: {
-                docunitStore: {
-                  documentUnit: new DocumentUnit("123", {
-                    documentNumber: "foo",
-                    previousDecisions: options.previousDecisions ?? undefined,
-                    ensuingDecisions: options.ensuingDecisions ?? undefined,
-                  }),
-                },
-              },
-            }),
-          ],
-        ],
         provide: {
           [previewLayoutInjectionKey as symbol]: "wide",
         },
@@ -37,6 +24,7 @@ function renderComponent(
     }),
   }
 }
+
 describe("preview proceeding decisions", () => {
   test("renders all proceeding decisions", async () => {
     renderComponent({

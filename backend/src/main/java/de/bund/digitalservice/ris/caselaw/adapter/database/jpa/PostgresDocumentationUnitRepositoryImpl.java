@@ -113,7 +113,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
       return DecisionTransformer.transformToDomain(decisionDTO);
     }
-    return null;
+    return null; // TODO prevent NPE
   }
 
   @Override

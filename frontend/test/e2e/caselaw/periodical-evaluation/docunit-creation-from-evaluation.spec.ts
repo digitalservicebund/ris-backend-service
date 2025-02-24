@@ -690,7 +690,9 @@ test.describe(
           )
           await saveRequest
 
-          await navigateToPreview(page, documentNumber, { skipAssert: true })
+          await navigateToPreview(page, documentNumber, "documentunit", {
+            skipAssert: true,
+          })
 
           await expect(
             page.getByText(
