@@ -2,11 +2,11 @@
 import { storeToRefs } from "pinia"
 import { getCategoryLabel } from "@/components/text-check/categoryLabels"
 import Tooltip from "@/components/Tooltip.vue"
+import { useScroll } from "@/composables/useScroll"
 import router from "@/router"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { Match } from "@/types/languagetool"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
-import { useScroll } from "@/composables/useScroll"
 
 const props = defineProps<{
   match: Match
