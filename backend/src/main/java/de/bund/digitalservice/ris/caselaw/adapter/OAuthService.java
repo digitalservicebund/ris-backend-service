@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ApiKeyTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
+import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -120,7 +121,12 @@ public class OAuthService implements AuthService {
   public Function<String, Boolean> userHasReadAccessByDocumentNumber() {
     return documentNumber -> {
       try {
-        return Optional.ofNullable(documentationUnitService.getByDocumentNumber(documentNumber))
+        return Optional.ofNullable(
+                Optional.ofNullable(
+                        (Documentable) documentationUnitService.getByDocumentNumber(documentNumber))
+                    .orElse(
+                        documentationUnitService.getPendingProceedingByDocumentNumber(
+                            documentNumber)))
             .map(this::userHasReadAccess)
             .orElse(false);
       } catch (DocumentationUnitNotExistsException ex) {
@@ -287,7 +293,7 @@ public class OAuthService implements AuthService {
     return procedure.userGroupId() != null && procedure.userGroupId().equals(userGroupIdOfUser);
   }
 
-  private boolean userHasWriteAccess(DocumentationUnit documentationUnit) {
+  private boolean userHasWriteAccess(Documentable documentationUnit) {
     return getUserDocumentationOffice()
         .map(
             userOffice ->
@@ -326,7 +332,7 @@ public class OAuthService implements AuthService {
         || isPublishedStatus(status);
   }
 
-  private boolean userHasReadAccess(DocumentationUnit documentationUnit) {
+  private boolean userHasReadAccess(Documentable documentationUnit) {
     return documentationUnit.status() == null
         || isPublishedStatus(documentationUnit.status())
         || userHasWriteAccess(documentationUnit);

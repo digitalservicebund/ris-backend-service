@@ -25,7 +25,7 @@ public class DuplicateRelationTransformer {
    *     requested
    */
   public static DuplicateRelation transformToDomain(
-      DuplicateRelationDTO duplicateRelationDTO, DecisionDTO current) {
+      DuplicateRelationDTO duplicateRelationDTO, DocumentationUnitDTO current) {
     DecisionDTO duplicate;
     if (duplicateRelationDTO.getDocumentationUnit1().getId().equals(current.getId())) {
       duplicate = duplicateRelationDTO.getDocumentationUnit2();

@@ -9,6 +9,7 @@ import DocumentUnit, {
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import { SingleNormValidationInfo } from "@/domain/singleNorm"
@@ -18,6 +19,10 @@ interface DocumentUnitService {
   getByDocumentNumber(
     documentNumber: string,
   ): Promise<ServiceResponse<DocumentUnit>>
+
+  getPendingProceedingByDocumentNumber(
+    documentNumber: string,
+  ): Promise<ServiceResponse<PendingProceeding>>
 
   createNew(
     params?: DocumentationUnitParameters,
@@ -67,6 +72,26 @@ const service: DocumentUnitService = {
       }
     } else {
       response.data = new DocumentUnit(response.data.uuid, { ...response.data })
+    }
+    return response
+  },
+
+  async getPendingProceedingByDocumentNumber(documentNumber: string) {
+    const response = await httpClient.get<PendingProceeding>(
+      `caselaw/pendingproceeding/${documentNumber}`,
+    )
+    if (response.status >= 300 || response.error) {
+      response.data = undefined
+      response.error = {
+        title:
+          response.status == 403
+            ? errorMessages.DOCUMENT_UNIT_NOT_ALLOWED.title
+            : errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED.title,
+      }
+    } else {
+      response.data = new PendingProceeding(response.data.uuid, {
+        ...response.data,
+      })
     }
     return response
   },

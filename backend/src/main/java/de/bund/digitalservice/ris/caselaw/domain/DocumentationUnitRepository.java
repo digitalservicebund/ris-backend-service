@@ -22,6 +22,15 @@ public interface DocumentationUnitRepository {
   DocumentationUnit findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
 
+  /**
+   * Find a pending proceeding by its document number
+   *
+   * @param documentNumber the document number
+   * @return the pending proceeding found
+   */
+  PendingProceeding findPendingProceedingByDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException;
+
   DocumentationUnitListItem findDocumentationUnitListItemByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
 

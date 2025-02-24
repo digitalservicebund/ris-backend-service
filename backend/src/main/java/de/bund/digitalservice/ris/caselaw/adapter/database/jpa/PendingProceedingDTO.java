@@ -31,6 +31,21 @@ public class PendingProceedingDTO extends DocumentationUnitDTO {
   @Column(name = "resolution_note")
   private String resolutionNote;
 
+  // Erledigung
+  @Column(name = "is_resolved")
+  boolean isResolved;
+
+  // Rechtsfrage
+  @Column(name = "legal_issue")
+  String legalIssue;
+
+  // Rechtsmittelzulassung
+  @Column(name = "admission_of_appeal")
+  String admissionOfAppeal;
+
+  // Rechtsmittelführer
+  @Column String appellant;
+
   @Override
   public String getHeadnote() {
     return "";

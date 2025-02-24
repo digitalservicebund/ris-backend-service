@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransforme
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.StatusTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -12,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -111,7 +113,25 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
       return DecisionTransformer.transformToDomain(decisionDTO);
     }
-    // TODO other transformer
+    return null;
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public PendingProceeding findPendingProceedingByDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException {
+    var pendingProceeding =
+        repository
+            .findByDocumentNumber(documentNumber)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+    return getPendingProceeding(pendingProceeding);
+  }
+
+  @Nullable
+  private static PendingProceeding getPendingProceeding(DocumentationUnitDTO documentationUnit) {
+    if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
+      return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
+    }
     return null;
   }
 
