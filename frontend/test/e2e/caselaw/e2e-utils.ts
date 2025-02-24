@@ -1,4 +1,4 @@
-import { expect, Locator, Page, Request, JSHandle } from "@playwright/test"
+import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
 import { Browser } from "playwright"
 import { caselawTest as test } from "./fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
@@ -80,7 +80,10 @@ export const navigateToReferences = async (
 
     await page.goto(baseUrl)
     await expect(
-      page.getByRole("heading", { name: "Fundstellen", exact: true }),
+      page.getByRole("heading", {
+        name: "Rechtsprechungsfundstellen",
+        exact: true,
+      }),
     ).toBeVisible()
   })
 }
