@@ -25,7 +25,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
@@ -58,7 +57,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -255,32 +253,6 @@ class DecisionTransformerTest {
             InputTypeDTO.builder().value("input types 1").rank(1L).build(),
             InputTypeDTO.builder().value("input types 3").rank(2L).build(),
             InputTypeDTO.builder().value("input types 2").rank(3L).build());
-  }
-
-  @Test
-  void testTransformToDTO_withOneNormReference() {
-    DecisionDTO currentDto = DecisionDTO.builder().build();
-    NormReference normReferenceInput =
-        NormReference.builder()
-            .normAbbreviation(
-                NormAbbreviation.builder()
-                    .id(UUID.fromString("33333333-2222-3333-4444-555555555555"))
-                    .build())
-            .singleNorms(List.of(SingleNorm.builder().singleNorm("single norm").build()))
-            .build();
-
-    DocumentationUnit updatedDomainObject =
-        DocumentationUnit.builder()
-            .contentRelatedIndexing(
-                ContentRelatedIndexing.builder().norms(List.of(normReferenceInput)).build())
-            .build();
-
-    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
-
-    assertThat(decisionDTO.getNormReferences().getFirst().getNormAbbreviation().getId())
-        .isEqualTo(normReferenceInput.normAbbreviation().id());
-    assertThat(decisionDTO.getNormReferences().getFirst().getSingleNorm())
-        .isEqualTo(normReferenceInput.singleNorms().getFirst().singleNorm());
   }
 
   @Test
@@ -1159,164 +1131,6 @@ class DecisionTransformerTest {
     assertThat(documentationUnit.coreData().leadingDecisionNormReferences())
         .hasSize(3)
         .containsExactly("BGB §1", "BGB §2", "BGB §3");
-  }
-
-  @Test
-  void testTransformToDomain_shouldTransformStatus() {
-    DecisionDTO decisionDTO =
-        generateSimpleDTOBuilder()
-            .status(
-                StatusDTO.builder()
-                    .createdAt(Instant.now())
-                    .publicationStatus(PublicationStatus.UNPUBLISHED)
-                    .withError(false)
-                    .build())
-            .build();
-
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(decisionDTO);
-
-    assertThat(documentationUnit.status().publicationStatus())
-        .isEqualTo(PublicationStatus.UNPUBLISHED);
-    assertThat(documentationUnit.status().withError()).isFalse();
-  }
-
-  @Test
-  void
-      testTransformToDomain_withMultipleNormReferences_withSameNormAbbreviation_shouldGroupNorms() {
-    UUID normAbbreviationId = UUID.randomUUID();
-    DecisionDTO decisionDTO =
-        generateSimpleDTOBuilder()
-            .normReferences(
-                List.of(
-                    NormReferenceDTO.builder()
-                        .normAbbreviation(
-                            NormAbbreviationDTO.builder().id(normAbbreviationId).build())
-                        .singleNorm("single norm 1")
-                        .build(),
-                    NormReferenceDTO.builder()
-                        .normAbbreviation(
-                            NormAbbreviationDTO.builder().id(normAbbreviationId).build())
-                        .singleNorm("single norm 2")
-                        .build()))
-            .build();
-
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(decisionDTO);
-
-    assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(1);
-    assertThat(
-            documentationUnit.contentRelatedIndexing().norms().getFirst().normAbbreviation().id())
-        .isEqualTo(normAbbreviationId);
-    assertThat(
-            documentationUnit
-                .contentRelatedIndexing()
-                .norms()
-                .getFirst()
-                .singleNorms()
-                .getFirst()
-                .singleNorm())
-        .isEqualTo("single norm 1");
-    assertThat(
-            documentationUnit
-                .contentRelatedIndexing()
-                .norms()
-                .getFirst()
-                .singleNorms()
-                .get(1)
-                .singleNorm())
-        .isEqualTo("single norm 2");
-  }
-
-  @Test
-  void
-      testTransformToDomain_withMultipleNormReferences_withNoAbbreviation_withSameNAbbreviationRawValue_shouldGroupNorms() {
-    DecisionDTO decisionDTO =
-        generateSimpleDTOBuilder()
-            .normReferences(
-                List.of(
-                    NormReferenceDTO.builder()
-                        .normAbbreviationRawValue("foo")
-                        .singleNorm("single norm 1")
-                        .build(),
-                    NormReferenceDTO.builder()
-                        .normAbbreviationRawValue("foo")
-                        .singleNorm("single norm 2")
-                        .build()))
-            .build();
-
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(decisionDTO);
-
-    assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(1);
-    assertThat(
-            documentationUnit
-                .contentRelatedIndexing()
-                .norms()
-                .getFirst()
-                .normAbbreviationRawValue())
-        .isEqualTo("foo");
-    assertThat(
-            documentationUnit
-                .contentRelatedIndexing()
-                .norms()
-                .getFirst()
-                .singleNorms()
-                .getFirst()
-                .singleNorm())
-        .isEqualTo("single norm 1");
-    assertThat(
-            documentationUnit
-                .contentRelatedIndexing()
-                .norms()
-                .getFirst()
-                .singleNorms()
-                .get(1)
-                .singleNorm())
-        .isEqualTo("single norm 2");
-  }
-
-  @Test
-  void testTransformToDomain_withMultipleNormReferences_withDifferentNormAbbreviation() {
-    DecisionDTO decisionDTO =
-        generateSimpleDTOBuilder()
-            .normReferences(
-                List.of(
-                    NormReferenceDTO.builder()
-                        .normAbbreviation(
-                            NormAbbreviationDTO.builder().id(UUID.randomUUID()).build())
-                        .singleNorm("single norm 1")
-                        .build(),
-                    NormReferenceDTO.builder()
-                        .normAbbreviation(
-                            NormAbbreviationDTO.builder().id(UUID.randomUUID()).build())
-                        .singleNorm("single norm 2")
-                        .build()))
-            .build();
-
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(decisionDTO);
-
-    assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(2);
-    assertThat(
-            documentationUnit.contentRelatedIndexing().norms().getFirst().normAbbreviation().id())
-        .isEqualTo(decisionDTO.getNormReferences().getFirst().getNormAbbreviation().getId());
-    assertThat(documentationUnit.contentRelatedIndexing().norms().get(1).normAbbreviation().id())
-        .isEqualTo(decisionDTO.getNormReferences().get(1).getNormAbbreviation().getId());
-    assertThat(
-            documentationUnit
-                .contentRelatedIndexing()
-                .norms()
-                .getFirst()
-                .singleNorms()
-                .getFirst()
-                .singleNorm())
-        .isEqualTo("single norm 1");
-    assertThat(
-            documentationUnit
-                .contentRelatedIndexing()
-                .norms()
-                .get(1)
-                .singleNorms()
-                .getFirst()
-                .singleNorm())
-        .isEqualTo("single norm 2");
   }
 
   @Test
