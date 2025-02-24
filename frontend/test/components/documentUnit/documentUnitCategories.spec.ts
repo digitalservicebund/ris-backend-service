@@ -17,6 +17,9 @@ function renderComponent() {
   return {
     user,
     ...render(DocumentUnitCategories, {
+      props: {
+        registerTextEditorRef: vi.fn(),
+      },
       global: {
         directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
