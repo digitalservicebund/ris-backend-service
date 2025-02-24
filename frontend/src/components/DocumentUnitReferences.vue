@@ -49,13 +49,14 @@ async function addNewEntry(entryType: "caselaw" | "literature") {
   await scrollIntoViewportById(elementId)
 }
 </script>
-re
 
 <template>
   <div class="flex w-full flex-1 grow flex-col p-24">
-    <div class="flex flex-row gap-24 pb-24">
+    <div
+      v-if="caselawReferences.length + literatureReferences.length > 3"
+      class="flex flex-row gap-24 pb-24"
+    >
       <TextButton
-        v-if="caselawReferences.length > 5"
         aria-label="Weitere Angabe Rechtsprechung Top"
         button-type="tertiary"
         :icon="IconAdd"
@@ -64,7 +65,6 @@ re
         @click="addNewEntry('caselaw')"
       />
       <TextButton
-        v-if="literatureReferences.length > 5"
         aria-label="Weitere Angabe Literatur Top"
         button-type="tertiary"
         :icon="IconAdd"
