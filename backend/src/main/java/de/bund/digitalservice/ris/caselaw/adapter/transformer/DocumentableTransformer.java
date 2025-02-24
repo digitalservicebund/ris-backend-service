@@ -178,7 +178,11 @@ public class DocumentableTransformer {
           previousDecisions.stream()
               .map(PreviousDecisionTransformer::transformToDTO)
               .filter(Objects::nonNull)
-              .peek(previousDecisionDTO -> previousDecisionDTO.setRank(i.getAndIncrement()))
+              .map(
+                  activeCitationDTO -> {
+                    activeCitationDTO.setRank(i.getAndIncrement());
+                    return activeCitationDTO;
+                  })
               .toList());
     }
   }
@@ -455,7 +459,7 @@ public class DocumentableTransformer {
 
   static List<PreviousDecision> getPreviousDecisions(DocumentationUnitDTO decisionDTO) {
     if (decisionDTO.getPreviousDecisions() == null) {
-      return null;
+      return List.of();
     }
 
     return decisionDTO.getPreviousDecisions().stream()

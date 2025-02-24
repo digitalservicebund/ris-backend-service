@@ -252,7 +252,11 @@ public class DecisionTransformer extends DocumentableTransformer {
         contentRelatedIndexing.activeCitations().stream()
             .map(ActiveCitationTransformer::transformToDTO)
             .filter(Objects::nonNull)
-            .peek(activeCitationDTO -> activeCitationDTO.setRank(i.getAndIncrement()))
+            .map(
+                previousDecisionDTO -> {
+                  previousDecisionDTO.setRank(i.getAndIncrement());
+                  return previousDecisionDTO;
+                })
             .toList());
   }
 
@@ -494,7 +498,7 @@ public class DecisionTransformer extends DocumentableTransformer {
                     .toList())
         .previousDecisions(getPreviousDecisions(decisionDTO))
         .attachments(buildOriginalFileDocuments(decisionDTO))
-        .ensuingDecisions(buildEnsuingDecisionsToDomain(decisionDTO))
+        .ensuingDecisions(buildEnsuingDecisions(decisionDTO))
         .status(getStatus(decisionDTO))
         .build();
   }
@@ -646,10 +650,10 @@ public class DecisionTransformer extends DocumentableTransformer {
             .toList());
   }
 
-  private static List<EnsuingDecision> buildEnsuingDecisionsToDomain(DecisionDTO decisionDTO) {
+  private static List<EnsuingDecision> buildEnsuingDecisions(DecisionDTO decisionDTO) {
 
     if (decisionDTO.getPendingDecisions() == null && decisionDTO.getEnsuingDecisions() == null) {
-      return null;
+      return List.of();
     }
 
     List<EnsuingDecision> withoutRank = new ArrayList<>();
