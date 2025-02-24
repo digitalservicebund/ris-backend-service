@@ -1,5 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
+import type { Component } from "vue"
+import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
 import DocumentUnit, { LongTexts, ShortTexts } from "@/domain/documentUnit"
@@ -11,7 +13,18 @@ function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
     history: createWebHistory(),
     routes: routes,
   })
-  return render(DocumentUnitTexts, {
+
+  const textEditorRefs = ref<Record<string, Component | null>>({})
+  const registerTextEditorRef = (key: string, el: Component | null) => {
+    if (el) {
+      textEditorRefs.value[key] = el
+    }
+  }
+
+  const utils = render(DocumentUnitTexts, {
+    props: {
+      registerTextEditorRef: registerTextEditorRef,
+    },
     global: {
       plugins: [
         [
@@ -32,6 +45,8 @@ function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
       ],
     },
   })
+
+  return { ...utils, textEditorRefs }
 }
 
 describe("Texts", () => {
@@ -122,5 +137,32 @@ describe("Texts", () => {
       screen.getByLabelText("Sonstiger Langtext Button Leiste"),
     ).toBeVisible()
     expect(screen.getByLabelText("Gliederung Button Leiste")).toBeVisible()
+  })
+
+  test("renders all text editors with ref", async () => {
+    const { textEditorRefs } = renderComponent(
+      {
+        headline: "headline",
+        guidingPrinciple: "guiding principle",
+        headnote: "headnote",
+        otherHeadnote: "other headnote",
+      },
+      {
+        tenor: "tenor",
+        reasons: "reasons",
+        caseFacts: "case facts",
+        decisionReasons: "decision reasons",
+      },
+    )
+
+    expect(textEditorRefs.value["headline"]).toBeTruthy()
+    expect(textEditorRefs.value["guidingPrinciple"]).toBeTruthy()
+    expect(textEditorRefs.value["headnote"]).toBeTruthy()
+    expect(textEditorRefs.value["otherHeadnote"]).toBeTruthy()
+
+    expect(textEditorRefs.value["tenor"]).toBeTruthy()
+    expect(textEditorRefs.value["reasons"]).toBeTruthy()
+    expect(textEditorRefs.value["caseFacts"]).toBeTruthy()
+    expect(textEditorRefs.value["decisionReasons"]).toBeTruthy()
   })
 })

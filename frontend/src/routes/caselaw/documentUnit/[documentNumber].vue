@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { useHead } from "@unhead/vue"
 import { storeToRefs } from "pinia"
-import type { Component } from "vue"
 import { onBeforeUnmount, onMounted, Ref, ref } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
+import TextEditor from "@/components/input/TextEditor.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import SideToggle from "@/components/SideToggle.vue"
@@ -85,7 +85,7 @@ async function attachmentsUploaded(anySuccessful: boolean) {
   }
 }
 
-const textEditorRefs = ref<Record<string, TextEditor | null>>({})
+const textEditorRefs = ref<Record<string, typeof TextEditor | null>>({})
 
 /**
  * Gets text category as a key and add its text editor ref to the ref list
@@ -94,7 +94,7 @@ const textEditorRefs = ref<Record<string, TextEditor | null>>({})
  */
 const registerTextEditorRef = (
   textCategory: string,
-  textEditorComponent: Component,
+  textEditorComponent: typeof TextEditor,
 ) => {
   textEditorRefs.value[textCategory] = textEditorComponent
 }
@@ -150,7 +150,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
  * @param match
  */
 function jumpToMatch(match: Match) {
-  textEditorRefs.value[match.category].jumpToMatch(match)
+  const textEditor = textEditorRefs.value[match.category]
+  if (textEditor) {
+    textEditor.jumpToMatch(match)
+  }
 }
 
 onBeforeUnmount(() => {

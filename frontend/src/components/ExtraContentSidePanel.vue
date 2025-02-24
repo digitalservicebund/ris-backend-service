@@ -25,7 +25,7 @@ const props = defineProps<{
   sidePanelMode?: SelectablePanelContent
   sidePanelShortcut?: string
   icon?: Component
-  jumpToMatch: (match: Match) => void
+  jumpToMatch?: (match: Match) => void
 }>()
 
 const store = useExtraContentSidePanelStore()

@@ -9,7 +9,7 @@ import { Match, Replacement, Suggestion } from "@/types/languagetool"
 const props = defineProps<{
   suggestion: Suggestion
   isSelected?: boolean
-  jumpToMatch: (match: Match) => void
+  jumpToMatch?: (match: Match) => void
 }>()
 
 const emit = defineEmits<{

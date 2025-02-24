@@ -7,7 +7,7 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { Match, Suggestion } from "@/types/languagetool"
 
 defineProps<{
-  jumpToMatch: (match: Match) => void
+  jumpToMatch?: (match: Match) => void
 }>()
 
 const store = useDocumentUnitStore()

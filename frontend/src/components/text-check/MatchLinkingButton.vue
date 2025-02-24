@@ -9,7 +9,7 @@ import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 
 const props = defineProps<{
   match: Match
-  jumpToMatch: (match: Match) => void
+  jumpToMatch?: (match: Match) => void
 }>()
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
@@ -23,7 +23,9 @@ async function navigateToCategoriesAndJumpToMatch(match: Match) {
     },
   })
   scrollToCategory("#" + match.category)
-  props.jumpToMatch(match)
+  if (props.jumpToMatch) {
+    props.jumpToMatch(match)
+  }
 }
 
 function scrollToCategory(hash: string) {
