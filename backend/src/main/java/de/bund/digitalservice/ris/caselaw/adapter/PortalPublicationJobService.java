@@ -83,7 +83,11 @@ public class PortalPublicationJobService {
             .toList();
 
     if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {
-      this.ldmlExporterService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
+      try {
+        this.ldmlExporterService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
+      } catch (Exception e) {
+        log.error("Could not upload changelog file.", e);
+      }
     }
 
     return new PublicationResult(publishDocNumbers.size(), deletedDocNumbers.size());

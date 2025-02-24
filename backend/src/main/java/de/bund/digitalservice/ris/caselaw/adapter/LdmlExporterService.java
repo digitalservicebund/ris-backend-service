@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
@@ -61,6 +62,7 @@ public class LdmlExporterService {
     this.schema = xmlUtilService.getSchema("caselawhandover/shared/akomantoso30.xsd");
   }
 
+  // FIXME: delete this method
   public void exportMultipleRandomDocumentationUnits() {
     log.info("Export to LDML process has started");
     List<DocumentationUnit> documentationUnitsToTransform = new ArrayList<>();
@@ -210,17 +212,13 @@ public class LdmlExporterService {
   }
 
   public void uploadChangelog(
-      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers) {
+      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
+      throws JsonProcessingException {
     Changelog changelog = new Changelog(publishedDocumentNumbers, deletedDocumentNumbers);
 
-    try {
-      String changelogString = objectMapper.writeValueAsString(changelog);
-      ldmlBucket.save(
-          "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json",
-          changelogString);
-    } catch (IOException e) {
-      log.error("Could not upload changelog file.", e);
-    }
+    String changelogString = objectMapper.writeValueAsString(changelog);
+    ldmlBucket.save(
+        "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
   @Async

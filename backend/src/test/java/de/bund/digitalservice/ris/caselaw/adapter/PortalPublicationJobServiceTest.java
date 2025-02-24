@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
@@ -46,7 +47,8 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldPublishASingleDocUnit() throws DocumentationUnitNotExistsException {
+  void shouldPublishASingleDocUnit()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("123", PortalPublicationTaskType.PUBLISH));
     when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
 
@@ -61,7 +63,8 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldDeleteASingleDocUnit() throws DocumentationUnitNotExistsException {
+  void shouldDeleteASingleDocUnit()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("456", PortalPublicationTaskType.DELETE));
     when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
 
@@ -76,7 +79,8 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldHandleErrorWhenPublishingASingleDocUnit() throws DocumentationUnitNotExistsException {
+  void shouldHandleErrorWhenPublishingASingleDocUnit()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("789", PortalPublicationTaskType.PUBLISH));
     when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
     doThrow(RuntimeException.class).when(ldmlExporterService).publishDocumentationUnit("789");
@@ -91,7 +95,8 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldHandleErrorWhenDeletingASingleDocUnit() throws DocumentationUnitNotExistsException {
+  void shouldHandleErrorWhenDeletingASingleDocUnit()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("312", PortalPublicationTaskType.DELETE));
     when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
     doThrow(RuntimeException.class).when(ldmlExporterService).deleteDocumentationUnit("312");
@@ -106,7 +111,25 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldContinueExecutionOnErrors() throws DocumentationUnitNotExistsException {
+  void shouldCatchErrorWhenUploadingChangelogFails()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
+    var jobs = List.of(createPublicationJob("312", PortalPublicationTaskType.DELETE));
+    when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
+    doThrow(RuntimeException.class).when(ldmlExporterService).uploadChangelog(any(), any());
+
+    this.service.executePendingJobs();
+
+    verify(ldmlExporterService, never()).publishDocumentationUnit(anyString());
+    verify(ldmlExporterService, times(1)).deleteDocumentationUnit("312");
+    verify(ldmlExporterService, times(1)).uploadChangelog(List.of(), List.of("312"));
+    verify(publicationJobRepository, times(1)).saveAll(jobs);
+    assertThat(jobs.getFirst().getPublicationStatus())
+        .isEqualTo(PortalPublicationTaskStatus.SUCCESS);
+  }
+
+  @Test
+  void shouldContinueExecutionOnErrors()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs =
         List.of(
             createPublicationJob("1", PortalPublicationTaskType.PUBLISH),
