@@ -190,7 +190,10 @@ const buttonsDisabled = computed(
   () => !(props.editable && (hasFocus.value || isHovered.value)),
 )
 
-const shouldShow = (): boolean => {
+/**
+ * A function to determine rather a match menu should be shownen
+ */
+const shouldShowBubbleMenu = (): boolean => {
   if (editor == undefined) return false
 
   if (
@@ -274,9 +277,24 @@ const resizeObserver = new ResizeObserver((entries) => {
   }
 })
 
+/**
+ * Set the selected text of match in focus
+ * @param selectedMatch
+ */
 function jumpToMatch(selectedMatch: Match) {
-  match.value = editor.storage.languagetool.languageToolService.match
-  matchRange.value = editor.storage.languagetool.languageToolService.matchRange
+  editor
+    .chain()
+    .focus()
+    .setTextSelection({
+      from: selectedMatch.offset,
+      to: selectedMatch.offset + selectedMatch.length,
+    })
+    .run()
+
+  editor.commands.setTextSelection({
+    from: selectedMatch.offset,
+    to: selectedMatch.offset + selectedMatch.length,
+  })
 }
 
 defineExpose({ jumpToMatch })
@@ -320,7 +338,7 @@ defineExpose({ jumpToMatch })
         v-if="editor"
         class="bubble-menu"
         :editor="editor"
-        :should-show="shouldShow"
+        :should-show="shouldShowBubbleMenu"
         :tippy-options="{ placement: 'bottom', animation: 'fade' }"
       >
         <TextCheckModal

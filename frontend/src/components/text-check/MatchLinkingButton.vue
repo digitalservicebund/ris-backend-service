@@ -14,16 +14,6 @@ const props = defineProps<{
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
 
-function categoriesRoute() {
-  return {
-    name: "caselaw-documentUnit-documentNumber-categories",
-    hash: `#${props.match.category}`,
-    params: {
-      documentNumber: documentUnit.value!.documentNumber,
-    },
-  }
-}
-
 async function navigateToCategoriesAndJumpToMatch(match: Match) {
   await router.push({
     name: "caselaw-documentUnit-documentNumber-categories",
@@ -32,7 +22,17 @@ async function navigateToCategoriesAndJumpToMatch(match: Match) {
       documentNumber: documentUnit.value!.documentNumber,
     },
   })
+  scrollToCategory("#" + match.category)
   props.jumpToMatch(match)
+}
+
+function scrollToCategory(hash: string) {
+  if (hash) {
+    const element = document.querySelector(hash)
+    if (element) {
+      element.scrollIntoView({ block: "nearest" })
+    }
+  }
 }
 </script>
 

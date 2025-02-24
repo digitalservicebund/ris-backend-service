@@ -10,8 +10,6 @@ defineProps<{
   jumpToMatch: (match: Match) => void
 }>()
 
-const emit = defineEmits<(event: "jumpToMatch", match: Match) => void>()
-
 const store = useDocumentUnitStore()
 
 const errors = ref<Suggestion[]>()

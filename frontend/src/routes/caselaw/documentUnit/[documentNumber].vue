@@ -7,8 +7,6 @@ import { useRoute } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
-import type { TextEditor } from "@/components/input/TextEditor.vue"
-import { ValidationError } from "@/components/input/types"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import SideToggle from "@/components/SideToggle.vue"
@@ -41,7 +39,6 @@ const route = useRoute()
 const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
 const { pushQueryToRoute } = useQuery()
 
-const validationErrors = ref<ValidationError[]>([])
 const showNavigationPanelRef: Ref<boolean> = ref(
   route.query.showNavigationPanel !== "false",
 )
