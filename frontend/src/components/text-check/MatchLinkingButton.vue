@@ -6,34 +6,27 @@ import router from "@/router"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { Match } from "@/types/languagetool"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
+import { useScroll } from "@/composables/useScroll"
 
 const props = defineProps<{
   match: Match
   jumpToMatch?: (match: Match) => void
 }>()
 
+const { scrollIntoViewportById } = useScroll()
+
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
 
 async function navigateToCategoriesAndJumpToMatch(match: Match) {
   await router.push({
     name: "caselaw-documentUnit-documentNumber-categories",
-    hash: `#${props.match.category}`,
     params: {
       documentNumber: documentUnit.value!.documentNumber,
     },
   })
-  scrollToCategory("#" + match.category)
+  await scrollIntoViewportById(match.category)
   if (props.jumpToMatch) {
     props.jumpToMatch(match)
-  }
-}
-
-function scrollToCategory(hash: string) {
-  if (hash) {
-    const element = document.querySelector(hash)
-    if (element) {
-      element.scrollIntoView({ block: "nearest" })
-    }
   }
 }
 </script>
