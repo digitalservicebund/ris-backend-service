@@ -46,6 +46,28 @@ public class PortalPublicationJobService {
         publicationResult.deletedCount);
   }
 
+  private void executeJob(PortalPublicationJobDTO job) {
+    if (job.getPublicationType() == PortalPublicationTaskType.PUBLISH) {
+      try {
+        this.ldmlExporterService.publishDocumentationUnit(job.getDocumentNumber());
+        job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
+      } catch (Exception e) {
+        log.error("Could not publish documentation unit {}", job.getDocumentNumber(), e);
+        job.setPublicationStatus(PortalPublicationTaskStatus.ERROR);
+      }
+    }
+
+    if (job.getPublicationType() == PortalPublicationTaskType.DELETE) {
+      try {
+        this.ldmlExporterService.deleteDocumentationUnit(job.getDocumentNumber());
+        job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
+      } catch (Exception e) {
+        log.error("Could not unpublish documentation unit {}", job.getDocumentNumber(), e);
+        job.setPublicationStatus(PortalPublicationTaskStatus.ERROR);
+      }
+    }
+  }
+
   private PublicationResult publishChangelog(List<PortalPublicationJobDTO> pendingJobs) {
     List<String> publishDocNumbers =
         pendingJobs.stream()
@@ -60,29 +82,11 @@ public class PortalPublicationJobService {
             .map(PortalPublicationJobDTO::getDocumentNumber)
             .toList();
 
-    this.ldmlExporterService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
+    if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {
+      this.ldmlExporterService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
+    }
 
     return new PublicationResult(publishDocNumbers.size(), deletedDocNumbers.size());
-  }
-
-  private void executeJob(PortalPublicationJobDTO job) {
-    if (job.getPublicationType() == PortalPublicationTaskType.PUBLISH) {
-      try {
-        this.ldmlExporterService.publishDocumentationUnit(job.getDocumentNumber());
-        job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
-      } catch (Exception e) {
-        job.setPublicationStatus(PortalPublicationTaskStatus.ERROR);
-      }
-    }
-
-    if (job.getPublicationType() == PortalPublicationTaskType.DELETE) {
-      try {
-        this.ldmlExporterService.deleteDocumentationUnit(job.getDocumentNumber());
-        job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
-      } catch (Exception e) {
-        job.setPublicationStatus(PortalPublicationTaskStatus.ERROR);
-      }
-    }
   }
 
   private record PublicationResult(int publishedCount, int deletedCount) {}
