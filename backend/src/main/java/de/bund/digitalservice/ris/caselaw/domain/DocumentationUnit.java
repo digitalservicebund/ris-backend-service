@@ -46,4 +46,5 @@ public record DocumentationUnit(
     List<Reference> caselawReferences,
     List<Reference> literatureReferences,
     boolean isEditable,
-    boolean isDeletable) {}
+    boolean isDeletable)
+    implements Documentable {}

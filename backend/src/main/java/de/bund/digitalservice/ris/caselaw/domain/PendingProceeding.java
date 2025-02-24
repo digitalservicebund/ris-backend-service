@@ -45,4 +45,7 @@ public record PendingProceeding(
     boolean isResolved,
     String legalIssue,
     String admissionOfAppeal,
-    String appellant) {}
+    String appellant,
+    boolean isEditable,
+    boolean isDeletable)
+    implements Documentable {}
