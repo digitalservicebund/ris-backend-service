@@ -9,11 +9,11 @@ import DocumentUnit, {
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import { SingleNormValidationInfo } from "@/domain/singleNorm"
 import errorMessages from "@/i18n/errors.json"
-import PendingProceeding from "@/domain/pendingProceeding"
 
 interface DocumentUnitService {
   getByDocumentNumber(

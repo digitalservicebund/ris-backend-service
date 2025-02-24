@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import { useRoute } from "vue-router"
+import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 
 const route = useRoute()
 const documentNumber = route.params.documentNumber as string
