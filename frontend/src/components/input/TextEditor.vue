@@ -262,7 +262,7 @@ watch(
 watch(
   () => props.textCheck,
   (newValue) => {
-    editor.commands.toggleLanguageTool(newValue)
+    editor.commands.toggleTextCheckActiveState(newValue)
   },
 )
 

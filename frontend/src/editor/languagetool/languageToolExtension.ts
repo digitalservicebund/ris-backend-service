@@ -18,15 +18,13 @@ declare module "@tiptap/core" {
        */
       proofread: () => ReturnType
 
-      toggleProofreading: () => ReturnType
-
       ignoreLanguageToolSuggestion: () => ReturnType
 
       resetLanguageToolMatch: () => ReturnType
 
-      toggleLanguageTool: (state: boolean) => ReturnType
+      toggleTextCheckActiveState: (state: boolean) => ReturnType
 
-      getLanguageToolState: () => ReturnType
+      getTextCheckActiveState: () => ReturnType
     }
   }
 }
@@ -112,20 +110,20 @@ export const LanguageToolExtension = Extension.create<
           return false
         },
 
-      toggleLanguageTool:
+      toggleTextCheckActiveState:
         (state) =>
         ({ commands }) => {
-          this.storage.languageToolService!.languageToolActive = state
+          this.storage.languageToolService!.isTextCheckActive = state
 
-          if (this.storage.languageToolService!.languageToolActive)
+          if (this.storage.languageToolService!.isTextCheckActive)
             commands.proofread()
           else commands.resetLanguageToolMatch()
 
           return false
         },
 
-      getLanguageToolState: () => () =>
-        this.storage.languageToolService!.languageToolActive,
+      getIsTextCheckActive: () => () =>
+        this.storage.languageToolService!.isTextCheckActive,
     }
   },
 
@@ -143,6 +141,8 @@ export const LanguageToolExtension = Extension.create<
             this.storage.languageToolService = new LanguageTool(
               DecorationSet.create(state.doc, []),
             )
+            this.storage.languageToolService!.isTextCheckActive =
+              this.options.textToolEnabled
 
             if (this.options.automaticMode && this.options.textToolEnabled) {
               void this.storage.languageToolService.proofreadAndDecorateWholeDoc(
@@ -153,7 +153,7 @@ export const LanguageToolExtension = Extension.create<
             return this.storage.languageToolService.decorationSet
           },
           apply: (tr) => {
-            if (!this.storage.languageToolService!.languageToolActive)
+            if (!this.storage.languageToolService!.isTextCheckActive)
               return DecorationSet.empty
 
             const loading = tr.getMeta(

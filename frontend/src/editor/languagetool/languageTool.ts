@@ -55,7 +55,7 @@ export default class LanguageTool {
 
   public proofReadInitially = false
 
-  public languageToolActive: boolean = false
+  public isTextCheckActive: boolean = false
 
   constructor(decorationSet: DecorationSet) {
     this.decorationSet = decorationSet
@@ -94,7 +94,7 @@ export default class LanguageTool {
     originalFrom: number,
   ) => {
     let matches: Match[] = []
-    if (!StringsUtil.isEmpty(text) && this.languageToolActive) {
+    if (!StringsUtil.isEmpty(text) && this.isTextCheckActive) {
       const languageToolCheckResponse: ServiceResponse<TextCheckResponse> =
         await languageToolService.check(text)
 
@@ -117,7 +117,7 @@ export default class LanguageTool {
       const docFrom = match.offset + originalFrom
       const docTo = docFrom + match.length
 
-      decorations.push(this.gimmeDecoration(docFrom, docTo, match))
+      decorations.push(this.generateDecoration(docFrom, docTo, match))
     }
 
     const decorationsToRemove = this.decorationSet.find(
@@ -138,7 +138,11 @@ export default class LanguageTool {
       )
   }
 
-  private readonly gimmeDecoration = (from: number, to: number, match: Match) =>
+  private readonly generateDecoration = (
+    from: number,
+    to: number,
+    match: Match,
+  ) =>
     Decoration.inline(from, to, {
       class: `lt lt-${match.rule.issueType}`,
       nodeName: "span",
