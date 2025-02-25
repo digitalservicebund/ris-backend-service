@@ -141,7 +141,7 @@ export const LanguageToolExtension = Extension.create<
             this.storage.languageToolService = new LanguageTool(
               DecorationSet.create(state.doc, []),
             )
-            this.storage.languageToolService!.isTextCheckActive =
+            this.storage.languageToolService.isTextCheckActive =
               this.options.textToolEnabled
 
             if (this.options.automaticMode && this.options.textToolEnabled) {
