@@ -1,4 +1,4 @@
-import { expect, Locator, Page, Request, JSHandle } from "@playwright/test"
+import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
 import { Browser } from "playwright"
 import { caselawTest as test } from "./fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
@@ -80,7 +80,10 @@ export const navigateToReferences = async (
 
     await page.goto(baseUrl)
     await expect(
-      page.getByRole("heading", { name: "Fundstellen", exact: true }),
+      page.getByRole("heading", {
+        name: "Rechtsprechungsfundstellen",
+        exact: true,
+      }),
     ).toBeVisible()
   })
 }
@@ -117,23 +120,23 @@ export const navigateToPeriodicalHandover = async (
     await expect(page.getByTestId("handover-title")).toBeVisible()
   })
 }
-
 export const navigateToPreview = async (
   page: Page,
   documentNumber: string,
+  type: "pending-proceeding" | "documentunit" = "documentunit",
   options?: {
     skipAssert?: boolean
   },
 ) => {
   await test.step("Navigate to 'Vorschau'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
-    const baseUrl = `/caselaw/documentunit/${documentNumber}/preview${queryParams}`
+    const baseUrl = `/caselaw/${type}/${documentNumber}/preview${queryParams}`
 
     await page.goto(baseUrl)
 
     if (options?.skipAssert) return
     await expect(page.getByTestId("preview")).toBeVisible({
-      timeout: 15000, // for backend warm up
+      timeout: 15000, // for backend warm-up
     })
     await expect(page.getByText(documentNumber)).toBeVisible()
   })

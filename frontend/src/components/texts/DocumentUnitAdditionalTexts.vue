@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { type Component, computed } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import ParticipatingJudges from "@/components/ParticipatingJudges.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
@@ -7,6 +7,10 @@ import { useInternalUser } from "@/composables/useInternalUser"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
+
+defineProps<{
+  registerTextEditorRef: (key: string, el: Component | null) => void
+}>()
 
 const store = useDocumentUnitStore()
 
@@ -61,6 +65,7 @@ const outline = computed({
     <div class="flex flex-col gap-24">
       <TextEditorCategory
         id="otherLongText"
+        v-bind="{ registerTextEditorRef }"
         v-model="otherLongText"
         :editable="isInternalUser"
         label="Sonstiger Langtext"
@@ -71,6 +76,7 @@ const outline = computed({
 
       <TextEditorCategory
         id="dissentingOpinion"
+        v-bind="{ registerTextEditorRef }"
         v-model="dissentingOpinion"
         :editable="isInternalUser"
         label="Abweichende Meinung"
@@ -90,6 +96,7 @@ const outline = computed({
 
       <div class="gap-0">
         <TextEditorCategory
+          v-bind="{ registerTextEditorRef }"
           id="outline"
           v-model="outline"
           :editable="isInternalUser"

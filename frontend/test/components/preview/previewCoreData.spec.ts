@@ -7,6 +7,7 @@ function renderComponent(coreData: CoreData) {
   return render(PreviewCoreData, {
     props: {
       coreData: coreData,
+      dateLabel: "Entscheidungsdatum",
     },
     global: {
       provide: {

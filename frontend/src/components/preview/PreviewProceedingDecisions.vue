@@ -1,26 +1,15 @@
 <script setup lang="ts">
-import { computed } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import EnsuingDecision from "@/domain/ensuingDecision"
+import PreviousDecision from "@/domain/previousDecision"
 
-const store = useDocumentUnitStore()
-
-const previousDecisions = computed({
-  get: () => store.documentUnit!.previousDecisions,
-  set: (newValues) => {
-    store.documentUnit!.previousDecisions = newValues
-  },
-})
-
-const ensuingDecisions = computed({
-  get: () => store.documentUnit!.ensuingDecisions,
-  set: (newValues) => {
-    store.documentUnit!.ensuingDecisions = newValues
-  },
-})
+defineProps<{
+  previousDecisions: PreviousDecision[] | undefined
+  ensuingDecisions: EnsuingDecision[] | undefined
+}>()
 </script>
 
 <template>

@@ -117,7 +117,10 @@ test.describe("category import", () => {
 
       await test.step("open Fundstellen tab", async () => {
         await expect(
-          page.getByRole("heading", { name: "Fundstellen", exact: true }),
+          page.getByRole("heading", {
+            name: "Rechtsprechungsfundstellen",
+            exact: true,
+          }),
         ).toBeInViewport()
       })
 
@@ -208,7 +211,10 @@ test.describe("category import", () => {
 
       await test.step("open Fundstellen tab", async () => {
         await expect(
-          page.getByRole("heading", { name: "Fundstellen", exact: true }),
+          page.getByRole("heading", {
+            name: "Rechtsprechungsfundstellen",
+            exact: true,
+          }),
         ).toBeInViewport()
       })
 

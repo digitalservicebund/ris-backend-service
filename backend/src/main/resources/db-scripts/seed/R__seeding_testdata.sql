@@ -1,22 +1,24 @@
 -- This timestamp updates the checksum, so flyway registers an update and migrates each time
 -- ${flyway:timestamp}
-delete from
-  incremental_migration.documentation_unit
-where
-  document_number LIKE 'YY%';
+
+BEGIN;
+
+DELETE FROM incremental_migration.decision p
+    USING incremental_migration.documentation_unit d
+WHERE p.id = d.id
+  AND d.document_number LIKE 'YY%';;
+
+DELETE FROM incremental_migration.pending_proceeding p
+    USING incremental_migration.documentation_unit d
+WHERE p.id = d.id
+  AND d.document_number LIKE 'YY%';;
 
 -- Delete any test-related records in the documentation_unit table
-delete from
-    incremental_migration.decision
+DELETE FROM incremental_migration.documentation_unit
 where
-    current_procedure_id IN (
-        SELECT
-            id
-        from
-            incremental_migration.procedure
-        where
-            name LIKE 'test_%'
-    );
+    document_number LIKE 'YY%';
+
+COMMIT;
 
 -- Delete test-related records from documentation_unit_procedure
 delete from
@@ -520,6 +522,40 @@ VALUES
       NULL,
       NULL,
       NULL
+  ),
+    --- pending proceeding ---
+    (
+      gen_random_uuid (),
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.court
+          WHERE
+              type
+                  = 'BFH'
+      ),
+      '2025-02-24',
+      'YYTestDoc0017',
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.document_type
+          WHERE
+              abbreviation = 'Anh'
+      ),
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_office
+          WHERE
+              abbreviation = 'BFH'
+      ),
+      NULL,
+      NULL,
+      NULL
   );
 
 INSERT INTO
@@ -745,6 +781,32 @@ VALUES
         NULL,
         NULL,
         NULL
+    );
+
+
+INSERT INTO
+    incremental_migration.pending_proceeding (
+    id,
+    resolution_note,
+    is_resolved,
+    legal_issue,
+    admission_of_appeal,
+    appellant
+)
+VALUES
+    (
+        (SELECT
+        id
+        FROM
+        incremental_migration.documentation_unit
+        WHERE
+        document_number
+        = 'YYTestDoc0017'),
+        '<p>Verfahren ist erledigt durch: Zurücknahme der Klage. Das erstinstanzliche Urteil ist gegenstandslos.</p>',
+        true,
+        '<p>Gewerbesteuerpflicht des Bäderbetriebs einer Gemeinde als Betrieb gewerblicher Art (Gewinnerzielungsabsicht)? Ist ein Betrieb gewerblicher Art einer juristischen Person des öffentlichen Rechts nur gewerbesteuerpflichtig, wenn er mit der Absicht der Gewinnerzielung betrieben wird?</p>',
+        'Zulassung durch BFH',
+        'Verwaltung'
     );
 
 INSERT INTO
@@ -1030,7 +1092,21 @@ VALUES
           WHERE
               document_number = 'YYTestDoc0016'
       )
-    )
+    ),
+    (
+      gen_random_uuid (),
+      '2025-02-25 18:38:43.043877 +00:00',
+      'PUBLISHED',
+      false,
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_unit
+          WHERE
+              document_number = 'YYTestDoc0017'
+      )
+    );
     ;
 
 UPDATE incremental_migration.documentation_unit SET current_status_id =
@@ -1097,6 +1173,10 @@ WHERE document_number = 'YYTestDoc0015';
 UPDATE incremental_migration.documentation_unit SET current_status_id =
     (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0016'))
 WHERE document_number = 'YYTestDoc0016';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0017'))
+WHERE document_number = 'YYTestDoc0017';
 
 
 UPDATE
@@ -1173,7 +1253,21 @@ VALUES
         document_number = 'YYTestDoc0013'
     ),
     1
-  );
+  ),
+    (
+        gen_random_uuid (),
+        'I R 20000/34',
+        (
+            SELECT
+                id
+            FROM
+                incremental_migration.documentation_unit
+            WHERE
+                document_number = 'YYTestDoc0017'
+        ),
+        1
+    );
+    ;
 
 INSERT INTO
     incremental_migration.keyword (id, value)

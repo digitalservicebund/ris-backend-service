@@ -1,10 +1,14 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { type Component, computed } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
 import { longTextLabels } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
+
+defineProps<{
+  registerTextEditorRef: (key: string, el: Component | null) => void
+}>()
 
 const store = useDocumentUnitStore()
 
@@ -71,6 +75,7 @@ const decisionReasons = computed({
     <div class="flex flex-col gap-24">
       <TextEditorCategory
         id="tenor"
+        v-bind="{ registerTextEditorRef }"
         v-model="tenor"
         :label="longTextLabels.tenor"
         :should-show-button="!store.documentUnit?.longTexts?.tenor?.length"
@@ -78,6 +83,7 @@ const decisionReasons = computed({
 
       <TextEditorCategory
         id="reasons"
+        v-bind="{ registerTextEditorRef }"
         v-model="reasons"
         :label="longTextLabels.reasons"
         :should-show-button="!store.documentUnit?.longTexts?.reasons?.length"
@@ -85,6 +91,7 @@ const decisionReasons = computed({
 
       <TextEditorCategory
         id="caseFacts"
+        v-bind="{ registerTextEditorRef }"
         v-model="caseFacts"
         :label="longTextLabels.caseFacts"
         :should-show-button="!store.documentUnit?.longTexts?.caseFacts?.length"
@@ -92,6 +99,7 @@ const decisionReasons = computed({
 
       <TextEditorCategory
         id="decisionReasons"
+        v-bind="{ registerTextEditorRef }"
         v-model="decisionReasons"
         :label="longTextLabels.decisionReasons"
         :should-show-button="

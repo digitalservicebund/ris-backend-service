@@ -5,73 +5,69 @@ import FieldOfLawNodeView from "@/components/preview/FieldOfLawNodeView.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { ContentRelatedIndexing } from "@/domain/documentUnit"
 
-const store = useDocumentUnitStore()
-const contentRelatedIndexing = computed({
-  get: () => store.documentUnit!.contentRelatedIndexing,
-  set: (newValues) => {
-    store.documentUnit!.contentRelatedIndexing = newValues
-  },
-})
+const props = defineProps<{
+  contentRelatedIndexing: ContentRelatedIndexing
+}>()
 
 const hasKeywords = computed(() => {
   return (
-    contentRelatedIndexing.value.keywords &&
-    contentRelatedIndexing.value.keywords?.length > 0
+    props.contentRelatedIndexing.keywords &&
+    props.contentRelatedIndexing.keywords?.length > 0
   )
 })
 
 const hasFieldsOfLaw = computed(() => {
   return (
-    contentRelatedIndexing.value.fieldsOfLaw &&
-    contentRelatedIndexing.value.fieldsOfLaw?.length > 0
+    props.contentRelatedIndexing.fieldsOfLaw &&
+    props.contentRelatedIndexing.fieldsOfLaw?.length > 0
   )
 })
 
 const hasNorms = computed(() => {
   return (
-    contentRelatedIndexing.value.norms &&
-    contentRelatedIndexing.value.norms?.length > 0
+    props.contentRelatedIndexing.norms &&
+    props.contentRelatedIndexing.norms?.length > 0
   )
 })
 
 const hasActiveCitations = computed(() => {
   return (
-    contentRelatedIndexing.value.activeCitations &&
-    contentRelatedIndexing.value.activeCitations?.length > 0
+    props.contentRelatedIndexing.activeCitations &&
+    props.contentRelatedIndexing.activeCitations?.length > 0
   )
 })
 
 const hasJobProfiles = computed(() => {
   return (
-    contentRelatedIndexing.value.jobProfiles &&
-    contentRelatedIndexing.value.jobProfiles?.length > 0
+    props.contentRelatedIndexing.jobProfiles &&
+    props.contentRelatedIndexing.jobProfiles?.length > 0
   )
 })
 
 const hasCollectiveAgreements = computed(() => {
   return (
-    contentRelatedIndexing.value.collectiveAgreements &&
-    contentRelatedIndexing.value.collectiveAgreements?.length > 0
+    props.contentRelatedIndexing.collectiveAgreements &&
+    props.contentRelatedIndexing.collectiveAgreements?.length > 0
   )
 })
 
 const hasDismissalGrounds = computed(() => {
   return (
-    contentRelatedIndexing.value.dismissalGrounds &&
-    contentRelatedIndexing.value.dismissalGrounds?.length > 0
+    props.contentRelatedIndexing.dismissalGrounds &&
+    props.contentRelatedIndexing.dismissalGrounds?.length > 0
   )
 })
 
 const hasDismissalTypes = computed(() => {
   return (
-    contentRelatedIndexing.value.dismissalTypes &&
-    contentRelatedIndexing.value.dismissalTypes?.length > 0
+    props.contentRelatedIndexing.dismissalTypes &&
+    props.contentRelatedIndexing.dismissalTypes?.length > 0
   )
 })
 const hasLegislativeMandate = computed(() => {
-  return contentRelatedIndexing.value.hasLegislativeMandate
+  return props.contentRelatedIndexing.hasLegislativeMandate
 })
 </script>
 
@@ -80,7 +76,10 @@ const hasLegislativeMandate = computed(() => {
     <PreviewRow v-if="hasKeywords">
       <PreviewCategory>Schlagwörter</PreviewCategory>
       <PreviewContent>
-        <div v-for="keyword in contentRelatedIndexing.keywords" :key="keyword">
+        <div
+          v-for="keyword in props.contentRelatedIndexing.keywords"
+          :key="keyword"
+        >
           {{ keyword }}
         </div>
       </PreviewContent>
@@ -89,7 +88,7 @@ const hasLegislativeMandate = computed(() => {
       <PreviewCategory>Sachgebiete</PreviewCategory>
       <PreviewContent>
         <div
-          v-for="fieldOfLaw in contentRelatedIndexing.fieldsOfLaw"
+          v-for="fieldOfLaw in props.contentRelatedIndexing.fieldsOfLaw"
           :key="fieldOfLaw.identifier"
           class="flex flex-row"
         >
@@ -104,7 +103,7 @@ const hasLegislativeMandate = computed(() => {
     <PreviewRow v-if="hasNorms">
       <PreviewCategory>Normen</PreviewCategory>
       <PreviewContent>
-        <div v-for="norm in contentRelatedIndexing.norms" :key="norm.id">
+        <div v-for="norm in props.contentRelatedIndexing.norms" :key="norm.id">
           <div v-if="norm.singleNorms && norm.singleNorms.length > 0">
             <div v-for="(singleNorm, i) in norm.singleNorms" :key="i">
               {{ norm.renderSummary }}
@@ -129,7 +128,7 @@ const hasLegislativeMandate = computed(() => {
       <PreviewCategory>Aktivzitierung</PreviewCategory>
       <PreviewContent>
         <div
-          v-for="activeCitation in contentRelatedIndexing.activeCitations"
+          v-for="activeCitation in props.contentRelatedIndexing.activeCitations"
           :key="activeCitation.id"
         >
           {{ activeCitation.renderSummary }}
@@ -140,7 +139,8 @@ const hasLegislativeMandate = computed(() => {
       <PreviewCategory>Tarifvertrag</PreviewCategory>
       <PreviewContent data-testid="Tarifvertrag">
         <div
-          v-for="collectiveAgreement in contentRelatedIndexing.collectiveAgreements"
+          v-for="collectiveAgreement in props.contentRelatedIndexing
+            .collectiveAgreements"
           :key="collectiveAgreement"
         >
           {{ collectiveAgreement }}
@@ -151,7 +151,7 @@ const hasLegislativeMandate = computed(() => {
       <PreviewCategory>Kündigungsarten</PreviewCategory>
       <PreviewContent data-testid="Kündigungsarten">
         <div
-          v-for="dismissalType in contentRelatedIndexing.dismissalTypes"
+          v-for="dismissalType in props.contentRelatedIndexing.dismissalTypes"
           :key="dismissalType"
         >
           {{ dismissalType }}
@@ -162,7 +162,8 @@ const hasLegislativeMandate = computed(() => {
       <PreviewCategory>Kündigungsgründe</PreviewCategory>
       <PreviewContent data-testid="Kündigungsgründe">
         <div
-          v-for="dismissalGround in contentRelatedIndexing.dismissalGrounds"
+          v-for="dismissalGround in props.contentRelatedIndexing
+            .dismissalGrounds"
           :key="dismissalGround"
         >
           {{ dismissalGround }}
@@ -173,7 +174,7 @@ const hasLegislativeMandate = computed(() => {
       <PreviewCategory>Berufsbild</PreviewCategory>
       <PreviewContent>
         <div
-          v-for="jobProfile in contentRelatedIndexing.jobProfiles"
+          v-for="jobProfile in props.contentRelatedIndexing.jobProfiles"
           :key="jobProfile"
         >
           {{ jobProfile }}

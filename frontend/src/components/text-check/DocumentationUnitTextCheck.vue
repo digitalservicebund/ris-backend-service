@@ -4,7 +4,11 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import SuggestionGroup from "@/components/text-check/SuggestionGroup.vue"
 import languageToolService from "@/services/languageToolService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { Suggestion } from "@/types/languagetool"
+import { Match, Suggestion } from "@/types/languagetool"
+
+defineProps<{
+  jumpToMatch?: (match: Match) => void
+}>()
 
 const store = useDocumentUnitStore()
 
@@ -62,6 +66,7 @@ onMounted(async () => {
           :key="error.word"
           :is-selected="selectedSuggestion == error"
           :suggestion="error"
+          v-bind="{ jumpToMatch }"
           @click="selectedSuggestion = error"
           @suggestion:ignore="ignoreSuggestion"
           @suggestion:update="acceptSuggestion"
