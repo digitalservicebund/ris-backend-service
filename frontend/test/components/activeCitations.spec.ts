@@ -9,7 +9,6 @@ import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
-import featureToggleService from "@/services/featureToggleService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
@@ -116,10 +115,7 @@ describe("active citations", () => {
   afterAll(() => server.close())
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
+
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",

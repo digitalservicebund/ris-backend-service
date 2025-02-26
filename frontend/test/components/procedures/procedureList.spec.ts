@@ -8,7 +8,6 @@ import { createRouter, createWebHistory } from "vue-router"
 import { Page } from "@/components/Pagination.vue"
 import ProcedureList from "@/components/procedures/ProcedureList.vue"
 import { Procedure } from "@/domain/documentUnit"
-import featureToggleService from "@/services/featureToggleService"
 import service from "@/services/procedureService"
 import userGroupsService from "@/services/userGroupsService"
 
@@ -131,12 +130,7 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
 }
 
 describe("ProcedureList", () => {
-  beforeEach(() => {
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
-  })
+  beforeEach(() => {})
 
   afterEach(() => {
     vi.resetAllMocks()

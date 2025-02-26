@@ -10,7 +10,6 @@ import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import documentUnitService from "@/services/documentUnitService"
-import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/legalPeriodicalEditionService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
@@ -116,10 +115,6 @@ describe("Legal periodical edition evaluation", () => {
         }),
       }),
     )
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
   })
 
   afterEach(() => {

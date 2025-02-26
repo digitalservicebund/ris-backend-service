@@ -7,7 +7,6 @@ import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
-import featureToggleService from "@/services/featureToggleService"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 
 let router: Router
@@ -114,11 +113,6 @@ describe("ExtraContentSidePanel", () => {
           component: {},
         },
       ],
-    })
-
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
     })
   })
 

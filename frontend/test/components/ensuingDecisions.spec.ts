@@ -8,7 +8,6 @@ import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import documentUnitService from "@/services/documentUnitService"
-import featureToggleService from "@/services/featureToggleService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
@@ -105,10 +104,6 @@ describe("EnsuingDecisions", () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
   beforeEach(() => {
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",

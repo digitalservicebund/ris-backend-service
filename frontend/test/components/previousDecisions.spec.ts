@@ -8,7 +8,6 @@ import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
-import featureToggleService from "@/services/featureToggleService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
@@ -104,10 +103,6 @@ describe("PreviousDecisions", () => {
 
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
 
     vi.spyOn(
       documentUnitService,

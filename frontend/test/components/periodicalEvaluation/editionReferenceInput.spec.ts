@@ -6,7 +6,6 @@ import { createRouter, createWebHistory } from "vue-router"
 import PeriodicalEditionReferenceInput from "@/components/periodical-evaluation/references/PeriodicalEditionReferenceInput.vue"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import documentUnitService from "@/services/documentUnitService"
-import featureToggleService from "@/services/featureToggleService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
@@ -108,11 +107,6 @@ describe("Legal periodical edition reference input", () => {
         },
       }),
     )
-
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
   })
 
   it("search is triggered with shortcut", async () => {

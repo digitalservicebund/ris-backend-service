@@ -10,7 +10,6 @@ import handover from "@/routes/caselaw/periodical-evaluation/[editionId]/handove
 import references from "@/routes/caselaw/periodical-evaluation/[editionId]/references.vue"
 import EditionId from "@/routes/caselaw/periodical-evaluation/[editionId].vue"
 import documentUnitService from "@/services/documentUnitService"
-import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -126,10 +125,6 @@ describe("Edition Id Route", () => {
         ],
       }),
     )
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
   })
 
   describe("Conditional rendering", () => {
