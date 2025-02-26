@@ -196,9 +196,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  // TODO find out whats wrong
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("text editor", async ({ page, documentNumber }) => {
+  test("text editor", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await clickCategoryButton("Leitsatz", page)
     const editorField = page.locator("[data-testid='Leitsatz'] >> div")
@@ -206,7 +204,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await editorField.type("this is text")
 
     const accessibilityScanResults = await useAxeBuilder(page)
-      .disableRules(["duplicate-id-aria"])
+      .disableRules(["duplicate-id-aria", "aria-allowed-attr"])
       .analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })

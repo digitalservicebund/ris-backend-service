@@ -335,7 +335,10 @@ function onDelete() {
                 class="flex cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
                 target="_blank"
                 :to="{
-                  name: 'caselaw-documentUnit-documentNumber-preview',
+                  name:
+                    listEntry.documentType?.jurisShortcut === 'Anh'
+                      ? 'caselaw-pending-proceeding-documentNumber-preview'
+                      : 'caselaw-documentUnit-documentNumber-preview',
                   params: { documentNumber: listEntry.documentNumber },
                 }"
               >
