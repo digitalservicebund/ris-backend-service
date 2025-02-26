@@ -184,39 +184,37 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
-  public void save(Documentable documentationUnit) {
+  public void save(Documentable documentable) {
 
     DocumentationUnitDTO documentationUnitDTO =
-        repository.findById(documentationUnit.uuid()).orElse(null);
+        repository.findById(documentable.uuid()).orElse(null);
     if (documentationUnitDTO == null) {
-      log.info("Can't save non-existing docUnit with id = " + documentationUnit.uuid());
+      log.info("Can't save non-existing docUnit with id = " + documentable.uuid());
       return;
     }
 
     // ---
     // Doing database-related (pre) transformation
 
-    if (documentationUnit.coreData() != null) {
+    if (documentable.coreData() != null) {
       documentationUnitDTO.getRegions().clear();
-      if (documentationUnit.coreData().court() != null
-          && documentationUnit.coreData().court().id() != null) {
+      if (documentable.coreData().court() != null && documentable.coreData().court().id() != null) {
         Optional<CourtDTO> court =
-            databaseCourtRepository.findById(documentationUnit.coreData().court().id());
+            databaseCourtRepository.findById(documentable.coreData().court().id());
         if (court.isPresent() && court.get().getRegion() != null) {
           documentationUnitDTO.getRegions().add(court.get().getRegion());
         }
         // delete leading decision norm references if court is not BGH
-        if (documentationUnit instanceof DocumentationUnit
+        if (documentable instanceof DocumentationUnit documentationUnit
             && court.isPresent()
             && !court.get().getType().equals("BGH")) {
-          documentationUnit =
-              ((DocumentationUnit) documentationUnit)
-                  .toBuilder()
-                      .coreData(
-                          documentationUnit.coreData().toBuilder()
-                              .leadingDecisionNormReferences(List.of())
-                              .build())
-                      .build();
+          documentable =
+              documentationUnit.toBuilder()
+                  .coreData(
+                      documentationUnit.coreData().toBuilder()
+                          .leadingDecisionNormReferences(List.of())
+                          .build())
+                  .build();
         }
       }
     }
@@ -224,7 +222,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       documentationUnitDTO =
-          DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentationUnit);
+          DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);
       repository.save(documentationUnitDTO);
     }
     // TODO pending proceeding
