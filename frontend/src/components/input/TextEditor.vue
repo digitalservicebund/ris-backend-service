@@ -301,7 +301,7 @@ function jumpToMatch(selectedMatch: Match) {
  * trigger text check when text editor has focus
  */
 watch(hasFocus, () => {
-  if (hasFocus) {
+  if (hasFocus.value) {
     editor.commands.proofread()
   }
 })
