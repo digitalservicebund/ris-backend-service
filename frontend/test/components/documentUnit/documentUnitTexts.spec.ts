@@ -165,4 +165,4 @@ describe("Texts", () => {
     expect(textEditorRefs.value["caseFacts"]).toBeTruthy()
     expect(textEditorRefs.value["decisionReasons"]).toBeTruthy()
   })
-}, 10000)
+})
