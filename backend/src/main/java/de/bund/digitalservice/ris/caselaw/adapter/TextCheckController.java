@@ -65,6 +65,7 @@ public class TextCheckController {
   }
 
   @GetMapping("{id}/text-check")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<TextCheckResponse> checkCategory(
       @PathVariable("id") UUID id, @Param("category") String category) {
     List<Match> matches;

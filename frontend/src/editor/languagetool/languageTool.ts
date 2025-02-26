@@ -141,10 +141,6 @@ export default class LanguageTool {
     setTimeout(this.addEventListenersToDecorations, 100)
   }
 
-  // public checkCategory(doc: PMNode, category?: string) {
-  //   this.checkCategoryAndSetDecorations(doc, category)
-  // }
-
   public checkCategoryAndSetDecorations = async (
     doc: PMNode,
     category?: string,
@@ -169,7 +165,7 @@ export default class LanguageTool {
       const docFrom = match.offset + 1
       const docTo = docFrom + match.length
 
-      decorations.push(this.gimmeDecoration(docFrom, docTo, match))
+      decorations.push(this.generateDecoration(docFrom, docTo, match))
     }
 
     this.decorationSet = DecorationSet.empty
