@@ -39,12 +39,12 @@ public class PortalPublicationJobDTO {
   @Include
   private String documentNumber;
 
-  @Column(name = "publication_type")
+  @Column(name = "portal_publication_type")
   @NotNull
   @Enumerated(EnumType.STRING)
   private PortalPublicationTaskType publicationType;
 
-  @Column(name = "publication_status")
+  @Column(name = "portal_publication_status")
   @NotNull
   @Enumerated(EnumType.STRING)
   private PortalPublicationTaskStatus publicationStatus;
