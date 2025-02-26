@@ -229,7 +229,7 @@ class DocumentationUnitServiceTest {
     Assertions.assertThrows(
         DocumentationUnitDeletionException.class, () -> service.deleteByUuid(TEST_UUID));
 
-    verify(repository, times(2)).findByUuid(TEST_UUID);
+    verify(repository, times(1)).findByUuid(TEST_UUID);
   }
 
   @Test

@@ -8,12 +8,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingT
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.StatusTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
-import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -99,7 +99,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public DocumentationUnit findByDocumentNumber(String documentNumber)
+  public Documentable findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository
@@ -109,26 +109,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Nullable
-  private static DocumentationUnit getDocumentationUnit(DocumentationUnitDTO documentationUnit) {
+  private static Documentable getDocumentationUnit(DocumentationUnitDTO documentationUnit) {
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
       return DecisionTransformer.transformToDomain(decisionDTO);
     }
-    return null; // TODO prevent NPE
-  }
-
-  @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
-  public PendingProceeding findPendingProceedingByDocumentNumber(String documentNumber)
-      throws DocumentationUnitNotExistsException {
-    var pendingProceeding =
-        repository
-            .findByDocumentNumber(documentNumber)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-    return getPendingProceeding(pendingProceeding);
-  }
-
-  @Nullable
-  private static PendingProceeding getPendingProceeding(DocumentationUnitDTO documentationUnit) {
     if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
       return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
     }
@@ -148,7 +132,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public DocumentationUnit findByUuid(UUID uuid) throws DocumentationUnitNotExistsException {
+  public Documentable findByUuid(UUID uuid) throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
     return getDocumentationUnit(documentationUnit);
@@ -200,7 +184,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
-  public void save(DocumentationUnit documentationUnit) {
+  public void save(Documentable documentationUnit) {
 
     DocumentationUnitDTO documentationUnitDTO =
         repository.findById(documentationUnit.uuid()).orElse(null);
@@ -222,28 +206,32 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           documentationUnitDTO.getRegions().add(court.get().getRegion());
         }
         // delete leading decision norm references if court is not BGH
-        if (court.isPresent() && !court.get().getType().equals("BGH")) {
+        if (documentationUnit instanceof DocumentationUnit
+            && court.isPresent()
+            && !court.get().getType().equals("BGH")) {
           documentationUnit =
-              documentationUnit.toBuilder()
-                  .coreData(
-                      documentationUnit.coreData().toBuilder()
-                          .leadingDecisionNormReferences(List.of())
-                          .build())
-                  .build();
+              ((DocumentationUnit) documentationUnit)
+                  .toBuilder()
+                      .coreData(
+                          documentationUnit.coreData().toBuilder()
+                              .leadingDecisionNormReferences(List.of())
+                              .build())
+                      .build();
         }
       }
     }
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
-      documentationUnitDTO = DecisionTransformer.transformToDTO(decisionDTO, documentationUnit);
+      documentationUnitDTO =
+          DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentationUnit);
       repository.save(documentationUnitDTO);
     }
     // TODO pending proceeding
   }
 
   @Override
-  public void saveKeywords(DocumentationUnit documentationUnit) {
+  public void saveKeywords(Documentable documentationUnit) {
     if (documentationUnit == null || documentationUnit.contentRelatedIndexing() == null) {
       return;
     }
@@ -291,7 +279,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
-  public void saveFieldsOfLaw(DocumentationUnit documentationUnit) {
+  public void saveFieldsOfLaw(Documentable documentationUnit) {
     if (documentationUnit == null || documentationUnit.contentRelatedIndexing() == null) {
       return;
     }
@@ -343,10 +331,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void saveProcedures(DocumentationUnit documentationUnit) {
+  public void saveProcedures(Documentable documentationUnit) {
     if (documentationUnit == null
         || documentationUnit.coreData() == null
-        || documentationUnit.coreData().procedure() == null) {
+        || documentationUnit.coreData().procedure() == null
+        || !(documentationUnit instanceof DocumentationUnit)) {
       return;
     }
 
@@ -410,7 +399,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
-  public void delete(DocumentationUnit documentationUnit) {
+  public void delete(Documentable documentationUnit) {
     repository.deleteById(documentationUnit.uuid());
   }
 

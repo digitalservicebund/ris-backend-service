@@ -163,8 +163,8 @@ class ScheduledPublicationServiceTest {
         .save(
             argThat(
                 updatedDocUnit ->
-                    werePublicationDatesSet(updatedDocUnit)
-                        && areAllOtherFieldsEqual(docUnit, updatedDocUnit)));
+                    werePublicationDatesSet((DocumentationUnit) updatedDocUnit)
+                        && areAllOtherFieldsEqual(docUnit, (DocumentationUnit) updatedDocUnit)));
   }
 
   private boolean werePublicationDatesSet(DocumentationUnit actualDocUnit) {

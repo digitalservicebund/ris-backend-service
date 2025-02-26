@@ -207,7 +207,8 @@ class DuplicateCheckFullIntegrationTest {
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
+      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
+          .isEmpty();
     }
 
     @Test
@@ -228,7 +229,8 @@ class DuplicateCheckFullIntegrationTest {
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
+      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
+          .isEmpty();
     }
 
     @Test
@@ -264,7 +266,8 @@ class DuplicateCheckFullIntegrationTest {
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(initialDocUnit.managementData().duplicateRelations()).isEmpty();
+      assertThat(((DocumentationUnit) initialDocUnit).managementData().duplicateRelations())
+          .isEmpty();
     }
 
     @Test
@@ -301,7 +304,8 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       DuplicateRelation duplicate =
-          foundDocUnit.managementData().duplicateRelations().stream().findFirst().get();
+          ((DocumentationUnit) foundDocUnit)
+              .managementData().duplicateRelations().stream().findFirst().get();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
     }
@@ -340,7 +344,8 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       DuplicateRelation duplicate =
-          foundDocUnit.managementData().duplicateRelations().stream().findFirst().get();
+          ((DocumentationUnit) foundDocUnit)
+              .managementData().duplicateRelations().stream().findFirst().get();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
     }
@@ -381,7 +386,8 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       DuplicateRelation duplicate =
-          foundDocUnit.managementData().duplicateRelations().stream().findFirst().get();
+          ((DocumentationUnit) foundDocUnit)
+              .managementData().duplicateRelations().stream().findFirst().get();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
     }
@@ -422,7 +428,8 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       DuplicateRelation duplicate =
-          foundDocUnit.managementData().duplicateRelations().stream().findFirst().get();
+          ((DocumentationUnit) foundDocUnit)
+              .managementData().duplicateRelations().stream().findFirst().get();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.IGNORED);
     }
@@ -457,14 +464,8 @@ class DuplicateCheckFullIntegrationTest {
       // Create duplicate with pending status
       duplicateCheckService.checkAllDuplicates();
       assertThat(
-              documentationUnitService
-                  .getByUuid(docUnitToBeChecked.getId())
-                  .managementData()
-                  .duplicateRelations()
-                  .stream()
-                  .findFirst()
-                  .get()
-                  .status())
+              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+                  .managementData().duplicateRelations().stream().findFirst().get().status())
           .isEqualTo(DuplicateRelationStatus.PENDING);
 
       // change isJdvDuplicateCheckActive from null to false
@@ -478,7 +479,8 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       DuplicateRelation duplicate =
-          foundDocUnit.managementData().duplicateRelations().stream().findFirst().get();
+          ((DocumentationUnit) foundDocUnit)
+              .managementData().duplicateRelations().stream().findFirst().get();
       assertThat(duplicate.documentNumber()).isEqualTo(duplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.IGNORED);
     }
@@ -519,14 +521,8 @@ class DuplicateCheckFullIntegrationTest {
       // Create duplicates
       duplicateCheckService.checkAllDuplicates();
       assertThat(
-              documentationUnitService
-                  .getByUuid(docUnitToBeChecked.getId())
-                  .managementData()
-                  .duplicateRelations()
-                  .stream()
-                  .findFirst()
-                  .get()
-                  .status())
+              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+                  .managementData().duplicateRelations().stream().findFirst().get().status())
           .isEqualTo(DuplicateRelationStatus.PENDING);
       assertThat(duplicateRelationRepository.findAll()).hasSize(3);
 
@@ -541,10 +537,11 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
+              ((DocumentationUnit) foundDocUnit)
+                  .managementData().duplicateRelations().stream()
+                      .findFirst()
+                      .get()
+                      .documentNumber())
           .isEqualTo("DocumentNumb2");
     }
 
@@ -576,8 +573,7 @@ class DuplicateCheckFullIntegrationTest {
       // Create duplicates
       duplicateCheckService.checkAllDuplicates();
       assertThat(
-              documentationUnitService
-                  .getByUuid(docUnitToBeChecked.getId())
+              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations())
           .hasSize(1);
@@ -589,8 +585,7 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
       assertThat(
-              documentationUnitService
-                  .getByUuid(docUnitToBeChecked.getId())
+              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations())
           .isEmpty();
@@ -634,8 +629,7 @@ class DuplicateCheckFullIntegrationTest {
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       // ... it won't be sent to the frontend
       assertThat(
-              documentationUnitService
-                  .getByUuid(docUnitToBeChecked.getId())
+              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations())
           .isEmpty();
@@ -679,14 +673,8 @@ class DuplicateCheckFullIntegrationTest {
 
       // Assert
       assertThat(
-              documentationUnitService
-                  .getByUuid(original.getId())
-                  .managementData()
-                  .duplicateRelations()
-                  .stream()
-                  .findFirst()
-                  .get()
-                  .status())
+              ((DocumentationUnit) documentationUnitService.getByUuid(original.getId()))
+                  .managementData().duplicateRelations().stream().findFirst().get().status())
           .isEqualTo(DuplicateRelationStatus.IGNORED);
     }
 
@@ -739,10 +727,11 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
+              ((DocumentationUnit) foundDocUnit)
+                  .managementData().duplicateRelations().stream()
+                      .findFirst()
+                      .get()
+                      .documentNumber())
           .isEqualTo(secondParams.documentNumber);
     }
 
@@ -778,10 +767,11 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
+              ((DocumentationUnit) foundDocUnit)
+                  .managementData().duplicateRelations().stream()
+                      .findFirst()
+                      .get()
+                      .documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
@@ -818,10 +808,11 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
+              ((DocumentationUnit) foundDocUnit)
+                  .managementData().duplicateRelations().stream()
+                      .findFirst()
+                      .get()
+                      .documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
@@ -856,10 +847,11 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
+              ((DocumentationUnit) foundDocUnit)
+                  .managementData().duplicateRelations().stream()
+                      .findFirst()
+                      .get()
+                      .documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
@@ -897,10 +889,11 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
+              ((DocumentationUnit) foundDocUnit)
+                  .managementData().duplicateRelations().stream()
+                      .findFirst()
+                      .get()
+                      .documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
@@ -937,10 +930,11 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
+              ((DocumentationUnit) foundDocUnit)
+                  .managementData().duplicateRelations().stream()
+                      .findFirst()
+                      .get()
+                      .documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
@@ -975,10 +969,11 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
+              ((DocumentationUnit) foundDocUnit)
+                  .managementData().duplicateRelations().stream()
+                      .findFirst()
+                      .get()
+                      .documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 

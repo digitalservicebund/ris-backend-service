@@ -50,7 +50,12 @@ public class TextCheckService {
       throws DocumentationUnitNotExistsException {
     List<Match> allMatches = new ArrayList<>();
 
-    DocumentationUnit documentationUnit = documentationUnitService.getByUuid(id);
+    Documentable documentable = documentationUnitService.getByUuid(id);
+
+    if (!(documentable instanceof DocumentationUnit documentationUnit)) {
+      throw new UnsupportedOperationException(
+          "Check not supported for Documentable type: " + documentable.getClass());
+    }
 
     if (documentationUnit.longTexts() != null) {
       allMatches.addAll(checkReasons(documentationUnit));
@@ -67,7 +72,16 @@ public class TextCheckService {
   @SuppressWarnings("unused")
   public List<Match> checkCategory(UUID id, CategoryType category)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit = documentationUnitService.getByUuid(id);
+    if (category == null) {
+      return Collections.emptyList();
+    }
+
+    Documentable documentable = documentationUnitService.getByUuid(id);
+
+    if (!(documentable instanceof DocumentationUnit documentationUnit)) {
+      throw new UnsupportedOperationException(
+          "Check category not supported for Documentable type: " + documentable.getClass());
+    }
 
     if (Objects.requireNonNull(category) == CategoryType.DECISION_REASON) {
       return checkDecisionReasonsByHTML(documentationUnit);

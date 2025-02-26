@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
+import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -67,7 +68,7 @@ public class DocumentationUnitController {
   private final ConverterService converterService;
   private final HandoverService handoverService;
   private final LdmlExporterService ldmlExporterService;
-  private final OAuthService oAuthService;
+
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
   private final DuplicateCheckService duplicateCheckService;
@@ -79,7 +80,6 @@ public class DocumentationUnitController {
       ConverterService converterService,
       HandoverService handoverService,
       LdmlExporterService ldmlExporterService,
-      OAuthService oAuthService,
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService,
       DuplicateCheckService duplicateCheckService) {
@@ -89,7 +89,6 @@ public class DocumentationUnitController {
     this.converterService = converterService;
     this.handoverService = handoverService;
     this.ldmlExporterService = ldmlExporterService;
-    this.oAuthService = oAuthService;
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
     this.duplicateCheckService = duplicateCheckService;
@@ -171,9 +170,13 @@ public class DocumentationUnitController {
 
   private void initializeCoreDataAndCheckDuplicates(UUID uuid, Docx2Html docx2html) {
     try {
-      DocumentationUnit docUnit = service.getByUuid(uuid);
-      documentationUnitDocxMetadataInitializationService.initializeCoreData(docUnit, docx2html);
-      checkDuplicates(docUnit.documentNumber());
+      Documentable documentable = service.getByUuid(uuid);
+      if (documentable instanceof DocumentationUnit docUnit) {
+        documentationUnitDocxMetadataInitializationService.initializeCoreData(docUnit, docx2html);
+        checkDuplicates(docUnit.documentNumber());
+      } else {
+        log.info("Documentable type not supported: {}", documentable.getClass().getName());
+      }
     } catch (DocumentationUnitNotExistsException ex) {
       // file upload should not fail because of core data initialization or dup check
       log.error(
@@ -252,17 +255,10 @@ public class DocumentationUnitController {
     }
 
     try {
+      Documentable documentable = service.getByDocumentNumberWithUser(documentNumber, oidcUser);
       checkDuplicates(documentNumber);
-      var documentationUnit = service.getByDocumentNumber(documentNumber);
-      return ResponseEntity.ok(
-          documentationUnit.toBuilder()
-              .isEditable(
-                  oAuthService.userHasWriteAccess(
-                      oidcUser,
-                      documentationUnit.coreData().creatingDocOffice(),
-                      documentationUnit.coreData().documentationOffice(),
-                      documentationUnit.status()))
-              .build());
+      return ResponseEntity.ok((DocumentationUnit) documentable);
+
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);
       return ResponseEntity.ok(DocumentationUnit.builder().build());

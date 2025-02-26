@@ -61,8 +61,14 @@ public class HandoverService {
   public HandoverMail handoverDocumentationUnitAsMail(
       UUID documentationUnitId, String issuerAddress) throws DocumentationUnitNotExistsException {
 
-    DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId);
-    return mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
+    Documentable documentable = repository.findByUuid(documentationUnitId);
+
+    if (documentable instanceof DocumentationUnit documentationUnit) {
+      return mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
+    } else {
+      log.info("Documentable type not supported: {}", documentable.getClass().getName());
+      return null;
+    }
   }
 
   /**
@@ -96,8 +102,14 @@ public class HandoverService {
   public XmlTransformationResult createPreviewXml(UUID documentUuid)
       throws DocumentationUnitNotExistsException {
 
-    DocumentationUnit documentationUnit = repository.findByUuid(documentUuid);
-    return mailService.getXmlPreview(documentationUnit);
+    Documentable documentable = repository.findByUuid(documentUuid);
+
+    if (documentable instanceof DocumentationUnit documentationUnit) {
+      return mailService.getXmlPreview(documentationUnit);
+    } else {
+      log.info("Documentable type not supported: {}", documentable.getClass().getName());
+    }
+    return null;
   }
 
   /**

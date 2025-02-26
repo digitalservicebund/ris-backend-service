@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -69,7 +70,14 @@ public class LdmlExporterService {
     idsToTransform.forEach(
         id -> {
           try {
-            documentationUnitsToTransform.add(documentationUnitRepository.findByUuid(id));
+            Documentable documentable = documentationUnitRepository.findByUuid(id);
+            if (documentable instanceof DocumentationUnit documentationUnit) {
+              documentationUnitsToTransform.add(documentationUnit);
+            } else {
+              log.info(
+                  "Documentable type not supported for LDML export: "
+                      + documentable.getClass().getName());
+            }
           } catch (DocumentationUnitNotExistsException ex) {
             log.debug(ex.getMessage());
           }
@@ -116,8 +124,14 @@ public class LdmlExporterService {
    */
   public void publishDocumentationUnit(UUID documentationUnitId)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        documentationUnitRepository.findByUuid(documentationUnitId);
+
+    Documentable documentable = documentationUnitRepository.findByUuid(documentationUnitId);
+
+    if (!(documentable instanceof DocumentationUnit documentationUnit)) {
+      throw new UnsupportedOperationException(
+          "Publish not supported for Documentable type: " + documentable.getClass());
+    }
+
     Optional<CaseLawLdml> ldml =
         DocumentationUnitToLdmlTransformer.transformToLdml(
             documentationUnit, documentBuilderFactory);
@@ -245,13 +259,18 @@ public class LdmlExporterService {
     ZipOutputStream zos = new ZipOutputStream(baos);
 
     for (String documentNumber : documentNumbers) {
-      DocumentationUnit documentationUnit;
+      Documentable documentable;
       try {
-        documentationUnit = documentationUnitRepository.findByDocumentNumber(documentNumber);
+        documentable = documentationUnitRepository.findByDocumentNumber(documentNumber);
       } catch (Exception ex) {
         log.error(
             "Couldn't export (step get documentation unit) {} as LegalDocML", documentNumber, ex);
         continue;
+      }
+
+      if (!(documentable instanceof DocumentationUnit documentationUnit)) {
+        throw new UnsupportedOperationException(
+            "Export not supported for Documentable type: " + documentable.getClass());
       }
 
       Optional<CaseLawLdml> ldml =

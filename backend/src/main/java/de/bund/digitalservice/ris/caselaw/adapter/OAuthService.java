@@ -121,12 +121,7 @@ public class OAuthService implements AuthService {
   public Function<String, Boolean> userHasReadAccessByDocumentNumber() {
     return documentNumber -> {
       try {
-        return Optional.ofNullable(
-                Optional.ofNullable(
-                        (Documentable) documentationUnitService.getByDocumentNumber(documentNumber))
-                    .orElse(
-                        documentationUnitService.getPendingProceedingByDocumentNumber(
-                            documentNumber)))
+        return Optional.ofNullable(documentationUnitService.getByDocumentNumber(documentNumber))
             .map(this::userHasReadAccess)
             .orElse(false);
       } catch (DocumentationUnitNotExistsException ex) {
