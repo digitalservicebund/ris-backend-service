@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.LdmlBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.PortalPrototypeBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationJobService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
@@ -87,6 +88,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
       XmlUtilService.class,
       ConverterConfig.class,
       LdmlBucket.class,
+      PortalPrototypeBucket.class,
       DocumentationUnitService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
@@ -127,8 +129,11 @@ class PortalPublicationJobIntegrationTest {
   @Autowired private PortalPublicationJobRepository publicationJobRepository;
   @Autowired private PortalPublicationJobService portalPublicationJobService;
 
-  @MockitoBean(name = "ldmlS3Client")
+  @MockitoBean(name = "portalPrototypeS3Client")
   private S3Client s3Client;
+
+  @MockitoBean(name = "ldmlS3Client")
+  private S3Client ldmlS3Client;
 
   @MockitoBean private UserService userService;
   @MockitoBean private DocxConverterService docxConverterService;

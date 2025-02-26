@@ -41,7 +41,8 @@ public class LdmlExporterService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
   private final DocumentBuilderFactory documentBuilderFactory;
-  private final LdmlBucket ldmlBucket;
+  private final LdmlBucket internalPortalBucket;
+  private final PortalPrototypeBucket portalPrototypeBucket;
   private final ObjectMapper objectMapper;
   private final Templates htmlToAknHtml;
   private final Schema schema;
@@ -51,13 +52,15 @@ public class LdmlExporterService {
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,
-      LdmlBucket ldmlBucket,
+      LdmlBucket internalPortalBucket,
+      PortalPrototypeBucket portalPrototypeBucket,
       ObjectMapper objectMapper) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.documentBuilderFactory = documentBuilderFactory;
     // TODO: Configuration for bucket (Internal/External ExporterService)
-    this.ldmlBucket = ldmlBucket;
+    this.internalPortalBucket = internalPortalBucket;
+    this.portalPrototypeBucket = portalPrototypeBucket;
     this.objectMapper = objectMapper;
     this.htmlToAknHtml = xmlUtilService.getTemplates("caselawhandover/htmlToAknHtml.xslt");
     this.schema = xmlUtilService.getSchema("caselawhandover/shared/akomantoso30.xsd");
@@ -93,7 +96,7 @@ public class LdmlExporterService {
 
       try {
         String changelogString = objectMapper.writeValueAsString(changelog);
-        ldmlBucket.save(
+        internalPortalBucket.save(
             "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json",
             changelogString);
       } catch (IOException e) {
@@ -148,7 +151,7 @@ public class LdmlExporterService {
     }
 
     try {
-      ldmlBucket.save(
+      internalPortalBucket.save(
           "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogJson);
     } catch (BucketException e) {
       log.error("Could not save changelog to bucket", e);
@@ -156,7 +159,7 @@ public class LdmlExporterService {
     }
 
     try {
-      ldmlBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
+      internalPortalBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
       log.info("LDML for documentation unit {} successfully published.", ldml.get().getUniqueId());
     } catch (BucketException e) {
       log.error("Could not save LDML to bucket", e);
@@ -196,7 +199,7 @@ public class LdmlExporterService {
     }
 
     try {
-      ldmlBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
+      portalPrototypeBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
       log.info("LDML for documentation unit {} successfully published.", ldml.get().getUniqueId());
     } catch (BucketException e) {
       log.error("Could not save LDML to bucket", e);
@@ -206,7 +209,7 @@ public class LdmlExporterService {
 
   public void deleteDocumentationUnit(String documentNumber) {
     try {
-      ldmlBucket.delete(documentNumber + ".xml");
+      portalPrototypeBucket.delete(documentNumber + ".xml");
     } catch (BucketException e) {
       log.error("Could not delete LDML from bucket, docNumber: {}", documentNumber, e);
     }
@@ -218,7 +221,7 @@ public class LdmlExporterService {
     Changelog changelog = new Changelog(publishedDocumentNumbers, deletedDocumentNumbers);
 
     String changelogString = objectMapper.writeValueAsString(changelog);
-    ldmlBucket.save(
+    portalPrototypeBucket.save(
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
@@ -351,7 +354,7 @@ public class LdmlExporterService {
     ByteBuffer buffer = ByteBuffer.wrap(baos.toByteArray());
     buffer.rewind();
 
-    ldmlBucket.saveBytes("test_documentation_units.zip", buffer);
+    internalPortalBucket.saveBytes("test_documentation_units.zip", buffer);
   }
 
   public String transformAndSaveDocumentationUnit(DocumentationUnit documentationUnit) {
@@ -362,7 +365,7 @@ public class LdmlExporterService {
     if (ldml.isPresent()) {
       Optional<String> fileContent = ldmlToString(ldml.get());
       if (fileContent.isPresent()) {
-        ldmlBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
+        internalPortalBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
         return ldml.get().getUniqueId();
       }
     }
