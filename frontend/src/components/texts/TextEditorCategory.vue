@@ -46,7 +46,6 @@ async function focusEditor() {
         :id="id"
         :ref="(el) => registerTextEditorRef(id, el)"
         :aria-label="label"
-        :category="props.id"
         class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
         editable
         :field-size="fieldSize"

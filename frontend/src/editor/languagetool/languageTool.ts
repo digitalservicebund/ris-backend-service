@@ -4,7 +4,6 @@ import { Transaction } from "prosemirror-state"
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view"
 import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/languageToolService"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import {
   LanguageToolHelpingWords,
   Match,
@@ -128,51 +127,6 @@ export default class LanguageTool {
 
     this.decorationSet = this.decorationSet.remove(decorationsToRemove)
 
-    this.decorationSet = this.decorationSet.add(doc, decorations)
-
-    if (this.editorView)
-      this.dispatch(
-        this.editorView.state.tr.setMeta(
-          LanguageToolHelpingWords.LanguageToolTransactionName,
-          true,
-        ),
-      )
-
-    setTimeout(this.addEventListenersToDecorations, 100)
-  }
-
-  // public checkCategory(doc: PMNode, category?: string) {
-  //   this.checkCategoryAndSetDecorations(doc, category)
-  // }
-
-  public checkCategoryAndSetDecorations = async (
-    doc: PMNode,
-    category?: string,
-  ) => {
-    const store = useDocumentUnitStore()
-
-    if (store.documentUnit?.uuid == undefined) {
-      return
-    }
-
-    const languageToolCheckResponse: ServiceResponse<TextCheckResponse> =
-      await languageToolService.checkCategory(
-        store.documentUnit?.uuid,
-        category,
-      )
-
-    const matches = languageToolCheckResponse.data?.matches || []
-
-    const decorations: Decoration[] = []
-
-    for (const match of matches) {
-      const docFrom = match.offset + 1
-      const docTo = docFrom + match.length
-
-      decorations.push(this.gimmeDecoration(docFrom, docTo, match))
-    }
-
-    this.decorationSet = DecorationSet.empty
     this.decorationSet = this.decorationSet.add(doc, decorations)
 
     if (this.editorView)

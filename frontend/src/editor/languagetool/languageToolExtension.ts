@@ -25,8 +25,6 @@ declare module "@tiptap/core" {
       toggleTextCheckActiveState: (state: boolean) => ReturnType
 
       getTextCheckActiveState: () => ReturnType
-
-      textCheck: () => ReturnType
     }
   }
 }
@@ -43,7 +41,6 @@ export const LanguageToolExtension = Extension.create<
       automaticMode: true,
       documentId: undefined,
       textToolEnabled: false,
-      category: undefined,
     }
   },
 
@@ -127,17 +124,6 @@ export const LanguageToolExtension = Extension.create<
 
       getIsTextCheckActive: () => () =>
         this.storage.languageToolService!.isTextCheckActive,
-
-      textCheck:
-        () =>
-        ({ tr }) => {
-          void this.storage.languageToolService!.checkCategoryAndSetDecorations(
-            tr.doc,
-            this.options.category,
-          )
-
-          return true
-        },
     }
   },
 

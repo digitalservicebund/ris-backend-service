@@ -52,7 +52,6 @@ interface Props {
   plainBorderNumbers?: boolean
   fieldSize?: TextAreaInputAttributes["fieldSize"]
   textCheck?: boolean
-  category?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -63,7 +62,6 @@ const props = withDefaults(defineProps<Props>(), {
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
   textCheck: false,
-  category: "",
 })
 
 const emit = defineEmits<{
@@ -140,7 +138,6 @@ const editor: Editor = new Editor({
       automaticMode: true,
       documentId: "1",
       textToolEnabled: props.textCheck,
-      category: props.category,
     }),
   ],
   onUpdate: () => {
