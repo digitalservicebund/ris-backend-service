@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class PortalPublicationJobService {
 
   private final PortalPublicationJobRepository publicationJobRepository;
+  // TODO: Should use external exporter service (-> different bucket)
   private final LdmlExporterService ldmlExporterService;
 
   public PortalPublicationJobService(

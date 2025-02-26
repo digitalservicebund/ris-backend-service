@@ -56,13 +56,14 @@ public class LdmlExporterService {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.documentBuilderFactory = documentBuilderFactory;
+    // TODO: Configuration for bucket (Internal/External ExporterService)
     this.ldmlBucket = ldmlBucket;
     this.objectMapper = objectMapper;
     this.htmlToAknHtml = xmlUtilService.getTemplates("caselawhandover/htmlToAknHtml.xslt");
     this.schema = xmlUtilService.getSchema("caselawhandover/shared/akomantoso30.xsd");
   }
 
-  // FIXME: delete this method
+  // FIXME: delete this method?
   public void exportMultipleRandomDocumentationUnits() {
     log.info("Export to LDML process has started");
     List<DocumentationUnit> documentationUnitsToTransform = new ArrayList<>();
