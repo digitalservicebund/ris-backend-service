@@ -135,7 +135,7 @@ const editor: Editor = new Editor({
       names: ["listItem", "paragraph"],
     }),
     LanguageToolExtension.configure({
-      automaticMode: true,
+      automaticMode: false,
       documentId: "1",
       textToolEnabled: props.textCheck,
     }),
@@ -296,6 +296,15 @@ function jumpToMatch(selectedMatch: Match) {
     to: selectedMatch.offset + selectedMatch.length,
   })
 }
+
+/**
+ * trigger text check when text editor has focus
+ */
+watch(hasFocus, () => {
+  if (hasFocus) {
+    editor.commands.proofread()
+  }
+})
 
 defineExpose({ jumpToMatch })
 </script>
