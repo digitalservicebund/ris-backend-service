@@ -57,6 +57,7 @@ export interface Match {
   shortMessage: string
   replacements: Replacement[]
   offset: number
+  htmlOffset: number
   length: number
   context: Context
   sentence: string
@@ -93,6 +94,7 @@ export interface LanguageToolOptions {
   automaticMode: boolean
   documentId: string | number | undefined
   textToolEnabled: boolean
+  category: string | undefined
 }
 
 export interface LanguageToolStorage {

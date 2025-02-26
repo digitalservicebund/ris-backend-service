@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.Context;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -10,24 +9,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
 
 @Slf4j
 public class TextCheckService {
-  private static final String BORDER_NUMBER = "border-number";
-  private static final String CONTENT = "content";
   private final DocumentationUnitService documentationUnitService;
 
   public TextCheckService(DocumentationUnitService documentationUnitService) {
@@ -67,13 +61,23 @@ public class TextCheckService {
   @SuppressWarnings("unused")
   public List<Match> checkCategory(UUID id, CategoryType category)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit = documentationUnitService.getByUuid(id);
-
-    if (Objects.requireNonNull(category) == CategoryType.DECISION_REASON) {
-      return checkDecisionReasonsByHTML(documentationUnit);
+    if (category == null) {
+      return Collections.emptyList();
     }
 
-    return Collections.emptyList();
+    DocumentationUnit documentationUnit = documentationUnitService.getByUuid(id);
+
+    return switch (category) {
+      case REASONS -> checkCategoryByHTML(documentationUnit.longTexts().reasons(), category);
+      case CASE_FACTS -> checkCategoryByHTML(documentationUnit.longTexts().caseFacts(), category);
+      case DECISION_REASON ->
+          checkCategoryByHTML(documentationUnit.longTexts().decisionReasons(), category);
+      case HEADNOTE -> checkCategoryByHTML(documentationUnit.shortTexts().headnote(), category);
+      case GUIDING_PRINCIPLE ->
+          checkCategoryByHTML(documentationUnit.shortTexts().guidingPrinciple(), category);
+      case TENOR -> checkCategoryByHTML(documentationUnit.longTexts().tenor(), category);
+      case UNKNOWN -> Collections.emptyList();
+    };
   }
 
   private List<Match> checkGuidingPrinciple(DocumentationUnit documentationUnit) {
@@ -93,117 +97,73 @@ public class TextCheckService {
     return checkText(documentationUnit.longTexts().reasons(), CategoryType.REASONS);
   }
 
-  public List<Match> checkDecisionReasonsByHTML(DocumentationUnit documentationUnit) {
-    if (documentationUnit.longTexts().decisionReasons() == null) {
+  private List<Match> checkCategoryByHTML(String htmlText, CategoryType categoryType) {
+    if (htmlText == null) {
       return Collections.emptyList();
     }
 
     Parser parser = Parser.htmlParser();
     parser.setTrackPosition(true);
-    Document document = Jsoup.parse(documentationUnit.longTexts().decisionReasons(), parser);
-    StringBuilder stringBuilder = new StringBuilder();
-    Map<Integer, Integer> borderNumberOffset = new LinkedMap<>();
-    AtomicInteger lastOffset = new AtomicInteger(0);
+    Document document = Jsoup.parse(htmlText, parser);
+
+    Map<Integer, String> textNodes = new LinkedMap<>();
+    AtomicInteger offset = new AtomicInteger(0);
     document
         .getElementsByTag("body")
         .first()
         .childNodes()
-        .forEach(child -> handleChildren(child, stringBuilder, borderNumberOffset, lastOffset, 1));
+        .forEach(child -> handleChildren(child, textNodes, offset, 1));
 
-    String cleanText = cleanUpSpaces(stringBuilder.toString());
+    var textChunks = generateTextChunks(textNodes);
 
-    return check(URLEncoder.encode(cleanText, StandardCharsets.UTF_8)).stream()
-        .map(match -> calculateRightPosition(match, borderNumberOffset))
-        .toList();
-  }
-
-  private Match calculateRightPosition(Match match, Map<Integer, Integer> borderNumberOffset) {
-    AtomicInteger lastOffset = new AtomicInteger(0);
-    borderNumberOffset.forEach(
-        (position, offset) -> {
-          if (position <= match.offset()) {
-            lastOffset.set(offset);
-          }
+    List<Match> matches = new ArrayList<>();
+    textChunks.forEach(
+        (pos, text) -> {
+          List<Match> textMatches = checkText(text, categoryType);
+          List<Match> newTextMatches =
+              textMatches.stream()
+                  .map(match -> match.toBuilder().offset(match.offset() + pos).build())
+                  .toList();
+          matches.addAll(newTextMatches);
         });
 
-    Context oldContext = match.context();
-    return match.toBuilder()
-        .offset(lastOffset.get() + match.offset())
-        .context(
-            new Context(
-                oldContext.text(), lastOffset.get() + oldContext.offset(), oldContext.length()))
-        .build();
+    return matches;
   }
 
-  private String cleanUpSpaces(String dirtyText) {
-    final AtomicBoolean spaceFound = new AtomicBoolean(false);
-    StringBuilder cleanText = new StringBuilder();
-    dirtyText
-        .chars()
-        .forEach(
-            ch -> {
-              if (spaceFound.get()) {
-                if (ch == ' ') {
-                  return;
-                } else {
-                  spaceFound.set(false);
-                }
-              } else {
-                if (ch == ' ') {
-                  spaceFound.set(true);
-                }
-              }
-              cleanText.append((char) ch);
-            });
+  private Map<Integer, String> generateTextChunks(Map<Integer, String> textNodes) {
+    Map<Integer, String> textChunks = new LinkedMap<>();
 
-    return cleanText.toString().trim();
+    StringBuilder builder = new StringBuilder();
+    AtomicInteger startPos = new AtomicInteger(0);
+    for (var entry : textNodes.entrySet()) {
+      String text = entry.getValue();
+      Integer pos = entry.getKey();
+      if (builder.length() + text.length() > 5000) {
+        textChunks.put(startPos.get(), builder.toString());
+        builder = new StringBuilder();
+        startPos.set(pos);
+      }
+
+      builder.append(text).append(" ").append(System.lineSeparator());
+    }
+
+    textChunks.put(startPos.get(), builder.toString());
+
+    return textChunks;
   }
 
   private void handleChildren(
-      Node child,
-      StringBuilder stringBuilder,
-      Map<Integer, Integer> borderNumberOffset,
-      AtomicInteger lastOffset,
-      int level) {
-    if (child.nodeName().equals(BORDER_NUMBER)) {
-      handleBorderNumber(child, stringBuilder, borderNumberOffset, lastOffset, level + 1);
+      Node child, Map<Integer, String> textNodes, AtomicInteger offset, int level) {
+
+    log.info("{} node '{}' at {}", level, child.nodeName(), child.sourceRange());
+    if (child instanceof TextNode textNode) {
+      log.info("  text node content: '{}'", textNode.text());
+      textNodes.put(offset.getAndAdd(textNode.text().length() + 2), textNode.text());
     } else {
-      log.info("{} node '{}' at {}", level, child.nodeName(), child.sourceRange());
-      if (child instanceof TextNode textNode) {
-        log.info("  text node content: '{}'", textNode.text());
-        stringBuilder.append(textNode.text());
-      } else {
-        child
-            .childNodes()
-            .forEach(
-                grandChild ->
-                    handleChildren(
-                        grandChild, stringBuilder, borderNumberOffset, lastOffset, level + 1));
-      }
+      child
+          .childNodes()
+          .forEach(grandChild -> handleChildren(grandChild, textNodes, offset, level + 1));
     }
-  }
-
-  private void handleBorderNumber(
-      Node borderNumber,
-      StringBuilder stringBuilder,
-      Map<Integer, Integer> borderNumberOffset,
-      AtomicInteger lastOffset,
-      int level) {
-    log.info("{} border number at {}", level, borderNumber.sourceRange());
-
-    Element borderNumberElement = (Element) borderNumber;
-    Element numberElement = borderNumberElement.getElementsByTag("number").first();
-    Element contentElement = borderNumberElement.getElementsByTag(CONTENT).first();
-
-    int position = stringBuilder.length();
-    lastOffset.set(lastOffset.addAndGet(numberElement.text().length() + 6));
-    borderNumberOffset.put(position, lastOffset.get());
-
-    contentElement
-        .children()
-        .forEach(
-            child ->
-                handleChildren(child, stringBuilder, borderNumberOffset, lastOffset, level + 1));
   }
 
   private List<Match> checkCaseFacts(DocumentationUnit documentationUnit) {
@@ -226,17 +186,8 @@ public class TextCheckService {
     if (text == null) {
       return Collections.emptyList();
     }
-    Document document = Jsoup.parse(text);
-    document
-        .getElementsByTag(BORDER_NUMBER)
-        .forEach(
-            element -> {
-              Element newElement = element.getElementsByTag(CONTENT).first();
-              element.after(newElement.html());
-              element.remove();
-            });
 
-    return check(URLEncoder.encode(document.text(), StandardCharsets.UTF_8)).stream()
+    return check(URLEncoder.encode(text, StandardCharsets.UTF_8)).stream()
         .map(match -> match.toBuilder().category(categoryType).build())
         .toList();
   }

@@ -11,6 +11,7 @@ public record Match(
     CategoryType category,
     List<Replacement> replacements,
     int offset,
+    Integer htmlOffset,
     int length,
     Context context,
     String sentence,
