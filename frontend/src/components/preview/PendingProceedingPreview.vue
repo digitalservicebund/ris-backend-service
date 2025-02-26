@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import { provide } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
+import ErrorPage from "@/components/PageError.vue"
 import {
   PreviewLayout,
   previewLayoutInjectionKey,
@@ -19,22 +20,23 @@ import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
 import PendingProceeding from "@/domain/pendingProceeding"
 import Reference from "@/domain/reference"
 import documentUnitService from "@/services/documentUnitService"
+import { ServiceResponse } from "@/services/httpClient"
 
 const props = defineProps<{
   layout?: PreviewLayout
   documentNumber: string
 }>()
 
-const pendingProceeding = await loadPendingProceeding(props.documentNumber)
+const pendingProceedingResponse = await loadPendingProceeding(
+  props.documentNumber,
+)
 
 async function loadPendingProceeding(
   documentNumber: string,
-): Promise<PendingProceeding> {
-  const response =
-    await documentUnitService.getPendingProceedingByDocumentNumber(
-      documentNumber,
-    )
-  return response.data!
+): Promise<ServiceResponse<PendingProceeding>> {
+  return await documentUnitService.getPendingProceedingByDocumentNumber(
+    documentNumber,
+  )
 }
 
 provide(previewLayoutInjectionKey, props.layout || "wide")
@@ -42,24 +44,24 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
 
 <template>
   <FlexContainer
-    v-if="pendingProceeding"
+    v-if="pendingProceedingResponse.data"
     class="max-w-screen-xl"
     data-testid="preview"
     flex-direction="flex-col"
   >
     <h1 class="ds-heading-03-bold mt-16 px-16">
-      {{ pendingProceeding.documentNumber }}
+      {{ pendingProceedingResponse.data.documentNumber }}
     </h1>
     <p class="ds-label-03-reg mb-16 px-16">
       Vorschau erstellt am {{ dayjs(new Date()).format("DD.MM.YYYY") }} um
       {{ dayjs(new Date()).format("HH:mm:ss") }}
     </p>
     <PreviewCoreData
-      :core-data="pendingProceeding.coreData"
+      :core-data="pendingProceedingResponse.data.coreData"
       date-label="Mitteilungsdatum"
     />
     <FlexContainer flex-direction="flex-col">
-      <PreviewRow v-if="pendingProceeding.resolutionNote">
+      <PreviewRow v-if="pendingProceedingResponse.data.resolutionNote">
         <PreviewCategory>Erledigungsvermerk</PreviewCategory>
         <PreviewContent>
           <TextEditor
@@ -67,17 +69,17 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
             aria-label="Erledigungsvermerk"
             field-size="max"
             preview
-            :value="pendingProceeding.resolutionNote"
+            :value="pendingProceedingResponse.data.resolutionNote"
           />
         </PreviewContent>
       </PreviewRow>
       <PreviewRow>
         <PreviewCategory>Erledigung</PreviewCategory>
         <PreviewContent>
-          {{ pendingProceeding.isResolved ? "Ja" : "Nein" }}
+          {{ pendingProceedingResponse.data.isResolved ? "Ja" : "Nein" }}
         </PreviewContent>
       </PreviewRow>
-      <PreviewRow v-if="pendingProceeding.legalIssue">
+      <PreviewRow v-if="pendingProceedingResponse.data.legalIssue">
         <PreviewCategory>Rechtsfrage</PreviewCategory>
         <PreviewContent>
           <TextEditor
@@ -85,42 +87,51 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
             aria-label="Rechtsfrage"
             field-size="max"
             preview
-            :value="pendingProceeding.legalIssue"
+            :value="pendingProceedingResponse.data.legalIssue"
           />
         </PreviewContent>
       </PreviewRow>
-      <PreviewRow v-if="pendingProceeding.admissionOfAppeal">
+      <PreviewRow v-if="pendingProceedingResponse.data.admissionOfAppeal">
         <PreviewCategory>Rechtsmittelzulassung</PreviewCategory>
         <PreviewContent>
-          {{ pendingProceeding.admissionOfAppeal }}
+          {{ pendingProceedingResponse.data.admissionOfAppeal }}
         </PreviewContent>
       </PreviewRow>
-      <PreviewRow v-if="pendingProceeding.appellant">
+      <PreviewRow v-if="pendingProceedingResponse.data.appellant">
         <PreviewCategory>Rechtsmittelführer</PreviewCategory>
         <PreviewContent>
-          {{ pendingProceeding.appellant }}
+          {{ pendingProceedingResponse.data.appellant }}
         </PreviewContent>
       </PreviewRow>
     </FlexContainer>
     <PreviewCaselawReferences
-      :caselaw-references="pendingProceeding.caselawReferences as Reference[]"
+      :caselaw-references="
+        pendingProceedingResponse.data.caselawReferences as Reference[]
+      "
     />
     <PreviewLiteratureReferences
       :literature-references="
-        pendingProceeding.literatureReferences as Reference[]
+        pendingProceedingResponse.data.literatureReferences as Reference[]
       "
     />
     <PreviewProceedingDecisions
-      :ensuing-decisions="pendingProceeding.ensuingDecisions"
-      :previous-decisions="pendingProceeding.previousDecisions"
+      :ensuing-decisions="pendingProceedingResponse.data.ensuingDecisions"
+      :previous-decisions="pendingProceedingResponse.data.previousDecisions"
     />
     <PreviewContentRelatedIndexing
-      :content-related-indexing="pendingProceeding.contentRelatedIndexing"
+      :content-related-indexing="
+        pendingProceedingResponse.data.contentRelatedIndexing
+      "
     />
 
     <PreviewShortTexts
-      :short-texts="pendingProceeding.shortTexts"
+      :short-texts="pendingProceedingResponse.data.shortTexts"
       :valid-border-numbers="[]"
     />
   </FlexContainer>
+  <ErrorPage
+    v-if="pendingProceedingResponse.error"
+    :error="pendingProceedingResponse.error"
+    :title="pendingProceedingResponse.error?.title"
+  />
 </template>
