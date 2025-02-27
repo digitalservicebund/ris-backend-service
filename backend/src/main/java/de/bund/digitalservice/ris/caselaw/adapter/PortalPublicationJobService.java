@@ -15,14 +15,13 @@ import org.springframework.stereotype.Service;
 public class PortalPublicationJobService {
 
   private final PortalPublicationJobRepository publicationJobRepository;
-  // TODO: Should use external exporter service (-> different bucket)
-  private final LdmlExporterService ldmlExporterService;
+  private final PublicPortalPublicationService internalPortalPublicationService;
 
   public PortalPublicationJobService(
       PortalPublicationJobRepository publicationJobRepository,
-      LdmlExporterService ldmlExporterService) {
+      PublicPortalPublicationService publicPortalPublicationService) {
     this.publicationJobRepository = publicationJobRepository;
-    this.ldmlExporterService = ldmlExporterService;
+    this.internalPortalPublicationService = publicPortalPublicationService;
   }
 
   @Scheduled(fixedDelayString = "PT5S")
@@ -50,7 +49,7 @@ public class PortalPublicationJobService {
   private void executeJob(PortalPublicationJobDTO job) {
     if (job.getPublicationType() == PortalPublicationTaskType.PUBLISH) {
       try {
-        this.ldmlExporterService.publishDocumentationUnit(job.getDocumentNumber());
+        this.internalPortalPublicationService.publishDocumentationUnit(job.getDocumentNumber());
         job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
       } catch (Exception e) {
         log.error("Could not publish documentation unit {}", job.getDocumentNumber(), e);
@@ -60,7 +59,7 @@ public class PortalPublicationJobService {
 
     if (job.getPublicationType() == PortalPublicationTaskType.DELETE) {
       try {
-        this.ldmlExporterService.deleteDocumentationUnit(job.getDocumentNumber());
+        this.internalPortalPublicationService.deleteDocumentationUnit(job.getDocumentNumber());
         job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
       } catch (Exception e) {
         log.error("Could not unpublish documentation unit {}", job.getDocumentNumber(), e);
@@ -85,7 +84,7 @@ public class PortalPublicationJobService {
 
     if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {
       try {
-        this.ldmlExporterService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
+        this.internalPortalPublicationService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
       } catch (Exception e) {
         log.error("Could not upload changelog file.", e);
       }

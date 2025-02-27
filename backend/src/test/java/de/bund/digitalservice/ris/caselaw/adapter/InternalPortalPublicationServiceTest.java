@@ -44,14 +44,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class CaseLawLdmlExportTest {
+class InternalPortalPublicationServiceTest {
 
   static DocumentationUnitRepository documentationUnitRepository;
-  static LdmlBucket caseLawBucket;
-  static PortalPrototypeBucket externalBucket;
+  static InternalPortalBucket caseLawBucket;
   static DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
-  static LdmlExporterService exporter;
+  static InternalPortalPublicationService internalPortalPublicationService;
   static DocumentationUnit testDocumentUnit;
   static UUID testUUID;
   static ObjectMapper objectMapper;
@@ -59,16 +58,14 @@ class CaseLawLdmlExportTest {
   @BeforeAll
   static void setUpBeforeClass() {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
-    caseLawBucket = mock(LdmlBucket.class);
-    externalBucket = mock(PortalPrototypeBucket.class);
+    caseLawBucket = mock(InternalPortalBucket.class);
     objectMapper = mock(ObjectMapper.class);
-    exporter =
-        new LdmlExporterService(
+    internalPortalPublicationService =
+        new InternalPortalPublicationService(
             documentationUnitRepository,
             xmlUtilService,
             documentBuilderFactory,
             caseLawBucket,
-            externalBucket,
             objectMapper);
 
     PreviousDecision related1 =
@@ -112,54 +109,12 @@ class CaseLawLdmlExportTest {
   }
 
   @Test
-  @DisplayName("Should call caselaw bucket save once")
-  void exportOneCaseLaw() throws DocumentationUnitNotExistsException {
-    when(documentationUnitRepository.getRandomDocumentationUnitIds())
-        .thenReturn(List.of(UUID.randomUUID()));
-    when(documentationUnitRepository.findByUuid(any())).thenReturn(testDocumentUnit);
-
-    exporter.exportMultipleRandomDocumentationUnits();
-    verify(caseLawBucket, times(2)).save(anyString(), anyString());
-  }
-
-  @Test
-  @DisplayName("Invalid Case Law Ldml should fail validation 1")
-  void xsdValidationFailure1() throws DocumentationUnitNotExistsException {
-    DocumentationUnit invalidTestDocumentUnit =
-        testDocumentUnit.toBuilder()
-            .longTexts(
-                testDocumentUnit.longTexts().toBuilder()
-                    .caseFacts("<p>Example <p>nested</p> content 1</p>")
-                    .build())
-            .build();
-    when(documentationUnitRepository.getRandomDocumentationUnitIds())
-        .thenReturn(List.of(UUID.randomUUID()));
-    when(documentationUnitRepository.findByUuid(any())).thenReturn(invalidTestDocumentUnit);
-
-    exporter.exportMultipleRandomDocumentationUnits();
-    verify(caseLawBucket, times(0)).save(anyString(), anyString());
-  }
-
-  @Test
-  @DisplayName("Invalid Case Law Ldml should fail validation 2")
-  void xsdValidationFailure2() throws DocumentationUnitNotExistsException {
-    DocumentationUnit invalidTestDocumentUnit =
-        testDocumentUnit.toBuilder().longTexts(null).build();
-    when(documentationUnitRepository.getRandomDocumentationUnitIds())
-        .thenReturn(List.of(UUID.randomUUID()));
-    when(documentationUnitRepository.findByUuid(any())).thenReturn(invalidTestDocumentUnit);
-
-    exporter.exportMultipleRandomDocumentationUnits();
-    verify(caseLawBucket, times(0)).save(anyString(), anyString());
-  }
-
-  @Test
   @DisplayName("Should publish single documentation unit succesfully")
   void publishSuccessfully() throws DocumentationUnitNotExistsException {
     UUID documentationUnitId = UUID.randomUUID();
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
 
-    exporter.publishDocumentationUnit(documentationUnitId);
+    internalPortalPublicationService.publishDocumentationUnit(documentationUnitId);
 
     verify(caseLawBucket, times(2)).save(anyString(), anyString());
   }
@@ -174,7 +129,8 @@ class CaseLawLdmlExportTest {
         .thenReturn(invalidTestDocumentUnit);
 
     assertThatExceptionOfType(LdmlTransformationException.class)
-        .isThrownBy(() -> exporter.publishDocumentationUnit(documentationUnitId))
+        .isThrownBy(
+            () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
         .withMessageContaining("Could not transform documentation unit to LDML.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
@@ -189,7 +145,8 @@ class CaseLawLdmlExportTest {
         .thenReturn(invalidTestDocumentUnit);
 
     assertThatExceptionOfType(LdmlTransformationException.class)
-        .isThrownBy(() -> exporter.publishDocumentationUnit(documentationUnitId))
+        .isThrownBy(
+            () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
         .withMessageContaining("Could not transform documentation unit to valid LDML.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
@@ -203,7 +160,8 @@ class CaseLawLdmlExportTest {
     when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> exporter.publishDocumentationUnit(documentationUnitId))
+        .isThrownBy(
+            () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
         .withMessageContaining(
             "Could not publish documentation unit to portal, because changelog file could not be created.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
@@ -218,7 +176,8 @@ class CaseLawLdmlExportTest {
     doThrow(BucketException.class).when(caseLawBucket).save(contains("changelogs/"), anyString());
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> exporter.publishDocumentationUnit(documentationUnitId))
+        .isThrownBy(
+            () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
         .withMessageContaining("Could not save changelog to bucket");
   }
 
@@ -230,7 +189,8 @@ class CaseLawLdmlExportTest {
     doThrow(BucketException.class).when(caseLawBucket).save(contains(".xml"), anyString());
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> exporter.publishDocumentationUnit(documentationUnitId))
+        .isThrownBy(
+            () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
         .withMessageContaining("Could not save LDML to bucket");
   }
 
@@ -247,7 +207,7 @@ class CaseLawLdmlExportTest {
         DocumentationUnitToLdmlTransformer.transformToLdml(
             testDocumentUnit, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = exporter.ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -278,7 +238,7 @@ class CaseLawLdmlExportTest {
         DocumentationUnitToLdmlTransformer.transformToLdml(
             dissentingCaseLaw, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = exporter.ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -304,7 +264,7 @@ class CaseLawLdmlExportTest {
     Optional<CaseLawLdml> ldml =
         DocumentationUnitToLdmlTransformer.transformToLdml(headnoteCaseLaw, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = exporter.ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -333,7 +293,7 @@ class CaseLawLdmlExportTest {
         DocumentationUnitToLdmlTransformer.transformToLdml(
             otherHeadnoteCaseLaw, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = exporter.ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -359,7 +319,7 @@ class CaseLawLdmlExportTest {
     Optional<CaseLawLdml> ldml =
         DocumentationUnitToLdmlTransformer.transformToLdml(groundsCaseLaw, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = exporter.ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -390,7 +350,7 @@ class CaseLawLdmlExportTest {
         DocumentationUnitToLdmlTransformer.transformToLdml(
             otherLongTextCaseLaw, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = exporter.ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -423,7 +383,7 @@ class CaseLawLdmlExportTest {
             otherLongTextCaseLaw, documentBuilderFactory);
 
     assertThat(ldml).isPresent();
-    Optional<String> fileContent = exporter.ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
     assertThat(fileContent).isPresent();
     assertThat(StringUtils.deleteWhitespace(fileContent.get()))
         .contains(StringUtils.deleteWhitespace(expected));

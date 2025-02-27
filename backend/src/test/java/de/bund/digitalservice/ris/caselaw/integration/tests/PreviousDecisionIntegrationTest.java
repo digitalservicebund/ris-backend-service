@@ -15,7 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
+import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
@@ -131,7 +131,7 @@ class PreviousDecisionIntegrationTest {
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
 
   @MockitoBean
