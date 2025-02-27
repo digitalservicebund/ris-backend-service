@@ -10,10 +10,22 @@ public enum CategoryType {
   DECISION_REASON("decisionReason"),
   HEADNOTE("headnote"),
   GUIDING_PRINCIPLE("guidingPrinciple"),
-  TENOR("tenor");
+  TENOR("tenor"),
+  UNKNOWN("unbekannt");
+
   @JsonValue private final String name;
 
   CategoryType(String name) {
     this.name = name;
+  }
+
+  public static CategoryType forName(String category) {
+    for (CategoryType type : CategoryType.values()) {
+      if (type.name.equals(category)) {
+        return type;
+      }
+    }
+
+    return UNKNOWN;
   }
 }

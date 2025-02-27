@@ -1,3 +1,3 @@
 languagetool:
-  url: http://localhost:8081/v2/check
+  url: http://localhost:8181/v2/check
   language: de-DE

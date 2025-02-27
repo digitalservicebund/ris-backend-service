@@ -4,11 +4,14 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.gravity9.jsonpatch.AddOperation;
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchException;
 import com.gravity9.jsonpatch.JsonPatchOperation;
+import com.gravity9.jsonpatch.PathValueOperation;
 import com.gravity9.jsonpatch.RemoveOperation;
+import com.gravity9.jsonpatch.ReplaceOperation;
 import com.gravity9.jsonpatch.diff.JsonDiff;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
@@ -21,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +33,9 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class DatabasePatchMapperService implements PatchMapperService {
+  private static final Pattern TEXT_CHECK_PATTERN =
+      Pattern.compile("<text-check.*?>(.*?)</text-check>");
+
   private final ObjectMapper objectMapper;
   private final DatabaseDocumentationUnitPatchRepository repository;
 
@@ -166,5 +174,38 @@ public class DatabasePatchMapperService implements PatchMapperService {
     }
 
     return new RisJsonPatch(0L, new JsonPatch(operations), errorPaths);
+  }
+
+  @Override
+  public JsonPatch removeTextCheckTags(JsonPatch patch) {
+    List<JsonPatchOperation> operations = new ArrayList<>();
+
+    patch
+        .getOperations()
+        .forEach(
+            operation -> {
+              if (operation instanceof PathValueOperation valueOperation
+                  && valueOperation.getValue() instanceof TextNode valueNode) {
+                String value = valueNode.textValue();
+                Matcher matcher = TEXT_CHECK_PATTERN.matcher(value);
+                StringBuilder builder = new StringBuilder();
+                while (matcher.find()) {
+                  matcher.appendReplacement(builder, matcher.group(1));
+                }
+                matcher.appendTail(builder);
+                if (operation instanceof AddOperation) {
+                  operations.add(
+                      new AddOperation(valueOperation.getPath(), new TextNode(builder.toString())));
+                } else if (operation instanceof ReplaceOperation) {
+                  operations.add(
+                      new ReplaceOperation(
+                          valueOperation.getPath(), new TextNode(builder.toString())));
+                }
+              } else {
+                operations.add(operation);
+              }
+            });
+
+    return new JsonPatch(operations);
   }
 }

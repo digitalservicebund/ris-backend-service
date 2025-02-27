@@ -41,6 +41,7 @@ export const LanguageToolExtension = Extension.create<
       automaticMode: true,
       documentId: undefined,
       textToolEnabled: false,
+      category: undefined,
     }
   },
 

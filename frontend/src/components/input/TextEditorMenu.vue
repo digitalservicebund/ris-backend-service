@@ -27,6 +27,7 @@ import IconSubscript from "~icons/ic/sharp-subscript"
 import IconSuperscript from "~icons/ic/sharp-superscript"
 import IconUndo from "~icons/ic/sharp-undo"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
+import IconSpellCheck from "~icons/material-symbols/spellcheck"
 import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after"
 import MdiTableColumnRemove from "~icons/mdi/table-column-remove"
 import MdiTablePlus from "~icons/mdi/table-plus"
@@ -291,6 +292,15 @@ const buttons = computed(() => {
     group: "borderNumber",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
+  })
+
+  buttons.push({
+    type: "textCheck",
+    icon: IconSpellCheck,
+    ariaLabel: "Rechtschreibprüfung",
+    group: "textCheck",
+    isCollapsable: false,
+    callback: () => props.editor.chain().focus().textCheck().run(),
   })
 
   return buttons

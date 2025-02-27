@@ -53,10 +53,12 @@ export interface Rule {
 }
 
 export interface Match {
+  id: number
   message: string
   shortMessage: string
   replacements: Replacement[]
   offset: number
+  htmlOffset: number
   length: number
   context: Context
   sentence: string
@@ -77,6 +79,11 @@ export interface TextCheckAllResponse {
   suggestions: Suggestion[]
 }
 
+export interface TextCheckCategoryResponse {
+  htmlText: string
+  matches: Match[]
+}
+
 export interface Suggestion {
   word: string
   matches: Match[]
@@ -93,6 +100,7 @@ export interface LanguageToolOptions {
   automaticMode: boolean
   documentId: string | number | undefined
   textToolEnabled: boolean
+  category: string | undefined
 }
 
 export interface LanguageToolStorage {

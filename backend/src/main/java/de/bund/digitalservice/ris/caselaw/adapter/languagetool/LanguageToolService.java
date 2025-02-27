@@ -30,7 +30,12 @@ public class LanguageToolService extends TextCheckService {
     headers.set("Content-Type", "application/x-www-form-urlencoded");
 
     String body =
-        "text=" + text + "&language=" + languageToolConfig.getLanguage() + "&enabledOnly=false";
+        "text="
+            + text
+            + "&language="
+            + languageToolConfig.getLanguage()
+            + "&enabledOnly=false"
+            + "&disabledRules=BORDER_NUMBER";
 
     HttpEntity<String> entity = new HttpEntity<>(body, headers);
 

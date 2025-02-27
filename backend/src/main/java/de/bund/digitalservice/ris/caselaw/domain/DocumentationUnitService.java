@@ -337,6 +337,8 @@ public class DocumentationUnitService {
       log.debug("version {} - update patch: {}", patch.documentationUnitVersion(), toUpdate);
 
       if (!toUpdate.getOperations().isEmpty()) {
+        toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
+
         DocumentationUnit patchedDocumentationUnit =
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
         patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
