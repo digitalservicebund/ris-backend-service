@@ -69,15 +69,12 @@ public class PublicPortalPublicationService {
 
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
     if (fileContent.isEmpty()) {
-      throw new LdmlTransformationException(
-          "Could not transform documentation unit to valid LDML.", null);
+      throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
     }
 
     try {
       publicPortalBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
-      log.info("LDML for documentation unit {} successfully published.", ldml.get().getUniqueId());
     } catch (BucketException e) {
-      log.error("Could not save LDML to bucket", e);
       throw new PublishException("Could not save LDML to bucket.", e);
     }
   }
@@ -91,7 +88,7 @@ public class PublicPortalPublicationService {
     try {
       publicPortalBucket.delete(documentNumber + ".xml");
     } catch (BucketException e) {
-      log.error("Could not delete LDML from bucket, docNumber: {}", documentNumber, e);
+      throw new PublishException("Could not delete LDML from bucket.", e);
     }
   }
 
