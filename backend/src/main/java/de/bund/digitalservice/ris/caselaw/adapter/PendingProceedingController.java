@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
@@ -49,8 +50,11 @@ public class PendingProceedingController {
 
     try {
       checkDuplicates(documentNumber);
-      var documentationUnit = service.getPendingProceedingByDocumentNumber(documentNumber);
-      return ResponseEntity.ok(documentationUnit);
+      Documentable documentable = service.getByDocumentNumber(documentNumber);
+      if (documentable instanceof PendingProceeding pendingProceeding) {
+        return ResponseEntity.ok(pendingProceeding);
+      }
+      return ResponseEntity.ok(PendingProceeding.builder().build());
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);
       return ResponseEntity.ok(PendingProceeding.builder().build());

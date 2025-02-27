@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
@@ -165,8 +165,7 @@ public class JurisXmlExporterResponseProcessor {
     if (docNumberMatcher.find()) {
       String documentNumber = docNumberMatcher.group(1);
       try {
-        DocumentationUnit docUnit =
-            documentationUnitRepository.findByDocumentNumber(documentNumber);
+        Documentable docUnit = documentationUnitRepository.findByDocumentNumber(documentNumber);
         return docUnit.uuid();
       } catch (DocumentationUnitNotExistsException ignored) {
         return null;

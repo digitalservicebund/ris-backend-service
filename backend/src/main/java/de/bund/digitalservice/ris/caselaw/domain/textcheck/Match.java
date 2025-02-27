@@ -5,12 +5,14 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record Match(
+    Integer id,
     String word,
     String message,
     String shortMessage,
     CategoryType category,
     List<Replacement> replacements,
     int offset,
+    Integer htmlOffset,
     int length,
     Context context,
     String sentence,

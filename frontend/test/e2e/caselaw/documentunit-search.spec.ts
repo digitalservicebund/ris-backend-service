@@ -306,8 +306,8 @@ test.describe("search", () => {
 
     await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    //15 + table header
-    await expect.poll(async () => page.locator(".table-row").count()).toBe(16)
+    //16 + table header
+    await expect.poll(async () => page.locator(".table-row").count()).toBe(17)
 
     const docofficeOnly = page.getByLabel("Nur meine Dokstelle Filter")
     await docofficeOnly.click()

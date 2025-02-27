@@ -64,10 +64,16 @@ public class LegalPeriodicalEditionController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated() && @userIsInternal.apply(#oidcUser)")
-  public LegalPeriodicalEdition save(
+  public ResponseEntity<LegalPeriodicalEdition> save(
       @Valid @RequestBody LegalPeriodicalEdition legalPeriodicalEdition,
       @AuthenticationPrincipal OidcUser oidcUser) {
-    return service.saveLegalPeriodicalEdition(oidcUser, legalPeriodicalEdition);
+    try {
+      return ResponseEntity.ok(
+          service.saveLegalPeriodicalEdition(oidcUser, legalPeriodicalEdition));
+    } catch (Exception e) {
+      log.error("Could not save the edition", e);
+      return ResponseEntity.internalServerError().build();
+    }
   }
 
   @DeleteMapping(value = "/{editionId}")

@@ -17,18 +17,9 @@ public interface DocumentationUnitRepository {
    * Find a documentation unit by its document number
    *
    * @param documentNumber the document number
-   * @return the documentation unit found
+   * @return the documentation unit found (decision or pending proceeding)
    */
-  DocumentationUnit findByDocumentNumber(String documentNumber)
-      throws DocumentationUnitNotExistsException;
-
-  /**
-   * Find a pending proceeding by its document number
-   *
-   * @param documentNumber the document number
-   * @return the pending proceeding found
-   */
-  PendingProceeding findPendingProceedingByDocumentNumber(String documentNumber)
+  Documentable findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
 
   DocumentationUnitListItem findDocumentationUnitListItemByDocumentNumber(String documentNumber)
@@ -40,7 +31,7 @@ public interface DocumentationUnitRepository {
    * @param uuid the UUID to search for
    * @return the documentation unit found
    */
-  DocumentationUnit findByUuid(UUID uuid) throws DocumentationUnitNotExistsException;
+  Documentable findByUuid(UUID uuid) throws DocumentationUnitNotExistsException;
 
   /**
    * Create a new documentation unit with the given document number and documentation office
@@ -58,28 +49,28 @@ public interface DocumentationUnitRepository {
    *
    * @param documentationUnit the documentation unit to save
    */
-  void save(DocumentationUnit documentationUnit);
+  void save(Documentable documentationUnit);
 
   /**
    * Save the keywords of a documentation unit
    *
    * @param documentationUnit the documentation unit to save the keywords for
    */
-  void saveKeywords(DocumentationUnit documentationUnit);
+  void saveKeywords(Documentable documentationUnit);
 
   /**
    * Save the fields of law of a documentation unit
    *
    * @param documentationUnit the documentation unit to save the fields of law for
    */
-  void saveFieldsOfLaw(DocumentationUnit documentationUnit);
+  void saveFieldsOfLaw(Documentable documentationUnit);
 
   /**
    * Save the procedures of a documentation unit
    *
    * @param documentationUnit the documentation unit to save the procedures for
    */
-  void saveProcedures(DocumentationUnit documentationUnit);
+  void saveProcedures(Documentable documentationUnit);
 
   /**
    * Save lastPublicationDateTime of a documentation unit
@@ -93,7 +84,7 @@ public interface DocumentationUnitRepository {
    *
    * @param documentationUnit the documentation unit to delete
    */
-  void delete(DocumentationUnit documentationUnit);
+  void delete(Documentable documentationUnit);
 
   /**
    * Search for documentation units that are linkable to the given documentation unit

@@ -60,6 +60,8 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
         .legalIssue(pendingProceedingDTO.getLegalIssue())
         .admissionOfAppeal(pendingProceedingDTO.getAdmissionOfAppeal())
         .appellant(pendingProceedingDTO.getAppellant())
+        .isDeletable(false)
+        .isEditable(false)
         .build();
   }
 }

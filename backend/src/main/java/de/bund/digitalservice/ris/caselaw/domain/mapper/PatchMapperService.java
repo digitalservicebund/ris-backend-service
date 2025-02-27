@@ -95,4 +95,12 @@ public interface PatchMapperService {
     List<JsonPatchOperation> operations = patch.getOperations();
     return operations.size() == 1 && "/version".equals(operations.getFirst().getPath());
   }
+
+  /**
+   * Remove all informational tags for the text check. <text-check></text-check>
+   *
+   * @param patch with text check tags
+   * @return patch without text check tags.
+   */
+  JsonPatch removeTextCheckTags(JsonPatch patch);
 }

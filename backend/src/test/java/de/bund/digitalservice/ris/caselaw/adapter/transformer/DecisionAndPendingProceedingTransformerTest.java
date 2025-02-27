@@ -17,7 +17,7 @@ import java.util.UUID;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class DocumentationUnitAndPendingProceedingTransformerTest {
+class DecisionAndPendingProceedingTransformerTest {
 
   static UUID normAbbreviationId = UUID.randomUUID();
 

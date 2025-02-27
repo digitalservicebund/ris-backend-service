@@ -41,6 +41,7 @@ export const LanguageToolExtension = Extension.create<
       automaticMode: true,
       documentId: undefined,
       textToolEnabled: false,
+      category: undefined,
     }
   },
 
@@ -115,7 +116,10 @@ export const LanguageToolExtension = Extension.create<
         ({ commands }) => {
           this.storage.languageToolService!.isTextCheckActive = state
 
-          if (this.storage.languageToolService!.isTextCheckActive)
+          if (
+            this.storage.languageToolService!.isTextCheckActive &&
+            this.options.automaticMode
+          )
             commands.proofread()
           else commands.resetLanguageToolMatch()
 
@@ -170,7 +174,10 @@ export const LanguageToolExtension = Extension.create<
             if (languageToolDecorations)
               return this.storage.languageToolService!.decorationSet
 
-            if (tr.docChanged && this.options.automaticMode) {
+            if (
+              tr.docChanged &&
+              this.storage.languageToolService!.isTextCheckActive
+            ) {
               if (!this.storage.languageToolService!.proofReadInitially)
                 void this.storage.languageToolService!.debouncedProofreadAndDecorate(
                   tr.doc,

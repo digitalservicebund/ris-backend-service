@@ -216,17 +216,30 @@ public class DocumentationUnitService {
         .build();
   }
 
-  public DocumentationUnit getByDocumentNumber(String documentNumber)
+  public Documentable getByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException {
     return repository.findByDocumentNumber(documentNumber);
   }
 
-  public PendingProceeding getPendingProceedingByDocumentNumber(String documentNumber)
+  public Documentable getByDocumentNumberWithUser(String documentNumber, OidcUser oidcUser)
       throws DocumentationUnitNotExistsException {
-    return repository.findPendingProceedingByDocumentNumber(documentNumber);
+    var documentable = repository.findByDocumentNumber(documentNumber);
+    if (documentable instanceof DocumentationUnit documentationUnit) {
+      return documentationUnit.toBuilder()
+          .isEditable(
+              authService.userHasWriteAccess(
+                  oidcUser,
+                  documentationUnit.coreData().creatingDocOffice(),
+                  documentationUnit.coreData().documentationOffice(),
+                  documentationUnit.status()))
+          .build();
+    } else {
+      log.info("Documentable type not supported: {}", documentable.getClass().getName());
+      return documentable;
+    }
   }
 
-  public DocumentationUnit getByUuid(UUID documentationUnitId)
+  public Documentable getByUuid(UUID documentationUnitId)
       throws DocumentationUnitNotExistsException {
     return repository.findByUuid(documentationUnitId);
   }
@@ -234,7 +247,7 @@ public class DocumentationUnitService {
   @Transactional(transactionManager = "jpaTransactionManager")
   public String deleteByUuid(UUID documentationUnitId) throws DocumentationUnitNotExistsException {
 
-    DocumentationUnit docUnit = getByUuid(documentationUnitId);
+    Documentable docUnit = getByUuid(documentationUnitId);
     Map<RelatedDocumentationType, Long> relatedEntities =
         repository.getAllRelatedDocumentationUnitsByDocumentNumber(docUnit.documentNumber());
 
@@ -251,16 +264,16 @@ public class DocumentationUnitService {
           "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities);
     }
 
-    DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId);
-
     log.debug("Deleting DocumentationUnitDTO " + documentationUnitId);
 
-    if (documentationUnit.attachments() != null && !documentationUnit.attachments().isEmpty())
+    if (docUnit instanceof DocumentationUnit decision
+        && decision.attachments() != null
+        && !decision.attachments().isEmpty())
       attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentationUnitId);
 
-    saveForRecycling(documentationUnit);
+    saveForRecycling(docUnit);
     try {
-      repository.delete(documentationUnit);
+      repository.delete(docUnit);
     } catch (Exception e) {
       log.error("Could not delete documentation unit from database {}", documentationUnitId, e);
       throw new DocumentationUnitDeletionException(
@@ -289,7 +302,12 @@ public class DocumentationUnitService {
        * handle unique following operation (sometimes by add and remove operations at the same time)
     */
 
-    DocumentationUnit existingDocumentationUnit = getByUuid(documentationUnitId);
+    Documentable documentable = getByUuid(documentationUnitId);
+
+    if (!(documentable instanceof DocumentationUnit existingDocumentationUnit)) {
+      throw new UnsupportedOperationException(
+          "Update not supported for Documentable type: " + documentable.getClass());
+    }
 
     long newVersion = 1L;
     if (existingDocumentationUnit.version() != null) {
@@ -319,6 +337,8 @@ public class DocumentationUnitService {
       log.debug("version {} - update patch: {}", patch.documentationUnitVersion(), toUpdate);
 
       if (!toUpdate.getOperations().isEmpty()) {
+        toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
+
         DocumentationUnit patchedDocumentationUnit =
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
         patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
@@ -401,7 +421,7 @@ public class DocumentationUnitService {
       }
     }
 
-    return repository.findByUuid(documentationUnit.uuid());
+    return (DocumentationUnit) repository.findByUuid(documentationUnit.uuid());
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
@@ -431,7 +451,7 @@ public class DocumentationUnitService {
     return "Validation error";
   }
 
-  private void saveForRecycling(DocumentationUnit documentationUnit) {
+  private void saveForRecycling(Documentable documentationUnit) {
     try {
       documentNumberRecyclingService.addForRecycling(
           documentationUnit.uuid(),

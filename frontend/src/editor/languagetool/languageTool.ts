@@ -136,6 +136,8 @@ export default class LanguageTool {
           true,
         ),
       )
+
+    setTimeout(this.addEventListenersToDecorations, 100)
   }
 
   private readonly generateDecoration = (

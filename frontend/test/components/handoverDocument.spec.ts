@@ -3,7 +3,6 @@ import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { Stubs } from "@vue/test-utils/dist/types"
 import { beforeEach } from "vitest"
-import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
 import DocumentUnit, { DuplicateRelationStatus } from "@/domain/documentUnit"
@@ -14,6 +13,10 @@ import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
+import { ServiceResponse } from "@/services/httpClient"
+import languageToolService from "@/services/languageToolService"
+
+import { TextCheckAllResponse } from "@/types/languagetool"
 import routes from "~/test-helper/routes"
 
 const router = createRouter({
@@ -68,10 +71,18 @@ describe("HandoverDocumentationUnitView:", () => {
         success: true,
       }),
     })
+
     vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
       status: 200,
       data: true,
     })
+
+    vi.spyOn(languageToolService, "checkAll").mockResolvedValue({
+      status: 200,
+      data: {
+        suggestions: [],
+      },
+    } as ServiceResponse<TextCheckAllResponse>)
   })
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
@@ -406,9 +417,6 @@ describe("HandoverDocumentationUnitView:", () => {
         }),
       })
 
-      // wait for feature flag to be loaded, can be removed when flag is removed.
-      await nextTick()
-
       expect(
         screen.getByText("Es besteht Dublettenverdacht."),
       ).toBeInTheDocument()
@@ -450,9 +458,6 @@ describe("HandoverDocumentationUnitView:", () => {
           },
         }),
       })
-
-      // wait for feature flag to be loaded, can be removed when flag is removed.
-      await nextTick()
 
       expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
       expect(
@@ -720,11 +725,11 @@ describe("HandoverDocumentationUnitView:", () => {
       },
     })
 
-    // Wait for feature flag to be set in onMounted
+    // Wait for XML Vorschau
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefüllt.RandnummernprüfungDie Reihenfolge der Randnummern ist korrekt.DublettenprüfungEs besteht kein Dublettenverdacht.XML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefüllt.RandnummernprüfungDie Reihenfolge der Randnummern ist korrekt.DublettenprüfungEs besteht kein Dublettenverdacht.RechtschreibprüfungEs wurden keine Rechtschreibfehler identifiziert.XML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -165,6 +167,16 @@ class PublicPortalPublicationServiceTest {
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.publishDocumentationUnit(testDocumentNumber))
         .withMessageContaining("Could not save LDML to bucket.");
+  }
+
+  @Test
+  void publish_withPendingProceeding_shouldDoNothing() throws DocumentationUnitNotExistsException {
+    PendingProceeding pendingProceeding = PendingProceeding.builder().build();
+    when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
+        .thenReturn(pendingProceeding);
+
+    verify(publicPortalBucket, never()).save(anyString(), anyString());
+    verify(xmlUtilService, never()).ldmlToString(any());
   }
 
   @Test

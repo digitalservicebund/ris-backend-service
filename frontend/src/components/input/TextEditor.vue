@@ -34,11 +34,13 @@ import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
 import { LanguageToolExtension } from "@/editor/languagetool/languageToolExtension"
+import { LanguageToolRis } from "@/editor/languagetool/languateToolRis"
 import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
+import { TextCheck } from "@/editor/textCheck"
 import { LanguageToolHelpingWords, Match } from "@/types/languagetool"
 
 import "@/styles/language-tool.scss"
@@ -52,6 +54,7 @@ interface Props {
   plainBorderNumbers?: boolean
   fieldSize?: TextAreaInputAttributes["fieldSize"]
   textCheck?: boolean
+  category?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -62,6 +65,7 @@ const props = withDefaults(defineProps<Props>(), {
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
   textCheck: false,
+  category: "",
 })
 
 const emit = defineEmits<{
@@ -134,10 +138,13 @@ const editor: Editor = new Editor({
     Indent.configure({
       names: ["listItem", "paragraph"],
     }),
+    TextCheck,
+    LanguageToolRis.configure({ category: props.category }),
     LanguageToolExtension.configure({
-      automaticMode: true,
+      automaticMode: false,
       documentId: "1",
       textToolEnabled: props.textCheck,
+      category: props.category,
     }),
   ],
   onUpdate: () => {
@@ -296,6 +303,15 @@ function jumpToMatch(selectedMatch: Match) {
     to: selectedMatch.offset + selectedMatch.length,
   })
 }
+
+/**
+ * trigger text check when text editor has focus
+ */
+watch(hasFocus, () => {
+  if (hasFocus.value) {
+    editor.commands.proofread()
+  }
+})
 
 defineExpose({ jumpToMatch })
 </script>

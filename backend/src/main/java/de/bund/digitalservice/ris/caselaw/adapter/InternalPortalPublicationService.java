@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -65,8 +66,14 @@ public class InternalPortalPublicationService {
    */
   public void publishDocumentationUnit(UUID documentationUnitId)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        documentationUnitRepository.findByUuid(documentationUnitId);
+
+    Documentable documentable = documentationUnitRepository.findByUuid(documentationUnitId);
+
+    if (!(documentable instanceof DocumentationUnit documentationUnit)) {
+      throw new UnsupportedOperationException(
+          "Publish not supported for Documentable type: " + documentable.getClass());
+    }
+
     Optional<CaseLawLdml> ldml =
         DocumentationUnitToLdmlTransformer.transformToLdml(
             documentationUnit, documentBuilderFactory);
@@ -194,13 +201,18 @@ public class InternalPortalPublicationService {
     ZipOutputStream zos = new ZipOutputStream(baos);
 
     for (String documentNumber : documentNumbers) {
-      DocumentationUnit documentationUnit;
+      Documentable documentable;
       try {
-        documentationUnit = documentationUnitRepository.findByDocumentNumber(documentNumber);
+        documentable = documentationUnitRepository.findByDocumentNumber(documentNumber);
       } catch (Exception ex) {
         log.error(
             "Couldn't export (step get documentation unit) {} as LegalDocML", documentNumber, ex);
         continue;
+      }
+
+      if (!(documentable instanceof DocumentationUnit documentationUnit)) {
+        throw new UnsupportedOperationException(
+            "Export not supported for Documentable type: " + documentable.getClass());
       }
 
       Optional<CaseLawLdml> ldml =
@@ -240,20 +252,5 @@ public class InternalPortalPublicationService {
     buffer.rewind();
 
     internalPortalBucket.saveBytes("test_documentation_units.zip", buffer);
-  }
-
-  public String transformAndSaveDocumentationUnit(DocumentationUnit documentationUnit) {
-    Optional<CaseLawLdml> ldml =
-        DocumentationUnitToLdmlTransformer.transformToLdml(
-            documentationUnit, documentBuilderFactory);
-
-    if (ldml.isPresent()) {
-      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
-      if (fileContent.isPresent()) {
-        internalPortalBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
-        return ldml.get().getUniqueId();
-      }
-    }
-    return null;
   }
 }

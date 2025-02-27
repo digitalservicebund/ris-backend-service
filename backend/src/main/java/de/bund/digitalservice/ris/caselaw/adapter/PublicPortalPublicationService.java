@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -56,8 +57,11 @@ public class PublicPortalPublicationService {
    */
   public void publishDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        documentationUnitRepository.findByDocumentNumber(documentNumber);
+    Documentable documentable = documentationUnitRepository.findByDocumentNumber(documentNumber);
+    if (!(documentable instanceof DocumentationUnit documentationUnit)) {
+      // for now pending proceedings can not be transformed to LDML, so they are ignored.
+      return;
+    }
     Optional<CaseLawLdml> ldml =
         DocumentationUnitToLdmlTransformer.transformToLdml(
             documentationUnit, documentBuilderFactory);

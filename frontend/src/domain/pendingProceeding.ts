@@ -35,7 +35,6 @@ export default class PendingProceeding {
     "fileNumbers",
     "court",
     "decisionDate",
-    "legalEffect",
     "documentType",
   ] as const
 
