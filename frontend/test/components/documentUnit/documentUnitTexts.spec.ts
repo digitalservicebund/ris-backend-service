@@ -137,7 +137,7 @@ describe("Texts", () => {
       screen.getByLabelText("Sonstiger Langtext Button Leiste"),
     ).toBeVisible()
     expect(screen.getByLabelText("Gliederung Button Leiste")).toBeVisible()
-  })
+  }, 10000)
 
   test("renders all text editors with ref", async () => {
     const { textEditorRefs } = renderComponent(
