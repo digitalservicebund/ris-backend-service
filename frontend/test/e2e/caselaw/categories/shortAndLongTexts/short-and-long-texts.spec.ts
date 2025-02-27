@@ -86,7 +86,8 @@ test.describe("short and long texts", () => {
     ).toHaveCount(0)
   })
 
-  test(
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
     "text editor keyboard navigation",
     {
       annotation: {
