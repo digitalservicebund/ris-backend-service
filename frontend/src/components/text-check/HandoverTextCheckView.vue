@@ -21,18 +21,18 @@ const loading = ref(true)
 const errorCount = ref(0)
 const sidePanelStore = useExtraContentSidePanelStore()
 
-async function navigateToCheckAllInCategories() {
+useExtraContentSidePanelStore().setSidePanelMode("text-check")
+
+async function navigateToTextCheckSummaryInCategories() {
   await router.push({
     name: "caselaw-documentUnit-documentNumber-categories",
     params: {
       documentNumber: props.documentNumber,
-      showAttachmentPanel: "true",
     },
   })
   sidePanelStore.setSidePanelMode("text-check")
+  sidePanelStore.togglePanel(true)
 }
-
-useExtraContentSidePanelStore().setSidePanelMode("text-check")
 
 const checkAll = async (documentUnitId: string) => {
   const response = await languageToolService.checkAll(documentUnitId)
@@ -99,7 +99,7 @@ onMounted(async () => {
             class="w-fit"
             label="Rechtschreibfehler prüfen"
             size="small"
-            @click="navigateToCheckAllInCategories"
+            @click="navigateToTextCheckSummaryInCategories"
           />
         </div>
       </div>
