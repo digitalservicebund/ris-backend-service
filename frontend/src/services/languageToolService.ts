@@ -1,3 +1,4 @@
+import errorMessages from "@/i18n/errors.json"
 import httpClient, { ServiceResponse } from "@/services/httpClient"
 import { TextCheckAllResponse, TextCheckResponse } from "@/types/languagetool"
 
@@ -21,9 +22,17 @@ const service: LanguageToolService = {
     )
   },
   async checkAll(id: string) {
-    return await httpClient.get<TextCheckAllResponse>(
+    const response = await httpClient.get<TextCheckAllResponse>(
       `caselaw/documentunits/${id}/text-check/all`,
     )
+
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.TEXT_CHECK_FAILED.title,
+      }
+    }
+
+    return response
   },
 }
 

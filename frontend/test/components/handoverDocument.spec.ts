@@ -11,7 +11,12 @@ import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
+import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
+import { ServiceResponse } from "@/services/httpClient"
+import languageToolService from "@/services/languageToolService"
+
+import { TextCheckAllResponse } from "@/types/languagetool"
 import routes from "~/test-helper/routes"
 
 const router = createRouter({
@@ -66,6 +71,18 @@ describe("HandoverDocumentationUnitView:", () => {
         success: true,
       }),
     })
+
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+
+    vi.spyOn(languageToolService, "checkAll").mockResolvedValue({
+      status: 200,
+      data: {
+        suggestions: [],
+      },
+    } as ServiceResponse<TextCheckAllResponse>)
   })
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
@@ -712,7 +729,7 @@ describe("HandoverDocumentationUnitView:", () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefüllt.RandnummernprüfungDie Reihenfolge der Randnummern ist korrekt.DublettenprüfungEs besteht kein Dublettenverdacht.XML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefüllt.RandnummernprüfungDie Reihenfolge der Randnummern ist korrekt.DublettenprüfungEs besteht kein Dublettenverdacht.RechtschreibprüfungEs wurden keine Rechtschreibfehler identifiziert.XML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

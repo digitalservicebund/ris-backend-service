@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
+import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import SuggestionGroup from "@/components/text-check/SuggestionGroup.vue"
+import { ResponseError } from "@/services/httpClient"
 import languageToolService from "@/services/languageToolService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { Match, Suggestion } from "@/types/languagetool"
@@ -9,6 +11,8 @@ import { Match, Suggestion } from "@/types/languagetool"
 defineProps<{
   jumpToMatch?: (match: Match) => void
 }>()
+
+const responseError = ref<ResponseError | undefined>()
 
 const store = useDocumentUnitStore()
 
@@ -24,11 +28,18 @@ const checkAll = async () => {
 
     errors.value = response.data?.suggestions
 
-    let counter = 0
-    response.data?.suggestions.forEach(
-      (suggestion) => (counter += suggestion.matches.length),
-    )
-    errorCount.value = counter
+    if (response.error) {
+      responseError.value = response.error
+    }
+
+    if (response.data && response.data.suggestions) {
+      let counter = 0
+      response.data?.suggestions.forEach(
+        (suggestion) => (counter += suggestion.matches.length),
+      )
+      errorCount.value = counter
+      responseError.value = undefined
+    }
   }
 }
 
@@ -51,6 +62,13 @@ onMounted(async () => {
     <div class="flex flex-row gap-4">
       <span class="ds-label-01-bold">Rechtschreibprüfung </span>
       <span v-if="!loading">({{ errorCount }})</span>
+    </div>
+
+    <div v-if="responseError">
+      <InfoModal
+        :description="responseError.description"
+        :title="responseError.title"
+      />
     </div>
 
     <div>
