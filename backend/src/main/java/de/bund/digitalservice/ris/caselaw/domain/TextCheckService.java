@@ -64,7 +64,6 @@ public class TextCheckService {
     return allMatches;
   }
 
-  @SuppressWarnings("unused")
   public TextCheckCategoryResponse checkCategory(UUID id, CategoryType category)
       throws DocumentationUnitNotExistsException {
     if (category == null) {
@@ -159,6 +158,7 @@ public class TextCheckService {
     return new TextCheckCategoryResponse(newHtmlText.toString(), matches);
   }
 
+  @SuppressWarnings(" java:S1144")
   private Map<Integer, String> generateTextChunks(Map<Integer, String> textNodes) {
     Map<Integer, String> textChunks = new LinkedMap<>();
 

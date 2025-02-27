@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class DatabasePatchMapperService implements PatchMapperService {
+  @SuppressWarnings("java:S5852")
   private static final Pattern TEXT_CHECK_PATTERN =
       Pattern.compile("<text-check.*?>(.*?)</text-check>");
 

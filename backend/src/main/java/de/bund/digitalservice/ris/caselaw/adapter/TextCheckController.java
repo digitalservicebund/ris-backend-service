@@ -69,8 +69,6 @@ public class TextCheckController {
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<TextCheckCategoryResponse> checkCategory(
       @PathVariable("id") UUID id, @Param("category") String category) {
-    List<Match> matches;
-
     try {
       return ResponseEntity.ok(textCheckService.checkCategory(id, CategoryType.forName(category)));
     } catch (DocumentationUnitNotExistsException ex) {

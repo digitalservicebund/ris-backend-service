@@ -143,7 +143,7 @@ const editor: Editor = new Editor({
     LanguageToolExtension.configure({
       automaticMode: false,
       documentId: "1",
-      textToolEnabled: props.textCheck,
+      textToolEnabled: false,
       category: props.category,
     }),
   ],
@@ -263,13 +263,6 @@ watch(
     const cursorPos = editor.state.selection.anchor
     editor.commands.setContent(value, false)
     editor.commands.setTextSelection(cursorPos)
-  },
-)
-
-watch(
-  () => props.textCheck,
-  (newValue) => {
-    editor.commands.toggleTextCheckActiveState(newValue)
   },
 )
 
