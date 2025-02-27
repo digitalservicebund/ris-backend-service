@@ -11,8 +11,9 @@ import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
-import HandoverLanguageTool from "@/components/text-check/HandoverLanguageTool.vue"
+import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import {
   DuplicateRelationStatus,
@@ -62,6 +63,8 @@ const categoriesRoute = computed(() => ({
 const isFirstTimeHandover = computed(() => {
   return !props.eventLog || props.eventLog.length === 0
 })
+
+const textCheck = useFeatureToggle("neuris.text-check")
 
 const preview = ref<Preview>()
 const frontendError = ref()
@@ -597,8 +600,9 @@ const isPublishable = computed<boolean>(
         :pending-duplicates="pendingDuplicates"
       />
 
-      <HandoverLanguageTool
-        v-if="false"
+      <HandoverTextCheckView
+        v-if="textCheck"
+        :document-id="store.documentUnit!.uuid"
         :document-number="store.documentUnit!.documentNumber"
       />
 

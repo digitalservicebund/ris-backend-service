@@ -223,5 +223,8 @@
   "EDITION_LOADING_XML_PREVIEW": {
     "title": "Fehler beim Laden der XML-Vorschau",
     "description": "Bitte laden Sie die Seite neu."
+  },
+  "TEXT_CHECK_FAILED": {
+    "title": "Fehler beim Prüfen der Rechtschreibung"
   }
 }

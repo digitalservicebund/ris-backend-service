@@ -11,7 +11,7 @@ import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
-import DocumentationUnitTextCheck from "@/components/text-check/DocumentationUnitTextCheck.vue"
+import DocumentationUnitTextCheckSummary from "@/components/text-check/DocumentationUnitTextCheckSummary.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import DocumentUnit from "@/domain/documentUnit"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
@@ -184,7 +184,7 @@ onMounted(() => {
           :document-number="importDocumentNumber"
         />
 
-        <DocumentationUnitTextCheck
+        <DocumentationUnitTextCheckSummary
           v-else-if="panelMode === 'text-check' && textCheck"
           v-bind="{ jumpToMatch }"
         />
