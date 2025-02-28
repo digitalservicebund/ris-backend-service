@@ -15,6 +15,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
 public class OtcObsConfig {
+  public static final String EU_DE = "eu-de";
+
   @Value("${otc.obs.endpoint:https://obs.eu-de.otc.t-systems.com}")
   private String endpoint;
 
@@ -44,7 +46,7 @@ public class OtcObsConfig {
             StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(docxAccessKeyId, docxSecretAccessKey)))
         .endpointOverride(new URI(endpoint))
-        .region(Region.of("eu-de"))
+        .region(Region.of(EU_DE))
         .build();
   }
 
@@ -57,7 +59,7 @@ public class OtcObsConfig {
                 AwsBasicCredentials.create(
                     internalPortalAccessKeyId, internalPortalSecretAccessKey)))
         .endpointOverride(new URI(endpoint))
-        .region(Region.of("eu-de"))
+        .region(Region.of(EU_DE))
         .build();
   }
 
@@ -75,7 +77,7 @@ public class OtcObsConfig {
             StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(publicPortalAccessKeyId, publicPortalAccessKey)))
         .endpointOverride(new URI(endpoint))
-        .region(Region.of("eu-de"))
+        .region(Region.of(EU_DE))
         .build();
   }
 

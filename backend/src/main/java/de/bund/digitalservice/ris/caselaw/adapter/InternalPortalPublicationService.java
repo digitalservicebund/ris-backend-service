@@ -118,6 +118,7 @@ public class InternalPortalPublicationService {
   }
 
   @Async
+  @SuppressWarnings("java:S135")
   public void exportSampleLdmls() throws IOException {
     List<String> documentNumbers =
         List.of(

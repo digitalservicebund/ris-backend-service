@@ -125,9 +125,9 @@ class PublicPortalPublicationServiceTest {
     when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
         .thenReturn(invalidTestDocumentUnit);
 
+    var documentNumber = invalidTestDocumentUnit.documentNumber();
     assertThatExceptionOfType(LdmlTransformationException.class)
-        .isThrownBy(
-            () -> subject.publishDocumentationUnit(invalidTestDocumentUnit.documentNumber()))
+        .isThrownBy(() -> subject.publishDocumentationUnit(documentNumber))
         .withMessageContaining("Could not transform documentation unit to LDML.");
   }
 
