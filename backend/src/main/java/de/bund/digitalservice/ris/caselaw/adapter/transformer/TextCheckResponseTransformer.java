@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolResponse;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Category;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Context;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.MatchBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
@@ -12,8 +13,11 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TextCheckResponseTransformer {
   private TextCheckResponseTransformer() {}
@@ -21,6 +25,9 @@ public class TextCheckResponseTransformer {
   public static TextCheckAllResponse transformToAllDomain(
       List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches) {
     List<Suggestion> suggestions = new ArrayList<>();
+    Set<CategoryType> categoryTypes = new HashSet<>();
+    AtomicInteger totalTextCheckErrors = new AtomicInteger();
+
     matches.forEach(
         match -> {
           String word =
@@ -38,10 +45,19 @@ public class TextCheckResponseTransformer {
           Optional<Suggestion> suggestionOptional =
               suggestions.stream().filter(suggestion -> suggestion.word().equals(word)).findFirst();
 
-          suggestionOptional.ifPresent(suggestion -> suggestion.matches().add(match));
+          suggestionOptional.ifPresent(
+              suggestion -> {
+                suggestion.matches().add(match);
+                categoryTypes.add(match.category());
+                totalTextCheckErrors.getAndIncrement();
+              });
         });
 
-    return TextCheckAllResponse.builder().suggestions(suggestions).build();
+    return TextCheckAllResponse.builder()
+        .suggestions(suggestions)
+        .categoryTypes(categoryTypes)
+        .totalTextCheckErrors(totalTextCheckErrors.get())
+        .build();
   }
 
   public static TextCheckResponse transformToDomain(

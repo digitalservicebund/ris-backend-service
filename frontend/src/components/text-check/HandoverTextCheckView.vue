@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
+import { onBeforeMount, ref } from "vue"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
+import { getCategoryLabels } from "@/components/text-check/categoryLabels"
 import router from "@/router"
 import { ResponseError } from "@/services/httpClient"
 import languageToolService from "@/services/languageToolService"
@@ -17,11 +18,10 @@ const props = defineProps<{
 
 const responseError = ref<ResponseError | undefined>()
 
-const loading = ref(true)
-const errorCount = ref(0)
+const loading = ref()
+const totalTextCheckErrors = ref(0)
 const sidePanelStore = useExtraContentSidePanelStore()
-
-useExtraContentSidePanelStore().setSidePanelMode("text-check")
+const textCategories = ref<string[] | undefined>()
 
 async function navigateToTextCheckSummaryInCategories() {
   await router.push({
@@ -34,26 +34,28 @@ async function navigateToTextCheckSummaryInCategories() {
   sidePanelStore.togglePanel(true)
 }
 
+function resetResults() {
+  totalTextCheckErrors.value = 0
+  textCategories.value = undefined
+}
+
 const checkAll = async (documentUnitId: string) => {
+  resetResults()
+  loading.value = true
   const response = await languageToolService.checkAll(documentUnitId)
 
   if (response.error) {
     responseError.value = response.error
-  }
-  if (response.data && response.data.suggestions) {
-    let counter = 0
-    response.data.suggestions.forEach(
-      (suggestion) => (counter += suggestion.matches.length),
-    )
-    errorCount.value = counter
-
+  } else if (response.data && response.data.suggestions) {
     responseError.value = undefined
+    totalTextCheckErrors.value = response.data.totalTextCheckErrors
+    textCategories.value = getCategoryLabels(response.data.categoryTypes)
   }
+  loading.value = false
 }
 
-onMounted(async () => {
+onBeforeMount(async () => {
   await checkAll(props.documentId)
-  loading.value = false
 })
 </script>
 
@@ -68,12 +70,12 @@ onMounted(async () => {
       />
     </div>
 
-    <div v-if="loading" class="flex flex-col">
+    <div v-else-if="loading" class="flex flex-col">
       <LoadingSpinner size="small" />
     </div>
 
     <div v-else>
-      <div v-if="errorCount > 0">
+      <div v-if="totalTextCheckErrors > 0">
         <div class="flex flex-col gap-16">
           <div class="flex flex-row gap-8">
             <IconErrorOutline class="text-red-800" />
@@ -81,12 +83,17 @@ onMounted(async () => {
               Es wurden Rechtschreibfehler identifiziert:
               <div>
                 <dl class="my-16">
-                  <div class="grid grid-cols-[auto_1fr] gap-x-16 px-0">
+                  <div
+                    class="grid grid-cols-[auto_1fr] gap-x-16 px-0"
+                    data-testid="total-text-check-errors"
+                  >
                     <dt class="ds-label-02-bold self-center">Anzahl</dt>
-                    <dd class="ds-body-02-reg">{{ errorCount }}</dd>
+                    <dd class="ds-body-02-reg">
+                      {{ totalTextCheckErrors }}
+                    </dd>
                     <dt class="ds-label-02-bold self-center">Rubrik</dt>
                     <dd class="ds-body-02-reg">
-                      Schlagwörter, Leitsatz, Gründe
+                      {{ textCategories?.join(", ") }}
                     </dd>
                   </div>
                 </dl>

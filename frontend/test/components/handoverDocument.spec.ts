@@ -81,6 +81,8 @@ describe("HandoverDocumentationUnitView:", () => {
       status: 200,
       data: {
         suggestions: [],
+        totalTextCheckErrors: 0,
+        categoryTypes: [],
       },
     } as ServiceResponse<TextCheckAllResponse>)
   })
