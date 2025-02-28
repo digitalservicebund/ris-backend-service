@@ -118,6 +118,7 @@ public class XmlUtilService {
     }
   }
 
+  @SuppressWarnings("java:S5852")
   private void logXsdError(String caseLawId, String beforeXslt, Exception e) {
     String hint = "";
     if (beforeXslt.contains("<akn:judgmentBody/>")) {
