@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -81,6 +82,7 @@ import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @RISIntegrationTest(
@@ -255,6 +257,30 @@ class PortalPublicationJobIntegrationTest {
                 .map(PortalPublicationJobDTO::getPublicationStatus)
                 .toList())
         .isEqualTo(List.of(PortalPublicationTaskStatus.ERROR, PortalPublicationTaskStatus.SUCCESS));
+  }
+
+  @Test
+  // In Migration there is no filter for "pure"-deletion jobs (Rsp_Loeschungen.csv), hence we will
+  // receive deletion jobs for non-existing documents -> we ignore them by marking them as success
+  void executePendingJobs_withFailedDeletionJob_shouldMarkJobAsSuccess() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, buildValidDocumentationUnit("1"));
+
+    // DELETE job will fail as the file is missing
+    doThrow(NoSuchKeyException.class).when(s3Client).deleteObject(any(Consumer.class));
+
+    portalPublicationJobRepository.saveAll(
+        List.of(createPublicationJob(dto, PortalPublicationTaskType.DELETE)));
+
+    portalPublicationJobService.executePendingJobs();
+
+    assertThat(
+            portalPublicationJobRepository.findAll().stream()
+                .map(PortalPublicationJobDTO::getPublicationStatus)
+                .toList())
+        .hasSize(1)
+        .isEqualTo(List.of(PortalPublicationTaskStatus.SUCCESS));
   }
 
   private PortalPublicationJobDTO createPublicationJob(
