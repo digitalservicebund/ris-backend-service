@@ -201,11 +201,16 @@ public class DocumentationUnitService {
       OidcUser oidcUser, DocumentationUnitListItem listItem) {
 
     boolean hasWriteAccess =
-        authService.userHasWriteAccess(
-            oidcUser,
-            listItem.creatingDocumentationOffice(),
-            listItem.documentationOffice(),
-            listItem.status());
+        !(listItem.documentType() != null
+                && listItem
+                    .documentType()
+                    .jurisShortcut()
+                    .equals("Anh")) // pending proceedings are not to be edited or deleted yet
+            && authService.userHasWriteAccess(
+                oidcUser,
+                listItem.creatingDocumentationOffice(),
+                listItem.documentationOffice(),
+                listItem.status());
     boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
 
     return listItem.toBuilder()

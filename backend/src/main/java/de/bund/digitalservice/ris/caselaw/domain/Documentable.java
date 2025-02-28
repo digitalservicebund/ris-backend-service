@@ -3,30 +3,34 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import java.util.List;
 import java.util.UUID;
 
-/** The shared domain model interface for a caselaw decision or a pending proceeding */
+/**
+ * The shared domain model interface for a caselaw decision {@link
+ * de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit} and a pending proceeding {@link
+ * de.bund.digitalservice.ris.caselaw.domain.PendingProceeding}.
+ */
 public interface Documentable {
 
-  public UUID uuid();
+  UUID uuid();
 
-  public String documentNumber();
+  String documentNumber();
 
-  public CoreData coreData();
+  CoreData coreData();
 
-  public List<PreviousDecision> previousDecisions();
+  List<PreviousDecision> previousDecisions();
 
-  public List<EnsuingDecision> ensuingDecisions();
+  List<EnsuingDecision> ensuingDecisions();
 
-  public ShortTexts shortTexts();
+  ShortTexts shortTexts();
 
-  public Status status();
+  Status status();
 
-  public ContentRelatedIndexing contentRelatedIndexing();
+  ContentRelatedIndexing contentRelatedIndexing();
 
-  public List<Reference> caselawReferences();
+  List<Reference> caselawReferences();
 
-  public List<Reference> literatureReferences();
+  List<Reference> literatureReferences();
 
-  public boolean isEditable();
+  boolean isEditable();
 
-  public boolean isDeletable();
+  boolean isDeletable();
 }

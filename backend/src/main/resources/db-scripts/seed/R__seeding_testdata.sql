@@ -556,7 +556,40 @@ VALUES
       NULL,
       NULL,
       NULL
-  );
+  ),
+    (
+        gen_random_uuid (),
+        (
+            SELECT
+                id
+            FROM
+                incremental_migration.court
+            WHERE
+                type
+                    = 'BFH'
+        ),
+    '2025-02-24',
+    'YYTestDoc0018',
+  (
+      SELECT
+      id
+      FROM
+      incremental_migration.document_type
+      WHERE
+      abbreviation = 'Anh'
+  ),
+  (
+      SELECT
+      id
+      FROM
+      incremental_migration.documentation_office
+      WHERE
+      abbreviation = 'DS'
+  ),
+    NULL,
+    NULL,
+    NULL
+    );
 
 INSERT INTO
     incremental_migration.decision (
@@ -807,6 +840,20 @@ VALUES
         '<p>Gewerbesteuerpflicht des Bäderbetriebs einer Gemeinde als Betrieb gewerblicher Art (Gewinnerzielungsabsicht)? Ist ein Betrieb gewerblicher Art einer juristischen Person des öffentlichen Rechts nur gewerbesteuerpflichtig, wenn er mit der Absicht der Gewinnerzielung betrieben wird?</p>',
         'Zulassung durch BFH',
         'Verwaltung'
+    ),
+    (
+        (SELECT
+             id
+         FROM
+             incremental_migration.documentation_unit
+         WHERE
+             document_number
+                 = 'YYTestDoc0018'),
+        NULL,
+        false,
+        '<p>Unveröffentlichtes anhängiges Verfahren</p>',
+        NULL,
+        NULL
     );
 
 INSERT INTO
@@ -1106,7 +1153,21 @@ VALUES
           WHERE
               document_number = 'YYTestDoc0017'
       )
-    );
+    ),
+  (
+      gen_random_uuid (),
+      '2025-02-26 18:38:43.043877 +00:00',
+      'UNPUBLISHED',
+      false,
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_unit
+          WHERE
+              document_number = 'YYTestDoc0018'
+      )
+  )
     ;
 
 UPDATE incremental_migration.documentation_unit SET current_status_id =
@@ -1177,6 +1238,10 @@ WHERE document_number = 'YYTestDoc0016';
 UPDATE incremental_migration.documentation_unit SET current_status_id =
     (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0017'))
 WHERE document_number = 'YYTestDoc0017';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0018'))
+WHERE document_number = 'YYTestDoc0018';
 
 
 UPDATE
