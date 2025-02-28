@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import jakarta.xml.bind.JAXB;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
@@ -8,6 +10,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.xml.XMLConstants;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
@@ -33,9 +36,13 @@ import org.xml.sax.SAXException;
 @Slf4j
 public class XmlUtilService {
   private final TransformerFactory transformerFactory;
+  private final Templates htmlToAknHtml;
+  private final Schema schema;
 
   public XmlUtilService(@Qualifier("saxon") TransformerFactory transformerFactory) {
     this.transformerFactory = transformerFactory;
+    this.htmlToAknHtml = getTemplates("caselawhandover/htmlToAknHtml.xslt");
+    this.schema = getSchema("caselawhandover/shared/akomantoso30.xsd");
   }
 
   public Templates getTemplates(String filePath) {
@@ -82,5 +89,48 @@ public class XmlUtilService {
       log.error("Xslt transformation error.", e);
       throw new MappingException(e.getMessage());
     }
+  }
+
+  public Optional<String> ldmlToString(CaseLawLdml ldml) {
+    StringWriter jaxbOutput = new StringWriter();
+    JAXB.marshal(ldml, jaxbOutput);
+
+    try {
+      String ldmlAsXmlString = XmlUtilService.xsltTransform(htmlToAknHtml, jaxbOutput.toString());
+      if (ldmlAsXmlString.contains("akn:unknownUseCaseDiscovered")) {
+        int hintStart = Math.max(0, ldmlAsXmlString.indexOf("akn:unknownUseCaseDiscovered") - 10);
+        int hintEnd = Math.min(ldmlAsXmlString.length(), hintStart + 60);
+        String hint =
+            "\"..." + ldmlAsXmlString.substring(hintStart, hintEnd).replace("\n", "") + "...\"";
+        log.error(
+            "Invalid ldml produced for {}. A new unsupported attribute or elements was discovered."
+                + " It is either an error or needs to be added to the allow list. hint : {}",
+            ldml.getUniqueId(),
+            hint);
+        return Optional.empty();
+      }
+
+      schema.newValidator().validate(new StreamSource(new StringReader(ldmlAsXmlString)));
+      return Optional.of(ldmlAsXmlString);
+    } catch (SAXException | MappingException | IOException e) {
+      logXsdError(ldml.getUniqueId(), jaxbOutput.toString(), e);
+      return Optional.empty();
+    }
+  }
+
+  private void logXsdError(String caseLawId, String beforeXslt, Exception e) {
+    String hint = "";
+    if (beforeXslt.contains("<akn:judgmentBody/>")) {
+      hint = "Ldml contained <judgementBody/>. An empty judgementBody isn't allowed.";
+    } else if (beforeXslt.contains("KARE600062214")) {
+      hint = "KARE600062214 contains an invalid width (escaping issue)";
+    } else if (beforeXslt.contains("JURE200002538")) {
+      hint = "JURE200002538 contains an invalid href (invalid whitespace in the middle of the url)";
+    } else if (beforeXslt.matches("(?s).*?<akn:header>.*?<div.*?>.*?</akn:header>.*")) {
+      hint = "Ldml contained <div> inside title.";
+    } else if (beforeXslt.matches("(?s).*?<akn:header>.*?<br.*?>.*?</akn:header>.*")) {
+      hint = "Ldml contained <br> inside title.";
+    }
+    log.error("Error: {} Case Law {} does not match akomantoso30.xsd. {}", hint, caseLawId, e);
   }
 }

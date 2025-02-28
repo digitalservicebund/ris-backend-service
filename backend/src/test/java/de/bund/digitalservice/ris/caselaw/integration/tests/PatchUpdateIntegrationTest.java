@@ -20,8 +20,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
-import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
@@ -142,7 +142,7 @@ class PatchUpdateIntegrationTest {
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private DocumentationUnitDocxMetadataInitializationService initializationService;
   @MockitoBean private UserGroupService userGroupService;
-  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
 
   private UUID court1Id;

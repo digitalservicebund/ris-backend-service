@@ -20,16 +20,16 @@ public class AdminController {
 
   private final MailTrackingService mailTrackingService;
   private final EnvironmentService environmentService;
-  private final LdmlExporterService ldmlExporterService;
+  private final InternalPortalPublicationService internalPortalPublicationService;
 
   @Autowired
   public AdminController(
       MailTrackingService mailTrackingService,
       EnvironmentService environmentService,
-      LdmlExporterService ldmlExporterService) {
+      InternalPortalPublicationService internalPortalPublicationService) {
     this.mailTrackingService = mailTrackingService;
     this.environmentService = environmentService;
-    this.ldmlExporterService = ldmlExporterService;
+    this.internalPortalPublicationService = internalPortalPublicationService;
   }
 
   @PostMapping("/webhook")
@@ -47,18 +47,11 @@ public class AdminController {
     return ResponseEntity.ok(environmentService.getEnvironment());
   }
 
-  @GetMapping("/ldml")
-  @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<Void> createLdml() {
-    ldmlExporterService.exportMultipleRandomDocumentationUnits();
-    return ResponseEntity.ok().build();
-  }
-
   @GetMapping("/ldml/samples")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<Void> createSampleLdmls() {
     try {
-      ldmlExporterService.exportSampleLdmls();
+      internalPortalPublicationService.exportSampleLdmls();
     } catch (IOException ex) {
       log.error("Couldn't generate zip file for sample documentation units.", ex);
       return ResponseEntity.internalServerError().build();

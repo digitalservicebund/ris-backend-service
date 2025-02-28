@@ -10,103 +10,45 @@ import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
-import jakarta.xml.bind.JAXB;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Templates;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mapping.MappingException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.xml.sax.SAXException;
 
 @Service
 @Slf4j
-public class LdmlExporterService {
+public class InternalPortalPublicationService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
   private final DocumentBuilderFactory documentBuilderFactory;
-  private final LdmlBucket ldmlBucket;
+  private final InternalPortalBucket internalPortalBucket;
   private final ObjectMapper objectMapper;
-  private final Templates htmlToAknHtml;
-  private final Schema schema;
+  private final XmlUtilService xmlUtilService;
 
   @Autowired
-  public LdmlExporterService(
+  public InternalPortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,
-      LdmlBucket ldmlBucket,
+      InternalPortalBucket internalPortalBucket,
       ObjectMapper objectMapper) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.documentBuilderFactory = documentBuilderFactory;
-    this.ldmlBucket = ldmlBucket;
+    this.internalPortalBucket = internalPortalBucket;
     this.objectMapper = objectMapper;
-    this.htmlToAknHtml = xmlUtilService.getTemplates("caselawhandover/htmlToAknHtml.xslt");
-    this.schema = xmlUtilService.getSchema("caselawhandover/shared/akomantoso30.xsd");
-  }
-
-  public void exportMultipleRandomDocumentationUnits() {
-    log.info("Export to LDML process has started");
-    List<DocumentationUnit> documentationUnitsToTransform = new ArrayList<>();
-
-    List<UUID> idsToTransform = documentationUnitRepository.getRandomDocumentationUnitIds();
-    idsToTransform.forEach(
-        id -> {
-          try {
-            Documentable documentable = documentationUnitRepository.findByUuid(id);
-            if (documentable instanceof DocumentationUnit documentationUnit) {
-              documentationUnitsToTransform.add(documentationUnit);
-            } else {
-              log.info(
-                  "Documentable type not supported for LDML export: "
-                      + documentable.getClass().getName());
-            }
-          } catch (DocumentationUnitNotExistsException ex) {
-            log.debug(ex.getMessage());
-          }
-        });
-
-    List<String> transformedDocUnits = new ArrayList<>();
-    if (!documentationUnitsToTransform.isEmpty()) {
-      for (DocumentationUnit documentationUnit : documentationUnitsToTransform) {
-        var documentNumber = transformAndSaveDocumentationUnit(documentationUnit);
-        if (documentNumber != null) {
-          transformedDocUnits.add(documentNumber);
-        }
-      }
-    }
-
-    if (!transformedDocUnits.isEmpty()) {
-      Changelog changelog = new Changelog(transformedDocUnits, null);
-
-      try {
-        String changelogString = objectMapper.writeValueAsString(changelog);
-        ldmlBucket.save(
-            "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json",
-            changelogString);
-      } catch (IOException e) {
-        log.error("Could not write changelog file. {}", e.getMessage());
-      }
-    }
-
-    log.info("Export to LDML process is done");
+    this.xmlUtilService = xmlUtilService;
   }
 
   /**
@@ -141,7 +83,7 @@ public class LdmlExporterService {
           "Could not transform documentation unit to LDML.", null);
     }
 
-    Optional<String> fileContent = ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
     if (fileContent.isEmpty()) {
       throw new LdmlTransformationException(
           "Could not transform documentation unit to valid LDML.", null);
@@ -159,7 +101,7 @@ public class LdmlExporterService {
     }
 
     try {
-      ldmlBucket.save(
+      internalPortalBucket.save(
           "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogJson);
     } catch (BucketException e) {
       log.error("Could not save changelog to bucket", e);
@@ -167,7 +109,7 @@ public class LdmlExporterService {
     }
 
     try {
-      ldmlBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
+      internalPortalBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
       log.info("LDML for documentation unit {} successfully published.", ldml.get().getUniqueId());
     } catch (BucketException e) {
       log.error("Could not save LDML to bucket", e);
@@ -282,7 +224,7 @@ public class LdmlExporterService {
         continue;
       }
 
-      Optional<String> fileContent = ldmlToString(ldml.get());
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
       if (fileContent.isEmpty()) {
         log.error("Couldn't export (step generate file content) {} as LegalDocML", documentNumber);
         continue;
@@ -309,64 +251,6 @@ public class LdmlExporterService {
     ByteBuffer buffer = ByteBuffer.wrap(baos.toByteArray());
     buffer.rewind();
 
-    ldmlBucket.saveBytes("test_documentation_units.zip", buffer);
-  }
-
-  public String transformAndSaveDocumentationUnit(DocumentationUnit documentationUnit) {
-    Optional<CaseLawLdml> ldml =
-        DocumentationUnitToLdmlTransformer.transformToLdml(
-            documentationUnit, documentBuilderFactory);
-
-    if (ldml.isPresent()) {
-      Optional<String> fileContent = ldmlToString(ldml.get());
-      if (fileContent.isPresent()) {
-        ldmlBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
-        return ldml.get().getUniqueId();
-      }
-    }
-    return null;
-  }
-
-  public Optional<String> ldmlToString(CaseLawLdml ldml) {
-    StringWriter jaxbOutput = new StringWriter();
-    JAXB.marshal(ldml, jaxbOutput);
-
-    try {
-      String ldmlAsXmlString = XmlUtilService.xsltTransform(htmlToAknHtml, jaxbOutput.toString());
-      if (ldmlAsXmlString.contains("akn:unknownUseCaseDiscovered")) {
-        int hintStart = Math.max(0, ldmlAsXmlString.indexOf("akn:unknownUseCaseDiscovered") - 10);
-        int hintEnd = Math.min(ldmlAsXmlString.length(), hintStart + 60);
-        String hint =
-            "\"..." + ldmlAsXmlString.substring(hintStart, hintEnd).replace("\n", "") + "...\"";
-        log.error(
-            "Invalid ldml produced for {}. A new unsupported attribute or elements was discovered."
-                + " It is either an error or needs to be added to the allow list. hint : {}",
-            ldml.getUniqueId(),
-            hint);
-        return Optional.empty();
-      }
-
-      schema.newValidator().validate(new StreamSource(new StringReader(ldmlAsXmlString)));
-      return Optional.of(ldmlAsXmlString);
-    } catch (SAXException | MappingException | IOException e) {
-      logXsdError(ldml.getUniqueId(), jaxbOutput.toString(), e);
-      return Optional.empty();
-    }
-  }
-
-  private void logXsdError(String caseLawId, String beforeXslt, Exception e) {
-    String hint = "";
-    if (beforeXslt.contains("<akn:judgmentBody/>")) {
-      hint = "Ldml contained <judgementBody/>. An empty judgementBody isn't allowed.";
-    } else if (beforeXslt.contains("KARE600062214")) {
-      hint = "KARE600062214 contains an invalid width (escaping issue)";
-    } else if (beforeXslt.contains("JURE200002538")) {
-      hint = "JURE200002538 contains an invalid href (invalid whitespace in the middle of the url)";
-    } else if (beforeXslt.matches("(?s).*?<akn:header>.*?<div.*?>.*?</akn:header>.*")) {
-      hint = "Ldml contained <div> inside title.";
-    } else if (beforeXslt.matches("(?s).*?<akn:header>.*?<br.*?>.*?</akn:header>.*")) {
-      hint = "Ldml contained <br> inside title.";
-    }
-    log.error("Error: {} Case Law {} does not match akomantoso30.xsd. {}", hint, caseLawId, e);
+    internalPortalBucket.saveBytes("test_documentation_units.zip", buffer);
   }
 }

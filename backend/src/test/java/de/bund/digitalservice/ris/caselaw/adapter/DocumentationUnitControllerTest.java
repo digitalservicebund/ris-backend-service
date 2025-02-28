@@ -90,7 +90,7 @@ class DocumentationUnitControllerTest {
   @MockitoBean private DocumentationUnitService service;
   @MockitoBean private DocumentationUnitDocxMetadataInitializationService docUnitAttachmentService;
   @MockitoBean private HandoverService handoverService;
-  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
   @MockitoBean private UserService userService;
   @MockitoBean private DocxConverterService docxConverterService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
@@ -740,7 +740,7 @@ class DocumentationUnitControllerTest {
       throws DocumentationUnitNotExistsException {
 
     doThrow(DocumentationUnitNotExistsException.class)
-        .when(ldmlExporterService)
+        .when(internalPortalPublicationService)
         .publishDocumentationUnit(TEST_UUID);
 
     risWebClient
@@ -751,7 +751,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(ldmlExporterService).publishDocumentationUnit(TEST_UUID);
+    verify(internalPortalPublicationService).publishDocumentationUnit(TEST_UUID);
   }
 
   @Test
@@ -759,7 +759,7 @@ class DocumentationUnitControllerTest {
       throws DocumentationUnitNotExistsException {
 
     doThrow(LdmlTransformationException.class)
-        .when(ldmlExporterService)
+        .when(internalPortalPublicationService)
         .publishDocumentationUnit(TEST_UUID);
 
     risWebClient
@@ -770,13 +770,15 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .isBadRequest();
 
-    verify(ldmlExporterService).publishDocumentationUnit(TEST_UUID);
+    verify(internalPortalPublicationService).publishDocumentationUnit(TEST_UUID);
   }
 
   @Test
   void testPublish_withServiceThrowsPublishException() throws DocumentationUnitNotExistsException {
 
-    doThrow(PublishException.class).when(ldmlExporterService).publishDocumentationUnit(TEST_UUID);
+    doThrow(PublishException.class)
+        .when(internalPortalPublicationService)
+        .publishDocumentationUnit(TEST_UUID);
 
     risWebClient
         .withDefaultLogin()
@@ -786,7 +788,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(ldmlExporterService).publishDocumentationUnit(TEST_UUID);
+    verify(internalPortalPublicationService).publishDocumentationUnit(TEST_UUID);
   }
 
   @Test

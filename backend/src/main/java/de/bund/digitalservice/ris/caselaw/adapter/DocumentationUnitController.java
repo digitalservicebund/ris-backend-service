@@ -67,8 +67,7 @@ public class DocumentationUnitController {
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
   private final HandoverService handoverService;
-  private final LdmlExporterService ldmlExporterService;
-
+  private final InternalPortalPublicationService internalPortalPublicationService;
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
   private final DuplicateCheckService duplicateCheckService;
@@ -79,7 +78,7 @@ public class DocumentationUnitController {
       AttachmentService attachmentService,
       ConverterService converterService,
       HandoverService handoverService,
-      LdmlExporterService ldmlExporterService,
+      InternalPortalPublicationService internalPortalPublicationService,
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService,
       DuplicateCheckService duplicateCheckService) {
@@ -88,7 +87,7 @@ public class DocumentationUnitController {
     this.attachmentService = attachmentService;
     this.converterService = converterService;
     this.handoverService = handoverService;
-    this.ldmlExporterService = ldmlExporterService;
+    this.internalPortalPublicationService = internalPortalPublicationService;
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
     this.duplicateCheckService = duplicateCheckService;
@@ -467,7 +466,7 @@ public class DocumentationUnitController {
   public ResponseEntity<Void> publishDocumentationUnit(@PathVariable UUID uuid) {
 
     try {
-      ldmlExporterService.publishDocumentationUnit(uuid);
+      internalPortalPublicationService.publishDocumentationUnit(uuid);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Error handing over documentation unit '{}' to portal", uuid, e);

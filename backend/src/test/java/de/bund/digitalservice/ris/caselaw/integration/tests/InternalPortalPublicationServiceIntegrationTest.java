@@ -18,9 +18,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.LdmlBucket;
-import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
+import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalBucket;
+import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.PublicPortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
@@ -73,10 +74,11 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @RISIntegrationTest(
     imports = {
-      LdmlExporterService.class,
+      InternalPortalPublicationService.class,
       XmlUtilService.class,
       ConverterConfig.class,
-      LdmlBucket.class,
+      InternalPortalBucket.class,
+      PublicPortalBucket.class,
       DocumentationUnitService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
@@ -92,7 +94,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
       DocumentNumberPatternConfig.class
     },
     controllers = {DocumentationUnitController.class})
-class PublishIntegrationTest {
+class InternalPortalPublicationServiceIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -112,8 +114,11 @@ class PublishIntegrationTest {
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
 
-  @MockitoBean(name = "ldmlS3Client")
+  @MockitoBean(name = "internalPortalS3Client")
   private S3Client s3Client;
+
+  @MockitoBean(name = "publicPortalS3Client")
+  private S3Client portalPrototypeS3Client;
 
   @MockitoBean private UserService userService;
   @MockitoBean private DocxConverterService docxConverterService;
