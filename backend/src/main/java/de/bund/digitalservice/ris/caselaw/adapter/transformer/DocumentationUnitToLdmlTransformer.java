@@ -247,6 +247,7 @@ public class DocumentationUnitToLdmlTransformer {
       applyIfNotEmpty(
           contentRelatedIndexing.norms().stream()
               .flatMap(normReference -> normReference.singleNorms().stream())
+              .filter(Objects::nonNull)
               .map(
                   singleNorm -> {
                     var type = nullSafeGet(singleNorm.legalForce(), LegalForce::type);
