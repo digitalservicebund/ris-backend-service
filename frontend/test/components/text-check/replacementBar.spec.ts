@@ -19,7 +19,7 @@ function renderComponent(options?: {
   }
 }
 
-describe("ReplacementBar", () => {
+describe("Match replacement bar single and multiple test", () => {
   test.each([
     {
       mode: "single" as const,

@@ -58,7 +58,7 @@ export interface Match {
   shortMessage: string
   replacements: Replacement[]
   offset: number
-  htmlOffset: number
+  htmlOffset?: number
   length: number
   context: Context
   sentence: string
@@ -66,7 +66,6 @@ export interface Match {
   rule: Rule
   ignoreForIncompleteSentence: boolean
   contextForSureMatch: number
-  content: string
   word: string
   category: string
 }
@@ -77,6 +76,8 @@ export interface TextCheckResponse {
 
 export interface TextCheckAllResponse {
   suggestions: Suggestion[]
+  categoryTypes: string[]
+  totalTextCheckErrors: number
 }
 
 export interface TextCheckCategoryResponse {

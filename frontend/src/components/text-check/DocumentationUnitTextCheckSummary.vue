@@ -17,7 +17,7 @@ const responseError = ref<ResponseError | undefined>()
 const store = useDocumentUnitStore()
 
 const errors = ref<Suggestion[]>()
-const errorCount = ref(0)
+const totalTextCheckErrors = ref(0)
 const loading = ref(true)
 
 const selectedSuggestion = ref()
@@ -33,11 +33,8 @@ const checkAll = async () => {
     }
 
     if (response.data && response.data.suggestions) {
-      let counter = 0
-      response.data?.suggestions.forEach(
-        (suggestion) => (counter += suggestion.matches.length),
-      )
-      errorCount.value = counter
+      totalTextCheckErrors.value = response.data.totalTextCheckErrors
+
       responseError.value = undefined
     }
   }
@@ -61,7 +58,7 @@ onMounted(async () => {
   <div class="flex flex-col gap-8">
     <div class="flex flex-row gap-4">
       <span class="ds-label-01-bold">Rechtschreibprüfung </span>
-      <span v-if="!loading">({{ errorCount }})</span>
+      <span v-if="!loading">({{ totalTextCheckErrors }})</span>
     </div>
 
     <div v-if="responseError">
