@@ -1,12 +1,32 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import { ref } from "vue"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
 import DuplicateRelationListItem from "@/components/DuplicateRelationListItem.vue"
+import { InfoStatus } from "@/components/enumInfoStatus"
+import InfoModal from "@/components/InfoModal.vue"
+import TextButton from "@/components/input/TextButton.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import portalService from "@/services/portalService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
+const errorMessage = ref()
+const successMessage = ref()
+
+const deleteFromPortal = async () => {
+  const docNumber = documentUnit.value?.documentNumber
+  if (!docNumber) return
+
+  const response = await portalService.deleteFromPortal(docNumber)
+  if (response.error) {
+    errorMessage.value = response.error.title
+  } else {
+    successMessage.value =
+      "Dokumentationseinheit wurde erfolgreich aus dem Portal entfernt"
+  }
+}
 </script>
 
 <template>
@@ -41,9 +61,23 @@ const { documentUnit } = storeToRefs(useDocumentUnitStore())
         >Dokumentationseinheit "{{ documentUnit?.documentNumber }}"
         löschen</TitleElement
       >
-      <DocumentUnitDeleteButton
-        :document-number="documentUnit?.documentNumber!"
-        :uuid="documentUnit?.uuid!"
+      <div class="flex flex-row gap-24">
+        <DocumentUnitDeleteButton
+          :document-number="documentUnit?.documentNumber!"
+          :uuid="documentUnit?.uuid!"
+        />
+        <TextButton
+          button-type="destructive"
+          label="Dokumentationseinheit aus Portal entfernen"
+          size="small"
+          @click="deleteFromPortal"
+        />
+      </div>
+      <InfoModal v-if="errorMessage" :title="errorMessage" />
+      <InfoModal
+        v-if="successMessage"
+        :status="InfoStatus.SUCCEED"
+        :title="successMessage"
       />
     </div>
   </div>
