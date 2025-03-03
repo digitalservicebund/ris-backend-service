@@ -692,7 +692,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   public List<String> findAllDocumentNumbersByMatchingPublishCriteria() {
-    return repository.getAllMatchingPublishCriteria(LocalDate.of(2010, 1, 1)).stream()
+    return repository.getAllMatchingPublishCriteria().stream()
         .filter(DecisionDTO.class::isInstance)
         .map(DocumentationUnitDTO::getDocumentNumber)
         .toList();

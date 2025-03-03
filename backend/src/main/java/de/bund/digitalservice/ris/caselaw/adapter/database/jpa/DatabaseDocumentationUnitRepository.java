@@ -171,10 +171,10 @@ public interface DatabaseDocumentationUnitRepository
         SELECT d FROM DocumentationUnitDTO d
         JOIN d.court c
         JOIN d.status s
-        WHERE d.date > :startDate
+        WHERE cast(d.date as date) > cast('2009-12-31' as date)
         AND s.publicationStatus = 'PUBLISHED'
-        AND d.fedst <> 'juris'
+        AND (d.fedst is null OR d.fedst != 'juris')
         AND c.type IN ('BSG', 'BAG', 'BGH', 'BFH', 'BVerfG', 'BVerwG', 'BPatG')
     """)
-  List<DocumentationUnitDTO> getAllMatchingPublishCriteria(@Param("startDate") LocalDate startDate);
+  List<DocumentationUnitDTO> getAllMatchingPublishCriteria();
 }

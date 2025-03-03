@@ -117,13 +117,13 @@ public class PublicPortalPublicationService {
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
-  @Scheduled(fixedDelayString = "PT1M")
+  @Scheduled(cron = "0 30 5 * * *")
   public void logDatabaseToBucketDiff() {
     List<String> databaseDocumentNumbers =
         documentationUnitRepository.findAllDocumentNumbersByMatchingPublishCriteria();
     List<String> portalBucketDocumentNumbers =
         publicPortalBucket.getAllFilenames().stream()
-            .filter(fileName -> !fileName.contains("changelog"))
+            .filter(fileName -> fileName.contains(".xml"))
             .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
             .toList();
 
@@ -138,8 +138,12 @@ public class PublicPortalPublicationService {
             .toList();
 
     log.info(
+        "Found in bucket but not in database: {}. Document numbers: {}",
+        inBucketNotInDatabase.size(),
         inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
     log.info(
+        "Found in database but not in bucket: {}. Document numbers: {}",
+        inBucketNotInDatabase.size(),
         inDatabaseNotInBucket.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 }
