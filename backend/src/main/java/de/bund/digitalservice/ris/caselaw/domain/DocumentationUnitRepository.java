@@ -128,4 +128,6 @@ public interface DocumentationUnitRepository {
 
   /** Returns doc units with a scheduled publication date that is in the past. */
   List<DocumentationUnit> getScheduledDocumentationUnitsDueNow();
+
+  List<String> findAllDocumentNumbersByMatchingPublishCriteria();
 }

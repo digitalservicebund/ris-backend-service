@@ -164,4 +164,17 @@ public interface DatabaseDocumentationUnitRepository
   WHERE documentationUnit.scheduledPublicationDateTime <= CURRENT_TIMESTAMP
 """)
   List<DocumentationUnitDTO> getScheduledDocumentationUnitsDueNow();
+
+  @Query(
+      value =
+          """
+        SELECT d FROM DocumentationUnitDTO d
+        JOIN d.court c
+        JOIN d.status s
+        WHERE cast(d.date as date) > cast('2009-12-31' as date)
+        AND s.publicationStatus = 'PUBLISHED'
+        AND (d.fedst is null OR d.fedst != 'juris')
+        AND c.type IN ('BSG', 'BAG', 'BGH', 'BFH', 'BVerfG', 'BVerwG', 'BPatG')
+    """)
+  List<DocumentationUnitDTO> getAllMatchingPublishCriteria();
 }

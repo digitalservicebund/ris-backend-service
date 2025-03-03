@@ -14,9 +14,11 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotE
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -113,5 +115,35 @@ public class PublicPortalPublicationService {
     String changelogString = objectMapper.writeValueAsString(changelog);
     publicPortalBucket.save(
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
+  }
+
+  @Scheduled(cron = "0 30 5 * * *")
+  public void logDatabaseToBucketDiff() {
+    List<String> databaseDocumentNumbers =
+        documentationUnitRepository.findAllDocumentNumbersByMatchingPublishCriteria();
+    List<String> portalBucketDocumentNumbers =
+        publicPortalBucket.getAllFilenames().stream()
+            .filter(fileName -> fileName.contains(".xml"))
+            .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
+            .toList();
+
+    List<String> inBucketNotInDatabase =
+        portalBucketDocumentNumbers.stream()
+            .filter(documentNumber -> !databaseDocumentNumbers.contains(documentNumber))
+            .toList();
+
+    List<String> inDatabaseNotInBucket =
+        databaseDocumentNumbers.stream()
+            .filter(documentNumber -> !portalBucketDocumentNumbers.contains(documentNumber))
+            .toList();
+
+    log.info(
+        "Found in bucket but not in database: {}. Document numbers: {}",
+        inBucketNotInDatabase.size(),
+        inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    log.info(
+        "Found in database but not in bucket: {}. Document numbers: {}",
+        inBucketNotInDatabase.size(),
+        inDatabaseNotInBucket.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 }
