@@ -4,13 +4,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.InternalPortalTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.Procedure;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import de.bund.digitalservice.ris.caselaw.domain.Source;
+import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -32,12 +49,15 @@ class InternalPortalTransformerTest {
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
 
   private static InternalPortalTransformer subject;
+  private static UUID documentationUnitId;
 
   @BeforeAll
   static void setUpBeforeClass() {
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
     subject = new InternalPortalTransformer(documentBuilderFactory);
+
+    documentationUnitId = UUID.randomUUID();
 
     PreviousDecision related1 =
         PreviousDecision.builder()
@@ -252,5 +272,279 @@ class InternalPortalTransformerTest {
     assertThat(fileContent).isPresent();
     assertThat(StringUtils.deleteWhitespace(fileContent.get()))
         .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  @Test
+  void testEntireLdml() {
+    var documentationUnit = getEntireDocumentationUnit();
+    var expected =
+        String.format(
+            """
+<?xml version="1.0" encoding="utf-8"?>
+<akn:akomaNtoso xmlns:akn="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17"
+                xmlns:ris="http://example.com/0.1/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://docs.oasis-open.org/legaldocml/ns/akn/3.0/WD17 https://docs.oasis-open.org/legaldocml/akn-core/v1.0/csprd02/part2-specs/schemas/akomantoso30.xsd">
+   <akn:judgment name="attributsemantik-noch-undefiniert">
+      <akn:meta>
+         <akn:identification source="attributsemantik-noch-undefiniert">
+            <akn:FRBRWork>
+               <akn:FRBRthis value="YYTestDoc0013"/>
+               <akn:FRBRuri value="YYTestDoc0013"/>
+               <akn:FRBRalias name="uebergreifende-id" value="%s"/>
+               <akn:FRBRalias name="ecli" value="ecli test"/>
+               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
+               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
+               <akn:FRBRcountry value="de"/>
+            </akn:FRBRWork>
+            <akn:FRBRExpression>
+               <akn:FRBRthis value="YYTestDoc0013/dokument"/>
+               <akn:FRBRuri value="YYTestDoc0013/dokument"/>
+               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
+               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
+               <akn:FRBRlanguage language="deu"/>
+            </akn:FRBRExpression>
+            <akn:FRBRManifestation>
+               <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
+               <akn:FRBRuri value="YYTestDoc0013/dokument.xml"/>
+               <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
+               <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
+            </akn:FRBRManifestation>
+         </akn:identification>
+         <akn:classification source="attributsemantik-noch-undefiniert">
+            <akn:keyword dictionary="attributsemantik-noch-undefiniert"
+                         showAs="attributsemantik-noch-undefiniert"
+                         value="keyword test"/>
+         </akn:classification>
+         <akn:proprietary source="attributsemantik-noch-undefiniert">
+            <ris:meta>
+               <ris:decisionNames>
+                  <ris:decisionName>decisionName test</ris:decisionName>
+               </ris:decisionNames>
+               <ris:previousDecisions>
+                  <ris:previousDecision date="2020-01-01">
+                     <ris:documentNumber>previous decision document number 1</ris:documentNumber>
+                     <ris:fileNumber>previous decision file number</ris:fileNumber>
+                     <ris:courtType>previous decision court type</ris:courtType>
+                  </ris:previousDecision>
+                  <ris:previousDecision date="2020-01-01">
+                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
+                     <ris:fileNumber>previous decision file number</ris:fileNumber>
+                     <ris:courtType>previous decision court type</ris:courtType>
+                  </ris:previousDecision>
+               </ris:previousDecisions>
+               <ris:ensuingDecisions>
+                  <ris:ensuingDecision date="2022-10-01">
+                     <ris:documentNumber>ensuing decision document number 1</ris:documentNumber>
+                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
+                     <ris:courtType>ensuing decision court type</ris:courtType>
+                  </ris:ensuingDecision>
+                  <ris:ensuingDecision date="2022-10-01">
+                     <ris:documentNumber>previous decision document number 2</ris:documentNumber>
+                     <ris:fileNumber>ensuing decision file number</ris:fileNumber>
+                     <ris:courtType>ensuing decision court type</ris:courtType>
+                  </ris:ensuingDecision>
+               </ris:ensuingDecisions>
+               <ris:fileNumbers>
+                  <ris:fileNumber>fileNumber test</ris:fileNumber>
+               </ris:fileNumbers>
+               <ris:documentType>documentType test</ris:documentType>
+               <ris:courtLocation>courtLocation test</ris:courtLocation>
+               <ris:courtType>courType test</ris:courtType>
+               <ris:legalForces>
+                  <ris:legalForce>legalForce test</ris:legalForce>
+               </ris:legalForces>
+               <ris:legalEffect>ja</ris:legalEffect>
+               <ris:fieldOfLaws/>
+               <ris:judicialBody>appraisalBody test</ris:judicialBody>
+               <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
+               <ris:error>false</ris:error>
+               <ris:documentationOffice>documentationOffice test</ris:documentationOffice>
+               <ris:procedures>
+                  <ris:procedure>previous procedure test</ris:procedure>
+               </ris:procedures>
+            </ris:meta>
+         </akn:proprietary>
+      </akn:meta>
+      <akn:header>
+         <akn:p>headline test</akn:p>
+      </akn:header>
+      <akn:judgmentBody>
+         <akn:motivation>
+            <akn:p>guidingPrinciple test</akn:p>
+         </akn:motivation>
+         <akn:introduction>
+            <akn:block name="Orientierungssatz">
+               <akn:embeddedStructure>
+                  <akn:p>headnote test</akn:p>
+               </akn:embeddedStructure>
+            </akn:block>
+            <akn:block name="Sonstiger Orientierungssatz">
+               <akn:embeddedStructure>
+                  <akn:p>otherHeadNote test</akn:p>
+               </akn:embeddedStructure>
+            </akn:block>
+            <akn:block name="Tenor">
+               <akn:embeddedStructure>
+                  <akn:p>tenor</akn:p>
+               </akn:embeddedStructure>
+            </akn:block>
+         </akn:introduction>
+         <akn:background>
+            <akn:p>caseFacts test</akn:p>
+         </akn:background>
+         <akn:decision>
+            <akn:block name="Entscheidungsgründe">
+               <akn:embeddedStructure>
+                  <akn:p>decisionGrounds test</akn:p>
+               </akn:embeddedStructure>
+            </akn:block>
+            <akn:block name="Gründe">
+               <akn:embeddedStructure>
+                  <akn:p>grounds test</akn:p>
+               </akn:embeddedStructure>
+            </akn:block>
+            <akn:block name="Sonstiger Langtext">
+               <akn:embeddedStructure>
+                  <akn:p>otherLongText test</akn:p>
+               </akn:embeddedStructure>
+            </akn:block>
+            <akn:block name="Abweichende Meinung">
+               <akn:opinion>
+                  <akn:embeddedStructure>
+                     <akn:p>dissenting test</akn:p>
+                  </akn:embeddedStructure>
+               </akn:opinion>
+            </akn:block>
+         </akn:decision>
+      </akn:judgmentBody>
+   </akn:judgment>
+</akn:akomaNtoso>
+           """,
+            documentationUnitId);
+
+    // Act
+    Optional<CaseLawLdml> ldml = subject.transformToLdml(documentationUnit);
+
+    // Assert
+    Assertions.assertTrue(ldml.isPresent());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Assertions.assertTrue(fileContent.isPresent());
+    Assertions.assertEquals(expected, fileContent.get());
+  }
+
+  DocumentationUnit getEntireDocumentationUnit() {
+    PreviousDecision previousDecision1 =
+        PreviousDecision.builder()
+            .decisionDate(LocalDate.of(2020, 1, 1))
+            .court(Court.builder().type("previous decision court type").build())
+            .documentType(DocumentType.builder().label("previous decision document type").build())
+            .fileNumber("previous decision file number")
+            .documentNumber("previous decision document number 1")
+            .build();
+    PreviousDecision previousDecision2 =
+        previousDecision1.toBuilder().documentNumber("previous decision document number 2").build();
+
+    EnsuingDecision ensuingDecision1 =
+        EnsuingDecision.builder()
+            .decisionDate(LocalDate.of(2022, 10, 1))
+            .court(Court.builder().type("ensuing decision court type").build())
+            .documentType(DocumentType.builder().label("ensuing decision document type").build())
+            .fileNumber("ensuing decision file number")
+            .documentNumber("ensuing decision document number 1")
+            .build();
+    EnsuingDecision ensuingDecision2 =
+        ensuingDecision1.toBuilder().documentNumber("previous decision document number 2").build();
+
+    return DocumentationUnit.builder()
+        .uuid(documentationUnitId)
+        .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+        .coreData(
+            CoreData.builder()
+                .ecli("ecli test")
+                .documentationOffice(
+                    DocumentationOffice.builder().abbreviation("documentationOffice test").build())
+                .creatingDocOffice(
+                    DocumentationOffice.builder()
+                        .abbreviation("creatingDocumentationOffice test")
+                        .build())
+                .court(
+                    Court.builder()
+                        .label("courtLable test")
+                        .type("courType test")
+                        .location("courtLocation test")
+                        .region("region test")
+                        .build())
+                .source(
+                    Source.builder()
+                        .sourceRawValue("sourceRawValue test")
+                        .value(SourceValue.S)
+                        .build())
+                .documentType(DocumentType.builder().label("documentType test").build())
+                .legalEffect("ja")
+                .fileNumbers(List.of("fileNumber test"))
+                .decisionDate(LocalDate.of(2020, 1, 1))
+                .appraisalBody("appraisalBody test")
+                .inputTypes(List.of("inputType test"))
+                .procedure(Procedure.builder().label("procedure test").build())
+                .previousProcedures(List.of("previous procedure test"))
+                .build())
+        .documentNumber("YYTestDoc0013")
+        .longTexts(
+            LongTexts.builder()
+                .caseFacts("<p>caseFacts test</p>")
+                .decisionReasons("<p>decisionGrounds test</p>")
+                .reasons("<p>grounds test</p>")
+                .dissentingOpinion("<p>dissenting test</p>")
+                .otherLongText("<p>otherLongText test</p>")
+                .tenor("<p>tenor</p>")
+                .participatingJudges(
+                    List.of(
+                        ParticipatingJudge.builder()
+                            .name("participating judge test")
+                            .referencedOpinions("referenced opinions test")
+                            .build()))
+                .build())
+        .shortTexts(
+            ShortTexts.builder()
+                .guidingPrinciple("<p>guidingPrinciple test</p>")
+                .headline("<p>headline test</p>")
+                .decisionName("decisionName test")
+                .headnote("<p>headnote test</p>")
+                .otherHeadnote("<p>otherHeadNote test</p>")
+                .build())
+        .contentRelatedIndexing(
+            ContentRelatedIndexing.builder()
+                .activeCitations(
+                    List.of(
+                        ActiveCitation.builder()
+                            .citationType(CitationType.builder().label("citation test").build())
+                            .build()))
+                .keywords(List.of("keyword test"))
+                .fieldsOfLaw(List.of(FieldOfLaw.builder().identifier("fieldOfLaw test").build()))
+                .norms(
+                    List.of(
+                        NormReference.builder()
+                            .singleNorms(
+                                List.of(
+                                    SingleNorm.builder()
+                                        .singleNorm("singleNorm test")
+                                        .legalForce(
+                                            LegalForce.builder()
+                                                .type(
+                                                    LegalForceType.builder()
+                                                        .label("legalForce test")
+                                                        .build())
+                                                .build())
+                                        .build()))
+                            .normAbbreviation(
+                                NormAbbreviation.builder()
+                                    .abbreviation("normReference test")
+                                    .build())
+                            .build()))
+                .build())
+        .previousDecisions(List.of(previousDecision1, previousDecision2))
+        .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))
+        .build();
   }
 }

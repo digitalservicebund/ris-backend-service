@@ -36,15 +36,13 @@ public class PublicPortalTransformer extends CommonPortalTransformer {
 
     var coreData = documentationUnit.coreData();
     if (coreData != null) {
-      if (coreData.deviatingDecisionDates() != null) {
-        applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
+      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
 
-        builder
-            .documentType(coreData.documentType().label())
-            .courtLocation(nullSafeGet(coreData.court(), Court::location))
-            .courtType(nullSafeGet(coreData.court(), Court::type))
-            .judicialBody(nullIfEmpty(coreData.appraisalBody()));
-      }
+      builder
+          .documentType(coreData.documentType().label())
+          .courtLocation(nullSafeGet(coreData.court(), Court::location))
+          .courtType(nullSafeGet(coreData.court(), Court::type))
+          .judicialBody(nullIfEmpty(coreData.appraisalBody()));
     }
     return builder.build();
   }

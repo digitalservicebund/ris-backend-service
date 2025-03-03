@@ -151,7 +151,9 @@ public abstract class CommonPortalTransformer {
     var shortTexts = documentationUnit.shortTexts();
     var longTexts = documentationUnit.longTexts();
 
+    // Fixme: headNote should not be included in public portal
     var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
+    // Fixme: otherHeadNote should not be included in public portal
     var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
     var outline = nullSafeGet(longTexts, LongTexts::outline);
     var tenor = nullSafeGet(longTexts, LongTexts::tenor);
