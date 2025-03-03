@@ -14,9 +14,11 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotE
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -113,5 +115,31 @@ public class PublicPortalPublicationService {
     String changelogString = objectMapper.writeValueAsString(changelog);
     publicPortalBucket.save(
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
+  }
+
+  @Scheduled(fixedDelayString = "PT1M")
+  public void logDatabaseToBucketDiff() {
+    List<String> databaseDocumentNumbers =
+        documentationUnitRepository.findAllDocumentNumbersByMatchingPublishCriteria();
+    List<String> portalBucketDocumentNumbers =
+        publicPortalBucket.getAllFilenames().stream()
+            .filter(fileName -> !fileName.contains("changelog"))
+            .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
+            .toList();
+
+    List<String> inBucketNotInDatabase =
+        portalBucketDocumentNumbers.stream()
+            .filter(documentNumber -> !databaseDocumentNumbers.contains(documentNumber))
+            .toList();
+
+    List<String> inDatabaseNotInBucket =
+        databaseDocumentNumbers.stream()
+            .filter(documentNumber -> !portalBucketDocumentNumbers.contains(documentNumber))
+            .toList();
+
+    log.info(
+        inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    log.info(
+        inDatabaseNotInBucket.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 }

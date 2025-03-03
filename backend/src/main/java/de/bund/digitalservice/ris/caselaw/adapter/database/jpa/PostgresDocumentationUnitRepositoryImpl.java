@@ -689,4 +689,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         .map(decision -> DecisionTransformer.transformToDomain((DecisionDTO) decision))
         .toList();
   }
+
+  @Override
+  public List<String> findAllDocumentNumbersByMatchingPublishCriteria() {
+    return repository.getAllMatchingPublishCriteria(LocalDate.of(2010, 1, 1)).stream()
+        .filter(DecisionDTO.class::isInstance)
+        .map(DocumentationUnitDTO::getDocumentNumber)
+        .toList();
+  }
 }

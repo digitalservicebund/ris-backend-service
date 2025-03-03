@@ -224,4 +224,6 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
    */
   @Column(name = "duplicate_check")
   private Boolean isJdvDuplicateCheckActive;
+
+  @Column() private String fedst;
 }
