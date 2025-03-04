@@ -194,16 +194,16 @@ const buttonsDisabled = computed(
 const shouldShowBubbleMenu = (): boolean => {
   if (editor == undefined) return false
 
-  if (editor.storage.languagetool2 == undefined) return false
+  if (editor.storage.textCheckExtension == undefined) return false
 
-  return editor.storage.languagetool2.selectedMatch != undefined
+  return editor.storage.textCheckExtension.selectedMatch != undefined
 }
 
 /**
  * If a match id tag selected it will update the current match, otherwise set it to empty
  */
 const updateSelectedMatchMatch = () => {
-  selectedMatch.value = editor.storage.languagetool2.selectedMatch
+  selectedMatch.value = editor.storage.textCheckExtension.selectedMatch
   console.log(selectedMatch.value)
 }
 

@@ -12,7 +12,7 @@ import {
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
-    languagetool2: {
+    textCheckExtension: {
       textCheck: () => ReturnType
       setSelectedMatch: (matchId?: number) => ReturnType
       resetSelectedMatch: () => ReturnType
@@ -26,7 +26,7 @@ export const TextCheckExtension = Extension.create<
   TextCheckExtensionOptions,
   TextCheckExtensionStorage
 >({
-  name: "languagetool2",
+  name: "textCheckExtension",
 
   addStorage() {
     return {
@@ -53,8 +53,7 @@ export const TextCheckExtension = Extension.create<
       setSelectedMatch:
         (matchId?: number) =>
         ({ editor }) => {
-          void setMatch(editor, matchId)
-          return false
+          return setMatch(editor, matchId)
         },
       acceptMatch:
         (matchId: number, text: string) =>

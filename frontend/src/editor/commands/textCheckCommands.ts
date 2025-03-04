@@ -45,7 +45,7 @@ const checkCategory = async (editor: Editor, category?: string) => {
 
   if (languageToolCheckResponse.status == 200) {
     const extensionStorage = editor.storage
-      .languagetool2 as TextCheckExtensionStorage
+      .textCheckExtension as TextCheckExtensionStorage
     extensionStorage.matches = languageToolCheckResponse.data!.matches
 
     editor.commands.setContent(languageToolCheckResponse.data!.htmlText)
@@ -86,9 +86,8 @@ const replaceMatch = (editor: Editor, matchId: number, text: string) => {
   })
 }
 
-const setMatch = async (editor: Editor, matchId?: number) => {
-  const extensionStorage: TextCheckExtensionStorage =
-    editor.storage.languagetool2
+const setMatch = (editor: Editor, matchId?: number) => {
+  const extensionStorage = getExtensionStorage(editor)
 
   if (matchId) {
     const selectedMatch = extensionStorage.matches.find(
@@ -102,11 +101,12 @@ const setMatch = async (editor: Editor, matchId?: number) => {
   } else {
     clearSelectedMatch(editor)
   }
+  return extensionStorage.selectedMatch
 }
 
 const clearSelectedMatch = (editor: Editor) => {
   const extensionStorage = editor.storage
-    .languagetool2 as TextCheckExtensionStorage
+    .textCheckExtension as TextCheckExtensionStorage
   extensionStorage.selectedMatch = undefined
 }
 
@@ -115,10 +115,12 @@ const clearAllMatches = (editor: Editor) => {
   clearMatches(editor)
 }
 
+const getExtensionStorage = (editor: Editor): TextCheckExtensionStorage => {
+  return editor.storage.textCheckExtension as TextCheckExtensionStorage
+}
+
 const clearMatches = (editor: Editor) => {
-  const extensionStorage = editor.storage
-    .languagetool2 as TextCheckExtensionStorage
-  extensionStorage.matches = []
+  getExtensionStorage(editor).matches = []
 }
 
 export { handleSelection, checkCategory, replaceMatch, setMatch, clearMatches }
