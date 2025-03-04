@@ -118,7 +118,7 @@ public class PublicPortalPublicationService {
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
-  @Scheduled(cron = "0 45 12 * * *")
+  @Scheduled(cron = "0 45 14 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
@@ -142,12 +142,12 @@ public class PublicPortalPublicationService {
             .toList();
 
     log.info(
+        "Found in database but not in bucket: {}. Document numbers: {}",
+        inDatabaseNotInBucket.size(),
+        inDatabaseNotInBucket.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    log.info(
         "Found in bucket but not in database: {}. Document numbers: {}",
         inBucketNotInDatabase.size(),
         inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
-    log.info(
-        "Found in database but not in bucket: {}. Document numbers: {}",
-        inBucketNotInDatabase.size(),
-        inDatabaseNotInBucket.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 }
