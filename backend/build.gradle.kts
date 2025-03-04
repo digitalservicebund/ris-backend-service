@@ -208,9 +208,9 @@ dependencies {
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.45.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.18.2")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.2")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.18.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.3")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
@@ -221,7 +221,7 @@ dependencies {
 
     implementation("io.getunleash:unleash-client-java:9.3.2")
     implementation("org.apache.commons:commons-text:1.13.0")
-    implementation("org.jsoup:jsoup:1.18.3")
+    implementation("org.jsoup:jsoup:1.19.1")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.3.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.3.0")
@@ -237,7 +237,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.15.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.16.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.3")
