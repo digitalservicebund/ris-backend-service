@@ -50,7 +50,7 @@ public class PendingProceedingController {
 
     try {
       checkDuplicates(documentNumber);
-      Documentable documentable = service.getByDocumentNumber(documentNumber);
+      Documentable documentable = service.getByDocumentNumberWithUser(documentNumber, oidcUser);
       if (documentable instanceof PendingProceeding pendingProceeding) {
         return ResponseEntity.ok(pendingProceeding);
       }
