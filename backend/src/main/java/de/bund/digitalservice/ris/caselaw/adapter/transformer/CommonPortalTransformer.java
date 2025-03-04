@@ -90,6 +90,8 @@ public abstract class CommonPortalTransformer {
 
   protected abstract Meta buildMeta(DocumentationUnit documentationUnit) throws ValidationException;
 
+  protected abstract AknMultipleBlock buildIntroduction(DocumentationUnit documentationUnit);
+
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(DocumentationUnit documentationUnit) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
@@ -145,42 +147,6 @@ public abstract class CommonPortalTransformer {
         .decision(buildDecision(documentationUnit));
 
     return builder.build();
-  }
-
-  private AknMultipleBlock buildIntroduction(DocumentationUnit documentationUnit) {
-    var shortTexts = documentationUnit.shortTexts();
-    var longTexts = documentationUnit.longTexts();
-
-    // Fixme: headNote should not be included in public portal
-    var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
-    // Fixme: otherHeadNote should not be included in public portal
-    var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
-    var outline = nullSafeGet(longTexts, LongTexts::outline);
-    var tenor = nullSafeGet(longTexts, LongTexts::tenor);
-
-    if (StringUtils.isNotEmpty(headnote)
-        || StringUtils.isNotEmpty(otherHeadnote)
-        || StringUtils.isNotEmpty(outline)
-        || StringUtils.isNotEmpty(tenor)) {
-      return new AknMultipleBlock()
-          .withBlock(
-              AknEmbeddedStructureInBlock.HeadNote.NAME,
-              AknEmbeddedStructureInBlock.HeadNote.build(
-                  JaxbHtml.build(htmlStringToObjectList(headnote))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
-              AknEmbeddedStructureInBlock.OtherHeadNote.build(
-                  JaxbHtml.build(htmlStringToObjectList(otherHeadnote))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Outline.NAME,
-              AknEmbeddedStructureInBlock.Outline.build(
-                  JaxbHtml.build(htmlStringToObjectList(outline))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Tenor.NAME,
-              AknEmbeddedStructureInBlock.Tenor.build(
-                  JaxbHtml.build(htmlStringToObjectList(tenor))));
-    }
-    return null;
   }
 
   private AknMultipleBlock buildDecision(DocumentationUnit documentationUnit) {
@@ -296,7 +262,7 @@ public abstract class CommonPortalTransformer {
     return input;
   }
 
-  private List<Object> htmlStringToObjectList(String html) {
+  protected List<Object> htmlStringToObjectList(String html) {
     if (StringUtils.isBlank(html)) {
       return Collections.emptyList();
     }

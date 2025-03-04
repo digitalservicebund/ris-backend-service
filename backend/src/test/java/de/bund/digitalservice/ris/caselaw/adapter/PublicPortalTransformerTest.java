@@ -175,16 +175,6 @@ class PublicPortalTransformerTest {
                             <akn:p>guidingPrinciple test</akn:p>
                          </akn:motivation>
                          <akn:introduction>
-                            <akn:block name="Orientierungssatz">
-                               <akn:embeddedStructure>
-                                  <akn:p>headNote test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
-                            <akn:block name="Sonstiger Orientierungssatz">
-                               <akn:embeddedStructure>
-                                  <akn:p>otherHeadNote test</akn:p>
-                               </akn:embeddedStructure>
-                            </akn:block>
                             <akn:block name="Tenor">
                                <akn:embeddedStructure>
                                   <akn:p>tenor test</akn:p>
@@ -565,16 +555,15 @@ class PublicPortalTransformerTest {
                          value="keyword test"/>
          </akn:classification>
             """),
-        // Fixme: should not be included! -->
-        //        Arguments.of(
-        //            "'headnote' (Orientierungssatz)",
-        //            """
-        //            <akn:block name="Orientierungssatz">
-        //               <akn:embeddedStructure>
-        //                  <akn:p>headNote test</akn:p>
-        //               </akn:embeddedStructure>
-        //            </akn:block>
-        //            """),
+        Arguments.of(
+            "'headnote' (Orientierungssatz)",
+            """
+                    <akn:block name="Orientierungssatz">
+                       <akn:embeddedStructure>
+                          <akn:p>headNote test</akn:p>
+                       </akn:embeddedStructure>
+                    </akn:block>
+                    """),
         Arguments.of(
             "'inputType' (EingabeTyp)",
             """
@@ -585,16 +574,15 @@ class PublicPortalTransformerTest {
             """
                 <ris:legalEffect>ja</ris:legalEffect>
                 """),
-        // Fixme: should not be included! -->
-        //        Arguments.of(
-        //            "'otherHeadNote' (Sonstiger Orientierungssatz)",
-        //            """
-        //            <akn:block name="Sonstiger Orientierungssatz">
-        //               <akn:embeddedStructure>
-        //                  <akn:p>otherHeadNote test</akn:p>
-        //               </akn:embeddedStructure>
-        //            </akn:block>
-        //            """),
+        Arguments.of(
+            "'otherHeadNote' (Sonstiger Orientierungssatz)",
+            """
+                    <akn:block name="Sonstiger Orientierungssatz">
+                       <akn:embeddedStructure>
+                          <akn:p>otherHeadNote test</akn:p>
+                       </akn:embeddedStructure>
+                    </akn:block>
+                    """),
         Arguments.of(
             "'procedures' (Vorgänge)",
             """

@@ -4,13 +4,17 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNot
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
@@ -108,5 +112,39 @@ public class InternalPortalTransformer extends CommonPortalTransformer {
                 nullSafeGet(lastStatus, Status::publicationStatus), PublicationStatus::toString))
         .error(lastStatus != null && lastStatus.withError())
         .build();
+  }
+
+  @Override
+  protected AknMultipleBlock buildIntroduction(DocumentationUnit documentationUnit) {
+    var shortTexts = documentationUnit.shortTexts();
+
+    var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
+    var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
+    var outline = nullSafeGet(documentationUnit.longTexts(), LongTexts::outline);
+    var tenor = nullSafeGet(documentationUnit.longTexts(), LongTexts::tenor);
+
+    if (StringUtils.isNotEmpty(headnote)
+        || StringUtils.isNotEmpty(otherHeadnote)
+        || StringUtils.isNotEmpty(outline)
+        || StringUtils.isNotEmpty(tenor)) {
+      return new AknMultipleBlock()
+          .withBlock(
+              AknEmbeddedStructureInBlock.HeadNote.NAME,
+              AknEmbeddedStructureInBlock.HeadNote.build(
+                  JaxbHtml.build(htmlStringToObjectList(headnote))))
+          .withBlock(
+              AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
+              AknEmbeddedStructureInBlock.OtherHeadNote.build(
+                  JaxbHtml.build(htmlStringToObjectList(otherHeadnote))))
+          .withBlock(
+              AknEmbeddedStructureInBlock.Outline.NAME,
+              AknEmbeddedStructureInBlock.Outline.build(
+                  JaxbHtml.build(htmlStringToObjectList(outline))))
+          .withBlock(
+              AknEmbeddedStructureInBlock.Tenor.NAME,
+              AknEmbeddedStructureInBlock.Tenor.build(
+                  JaxbHtml.build(htmlStringToObjectList(tenor))));
+    }
+    return null;
   }
 }
