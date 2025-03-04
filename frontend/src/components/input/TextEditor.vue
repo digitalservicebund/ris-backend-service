@@ -155,7 +155,7 @@ const editor: Editor = new Editor({
 
 function handleMatchSelected() {
   editor.commands.handleMatchSelection()
-  updateSelectedMatchMatch()
+  setTimeout(() => updateSelectedMatchMatch())
 }
 
 const containerWidth = ref<number>()
@@ -217,8 +217,6 @@ const acceptSuggestion = (suggestion: string) => {
     updateSelectedMatchMatch()
   }
 }
-
-const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 

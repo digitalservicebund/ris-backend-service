@@ -8,23 +8,28 @@ import {
   TextCheckExtensionStorage,
 } from "@/types/languagetool"
 
+/**
+ * Function to update the selected match by text check tags, will reset selected if not a text check tag
+ * @param state
+ * @param editor
+ */
 const handleSelection = ({ state, editor }: CommandProps): boolean => {
   const { selection } = state
 
   const node = state.doc.nodeAt(selection.from)
 
-  if (node && node.marks) {
+  if (node?.marks) {
     const textCheckMark = node.marks.find(
       (mark) => mark.type.name === "textCheck",
     )
 
     if (textCheckMark) {
-      const matchId = textCheckMark.attrs.id
+      const matchId = Number(textCheckMark.attrs.id)
       editor.commands.setSelectedMatch(matchId)
       return true
     }
   }
-
+  clearSelectedMatch(editor)
   return false
 }
 
