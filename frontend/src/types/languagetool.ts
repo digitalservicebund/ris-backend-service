@@ -116,3 +116,12 @@ export enum LanguageToolHelpingWords {
   MatchRangeUpdatedTransactionName = "matchRangeUpdated",
   LoadingTransactionName = "languageToolLoading",
 }
+
+export interface TextCheckExtensionStorage {
+  matches: Match[]
+  selectedMatch: Match | undefined
+}
+
+export type TextCheckExtensionOptions = {
+  category?: string
+}

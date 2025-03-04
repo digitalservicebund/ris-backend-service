@@ -33,17 +33,16 @@ import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
-import { LanguageToolExtension } from "@/editor/languagetool/languageToolExtension"
-import { LanguageToolRis } from "@/editor/languagetool/languateToolRis"
 import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
-import { TextCheck } from "@/editor/textCheck"
-import { LanguageToolHelpingWords, Match } from "@/types/languagetool"
+import { TextCheckMark } from "@/editor/textCheckMark"
+import { Match } from "@/types/languagetool"
 
 import "@/styles/language-tool.scss"
+import { TextCheckExtension } from "@/editor/textCheckExtension"
 
 interface Props {
   value?: string
@@ -71,7 +70,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
-const loading = ref(false)
 
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
@@ -138,18 +136,11 @@ const editor: Editor = new Editor({
     Indent.configure({
       names: ["listItem", "paragraph"],
     }),
-    TextCheck,
-    LanguageToolRis.configure({ category: props.category }),
-    LanguageToolExtension.configure({
-      automaticMode: false,
-      documentId: "1",
-      textToolEnabled: false,
-      category: props.category,
-    }),
+    TextCheckMark,
+    TextCheckExtension.configure({ category: props.category }),
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
-    setTimeout(() => updateMatch(editor))
   },
   onFocus: () => (hasFocus.value = true),
   editable: props.editable,
@@ -158,18 +149,18 @@ const editor: Editor = new Editor({
   },
   onSelectionUpdate: () => {
     editor.commands.handleSelection()
-    setTimeout(() => updateMatch(editor))
-  },
-  onTransaction({ transaction: tr }) {
-    loading.value = !!tr.getMeta(
-      LanguageToolHelpingWords.LoadingTransactionName,
-    )
+    handleMatchSelected()
   },
 })
 
+function handleMatchSelected() {
+  editor.commands.handleMatchSelection()
+  updateSelectedMatchMatch()
+}
+
 const containerWidth = ref<number>()
 
-const match = ref<Match>()
+const selectedMatch = ref<Match>()
 
 const editorExpanded = ref(false)
 const editorStyleClasses = computed(() => {
@@ -198,45 +189,58 @@ const buttonsDisabled = computed(
 )
 
 /**
- * A function to determine rather a match menu should be shownen
+ * A function to determine rather a match menu should be shown
  */
 const shouldShowBubbleMenu = (): boolean => {
   if (editor == undefined) return false
 
-  if (
-    editor.storage.languagetool == undefined ||
-    editor.storage.languagetool.languageToolService == undefined
-  )
-    return false
-  const match = editor.storage.languagetool.languageToolService.match
-  const matchRange = editor.storage.languagetool.languageToolService.matchRange
+  if (editor.storage.languagetool2 == undefined) return false
 
-  const { from, to } = editor.state.selection
-
-  return (
-    !!match && !!matchRange && matchRange.from <= from && to <= matchRange.to
-  )
+  return editor.storage.languagetool2.selectedMatch != undefined
 }
 
-const matchRange = ref<{ from: number; to: number }>()
-
-// const loading = ref(false)
-
-const updateMatch = (editor: Editor) => {
-  match.value = editor.storage.languagetool.languageToolService.match
-  matchRange.value = editor.storage.languagetool.languageToolService.matchRange
+/**
+ * If a match id tag selected it will update the current match, otherwise set it to empty
+ */
+const updateSelectedMatchMatch = () => {
+  selectedMatch.value = editor.storage.languagetool2.selectedMatch
+  console.log(selectedMatch.value)
 }
 
-// const updateHtml = () => navigator.clipboard.writeText(editor.getHTML())
-
+/**
+ * Replace and reset selected match
+ * @param suggestion
+ */
 const acceptSuggestion = (suggestion: string) => {
-  if (matchRange.value != undefined) {
-    editor.commands.insertContentAt(matchRange.value, suggestion)
-    editor.storage.languagetool.languageToolService.resetLanguageToolMatch()
+  if (selectedMatch.value && selectedMatch.value?.id) {
+    editor.commands.acceptMatch(selectedMatch.value.id, suggestion)
+    updateSelectedMatchMatch()
   }
 }
 
 const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
+
+const ariaLabel = props.ariaLabel ? props.ariaLabel : null
+
+/**
+ * Set the selected text of match in focus
+ * @param selectedMatch
+ */
+function jumpToMatch(selectedMatch: Match) {
+  editor
+    .chain()
+    .focus()
+    .setTextSelection({
+      from: selectedMatch.offset,
+      to: selectedMatch.offset + selectedMatch.length,
+    })
+    .run()
+
+  editor.commands.setTextSelection({
+    from: selectedMatch.offset,
+    to: selectedMatch.offset + selectedMatch.length,
+  })
+}
 
 watch(
   () => hasFocus.value,
@@ -249,8 +253,6 @@ watch(
   },
   { immediate: true },
 )
-
-const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
 watch(
   () => props.value,
@@ -274,35 +276,6 @@ onMounted(async () => {
 const resizeObserver = new ResizeObserver((entries) => {
   for (const entry of entries) {
     containerWidth.value = entry.contentRect.width
-  }
-})
-
-/**
- * Set the selected text of match in focus
- * @param selectedMatch
- */
-function jumpToMatch(selectedMatch: Match) {
-  editor
-    .chain()
-    .focus()
-    .setTextSelection({
-      from: selectedMatch.offset,
-      to: selectedMatch.offset + selectedMatch.length,
-    })
-    .run()
-
-  editor.commands.setTextSelection({
-    from: selectedMatch.offset,
-    to: selectedMatch.offset + selectedMatch.length,
-  })
-}
-
-/**
- * trigger text check when text editor has focus
- */
-watch(hasFocus, () => {
-  if (hasFocus.value) {
-    editor.commands.proofread()
   }
 })
 
@@ -351,8 +324,8 @@ defineExpose({ jumpToMatch })
         :tippy-options="{ placement: 'bottom', animation: 'fade' }"
       >
         <TextCheckModal
-          v-if="match"
-          :match="match"
+          v-if="selectedMatch"
+          :match="selectedMatch"
           @suggestion:ignore="ignoreSuggestion"
           @suggestion:update="acceptSuggestion"
         />
