@@ -78,10 +78,9 @@ class PublicPortalTransformerTest {
 
   @ParameterizedTest(name = "{0}")
   @MethodSource("testCasesForForbiddenAttributes")
-  void transformForbiddenAttributes(
-      String testName, String expected, DocumentationUnit documentationUnit) {
+  void transformForbiddenAttributes(String testName, String expected) {
     // Act
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(documentationUnit);
+    Optional<CaseLawLdml> ldml = subject.transformToLdml(testDocumentUnit);
 
     // Assert
     Assertions.assertTrue(ldml.isPresent());
@@ -293,7 +292,28 @@ class PublicPortalTransformerTest {
                     .inputTypes(List.of("inputType test"))
                     .procedure(Procedure.builder().label("procedure test").build())
                     .previousProcedures(List.of("previous procedure test"))
+                    .documentationOffice(
+                        DocumentationOffice.builder()
+                            .abbreviation("documentationOffice test")
+                            .build())
+                    .creatingDocOffice(
+                        DocumentationOffice.builder()
+                            .abbreviation("documentationOffice test")
+                            .build())
+                    .source(
+                        Source.builder()
+                            .sourceRawValue("sourceRawValue test")
+                            .value(SourceValue.S)
+                            .build())
+                    .previousProcedures(List.of("previous procedure test"))
+                    .procedure(Procedure.builder().label("procedure test").build())
+                    .inputTypes(List.of("inputType test"))
+                    .deviatingEclis(List.of("deviating ecli test"))
+                    .deviatingCourts(List.of("deviating court"))
+                    .deviatingFileNumbers(List.of("deviating fileNumber"))
+                    .deviatingDecisionDates(List.of(LocalDate.of(2010, 5, 12)))
                     .build())
+            .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
             .documentNumber("YYTestDoc0013")
             .longTexts(
                 LongTexts.builder()
@@ -535,10 +555,7 @@ class PublicPortalTransformerTest {
             <ris:decisionNames>
                <ris:decisionName>decisionName test</ris:decisionName>
             </ris:decisionNames>
-               """,
-            testDocumentUnit.toBuilder()
-                .shortTexts(ShortTexts.builder().decisionName("decisionName test").build())
-                .build()),
+               """),
         Arguments.of(
             "'keywords' (Schlagworte)",
             """
@@ -547,14 +564,7 @@ class PublicPortalTransformerTest {
                          showAs="attributsemantik-noch-undefiniert"
                          value="keyword test"/>
          </akn:classification>
-            """,
-            testDocumentUnit.toBuilder()
-                .contentRelatedIndexing(
-                    ContentRelatedIndexing.builder()
-                        .norms(List.of())
-                        .keywords(List.of("keyword test"))
-                        .build())
-                .build()),
+            """),
         // Fixme: should not be included! -->
         //        Arguments.of(
         //            "'headnote' (Orientierungssatz)",
@@ -564,26 +574,17 @@ class PublicPortalTransformerTest {
         //                  <akn:p>headNote test</akn:p>
         //               </akn:embeddedStructure>
         //            </akn:block>
-        //            """,
-        //            testDocumentUnit.toBuilder()
-        //                .shortTexts(ShortTexts.builder().headnote("<p>headNote test</p>").build())
-        //                .build()),
+        //            """),
         Arguments.of(
             "'inputType' (EingabeTyp)",
             """
             inputType test
-            """,
-            testDocumentUnit.toBuilder()
-                .coreData(
-                    CoreData.builder()
-                        .inputTypes(List.of("inputType test"))
-                        .decisionDate(LocalDate.of(2010, 1, 1))
-                        .fileNumbers(List.of("test"))
-                        .legalEffect("ja")
-                        .documentType(DocumentType.builder().build())
-                        .court(Court.builder().type("test").build())
-                        .build())
-                .build()),
+            """),
+        Arguments.of(
+            "'legalEffect' (Rechtskraft)",
+            """
+                <ris:legalEffect>ja</ris:legalEffect>
+                """),
         // Fixme: should not be included! -->
         //        Arguments.of(
         //            "'otherHeadNote' (Sonstiger Orientierungssatz)",
@@ -593,124 +594,71 @@ class PublicPortalTransformerTest {
         //                  <akn:p>otherHeadNote test</akn:p>
         //               </akn:embeddedStructure>
         //            </akn:block>
-        //            """,
-        //            testDocumentUnit.toBuilder()
-        //                .shortTexts(ShortTexts.builder().otherHeadnote("<p>otherHeadNote
-        // test</p>").build())
-        //                .build()),
+        //            """),
         Arguments.of(
             "'procedures' (Vorgänge)",
             """
             <ris:procedures>
               <ris:procedure>previous procedure test</ris:procedure>
            </ris:procedures>
-            """,
-            testDocumentUnit.toBuilder()
-                .coreData(
-                    CoreData.builder()
-                        .previousProcedures(List.of("previous procedure test"))
-                        .procedure(Procedure.builder().label("procedure test").build())
-                        .decisionDate(LocalDate.of(2010, 1, 1))
-                        .fileNumbers(List.of("test"))
-                        .legalEffect("ja")
-                        .documentType(DocumentType.builder().build())
-                        .court(Court.builder().type("test").build())
-                        .build())
-                .build()),
+            """),
         Arguments.of(
             "'fieldsOfLaw' (Sachgebiete)",
             """
             <ris:fieldOfLaws/>
-            """,
-            testDocumentUnit.toBuilder()
-                .contentRelatedIndexing(
-                    ContentRelatedIndexing.builder()
-                        .fieldsOfLaw(
-                            List.of(FieldOfLaw.builder().identifier("fieldOfLaw test").build()))
-                        .norms(List.of())
-                        .build())
-                .build()),
+            """),
         Arguments.of(
             "'source' (Quelle)",
             """
             sourceRawValue test
-            """,
-            testDocumentUnit.toBuilder()
-                .coreData(
-                    CoreData.builder()
-                        .source(
-                            Source.builder()
-                                .sourceRawValue("sourceRawValue test")
-                                .value(SourceValue.S)
-                                .build())
-                        .decisionDate(LocalDate.of(2010, 1, 1))
-                        .fileNumbers(List.of("test"))
-                        .legalEffect("ja")
-                        .documentType(DocumentType.builder().build())
-                        .court(Court.builder().type("test").build())
-                        .build())
-                .build()),
+            """),
         Arguments.of(
             "'documentationOffice' (Dokumentationsstelle)",
             """
             <ris:documentationOffice>documentationOffice test</ris:documentationOffice>
-            """,
-            testDocumentUnit.toBuilder()
-                .coreData(
-                    CoreData.builder()
-                        .documentationOffice(
-                            DocumentationOffice.builder()
-                                .abbreviation("documentationOffice test")
-                                .build())
-                        .decisionDate(LocalDate.of(2010, 1, 1))
-                        .fileNumbers(List.of("test"))
-                        .legalEffect("ja")
-                        .documentType(DocumentType.builder().build())
-                        .court(Court.builder().type("test").build())
-                        .build())
-                .build()),
+            """),
         Arguments.of(
             "'creatingDocumentationOffice' (erstellende Dokumentationsstelle)",
             """
             documentationOffice test
-            """,
-            testDocumentUnit.toBuilder()
-                .coreData(
-                    CoreData.builder()
-                        .creatingDocOffice(
-                            DocumentationOffice.builder()
-                                .abbreviation("documentationOffice test")
-                                .build())
-                        .decisionDate(LocalDate.of(2010, 1, 1))
-                        .fileNumbers(List.of("test"))
-                        .legalEffect("ja")
-                        .documentType(DocumentType.builder().build())
-                        .court(Court.builder().type("test").build())
-                        .build())
-                .build(),
-            Arguments.of(
-                "'status' (Veröffentlichungsstatus)",
-                """
+            """),
+        Arguments.of(
+            "'status' (Veröffentlichungsstatus)",
+            """
                  <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
-                """,
-                testDocumentUnit.toBuilder()
-                    .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-                    .build()),
-            Arguments.of(
-                "'activeCitations' (Aktivzitierung)",
-                """
+                """),
+        Arguments.of(
+            "'activeCitations' (Aktivzitierung)",
+            """
                  citation test
-                """,
-                testDocumentUnit.toBuilder()
-                    .contentRelatedIndexing(
-                        ContentRelatedIndexing.builder()
-                            .activeCitations(
-                                List.of(
-                                    ActiveCitation.builder()
-                                        .citationType(
-                                            CitationType.builder().label("citation test").build())
-                                        .build()))
-                            .build())
-                    .build())));
+                """),
+        Arguments.of(
+            "'deviatingCourts' (Abweichende Gerichte)",
+            """
+              <ris:deviatingCourts>
+                <ris:deviatingCourt>deviating court</ris:deviatingCourt>
+              </ris:deviatingCourts>
+            """),
+        Arguments.of(
+            "'deviatingDates' (Abweichende Entscheidungsdatum)",
+            """
+              <ris:deviatingDates>
+                  <ris:deviatingDate>2010-05-12</ris:deviatingDate>
+               </ris:deviatingDates>
+            """),
+        Arguments.of(
+            "'deviatingEclis' (Abweichende Eclis)",
+            """
+              <ris:deviatingEclis>
+                  <ris:deviatingEcli>deviating ecli test</ris:deviatingEcli>
+               </ris:deviatingEclis>
+            """),
+        Arguments.of(
+            "'deviatingFileNumbers' (Abweichende Aktenzeichen)",
+            """
+              <ris:deviatingFileNumbers>
+                  <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
+               </ris:deviatingFileNumbers>
+            """));
   }
 }

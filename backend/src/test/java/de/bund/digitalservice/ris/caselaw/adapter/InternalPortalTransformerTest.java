@@ -357,6 +357,18 @@ class InternalPortalTransformerTest {
                <ris:legalEffect>ja</ris:legalEffect>
                <ris:fieldOfLaws/>
                <ris:judicialBody>appraisalBody test</ris:judicialBody>
+               <ris:deviatingCourts>
+                  <ris:deviatingCourt>deviating court</ris:deviatingCourt>
+               </ris:deviatingCourts>
+               <ris:deviatingDates>
+                  <ris:deviatingDate>2010-05-12</ris:deviatingDate>
+               </ris:deviatingDates>
+               <ris:deviatingEclis>
+                  <ris:deviatingEcli>deviating ecli test</ris:deviatingEcli>
+               </ris:deviatingEclis>
+               <ris:deviatingFileNumbers>
+                  <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
+               </ris:deviatingFileNumbers>
                <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
                <ris:error>false</ris:error>
                <ris:documentationOffice>documentationOffice test</ris:documentationOffice>
@@ -488,6 +500,10 @@ class InternalPortalTransformerTest {
                 .inputTypes(List.of("inputType test"))
                 .procedure(Procedure.builder().label("procedure test").build())
                 .previousProcedures(List.of("previous procedure test"))
+                .deviatingEclis(List.of("deviating ecli test"))
+                .deviatingCourts(List.of("deviating court"))
+                .deviatingFileNumbers(List.of("deviating fileNumber"))
+                .deviatingDecisionDates(List.of(LocalDate.of(2010, 5, 12)))
                 .build())
         .documentNumber("YYTestDoc0013")
         .longTexts(
