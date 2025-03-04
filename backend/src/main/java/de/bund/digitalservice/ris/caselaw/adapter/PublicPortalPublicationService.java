@@ -118,7 +118,7 @@ public class PublicPortalPublicationService {
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
-  @Scheduled(cron = "0 45 16 * * *")
+  @Scheduled(cron = "0 5 17 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
