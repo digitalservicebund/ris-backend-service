@@ -118,7 +118,7 @@ public class PublicPortalPublicationService {
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
-  @Scheduled(cron = "0 30 16 * * *")
+  @Scheduled(cron = "0 45 16 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
@@ -130,16 +130,13 @@ public class PublicPortalPublicationService {
             .filter(fileName -> fileName.contains(".xml"))
             .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
             .toList();
+
+    log.info(databaseDocumentNumbers.toString());
+    log.info("{} publishable document numbers in database.", databaseDocumentNumbers.size());
     log.info(
-        "{} publishable document numbers in data base. Document numbers: {}",
-        databaseDocumentNumbers.size(),
+        "Database document numbers: {}",
         databaseDocumentNumbers.stream().map(Object::toString).collect(Collectors.joining(", ")));
-    log.info(
-        "{} ldml files in bucket. Document numbers: {}",
-        portalBucketDocumentNumbers.size(),
-        portalBucketDocumentNumbers.stream()
-            .map(Object::toString)
-            .collect(Collectors.joining(", ")));
+    log.info("{} ldml files in bucket.", portalBucketDocumentNumbers.size());
 
     List<String> inBucketNotInDatabase =
         portalBucketDocumentNumbers.stream()
