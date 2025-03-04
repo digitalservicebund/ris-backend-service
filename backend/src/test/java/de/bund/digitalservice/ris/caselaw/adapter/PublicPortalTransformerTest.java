@@ -62,8 +62,8 @@ class PublicPortalTransformerTest {
   }
 
   @ParameterizedTest(name = "{0}")
-  @MethodSource("testCasesForTransformableAttributes")
-  void transformAllowedAttributes(String testName, String expected) {
+  @MethodSource("testCasesForIncludedAttributes")
+  void transformIncludedAttributes(String testName, String expected) {
     // Act
     Optional<CaseLawLdml> ldml = subject.transformToLdml(testDocumentUnit);
 
@@ -77,8 +77,8 @@ class PublicPortalTransformerTest {
   }
 
   @ParameterizedTest(name = "{0}")
-  @MethodSource("testCasesForForbiddenAttributes")
-  void transformForbiddenAttributes(String testName, String expected) {
+  @MethodSource("testCasesForExcludedAttributes")
+  void transformExcludedAttributes(String testName, String expected) {
     // Act
     Optional<CaseLawLdml> ldml = subject.transformToLdml(testDocumentUnit);
 
@@ -364,7 +364,7 @@ class PublicPortalTransformerTest {
             .build();
   }
 
-  static Stream<Arguments> testCasesForTransformableAttributes() {
+  static Stream<Arguments> testCasesForIncludedAttributes() {
     return Stream.of(
         Arguments.of(
             "'documentNumber' (Dokumentnummer)",
@@ -537,7 +537,7 @@ class PublicPortalTransformerTest {
                """));
   }
 
-  static Stream<Arguments> testCasesForForbiddenAttributes() {
+  static Stream<Arguments> testCasesForExcludedAttributes() {
     return Stream.of(
         Arguments.of(
             "'decisionNames' (Entscheidungsnamen)",
