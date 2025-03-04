@@ -17,10 +17,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -119,7 +119,7 @@ public class PublicPortalPublicationService {
   }
 
   @Scheduled(cron = "0 30 10 * * *")
-  @Transactional
+  @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
         "Checking for discrepancies between publishable doc units in database and files in portal bucket.");

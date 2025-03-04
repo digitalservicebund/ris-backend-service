@@ -168,13 +168,15 @@ public interface DatabaseDocumentationUnitRepository
   @Query(
       value =
           """
-        SELECT d FROM DocumentationUnitDTO d
+        SELECT d.documentNumber FROM DocumentationUnitDTO d
         JOIN d.court c
         JOIN d.status s
+        JOIN d.documentType dt
         WHERE cast(d.date as date) > cast('2009-12-31' as date)
         AND s.publicationStatus = 'PUBLISHED'
         AND (d.fedst is null OR d.fedst != 'juris')
         AND c.type IN ('BSG', 'BAG', 'BGH', 'BFH', 'BVerfG', 'BVerwG', 'BPatG')
+        AND dt.abbreviation <> 'Anh'
     """)
-  List<DocumentationUnitDTO> getAllMatchingPublishCriteria();
+  List<String> getAllMatchingPublishCriteria();
 }
