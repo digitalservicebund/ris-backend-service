@@ -176,6 +176,11 @@ services:
       retries: 5
       start_period: 3s
       timeout: 5s
+    
+  languagetool:
+      image: ghcr.io/digitalservicebund/neuris-languagetool:fc89b89c8a59e783d5b1ded7ec5cd911a82ef320
+      ports:
+        - 8181:8181
 
 volumes:
   gradle-cache:
