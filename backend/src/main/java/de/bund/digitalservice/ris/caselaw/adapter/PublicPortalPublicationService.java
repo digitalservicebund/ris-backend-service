@@ -118,7 +118,7 @@ public class PublicPortalPublicationService {
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
-  @Scheduled(cron = "0 10 10 * * *")
+  @Scheduled(cron = "0 30 10 * * *")
   @Transactional
   public void logDatabaseToBucketDiff() {
     log.info(
