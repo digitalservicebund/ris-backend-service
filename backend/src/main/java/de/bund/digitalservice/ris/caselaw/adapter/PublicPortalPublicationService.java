@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -117,8 +118,11 @@ public class PublicPortalPublicationService {
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
-  @Scheduled(cron = "0 30 5 * * *")
+  @Scheduled(cron = "0 10 10 * * *")
+  @Transactional
   public void logDatabaseToBucketDiff() {
+    log.info(
+        "Checking for discrepancies between publishable doc units in database and files in portal bucket.");
     List<String> databaseDocumentNumbers =
         documentationUnitRepository.findAllDocumentNumbersByMatchingPublishCriteria();
     List<String> portalBucketDocumentNumbers =
