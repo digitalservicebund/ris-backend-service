@@ -38,11 +38,11 @@ import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
+import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import { Match } from "@/types/languagetool"
 
 import "@/styles/language-tool.scss"
-import { TextCheckExtension } from "@/editor/textCheckExtension"
 
 interface Props {
   value?: string
