@@ -256,7 +256,7 @@ watch(
 watch(
   () => editor.storage.textCheckExtension?.selectedMatch,
   (newMatch) => {
-    selectedMatch.value = newMatch || undefined
+    selectedMatch.value = newMatch
   },
   { immediate: true },
 )
