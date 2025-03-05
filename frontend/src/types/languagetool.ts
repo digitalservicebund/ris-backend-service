@@ -72,3 +72,5 @@ export type TextCheckExtensionOptions = {
 }
 
 export const TextCheckTagName = "textCheck"
+
+export const NoIndexTagName = "noindex"

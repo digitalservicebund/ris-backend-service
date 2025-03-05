@@ -44,6 +44,7 @@ import { TextCheckMark } from "@/editor/textCheckMark"
 import { Match } from "@/types/languagetool"
 
 import "@/styles/language-tool.scss"
+import { NoIndexTagMark } from "@/editor/textCheckNoIndexMark"
 
 interface Props {
   value?: string
@@ -138,6 +139,7 @@ const editor: Editor = new Editor({
       names: ["listItem", "paragraph"],
     }),
     TextCheckMark,
+    NoIndexTagMark,
     TextCheckExtension.configure({ category: props.category }),
   ],
   onUpdate: () => {
@@ -199,7 +201,9 @@ const shouldShowBubbleMenu = (): boolean => {
  * Ignore match and remove the text check tag
  */
 function ignoreSuggestion() {
-  alert("Not implemented yet")
+  if (selectedMatch.value && selectedMatch.value?.id) {
+    editor.commands.ignoreMatch(selectedMatch.value.id)
+  }
 }
 
 /**

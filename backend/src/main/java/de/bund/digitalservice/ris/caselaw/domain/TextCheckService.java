@@ -17,6 +17,7 @@ import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
@@ -125,6 +126,7 @@ public class TextCheckService {
 
     //    var textChunks = generateTextChunks(textNodes);
 
+    List<String> ignoreWords = getNoIndexTags(document);
     List<Match> matches = new ArrayList<>();
     AtomicInteger id = new AtomicInteger(1);
     textNodes.forEach(
@@ -138,6 +140,7 @@ public class TextCheckService {
                               .htmlOffset(pos + match.offset())
                               .id(id.getAndIncrement())
                               .build())
+                  .filter(match -> !ignoreWords.contains(match.word()))
                   .toList();
           matches.addAll(newTextMatches);
         });
@@ -179,6 +182,10 @@ public class TextCheckService {
     textChunks.put(startPos.get(), builder.toString());
 
     return textChunks;
+  }
+
+  private List<String> getNoIndexTags(Document document) {
+    return document.getElementsByTag("noindex").stream().map(Element::text).toList();
   }
 
   private void handleChildren(Node child, Map<Integer, String> textNodes, int level) {
