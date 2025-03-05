@@ -187,20 +187,13 @@ const buttonsDisabled = computed(
  * A function to determine rather a match menu should be shown
  */
 const shouldShowBubbleMenu = (): boolean => {
-  if (editor == undefined) return false
-
-  if (editor.storage.textCheckExtension == undefined) return false
-
-  return editor.storage.textCheckExtension.selectedMatch != undefined
+  return selectedMatch.value != undefined
 }
 
 /**
- * If a match id tag selected it will update the current match, otherwise set it to empty
+ * Ignore match and remove the text check tag
  */
-const updateSelectedMatchMatch = () => {
-  selectedMatch.value = editor.storage.textCheckExtension.selectedMatch
-  console.log(selectedMatch.value)
-}
+function ignoreSuggestion() {}
 
 /**
  * Replace and reset selected match
@@ -209,7 +202,6 @@ const updateSelectedMatchMatch = () => {
 const acceptSuggestion = (suggestion: string) => {
   if (selectedMatch.value && selectedMatch.value?.id) {
     editor.commands.acceptMatch(selectedMatch.value.id, suggestion)
-    updateSelectedMatchMatch()
   }
 }
 
