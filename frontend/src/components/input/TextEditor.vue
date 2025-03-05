@@ -193,7 +193,9 @@ const shouldShowBubbleMenu = (): boolean => {
 /**
  * Ignore match and remove the text check tag
  */
-function ignoreSuggestion() {}
+function ignoreSuggestion() {
+  alert("Not implemented yet")
+}
 
 /**
  * Replace and reset selected match
