@@ -41,7 +41,6 @@ function ignoreSuggestion() {
       "
       button-type="tertiary"
       data-testid="suggestion-ignore-button"
-      disabled
       :label="replacementMode === 'single' ? 'Ignorieren ' : 'Alle ignorieren'"
       size="small"
       width="w-max"
