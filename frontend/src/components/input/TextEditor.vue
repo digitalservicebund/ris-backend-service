@@ -43,6 +43,7 @@ import { TextCheckMark } from "@/editor/textCheckMark"
 import { Match } from "@/types/languagetool"
 
 import "@/styles/language-tool.scss"
+import { isTextCheckTagSelected } from "@/editor/commands/textCheckCommands"
 
 interface Props {
   value?: string
@@ -187,7 +188,11 @@ const buttonsDisabled = computed(
  * A function to determine rather a match menu should be shown
  */
 const shouldShowBubbleMenu = (): boolean => {
-  return selectedMatch.value != undefined
+  if (editor) {
+    return isTextCheckTagSelected(editor)
+  } else {
+    return false
+  }
 }
 
 /**

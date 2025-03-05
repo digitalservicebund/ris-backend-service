@@ -9,29 +9,41 @@ import {
   TextCheckTagName,
 } from "@/types/languagetool"
 
+const isTextCheckTagSelected = (editor: Editor): boolean => {
+  const { selection } = editor.state
+  const node = editor.state.doc.nodeAt(selection.from)
+
+  if (node?.marks) {
+    return node.marks.some((mark) => mark.type.name === TextCheckTagName)
+  }
+
+  return false
+}
+
 /**
  * Function to update the selected match by text check tags, will reset selected if not a text check tag
  * @param state
  * @param editor
  */
 const handleSelection = ({ state, editor }: CommandProps): boolean => {
-  const { selection } = state
+  const node = state.doc.nodeAt(state.selection.from)
 
-  const node = state.doc.nodeAt(selection.from)
-
-  if (node?.marks) {
-    const textCheckMark = node.marks.find(
-      (mark) => mark.type.name === TextCheckTagName,
-    )
-
-    if (textCheckMark) {
-      const matchId = Number(textCheckMark.attrs.id)
-      setMatch(editor, matchId)
-      return true
-    }
+  if (!node?.marks) {
+    clearSelectedMatch(editor)
+    return false
   }
-  clearSelectedMatch(editor)
-  return false
+
+  const textCheckMark = node.marks.find(
+    (mark) => mark.type.name === TextCheckTagName,
+  )
+
+  if (!textCheckMark) {
+    clearSelectedMatch(editor)
+    return false
+  }
+
+  setMatch(editor, Number(textCheckMark.attrs.id))
+  return true
 }
 
 const checkCategory = async (editor: Editor, category?: string) => {
@@ -119,4 +131,11 @@ const clearMatches = (editor: Editor) => {
   getExtensionStorage(editor).matches = []
 }
 
-export { handleSelection, checkCategory, replaceMatch, setMatch, clearMatches }
+export {
+  handleSelection,
+  checkCategory,
+  replaceMatch,
+  setMatch,
+  clearMatches,
+  isTextCheckTagSelected,
+}
