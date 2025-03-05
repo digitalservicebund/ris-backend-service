@@ -111,11 +111,6 @@ const clearSelectedMatch = (editor: Editor) => {
   extensionStorage.selectedMatch = undefined
 }
 
-const clearAllMatches = (editor: Editor) => {
-  clearSelectedMatch(editor)
-  clearMatches(editor)
-}
-
 const getExtensionStorage = (editor: Editor): TextCheckExtensionStorage => {
   return editor.storage.textCheckExtension as TextCheckExtensionStorage
 }
