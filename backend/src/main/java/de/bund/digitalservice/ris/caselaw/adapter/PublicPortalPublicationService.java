@@ -118,7 +118,7 @@ public class PublicPortalPublicationService {
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
-  @Scheduled(cron = "0 5 17 * * *")
+  @Scheduled(cron = "0 4 30 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
@@ -131,13 +131,6 @@ public class PublicPortalPublicationService {
             .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
             .toList();
 
-    log.info(databaseDocumentNumbers.toString());
-    log.info("{} publishable document numbers in database.", databaseDocumentNumbers.size());
-    log.info(
-        "Database document numbers: {}",
-        databaseDocumentNumbers.stream().map(Object::toString).collect(Collectors.joining(", ")));
-    log.info("{} ldml files in bucket.", portalBucketDocumentNumbers.size());
-
     List<String> inBucketNotInDatabase =
         portalBucketDocumentNumbers.stream()
             .filter(documentNumber -> !databaseDocumentNumbers.contains(documentNumber))
@@ -149,12 +142,15 @@ public class PublicPortalPublicationService {
             .toList();
 
     log.info(
-        "Found in database but not in bucket: {}. Document numbers: {}",
-        inDatabaseNotInBucket.size(),
+        "Found {} publishable doc units by database query but not in bucket.",
+        inDatabaseNotInBucket.size());
+    log.info(
+        "Document numbers found in database but not in bucket: {}",
         inDatabaseNotInBucket.stream().map(Object::toString).collect(Collectors.joining(", ")));
     log.info(
-        "Found in bucket but not in database: {}. Document numbers: {}",
-        inBucketNotInDatabase.size(),
+        "Found {} doc units in bucket but not by database query.", inBucketNotInDatabase.size());
+    log.info(
+        "Document numbers found in bucket but not in database: {}",
         inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 }
