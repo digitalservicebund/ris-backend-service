@@ -14,6 +14,8 @@ import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
@@ -21,12 +23,14 @@ import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -159,7 +163,7 @@ class PublicPortalTransformerTest {
                                </ris:fileNumbers>
                                <ris:documentType>documentType test</ris:documentType>
                                <ris:courtLocation>courtLocation test</ris:courtLocation>
-                               <ris:courtType>courType test</ris:courtType>
+                               <ris:courtType>courtType test</ris:courtType>
                                <ris:legalForces>
                                   <ris:legalForce>legalForce test</ris:legalForce>
                                </ris:legalForces>
@@ -175,6 +179,11 @@ class PublicPortalTransformerTest {
                             <akn:p>guidingPrinciple test</akn:p>
                          </akn:motivation>
                          <akn:introduction>
+                            <akn:block name="Gliederung">
+                               <akn:embeddedStructure>
+                                  <akn:p>outline test</akn:p>
+                               </akn:embeddedStructure>
+                            </akn:block>
                             <akn:block name="Tenor">
                                <akn:embeddedStructure>
                                   <akn:p>tenor test</akn:p>
@@ -243,6 +252,7 @@ class PublicPortalTransformerTest {
             .documentType(DocumentType.builder().label("ensuing decision document type").build())
             .fileNumber("ensuing decision file number")
             .documentNumber("ensuing decision document number 1")
+            .pending(true)
             .build();
     EnsuingDecision ensuingDecision2 =
         ensuingDecision1.toBuilder().documentNumber("previous decision document number 2").build();
@@ -251,6 +261,7 @@ class PublicPortalTransformerTest {
         DocumentationUnit.builder()
             .uuid(documentationUnitId)
             .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+            .note("note test")
             .coreData(
                 CoreData.builder()
                     .ecli("ecli test")
@@ -264,8 +275,8 @@ class PublicPortalTransformerTest {
                             .build())
                     .court(
                         Court.builder()
-                            .label("courtLable test")
-                            .type("courType test")
+                            .label("courtLabel test")
+                            .type("courtType test")
                             .location("courtLocation test")
                             .region("region test")
                             .build())
@@ -290,11 +301,6 @@ class PublicPortalTransformerTest {
                         DocumentationOffice.builder()
                             .abbreviation("documentationOffice test")
                             .build())
-                    .source(
-                        Source.builder()
-                            .sourceRawValue("sourceRawValue test")
-                            .value(SourceValue.S)
-                            .build())
                     .previousProcedures(List.of("previous procedure test"))
                     .procedure(Procedure.builder().label("procedure test").build())
                     .inputTypes(List.of("inputType test"))
@@ -302,6 +308,8 @@ class PublicPortalTransformerTest {
                     .deviatingCourts(List.of("deviating court"))
                     .deviatingFileNumbers(List.of("deviating fileNumber"))
                     .deviatingDecisionDates(List.of(LocalDate.of(2010, 5, 12)))
+                    .yearsOfDispute(List.of(Year.now()))
+                    .leadingDecisionNormReferences(List.of("leadingDecisionNormReference test"))
                     .build())
             .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
             .documentNumber("YYTestDoc0013")
@@ -313,6 +321,7 @@ class PublicPortalTransformerTest {
                     .dissentingOpinion("<p>dissenting test</p>")
                     .otherLongText("<p>otherLongText test</p>")
                     .tenor("<p>tenor test</p>")
+                    .outline("<p>outline test</p>")
                     .participatingJudges(
                         List.of(
                             ParticipatingJudge.builder()
@@ -358,9 +367,32 @@ class PublicPortalTransformerTest {
                                         .abbreviation("normReference test")
                                         .build())
                                 .build()))
+                    .jobProfiles(List.of("jobProfile test"))
+                    .dismissalGrounds(List.of("dismissalGround test"))
+                    .dismissalTypes(List.of("dismissalType test"))
+                    .collectiveAgreements(List.of("collectiveAgreement test"))
+                    .hasLegislativeMandate(true)
                     .build())
             .previousDecisions(List.of(previousDecision1, previousDecision2))
             .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))
+            .caselawReferences(
+                List.of(
+                    Reference.builder()
+                        .referenceType(ReferenceType.CASELAW)
+                        .citation("citation")
+                        .referenceSupplement("reference supplement")
+                        .legalPeriodical(
+                            LegalPeriodical.builder().abbreviation("LegalPeriodical").build())
+                        .legalPeriodicalRawValue("LegalPeriodical")
+                        .build()))
+            .literatureReferences(
+                List.of(
+                    Reference.builder()
+                        .referenceType(ReferenceType.LITERATURE)
+                        .author("author")
+                        .citation("citation")
+                        .documentType(DocumentType.builder().label("doc type").build())
+                        .build()))
             .build();
   }
 
@@ -375,7 +407,8 @@ class PublicPortalTransformerTest {
         Arguments.of(
             "'court' (Gericht)",
             """
-                <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
+                <ris:courtLocation>courtLocation test</ris:courtLocation>
+                <ris:courtType>courtType test</ris:courtType>
                """),
         Arguments.of(
             "'decisionDate' (Entscheidungsdatum)",
@@ -411,7 +444,7 @@ class PublicPortalTransformerTest {
         //                <ris:region>region test</ris:region>
         //               """),
         // Normen -->
-        // Fixme: Should norms be converted more then just the legalForce???
+        // Fixme: Add elements for single norm and norm abbreviation once they are also transformed
         Arguments.of(
             "'normReferences' (Normen)",
             """
@@ -508,6 +541,15 @@ class PublicPortalTransformerTest {
                    </akn:embeddedStructure>
                 </akn:block>
                """),
+        Arguments.of(
+            "'outline' (Gliederung)'",
+            """
+                <akn:block name="Gliederung">
+                    <akn:embeddedStructure>
+                        <akn:p>outline test</akn:p>
+                    </akn:embeddedStructure>
+                </akn:block>
+                """),
         // Fixme: should be included -->
         //        Arguments.of(
         //            "'participatingJudges' (Mitwirkende Richter)",
@@ -565,7 +607,7 @@ class PublicPortalTransformerTest {
                     </akn:block>
                     """),
         Arguments.of(
-            "'inputType' (EingabeTyp)",
+            "'inputType' (Eingangsart)",
             """
             inputType test
             """),
