@@ -1,31 +1,3 @@
-import LanguageTool from "@/editor/languagetool/languageTool"
-
-export interface Software {
-  name: string
-  version: string
-  buildDate: string
-  apiVersion: number
-  premium: boolean
-  premiumHint: string
-  status: string
-}
-
-export interface Warnings {
-  incompleteResults: boolean
-}
-
-export interface DetectedLanguage {
-  name: string
-  code: string
-  confidence: number
-}
-
-export interface Language {
-  name: string
-  code: string
-  detectedLanguage: DetectedLanguage
-}
-
 export interface Replacement {
   value: string
 }
@@ -90,29 +62,13 @@ export interface Suggestion {
   matches: Match[]
 }
 
-export interface TextNodesWithPosition {
-  text: string
-  from: number
-  to: number
+export interface TextCheckExtensionStorage {
+  matches: Match[]
+  selectedMatch: Match | undefined
 }
 
-export interface LanguageToolOptions {
-  language: string
-  automaticMode: boolean
-  documentId: string | number | undefined
-  textToolEnabled: boolean
-  category: string | undefined
+export type TextCheckExtensionOptions = {
+  category?: string
 }
 
-export interface LanguageToolStorage {
-  loading?: boolean
-  matchRange?: { from: number; to: number }
-  languageToolService?: LanguageTool
-}
-
-export enum LanguageToolHelpingWords {
-  LanguageToolTransactionName = "languageToolTransaction",
-  MatchUpdatedTransactionName = "matchUpdated",
-  MatchRangeUpdatedTransactionName = "matchRangeUpdated",
-  LoadingTransactionName = "languageToolLoading",
-}
+export const TextCheckTagName = "textCheck"
