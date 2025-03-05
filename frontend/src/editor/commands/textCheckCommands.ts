@@ -6,6 +6,7 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import {
   TextCheckCategoryResponse,
   TextCheckExtensionStorage,
+  TextCheckTagName,
 } from "@/types/languagetool"
 
 /**
@@ -20,12 +21,12 @@ const handleSelection = ({ state, editor }: CommandProps): boolean => {
 
   if (node?.marks) {
     const textCheckMark = node.marks.find(
-      (mark) => mark.type.name === "textCheck",
+      (mark) => mark.type.name === TextCheckTagName,
     )
 
     if (textCheckMark) {
       const matchId = Number(textCheckMark.attrs.id)
-      editor.commands.setSelectedMatch(matchId)
+      setMatch(editor, matchId)
       return true
     }
   }
@@ -64,13 +65,13 @@ const replaceMatch = (editor: Editor, matchId: number, text: string) => {
       node.isText &&
       node.marks.some(
         (mark) =>
-          mark.type.name === "textCheck" &&
+          mark.type.name === TextCheckTagName &&
           mark.attrs.id === matchId.toString(),
       )
     ) {
       const textCheckMark = node.marks.find(
         (mark) =>
-          mark.type.name === "textCheck" &&
+          mark.type.name === TextCheckTagName &&
           mark.attrs.id === matchId.toString(),
       )
 
@@ -82,6 +83,7 @@ const replaceMatch = (editor: Editor, matchId: number, text: string) => {
         editor.view.dispatch(tr)
       }
     }
+
     clearSelectedMatch(editor)
   })
 }
@@ -101,7 +103,6 @@ const setMatch = (editor: Editor, matchId?: number) => {
   } else {
     clearSelectedMatch(editor)
   }
-  return extensionStorage.selectedMatch
 }
 
 const clearSelectedMatch = (editor: Editor) => {

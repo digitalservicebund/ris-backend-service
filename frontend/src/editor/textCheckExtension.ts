@@ -53,7 +53,8 @@ export const TextCheckExtension = Extension.create<
       setSelectedMatch:
         (matchId?: number) =>
         ({ editor }) => {
-          return setMatch(editor, matchId)
+          setMatch(editor, matchId)
+          return true
         },
       acceptMatch:
         (matchId: number, text: string) =>

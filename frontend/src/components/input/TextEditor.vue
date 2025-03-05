@@ -149,14 +149,9 @@ const editor: Editor = new Editor({
   },
   onSelectionUpdate: () => {
     editor.commands.handleSelection()
-    handleMatchSelected()
+    editor.commands.handleMatchSelection()
   },
 })
-
-function handleMatchSelected() {
-  editor.commands.handleMatchSelection()
-  setTimeout(() => updateSelectedMatchMatch())
-}
 
 const containerWidth = ref<number>()
 
@@ -264,6 +259,14 @@ watch(
     editor.commands.setContent(value, false)
     editor.commands.setTextSelection(cursorPos)
   },
+)
+
+watch(
+  () => editor.storage.textCheckExtension?.selectedMatch,
+  (newMatch) => {
+    selectedMatch.value = newMatch || undefined
+  },
+  { immediate: true },
 )
 
 onMounted(async () => {

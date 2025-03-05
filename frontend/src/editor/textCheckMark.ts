@@ -1,7 +1,8 @@
 import { Mark } from "@tiptap/vue-3"
+import { TextCheckTagName } from "@/types/languagetool"
 
 export const TextCheckMark = Mark.create({
-  name: "textCheck",
+  name: TextCheckTagName,
   priority: 1000,
   group: "inline",
 
