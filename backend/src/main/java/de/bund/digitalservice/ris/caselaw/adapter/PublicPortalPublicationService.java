@@ -6,7 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.PublicPortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -27,10 +27,10 @@ import org.springframework.stereotype.Service;
 public class PublicPortalPublicationService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final DocumentBuilderFactory documentBuilderFactory;
   private final PublicPortalBucket publicPortalBucket;
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
+  private final PublicPortalTransformer ldmlTransformer;
 
   @Autowired
   public PublicPortalPublicationService(
@@ -41,10 +41,10 @@ public class PublicPortalPublicationService {
       ObjectMapper objectMapper) {
 
     this.documentationUnitRepository = documentationUnitRepository;
-    this.documentBuilderFactory = documentBuilderFactory;
     this.publicPortalBucket = publicPortalBucket;
     this.objectMapper = objectMapper;
     this.xmlUtilService = xmlUtilService;
+    this.ldmlTransformer = new PublicPortalTransformer(documentBuilderFactory);
   }
 
   /**
@@ -65,9 +65,7 @@ public class PublicPortalPublicationService {
       // for now pending proceedings can not be transformed to LDML, so they are ignored.
       return;
     }
-    Optional<CaseLawLdml> ldml =
-        DocumentationUnitToLdmlTransformer.transformToLdml(
-            documentationUnit, documentBuilderFactory);
+    Optional<CaseLawLdml> ldml = ldmlTransformer.transformToLdml(documentationUnit);
 
     if (ldml.isEmpty()) {
       throw new LdmlTransformationException(
