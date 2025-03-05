@@ -148,7 +148,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.20.5"
+    val testContainersVersion = "1.20.6"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -166,7 +166,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.0")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.29.3")
+    implementation("com.google.protobuf:protobuf-java:4.30.0")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.5.2")
