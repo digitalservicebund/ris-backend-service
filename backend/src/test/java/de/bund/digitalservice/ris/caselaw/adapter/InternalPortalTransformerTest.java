@@ -16,6 +16,8 @@ import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
@@ -23,12 +25,14 @@ import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -350,7 +354,7 @@ class InternalPortalTransformerTest {
                </ris:fileNumbers>
                <ris:documentType>documentType test</ris:documentType>
                <ris:courtLocation>courtLocation test</ris:courtLocation>
-               <ris:courtType>courType test</ris:courtType>
+               <ris:courtType>courtType test</ris:courtType>
                <ris:legalForces>
                   <ris:legalForce>legalForce test</ris:legalForce>
                </ris:legalForces>
@@ -388,7 +392,7 @@ class InternalPortalTransformerTest {
          <akn:introduction>
             <akn:block name="Orientierungssatz">
                <akn:embeddedStructure>
-                  <akn:p>headnote test</akn:p>
+                  <akn:p>headNote test</akn:p>
                </akn:embeddedStructure>
             </akn:block>
             <akn:block name="Sonstiger Orientierungssatz">
@@ -396,9 +400,14 @@ class InternalPortalTransformerTest {
                   <akn:p>otherHeadNote test</akn:p>
                </akn:embeddedStructure>
             </akn:block>
+            <akn:block name="Gliederung">
+               <akn:embeddedStructure>
+                  <akn:p>outline test</akn:p>
+               </akn:embeddedStructure>
+            </akn:block>
             <akn:block name="Tenor">
                <akn:embeddedStructure>
-                  <akn:p>tenor</akn:p>
+                  <akn:p>tenor test</akn:p>
                </akn:embeddedStructure>
             </akn:block>
          </akn:introduction>
@@ -471,6 +480,7 @@ class InternalPortalTransformerTest {
     return DocumentationUnit.builder()
         .uuid(documentationUnitId)
         .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+        .note("note test")
         .coreData(
             CoreData.builder()
                 .ecli("ecli test")
@@ -482,8 +492,8 @@ class InternalPortalTransformerTest {
                         .build())
                 .court(
                     Court.builder()
-                        .label("courtLable test")
-                        .type("courType test")
+                        .label("courtLabel test")
+                        .type("courtType test")
                         .location("courtLocation test")
                         .region("region test")
                         .build())
@@ -500,11 +510,21 @@ class InternalPortalTransformerTest {
                 .inputTypes(List.of("inputType test"))
                 .procedure(Procedure.builder().label("procedure test").build())
                 .previousProcedures(List.of("previous procedure test"))
+                .documentationOffice(
+                    DocumentationOffice.builder().abbreviation("documentationOffice test").build())
+                .creatingDocOffice(
+                    DocumentationOffice.builder().abbreviation("documentationOffice test").build())
+                .previousProcedures(List.of("previous procedure test"))
+                .procedure(Procedure.builder().label("procedure test").build())
+                .inputTypes(List.of("inputType test"))
                 .deviatingEclis(List.of("deviating ecli test"))
                 .deviatingCourts(List.of("deviating court"))
                 .deviatingFileNumbers(List.of("deviating fileNumber"))
                 .deviatingDecisionDates(List.of(LocalDate.of(2010, 5, 12)))
+                .yearsOfDispute(List.of(Year.now()))
+                .leadingDecisionNormReferences(List.of("leadingDecisionNormReference test"))
                 .build())
+        .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
         .documentNumber("YYTestDoc0013")
         .longTexts(
             LongTexts.builder()
@@ -513,7 +533,8 @@ class InternalPortalTransformerTest {
                 .reasons("<p>grounds test</p>")
                 .dissentingOpinion("<p>dissenting test</p>")
                 .otherLongText("<p>otherLongText test</p>")
-                .tenor("<p>tenor</p>")
+                .tenor("<p>tenor test</p>")
+                .outline("<p>outline test</p>")
                 .participatingJudges(
                     List.of(
                         ParticipatingJudge.builder()
@@ -526,7 +547,7 @@ class InternalPortalTransformerTest {
                 .guidingPrinciple("<p>guidingPrinciple test</p>")
                 .headline("<p>headline test</p>")
                 .decisionName("decisionName test")
-                .headnote("<p>headnote test</p>")
+                .headnote("<p>headNote test</p>")
                 .otherHeadnote("<p>otherHeadNote test</p>")
                 .build())
         .contentRelatedIndexing(
@@ -558,9 +579,32 @@ class InternalPortalTransformerTest {
                                     .abbreviation("normReference test")
                                     .build())
                             .build()))
+                .jobProfiles(List.of("jobProfile test"))
+                .dismissalGrounds(List.of("dismissalGround test"))
+                .dismissalTypes(List.of("dismissalType test"))
+                .collectiveAgreements(List.of("collectiveAgreement test"))
+                .hasLegislativeMandate(true)
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))
         .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))
+        .caselawReferences(
+            List.of(
+                Reference.builder()
+                    .referenceType(ReferenceType.CASELAW)
+                    .citation("citation")
+                    .referenceSupplement("reference supplement")
+                    .legalPeriodical(
+                        LegalPeriodical.builder().abbreviation("LegalPeriodical").build())
+                    .legalPeriodicalRawValue("LegalPeriodical")
+                    .build()))
+        .literatureReferences(
+            List.of(
+                Reference.builder()
+                    .referenceType(ReferenceType.LITERATURE)
+                    .author("author")
+                    .citation("citation")
+                    .documentType(DocumentType.builder().label("doc type").build())
+                    .build()))
         .build();
   }
 }
