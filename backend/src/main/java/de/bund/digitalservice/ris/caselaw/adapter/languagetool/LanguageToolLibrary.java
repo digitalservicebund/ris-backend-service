@@ -9,6 +9,7 @@ import java.util.List;
 import org.languagetool.JLanguageTool;
 import org.languagetool.Languages;
 import org.languagetool.rules.RuleMatch;
+import org.springframework.context.annotation.Bean;
 
 public class LanguageToolLibrary extends TextCheckService {
   private final LanguageToolConfig languageToolConfig;
@@ -20,10 +21,14 @@ public class LanguageToolLibrary extends TextCheckService {
     this.languageToolConfig = languageToolConfig;
   }
 
+  @Bean
+  public JLanguageTool getLanguageTool() {
+    return new JLanguageTool(Languages.getLanguageForShortCode(languageToolConfig.getLanguage()));
+  }
+
   @Override
   protected List<Match> requestTool(String text) {
-    JLanguageTool langTool =
-        new JLanguageTool(Languages.getLanguageForShortCode(languageToolConfig.getLanguage()));
+    JLanguageTool langTool = getLanguageTool();
 
     try {
       // TODO comment in to use statistical ngram data:

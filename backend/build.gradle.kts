@@ -6,6 +6,7 @@ import com.github.jk1.license.render.CsvReportRenderer
 import com.github.jk1.license.render.ReportRenderer
 import io.franzbecker.gradle.lombok.task.DelombokTask
 import org.flywaydb.gradle.task.FlywayMigrateTask
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.io.Serializable
 
 plugins {
@@ -232,9 +233,7 @@ dependencies {
 
 
     implementation("org.languagetool:languagetool-core:6.6.9")
-    implementation("org.languagetool:language-de:6.6.9") {
-        exclude(group = "com.sun.xml.bind", module = "jaxb-core")
-    }
+    implementation("org.languagetool:language-de:6.6.9")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.10.2")
@@ -290,6 +289,10 @@ tasks {
         useJUnitPlatform {
             excludeTags("integration", "manual")
         }
+    }
+
+    withType<BootJar>().configureEach {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 
     task<Test>("integrationTest") {
