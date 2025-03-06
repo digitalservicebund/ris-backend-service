@@ -8,10 +8,8 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNo
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAlias;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAuthor;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrCountry;
@@ -24,21 +22,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Opinions;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
-import de.bund.digitalservice.ris.caselaw.domain.Procedure;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
-import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import jakarta.xml.bind.ValidationException;
 import java.io.IOException;
 import java.io.StringReader;
@@ -47,44 +39,41 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.data.mapping.MappingException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * Abstract base class for transforming documentation units into LDML case law format. Provides
+ * common transformation logic and helper methods.
+ */
 @Slf4j
-public class DocumentationUnitToLdmlTransformer {
+public abstract class CommonPortalTransformer {
 
-  private static final Logger logger =
-      LogManager.getLogger(DocumentationUnitToLdmlTransformer.class);
-  private static DocumentBuilderFactory documentBuilderFactory;
+  private final DocumentBuilderFactory documentBuilderFactory;
 
-  private DocumentationUnitToLdmlTransformer() {}
+  protected CommonPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+    this.documentBuilderFactory = documentBuilderFactory;
+  }
 
-  public static Optional<CaseLawLdml> transformToLdml(
-      DocumentationUnit documentationUnit, DocumentBuilderFactory documentBuilderFactory) {
-    DocumentationUnitToLdmlTransformer.documentBuilderFactory = documentBuilderFactory;
-
+  public Optional<CaseLawLdml> transformToLdml(DocumentationUnit documentationUnit) {
     try {
       return Optional.of(CaseLawLdml.builder().judgment(buildJudgment(documentationUnit)).build());
     } catch (ValidationException e) {
-      logger.error("Case law validation failed: {}", e.getMessage());
+      log.error("Case law validation failed: {}", e.getMessage());
       return Optional.empty();
     }
   }
 
-  private static Judgment buildJudgment(DocumentationUnit documentationUnit)
-      throws ValidationException {
+  private Judgment buildJudgment(DocumentationUnit documentationUnit) throws ValidationException {
     return Judgment.builder()
         .header(buildHeader(documentationUnit))
         .meta(buildMeta(documentationUnit))
@@ -92,8 +81,7 @@ public class DocumentationUnitToLdmlTransformer {
         .build();
   }
 
-  private static JaxbHtml buildHeader(DocumentationUnit documentationUnit)
-      throws ValidationException {
+  private JaxbHtml buildHeader(DocumentationUnit documentationUnit) throws ValidationException {
     // Case law handover : define what the title should be if headline is null
     String title =
         ObjectUtils.defaultIfNull(
@@ -104,7 +92,42 @@ public class DocumentationUnitToLdmlTransformer {
     return JaxbHtml.build(htmlStringToObjectList(title));
   }
 
-  private static JudgmentBody buildJudgmentBody(DocumentationUnit documentationUnit) {
+  protected abstract Meta buildMeta(DocumentationUnit documentationUnit) throws ValidationException;
+
+  protected abstract AknMultipleBlock buildIntroduction(DocumentationUnit documentationUnit);
+
+  protected RisMeta.RisMetaBuilder buildCommonRisMeta(DocumentationUnit documentationUnit) {
+    RisMeta.RisMetaBuilder builder = RisMeta.builder();
+
+    if (documentationUnit.previousDecisions() != null) {
+      applyIfNotEmpty(
+          buildRelatedDecisions(documentationUnit.previousDecisions()), builder::previousDecision);
+    }
+    if (documentationUnit.ensuingDecisions() != null) {
+      applyIfNotEmpty(
+          buildRelatedDecisions(documentationUnit.ensuingDecisions()), builder::ensuingDecision);
+    }
+
+    var contentRelatedIndexing = documentationUnit.contentRelatedIndexing();
+    if (contentRelatedIndexing != null) {
+      applyIfNotEmpty(
+          contentRelatedIndexing.norms().stream()
+              .flatMap(normReference -> normReference.singleNorms().stream())
+              .filter(Objects::nonNull)
+              .map(
+                  singleNorm -> {
+                    var type = nullSafeGet(singleNorm.legalForce(), LegalForce::type);
+                    return type != null ? type.label() : null;
+                  })
+              .filter(Objects::nonNull)
+              .toList(),
+          builder::legalForce);
+    }
+
+    return builder;
+  }
+
+  private JudgmentBody buildJudgmentBody(DocumentationUnit documentationUnit) {
 
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
@@ -130,41 +153,7 @@ public class DocumentationUnitToLdmlTransformer {
     return builder.build();
   }
 
-  private static AknMultipleBlock buildIntroduction(DocumentationUnit documentationUnit) {
-    var shortTexts = documentationUnit.shortTexts();
-    var longTexts = documentationUnit.longTexts();
-
-    var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
-    var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
-    var outline = nullSafeGet(longTexts, LongTexts::outline);
-    var tenor = nullSafeGet(longTexts, LongTexts::tenor);
-
-    if (StringUtils.isNotEmpty(headnote)
-        || StringUtils.isNotEmpty(otherHeadnote)
-        || StringUtils.isNotEmpty(outline)
-        || StringUtils.isNotEmpty(tenor)) {
-      return new AknMultipleBlock()
-          .withBlock(
-              AknEmbeddedStructureInBlock.HeadNote.NAME,
-              AknEmbeddedStructureInBlock.HeadNote.build(
-                  JaxbHtml.build(htmlStringToObjectList(headnote))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
-              AknEmbeddedStructureInBlock.OtherHeadNote.build(
-                  JaxbHtml.build(htmlStringToObjectList(otherHeadnote))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Outline.NAME,
-              AknEmbeddedStructureInBlock.Outline.build(
-                  JaxbHtml.build(htmlStringToObjectList(outline))))
-          .withBlock(
-              AknEmbeddedStructureInBlock.Tenor.NAME,
-              AknEmbeddedStructureInBlock.Tenor.build(
-                  JaxbHtml.build(htmlStringToObjectList(tenor))));
-    }
-    return null;
-  }
-
-  private static AknMultipleBlock buildDecision(DocumentationUnit documentationUnit) {
+  private AknMultipleBlock buildDecision(DocumentationUnit documentationUnit) {
     var longTexts = documentationUnit.longTexts();
 
     var decisionReasons = nullSafeGet(longTexts, LongTexts::decisionReasons);
@@ -194,134 +183,7 @@ public class DocumentationUnitToLdmlTransformer {
     return null;
   }
 
-  private static Meta buildMeta(DocumentationUnit documentationUnit) throws ValidationException {
-    if (documentationUnit.coreData() != null) {
-      validateNotNull(documentationUnit.coreData().court(), "Court missing");
-      if (documentationUnit.coreData().court() != null) {
-        validateNotNull(documentationUnit.coreData().court().type(), "CourtType missing");
-        // TODO: Figure out if court location needs to be present in LDML for superior courts
-        // validateNotNull(documentationUnit.coreData().court().location(), "CourtLocation
-        // missing");
-      }
-      validateNotNull(documentationUnit.coreData().documentType(), "DocumentType missing");
-      validateNotNull(documentationUnit.coreData().legalEffect(), "LegalEffect missing");
-      validate(!documentationUnit.coreData().fileNumbers().isEmpty(), "FileNumber missing");
-    } else {
-      throw new ValidationException("Core data is null");
-    }
-
-    Meta.MetaBuilder builder = Meta.builder();
-
-    // FIXME: Not in prototype
-    List<AknKeyword> keywords =
-        documentationUnit.contentRelatedIndexing() == null
-            ? Collections.emptyList()
-            : documentationUnit.contentRelatedIndexing().keywords().stream()
-                .map(AknKeyword::new)
-                .toList();
-
-    if (!keywords.isEmpty()) {
-      builder.classification(Classification.builder().keyword(keywords).build());
-    }
-
-    return builder
-        .identification(buildIdentification(documentationUnit))
-        .proprietary(Proprietary.builder().meta(buildRisMeta(documentationUnit)).build())
-        .build();
-  }
-
-  private static RisMeta buildRisMeta(DocumentationUnit documentationUnit) {
-    RisMeta.RisMetaBuilder builder = RisMeta.builder();
-
-    if (documentationUnit.previousDecisions() != null) {
-      applyIfNotEmpty(
-          buildRelatedDecisions(documentationUnit.previousDecisions()), builder::previousDecision);
-    }
-    if (documentationUnit.ensuingDecisions() != null) {
-      applyIfNotEmpty(
-          buildRelatedDecisions(documentationUnit.ensuingDecisions()), builder::ensuingDecision);
-    }
-
-    var contentRelatedIndexing = documentationUnit.contentRelatedIndexing();
-    if (contentRelatedIndexing != null) {
-      applyIfNotEmpty(
-          contentRelatedIndexing.norms().stream()
-              .flatMap(normReference -> normReference.singleNorms().stream())
-              .filter(Objects::nonNull)
-              .map(
-                  singleNorm -> {
-                    var type = nullSafeGet(singleNorm.legalForce(), LegalForce::type);
-                    return type != null ? type.label() : null;
-                  })
-              .filter(Objects::nonNull)
-              .toList(),
-          builder::legalForce);
-      // FIXME: field of law not in prototype
-      applyIfNotEmpty(
-          contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
-          builder::fieldOfLaw);
-    }
-
-    var coreData = documentationUnit.coreData();
-    if (coreData != null) {
-      if (coreData.deviatingDecisionDates() != null) {
-        // FIXME: No deviating decision dates in prototype
-        applyIfNotEmpty(
-            coreData.deviatingDecisionDates().stream().map(DateUtils::toDateString).toList(),
-            builder::deviatingDate);
-      }
-      // FIXME: No deviating decision courts in prototype
-      applyIfNotEmpty(coreData.deviatingCourts(), builder::deviatingCourt);
-      //    applyIfNotEmpty(
-      //        caseLaw.getDeviatingDocumentNumbers().stream()
-      //            .map(DeviatingDocumentNumber::getValue)
-      //            .toList(),
-      //        builder::deviatingDocumentNumber);
-      // FIXME: No deviating decision eclis in prototype
-      applyIfNotEmpty(coreData.deviatingEclis(), builder::deviatingEcli);
-      // FIXME: No deviating decision file numbers in prototype
-      applyIfNotEmpty(coreData.deviatingFileNumbers(), builder::deviatingFileNumber);
-      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
-      if (coreData.procedure() != null) {
-        // FIXME: No procedures in prototype
-        applyIfNotEmpty(
-            Stream.of(coreData.procedure())
-                .map(Procedure::label)
-                .flatMap(it -> documentationUnit.coreData().previousProcedures().stream())
-                .toList(),
-            builder::procedure);
-      }
-
-      builder
-          .documentType(coreData.documentType().label())
-          .courtLocation(nullSafeGet(coreData.court(), Court::location))
-          .courtType(nullSafeGet(coreData.court(), Court::type))
-          // FIXME: legalEffect Not in prototype
-          .legalEffect(coreData.legalEffect())
-          .judicialBody(nullIfEmpty(coreData.appraisalBody()))
-          // FIXME: Not in prototype
-          .documentationOffice(
-              nullSafeGet(coreData.documentationOffice(), DocumentationOffice::abbreviation));
-    }
-
-    var decisionName = nullSafeGet(documentationUnit.shortTexts(), ShortTexts::decisionName);
-    if (StringUtils.isNotEmpty(decisionName)) {
-      // FIXME Not in prototype
-      builder.decisionName(List.of(decisionName));
-    }
-
-    Status lastStatus = documentationUnit.status();
-
-    // FIXME Not in prototype
-    return builder
-        .publicationStatus(
-            nullSafeGet(
-                nullSafeGet(lastStatus, Status::publicationStatus), PublicationStatus::toString))
-        .error(lastStatus != null && lastStatus.withError())
-        .build();
-  }
-
-  private static List<RelatedDecision> buildRelatedDecisions(
+  protected List<RelatedDecision> buildRelatedDecisions(
       List<? extends RelatedDocumentationUnit> relatedDecisions) {
     List<RelatedDecision> previousDecision = new ArrayList<>();
     for (RelatedDocumentationUnit current : relatedDecisions) {
@@ -337,7 +199,7 @@ public class DocumentationUnitToLdmlTransformer {
     return previousDecision;
   }
 
-  private static Identification buildIdentification(DocumentationUnit documentationUnit)
+  protected Identification buildIdentification(DocumentationUnit documentationUnit)
       throws ValidationException {
     validateNotNull(documentationUnit.documentNumber(), "Unique identifier missing");
     validateNotNull(documentationUnit.uuid(), "Caselaw UUID missing");
@@ -385,7 +247,7 @@ public class DocumentationUnitToLdmlTransformer {
         .build();
   }
 
-  private static List<FrbrAlias> generateAliases(DocumentationUnit documentationUnit) {
+  protected List<FrbrAlias> generateAliases(DocumentationUnit documentationUnit) {
     List<FrbrAlias> aliases = new ArrayList<>();
 
     aliases.add(new FrbrAlias("uebergreifende-id", documentationUnit.uuid().toString()));
@@ -397,14 +259,14 @@ public class DocumentationUnitToLdmlTransformer {
     return aliases;
   }
 
-  private static String nullIfEmpty(String input) {
+  protected String nullIfEmpty(String input) {
     if (StringUtils.isEmpty(input)) {
       return null;
     }
     return input;
   }
 
-  private static List<Object> htmlStringToObjectList(String html) {
+  protected List<Object> htmlStringToObjectList(String html) {
     if (StringUtils.isBlank(html)) {
       return Collections.emptyList();
     }
@@ -423,6 +285,20 @@ public class DocumentationUnitToLdmlTransformer {
     } catch (ParserConfigurationException | IOException | SAXException e) {
       log.error("Xml transformation error.", e);
       throw new MappingException(e.getMessage());
+    }
+  }
+
+  protected void validateCoreData(DocumentationUnit documentationUnit) throws ValidationException {
+    if (documentationUnit.coreData() != null) {
+      validateNotNull(documentationUnit.coreData().court(), "Court missing");
+      if (documentationUnit.coreData().court() != null) {
+        validateNotNull(documentationUnit.coreData().court().type(), "CourtType missing");
+      }
+      validateNotNull(documentationUnit.coreData().documentType(), "DocumentType missing");
+      validateNotNull(documentationUnit.coreData().legalEffect(), "LegalEffect missing");
+      validate(!documentationUnit.coreData().fileNumbers().isEmpty(), "FileNumber missing");
+    } else {
+      throw new ValidationException("Core data is null");
     }
   }
 }

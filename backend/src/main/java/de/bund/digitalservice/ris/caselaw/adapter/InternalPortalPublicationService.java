@@ -5,7 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.InternalPortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -31,10 +31,10 @@ import org.springframework.stereotype.Service;
 public class InternalPortalPublicationService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final DocumentBuilderFactory documentBuilderFactory;
   private final InternalPortalBucket internalPortalBucket;
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
+  private final InternalPortalTransformer ldmlTransformer;
 
   @Autowired
   public InternalPortalPublicationService(
@@ -45,10 +45,10 @@ public class InternalPortalPublicationService {
       ObjectMapper objectMapper) {
 
     this.documentationUnitRepository = documentationUnitRepository;
-    this.documentBuilderFactory = documentBuilderFactory;
     this.internalPortalBucket = internalPortalBucket;
     this.objectMapper = objectMapper;
     this.xmlUtilService = xmlUtilService;
+    this.ldmlTransformer = new InternalPortalTransformer(documentBuilderFactory);
   }
 
   /**
@@ -74,9 +74,7 @@ public class InternalPortalPublicationService {
           "Publish not supported for Documentable type: " + documentable.getClass());
     }
 
-    Optional<CaseLawLdml> ldml =
-        DocumentationUnitToLdmlTransformer.transformToLdml(
-            documentationUnit, documentBuilderFactory);
+    Optional<CaseLawLdml> ldml = ldmlTransformer.transformToLdml(documentationUnit);
 
     if (ldml.isEmpty()) {
       throw new LdmlTransformationException(
@@ -216,9 +214,7 @@ public class InternalPortalPublicationService {
             "Export not supported for Documentable type: " + documentable.getClass());
       }
 
-      Optional<CaseLawLdml> ldml =
-          DocumentationUnitToLdmlTransformer.transformToLdml(
-              documentationUnit, documentBuilderFactory);
+      Optional<CaseLawLdml> ldml = ldmlTransformer.transformToLdml(documentationUnit);
 
       if (ldml.isEmpty()) {
         log.error("Couldn't export (step tranform) {} as LegalDocML", documentNumber);
