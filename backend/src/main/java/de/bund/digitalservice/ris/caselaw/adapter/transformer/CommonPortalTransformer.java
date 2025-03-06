@@ -51,6 +51,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * Abstract base class for transforming documentation units into LDML case law format. Provides
+ * common transformation logic and helper methods.
+ */
 @Slf4j
 public abstract class CommonPortalTransformer {
 

@@ -29,6 +29,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Transformer for converting documentation units to LDML format for internal portal use. Includes
+ * additional metadata like classification and keywords for internal processing.
+ */
 @Slf4j
 public class InternalPortalTransformer extends CommonPortalTransformer {
 
