@@ -7,6 +7,7 @@ import TextEditorButton, {
 } from "@/components/input/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
 import { longTextLabels } from "@/domain/documentUnit"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IcSharpAddBox from "~icons/ic/sharp-add-box"
 import MaterialSymbolsDeleteSweepOutline from "~icons/ic/sharp-delete-sweep"
 import IconExpand from "~icons/ic/sharp-expand"
@@ -44,8 +45,10 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
 const emit = defineEmits<{ onEditorExpandedChanged: [boolean] }>()
+
+const store = useDocumentUnitStore()
+
 const borderNumberCategories = [
   longTextLabels.reasons,
   longTextLabels.caseFacts,
@@ -300,7 +303,10 @@ const buttons = computed(() => {
     ariaLabel: "Rechtschreibprüfung",
     group: "textCheck",
     isCollapsable: false,
-    callback: () => props.editor.chain().focus().textCheck().run(),
+    callback: async () => {
+      await store.updateDocumentUnit()
+      props.editor.chain().focus().textCheck().run()
+    },
   })
 
   return buttons
