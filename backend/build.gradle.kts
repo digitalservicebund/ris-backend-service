@@ -230,7 +230,11 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.3.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.3.0")
 
-    implementation("org.languagetool:language-de:6.6.9")
+
+    implementation("org.languagetool:languagetool-core:6.6.9")
+    implementation("org.languagetool:language-de:6.6.9") {
+        exclude(group = "com.sun.xml.bind", module = "jaxb-core")
+    }
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.10.2")

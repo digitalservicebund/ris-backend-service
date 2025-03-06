@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.config;
 
 import de.bund.digitalservice.ris.caselaw.adapter.TextCheckMockService;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolService;
+import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolLibrary;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ public class TextCheckConfiguration {
   @Profile({"text-check", "staging"})
   public TextCheckService textCheckService(
       LanguageToolConfig config, DocumentationUnitService service) {
-    return new LanguageToolService(config, service);
+    return new LanguageToolLibrary(config, service);
   }
 
   @Bean

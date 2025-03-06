@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.languagetool.rules.RuleMatch;
 
 public class TextCheckResponseTransformer {
   private TextCheckResponseTransformer() {}
@@ -110,6 +111,55 @@ public class TextCheckResponseTransformer {
               .category(
                   new Category(
                       match.getRule().getCategory().getId(),
+                      match.getRule().getCategory().getName()))
+              .build();
+
+      matchBuilder.rule(rule);
+
+      matches.add(matchBuilder.build());
+    }
+
+    return matches;
+  }
+
+  public static List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match>
+      transformToListOfDomainMatches(List<RuleMatch> response) {
+    List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
+
+    for (RuleMatch match : response) {
+      MatchBuilder matchBuilder =
+          de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.builder()
+              .message(match.getMessage())
+              .shortMessage(match.getShortMessage())
+              .ignoreForIncompleteSentence(true); // TODO
+
+      List<Replacement> replacements = new ArrayList<>();
+      for (String replacement : match.getSuggestedReplacements()) {
+        replacements.add(new Replacement(replacement));
+      }
+
+      String word =
+          match
+              .getSentence()
+              .getText()
+              .substring(match.getFromPosSentence(), match.getToPosSentence());
+      matchBuilder.word(word); // TODO context
+
+      matchBuilder
+          .replacements(replacements)
+          .offset(match.getFromPos())
+          .length(match.getFromPos() - match.getToPos())
+          .sentence(match.getSentence().getText())
+          .type(new Type(match.getType().name()));
+
+      Rule rule =
+          Rule.builder()
+              .id(match.getRule().getId())
+              .description(match.getRule().getDescription())
+              .issueType(match.getRule().getLocQualityIssueType().name())
+              .category(
+                  new Category(
+                      match.getRule().getCategory().getId().toString(),
                       match.getRule().getCategory().getName()))
               .build();
 
