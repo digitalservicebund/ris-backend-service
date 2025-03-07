@@ -6,6 +6,7 @@ import com.github.jk1.license.render.CsvReportRenderer
 import com.github.jk1.license.render.ReportRenderer
 import io.franzbecker.gradle.lombok.task.DelombokTask
 import org.flywaydb.gradle.task.FlywayMigrateTask
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 import java.io.Serializable
 
 plugins {
@@ -23,6 +24,7 @@ plugins {
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "11.3.4"
     id("io.sentry.jvm.gradle") version "5.3.0"
+    id ("org.owasp.dependencycheck") version "12.1.0"
 }
 
 group = "de.bund.digitalservice"
@@ -40,6 +42,9 @@ repositories {
             username = System.getenv("GH_PACKAGES_REPOSITORY_USER")
             password = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN")
         }
+    }
+    maven {
+        url = uri("https://repo.languagetool.org/artifactory/languagetool-os-release/")
     }
     //  mavenLocal() // for local testing of library when publishing to maven local.
 }
@@ -226,6 +231,10 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.3.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.3.0")
 
+
+    implementation("org.languagetool:languagetool-core:6.6.9")
+    implementation("org.languagetool:language-de:6.6.9")
+
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.10.2")
 
@@ -280,6 +289,10 @@ tasks {
         useJUnitPlatform {
             excludeTags("integration", "manual")
         }
+    }
+
+    withType<BootJar>().configureEach {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 
     task<Test>("integrationTest") {

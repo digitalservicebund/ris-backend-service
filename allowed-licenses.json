@@ -4,6 +4,9 @@
       "moduleLicense": "GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1"
     },
     {
+      "moduleLicense": "GNU LESSER GENERAL PUBLIC LICENSE, Version 3",
+    },
+    {
       "moduleLicense": "Apache License, Version 2.0"
     },
     {
@@ -42,7 +45,9 @@
     {
       "moduleLicense": "Creative Commons Legal Code"
     },
-
+    {
+      "moduleLicense": "Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)",
+    },
     {
       "moduleLicense": "MIT"
     },
@@ -66,7 +71,6 @@
       "moduleVersion": "12.5",
       "moduleName": "net.sf.saxon:Saxon-HE"
     },
-
     {
       "moduleLicense": null,
       "moduleName": "software.amazon.awssdk:bom"
@@ -74,6 +78,9 @@
     {
       "moduleLicense": null,
       "moduleName": "io.sentry:sentry-bom"
+    },
+    {
+        "moduleLicense": "PUBLIC DOMAIN"
     }
   ]
 }
