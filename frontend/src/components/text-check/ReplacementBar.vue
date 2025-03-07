@@ -26,7 +26,7 @@ function ignoreSuggestion() {
       <TextButton
         :aria-label="`${replacement} übernehmen`"
         button-type="primary"
-        data-testid="suggestion-ignore-button"
+        data-testid="suggestion-accept-button"
         :label="replacement"
         size="small"
         width="w-max"

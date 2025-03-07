@@ -1,42 +1,34 @@
-/* stylelint-disable plugin/stylelint-bem-namics  */
-/* stylelint-disable selector-class-pattern  */
 
-.ProseMirror {
-  text-check {
-    border-bottom: 2px solid #e86a69;
-    transition: 0.25s ease-in-out;
+text-check {
+  border-bottom: 2px solid #e86a69;
+  transition: 0.25s ease-in-out;
+
+  &:hover {
+    background: rgba($color: #e86a69, $alpha: 20%);
+  }
+
+  &-style {
+    border-bottom: 2px solid #9d8eff;
 
     &:hover {
-      background: rgba($color: #e86a69, $alpha: 20%);
-    }
-
-    &-style {
-      border-bottom: 2px solid #9d8eff;
-
-      &:hover {
-        background: rgba($color: #9d8eff, $alpha: 20%) !important;
-      }
-    }
-
-    &-typographical,
-    &-grammar {
-      border-bottom: 2px solid #eeb55c;
-
-      &:hover {
-        background: rgba($color: #eeb55c, $alpha: 20%) !important;
-      }
-    }
-
-    &-misspelling {
-      border-bottom: 2px solid #e86a69;
-
-      &:hover {
-        background: rgba($color: #e86a69, $alpha: 20%) !important;
-      }
+      background: rgba($color: #9d8eff, $alpha: 20%) !important;
     }
   }
 
-  &-focused {
-    outline: none !important;
+  &-typographical,
+  &-grammar {
+    border-bottom: 2px solid #eeb55c;
+
+    &:hover {
+      background: rgba($color: #eeb55c, $alpha: 20%) !important;
+    }
+  }
+
+  &-misspelling {
+    border-bottom: 2px solid #e86a69;
+
+    &:hover {
+      background: rgba($color: #e86a69, $alpha: 20%) !important;
+    }
   }
 }
