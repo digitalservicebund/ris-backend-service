@@ -52,6 +52,7 @@ const checkCategory = async (editor: Editor, category?: string) => {
   if (store.documentUnit?.uuid == undefined) {
     return
   }
+  await store.updateDocumentUnit()
 
   const languageToolCheckResponse: ServiceResponse<TextCheckCategoryResponse> =
     await languageToolService.checkCategory(store.documentUnit?.uuid, category)

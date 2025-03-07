@@ -44,8 +44,8 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
 const emit = defineEmits<{ onEditorExpandedChanged: [boolean] }>()
+
 const borderNumberCategories = [
   longTextLabels.reasons,
   longTextLabels.caseFacts,
@@ -300,7 +300,9 @@ const buttons = computed(() => {
     ariaLabel: "Rechtschreibprüfung",
     group: "textCheck",
     isCollapsable: false,
-    callback: () => props.editor.chain().focus().textCheck().run(),
+    callback: async () => {
+      props.editor.chain().focus().textCheck().run()
+    },
   })
 
   return buttons
