@@ -4,6 +4,7 @@ import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/languageToolService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import {
+  NoIndexTagName,
   TextCheckCategoryResponse,
   TextCheckExtensionStorage,
   TextCheckTagName,
@@ -95,9 +96,8 @@ const replaceMatch = (editor: Editor, matchId: number, text: string) => {
         editor.view.dispatch(tr)
       }
     }
-
-    clearSelectedMatch(editor)
   })
+  clearSelectedMatch(editor)
 }
 
 const setMatch = (editor: Editor, matchId?: number) => {
@@ -127,6 +127,36 @@ const getExtensionStorage = (editor: Editor): TextCheckExtensionStorage => {
   return editor.storage.textCheckExtension as TextCheckExtensionStorage
 }
 
+const ignoreMatch = (editor: Editor, matchId: number) => {
+  console.log("i am here")
+  editor.state.doc.descendants((node, pos) => {
+    if (
+      node.isText &&
+      node.marks.some(
+        (mark) =>
+          mark.type.name === TextCheckTagName &&
+          mark.attrs.id === matchId.toString(),
+      )
+    ) {
+      const textCheckMark = node.marks.find(
+        (mark) =>
+          mark.type.name === TextCheckTagName &&
+          mark.attrs.id === matchId.toString(),
+      )
+
+      if (textCheckMark) {
+        const noIndexMark = editor.state.schema.marks[NoIndexTagName]?.create()
+        const tr = editor.state.tr
+          .delete(pos, pos + node.nodeSize)
+          .insert(pos, editor.state.schema.text(node.text, [noIndexMark]))
+
+        editor.view.dispatch(tr)
+      }
+    }
+  })
+  clearSelectedMatch(editor)
+}
+
 const clearMatches = (editor: Editor) => {
   getExtensionStorage(editor).matches = []
 }
@@ -138,4 +168,5 @@ export {
   setMatch,
   clearMatches,
   isTextCheckTagSelected,
+  ignoreMatch,
 }
