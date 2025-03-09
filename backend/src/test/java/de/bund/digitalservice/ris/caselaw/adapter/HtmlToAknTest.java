@@ -161,6 +161,33 @@ class HtmlToAknTest {
         StringUtils.deleteWhitespace(result));
   }
 
+  @Test
+  void images() {
+
+    String inputHtml = "<img src=\"path/to/image\" />";
+
+    String expectedXml =
+        """
+            <akn:judgmentBody>
+              <akn:motivation>
+                <akn:imgsrc="path/to/image"/>
+              </akn:motivation>
+            </akn:judgmentBody>
+            """;
+    String result =
+        getAkn(
+            Judgment.builder()
+                .judgmentBody(
+                    JudgmentBody.builder()
+                        .motivation(JaxbHtml.build(htmlStringToObjectList(inputHtml)))
+                        .build())
+                .build());
+
+    assertEquals(
+        StringUtils.deleteWhitespace(AKN_START + expectedXml + AKN_END),
+        StringUtils.deleteWhitespace(result));
+  }
+
   private static List<Object> htmlStringToObjectList(String html) {
     try {
       String wrapped = "<wrapper>" + html + "</wrapper>";
