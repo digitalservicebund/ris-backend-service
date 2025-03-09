@@ -273,6 +273,11 @@ public abstract class CommonPortalTransformer {
 
     html = html.replace("&nbsp;", "&#160;");
 
+    // Pre-process: Replace self-closing <img /> tags with <img></img> as we are using an XML parser
+    // and XML requires
+    // explicitly closed tags for elements.
+    html = html.replaceAll("<img([^>]*)/?(>)", "<img$1></img>");
+
     try {
       String wrapped = "<wrapper>" + html + "</wrapper>";
 
