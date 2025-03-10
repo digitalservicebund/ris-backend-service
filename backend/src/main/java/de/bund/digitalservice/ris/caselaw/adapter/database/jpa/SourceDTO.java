@@ -39,7 +39,11 @@ public class SourceDTO {
   @Column(name = "source_raw_value")
   private String sourceRawValue;
 
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+  // The doc unit also has a direct link to the references and is responsible for updating the
+  // references (via cascading) -> No CascadeType.MERGE!
+  @OneToOne(
+      cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+      orphanRemoval = true)
   @JoinColumn(name = "reference_id")
   private ReferenceDTO reference;
 }

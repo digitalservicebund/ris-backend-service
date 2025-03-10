@@ -641,6 +641,19 @@ class LegalPeriodicalEditionIntegrationTest {
             documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
             "DOC_NUMBER");
 
+    var reference =
+        CaselawReferenceDTO.builder()
+            .id(referenceId)
+            .documentationUnitRank(1)
+            .legalPeriodicalRawValue("ABC")
+            .citation("ABC 2024, 3")
+            .documentationUnit(docUnit)
+            .legalPeriodical(LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
+            .build();
+
+    // Reference needs to be saved manually as the source has no full cascading.
+    referenceRepository.save(reference);
+
     // add status and source
     documentationUnitRepository.save(
         docUnit.toBuilder()
@@ -649,16 +662,7 @@ class LegalPeriodicalEditionIntegrationTest {
                     List.of(
                         SourceDTO.builder()
                             .rank(1)
-                            .reference(
-                                CaselawReferenceDTO.builder()
-                                    .id(referenceId)
-                                    .documentationUnitRank(1)
-                                    .legalPeriodicalRawValue("ABC")
-                                    .citation("ABC 2024, 3")
-                                    .documentationUnit(docUnit)
-                                    .legalPeriodical(
-                                        LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
-                                    .build())
+                            .reference(reference)
                             .value(SourceValue.Z)
                             .build())))
             .build());
@@ -734,6 +738,19 @@ class LegalPeriodicalEditionIntegrationTest {
             documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
             "DOC_NUMBER");
 
+    var reference =
+        CaselawReferenceDTO.builder()
+            .id(referenceId)
+            .documentationUnitRank(1)
+            .legalPeriodicalRawValue("ABC")
+            .citation("ABC 2024, 3")
+            .documentationUnit(docUnit)
+            .legalPeriodical(LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
+            .build();
+
+    // Reference needs to be saved manually as the source has no full cascading.
+    referenceRepository.save(reference);
+
     // add status and source
     documentationUnitRepository.save(
         docUnit.toBuilder()
@@ -743,16 +760,7 @@ class LegalPeriodicalEditionIntegrationTest {
                     List.of(
                         SourceDTO.builder()
                             .rank(1)
-                            .reference(
-                                CaselawReferenceDTO.builder()
-                                    .id(referenceId)
-                                    .documentationUnitRank(1)
-                                    .legalPeriodicalRawValue("ABC")
-                                    .citation("ABC 2024, 3")
-                                    .documentationUnit(docUnit)
-                                    .legalPeriodical(
-                                        LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
-                                    .build())
+                            .reference(reference)
                             .value(SourceValue.Z)
                             .build())))
             .build());
