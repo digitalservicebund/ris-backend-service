@@ -24,8 +24,14 @@ const config = defineConfig({
   },
   projects: [
     {
-      name: "setup",
-      testMatch: /.*\.setup\.ts/,
+      name: "setup-chromium",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: /.*.setup.ts$/,
+    },
+    {
+      name: "setup-firefox",
+      use: { ...devices["Desktop Firefox"] },
+      testMatch: /.*.setup.ts$/,
     },
     {
       name: "chromium",
@@ -35,7 +41,7 @@ const config = defineConfig({
         channel: "chrome",
         storageState: "test/e2e/caselaw/.auth/user.json",
       },
-      dependencies: ["setup"],
+      dependencies: ["setup-chromium"],
     },
     {
       name: "firefox",
@@ -44,7 +50,7 @@ const config = defineConfig({
         ...devices["Desktop Firefox"],
         storageState: "test/e2e/caselaw/.auth/user.json",
       },
-      dependencies: ["setup"],
+      dependencies: ["setup-firefox"],
     },
     {
       name: "a11y",
@@ -54,7 +60,7 @@ const config = defineConfig({
         channel: "chrome",
         storageState: "test/e2e/caselaw/.auth/user.json",
       },
-      dependencies: ["setup"],
+      dependencies: ["setup-chromium"],
     },
     {
       name: "queries",
@@ -64,7 +70,7 @@ const config = defineConfig({
         channel: "chrome",
         storageState: "test/e2e/caselaw/.auth/user.json",
       },
-      dependencies: ["setup"],
+      dependencies: ["setup-chromium"],
     },
   ],
 })
