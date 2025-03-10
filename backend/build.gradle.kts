@@ -16,7 +16,7 @@ plugins {
     id("com.diffplug.spotless") version "7.0.2"
     id("org.sonarqube") version "6.0.1.5171"
     id("com.github.jk1.dependency-license-report") version "2.9"
-    id("com.gorylenko.gradle-git-properties") version "2.4.2"
+    id("com.gorylenko.gradle-git-properties") version "2.5.0"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
@@ -214,8 +214,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.14.4")
-    implementation("io.micrometer:micrometer-core:1.14.4")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.5")
+    implementation("io.micrometer:micrometer-core:1.14.5")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
