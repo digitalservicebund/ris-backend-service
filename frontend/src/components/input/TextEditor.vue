@@ -43,7 +43,7 @@ import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import { Match } from "@/types/languagetool"
 
-import "@/styles/language-tool.scss"
+import "@/styles/text-check.scss"
 
 interface Props {
   value?: string

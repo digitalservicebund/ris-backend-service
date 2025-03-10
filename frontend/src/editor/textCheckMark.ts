@@ -15,9 +15,7 @@ export const TextCheckMark = Mark.create({
       "text-check",
       {
         id: HTMLAttributes.id,
-        class: "lt",
       },
-      0,
     ]
   },
 

@@ -28,9 +28,12 @@ function getValues(replacements: Replacement[]) {
 <template>
   <div
     class="flex min-w-[432px] flex-col flex-wrap items-start justify-start gap-16 border-2 border-solid border-blue-800 bg-white p-24"
+    data-testid="text-check-modal"
   >
     <div class="flex flex-row gap-8">
-      <span class="font-bold"> {{ match.word }} </span>
+      <span class="font-bold" data-testid="text-check-modal-word">
+        {{ match.word }}
+      </span>
     </div>
 
     <p>{{ match.shortMessage || match.message }}</p>
