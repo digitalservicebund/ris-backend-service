@@ -35,6 +35,12 @@ async function verifyDocUnitOpensInNewTab(
   await expect(newTab.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
     "Anerkenntnisurteil",
   )
+
+  // Can be edited and saved after creation
+  await newTab
+    .getByLabel("Entscheidungsdatum", { exact: true })
+    .fill("01.01.2021")
+  await save(newTab)
   return documentNumber
 }
 
@@ -429,7 +435,7 @@ test.describe(
             .click()
           const newTab = await pagePromise
 
-          await test.step("Created documentation unit opens up with in new tab with correct data and reference assigned", async () => {
+          await test.step("Created documentation unit opens up with in new tab with correct data and reference assigned and is editable", async () => {
             documentNumber = await verifyDocUnitOpensInNewTab(
               newTab,
               randomFileNumber,
