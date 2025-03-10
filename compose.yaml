@@ -75,6 +75,7 @@ services:
       postgres14: { condition: service_healthy }
       redis: { condition: service_healthy }
       initialization: { condition: service_completed_successfully }
+      languagetool: { condition: service_healthy }
     ports:
       - 8080:8080
     healthcheck:
@@ -178,9 +179,18 @@ services:
       timeout: 5s
     
   languagetool:
-      image: ghcr.io/digitalservicebund/neuris-languagetool:fc89b89c8a59e783d5b1ded7ec5cd911a82ef320
-      ports:
-        - 8181:8181
+    image: ghcr.io/digitalservicebund/neuris-languagetool:b5454a8dfd2c629d3c5d4389e768080eb55e6d3c
+    extra_hosts:
+    - localhost:host-gateway
+    ports:
+      - 8181:8181
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8181/v2/languages || exit 1"]
+      interval: 5s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
+      
 
 volumes:
   gradle-cache:
