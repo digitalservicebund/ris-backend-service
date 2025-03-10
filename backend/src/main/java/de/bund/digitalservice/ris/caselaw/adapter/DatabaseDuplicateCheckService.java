@@ -57,8 +57,7 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
       }
 
     } catch (Exception e) {
-      var errorMessage = String.format("Could not check duplicates for doc unit %s", docNumber);
-      log.error(errorMessage, e);
+      log.error("Could not check duplicates for doc unit {}", docNumber, e);
     }
   }
 
@@ -68,7 +67,11 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
   @Transactional
   @Override
   public void checkAllDuplicates() {
-    this.duplicateRelationService.updateAllDuplicates();
+    try {
+      this.duplicateRelationService.updateAllDuplicates();
+    } catch (Exception e) {
+      log.error("Error while updating duplicate relations", e);
+    }
   }
 
   private List<DocumentationUnitIdDuplicateCheckDTO> findPotentialDuplicates(
