@@ -14,7 +14,11 @@ function mockSessionStore(userAuthenticated = true) {
 }
 
 describe("router's auth navigation guards", () => {
+  const assignMock = vi.fn()
+
   beforeEach(() => {
+    setActivePinia(createTestingPinia())
+
     vi.mock("~pages", () => ({
       default: [
         {
@@ -36,14 +40,13 @@ describe("router's auth navigation guards", () => {
       ],
     }))
 
-    setActivePinia(createTestingPinia())
-
-    afterEach(() => void vi.resetAllMocks())
+    Object.defineProperty(window, "location", {
+      value: {
+        ...window.location,
+        assign: assignMock,
+      },
+    })
   })
-
-  const assignMock = vi.fn()
-  window.location = { assign: assignMock as Location["assign"] } as Location
-  window.location.href = "/"
 
   afterEach(() => {
     vi.resetAllMocks()
