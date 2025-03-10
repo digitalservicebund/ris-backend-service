@@ -192,8 +192,8 @@ SELECT drel.id_a, drel.id_b,
 FROM duplicate_relations_view drel
          LEFT JOIN incremental_migration.duplicate_relation ON drel.id_a = duplicate_relation.documentation_unit_id1 AND
                                                                drel.id_b = duplicate_relation.documentation_unit_id2
-         LEFT JOIN incremental_migration.decision d1 ON drel.id_a = d1.id
-         LEFT JOIN incremental_migration.decision d2 ON drel.id_b = d2.id
+         LEFT JOIN incremental_migration.documentation_unit d1 ON drel.id_a = d1.id
+         LEFT JOIN incremental_migration.documentation_unit d2 ON drel.id_b = d2.id
 WHERE duplicate_relation.documentation_unit_id1 IS NULL;
 """,
       nativeQuery = true)
