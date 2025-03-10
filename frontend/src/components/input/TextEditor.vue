@@ -23,6 +23,7 @@ import { TextAreaInputAttributes } from "@/components/input/types"
 import TextCheckModal from "@/components/text-check/TextCheckModal.vue"
 import {
   BorderNumber,
+  borderNumberCategories,
   BorderNumberContent,
   BorderNumberNumber,
 } from "@/editor/borderNumber"
@@ -164,9 +165,9 @@ const editorStyleClasses = computed(() => {
     ? "plain-border-number"
     : ""
 
-  if (editorExpanded.value) {
-    return `h-640 ${plainBorderNumberStyle} p-4`
-  }
+  const withBorderNumbers = borderNumberCategories.includes(props.ariaLabel)
+    ? "with-border-numbers"
+    : ""
 
   const fieldSizeClasses = {
     max: "h-full",
@@ -174,10 +175,11 @@ const editorStyleClasses = computed(() => {
     medium: "h-160",
     small: "h-96",
   } as const
+  const size = editorExpanded.value
+    ? "h-640"
+    : (fieldSizeClasses[props.fieldSize] ?? "")
 
-  return fieldSizeClasses[props.fieldSize]
-    ? `${fieldSizeClasses[props.fieldSize]} ${plainBorderNumberStyle} p-4`
-    : undefined
+  return `${size} ${plainBorderNumberStyle} ${withBorderNumbers} p-4`
 })
 
 const buttonsDisabled = computed(
