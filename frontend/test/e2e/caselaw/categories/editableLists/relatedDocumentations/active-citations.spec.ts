@@ -242,5 +242,8 @@ test.describe("active citations", () => {
     await expect(page.getByTestId("Orientierungssatz")).toHaveText(
       `Teilweise Parallelentscheidung zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}.`,
     )
+    await expect(
+      page.getByRole("button", { name: "O-Satz generieren" }),
+    ).toBeDisabled()
   })
 })
