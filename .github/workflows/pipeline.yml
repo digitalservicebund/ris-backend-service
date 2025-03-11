@@ -451,38 +451,13 @@ jobs:
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  prep-playwright-tests:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ./frontend/package.json
-          cache: npm
-          cache-dependency-path: ./frontend/package-lock.json
-      - name: Get Playwright version
-        working-directory: ./frontend
-        run: echo "PLAYWRIGHT_VERSION=$(jq -r '.packages["node_modules/@playwright/test"].version' package-lock.json)" >> $GITHUB_ENV
-      - name: Cache browser binaries
-        id: cache-browser-binaries
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-      - name: Install browsers
-        # if: steps.cache-browser-binaries.outputs.cache-hit != 'true'
-        run: |
-          npx --yes playwright install --with-deps chromium firefox
-        working-directory: ./frontend
 
   e2e-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
     concurrency:
       group: deploy-staging
       cancel-in-progress: true
-    needs: [ deploy-staging, prep-playwright-tests ]
+    needs: [ deploy-staging ]
     # We do not include the matrix directly, so that the concurrency group does not apply to each matrix job individually
     uses: ./.github/workflows/e2e_matrix.yml
     secrets: inherit
@@ -492,7 +467,7 @@ jobs:
     concurrency:
       group: deploy-staging
       cancel-in-progress: true
-    needs: [ e2e-tests, prep-playwright-tests ]
+    needs: [ e2e-tests ]
     uses: ./.github/workflows/_playwright-test.yml
     with:
       project: "queries"
