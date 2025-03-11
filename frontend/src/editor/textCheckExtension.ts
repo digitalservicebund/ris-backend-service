@@ -2,6 +2,7 @@ import { Extension } from "@tiptap/core"
 import {
   checkCategory,
   handleSelection,
+  ignoreMatch,
   replaceMatch,
   setMatch,
 } from "@/editor/commands/textCheckCommands"
@@ -18,6 +19,7 @@ declare module "@tiptap/core" {
       resetSelectedMatch: () => ReturnType
       handleMatchSelection: () => ReturnType
       acceptMatch: (matchId: number, text: string) => ReturnType
+      ignoreMatch: (matchId: number) => ReturnType
     }
   }
 }
@@ -49,7 +51,6 @@ export const TextCheckExtension = Extension.create<
           return true
         },
       handleMatchSelection: () => handleSelection,
-
       setSelectedMatch:
         (matchId?: number) =>
         ({ editor }) => {
@@ -61,6 +62,15 @@ export const TextCheckExtension = Extension.create<
         ({ editor }) => {
           if (matchId) {
             replaceMatch(editor, matchId, text)
+            return true
+          }
+          return false
+        },
+      ignoreMatch:
+        (matchId: number) =>
+        ({ editor }) => {
+          if (matchId) {
+            ignoreMatch(editor, matchId)
             return true
           }
           return false
