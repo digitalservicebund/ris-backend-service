@@ -164,13 +164,13 @@ class HtmlToAknTest {
   @Test
   void images() {
 
-    String inputHtml = "<img src=\"path/to/image\" />";
+    String inputHtml = "<img alt=\"alt text\" height=\"70px\" src=\"path/to/image\" />";
 
     String expectedXml =
         """
             <akn:judgmentBody>
               <akn:motivation>
-                <akn:imgsrc="path/to/image"/>
+                <akn:imgalt="alttext"height="70px"src="path/to/image"/>
               </akn:motivation>
             </akn:judgmentBody>
             """;
