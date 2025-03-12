@@ -35,9 +35,37 @@ test.describe("category import", () => {
         ).toBeVisible()
       })
 
+      await test.step("search only possible with docnumber of 13 characters", async () => {
+        // with 12 characters
+        await page
+          .getByRole("textbox", { name: "Dokumentnummer Eingabefeld" })
+          .fill("123456789101")
+        await expect(
+          page.getByRole("button", { name: "Dokumentationseinheit laden" }),
+        ).toBeDisabled()
+        // with 13 characters
+        await page
+          .getByRole("textbox", { name: "Dokumentnummer Eingabefeld" })
+          .fill("1234567891012")
+        await expect(
+          page.getByRole("button", { name: "Dokumentationseinheit laden" }),
+        ).toBeEnabled()
+        // with 14 characters
+        await page
+          .getByRole("textbox", { name: "Dokumentnummer Eingabefeld" })
+          .fill("12345678910123")
+        await expect(
+          page.getByRole("button", { name: "Dokumentationseinheit laden" }),
+        ).toBeDisabled()
+      })
+
       await test.step("search for document unit displays core data", async () => {
         await searchForDocumentUnitToImport(page, "YYTestDoc0013")
-        await expect(page.getByText("fileNumber5")).toBeVisible()
+        await expect(
+          page.getByText(
+            "BVerfG, 02.02.2080, fileNumber5, allgemeine Geschäftsbedingungen",
+          ),
+        ).toBeVisible()
       })
     },
   )

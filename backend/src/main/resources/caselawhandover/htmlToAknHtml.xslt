@@ -45,9 +45,6 @@
         <xsl:apply-templates mode="firstPass"/>
     </xsl:template>
 
-    <!--Case Law team handover: decide how to transform these internal Juris image markers into html links -->
-    <xsl:template match="hfj" mode="firstPass"/>
-
     <!--Case Law team handover: Validate that removing this tag is okay. Example caselas is WBRE410020500
     The current web view https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX%3A62013CA0192
     doesn't have the <small> tag-->
@@ -92,7 +89,7 @@
                       self::akn:embeddedStructure or self::akn:introduction or self::akn:motivation or
                       self::akn:subFlow or self::blockquote or self::th or self::div]/
                       *[self::strong or self::b or self::em or self::i or self::br or self::ins or self::u or
-                      self::del or self::span or self::fussnote or self::jurimg or self::sup or self::sub or
+                      self::del or self::span or self::fussnote or self::sup or self::sub or
                       self::border-number-link]">
 
         <xsl:variable name="tagName">
@@ -109,9 +106,6 @@
                 <xsl:when test="name() ='fussnote'">
                     <xsl:value-of select="'span'"/>
                 </xsl:when>
-                <xsl:when test="name() ='jurimg'">
-                    <xsl:value-of select="'img'"/>
-                </xsl:when>
                 <xsl:when test="name() ='border-number-link'">
                     <xsl:value-of select="'borderNumberLink'"/>
                 </xsl:when>
@@ -124,9 +118,6 @@
         <!-- Create a block with a dynamic tag name -->
         <akn:block name="{$tagName}Wrapper">
             <xsl:choose>
-                <xsl:when test="name() ='jurimg'">
-                    <xsl:call-template name="jurimgTemplate"/>
-                </xsl:when>
                 <xsl:when test="name() ='border-number-link'">
                     <xsl:call-template name="borderNumberLinkTemplate"/>
                 </xsl:when>
@@ -245,31 +236,6 @@
         <xsl:element name="ris:{name()}">
             <xsl:apply-templates select="@* | node()"/>
         </xsl:element>
-    </xsl:template>
-
-    <!--Conversion of jurimg elements:
-    *The element is converted to an akn:img element
-    *path attribute is converted to src attribute and is mandatory
-    *name attribute is converted to title attribute
-    *linktext attribute dropped when equal to alt attribute and causes a validation error when not -->
-    <xsl:template match="jurimg">
-        <xsl:call-template name="jurimgTemplate"/>
-    </xsl:template>
-    <xsl:template name="jurimgTemplate">
-        <xsl:if test="not(@path)">
-            <akn:invalidImgMissingSrc/>
-        </xsl:if>
-        <xsl:if test="@linktext and not(@linktext=@alt)">
-            <akn:invalidLinkTextAttribute/>
-        </xsl:if>
-        <akn:img src="{@path}">
-            <xsl:apply-templates select="@*[not(name()='path')][not(name()='name')][not(name()='linktext')] | node()"/>
-            <xsl:if test="@name">
-                <xsl:attribute name="title">
-                    <xsl:value-of select="@name" />
-                </xsl:attribute>
-            </xsl:if>
-        </akn:img>
     </xsl:template>
 
     <!--Case Law team handover: akn doesn't support <cite>. Make sure <b> is appropriate.

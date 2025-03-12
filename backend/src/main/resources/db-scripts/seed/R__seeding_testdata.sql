@@ -30,32 +30,15 @@ where
         from
             incremental_migration.procedure
         where
-            name LIKE 'test_%'
+            name LIKE 'test\_%'
     );
 
 -- Delete test-related records from procedure table
 delete from
     incremental_migration.procedure
 where
-    name LIKE 'test_%';
+    name LIKE 'test\_%';
 
--- Everytime the application starts, any test procedures that may have accumulated will be deleted
-delete from
-  incremental_migration.documentation_unit_procedure
-where
-  procedure_id IN (
-    SELECT
-      id
-    from
-      incremental_migration.procedure
-    where
-      name LIKE 'test_%'
-  );
-
-delete from
-  incremental_migration.procedure
-where
-  name LIKE 'test_%';
 
 INSERT INTO
   incremental_migration.documentation_unit (
