@@ -194,6 +194,9 @@ FROM duplicate_relations_view drel
                                                                drel.id_b = duplicate_relation.documentation_unit_id2
          LEFT JOIN incremental_migration.documentation_unit d1 ON drel.id_a = d1.id
          LEFT JOIN incremental_migration.documentation_unit d2 ON drel.id_b = d2.id
+         -- proceeding decisions need to be filtered out -> only consider decisions
+         INNER JOIN incremental_migration.decision dec1 ON dec1.id = drel.id_a
+         INNER JOIN incremental_migration.decision dec2 ON dec2.id = drel.id_b
 WHERE duplicate_relation.documentation_unit_id1 IS NULL;
 """,
       nativeQuery = true)
