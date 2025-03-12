@@ -31,6 +31,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
@@ -226,6 +228,41 @@ class DuplicateCheckFullIntegrationTest {
       duplicateCheckService.checkAllDuplicates();
 
       var foundDocUnit = documentationUnitService.getByUuid(docUnitWithoutFileNumbers.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
+          .isEmpty();
+    }
+
+    @Test
+    void checkDuplicates_withPendingProceeding_shouldDoNothing()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var pendingProceedingDTO =
+          PendingProceedingDTO.builder()
+              .documentationOffice(documentationOffice)
+              .date(LocalDate.of(2023, 12, 11))
+              .documentNumber("DocumentNumb1")
+              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+              .build();
+      var decisionDTO =
+          DecisionDTO.builder()
+              .documentationOffice(documentationOffice)
+              .date(LocalDate.of(2023, 12, 11))
+              .documentNumber("DocumentNumb2")
+              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+              .build();
+
+      repository.save(pendingProceedingDTO);
+      var decision = repository.save(decisionDTO);
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkAllDuplicates();
+
+      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();

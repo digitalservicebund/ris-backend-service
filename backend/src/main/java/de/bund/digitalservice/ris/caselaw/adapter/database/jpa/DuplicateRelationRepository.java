@@ -116,8 +116,9 @@ WITH
         SELECT documentation_unit_id as id, value
         FROM incremental_migration.deviating_date
         UNION ALL
-        SELECT id, date as value
-        FROM incremental_migration.documentation_unit),
+        SELECT du.id, du.date as value
+        FROM incremental_migration.documentation_unit du
+        RIGHT JOIN incremental_migration.decision d ON d.id = du.id),
      all_courts as(
         SELECT documentation_unit_id as id, court.id as value
         FROM incremental_migration.deviating_court
@@ -129,12 +130,14 @@ WITH
                 END
             )
         UNION ALL
-        SELECT id, court_id as value
-        FROM incremental_migration.documentation_unit
+        SELECT du.id, court_id as value
+        FROM incremental_migration.documentation_unit du
+        RIGHT JOIN incremental_migration.decision d ON d.id = du.id
         WHERE court_id IS NOT NULL),
      all_file_numbers as (
         SELECT documentation_unit_id as id, UPPER(value) as value
         FROM incremental_migration.file_number
+        RIGHT JOIN incremental_migration.decision d ON d.id = documentation_unit_id
         -- File numbers as "XX" lead to explosion of duplicate relationships
         WHERE value NOT IN (SELECT value
                             FROM incremental_migration.file_number
