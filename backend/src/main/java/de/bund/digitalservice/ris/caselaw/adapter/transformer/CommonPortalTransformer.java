@@ -266,17 +266,16 @@ public abstract class CommonPortalTransformer {
     return input;
   }
 
-  protected List<Object> htmlStringToObjectList(String html) {
+  public List<Object> htmlStringToObjectList(String html) {
     if (StringUtils.isBlank(html)) {
       return Collections.emptyList();
     }
 
     html = html.replace("&nbsp;", "&#160;");
 
-    // Pre-process: Replace self-closing <img /> tags with <img></img> as we are using an XML parser
-    // and XML requires
-    // explicitly closed tags for elements.
-    html = html.replaceAll("<img([^>]*)/?(>)", "<img$1></img>");
+    // Pre-process: Replace unclosed <img> tags with <img/> as we are using an XML parser
+    // and XML requires explicitly closed tags for elements.
+    html = html.replaceAll("(<img\\b[^>]*?)(?<!/)>", "$1/>");
 
     try {
       String wrapped = "<wrapper>" + html + "</wrapper>";
