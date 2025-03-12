@@ -20,7 +20,8 @@ test.describe(
         tag: ["@RISDEV-6098"],
       },
       async ({ page, edition, prefilledDocumentUnit }) => {
-        const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] ?? ""
+        const fileNumber =
+          prefilledDocumentUnit.coreData?.fileNumbers?.[0] ?? ""
         const suffix = edition.suffix || ""
         await navigateToPeriodicalReferences(page, edition.id || "")
 
@@ -138,7 +139,14 @@ test.describe(
             "[aria-label='Dokumenttyp Literaturfundstelle']",
             "Anmerkung",
           )
+          // Listen for the request triggered by "Fundstelle vermerken" and wait for it to finish, so the fixture cleanup does not run into concurrency issues
+          const putRequestPromise = page.waitForRequest((request) =>
+            request.url().includes("api/v1/caselaw/legalperiodicaledition"),
+          )
           await page.getByLabel("Fundstelle vermerken").click()
+
+          await putRequestPromise
+
           await expect(
             page.getByText(`MMG 2024, 7${suffix}, Einstein, Albert (Ean)`),
           ).toBeVisible()
@@ -296,7 +304,14 @@ test.describe(
         })
 
         await test.step("Click on delete removes the entry again", async () => {
+          // Listen for the request triggered by "Eintrag löschen" and wait for it to finish, so the fixture cleanup does not run into concurrency issues
+          const deleteRequestPromise = page.waitForRequest((request) =>
+            request.url().includes("api/v1/caselaw/legalperiodicaledition"),
+          )
           await page.getByLabel("Eintrag löschen").click()
+
+          await deleteRequestPromise
+
           // 4 references all in summary list mode
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),

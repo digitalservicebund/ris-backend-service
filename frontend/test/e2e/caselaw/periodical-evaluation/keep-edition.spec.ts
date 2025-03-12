@@ -42,7 +42,14 @@ test.describe(
 
         await fillInput(page, "Zitatstelle *", "123")
         await fillInput(page, "Klammernzusatz", "L")
+
+        const putRequestPromise = page.waitForRequest((request) =>
+          request.url().includes("api/v1/caselaw/legalperiodicaledition"),
+        )
         await page.getByLabel("Treffer übernehmen").click()
+
+        await putRequestPromise
+
         await expect(
           page.getByText(`MMG 2024, 123${suffix} (L)`, { exact: true }),
         ).toHaveCount(1)
@@ -72,7 +79,13 @@ test.describe(
           "[aria-label='Dokumenttyp Literaturfundstelle']",
           "Anmerkung",
         )
+
+        const putRequestPromise = page.waitForRequest((request) =>
+          request.url().includes("api/v1/caselaw/legalperiodicaledition"),
+        )
         await page.getByLabel("Treffer übernehmen").click()
+
+        await putRequestPromise
 
         await expect(
           page.getByText(`MMG 2024, 124${suffix}, Berg, Peter (Ean)`, {

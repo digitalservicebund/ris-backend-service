@@ -60,6 +60,12 @@ export const caselawTest = test.extend<MyFixtures>({
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
     })
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create prefilledDocumentUnit: ${response.status()} ${response.statusText()}`,
+      )
+    }
     const prefilledDocumentUnit = await response.json()
 
     const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
@@ -125,6 +131,12 @@ export const caselawTest = test.extend<MyFixtures>({
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
       },
     )
+
+    if (!updateResponse.ok()) {
+      throw new Error(
+        `Failed to update prefilledDocumentUnit: ${response.status()} ${response.statusText()}`,
+      )
+    }
 
     await use(await updateResponse.json())
 
@@ -794,7 +806,7 @@ export const caselawTest = test.extend<MyFixtures>({
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
       },
     )
-    await response.json()
+
     if (!response.ok()) {
       throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
       ${response.status()} ${response.statusText()}`)
@@ -937,7 +949,7 @@ export const caselawTest = test.extend<MyFixtures>({
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
       },
     )
-    await response.json()
+
     if (!response.ok()) {
       throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
       ${response.status()} ${response.statusText()}`)

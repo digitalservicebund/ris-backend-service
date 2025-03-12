@@ -18,8 +18,7 @@ test.describe(
     tag: "@RISDEV-4264",
   },
   () => {
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip("Periodicals overview with a list of editions", async ({
+    test("Periodicals overview with a list of editions", async ({
       page,
       edition,
     }) => {
@@ -63,7 +62,14 @@ test.describe(
           },
         )
         await expect(periodical).toBeVisible()
+
+        const requestPromise = page.waitForRequest((request) =>
+          request.url().includes("api/v1/caselaw/legalperiodicaledition"),
+        )
         await periodical.click()
+
+        await requestPromise
+
         await waitForInputValue(page, "[aria-label='Periodikum']", "MMG")
       })
 
@@ -177,11 +183,14 @@ test.describe(
 
         try {
           await test.step("'Übernehmen und Fortfahren' saved the edition and replaces url with new edition id", async () => {
+            const requestPromise = page.waitForRequest((request) =>
+              request.url().includes("api/v1/caselaw/legalperiodicaledition"),
+            )
             await page.getByLabel("Übernehmen und Fortfahren").click()
+            await requestPromise
 
             await page.waitForURL(
               /\/caselaw\/periodical-evaluation\/[0-9a-fA-F-]{36}\/references/,
-              { timeout: 5_000 },
             )
 
             await expect(
@@ -231,17 +240,22 @@ test.describe(
       },
     )
 
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip("An edition can't be deleted as long as it has references", async ({
+    test("An edition can't be deleted as long as it has references", async ({
       page,
       editionWithReferences,
     }) => {
       await navigateToPeriodicalEvaluation(page)
 
       await fillInput(page, "Periodikum", "MMG")
+
+      const requestPromise = page.waitForRequest((request) =>
+        request.url().includes("api/v1/caselaw/legalperiodicaledition"),
+      )
       await page
         .getByText("MMG | Medizin Mensch Gesellschaft", { exact: true })
         .click()
+
+      await requestPromise
 
       const line = page.getByText(
         (editionWithReferences.name || "") + "MMG" + "4" + formattedDate,
