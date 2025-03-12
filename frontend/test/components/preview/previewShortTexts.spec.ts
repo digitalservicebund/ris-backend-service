@@ -1,7 +1,13 @@
 import { render, screen } from "@testing-library/vue"
+import { beforeAll } from "vitest"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
 import { ShortTexts } from "@/domain/documentUnit"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
+
+beforeAll(() => {
+  useFeatureToggleServiceMock()
+})
 
 function renderComponent(shortTexts: ShortTexts) {
   return render(PreviewShortTexts, {
@@ -16,6 +22,7 @@ function renderComponent(shortTexts: ShortTexts) {
     },
   })
 }
+
 describe("preview short texts", () => {
   test("renders all short texts", async () => {
     renderComponent({

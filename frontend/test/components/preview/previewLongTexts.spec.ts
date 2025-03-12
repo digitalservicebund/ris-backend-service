@@ -3,6 +3,9 @@ import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
 import { LongTexts } from "@/domain/documentUnit"
 import ParticipatingJudge from "@/domain/participatingJudge"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
+
+useFeatureToggleServiceMock()
 
 function renderComponent(longTexts: LongTexts) {
   return render(PreviewLongTexts, {
@@ -16,6 +19,7 @@ function renderComponent(longTexts: LongTexts) {
     },
   })
 }
+
 describe("preview long texts", () => {
   test("renders all long texts", async () => {
     renderComponent({

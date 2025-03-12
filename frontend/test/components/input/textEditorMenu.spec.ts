@@ -2,16 +2,21 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen, waitFor } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import { vi } from "vitest"
+import { beforeAll, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
-mockDocumentForProsemirror()
-vi.mock("@/composables/useInternalUser", () => {
-  return {
-    useInternalUser: () => true,
-  }
+beforeAll(() => {
+  mockDocumentForProsemirror()
+  useFeatureToggleServiceMock()
+
+  vi.mock("@/composables/useInternalUser", () => {
+    return {
+      useInternalUser: () => true,
+    }
+  })
 })
 
 describe("text editor toolbar", async () => {

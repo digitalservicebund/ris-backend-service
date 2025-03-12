@@ -1,46 +1,64 @@
 /* eslint-disable testing-library/no-node-access */
-import { render, screen, fireEvent } from "@testing-library/vue"
+import { createTestingPinia } from "@pinia/testing"
+import { userEvent } from "@testing-library/user-event"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
+
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
+import { TextAreaInputAttributes } from "@/components/input/types"
 import { longTextLabels } from "@/domain/documentUnit"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
+
+useFeatureToggleServiceMock()
 
 describe("text editor", async () => {
-  const router = createRouter({
-    history: createWebHistory(),
-    routes: [
-      {
-        path: "/",
-        name: "home",
-        component: {},
+  const renderComponent = async (options?: {
+    ariaLabel?: string
+    editable?: boolean
+    value?: string
+    fieldSize?: TextAreaInputAttributes["fieldSize"]
+  }) => {
+    userEvent.setup()
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        {
+          path: "/",
+          name: "home",
+          component: {},
+        },
+        {
+          path: "/caselaw/documentUnit/:documentNumber/categories#coreData",
+          name: "caselaw-documentUnit-documentNumber-categories#coreData",
+          component: {},
+        },
+      ],
+    })
+    render(TextEditor, {
+      props: {
+        value: options?.value,
+        ariaLabel: options?.ariaLabel,
+        editable: options?.editable,
+        fieldSize: options?.fieldSize,
       },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/categories#coreData",
-        name: "caselaw-documentUnit-documentNumber-categories#coreData",
-        component: {},
-      },
-    ],
-  })
+      global: { plugins: [router, createTestingPinia()] },
+    })
+
+    await flushPromises()
+  }
 
   test("renders text editor with default props", async () => {
-    render(TextEditor, {
-      props: {},
-      global: { plugins: [router] },
-    })
+    await renderComponent()
 
     expect(screen.getAllByTestId("Editor Feld").length).toBe(1)
   })
 
   test("renders text editor with props", async () => {
-    render(TextEditor, {
-      props: {
-        value: "Test Value",
-        ariaLabel: "Gründe",
-      },
-      global: { plugins: [router] },
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: "Gründe",
     })
-
-    await flushPromises()
 
     expect(screen.getByText("Test Value")).toBeInTheDocument()
     expect(screen.getByTestId("Gründe")).toBeInTheDocument()
@@ -53,25 +71,17 @@ describe("text editor", async () => {
     ["small", "h-96"],
     [undefined, "h-160"],
   ] as const)("renders %s field with correct class", async (a, expected) => {
-    render(TextEditor, {
-      props: { fieldSize: a },
-      global: { plugins: [router] },
-    })
+    await renderComponent({ fieldSize: a })
 
     expect(await screen.findByTestId("Editor Feld")).toHaveClass(expected)
   })
 
   test("enable buttons on focus", async () => {
-    render(TextEditor, {
-      props: {
-        value: "Test Value",
-        ariaLabel: "Gründe",
-        editable: true,
-      },
-      global: { plugins: [router] },
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: "Gründe",
+      editable: true,
     })
-
-    await flushPromises()
 
     const editorField = screen.getByTestId("Gründe")
 
@@ -86,16 +96,11 @@ describe("text editor", async () => {
   })
 
   test("disable buttons on blur", async () => {
-    render(TextEditor, {
-      props: {
-        value: "Test Value",
-        ariaLabel: "Gründe",
-        editable: true,
-      },
-      global: { plugins: [router] },
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: "Gründe",
+      editable: true,
     })
-
-    await flushPromises()
 
     const editorField = screen.getByTestId("Gründe")
 
@@ -123,16 +128,11 @@ describe("text editor", async () => {
    * The test should be continuosly improved to very that all buttons exist.
    */
   it("shows all necessary editor buttons", async () => {
-    render(TextEditor, {
-      props: {
-        value: "Test Value",
-        ariaLabel: "Gründe",
-        editable: true,
-      },
-      global: { plugins: [router] },
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: "Gründe",
+      editable: true,
     })
-
-    await flushPromises()
 
     const editorField = screen.getByTestId("Gründe")
 
@@ -168,16 +168,11 @@ describe("text editor", async () => {
   })
 
   it("shows all table buttons after menu is expanded", async () => {
-    render(TextEditor, {
-      props: {
-        value: "Test Value",
-        ariaLabel: "Gründe",
-        editable: true,
-      },
-      global: { plugins: [router] },
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: "Gründe",
+      editable: true,
     })
-
-    await flushPromises()
 
     const editorField = screen.getByTestId("Gründe")
 
@@ -214,16 +209,11 @@ describe("text editor", async () => {
     longTextLabels.participatingJudges,
     longTextLabels.outline,
   ])("hides add border number button for category %s", async (category) => {
-    render(TextEditor, {
-      props: {
-        value: "Test Value",
-        ariaLabel: category,
-        editable: true,
-      },
-      global: { plugins: [router] },
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: category,
+      editable: true,
     })
-
-    await flushPromises()
 
     const editorField = screen.getByTestId(category!)
 
@@ -243,16 +233,11 @@ describe("text editor", async () => {
     longTextLabels.dissentingOpinion,
     longTextLabels.otherLongText,
   ])("shows add border number button for category %s", async (category) => {
-    render(TextEditor, {
-      props: {
-        value: "Test Value",
-        ariaLabel: category,
-        editable: true,
-      },
-      global: { plugins: [router] },
+    await renderComponent({
+      value: "Test Value",
+      ariaLabel: category,
+      editable: true,
     })
-
-    await flushPromises()
 
     const editorField = screen.getByTestId(category!)
 

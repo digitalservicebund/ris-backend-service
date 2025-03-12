@@ -1,7 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { describe } from "vitest"
+import { beforeAll, describe } from "vitest"
 import { createRouter, createWebHistory, Router } from "vue-router"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import Attachment from "@/domain/attachment"
@@ -9,8 +9,13 @@ import DocumentUnit from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
 import featureToggleService from "@/services/featureToggleService"
 import { SelectablePanelContent } from "@/types/panelContentMode"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 let router: Router
+
+beforeAll(() => {
+  useFeatureToggleServiceMock()
+})
 
 function renderComponent(
   options: {

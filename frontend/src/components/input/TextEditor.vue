@@ -41,9 +41,10 @@ import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
+import FeatureToggleService from "@/services/featureToggleService"
 import { Match } from "@/types/languagetool"
 
-import "@/styles/language-tool.scss"
+import "@/styles/text-check.scss"
 
 interface Props {
   value?: string
@@ -72,6 +73,7 @@ const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
 
+const textCheckEnabled = ref<boolean>()
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
@@ -279,6 +281,12 @@ const resizeObserver = new ResizeObserver((entries) => {
   }
 })
 
+onMounted(async () => {
+  textCheckEnabled.value = (
+    await FeatureToggleService.isEnabled("neuris.text-check")
+  ).data
+})
+
 defineExpose({ jumpToMatch })
 </script>
 
@@ -302,6 +310,7 @@ defineExpose({ jumpToMatch })
       :container-width="containerWidth"
       :editor="editor"
       :editor-expanded="editorExpanded"
+      :text-check-enabled="textCheckEnabled"
       @on-editor-expanded-changed="
         (isExpanded) => (editorExpanded = isExpanded)
       "
