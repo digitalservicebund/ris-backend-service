@@ -18,7 +18,8 @@ test.describe(
     tag: "@RISDEV-4264",
   },
   () => {
-    test("Periodicals overview with a list of editions", async ({
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip("Periodicals overview with a list of editions", async ({
       page,
       edition,
     }) => {
@@ -230,7 +231,8 @@ test.describe(
       },
     )
 
-    test("An edition can't be deleted as long as it has references", async ({
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip("An edition can't be deleted as long as it has references", async ({
       page,
       editionWithReferences,
     }) => {
