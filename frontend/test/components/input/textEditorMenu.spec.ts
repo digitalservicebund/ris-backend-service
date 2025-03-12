@@ -6,12 +6,16 @@ import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
-mockDocumentForProsemirror()
-vi.mock("@/composables/useInternalUser", () => {
-  return {
-    useInternalUser: () => true,
-  }
+beforeAll(async () => {
+  mockDocumentForProsemirror()
+  vi.mock("@/composables/useInternalUser", () => {
+    return {
+      useInternalUser: () => true,
+    }
+  })
+  useFeatureToggleServiceMock()
 })
 
 describe("text editor toolbar", async () => {
