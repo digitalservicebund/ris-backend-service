@@ -21,6 +21,7 @@ import { computed, onMounted, ref, watch } from "vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import TextCheckModal from "@/components/text-check/TextCheckModal.vue"
+import TextCheckStatus from "@/components/text-check/TextCheckStatus.vue"
 import {
   BorderNumber,
   BorderNumberContent,
@@ -28,7 +29,7 @@ import {
 } from "@/editor/borderNumber"
 import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
-import { isTextCheckTagSelected } from "@/editor/commands/textCheckCommands"
+import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { EventHandler } from "@/editor/EventHandler"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
@@ -42,7 +43,7 @@ import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import FeatureToggleService from "@/services/featureToggleService"
-import { Match } from "@/types/languagetool"
+import { Match, TextCheckExtensionStorage } from "@/types/languagetool"
 
 import "@/styles/text-check.scss"
 
@@ -158,8 +159,6 @@ const editor: Editor = new Editor({
 
 const containerWidth = ref<number>()
 
-const selectedMatch = ref<Match>()
-
 const editorExpanded = ref(false)
 const editorStyleClasses = computed(() => {
   const plainBorderNumberStyle = props.plainBorderNumbers
@@ -186,12 +185,18 @@ const buttonsDisabled = computed(
   () => !(props.editable && (hasFocus.value || isHovered.value)),
 )
 
+const textCheckService = computed(() => {
+  const textCheckExtension = editor.storage
+    .textCheckExtension as TextCheckExtensionStorage
+  return textCheckExtension.service
+})
+
 /**
  * A function to determine rather a match menu should be shown
  */
 const shouldShowBubbleMenu = (): boolean => {
   if (editor) {
-    return isTextCheckTagSelected(editor)
+    return NeurisTextCheckService.isTextCheckTagSelected(editor)
   } else {
     return false
   }
@@ -262,13 +267,7 @@ watch(
   },
 )
 
-watch(
-  () => editor.storage.textCheckExtension?.selectedMatch,
-  (newMatch) => {
-    selectedMatch.value = newMatch
-  },
-  { immediate: true },
-)
+const selectedMatch = computed(() => textCheckService.value.selectedMatch.value)
 
 onMounted(async () => {
   const editorContainer = document.querySelector(".editor")
@@ -340,5 +339,6 @@ defineExpose({ jumpToMatch })
         />
       </BubbleMenu>
     </div>
+    <TextCheckStatus v-if="textCheck" :text-check-service="textCheckService" />
   </div>
 </template>

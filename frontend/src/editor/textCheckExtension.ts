@@ -1,9 +1,7 @@
 import { Extension } from "@tiptap/core"
 import {
-  checkCategory,
-  handleSelection,
-  replaceMatch,
-  setMatch,
+  NeurisTextCheckService,
+  TextCheckService,
 } from "@/editor/commands/textCheckCommands"
 import {
   TextCheckExtensionOptions,
@@ -30,8 +28,7 @@ export const TextCheckExtension = Extension.create<
 
   addStorage() {
     return {
-      matches: [],
-      selectedMatch: undefined,
+      service: new NeurisTextCheckService(),
     }
   },
   addOptions() {
@@ -45,22 +42,39 @@ export const TextCheckExtension = Extension.create<
       textCheck:
         () =>
         ({ editor }) => {
-          void checkCategory(editor, this.options.category)
+          const service = editor.storage.textCheckExtension
+            .service as TextCheckService
+
+          void service.checkCategory(editor, this.options.category)
           return true
         },
-      handleMatchSelection: () => handleSelection,
+      handleMatchSelection:
+        () =>
+        ({ state, editor }) => {
+          const service = editor.storage.textCheckExtension
+            .service as TextCheckService
+
+          service.handleSelection(editor, state)
+        },
 
       setSelectedMatch:
         (matchId?: number) =>
         ({ editor }) => {
-          setMatch(editor, matchId)
+          const service = editor.storage.textCheckExtension
+            .service as TextCheckService
+
+          service.setMatch(editor, matchId)
+
           return true
         },
       acceptMatch:
         (matchId: number, text: string) =>
         ({ editor }) => {
           if (matchId) {
-            replaceMatch(editor, matchId, text)
+            const service = editor.storage.textCheckExtension
+              .service as TextCheckService
+
+            service.replaceMatch(editor, matchId, text)
             return true
           }
           return false
