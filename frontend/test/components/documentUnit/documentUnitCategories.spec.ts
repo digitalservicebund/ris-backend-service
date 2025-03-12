@@ -6,6 +6,9 @@ import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
+
+useFeatureToggleServiceMock()
 
 function renderComponent() {
   const user = userEvent.setup()

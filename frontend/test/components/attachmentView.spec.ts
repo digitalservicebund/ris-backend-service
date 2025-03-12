@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/vue"
 import AttachmentView from "@/components/AttachmentView.vue"
 import attachmentService from "@/services/attachmentService"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 describe("attachments are shown in side panel", () => {
   test("panel shows content", async () => {
@@ -8,6 +9,8 @@ describe("attachments are shown in side panel", () => {
     vi.spyOn(attachmentService, "getAttachmentAsHtml").mockImplementation(() =>
       Promise.resolve({ status: 200, data: { html: content } }),
     )
+
+    useFeatureToggleServiceMock()
 
     render(AttachmentView, {
       props: {

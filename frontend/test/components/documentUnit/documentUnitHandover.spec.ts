@@ -8,6 +8,9 @@ import { HandoverMail, HandoverReport, Preview } from "@/domain/eventRecord"
 import documentUnitService from "@/services/documentUnitService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import routes from "~/test-helper/routes"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
+
+useFeatureToggleServiceMock()
 
 function renderComponent() {
   const user = userEvent.setup()
@@ -45,6 +48,7 @@ function renderComponent() {
     }),
   }
 }
+
 describe("Document Unit Handover", () => {
   vi.spyOn(handoverDocumentationUnitService, "getEventLog").mockImplementation(
     () =>

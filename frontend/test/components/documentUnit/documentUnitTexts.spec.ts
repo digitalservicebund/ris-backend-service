@@ -7,6 +7,9 @@ import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
 import DocumentUnit, { LongTexts, ShortTexts } from "@/domain/documentUnit"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import routes from "~/test-helper/routes"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
+
+useFeatureToggleServiceMock()
 
 function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
   const router = createRouter({
