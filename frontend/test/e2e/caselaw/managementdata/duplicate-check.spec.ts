@@ -131,7 +131,7 @@ test.describe(
       })
     })
 
-    test("Handover is only possible, when all warnings are ignored", async ({
+    test("Handover only with warning dialog until all warnings are ignored", async ({
       page,
       documentNumber,
       prefilledDocumentUnit,
@@ -160,7 +160,7 @@ test.describe(
 
       await navigateToHandover(page, documentNumber)
 
-      await test.step("Handover should not be possible with warnings", async () => {
+      await test.step("Handover should trigger warning dialog", async () => {
         await expect(
           page.getByText("Es besteht Dublettenverdacht."),
         ).toBeVisible()
@@ -175,9 +175,21 @@ test.describe(
         // XML needs to be loaded for the button to be enabled.
         await expect(page.getByText("XML Vorschau")).toBeVisible()
 
+        await page.getByLabel("Dokumentationseinheit an jDV übergeben").click()
+
         await expect(
-          page.getByLabel("Dokumentationseinheit an jDV übergeben"),
-        ).toBeDisabled()
+          page.getByText("Prüfung hat Warnungen ergeben"),
+        ).toBeVisible()
+        await expect(
+          page.getByText(
+            "Es besteht Dublettenverdacht.\nWollen Sie das Dokument dennoch übergeben?",
+          ),
+        ).toBeVisible()
+
+        await page.getByLabel("Trotzdem übergeben").click()
+
+        await expect(page.getByText("Email wurde versendet")).toBeVisible()
+        await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
       })
 
       await test.step("Navigate to Verwaltungsdaten via handover button", async () => {
@@ -207,7 +219,7 @@ test.describe(
       })
     })
 
-    test("Externals cannot see management data, but handover is blocked", async ({
+    test("Externals cannot see management data, but handover triggers warning dialog", async ({
       page,
       documentNumber,
       pageWithExternalUser,
@@ -225,7 +237,7 @@ test.describe(
 
       await navigateToHandover(pageWithExternalUser, documentNumber)
 
-      await test.step("Handover should not be possible with warnings", async () => {
+      await test.step("Handover should trigger dialog with warnings", async () => {
         await expect(
           pageWithExternalUser.getByText("Es besteht Dublettenverdacht."),
         ).toBeVisible()
@@ -240,11 +252,27 @@ test.describe(
           pageWithExternalUser.getByText("XML Vorschau"),
         ).toBeVisible()
 
+        await pageWithExternalUser
+          .getByLabel("Dokumentationseinheit an jDV übergeben")
+          .click()
+
         await expect(
-          pageWithExternalUser.getByLabel(
-            "Dokumentationseinheit an jDV übergeben",
+          pageWithExternalUser.getByText("Prüfung hat Warnungen ergeben"),
+        ).toBeVisible()
+        await expect(
+          pageWithExternalUser.getByText(
+            "Es besteht Dublettenverdacht.\nWollen Sie das Dokument dennoch übergeben?",
           ),
-        ).toBeDisabled()
+        ).toBeVisible()
+
+        await pageWithExternalUser.getByLabel("Trotzdem übergeben").click()
+
+        await expect(
+          pageWithExternalUser.getByText("Email wurde versendet"),
+        ).toBeVisible()
+        await expect(
+          pageWithExternalUser.getByText("Xml Email Abgabe -"),
+        ).toBeVisible()
       })
 
       await test.step("Verwaltungsdaten are not visible for Externals", async () => {
