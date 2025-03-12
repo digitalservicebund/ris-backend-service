@@ -1095,9 +1095,6 @@ class DuplicateCheckIntegrationTest {
     void checkDuplicates_pendingProceedingWithDeviatingDateAndFileNumber_shouldDoNothing()
         throws DocumentationUnitNotExistsException {
       // Arrange
-      var court =
-          databaseCourtRepository.save(
-              CourtDTO.builder().type("BFH").isForeignCourt(false).isSuperiorCourt(true).build());
       var pendingProceedingDTO =
           PendingProceedingDTO.builder()
               .documentationOffice(documentationOffice)
