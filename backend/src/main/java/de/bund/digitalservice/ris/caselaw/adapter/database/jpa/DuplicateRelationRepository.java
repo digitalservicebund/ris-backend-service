@@ -116,9 +116,8 @@ WITH
         SELECT documentation_unit_id as id, value
         FROM incremental_migration.deviating_date
         UNION ALL
-        SELECT du.id, du.date as value
-        FROM incremental_migration.documentation_unit du
-        RIGHT JOIN incremental_migration.decision d ON d.id = du.id),
+        SELECT id, date as value
+        FROM incremental_migration.documentation_unit),
      all_courts as(
         SELECT documentation_unit_id as id, court.id as value
         FROM incremental_migration.deviating_court
@@ -130,14 +129,12 @@ WITH
                 END
             )
         UNION ALL
-        SELECT du.id, court_id as value
-        FROM incremental_migration.documentation_unit du
-        RIGHT JOIN incremental_migration.decision d ON d.id = du.id
+        SELECT id, court_id as value
+        FROM incremental_migration.documentation_unit
         WHERE court_id IS NOT NULL),
      all_file_numbers as (
         SELECT documentation_unit_id as id, UPPER(value) as value
         FROM incremental_migration.file_number
-        RIGHT JOIN incremental_migration.decision d ON d.id = documentation_unit_id
         -- File numbers as "XX" lead to explosion of duplicate relationships
         WHERE value NOT IN (SELECT value
                             FROM incremental_migration.file_number
@@ -197,6 +194,9 @@ FROM duplicate_relations_view drel
                                                                drel.id_b = duplicate_relation.documentation_unit_id2
          LEFT JOIN incremental_migration.documentation_unit d1 ON drel.id_a = d1.id
          LEFT JOIN incremental_migration.documentation_unit d2 ON drel.id_b = d2.id
+         -- proceeding decisions need to be filtered out -> only consider decisions
+         INNER JOIN incremental_migration.decision dec1 ON dec1.id = drel.id_a
+         INNER JOIN incremental_migration.decision dec2 ON dec2.id = drel.id_b
 WHERE duplicate_relation.documentation_unit_id1 IS NULL;
 """,
       nativeQuery = true)
