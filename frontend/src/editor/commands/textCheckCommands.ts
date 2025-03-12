@@ -19,9 +19,9 @@ interface TextCheckService {
 
   checkCategory(editor: Editor, category?: string): Promise<void>
 
-  handleSelection(editor: Editor, state: EditorState): boolean
+  handleSelection(state: EditorState): boolean
 
-  setMatch(editor: Editor, matchId?: number): void
+  setMatch(matchId?: number): void
 
   replaceMatch(editor: Editor, matchId: number, text: string): void
 
@@ -48,9 +48,8 @@ class NeurisTextCheckService implements TextCheckService {
   /**
    * Function to update the selected match by text check tags, will reset selected if not a text check tag
    * @param state
-   * @param editor
    */
-  handleSelection = (editor: Editor, state: EditorState): boolean => {
+  handleSelection = (state: EditorState): boolean => {
     const node = state.doc.nodeAt(state.selection.from)
 
     if (!node?.marks) {
@@ -67,7 +66,7 @@ class NeurisTextCheckService implements TextCheckService {
       return false
     }
 
-    this.setMatch(editor, Number(textCheckMark.attrs.id))
+    this.setMatch(Number(textCheckMark.attrs.id))
     return true
   }
 
@@ -136,7 +135,7 @@ class NeurisTextCheckService implements TextCheckService {
     })
   }
 
-  setMatch = (editor: Editor, matchId?: number) => {
+  setMatch = (matchId?: number) => {
     if (matchId) {
       const selectedMatch = this.matches.find((match) => match.id === matchId)
       if (selectedMatch) {

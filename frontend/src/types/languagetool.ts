@@ -65,8 +65,6 @@ export interface Suggestion {
 }
 
 export interface TextCheckExtensionStorage {
-  matches: Match[]
-  selectedMatch: Match | undefined
   service: TextCheckService
 }
 

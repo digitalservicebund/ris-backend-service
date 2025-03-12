@@ -13,7 +13,6 @@ declare module "@tiptap/core" {
     textCheckExtension: {
       textCheck: () => ReturnType
       setSelectedMatch: (matchId?: number) => ReturnType
-      resetSelectedMatch: () => ReturnType
       handleMatchSelection: () => ReturnType
       acceptMatch: (matchId: number, text: string) => ReturnType
     }
@@ -54,7 +53,7 @@ export const TextCheckExtension = Extension.create<
           const service = editor.storage.textCheckExtension
             .service as TextCheckService
 
-          service.handleSelection(editor, state)
+          return service.handleSelection(state)
         },
 
       setSelectedMatch:
@@ -63,7 +62,7 @@ export const TextCheckExtension = Extension.create<
           const service = editor.storage.textCheckExtension
             .service as TextCheckService
 
-          service.setMatch(editor, matchId)
+          service.setMatch(matchId)
 
           return true
         },
