@@ -311,9 +311,14 @@ test.describe(
 
         await test.step("Click on delete removes the entry again", async () => {
           // Listen for the request triggered by "Eintrag löschen" and wait for it to finish, so the fixture cleanup does not run into concurrency issues
-          const deleteRequestPromise = page.waitForRequest((request) =>
-            request.url().includes("api/v1/caselaw/legalperiodicaledition"),
+          const deleteRequestPromise = page.waitForResponse(
+            (response) =>
+              response
+                .url()
+                .includes("api/v1/caselaw/legalperiodicaledition") &&
+              response.status() === 200,
           )
+
           await page.getByLabel("Eintrag löschen").click()
 
           await deleteRequestPromise
