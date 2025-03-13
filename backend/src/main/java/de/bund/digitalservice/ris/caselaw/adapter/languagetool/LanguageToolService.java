@@ -4,11 +4,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.TextCheckResponseT
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 public class LanguageToolService extends TextCheckService {
@@ -25,24 +29,26 @@ public class LanguageToolService extends TextCheckService {
   protected List<Match> requestTool(String text) {
     RestTemplate restTemplate = new RestTemplate();
 
+    // Prepare the form data
+    MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+    formData.add("data", text);
+    formData.add("language", languageToolConfig.getLanguage());
+    formData.add("mode", "all");
+    formData.add("disabledRules", "WHITESPACE_RULE");
+
+    // Set headers (optional but good practice)
     HttpHeaders headers = new HttpHeaders();
-    headers.set("Accept", "application/json");
-    headers.set("Content-Type", "application/x-www-form-urlencoded");
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-    String body =
-        "text="
-            + text
-            + "&language="
-            + languageToolConfig.getLanguage()
-            + "&enabledOnly=false"
-            + "&disabledRules=BORDER_NUMBER";
-
-    HttpEntity<String> entity = new HttpEntity<>(body, headers);
+    // Create the HTTP request
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
 
     ResponseEntity<LanguageToolResponse> response =
-        restTemplate.exchange(
-            languageToolConfig.getUrl(), HttpMethod.POST, entity, LanguageToolResponse.class);
+        restTemplate.postForEntity(
+            languageToolConfig.getUrl(), request, LanguageToolResponse.class);
 
-    return TextCheckResponseTransformer.transformToListOfDomainMatches(response.getBody());
+    return TextCheckResponseTransformer.transformToListOfDomainMatches(
+        Objects.requireNonNull(response.getBody()));
   }
 }

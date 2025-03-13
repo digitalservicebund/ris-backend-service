@@ -4,22 +4,24 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotE
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jose4j.json.internal.json_simple.JSONArray;
+import org.jose4j.json.internal.json_simple.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
+import org.jsoup.select.NodeTraversor;
+import org.jsoup.select.NodeVisitor;
 
 @Slf4j
 public class TextCheckService {
@@ -31,10 +33,6 @@ public class TextCheckService {
 
   public List<Match> check(String text) {
     return requestTool(text);
-  }
-
-  public List<Match> checkAsResponse(String text) {
-    return check(text);
   }
 
   protected List<Match> requestTool(String text) {
@@ -116,80 +114,89 @@ public class TextCheckService {
     parser.setTrackPosition(true);
     Document document = Jsoup.parse(htmlText, parser);
 
-    Map<Integer, String> textNodes = new LinkedMap<>();
-    document
-        .getElementsByTag("body")
-        .first()
-        .childNodes()
-        .forEach(child -> handleChildren(child, textNodes, 1));
+    JSONArray annotations = new JSONArray();
 
-    //    var textChunks = generateTextChunks(textNodes);
+    NodeTraversor.traverse(
+        new NodeVisitor() {
 
-    List<Match> matches = new ArrayList<>();
-    AtomicInteger id = new AtomicInteger(1);
-    textNodes.forEach(
-        (pos, text) -> {
-          List<Match> textMatches = checkText(text, categoryType);
-          List<Match> newTextMatches =
-              textMatches.stream()
-                  .map(
-                      match ->
-                          match.toBuilder()
-                              .htmlOffset(pos + match.offset())
-                              .id(id.getAndIncrement())
-                              .build())
-                  .toList();
-          matches.addAll(newTextMatches);
-        });
+          @Override
+          public void head(Node node, int depth) {
+
+            if (node instanceof TextNode) {
+              // Use getWholeText() to capture non-breaking spaces
+              String processedText = ((TextNode) node).getWholeText();
+
+              if (!processedText.isEmpty()) {
+                JSONObject textEntry = new JSONObject();
+                textEntry.put("text", processedText);
+                annotations.add(textEntry);
+              }
+              // Ignore comments and other non-element nodes
+            } else if (!node.nodeName().startsWith("#") && htmlText.contains(node.nodeName())) {
+              // Start building the markup tag
+              StringBuilder markupTag = new StringBuilder();
+              markupTag.append("<").append(node.nodeName());
+
+              // Add attributes if it's an Element
+              if (node instanceof Element element) {
+                for (Attribute attr : element.attributes()) {
+                  markupTag
+                      .append(" ")
+                      .append(attr.getKey())
+                      .append("=\"")
+                      .append(attr.getValue())
+                      .append("\"");
+                }
+              }
+
+              markupTag.append(">");
+
+              JSONObject markupEntry = new JSONObject();
+              markupEntry.put("markup", markupTag.toString());
+
+              // Custom logic for specific tags (optional)
+              if (node.nodeName().equals("p")) {
+                markupEntry.put("interpretAs", "\n\n");
+              }
+
+              annotations.add(markupEntry);
+            }
+          }
+
+          @Override
+          public void tail(Node node, int depth) {
+            if (!(node instanceof TextNode) && !node.nodeName().startsWith("#")) {
+              JSONObject markupEntry = new JSONObject();
+              markupEntry.put("markup", "</" + node.nodeName() + ">");
+              annotations.add(markupEntry);
+            }
+          }
+        },
+        document.body().children());
+
+    JSONObject result = new JSONObject();
+    result.put("annotation", annotations);
+
+    List<Match> matches = check(result.toString());
 
     StringBuilder newHtmlText = new StringBuilder();
     AtomicInteger lastPosition = new AtomicInteger(0);
+
+    String htmlWithReplacements =
+        htmlText.replaceAll("&gt;", ">").replaceAll("&lt;", "<").replaceAll("&amp;", "&");
+    ;
     matches.forEach(
         match -> {
-          newHtmlText.append(htmlText, lastPosition.get(), match.htmlOffset());
+          newHtmlText.append(htmlWithReplacements, lastPosition.get(), match.offset());
           newHtmlText.append("<text-check id=\"").append(match.id()).append("\">");
-          newHtmlText.append(htmlText, match.htmlOffset(), match.htmlOffset() + match.length());
+          newHtmlText.append(htmlWithReplacements, match.offset(), match.offset() + match.length());
           newHtmlText.append("</text-check>");
-          lastPosition.set(match.htmlOffset() + match.length());
+          lastPosition.set(match.offset() + match.length());
         });
 
-    newHtmlText.append(htmlText, lastPosition.get(), htmlText.length() - 1);
+    newHtmlText.append(htmlWithReplacements, lastPosition.get(), htmlWithReplacements.length() - 1);
 
     return new TextCheckCategoryResponse(newHtmlText.toString(), matches);
-  }
-
-  @SuppressWarnings(" java:S1144")
-  private Map<Integer, String> generateTextChunks(Map<Integer, String> textNodes) {
-    Map<Integer, String> textChunks = new LinkedMap<>();
-
-    StringBuilder builder = new StringBuilder();
-    AtomicInteger startPos = new AtomicInteger(0);
-    for (var entry : textNodes.entrySet()) {
-      String text = entry.getValue();
-      Integer pos = entry.getKey();
-      if (builder.length() + text.length() > 5000) {
-        textChunks.put(startPos.get(), builder.toString());
-        builder = new StringBuilder();
-        startPos.set(pos);
-      }
-
-      builder.append(text).append(" ").append(System.lineSeparator());
-    }
-
-    textChunks.put(startPos.get(), builder.toString());
-
-    return textChunks;
-  }
-
-  private void handleChildren(Node child, Map<Integer, String> textNodes, int level) {
-
-    log.info("{} node '{}' at {}", level, child.nodeName(), child.sourceRange());
-    if (child instanceof TextNode textNode) {
-      log.info("  text node content: '{}'", textNode.text());
-      textNodes.put(child.sourceRange().startPos(), textNode.text());
-    } else {
-      child.childNodes().forEach(grandChild -> handleChildren(grandChild, textNodes, level + 1));
-    }
   }
 
   private List<Match> checkCaseFacts(DocumentationUnit documentationUnit) {
@@ -213,7 +220,7 @@ public class TextCheckService {
       return Collections.emptyList();
     }
 
-    return check(URLEncoder.encode(text, StandardCharsets.UTF_8)).stream()
+    return checkCategoryByHTML(text, categoryType).matches().stream()
         .map(match -> match.toBuilder().category(categoryType).build())
         .toList();
   }
