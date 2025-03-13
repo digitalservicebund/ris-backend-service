@@ -297,6 +297,12 @@ test.describe(
 
         await test.step("After saving switching between literature and caselaw is not possible anymore", async () => {
           await page.getByTestId("list-entry-4").click()
+          await page
+            .getByLabel("Rechtsprechung Fundstelle")
+            .waitFor({ state: "detached" })
+          await page
+            .getByLabel("Literatur Fundstelle")
+            .waitFor({ state: "detached" })
           await expect(
             page.getByLabel("Rechtsprechung Fundstelle"),
           ).toBeHidden()
