@@ -69,9 +69,11 @@ public class TextCheckResponseTransformer {
       transformToListOfDomainMatches(LanguageToolResponse response) {
     List<de.bund.digitalservice.ris.caselaw.domain.textcheck.Match> matches = new ArrayList<>();
 
-    for (Match match : response.getMatches()) {
+    for (int i = 0; i < response.getMatches().size(); i++) {
+      Match match = response.getMatches().get(i);
       MatchBuilder matchBuilder =
           de.bund.digitalservice.ris.caselaw.domain.textcheck.Match.builder()
+              .id(i + 1) // start from 1
               .message(match.getMessage())
               .shortMessage(match.getShortMessage())
               .ignoreForIncompleteSentence(match.isIgnoreForIncompleteSentence());

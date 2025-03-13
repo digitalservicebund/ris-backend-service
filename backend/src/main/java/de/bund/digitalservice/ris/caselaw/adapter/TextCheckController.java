@@ -41,7 +41,7 @@ public class TextCheckController {
   public ResponseEntity<TextCheckResponse> check(@RequestBody String text) {
     try {
       return ResponseEntity.ok(
-          TextCheckResponseTransformer.transformToDomain(textCheckService.checkAsResponse(text)));
+          TextCheckResponseTransformer.transformToDomain(textCheckService.check(text)));
 
     } catch (Exception e) {
       log.error("Text check failed", e);
