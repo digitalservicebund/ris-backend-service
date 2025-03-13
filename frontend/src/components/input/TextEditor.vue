@@ -46,6 +46,7 @@ import FeatureToggleService from "@/services/featureToggleService"
 import { Match } from "@/types/languagetool"
 
 import "@/styles/text-check.scss"
+import TextEditorFooter from "@/components/input/TextEditorFooter.vue"
 
 interface Props {
   value?: string
@@ -338,10 +339,12 @@ defineExpose({ jumpToMatch })
         />
       </BubbleMenu>
     </div>
-    <TextCheckStatus
-      v-if="textCheck"
-      :loading="textCheckService.loading.value"
-      :response-error="textCheckService.responseError.value ?? undefined"
-    />
+    <TextEditorFooter v-if="textCheck">
+      <TextCheckStatus
+        v-if="textCheck"
+        :loading="textCheckService.loading.value"
+        :response-error="textCheckService.responseError.value ?? undefined"
+      />
+    </TextEditorFooter>
   </div>
 </template>
