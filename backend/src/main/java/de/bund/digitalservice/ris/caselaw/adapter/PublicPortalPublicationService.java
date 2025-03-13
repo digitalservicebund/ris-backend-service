@@ -116,15 +116,6 @@ public class PublicPortalPublicationService {
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
-  @Scheduled(fixedDelay = 600000000, initialDelay = 60000)
-  @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
-  public void deleteAllData() {
-    log.info("Deleting all data...from bucket.");
-    List<String> portalBucketDocumentNumbers = publicPortalBucket.getAllFilenames();
-    portalBucketDocumentNumbers.forEach(publicPortalBucket::delete);
-    log.info("Deleting all data...succeeded.");
-  }
-
   @Scheduled(cron = "0 30 4 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
