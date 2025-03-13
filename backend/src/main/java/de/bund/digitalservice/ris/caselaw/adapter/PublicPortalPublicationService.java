@@ -139,6 +139,7 @@ public class PublicPortalPublicationService {
             .filter(documentNumber -> !portalBucketDocumentNumbers.contains(documentNumber))
             .toList();
 
+    log.info("Number of LDML files in bucket: {}", portalBucketDocumentNumbers.size());
     log.info(
         "Found {} publishable doc units by database query but not in bucket.",
         inDatabaseNotInBucket.size());
