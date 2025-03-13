@@ -186,6 +186,12 @@ test.describe(
           ),
         ).toBeVisible()
 
+        await page.getByLabel("Abbrechen").click()
+
+        await expect(page.getByText("Email wurde versendet")).toBeHidden()
+
+        await page.getByLabel("Dokumentationseinheit an jDV übergeben").click()
+
         await page.getByLabel("Trotzdem übergeben").click()
 
         await expect(page.getByText("Email wurde versendet")).toBeVisible()
