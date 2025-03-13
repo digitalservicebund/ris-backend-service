@@ -33,7 +33,7 @@ otc:
 
 sentry:
   exception-resolver-order: -2147483647
-  ignored-exceptions-for-type: org.springframework.security.authorization.AuthorizationDeniedException, de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException
+  ignored-exceptions-for-type: org.springframework.security.authorization.AuthorizationDeniedException,de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException,org.apache.catalina.connector.ClientAbortException
 
 server:
   shutdown: graceful
