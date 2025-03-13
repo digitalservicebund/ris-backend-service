@@ -58,11 +58,13 @@ test.describe(
             await expect(textCheckTags.nth(i)).not.toHaveText("")
 
             const type =
+              // eslint-disable-next-line playwright/no-conditional-in-test
               (await textCheckTags.nth(i).getAttribute("type")) ??
               "uncategorized"
 
             const uncategorized = "#e86a69"
             const expectedBorder =
+              // eslint-disable-next-line playwright/no-conditional-in-test
               {
                 uncategorized: uncategorized,
                 style: "#9d8eff",
