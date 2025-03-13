@@ -16,6 +16,7 @@ export const TextCheckMark = Mark.create({
       "text-check",
       {
         id: HTMLAttributes.id,
+        type: HTMLAttributes.type,
       },
     ]
   },
@@ -27,6 +28,10 @@ export const TextCheckMark = Mark.create({
         renderHTML: (attributes) => ({
           id: attributes.id,
         }),
+      },
+      type: {
+        parseHTML: (element) => element.getAttribute("type"),
+        renderHTML: (attributes) => ({ type: attributes.type }),
       },
     }
   },

@@ -327,7 +327,7 @@ defineExpose({ jumpToMatch })
         class="bubble-menu"
         :editor="editor"
         :should-show="shouldShowBubbleMenu"
-        :tippy-options="{ placement: 'bottom', animation: 'fade' }"
+        :tippy-options="{ placement: 'bottom-start', animation: 'fade' }"
       >
         <TextCheckModal
           v-if="selectedMatch"

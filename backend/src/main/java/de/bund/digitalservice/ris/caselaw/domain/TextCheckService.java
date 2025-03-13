@@ -139,7 +139,12 @@ public class TextCheckService {
     matches.forEach(
         match -> {
           newHtmlText.append(htmlWithReplacements, lastPosition.get(), match.offset());
-          newHtmlText.append("<text-check id=\"").append(match.id()).append("\">");
+          newHtmlText
+              .append("<text-check id=\"")
+              .append(match.id())
+              .append("\" type=\"")
+              .append(match.rule().issueType().toLowerCase())
+              .append("\">");
           newHtmlText.append(htmlWithReplacements, match.offset(), match.offset() + match.length());
           newHtmlText.append("</text-check>");
           lastPosition.set(match.offset() + match.length());
