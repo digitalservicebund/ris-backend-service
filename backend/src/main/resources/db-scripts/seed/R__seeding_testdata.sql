@@ -20,6 +20,13 @@ where
 
 COMMIT;
 
+-- Unassign other doc units from test procedures, so that they can be deleted.
+UPDATE incremental_migration.decision
+SET current_procedure_id = NULL
+WHERE current_procedure_id IN ((SELECT id
+                                from incremental_migration.procedure
+                                where name LIKE 'test\_%'));
+
 -- Delete test-related records from documentation_unit_procedure
 delete from
     incremental_migration.documentation_unit_procedure
