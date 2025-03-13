@@ -39,6 +39,8 @@ test.describe(
             `decision-summary-${prefilledDocumentUnit.documentNumber}`,
           ),
         ).toBeVisible()
+        // wait for panel to open
+        await expect(page).toHaveURL(/showAttachmentPanel=true/)
 
         await fillInput(page, "Zitatstelle *", "123")
         await fillInput(page, "Klammernzusatz", "L")
@@ -53,6 +55,7 @@ test.describe(
         await expect(
           page.getByText(`MMG 2024, 123${suffix} (L)`, { exact: true }),
         ).toHaveCount(1)
+        await expect(page).toHaveURL(/showAttachmentPanel=false/)
       })
 
       await test.step("Add literature reference", async () => {
@@ -68,6 +71,9 @@ test.describe(
             `decision-summary-${prefilledDocumentUnit.documentNumber}`,
           ),
         ).toBeVisible()
+
+        // wait for panel to open
+        await expect(page).toHaveURL(/showAttachmentPanel=true/)
 
         await page.getByLabel("Literatur Fundstelle").click()
         await fillInput(page, "Zitatstelle *", "124")
