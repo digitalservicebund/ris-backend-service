@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckUnknownCategoryException;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
@@ -67,7 +68,7 @@ public class TextCheckService {
   public TextCheckCategoryResponse checkCategory(UUID id, CategoryType category)
       throws DocumentationUnitNotExistsException {
     if (category == null) {
-      return null;
+      throw new TextCheckUnknownCategoryException();
     }
 
     Documentable documentable = documentationUnitService.getByUuid(id);
@@ -76,13 +77,19 @@ public class TextCheckService {
       return switch (category) {
         case REASONS -> checkCategoryByHTML(documentationUnit.longTexts().reasons(), category);
         case CASE_FACTS -> checkCategoryByHTML(documentationUnit.longTexts().caseFacts(), category);
-        case DECISION_REASON ->
+        case DECISION_REASONS ->
             checkCategoryByHTML(documentationUnit.longTexts().decisionReasons(), category);
         case HEADNOTE -> checkCategoryByHTML(documentationUnit.shortTexts().headnote(), category);
+        case HEADLINE -> checkCategoryByHTML(documentationUnit.shortTexts().headline(), category);
         case GUIDING_PRINCIPLE ->
             checkCategoryByHTML(documentationUnit.shortTexts().guidingPrinciple(), category);
         case TENOR -> checkCategoryByHTML(documentationUnit.longTexts().tenor(), category);
-        case UNKNOWN -> null;
+        case OTHER_LONG_TEXT ->
+            checkCategoryByHTML(documentationUnit.longTexts().otherLongText(), category);
+        case DISSENTING_OPINION ->
+            checkCategoryByHTML(documentationUnit.longTexts().dissentingOpinion(), category);
+        case OUTLINE -> checkCategoryByHTML(documentationUnit.longTexts().outline(), category);
+        case UNKNOWN -> throw new TextCheckUnknownCategoryException(category.toString());
       };
     }
 
@@ -205,7 +212,8 @@ public class TextCheckService {
       return Collections.emptyList();
     }
 
-    return checkText(documentationUnit.longTexts().decisionReasons(), CategoryType.DECISION_REASON);
+    return checkText(
+        documentationUnit.longTexts().decisionReasons(), CategoryType.DECISION_REASONS);
   }
 
   private List<Match> checkText(String text, CategoryType categoryType) {
