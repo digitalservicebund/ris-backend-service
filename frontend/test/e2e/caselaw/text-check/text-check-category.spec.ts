@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import { navigateToCategories } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
-import { convertHexToRGB } from "~/utils/coloursUtil"
+import { convertHexToRGB } from "~/test-helper/coloursUtil"
 
 const textWithErrors =
   "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtschreibfehler werden rot markirt, Grammatikfehler werden gelb hervorgehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. Wussten Sie, dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Freitag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten."
