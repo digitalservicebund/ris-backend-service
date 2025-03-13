@@ -6,7 +6,7 @@ text-check {
     background: rgba($color: #e86a69, $alpha: 20%);
   }
 
-  &-style {
+  &[type="style"] {
     border-bottom: 2px solid #9d8eff;
 
     &:hover {
@@ -14,8 +14,8 @@ text-check {
     }
   }
 
-  &-typographical,
-  &-grammar {
+  &[type="typographical"],
+  &[type="grammar"] {
     border-bottom: 2px solid #eeb55c;
 
     &:hover {
@@ -23,7 +23,7 @@ text-check {
     }
   }
 
-  &-misspelling {
+  &[type="misspelling"] {
     border-bottom: 2px solid #e86a69;
 
     &:hover {
