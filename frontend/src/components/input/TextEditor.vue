@@ -18,6 +18,7 @@ import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
 import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
+import TextEditorFooter from "@/components/input/TextEditorFooter.vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import TextCheckModal from "@/components/text-check/TextCheckModal.vue"
@@ -44,9 +45,6 @@ import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import FeatureToggleService from "@/services/featureToggleService"
 import { Match } from "@/types/languagetool"
-
-import "@/styles/text-check.scss"
-import TextEditorFooter from "@/components/input/TextEditorFooter.vue"
 
 interface Props {
   value?: string
