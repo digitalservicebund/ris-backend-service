@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import { computed } from "vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
-import { TextCheckService } from "@/editor/commands/textCheckCommands"
+import { ResponseError } from "@/services/httpClient"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 interface Props {
-  textCheckService: TextCheckService
+  loading?: boolean
+  responseError?: ResponseError
 }
 
-const props = defineProps<Props>()
-
-const loading = computed(() => props.textCheckService.loading.value)
-
-const responseError = computed(() => props.textCheckService.responseError.value)
+defineProps<Props>()
 </script>
 <template>
   <div>
@@ -23,7 +19,7 @@ const responseError = computed(() => props.textCheckService.responseError.value)
           <LoadingSpinner class="mr-4 border-gray-900" size="extra-small" />
         </div>
       </div>
-      <div v-if="responseError">
+      <div v-else-if="responseError">
         <div class="flex items-center gap-x-8">
           <span class="text-gray-900">{{ responseError?.title }}</span>
           <IconErrorOutline class="text-gray-900" />

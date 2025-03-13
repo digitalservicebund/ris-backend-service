@@ -64,12 +64,9 @@ export interface Suggestion {
   matches: Match[]
 }
 
-export interface TextCheckExtensionStorage {
-  service: TextCheckService
-}
-
 export type TextCheckExtensionOptions = {
   category?: string
+  service?: TextCheckService
 }
 
 export const TextCheckTagName = "textCheck"

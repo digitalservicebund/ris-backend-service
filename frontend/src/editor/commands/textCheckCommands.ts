@@ -7,7 +7,6 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import {
   Match,
   TextCheckCategoryResponse,
-  TextCheckExtensionStorage,
   TextCheckTagName,
 } from "@/types/languagetool"
 
@@ -150,12 +149,6 @@ class NeurisTextCheckService implements TextCheckService {
 
   clearSelectedMatch = () => {
     this.selectedMatch.value = undefined
-  }
-
-  static readonly getExtensionStorage = (
-    editor: Editor,
-  ): TextCheckExtensionStorage => {
-    return editor.storage.textCheckExtension as TextCheckExtensionStorage
   }
 
   clearMatches = () => {
