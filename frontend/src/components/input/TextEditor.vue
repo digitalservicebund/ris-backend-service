@@ -18,6 +18,7 @@ import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
 import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
+import TextEditorFooter from "@/components/input/TextEditorFooter.vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import TextCheckModal from "@/components/text-check/TextCheckModal.vue"
@@ -43,9 +44,7 @@ import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import FeatureToggleService from "@/services/featureToggleService"
-import { Match, TextCheckExtensionStorage } from "@/types/languagetool"
-
-import "@/styles/text-check.scss"
+import { Match } from "@/types/languagetool"
 
 interface Props {
   value?: string
@@ -73,6 +72,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
+
+const textCheckService = new NeurisTextCheckService()
 
 const textCheckEnabled = ref<boolean>()
 const editorElement = ref<HTMLElement>()
@@ -141,7 +142,10 @@ const editor: Editor = new Editor({
       names: ["listItem", "paragraph"],
     }),
     TextCheckMark,
-    TextCheckExtension.configure({ category: props.category }),
+    TextCheckExtension.configure({
+      category: props.category,
+      service: textCheckService,
+    }),
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
@@ -184,12 +188,6 @@ const editorStyleClasses = computed(() => {
 const buttonsDisabled = computed(
   () => !(props.editable && (hasFocus.value || isHovered.value)),
 )
-
-const textCheckService = computed(() => {
-  const textCheckExtension = editor.storage
-    .textCheckExtension as TextCheckExtensionStorage
-  return textCheckExtension.service
-})
 
 /**
  * A function to determine rather a match menu should be shown
@@ -267,7 +265,7 @@ watch(
   },
 )
 
-const selectedMatch = computed(() => textCheckService.value.selectedMatch.value)
+const selectedMatch = computed(() => textCheckService.selectedMatch.value)
 
 onMounted(async () => {
   const editorContainer = document.querySelector(".editor")
@@ -339,6 +337,12 @@ defineExpose({ jumpToMatch })
         />
       </BubbleMenu>
     </div>
-    <TextCheckStatus v-if="textCheck" :text-check-service="textCheckService" />
+    <TextEditorFooter v-if="textCheck">
+      <TextCheckStatus
+        v-if="textCheck"
+        :loading="textCheckService.loading.value"
+        :response-error="textCheckService.responseError.value ?? undefined"
+      />
+    </TextEditorFooter>
   </div>
 </template>

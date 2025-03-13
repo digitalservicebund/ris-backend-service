@@ -1,12 +1,6 @@
 import { Extension } from "@tiptap/core"
-import {
-  NeurisTextCheckService,
-  TextCheckService,
-} from "@/editor/commands/textCheckCommands"
-import {
-  TextCheckExtensionOptions,
-  TextCheckExtensionStorage,
-} from "@/types/languagetool"
+import { TextCheckService } from "@/editor/commands/textCheckCommands"
+import { TextCheckExtensionOptions } from "@/types/languagetool"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -19,20 +13,14 @@ declare module "@tiptap/core" {
   }
 }
 
-export const TextCheckExtension = Extension.create<
-  TextCheckExtensionOptions,
-  TextCheckExtensionStorage
->({
+export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
   name: "textCheckExtension",
 
-  addStorage() {
-    return {
-      service: new NeurisTextCheckService(),
-    }
-  },
+  addStorage() {},
   addOptions() {
     return {
       category: undefined,
+      service: undefined,
     }
   },
 
@@ -41,37 +29,31 @@ export const TextCheckExtension = Extension.create<
       textCheck:
         () =>
         ({ editor }) => {
-          const service = editor.storage.textCheckExtension
-            .service as TextCheckService
+          const service = this.options.service as TextCheckService
 
           void service.checkCategory(editor, this.options.category)
           return true
         },
       handleMatchSelection:
         () =>
-        ({ state, editor }) => {
-          const service = editor.storage.textCheckExtension
-            .service as TextCheckService
+        ({ state }) => {
+          const service = this.options.service as TextCheckService
 
           return service.handleSelection(state)
         },
 
-      setSelectedMatch:
-        (matchId?: number) =>
-        ({ editor }) => {
-          const service = editor.storage.textCheckExtension
-            .service as TextCheckService
+      setSelectedMatch: (matchId?: number) => () => {
+        const service = this.options.service as TextCheckService
 
-          service.setMatch(matchId)
+        service.setMatch(matchId)
 
-          return true
-        },
+        return true
+      },
       acceptMatch:
         (matchId: number, text: string) =>
         ({ editor }) => {
           if (matchId) {
-            const service = editor.storage.textCheckExtension
-              .service as TextCheckService
+            const service = this.options.service as TextCheckService
 
             service.replaceMatch(editor, matchId, text)
             return true

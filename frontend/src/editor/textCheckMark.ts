@@ -1,3 +1,4 @@
+import "@/styles/text-check.scss"
 import { Mark } from "@tiptap/vue-3"
 import { TextCheckTagName } from "@/types/languagetool"
 
