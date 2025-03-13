@@ -18,8 +18,7 @@ test.describe(
     tag: "@RISDEV-4264",
   },
   () => {
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip("Periodicals overview with a list of editions", async ({
+    test("Periodicals overview with a list of editions", async ({
       page,
       edition,
     }) => {
@@ -75,11 +74,9 @@ test.describe(
       })
 
       await test.step("An existing periodical edition appears in the results", async () => {
-        await expect(page.locator(".table > tr >> nth=0")).toBeVisible()
-
-        await expect(
-          page.getByText((edition.name || "") + "MMG" + "0" + formattedDate),
-        ).toBeVisible()
+        const line = page.locator(`tr:has(td:has-text("${edition.name}"))`)
+        await line.waitFor({ state: "visible" })
+        await expect(line).toBeVisible()
       })
 
       await test.step("The table is cleared when filter is deleted", async () => {
@@ -241,8 +238,7 @@ test.describe(
       },
     )
 
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip("An edition can't be deleted as long as it has references", async ({
+    test("An edition can't be deleted as long as it has references", async ({
       page,
       editionWithReferences,
     }) => {
@@ -258,12 +254,11 @@ test.describe(
         .click()
       await response
 
-      // Find the row (tr) that contains the edition name
       const line = page.locator(
         `tr:has(td:has-text("${editionWithReferences.name}"))`,
       )
-
-      await expect(line).toBeVisible() // Ensure it's visible
+      await line.waitFor({ state: "visible" })
+      await expect(line).toBeVisible()
       // delete button should not be clickable
       await expect(line.locator("[aria-label='Ausgabe löschen']")).toBeHidden()
 
