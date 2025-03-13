@@ -108,14 +108,21 @@ test.describe(
 
       await test.step("By clicking on an edition, the detail view is opened.", async () => {
         await fillInput(page, "Periodikum", "MMG")
+
+        const response = page.waitForResponse((response) =>
+          response.url().includes("api/v1/caselaw/legalperiodicaledition"),
+        )
         await page
           .getByText("MMG | Medizin Mensch Gesellschaft", { exact: true })
           .click()
-        await expect(page.locator(".table > tr >> nth=0")).toBeVisible()
+        await response
+
+        const line = page.locator(`tr:has(td:has-text("${edition.name}"))`)
+        await line.waitFor({ state: "visible" })
+        await expect(line).toBeVisible()
+
         const pagePromise = page.context().waitForEvent("page")
-        const line = page.getByText(
-          (edition.name || "") + "MMG" + "0" + formattedDate,
-        )
+
         await line.locator("a").click()
         const newTab = await pagePromise
         await expect(newTab).toHaveURL(
