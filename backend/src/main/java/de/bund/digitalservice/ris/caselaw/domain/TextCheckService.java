@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
 import org.jose4j.json.internal.json_simple.JSONArray;
 import org.jose4j.json.internal.json_simple.JSONObject;
 import org.jsoup.Jsoup;
@@ -104,6 +105,7 @@ public class TextCheckService {
     return checkText(documentationUnit.longTexts().reasons(), CategoryType.REASONS);
   }
 
+  @SuppressWarnings("java:S1068")
   private TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType) {
     if (htmlText == null) {
@@ -114,17 +116,46 @@ public class TextCheckService {
     parser.setTrackPosition(true);
     Document document = Jsoup.parse(htmlText, parser);
 
-    JSONArray annotations = new JSONArray();
+    JSONArray annotations = getAnnotationsArray(htmlText, document);
 
+    JSONObject result = new JSONObject();
+    result.put("annotation", annotations);
+
+    List<Match> matches = check(result.toString());
+
+    StringBuilder newHtmlText = new StringBuilder();
+    AtomicInteger lastPosition = new AtomicInteger(0);
+
+    String htmlWithReplacements =
+        htmlText.replace("&gt;", ">").replace("&lt;", "<").replace("&amp;", "&");
+
+    matches.forEach(
+        match -> {
+          newHtmlText.append(htmlWithReplacements, lastPosition.get(), match.offset());
+          newHtmlText.append("<text-check id=\"").append(match.id()).append("\">");
+          newHtmlText.append(htmlWithReplacements, match.offset(), match.offset() + match.length());
+          newHtmlText.append("</text-check>");
+          lastPosition.set(match.offset() + match.length());
+        });
+
+    newHtmlText.append(htmlWithReplacements, lastPosition.get(), htmlWithReplacements.length() - 1);
+
+    return new TextCheckCategoryResponse(newHtmlText.toString(), matches);
+  }
+
+  @SuppressWarnings("java:S3776")
+  @NotNull
+  private static JSONArray getAnnotationsArray(String htmlText, Document document) {
+    JSONArray annotations = new JSONArray();
     NodeTraversor.traverse(
         new NodeVisitor() {
 
           @Override
           public void head(Node node, int depth) {
 
-            if (node instanceof TextNode) {
+            if (node instanceof TextNode textNode) {
               // Use getWholeText() to capture non-breaking spaces
-              String processedText = ((TextNode) node).getWholeText();
+              String processedText = textNode.getWholeText();
 
               if (!processedText.isEmpty()) {
                 JSONObject textEntry = new JSONObject();
@@ -173,30 +204,7 @@ public class TextCheckService {
           }
         },
         document.body().children());
-
-    JSONObject result = new JSONObject();
-    result.put("annotation", annotations);
-
-    List<Match> matches = check(result.toString());
-
-    StringBuilder newHtmlText = new StringBuilder();
-    AtomicInteger lastPosition = new AtomicInteger(0);
-
-    String htmlWithReplacements =
-        htmlText.replaceAll("&gt;", ">").replaceAll("&lt;", "<").replaceAll("&amp;", "&");
-    ;
-    matches.forEach(
-        match -> {
-          newHtmlText.append(htmlWithReplacements, lastPosition.get(), match.offset());
-          newHtmlText.append("<text-check id=\"").append(match.id()).append("\">");
-          newHtmlText.append(htmlWithReplacements, match.offset(), match.offset() + match.length());
-          newHtmlText.append("</text-check>");
-          lastPosition.set(match.offset() + match.length());
-        });
-
-    newHtmlText.append(htmlWithReplacements, lastPosition.get(), htmlWithReplacements.length() - 1);
-
-    return new TextCheckCategoryResponse(newHtmlText.toString(), matches);
+    return annotations;
   }
 
   private List<Match> checkCaseFacts(DocumentationUnit documentationUnit) {
