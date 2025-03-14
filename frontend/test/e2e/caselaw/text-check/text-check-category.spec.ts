@@ -68,6 +68,7 @@ test.describe(
 
           await otherHeadNoteEditor
             .locator("text-check")
+            .first()
             .waitFor({ state: "visible" })
         })
 
