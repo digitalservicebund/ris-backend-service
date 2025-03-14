@@ -64,6 +64,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Slf4j
 @Primary
+// Repository for main entity -> depends on more than 20 classes :-/
+@SuppressWarnings("java:S6539")
 public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUnitRepository {
   private final DatabaseDocumentationUnitRepository repository;
   private final DatabaseCourtRepository databaseCourtRepository;
