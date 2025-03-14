@@ -4,6 +4,7 @@ import { Ref, ref } from "vue"
 import { ResponseError, ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/languageToolService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+
 import {
   Match,
   TextCheckCategoryResponse,
@@ -22,7 +23,13 @@ interface TextCheckService {
 
   setMatch(matchId?: number): void
 
-  replaceMatch(editor: Editor, matchId: number, text: string): void
+  replaceMatch(
+    matchId: number,
+    text: string,
+    state: EditorState,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    dispatch: ((args?: any) => any) | undefined,
+  ): void
 
   clearSelectedMatch(): void
 }
@@ -101,12 +108,21 @@ class NeurisTextCheckService implements TextCheckService {
 
   /**
    * Received match id and the text to replace, find the mark with the id, remove the text-check html tag and set the text
-   * @param editor
    * @param matchId
    * @param text
+   * @param state
+   * @param dispatch
    */
-  replaceMatch = (editor: Editor, matchId: number, text: string) => {
-    editor.state.doc.descendants((node, pos) => {
+  replaceMatch = (
+    matchId: number,
+    text: string,
+    state: EditorState,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    dispatch: ((args?: any) => any) | undefined,
+  ) => {
+    const { tr } = state
+
+    state.doc.descendants((node, pos) => {
       if (
         node.isText &&
         node.marks.some(
@@ -122,11 +138,14 @@ class NeurisTextCheckService implements TextCheckService {
         )
 
         if (textCheckMark) {
-          const tr = editor.state.tr
-            .delete(pos, pos + node.nodeSize)
-            .insert(pos, editor.state.schema.text(text))
+          tr.delete(pos, pos + node.nodeSize).insert(
+            pos,
+            state.schema.text(text),
+          )
 
-          editor.view.dispatch(tr)
+          if (dispatch) {
+            dispatch(tr)
+          }
         }
       }
 

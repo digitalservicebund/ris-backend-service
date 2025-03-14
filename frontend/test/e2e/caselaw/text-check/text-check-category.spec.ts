@@ -144,10 +144,12 @@ test.describe(
           )
         })
 
-        await test.step("click on a selected suggestion, then click on a non-tag closes the text check modal.", async () => {
+        await test.step("click on a selected suggestion, then click on a non-tag closes the text check modal", async () => {
+          const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
+
           await page.locator("text-check").nth(0).click()
           await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
-          await page.getByText("Lebenslagen,").click()
+          await otherHeadNoteEditor.getByText("LanguageTool").click()
           await expect(page.getByTestId("text-check-modal-word")).toBeHidden()
         })
       },
