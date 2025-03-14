@@ -93,11 +93,14 @@ public class InternalPortalTransformer extends CommonPortalTransformer {
             builder::procedure);
       }
 
+      if (coreData.legalEffect() != null) {
+        builder.legalEffect(coreData.legalEffect());
+      }
+
       builder
           .documentType(coreData.documentType().label())
           .courtLocation(nullSafeGet(coreData.court(), Court::location))
           .courtType(nullSafeGet(coreData.court(), Court::type))
-          .legalEffect(coreData.legalEffect())
           .judicialBody(nullIfEmpty(coreData.appraisalBody()))
           .documentationOffice(
               nullSafeGet(coreData.documentationOffice(), DocumentationOffice::abbreviation));

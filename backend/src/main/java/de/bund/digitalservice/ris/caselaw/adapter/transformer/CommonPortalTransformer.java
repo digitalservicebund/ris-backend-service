@@ -313,7 +313,6 @@ public abstract class CommonPortalTransformer {
         validateNotNull(documentationUnit.coreData().court().type(), "CourtType missing");
       }
       validateNotNull(documentationUnit.coreData().documentType(), "DocumentType missing");
-      validateNotNull(documentationUnit.coreData().legalEffect(), "LegalEffect missing");
       validate(!documentationUnit.coreData().fileNumbers().isEmpty(), "FileNumber missing");
     } else {
       throw new ValidationException("Core data is null");
