@@ -41,7 +41,16 @@ test.describe(
 
           await fillInput(page, "Zitatstelle *", "5")
           await fillInput(page, "Klammernzusatz", "LT")
+          const putRequestPromise = page.waitForResponse(
+            (response) =>
+              response
+                .url()
+                .includes("api/v1/caselaw/legalperiodicaledition") &&
+              response.status() === 200,
+          )
           await page.getByLabel("Treffer übernehmen").click()
+
+          await putRequestPromise
 
           // 1 decision summary visible in list summary
           await expect(
@@ -86,7 +95,18 @@ test.describe(
 
           await fillInput(page, "Zitatstelle *", "6")
           await fillInput(page, "Klammernzusatz", "L")
+
+          const putRequestPromise = page.waitForResponse(
+            (response) =>
+              response
+                .url()
+                .includes("api/v1/caselaw/legalperiodicaledition") &&
+              response.status() === 200,
+          )
           await page.getByLabel("Fundstelle vermerken").click()
+
+          await putRequestPromise
+
           // second reference visible
           await expect(
             page.getByText(`MMG 2024, 6${suffix} (L)`, { exact: true }),
