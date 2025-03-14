@@ -18,6 +18,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -26,6 +27,9 @@ import net.sf.saxon.TransformerFactoryImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.core.io.ClassPathResource;
 
 class HtmlToAknTest {
@@ -161,166 +165,85 @@ class HtmlToAknTest {
         StringUtils.deleteWhitespace(result));
   }
 
-  @Test
-  void test_images_withClosingTag() {
-
-    String inputHtml = "<p><img alt=\"alt text\" height=\"70px\" src=\"path/to/image\" /></p>";
-
-    String expectedXml =
-        """
-      <akn:judgmentBody>
-         <akn:motivation>
-            <akn:p>
-               <akn:img alt="alt text" height="70px" src="path/to/image"/>
-            </akn:p>
-         </akn:motivation>
-      </akn:judgmentBody>
-""";
-    String result =
-        getAkn(
-            Judgment.builder()
-                .judgmentBody(
-                    JudgmentBody.builder()
-                        .motivation(
-                            JaxbHtml.build(
-                                commonPortalTransformer.htmlStringToObjectList(inputHtml)))
-                        .build())
-                .build());
-
-    assertEquals(AKN_START + expectedXml + AKN_END, result);
+  private static Stream<Arguments> provideTestCases() {
+    return Stream.of(
+        // image with closing tag
+        Arguments.of(
+            "<p><img alt=\"alt text\" height=\"70px\" src=\"path/to/image\" /></p>",
+            """
+                          <akn:judgmentBody>
+                             <akn:motivation>
+                                <akn:p>
+                                   <akn:img alt="alt text" height="70px" src="path/to/image"/>
+                                </akn:p>
+                             </akn:motivation>
+                          </akn:judgmentBody>
+                    """),
+        // image without closing tag
+        Arguments.of(
+            "<p><img alt=\"alt text\" height=\"70px\" src=\"path/to/image\"></p>",
+            """
+                          <akn:judgmentBody>
+                             <akn:motivation>
+                                <akn:p>
+                                   <akn:img alt="alt text" height="70px" src="path/to/image"/>
+                                </akn:p>
+                             </akn:motivation>
+                          </akn:judgmentBody>
+                    """),
+        // self closing break not inside block element
+        Arguments.of(
+            "<br />",
+            """
+                          <akn:judgmentBody>
+                             <akn:motivation>
+                                <akn:p>
+                                   <akn:br/>
+                                </akn:p>
+                             </akn:motivation>
+                          </akn:judgmentBody>
+                    """),
+        // self closing break inside block element
+        Arguments.of(
+            "<p><br /></p>",
+            """
+                          <akn:judgmentBody>
+                             <akn:motivation>
+                                <akn:p>
+                                   <akn:br/>
+                                </akn:p>
+                             </akn:motivation>
+                          </akn:judgmentBody>
+                    """),
+        // non self closing break not inside block element
+        Arguments.of(
+            "<br>",
+            """
+                          <akn:judgmentBody>
+                             <akn:motivation>
+                                <akn:p>
+                                   <akn:br/>
+                                </akn:p>
+                             </akn:motivation>
+                          </akn:judgmentBody>
+                    """),
+        // non self closing break inside block element
+        Arguments.of(
+            "<p><br></p>",
+            """
+                          <akn:judgmentBody>
+                             <akn:motivation>
+                                <akn:p>
+                                   <akn:br/>
+                                </akn:p>
+                             </akn:motivation>
+                          </akn:judgmentBody>
+                    """));
   }
 
-  @Test
-  void test_images_withoutClosingTag() {
-
-    String inputHtml = "<p><img alt=\"alt text\" height=\"70px\" src=\"path/to/image\"></p>";
-
-    String expectedXml =
-        """
-      <akn:judgmentBody>
-         <akn:motivation>
-            <akn:p>
-               <akn:img alt="alt text" height="70px" src="path/to/image"/>
-            </akn:p>
-         </akn:motivation>
-      </akn:judgmentBody>
-""";
-    String result =
-        getAkn(
-            Judgment.builder()
-                .judgmentBody(
-                    JudgmentBody.builder()
-                        .motivation(
-                            JaxbHtml.build(
-                                commonPortalTransformer.htmlStringToObjectList(inputHtml)))
-                        .build())
-                .build());
-
-    assertEquals(AKN_START + expectedXml + AKN_END, result);
-  }
-
-  @Test
-  void test_self_closing_break_not_inside_block_level_element() {
-
-    String inputHtml = "<br />";
-
-    String expectedXml =
-        """
-              <akn:judgmentBody>
-                 <akn:motivation>
-                    <akn:p>
-                       <akn:br/>
-                    </akn:p>
-                 </akn:motivation>
-              </akn:judgmentBody>
-        """;
-    String result =
-        getAkn(
-            Judgment.builder()
-                .judgmentBody(
-                    JudgmentBody.builder()
-                        .motivation(
-                            JaxbHtml.build(
-                                commonPortalTransformer.htmlStringToObjectList(inputHtml)))
-                        .build())
-                .build());
-
-    assertEquals(AKN_START + expectedXml + AKN_END, result);
-  }
-
-  @Test
-  void test_self_closing_break_inside_block_level_element() {
-
-    String inputHtml = "<p><br /></p>";
-
-    String expectedXml =
-        """
-              <akn:judgmentBody>
-                 <akn:motivation>
-                    <akn:p>
-                       <akn:br/>
-                    </akn:p>
-                 </akn:motivation>
-              </akn:judgmentBody>
-        """;
-    String result =
-        getAkn(
-            Judgment.builder()
-                .judgmentBody(
-                    JudgmentBody.builder()
-                        .motivation(
-                            JaxbHtml.build(
-                                commonPortalTransformer.htmlStringToObjectList(inputHtml)))
-                        .build())
-                .build());
-
-    assertEquals(AKN_START + expectedXml + AKN_END, result);
-  }
-
-  @Test
-  void test_non_self_closing_break_not_inside_block_level_element() {
-
-    String inputHtml = "<br>";
-
-    String expectedXml =
-        """
-              <akn:judgmentBody>
-                 <akn:motivation>
-                    <akn:p>
-                       <akn:br/>
-                    </akn:p>
-                 </akn:motivation>
-              </akn:judgmentBody>
-        """;
-    String result =
-        getAkn(
-            Judgment.builder()
-                .judgmentBody(
-                    JudgmentBody.builder()
-                        .motivation(
-                            JaxbHtml.build(
-                                commonPortalTransformer.htmlStringToObjectList(inputHtml)))
-                        .build())
-                .build());
-
-    assertEquals(AKN_START + expectedXml + AKN_END, result);
-  }
-
-  @Test
-  void test_non_self_closing_break_inside_block_level_element() {
-
-    String inputHtml = "<p><br></p>";
-
-    String expectedXml =
-        """
-              <akn:judgmentBody>
-                 <akn:motivation>
-                    <akn:p>
-                       <akn:br/>
-                    </akn:p>
-                 </akn:motivation>
-              </akn:judgmentBody>
-        """;
+  @ParameterizedTest
+  @MethodSource("provideTestCases")
+  void testBreakTags(String inputHtml, String expectedXml) {
     String result =
         getAkn(
             Judgment.builder()
