@@ -86,11 +86,10 @@
 
     <!--Some locations don't support some html elements. This template allows defining these relations only once-->
     <xsl:template match="*[self::akn:arguments or self::akn:background or self::akn:decision or
-                      self::akn:embeddedStructure or self::akn:introduction or self::akn:motivation or
-                      self::akn:subFlow or self::blockquote or self::th or self::div]/
-                      *[self::strong or self::b or self::em or self::i or self::br or self::ins or self::u or
-                      self::del or self::span or self::fussnote or self::sup or self::sub or
-                      self::border-number-link]">
+                  self::akn:embeddedStructure or self::akn:introduction or self::akn:motivation or
+                  self::akn:subFlow or self::blockquote or self::th or self::div]/
+                  *[self::strong or self::b or self::em or self::i or self::br or self::ins or self::u or
+                  self::del or self::span or self::fussnote or self::sup or self::sub or self::border-number-link]">
 
         <xsl:variable name="tagName">
             <xsl:choose>
@@ -115,19 +114,40 @@
             </xsl:choose>
         </xsl:variable>
 
-        <!-- Create a block with a dynamic tag name -->
-        <akn:block name="{$tagName}Wrapper">
-            <xsl:choose>
-                <xsl:when test="name() ='border-number-link'">
-                    <xsl:call-template name="borderNumberLinkTemplate"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:element name="akn:{$tagName}">
-                        <xsl:apply-templates select="@* | node()"/>
-                    </xsl:element>
-                </xsl:otherwise>
-            </xsl:choose>
-        </akn:block>
+        <xsl:choose>
+            <!-- Special case for <br> to remain self-closing -->
+            <xsl:when test="name()='br'">
+                <!-- Check if the <br> is inside a block-level element (e.g., p, div, ul) -->
+                <xsl:choose>
+                    <xsl:when test="not(parent::akn:p or parent::akn:ul or parent::akn:ol or parent::akn:table or parent::akn:block)">
+                        <!-- Wrap <br> in <akn:p> if not in a block element -->
+                        <akn:p>
+                            <akn:br/>
+                        </akn:p>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- If inside a block-level element, just output <akn:br /> -->
+                        <akn:br/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+
+            <!-- Regular block for other elements -->
+            <xsl:otherwise>
+                <akn:block name="{$tagName}Wrapper">
+                    <xsl:choose>
+                        <xsl:when test="name() ='border-number-link'">
+                            <xsl:call-template name="borderNumberLinkTemplate"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:element name="akn:{$tagName}">
+                                <xsl:apply-templates select="@* | node()"/>
+                            </xsl:element>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </akn:block>
+            </xsl:otherwise>
+        </xsl:choose>
 
     </xsl:template>
 
@@ -248,13 +268,31 @@
 
     <!--Simple renames to akn namespace. Note: some of these (like br) only apply when they don't match
     the more specific rule wrapping them when they occur in an unsupported location-->
-    <xsl:template match="a|sub|sup|span|p|div|i|b|u|del|br|ol|ul|li|img">
+    <xsl:template match="a|sub|sup|span|p|div|i|b|u|del|ol|ul|li|img">
         <xsl:element name="akn:{name()}">
             <xsl:apply-templates select="@* | node()"/>
         </xsl:element>
     </xsl:template>
 
     <!--Miscellaneous elements    -->
+
+    <!-- Ensure <br> is self-closing and placed inside a <akn:p> -->
+    <xsl:template match="br">
+        <xsl:choose>
+            <!-- If br is already inside a p (paragraph), just convert it to selfclosing akn:br -->
+            <xsl:when test="parent::p">
+                <akn:br/>
+            </xsl:when>
+
+            <!-- If br is outside a p, wrap it inside an akn:p -->
+            <xsl:otherwise>
+                <akn:p>
+                    <akn:br/>
+                </akn:p>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <!--akn:a elements require the href attribute, but it's actually not required in html -->
     <xsl:template match="a[not(@href)]">
         <xsl:element name="akn:a">

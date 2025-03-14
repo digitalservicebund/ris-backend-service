@@ -218,4 +218,120 @@ class HtmlToAknTest {
 
     assertEquals(AKN_START + expectedXml + AKN_END, result);
   }
+
+  @Test
+  void test_self_closing_break_not_inside_block_level_element() {
+
+    String inputHtml = "<br />";
+
+    String expectedXml =
+        """
+              <akn:judgmentBody>
+                 <akn:motivation>
+                    <akn:p>
+                       <akn:br/>
+                    </akn:p>
+                 </akn:motivation>
+              </akn:judgmentBody>
+        """;
+    String result =
+        getAkn(
+            Judgment.builder()
+                .judgmentBody(
+                    JudgmentBody.builder()
+                        .motivation(
+                            JaxbHtml.build(
+                                commonPortalTransformer.htmlStringToObjectList(inputHtml)))
+                        .build())
+                .build());
+
+    assertEquals(AKN_START + expectedXml + AKN_END, result);
+  }
+
+  @Test
+  void test_self_closing_break_inside_block_level_element() {
+
+    String inputHtml = "<p><br /></p>";
+
+    String expectedXml =
+        """
+              <akn:judgmentBody>
+                 <akn:motivation>
+                    <akn:p>
+                       <akn:br/>
+                    </akn:p>
+                 </akn:motivation>
+              </akn:judgmentBody>
+        """;
+    String result =
+        getAkn(
+            Judgment.builder()
+                .judgmentBody(
+                    JudgmentBody.builder()
+                        .motivation(
+                            JaxbHtml.build(
+                                commonPortalTransformer.htmlStringToObjectList(inputHtml)))
+                        .build())
+                .build());
+
+    assertEquals(AKN_START + expectedXml + AKN_END, result);
+  }
+
+  @Test
+  void test_non_self_closing_break_not_inside_block_level_element() {
+
+    String inputHtml = "<br>";
+
+    String expectedXml =
+        """
+              <akn:judgmentBody>
+                 <akn:motivation>
+                    <akn:p>
+                       <akn:br/>
+                    </akn:p>
+                 </akn:motivation>
+              </akn:judgmentBody>
+        """;
+    String result =
+        getAkn(
+            Judgment.builder()
+                .judgmentBody(
+                    JudgmentBody.builder()
+                        .motivation(
+                            JaxbHtml.build(
+                                commonPortalTransformer.htmlStringToObjectList(inputHtml)))
+                        .build())
+                .build());
+
+    assertEquals(AKN_START + expectedXml + AKN_END, result);
+  }
+
+  @Test
+  void test_non_self_closing_break_inside_block_level_element() {
+
+    String inputHtml = "<p><br></p>";
+
+    String expectedXml =
+        """
+              <akn:judgmentBody>
+                 <akn:motivation>
+                    <akn:p>
+                       <akn:br/>
+                    </akn:p>
+                 </akn:motivation>
+              </akn:judgmentBody>
+        """;
+    String result =
+        getAkn(
+            Judgment.builder()
+                .judgmentBody(
+                    JudgmentBody.builder()
+                        .motivation(
+                            JaxbHtml.build(
+                                commonPortalTransformer.htmlStringToObjectList(inputHtml)))
+                        .build())
+                .build());
+
+    assertEquals(AKN_START + expectedXml + AKN_END, result);
+  }
 }
