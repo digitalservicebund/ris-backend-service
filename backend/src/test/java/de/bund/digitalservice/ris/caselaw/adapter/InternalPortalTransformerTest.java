@@ -36,6 +36,7 @@ import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import net.sf.saxon.TransformerFactoryImpl;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +45,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -275,6 +279,132 @@ class InternalPortalTransformerTest {
     assertThat(fileContent).isPresent();
     assertThat(StringUtils.deleteWhitespace(fileContent.get()))
         .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  @Test
+  @DisplayName("Non self closing break inside block element")
+  void testTransform_borderNumber() {
+    String expected =
+        """
+                                <akn:hcontainer name="randnummer">
+                                   <akn:num>1</akn:num>
+                                   <akn:content>
+                                     <akn:p>Lorem ipsum</akn:p>
+                                   </akn:content>
+                                </akn:hcontainer>
+                                """;
+    DocumentationUnit otherLongTextCaseLaw =
+        testDocumentUnit.toBuilder()
+            .longTexts(
+                LongTexts.builder()
+                    .reasons(
+                        "<border-number>\n"
+                            + "                    <number>1</number>\n"
+                            + "                    <content>\n"
+                            + "                      <p>Lorem ipsum</p>\n"
+                            + "                    </content>\n"
+                            + "                </border-number>")
+                    .build())
+            .build();
+
+    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherLongTextCaseLaw);
+
+    assertThat(ldml).isPresent();
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  @Test
+  @DisplayName("Mixed text in header")
+  void testTransform_mixedTextInHeader() {
+    String expected =
+        """
+                                <akn:header>
+                                  <akn:p alternativeTo="textWrapper">Hello</akn:p>
+                                  <akn:p> paragraph</akn:p>
+                                  <akn:p alternativeTo="textWrapper"> world!</akn:p>
+                                </akn:header>
+                                """;
+    DocumentationUnit otherLongTextCaseLaw =
+        testDocumentUnit.toBuilder()
+            .shortTexts(ShortTexts.builder().headline("Hello<p> paragraph</p> world!").build())
+            .build();
+
+    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherLongTextCaseLaw);
+
+    assertThat(ldml).isPresent();
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  @Test
+  @DisplayName("Keywords")
+  void testTransform_keywords() {
+    String expected =
+        """
+                              <akn:meta>
+                                 <akn:classification source="attributsemantik-noch-undefiniert">
+                                    <akn:keyword dictionary="attributsemantik-noch-undefiniert"
+                                                 showAs="attributsemantik-noch-undefiniert"
+                                                 value="keyword1"/>
+                                 </akn:classification>
+                              </akn:meta>
+                              """;
+    DocumentationUnit otherLongTextCaseLaw =
+        testDocumentUnit.toBuilder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder().keywords(List.of("keyword 1")).build())
+            .build();
+
+    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherLongTextCaseLaw);
+
+    assertThat(ldml).isPresent();
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expected));
+  }
+
+  static Stream<Arguments> provideTagFormattingTestCases() {
+    return Stream.of(
+        // Image with closing tag
+        Arguments.of(
+            "<p><img alt=\"alt text\" height=\"70\" src=\"path/to/image\" /></p>",
+            "<akn:p><akn:imgalt=\"alttext\"height=\"70\"src=\"path/to/image\"/></akn:p>"),
+        // Image without closing tag
+        Arguments.of(
+            "<p><img alt=\"alt text\" height=\"70\" src=\"path/to/image\"></p>",
+            "<akn:p><akn:img alt=\"alt text\" height=\"70\" src=\"path/to/image\"/></akn:p>"),
+        // Self closing break not inside block element
+        Arguments.of("<br />", "<akn:p><akn:br/></akn:p>"),
+        // Self closing break inside block element
+        Arguments.of("<p><br /></p>", "<akn:p><akn:br/></akn:p>"),
+        // Non self closing break not inside block element
+        Arguments.of("<br>", "<akn:p><akn:br/></akn:p>"),
+        // Non self closing break inside block element
+        Arguments.of("<p><br></p>", "<akn:p><akn:br/></akn:p>"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideTagFormattingTestCases")
+  @DisplayName("Transform self closing HTML tags to LDML")
+  void testTransformTags(String inputHtml, String expectedFragment) {
+    DocumentationUnit otherLongTextCaseLaw =
+        testDocumentUnit.toBuilder()
+            .longTexts(LongTexts.builder().reasons(inputHtml).build())
+            .build();
+
+    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherLongTextCaseLaw);
+
+    assertThat(ldml).isPresent();
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    assertThat(fileContent).isPresent();
+    assertThat(StringUtils.deleteWhitespace(fileContent.get()))
+        .contains(StringUtils.deleteWhitespace(expectedFragment));
   }
 
   @Test

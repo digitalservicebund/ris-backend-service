@@ -111,7 +111,7 @@ public abstract class CommonPortalTransformer {
     }
 
     var contentRelatedIndexing = documentationUnit.contentRelatedIndexing();
-    if (contentRelatedIndexing != null) {
+    if (contentRelatedIndexing != null && contentRelatedIndexing.norms() != null) {
       applyIfNotEmpty(
           contentRelatedIndexing.norms().stream()
               .flatMap(normReference -> normReference.singleNorms().stream())
