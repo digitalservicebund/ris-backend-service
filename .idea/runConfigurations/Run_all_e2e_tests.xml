@@ -4,7 +4,7 @@
     <node-interpreter value="project" />
     <playwright-package value="$PROJECT_DIR$/frontend/node_modules/@playwright/test" />
     <working-dir value="$PROJECT_DIR$/frontend" />
-    <cli-options value="--debug --project=chromium" />
+    <cli-options value="--ui" />
     <envs />
     <scope-kind value="ALL" />
     <method v="2" />
