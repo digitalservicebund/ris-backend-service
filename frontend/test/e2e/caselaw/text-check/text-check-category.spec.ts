@@ -4,13 +4,22 @@ import { caselawTest as test } from "../fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { convertHexToRGB } from "~/test-helper/coloursUtil"
 
-const textWithErrors =
-  "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtschreibfehler werden rot markirt, Grammatikfehler werden gelb hervorgehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. Wussten Sie, dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Freitag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten."
+const textWithErrors = {
+  text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten.",
+  incorrectWords: [
+    "sie",
+    "Rechtshcreibfehler",
+    "markirt",
+    "hervor gehoben",
+    "wie",
+    "wussten",
+    "Sie dass",
+    "zB.",
+    "Donnerstag, dem 13",
+  ],
+}
 
-const expectedTextCheckCount = 4
-
-/* eslint-disable playwright/no-skipped-test */
-test.describe.skip(
+test.describe(
   "check text category",
   {
     annotation: {
@@ -41,22 +50,32 @@ test.describe.skip(
           const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
           await otherHeadNoteEditor.locator("div").fill("")
 
-          await otherHeadNoteEditor.locator("div").fill(textWithErrors)
+          await otherHeadNoteEditor.locator("div").fill(textWithErrors.text)
           await expect(otherHeadNoteEditor.locator("div")).toHaveText(
-            textWithErrors,
+            textWithErrors.text,
           )
         })
 
-        await test.step("trigger category text check underlines matches with corresponded color", async () => {
+        await test.step("trigger category text check", async () => {
+          const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
+
           await page
             .getByLabel("Orientierungssatz Button")
             .getByRole("button", { name: "Rechtschreibprüfung" })
             .click()
 
-          const textCheckTags = page.locator("text-check")
-          await expect(textCheckTags).toHaveCount(expectedTextCheckCount)
+          await otherHeadNoteEditor
+            .locator("text-check")
+            .first()
+            .waitFor({ state: "visible" })
+        })
 
-          for (let i = 0; i < expectedTextCheckCount; i++) {
+        await test.step("text check tags are marked by type with corresponded color", async () => {
+          const textCheckTags = page
+            .getByTestId("Orientierungssatz")
+            .locator("text-check")
+
+          for (let i = 0; i < textWithErrors.incorrectWords.length; i++) {
             await expect(textCheckTags.nth(i)).not.toHaveText("")
 
             const type =
@@ -85,28 +104,24 @@ test.describe.skip(
         })
 
         await test.step("clicking on text check tags opens corresponded modal", async () => {
-          const textCheckTags = page.locator("text-check")
-          await expect(textCheckTags).toHaveCount(expectedTextCheckCount)
-
           for (
             let textCheckIndex = 0;
-            textCheckIndex < expectedTextCheckCount;
+            textCheckIndex < textWithErrors.incorrectWords.length;
             textCheckIndex++
           ) {
-            const textCheckTag = textCheckTags.nth(textCheckIndex)
-
-            const textContent = await textCheckTag.evaluate(
-              (el) => el.textContent,
+            const allTextCheckById = page.locator(
+              `text-check[id='${textCheckIndex + 1}']`,
             )
+            const totalTextCheckTags = await allTextCheckById.count()
 
-            await textCheckTags.nth(textCheckIndex).click()
-            await expect(page.getByTestId("text-check-modal")).toBeVisible()
-            await expect(
-              page.getByTestId("text-check-modal-word"),
-            ).toContainText(textContent!)
-            await expect(
-              page.getByTestId("text-check-modal-word"),
-            ).not.toHaveText("")
+            for (let index = 0; index < totalTextCheckTags; index++) {
+              const textCheckTag = allTextCheckById.nth(index)
+              await textCheckTag.click()
+              await expect(page.getByTestId("text-check-modal")).toBeVisible()
+              await expect(
+                page.getByTestId("text-check-modal-word"),
+              ).toContainText(textWithErrors.incorrectWords[textCheckIndex])
+            }
           }
         })
 
@@ -125,7 +140,7 @@ test.describe.skip(
           await expect(page.getByTestId("text-check-modal")).toBeHidden()
 
           await expect(otherHeadNoteEditor.locator("div")).toHaveText(
-            textWithErrors.replace(textCheckLiteral, "z. B."),
+            textWithErrors.text.replace(textCheckLiteral, "z. B."),
           )
         })
 
