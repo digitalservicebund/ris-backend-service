@@ -1,3 +1,4 @@
+import "@/styles/text-check.scss"
 import { Mark } from "@tiptap/vue-3"
 import { TextCheckTagName } from "@/types/languagetool"
 
@@ -15,9 +16,8 @@ export const TextCheckMark = Mark.create({
       "text-check",
       {
         id: HTMLAttributes.id,
-        class: "lt",
+        type: HTMLAttributes.type,
       },
-      0,
     ]
   },
 
@@ -28,6 +28,10 @@ export const TextCheckMark = Mark.create({
         renderHTML: (attributes) => ({
           id: attributes.id,
         }),
+      },
+      type: {
+        parseHTML: (element) => element.getAttribute("type"),
+        renderHTML: (attributes) => ({ type: attributes.type }),
       },
     }
   },

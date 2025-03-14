@@ -65,20 +65,15 @@ public class PublicPortalPublicationService {
       // for now pending proceedings can not be transformed to LDML, so they are ignored.
       return;
     }
-    Optional<CaseLawLdml> ldml = ldmlTransformer.transformToLdml(documentationUnit);
+    CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
 
-    if (ldml.isEmpty()) {
-      throw new LdmlTransformationException(
-          "Could not transform documentation unit to LDML.", null);
-    }
-
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
     }
 
     try {
-      publicPortalBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
+      publicPortalBucket.save(ldml.getUniqueId() + ".xml", fileContent.get());
     } catch (BucketException e) {
       throw new PublishException("Could not save LDML to bucket.", e);
     }
@@ -116,7 +111,7 @@ public class PublicPortalPublicationService {
         "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
   }
 
-  @Scheduled(cron = "0 30 4 * * *")
+  @Scheduled(cron = "0 50 11 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
@@ -139,6 +134,7 @@ public class PublicPortalPublicationService {
             .filter(documentNumber -> !portalBucketDocumentNumbers.contains(documentNumber))
             .toList();
 
+    log.info("Number of LDML files in bucket: {}", portalBucketDocumentNumbers.size());
     log.info(
         "Found {} publishable doc units by database query but not in bucket.",
         inDatabaseNotInBucket.size());

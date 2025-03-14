@@ -39,13 +39,23 @@ test.describe(
             `decision-summary-${prefilledDocumentUnit.documentNumber}`,
           ),
         ).toBeVisible()
+        // wait for panel to open
+        await expect(page).toHaveURL(/showAttachmentPanel=true/)
 
         await fillInput(page, "Zitatstelle *", "123")
         await fillInput(page, "Klammernzusatz", "L")
+
+        const putRequestPromise = page.waitForRequest((request) =>
+          request.url().includes("api/v1/caselaw/legalperiodicaledition"),
+        )
         await page.getByLabel("Treffer übernehmen").click()
+
+        await putRequestPromise
+
         await expect(
           page.getByText(`MMG 2024, 123${suffix} (L)`, { exact: true }),
         ).toHaveCount(1)
+        await expect(page).toHaveURL(/showAttachmentPanel=false/)
       })
 
       await test.step("Add literature reference", async () => {
@@ -62,6 +72,9 @@ test.describe(
           ),
         ).toBeVisible()
 
+        // wait for panel to open
+        await expect(page).toHaveURL(/showAttachmentPanel=true/)
+
         await page.getByLabel("Literatur Fundstelle").click()
         await fillInput(page, "Zitatstelle *", "124")
         await fillInput(page, "Autor Literaturfundstelle", "Berg, Peter")
@@ -72,7 +85,13 @@ test.describe(
           "[aria-label='Dokumenttyp Literaturfundstelle']",
           "Anmerkung",
         )
+
+        const putRequestPromise = page.waitForRequest((request) =>
+          request.url().includes("api/v1/caselaw/legalperiodicaledition"),
+        )
         await page.getByLabel("Treffer übernehmen").click()
+
+        await putRequestPromise
 
         await expect(
           page.getByText(`MMG 2024, 124${suffix}, Berg, Peter (Ean)`, {

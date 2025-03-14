@@ -36,3 +36,7 @@ database:
   seed: true
 neuris:
   environment: staging
+
+languagetool:
+  url: http://localhost:8181/v2/check
+  language: de-DE

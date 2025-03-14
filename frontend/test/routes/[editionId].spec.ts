@@ -15,7 +15,9 @@ import { ServiceResponse } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
+useFeatureToggleServiceMock()
 const editionUuid = crypto.randomUUID()
 const legalPeriodical: LegalPeriodical = {
   uuid: crypto.randomUUID(),

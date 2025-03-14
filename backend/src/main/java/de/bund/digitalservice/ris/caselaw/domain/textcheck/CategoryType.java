@@ -7,10 +7,14 @@ import lombok.Getter;
 public enum CategoryType {
   REASONS("reasons"),
   CASE_FACTS("caseFacts"),
-  DECISION_REASON("decisionReason"),
+  DECISION_REASONS("decisionReasons"),
   HEADNOTE("headnote"),
   GUIDING_PRINCIPLE("guidingPrinciple"),
   TENOR("tenor"),
+  HEADLINE("headline"),
+  OTHER_LONG_TEXT("otherLongText"),
+  DISSENTING_OPINION("dissentingOpinion"),
+  OUTLINE("outline"),
   UNKNOWN("unbekannt");
 
   @JsonValue private final String name;

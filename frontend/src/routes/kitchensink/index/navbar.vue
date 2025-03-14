@@ -9,17 +9,17 @@ const menuItems: MenuItem[] = [
   {
     label: "Kitchensink",
     route: {
-      name: "/kitchensink",
+      name: "kitchensink-index-navbar",
       hash: "#navbarTop",
     },
     children: [
       {
         label: "Navbar Top",
-        route: { name: "/kitchensink", hash: "#navbarTop" },
+        route: { name: "kitchensink-index-navbar", hash: "#navbarTop" },
       },
       {
         label: "Navbar Side",
-        route: { name: "/kitchensink", hash: "#navbarSide" },
+        route: { name: "kitchensink-index-navbar", hash: "#navbarSide" },
       },
     ],
   },
@@ -33,12 +33,18 @@ const menuItems: MenuItem[] = [
   {
     label: "Last Item",
     route: {
-      name: "/kitchensink",
+      name: "kitchensink-index-navbar",
       hash: "#nothing",
     },
     children: [
-      { label: "Foo", route: { name: "/kitchensink", hash: "#foo" } },
-      { label: "Bar", route: { name: "/kitchensink", hash: "#bar" } },
+      {
+        label: "Foo",
+        route: { name: "kitchensink-index-navbar", hash: "#foo" },
+      },
+      {
+        label: "Bar",
+        route: { name: "kitchensink-index-navbar", hash: "#bar" },
+      },
     ],
   },
 ]

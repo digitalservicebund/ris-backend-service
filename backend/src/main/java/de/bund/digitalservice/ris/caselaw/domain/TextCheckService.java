@@ -1,25 +1,29 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckUnknownCategoryException;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
+import org.jose4j.json.internal.json_simple.JSONArray;
+import org.jose4j.json.internal.json_simple.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Parser;
+import org.jsoup.select.NodeTraversor;
+import org.jsoup.select.NodeVisitor;
 
 @Slf4j
 public class TextCheckService {
@@ -31,10 +35,6 @@ public class TextCheckService {
 
   public List<Match> check(String text) {
     return requestTool(text);
-  }
-
-  public List<Match> checkAsResponse(String text) {
-    return check(text);
   }
 
   protected List<Match> requestTool(String text) {
@@ -67,7 +67,7 @@ public class TextCheckService {
   public TextCheckCategoryResponse checkCategory(UUID id, CategoryType category)
       throws DocumentationUnitNotExistsException {
     if (category == null) {
-      return null;
+      throw new TextCheckUnknownCategoryException();
     }
 
     Documentable documentable = documentationUnitService.getByUuid(id);
@@ -76,13 +76,19 @@ public class TextCheckService {
       return switch (category) {
         case REASONS -> checkCategoryByHTML(documentationUnit.longTexts().reasons(), category);
         case CASE_FACTS -> checkCategoryByHTML(documentationUnit.longTexts().caseFacts(), category);
-        case DECISION_REASON ->
+        case DECISION_REASONS ->
             checkCategoryByHTML(documentationUnit.longTexts().decisionReasons(), category);
         case HEADNOTE -> checkCategoryByHTML(documentationUnit.shortTexts().headnote(), category);
+        case HEADLINE -> checkCategoryByHTML(documentationUnit.shortTexts().headline(), category);
         case GUIDING_PRINCIPLE ->
             checkCategoryByHTML(documentationUnit.shortTexts().guidingPrinciple(), category);
         case TENOR -> checkCategoryByHTML(documentationUnit.longTexts().tenor(), category);
-        case UNKNOWN -> null;
+        case OTHER_LONG_TEXT ->
+            checkCategoryByHTML(documentationUnit.longTexts().otherLongText(), category);
+        case DISSENTING_OPINION ->
+            checkCategoryByHTML(documentationUnit.longTexts().dissentingOpinion(), category);
+        case OUTLINE -> checkCategoryByHTML(documentationUnit.longTexts().outline(), category);
+        case UNKNOWN -> throw new TextCheckUnknownCategoryException(category.toString());
       };
     }
 
@@ -106,6 +112,7 @@ public class TextCheckService {
     return checkText(documentationUnit.longTexts().reasons(), CategoryType.REASONS);
   }
 
+  @SuppressWarnings("java:S1068")
   private TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType) {
     if (htmlText == null) {
@@ -116,80 +123,100 @@ public class TextCheckService {
     parser.setTrackPosition(true);
     Document document = Jsoup.parse(htmlText, parser);
 
-    Map<Integer, String> textNodes = new LinkedMap<>();
-    document
-        .getElementsByTag("body")
-        .first()
-        .childNodes()
-        .forEach(child -> handleChildren(child, textNodes, 1));
+    JSONArray annotations = getAnnotationsArray(htmlText, document);
 
-    //    var textChunks = generateTextChunks(textNodes);
+    JSONObject result = new JSONObject();
+    result.put("annotation", annotations);
 
-    List<Match> matches = new ArrayList<>();
-    AtomicInteger id = new AtomicInteger(1);
-    textNodes.forEach(
-        (pos, text) -> {
-          List<Match> textMatches = checkText(text, categoryType);
-          List<Match> newTextMatches =
-              textMatches.stream()
-                  .map(
-                      match ->
-                          match.toBuilder()
-                              .htmlOffset(pos + match.offset())
-                              .id(id.getAndIncrement())
-                              .build())
-                  .toList();
-          matches.addAll(newTextMatches);
-        });
+    List<Match> matches = check(result.toString());
 
     StringBuilder newHtmlText = new StringBuilder();
     AtomicInteger lastPosition = new AtomicInteger(0);
+
+    String htmlWithReplacements =
+        htmlText.replace("&gt;", ">").replace("&lt;", "<").replace("&amp;", "&");
+
     matches.forEach(
         match -> {
-          newHtmlText.append(htmlText, lastPosition.get(), match.htmlOffset());
-          newHtmlText.append("<text-check id=\"").append(match.id()).append("\">");
-          newHtmlText.append(htmlText, match.htmlOffset(), match.htmlOffset() + match.length());
+          newHtmlText.append(htmlWithReplacements, lastPosition.get(), match.offset());
+          newHtmlText
+              .append("<text-check id=\"")
+              .append(match.id())
+              .append("\" type=\"")
+              .append(match.rule().issueType().toLowerCase())
+              .append("\">");
+          newHtmlText.append(htmlWithReplacements, match.offset(), match.offset() + match.length());
           newHtmlText.append("</text-check>");
-          lastPosition.set(match.htmlOffset() + match.length());
+          lastPosition.set(match.offset() + match.length());
         });
 
-    newHtmlText.append(htmlText, lastPosition.get(), htmlText.length() - 1);
+    newHtmlText.append(htmlWithReplacements, lastPosition.get(), htmlWithReplacements.length() - 1);
 
     return new TextCheckCategoryResponse(newHtmlText.toString(), matches);
   }
 
-  @SuppressWarnings(" java:S1144")
-  private Map<Integer, String> generateTextChunks(Map<Integer, String> textNodes) {
-    Map<Integer, String> textChunks = new LinkedMap<>();
+  @SuppressWarnings("java:S3776")
+  @NotNull
+  private static JSONArray getAnnotationsArray(String htmlText, Document document) {
+    JSONArray annotations = new JSONArray();
+    NodeTraversor.traverse(
+        new NodeVisitor() {
 
-    StringBuilder builder = new StringBuilder();
-    AtomicInteger startPos = new AtomicInteger(0);
-    for (var entry : textNodes.entrySet()) {
-      String text = entry.getValue();
-      Integer pos = entry.getKey();
-      if (builder.length() + text.length() > 5000) {
-        textChunks.put(startPos.get(), builder.toString());
-        builder = new StringBuilder();
-        startPos.set(pos);
-      }
+          @Override
+          public void head(Node node, int depth) {
 
-      builder.append(text).append(" ").append(System.lineSeparator());
-    }
+            if (node instanceof TextNode textNode) {
+              // Use getWholeText() to capture non-breaking spaces
+              String processedText = textNode.getWholeText();
 
-    textChunks.put(startPos.get(), builder.toString());
+              if (!processedText.isEmpty()) {
+                JSONObject textEntry = new JSONObject();
+                textEntry.put("text", processedText);
+                annotations.add(textEntry);
+              }
+              // Ignore comments and other non-element nodes
+            } else if (!node.nodeName().startsWith("#") && htmlText.contains(node.nodeName())) {
+              // Start building the markup tag
+              StringBuilder markupTag = new StringBuilder();
+              markupTag.append("<").append(node.nodeName());
 
-    return textChunks;
-  }
+              // Add attributes if it's an Element
+              if (node instanceof Element element) {
+                for (Attribute attr : element.attributes()) {
+                  markupTag
+                      .append(" ")
+                      .append(attr.getKey())
+                      .append("=\"")
+                      .append(attr.getValue())
+                      .append("\"");
+                }
+              }
 
-  private void handleChildren(Node child, Map<Integer, String> textNodes, int level) {
+              markupTag.append(">");
 
-    log.info("{} node '{}' at {}", level, child.nodeName(), child.sourceRange());
-    if (child instanceof TextNode textNode) {
-      log.info("  text node content: '{}'", textNode.text());
-      textNodes.put(child.sourceRange().startPos(), textNode.text());
-    } else {
-      child.childNodes().forEach(grandChild -> handleChildren(grandChild, textNodes, level + 1));
-    }
+              JSONObject markupEntry = new JSONObject();
+              markupEntry.put("markup", markupTag.toString());
+
+              // Custom logic for specific tags (optional)
+              if (node.nodeName().equals("p")) {
+                markupEntry.put("interpretAs", "\n\n");
+              }
+
+              annotations.add(markupEntry);
+            }
+          }
+
+          @Override
+          public void tail(Node node, int depth) {
+            if (!(node instanceof TextNode) && !node.nodeName().startsWith("#")) {
+              JSONObject markupEntry = new JSONObject();
+              markupEntry.put("markup", "</" + node.nodeName() + ">");
+              annotations.add(markupEntry);
+            }
+          }
+        },
+        document.body().children());
+    return annotations;
   }
 
   private List<Match> checkCaseFacts(DocumentationUnit documentationUnit) {
@@ -205,7 +232,8 @@ public class TextCheckService {
       return Collections.emptyList();
     }
 
-    return checkText(documentationUnit.longTexts().decisionReasons(), CategoryType.DECISION_REASON);
+    return checkText(
+        documentationUnit.longTexts().decisionReasons(), CategoryType.DECISION_REASONS);
   }
 
   private List<Match> checkText(String text, CategoryType categoryType) {
@@ -213,7 +241,7 @@ public class TextCheckService {
       return Collections.emptyList();
     }
 
-    return check(URLEncoder.encode(text, StandardCharsets.UTF_8)).stream()
+    return checkCategoryByHTML(text, categoryType).matches().stream()
         .map(match -> match.toBuilder().category(categoryType).build())
         .toList();
   }

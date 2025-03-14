@@ -18,9 +18,11 @@ import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
 import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
+import TextEditorFooter from "@/components/input/TextEditorFooter.vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import TextCheckModal from "@/components/text-check/TextCheckModal.vue"
+import TextCheckStatus from "@/components/text-check/TextCheckStatus.vue"
 import {
   BorderNumber,
   BorderNumberContent,
@@ -28,7 +30,7 @@ import {
 } from "@/editor/borderNumber"
 import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
-import { isTextCheckTagSelected } from "@/editor/commands/textCheckCommands"
+import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { EventHandler } from "@/editor/EventHandler"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
@@ -41,9 +43,8 @@ import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
+import FeatureToggleService from "@/services/featureToggleService"
 import { Match } from "@/types/languagetool"
-
-import "@/styles/language-tool.scss"
 
 interface Props {
   value?: string
@@ -72,6 +73,9 @@ const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
 
+const textCheckService = new NeurisTextCheckService()
+
+const textCheckEnabled = ref<boolean>()
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
@@ -138,7 +142,10 @@ const editor: Editor = new Editor({
       names: ["listItem", "paragraph"],
     }),
     TextCheckMark,
-    TextCheckExtension.configure({ category: props.category }),
+    TextCheckExtension.configure({
+      category: props.category,
+      service: textCheckService,
+    }),
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
@@ -155,8 +162,6 @@ const editor: Editor = new Editor({
 })
 
 const containerWidth = ref<number>()
-
-const selectedMatch = ref<Match>()
 
 const editorExpanded = ref(false)
 const editorStyleClasses = computed(() => {
@@ -189,7 +194,7 @@ const buttonsDisabled = computed(
  */
 const shouldShowBubbleMenu = (): boolean => {
   if (editor) {
-    return isTextCheckTagSelected(editor)
+    return NeurisTextCheckService.isTextCheckTagSelected(editor)
   } else {
     return false
   }
@@ -260,13 +265,7 @@ watch(
   },
 )
 
-watch(
-  () => editor.storage.textCheckExtension?.selectedMatch,
-  (newMatch) => {
-    selectedMatch.value = newMatch
-  },
-  { immediate: true },
-)
+const selectedMatch = computed(() => textCheckService.selectedMatch.value)
 
 onMounted(async () => {
   const editorContainer = document.querySelector(".editor")
@@ -277,6 +276,12 @@ const resizeObserver = new ResizeObserver((entries) => {
   for (const entry of entries) {
     containerWidth.value = entry.contentRect.width
   }
+})
+
+onMounted(async () => {
+  textCheckEnabled.value = (
+    await FeatureToggleService.isEnabled("neuris.text-check")
+  ).data
 })
 
 defineExpose({ jumpToMatch })
@@ -302,6 +307,7 @@ defineExpose({ jumpToMatch })
       :container-width="containerWidth"
       :editor="editor"
       :editor-expanded="editorExpanded"
+      :text-check-enabled="textCheckEnabled"
       @on-editor-expanded-changed="
         (isExpanded) => (editorExpanded = isExpanded)
       "
@@ -321,7 +327,7 @@ defineExpose({ jumpToMatch })
         class="bubble-menu"
         :editor="editor"
         :should-show="shouldShowBubbleMenu"
-        :tippy-options="{ placement: 'bottom', animation: 'fade' }"
+        :tippy-options="{ placement: 'bottom-start', animation: 'fade' }"
       >
         <TextCheckModal
           v-if="selectedMatch"
@@ -331,5 +337,12 @@ defineExpose({ jumpToMatch })
         />
       </BubbleMenu>
     </div>
+    <TextEditorFooter v-if="textCheck">
+      <TextCheckStatus
+        v-if="textCheck"
+        :loading="textCheckService.loading.value"
+        :response-error="textCheckService.responseError.value ?? undefined"
+      />
+    </TextEditorFooter>
   </div>
 </template>

@@ -34,7 +34,6 @@ const service: LanguageToolService = {
     const response = await httpClient.get<TextCheckAllResponse>(
       `caselaw/documentunits/${id}/text-check/all`,
     )
-
     if (response.status >= 300) {
       response.error = {
         title: errorMessages.TEXT_CHECK_FAILED.title,
@@ -44,10 +43,16 @@ const service: LanguageToolService = {
     return response
   },
   async checkCategory(id: string, category?: string) {
-    return await httpClient.get<TextCheckCategoryResponse>(
+    const response = await httpClient.get<TextCheckCategoryResponse>(
       `caselaw/documentunits/${id}/text-check`,
       category !== undefined ? { params: { category } } : {},
     )
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.TEXT_CHECK_FAILED.title,
+      }
+    }
+    return response
   },
 }
 

@@ -1,3 +1,5 @@
+import { TextCheckService } from "@/editor/commands/textCheckCommands"
+
 export interface Replacement {
   value: string
 }
@@ -62,13 +64,9 @@ export interface Suggestion {
   matches: Match[]
 }
 
-export interface TextCheckExtensionStorage {
-  matches: Match[]
-  selectedMatch: Match | undefined
-}
-
 export type TextCheckExtensionOptions = {
   category?: string
+  service?: TextCheckService
 }
 
 export const TextCheckTagName = "textCheck"

@@ -139,7 +139,17 @@ test.describe(
             .getByLabel("Auswahl zurücksetzen")
             .click()
           await page.keyboard.press("Escape")
+
+          const requestPromise = page.waitForRequest((request) =>
+            request
+              .url()
+              .includes(
+                "api/v1/caselaw/documentunits/search-linkable-documentation-units",
+              ),
+          )
           await page.getByText("Suchen").click()
+          await requestPromise
+
           await expect(page.getByLabel("Gericht")).toHaveValue("")
           await expect(
             page.getByLabel("Zuständige Dokumentationsstelle"),

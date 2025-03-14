@@ -28,7 +28,6 @@ import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -199,17 +198,6 @@ public class DecisionTransformer extends DocumentableTransformer {
             ? new ArrayList<>(currentDto.getSource())
             : new ArrayList<>();
 
-    // Check if the first existing source has a reference and remove if it has been deleted in
-    // domain object
-    if (!existingSources.isEmpty()) {
-      SourceDTO firstSource = existingSources.getFirst();
-      var reference = firstSource.getReference();
-
-      if (reference != null && !decisionContainsReferenceWithId(decision, reference.getId())) {
-        firstSource.setReference(null); // Otherwise the source can not be deleted
-      }
-    }
-
     // Create new SourceDTO
     SourceDTO newSource = SourceDTO.builder().value(decision.coreData().source().value()).build();
 
@@ -217,13 +205,20 @@ public class DecisionTransformer extends DocumentableTransformer {
       newSource.setRank(1);
       existingSources.add(newSource);
     } else {
-      var existingSource =
-          existingSources.stream().max(Comparator.comparing(SourceDTO::getRank)).get();
+      SourceDTO firstSource = existingSources.getFirst();
+      var reference = firstSource.getReference();
+      // Check if the first existing source has a reference and remove if it has been deleted in
+      // domain object. A reference is only linked if the doc unit is created from a reference,
+      // that's why it is enough to check the first reference.
+      if (reference != null && !decisionContainsReferenceWithId(decision, reference.getId())) {
+        firstSource.setReference(null); // Otherwise the source can not be deleted
+      }
 
-      if (existingSource.getValue() != newSource.getValue()) {
+      var latestSource = existingSources.getLast();
+      if (latestSource.getValue() != newSource.getValue()) {
         // If the user selected a source with a different value, we replace it.
         newSource.setRank(existingSources.size());
-        existingSources.remove(existingSource);
+        existingSources.remove(latestSource);
         existingSources.add(newSource);
       }
       // else: If the user selected the same source or didn't change it, we don't do anything.

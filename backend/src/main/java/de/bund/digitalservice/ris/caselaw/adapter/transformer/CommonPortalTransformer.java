@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Opinions;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
@@ -38,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,12 +64,14 @@ public abstract class CommonPortalTransformer {
     this.documentBuilderFactory = documentBuilderFactory;
   }
 
-  public Optional<CaseLawLdml> transformToLdml(DocumentationUnit documentationUnit) {
+  public CaseLawLdml transformToLdml(DocumentationUnit documentationUnit) {
     try {
-      return Optional.of(CaseLawLdml.builder().judgment(buildJudgment(documentationUnit)).build());
+      return CaseLawLdml.builder().judgment(buildJudgment(documentationUnit)).build();
     } catch (ValidationException e) {
-      log.error("Case law validation failed: {}", e.getMessage());
-      return Optional.empty();
+      if (e.getMessage().contains("Empty judgment body")) {
+        throw new LdmlTransformationException("Missing judgment body.", e);
+      }
+      throw new LdmlTransformationException("LDML validation failed.", e);
     }
   }
 
@@ -127,7 +129,8 @@ public abstract class CommonPortalTransformer {
     return builder;
   }
 
-  private JudgmentBody buildJudgmentBody(DocumentationUnit documentationUnit) {
+  private JudgmentBody buildJudgmentBody(DocumentationUnit documentationUnit)
+      throws ValidationException {
 
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
@@ -150,7 +153,16 @@ public abstract class CommonPortalTransformer {
         // Langtext"
         .decision(buildDecision(documentationUnit));
 
-    return builder.build();
+    var judgmentBody = builder.build();
+
+    if (judgmentBody.getIntroduction() == null
+        && judgmentBody.getBackground() == null
+        && judgmentBody.getDecision() == null
+        && judgmentBody.getMotivation() == null) {
+      throw new ValidationException("Empty judgment body");
+    }
+
+    return judgmentBody;
   }
 
   private AknMultipleBlock buildDecision(DocumentationUnit documentationUnit) {
@@ -266,17 +278,18 @@ public abstract class CommonPortalTransformer {
     return input;
   }
 
-  protected List<Object> htmlStringToObjectList(String html) {
+  public List<Object> htmlStringToObjectList(String html) {
     if (StringUtils.isBlank(html)) {
       return Collections.emptyList();
     }
 
     html = html.replace("&nbsp;", "&#160;");
 
-    // Pre-process: Replace self-closing <img /> tags with <img></img> as we are using an XML parser
-    // and XML requires
-    // explicitly closed tags for elements.
-    html = html.replaceAll("<img([^>]*)/?(>)", "<img$1></img>");
+    // Pre-process: Replace unclosed <img> tags with <img/> as we are using an XML parser
+    // and XML requires explicitly closed tags for elements.
+    html =
+        html.replaceAll("(<img\\b[^>]*?)(?<!/)>", "$1/>")
+            .replaceAll("<\\s*br\\s*>(?!\\s*<\\s*/\\s*br\\s*>)", "<br/>");
 
     try {
       String wrapped = "<wrapper>" + html + "</wrapper>";

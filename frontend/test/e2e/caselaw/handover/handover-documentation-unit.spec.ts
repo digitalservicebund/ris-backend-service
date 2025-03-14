@@ -368,7 +368,10 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
           .click()
 
         await expect(
-          page.getByText("Warnung: Randnummern inkorrekt"),
+          page.getByText("Prüfung hat Warnungen ergeben"),
+        ).toBeVisible()
+        await expect(
+          page.getByText("Die Randnummern sind nicht korrekt"),
         ).toBeVisible()
 
         await page.getByLabel("Trotzdem übergeben").click()

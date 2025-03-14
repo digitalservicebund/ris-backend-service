@@ -74,20 +74,15 @@ public class InternalPortalPublicationService {
           "Publish not supported for Documentable type: " + documentable.getClass());
     }
 
-    Optional<CaseLawLdml> ldml = ldmlTransformer.transformToLdml(documentationUnit);
+    CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
 
-    if (ldml.isEmpty()) {
-      throw new LdmlTransformationException(
-          "Could not transform documentation unit to LDML.", null);
-    }
-
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {
       throw new LdmlTransformationException(
           "Could not transform documentation unit to valid LDML.", null);
     }
 
-    Changelog changelog = new Changelog(List.of(ldml.get().getUniqueId()), null);
+    Changelog changelog = new Changelog(List.of(ldml.getUniqueId()), null);
     String changelogJson;
     try {
       changelogJson = objectMapper.writeValueAsString(changelog);
@@ -107,8 +102,8 @@ public class InternalPortalPublicationService {
     }
 
     try {
-      internalPortalBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
-      log.info("LDML for documentation unit {} successfully published.", ldml.get().getUniqueId());
+      internalPortalBucket.save(ldml.getUniqueId() + ".xml", fileContent.get());
+      log.info("LDML for documentation unit {} successfully published.", ldml.getUniqueId());
     } catch (BucketException e) {
       log.error("Could not save LDML to bucket", e);
       throw new PublishException("Could not save LDML to bucket.", e);
@@ -214,14 +209,9 @@ public class InternalPortalPublicationService {
             "Export not supported for Documentable type: " + documentable.getClass());
       }
 
-      Optional<CaseLawLdml> ldml = ldmlTransformer.transformToLdml(documentationUnit);
+      CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
 
-      if (ldml.isEmpty()) {
-        log.error("Couldn't export (step tranform) {} as LegalDocML", documentNumber);
-        continue;
-      }
-
-      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
       if (fileContent.isEmpty()) {
         log.error("Couldn't export (step generate file content) {} as LegalDocML", documentNumber);
         continue;

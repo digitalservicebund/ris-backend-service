@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DuplicateRelationService;
 import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
@@ -29,8 +30,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicate
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
@@ -706,6 +711,164 @@ class DuplicateCheckFullIntegrationTest {
                   duplicateCheckService.updateDuplicateStatus(
                       "DocumentNumb1", "DocumentNumb2", DuplicateRelationStatus.IGNORED))
           .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void checkDuplicates_pendingProceedingWithFileNumberAndDate_shouldDoNothing()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var pendingProceedingDTO =
+          PendingProceedingDTO.builder()
+              .documentationOffice(documentationOffice)
+              .date(LocalDate.of(2023, 12, 11))
+              .documentNumber("DocumentNumb1")
+              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+              .build();
+      var decisionDTO =
+          DecisionDTO.builder()
+              .documentationOffice(documentationOffice)
+              .date(LocalDate.of(2023, 12, 11))
+              .documentNumber("DocumentNumb2")
+              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+              .build();
+
+      repository.save(pendingProceedingDTO);
+      var decision = repository.save(decisionDTO);
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkAllDuplicates();
+
+      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
+          .isEmpty();
+    }
+
+    @Test
+    void checkDuplicates_pendingProceedingWithFileNumberAndCourt_shouldDoNothing()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var court =
+          databaseCourtRepository.save(
+              CourtDTO.builder().type("BFH").isForeignCourt(false).isSuperiorCourt(true).build());
+      var pendingProceedingDTO =
+          PendingProceedingDTO.builder()
+              .documentationOffice(documentationOffice)
+              .court(court)
+              .documentNumber("DocumentNumb1")
+              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+              .build();
+      var decisionDTO =
+          DecisionDTO.builder()
+              .documentationOffice(documentationOffice)
+              .court(court)
+              .documentNumber("DocumentNumb2")
+              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+              .build();
+
+      repository.save(pendingProceedingDTO);
+      var decision = repository.save(decisionDTO);
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkAllDuplicates();
+
+      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
+          .isEmpty();
+    }
+
+    @Test
+    void checkDuplicates_pendingProceedingWithDeviatingFileNumberAndCourt_shouldDoNothing()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var court =
+          databaseCourtRepository.save(
+              CourtDTO.builder().type("BFH").isForeignCourt(false).isSuperiorCourt(true).build());
+      var pendingProceedingDTO =
+          PendingProceedingDTO.builder()
+              .documentationOffice(documentationOffice)
+              .court(court)
+              .documentNumber("DocumentNumb1")
+              .deviatingFileNumbers(
+                  List.of(DeviatingFileNumberDTO.builder().rank(0L).value("123").build()))
+              .build();
+      var decisionDTO =
+          DecisionDTO.builder()
+              .documentationOffice(documentationOffice)
+              .court(court)
+              .documentNumber("DocumentNumb2")
+              .deviatingFileNumbers(
+                  List.of(DeviatingFileNumberDTO.builder().rank(0L).value("123").build()))
+              .build();
+
+      repository.save(pendingProceedingDTO);
+      var decision = repository.save(decisionDTO);
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkAllDuplicates();
+
+      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
+          .isEmpty();
+    }
+
+    @Test
+    void checkDuplicates_pendingProceedingWithDeviatingDateAndFileNumber_shouldDoNothing()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var pendingProceedingDTO =
+          PendingProceedingDTO.builder()
+              .documentationOffice(documentationOffice)
+              .deviatingDates(
+                  List.of(
+                      DeviatingDateDTO.builder()
+                          .rank(0L)
+                          .value(LocalDate.of(2023, 12, 12))
+                          .build()))
+              .documentNumber("DocumentNumb1")
+              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+              .build();
+      var decisionDTO =
+          DecisionDTO.builder()
+              .documentationOffice(documentationOffice)
+              .deviatingDates(
+                  List.of(
+                      DeviatingDateDTO.builder()
+                          .rank(0L)
+                          .value(LocalDate.of(2023, 12, 12))
+                          .build()))
+              .documentNumber("DocumentNumb2")
+              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+              .build();
+
+      repository.save(pendingProceedingDTO);
+      var decision = repository.save(decisionDTO);
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkAllDuplicates();
+
+      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
+          .isEmpty();
     }
   }
 

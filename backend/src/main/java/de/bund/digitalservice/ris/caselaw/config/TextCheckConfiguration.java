@@ -12,14 +12,14 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class TextCheckConfiguration {
   @Bean
-  @Profile({"text-check", "staging"})
+  @Profile({"!production"})
   public TextCheckService textCheckService(
       LanguageToolConfig config, DocumentationUnitService service) {
     return new LanguageToolService(config, service);
   }
 
   @Bean
-  @Profile("!text-check & !staging")
+  @Profile("production")
   public TextCheckService textCheckMockService(DocumentationUnitService service) {
     return new TextCheckMockService(service);
   }

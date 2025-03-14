@@ -33,7 +33,11 @@ otc:
 
 sentry:
   exception-resolver-order: -2147483647
-  ignored-exceptions-for-type: org.springframework.security.authorization.AuthorizationDeniedException, de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException
+  ignored-exceptions-for-type:
+    - org.springframework.security.authorization.AuthorizationDeniedException
+    - de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException
+    - org.apache.catalina.connector.ClientAbortException # client closed connection, e.g. combobox
+    - org.springframework.web.context.request.async.AsyncRequestNotUsableException # client closed connection, e.g. combobox
 
 server:
   shutdown: graceful
@@ -46,6 +50,11 @@ server:
 #logging:
 #  level:
 #    org.springframework: DEBUG
+#    org.hibernate.SQL: DEBUG
+#    sql: debug
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#    org.hibernate.type: TRACE
+#    org.hibernate.orm.jdbc.bind: trace
 spring:
   codec:
     max-in-memory-size: 100MB
@@ -54,6 +63,15 @@ spring:
       mode: always
   jpa:
     open-in-view: false
+  #    show-sql: true
+  #    properties:
+  #      hibernate:
+  #        format_sql: true
+  #        highlight_sql: true
+  #        use_sql_comments: true
+  #        type: trace
+  #        query:
+  #          fail_on_pagination_over_collection_fetch: true
   security:
     oauth2:
       client:
@@ -86,3 +104,7 @@ neuris:
     BPatG: MPRE6******YY
     BAG: KARE7****YYYY
     # TODO: other docoffices
+
+languagetool:
+  url: http://languagetool:8181/v2/check
+  language: de-DE

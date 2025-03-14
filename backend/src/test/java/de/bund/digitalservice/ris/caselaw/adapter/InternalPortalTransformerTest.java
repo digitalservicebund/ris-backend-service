@@ -104,9 +104,9 @@ class InternalPortalTransformerTest {
          <akn:p>testDocumentNumber</akn:p>
       </akn:header>
      """;
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(testDocumentUnit);
-    Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    CaseLawLdml ldml = subject.transformToLdml(testDocumentUnit);
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -133,9 +133,9 @@ class InternalPortalTransformerTest {
                     .dissentingOpinion("<p>dissenting test</p>")
                     .build())
             .build();
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(dissentingCaseLaw);
-    Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    CaseLawLdml ldml = subject.transformToLdml(dissentingCaseLaw);
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -158,9 +158,9 @@ class InternalPortalTransformerTest {
             .shortTexts(
                 testDocumentUnit.shortTexts().toBuilder().headnote("<p>headnote test</p>").build())
             .build();
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(headnoteCaseLaw);
-    Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    CaseLawLdml ldml = subject.transformToLdml(headnoteCaseLaw);
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -185,9 +185,9 @@ class InternalPortalTransformerTest {
                     .otherHeadnote("<p>other headnote test</p>")
                     .build())
             .build();
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherHeadnoteCaseLaw);
-    Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    CaseLawLdml ldml = subject.transformToLdml(otherHeadnoteCaseLaw);
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -210,9 +210,9 @@ class InternalPortalTransformerTest {
             .longTexts(
                 testDocumentUnit.longTexts().toBuilder().reasons("<p>grounds test</p>").build())
             .build();
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(groundsCaseLaw);
-    Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    CaseLawLdml ldml = subject.transformToLdml(groundsCaseLaw);
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -239,9 +239,9 @@ class InternalPortalTransformerTest {
                     .otherLongText("<p>Other long text test</p>")
                     .build())
             .build();
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherLongTextCaseLaw);
-    Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -269,10 +269,9 @@ class InternalPortalTransformerTest {
                     .build())
             .build();
 
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherLongTextCaseLaw);
-
-    assertThat(ldml).isPresent();
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     assertThat(fileContent).isPresent();
     assertThat(StringUtils.deleteWhitespace(fileContent.get()))
         .contains(StringUtils.deleteWhitespace(expected));
@@ -445,11 +444,11 @@ class InternalPortalTransformerTest {
             documentationUnitId);
 
     // Act
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(documentationUnit);
+    CaseLawLdml ldml = subject.transformToLdml(documentationUnit);
 
     // Assert
-    Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertEquals(expected, fileContent.get());
   }
