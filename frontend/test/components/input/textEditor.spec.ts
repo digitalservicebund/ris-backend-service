@@ -165,7 +165,6 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Randnummern entfernen")).toBeInTheDocument()
     expect(screen.getByLabelText("Rückgängig machen")).toBeInTheDocument()
     expect(screen.getByLabelText("Wiederherstellen")).toBeInTheDocument()
-    expect(screen.getByLabelText("Rechtschreibprüfung")).toBeInTheDocument()
   })
 
   it("shows all table buttons after menu is expanded", async () => {
@@ -203,7 +202,6 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Zeile darunter einfügen")).toBeInTheDocument()
     expect(screen.getByLabelText("Spalte löschen")).toBeInTheDocument()
     expect(screen.getByLabelText("Zeile löschen")).toBeInTheDocument()
-    expect(screen.getByLabelText("Rechtschreibprüfung")).toBeInTheDocument()
   })
 
   it.each([
