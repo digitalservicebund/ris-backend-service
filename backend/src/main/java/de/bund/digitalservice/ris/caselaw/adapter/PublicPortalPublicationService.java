@@ -65,20 +65,15 @@ public class PublicPortalPublicationService {
       // for now pending proceedings can not be transformed to LDML, so they are ignored.
       return;
     }
-    Optional<CaseLawLdml> ldml = ldmlTransformer.transformToLdml(documentationUnit);
+    CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
 
-    if (ldml.isEmpty()) {
-      throw new LdmlTransformationException(
-          "Could not transform documentation unit to LDML.", null);
-    }
-
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
     }
 
     try {
-      publicPortalBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
+      publicPortalBucket.save(ldml.getUniqueId() + ".xml", fileContent.get());
     } catch (BucketException e) {
       throw new PublishException("Could not save LDML to bucket.", e);
     }
