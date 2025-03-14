@@ -130,9 +130,13 @@ test.describe("category import", () => {
         await expect(page.getByText(caselawReferenceCitation)).toBeHidden()
 
         await expect(
-          page.getByLabel("Fundstellen übernehmen", { exact: true }),
+          page.getByLabel("Rechtsprechungsfundstellen übernehmen", {
+            exact: true,
+          }),
         ).toBeVisible()
-        await page.getByLabel("Fundstellen übernehmen", { exact: true }).click()
+        await page
+          .getByLabel("Rechtsprechungsfundstellen übernehmen", { exact: true })
+          .click()
         await expect(page.getByText(caselawReferenceCitation)).toBeVisible()
 
         // Added Fundstelle + 1 new empty entry
@@ -190,7 +194,9 @@ test.describe("category import", () => {
         const listEntryLocator = page
           .getByTestId("caselaw-reference-list")
           .getByLabel("Listen Eintrag")
-        await page.getByLabel("Fundstellen übernehmen", { exact: true }).click()
+        await page
+          .getByLabel("Rechtsprechungsfundstellen übernehmen", { exact: true })
+          .click()
         await expect(listEntryLocator).toHaveCount(2)
         await expect(listEntryLocator.nth(0)).toHaveText(
           "MMG 2024, 1-2, Heft 1 (L)sekundär",
