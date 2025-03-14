@@ -4,6 +4,7 @@ import { setActivePinia } from "pinia"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import DocumentUnit from "@/domain/documentUnit"
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
+import languageToolService from "@/services/languageToolService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 describe("check category service", () => {
@@ -11,6 +12,14 @@ describe("check category service", () => {
   const updateDocumentUnitMock = vi.fn()
 
   beforeEach(() => {
+    vi.spyOn(languageToolService, "checkCategory").mockResolvedValue({
+      status: 200,
+      data: {
+        htmlText: "",
+        matches: [],
+      },
+    })
+
     setActivePinia(
       createTestingPinia({
         initialState: {
