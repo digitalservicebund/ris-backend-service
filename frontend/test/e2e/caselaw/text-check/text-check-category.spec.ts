@@ -7,6 +7,7 @@ import { convertHexToRGB } from "~/test-helper/coloursUtil"
 const textWithErrors =
   "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtschreibfehler werden rot markirt, Grammatikfehler werden gelb hervorgehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. Wussten Sie, dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Freitag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten."
 
+const expectedTextCheckCount = 4
 test.describe(
   "check text category",
   {
@@ -17,7 +18,7 @@ test.describe(
   },
   () => {
     test(
-      "clicking on text check save document and returns matches",
+      "clicking on text check button, save document and returns matches",
       {
         annotation: {
           description:
@@ -45,7 +46,6 @@ test.describe(
         })
 
         await test.step("trigger category text check underlines matches with corresponded color", async () => {
-          const expectedTextCheckCount = 6
           await page
             .getByLabel("Orientierungssatz Button")
             .getByRole("button", { name: "Rechtschreibprüfung" })
@@ -83,8 +83,6 @@ test.describe(
         })
 
         await test.step("clicking on text check tags opens corresponded modal", async () => {
-          const expectedTextCheckCount = 6
-
           const textCheckTags = page.locator("text-check")
           await expect(textCheckTags).toHaveCount(expectedTextCheckCount)
 
