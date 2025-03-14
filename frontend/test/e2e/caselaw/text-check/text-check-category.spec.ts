@@ -19,8 +19,6 @@ const textWithErrors = {
   ],
 }
 
-const expectedTextCheckCount = 4
-
 test.describe(
   "check text category",
   {
@@ -77,7 +75,7 @@ test.describe(
             .getByTestId("Orientierungssatz")
             .locator("text-check")
 
-          for (let i = 0; i < expectedTextCheckCount; i++) {
+          for (let i = 0; i < textWithErrors.incorrectWords.length; i++) {
             await expect(textCheckTags.nth(i)).not.toHaveText("")
 
             const type =
