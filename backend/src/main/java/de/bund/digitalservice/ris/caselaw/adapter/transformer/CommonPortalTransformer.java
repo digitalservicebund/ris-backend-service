@@ -285,11 +285,14 @@ public abstract class CommonPortalTransformer {
 
     html = html.replace("&nbsp;", "&#160;");
 
-    // Pre-process: Replace unclosed <img> tags with <img/> as we are using an XML parser
-    // and XML requires explicitly closed tags for elements.
+    // Pre-process:
+    // HTML allows tags that are not closed. However, XML does not. That's why we do
+    // this string-manipulation based workaround of closing the img and br tag.
+    // Colgroup are style elements for columns in table and are not needed */
     html =
         html.replaceAll("(<img\\b[^>]*?)(?<!/)>", "$1/>")
-            .replaceAll("<\\s*br\\s*>(?!\\s*<\\s*/\\s*br\\s*>)", "<br/>");
+            .replaceAll("<\\s*br\\s*>(?!\\s*<\\s*/\\s*br\\s*>)", "<br/>")
+            .replaceAll("<colgroup[^>]*>.*?</colgroup>", "");
 
     try {
       String wrapped = "<wrapper>" + html + "</wrapper>";
