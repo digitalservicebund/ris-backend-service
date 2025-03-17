@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jose4j.json.internal.json_simple.JSONArray;
 import org.jose4j.json.internal.json_simple.JSONObject;
@@ -112,8 +113,7 @@ public class TextCheckService {
     return checkText(documentationUnit.longTexts().reasons(), CategoryType.REASONS);
   }
 
-  @SuppressWarnings("java:S1068")
-  private TextCheckCategoryResponse checkCategoryByHTML(
+  protected TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType) {
     if (htmlText == null) {
       return null;
@@ -133,24 +133,25 @@ public class TextCheckService {
     StringBuilder newHtmlText = new StringBuilder();
     AtomicInteger lastPosition = new AtomicInteger(0);
 
-    String htmlWithReplacements =
-        htmlText.replace("&gt;", ">").replace("&lt;", "<").replace("&amp;", "&");
+    String htmlWithReplacements = StringEscapeUtils.unescapeHtml4(htmlText);
 
-    matches.forEach(
-        match -> {
-          newHtmlText.append(htmlWithReplacements, lastPosition.get(), match.offset());
-          newHtmlText
-              .append("<text-check id=\"")
-              .append(match.id())
-              .append("\" type=\"")
-              .append(match.rule().issueType().toLowerCase())
-              .append("\">");
-          newHtmlText.append(htmlWithReplacements, match.offset(), match.offset() + match.length());
-          newHtmlText.append("</text-check>");
-          lastPosition.set(match.offset() + match.length());
-        });
+    matches.stream()
+        .map(match -> match.toBuilder().category(categoryType).build())
+        .forEach(
+            match -> {
+              newHtmlText
+                  .append(htmlWithReplacements, lastPosition.get(), match.offset())
+                  .append(
+                      "<text-check id=\"%s\" type=\"%s\">%s</text-check>"
+                          .formatted(
+                              match.id(),
+                              match.rule().issueType().toLowerCase(),
+                              htmlWithReplacements.substring(
+                                  match.offset(), match.offset() + match.length())));
+              lastPosition.set(match.offset() + match.length());
+            });
 
-    newHtmlText.append(htmlWithReplacements, lastPosition.get(), htmlWithReplacements.length() - 1);
+    newHtmlText.append(htmlWithReplacements, lastPosition.get(), htmlWithReplacements.length());
 
     return new TextCheckCategoryResponse(newHtmlText.toString(), matches);
   }
