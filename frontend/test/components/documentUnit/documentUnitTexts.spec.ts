@@ -1,5 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
-import { render, screen } from "@testing-library/vue"
+import { render, screen, within } from "@testing-library/vue"
+import { flushPromises } from "@vue/test-utils"
 import type { Component } from "vue"
 import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -16,7 +17,7 @@ import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServi
 
 useFeatureToggleServiceMock()
 
-function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
+async function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
   const router = createRouter({
     history: createWebHistory(),
     routes: routes,
@@ -54,19 +55,21 @@ function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
     },
   })
 
+  await flushPromises()
+
   return { ...utils, textEditorRefs }
 }
 
 describe("Texts", () => {
   test("renders texts subheadings", async () => {
-    renderComponent()
+    await renderComponent()
     expect(screen.getByText("Kurztexte")).toBeVisible()
     expect(screen.getByText("Langtexte")).toBeVisible()
     expect(screen.getByText("Weitere Langtexte")).toBeVisible()
   })
 
   test("renders all text categories as buttons", async () => {
-    renderComponent()
+    await renderComponent()
     expect(
       screen.getByRole("button", { name: "Entscheidungsname" }),
     ).toBeVisible()
@@ -97,7 +100,7 @@ describe("Texts", () => {
   })
 
   test("renders all text categories as text fields", async () => {
-    renderComponent(
+    await renderComponent(
       {
         decisionName: "decision name",
         headline: "headline",
@@ -147,8 +150,8 @@ describe("Texts", () => {
     expect(screen.getByLabelText("Gliederung Button Leiste")).toBeVisible()
   }, 10000)
 
-  test("renders all tiptap text editors with ref", async () => {
-    const { textEditorRefs } = renderComponent(
+  test("renders all tiptap text editors with ref and text check button", async () => {
+    const { textEditorRefs } = await renderComponent(
       {
         headline: "headline",
         guidingPrinciple: "guiding principle",
@@ -177,8 +180,13 @@ describe("Texts", () => {
         if (!textEditorRefs.value[category]) {
           throw new Error(`Category '${category}' not found in textEditorRefs.`)
         }
-
         expect(textEditorRefs.value[category]).toBeTruthy()
+
+        const editor = screen.getByTestId(category)
+        expect(
+          within(editor).getByLabelText("Rechtschreibprüfung"),
+          `Category '${category}' should have text check button`,
+        ).toBeInTheDocument()
       })
   })
 })
