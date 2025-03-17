@@ -40,7 +40,7 @@ class LanguageToolServiceTest {
   }
 
   @Test
-  void testDoNotCloseCol() {
+  void testDoNotCloseSelfClosingTags() {
     String html =
         """
   <table>
@@ -55,14 +55,16 @@ class LanguageToolServiceTest {
         </td>
         <td>
           <p>table</p>
+          <img>
         </td>
       </tr>
     </tbody>
-  </table>""";
+  </table>
+  <hr>""";
     Document doc = Jsoup.parse(html.replaceAll("\\s+", ""));
     JSONArray result = getAnnotationsArray(html, doc);
 
-    Assertions.assertEquals(20, result.size());
+    Assertions.assertEquals(22, result.size());
     Assertions.assertEquals("<table>", ((JSONObject) result.get(0)).get("markup"));
     Assertions.assertEquals("<colgroup>", ((JSONObject) result.get(1)).get("markup"));
     Assertions.assertEquals("<col>", ((JSONObject) result.get(2)).get("markup"));
@@ -78,11 +80,13 @@ class LanguageToolServiceTest {
     Assertions.assertEquals("<td>", ((JSONObject) result.get(12)).get("markup"));
     Assertions.assertEquals("<p>", ((JSONObject) result.get(13)).get("markup"));
     Assertions.assertEquals("table", ((JSONObject) result.get(14)).get("text"));
-    Assertions.assertEquals("</p>", ((JSONObject) result.get(15)).get("markup"));
-    Assertions.assertEquals("</td>", ((JSONObject) result.get(16)).get("markup"));
-    Assertions.assertEquals("</tr>", ((JSONObject) result.get(17)).get("markup"));
-    Assertions.assertEquals("</tbody>", ((JSONObject) result.get(18)).get("markup"));
-    Assertions.assertEquals("</table>", ((JSONObject) result.get(19)).get("markup"));
+    Assertions.assertEquals("<img>", ((JSONObject) result.get(15)).get("markup"));
+    Assertions.assertEquals("</p>", ((JSONObject) result.get(16)).get("markup"));
+    Assertions.assertEquals("</td>", ((JSONObject) result.get(17)).get("markup"));
+    Assertions.assertEquals("</tr>", ((JSONObject) result.get(18)).get("markup"));
+    Assertions.assertEquals("</tbody>", ((JSONObject) result.get(19)).get("markup"));
+    Assertions.assertEquals("</table>", ((JSONObject) result.get(20)).get("markup"));
+    Assertions.assertEquals("<hr>", ((JSONObject) result.get(21)).get("markup"));
   }
 
   @Test

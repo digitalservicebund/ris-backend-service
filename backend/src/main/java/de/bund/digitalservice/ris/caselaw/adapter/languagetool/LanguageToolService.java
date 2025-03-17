@@ -111,10 +111,7 @@ public class LanguageToolService extends TextCheckService {
 
     @Override
     public void tail(Node node, int depth) {
-      if (!(node instanceof TextNode)
-          && !node.nameIs("col")
-          && !node.nameIs("br")
-          && !node.nodeName().startsWith("#")) {
+      if (NormalizingNodeVisitor.shouldClose(node)) {
         JSONObject markupEntry = new JSONObject();
         markupEntry.put("markup", NormalizingNodeVisitor.buildClosingTag(node));
         annotations.add(markupEntry);

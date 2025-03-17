@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class TextCheckServiceTest {
 
@@ -72,19 +74,46 @@ class TextCheckServiceTest {
         () -> textCheckService.checkWholeDocumentationUnit(uuid));
   }
 
-  @Test
-  void testCheckCategory_validCategory() throws DocumentationUnitNotExistsException {
+  @ParameterizedTest
+  @EnumSource(CategoryType.class)
+  void testCheckCategory_validCategory(CategoryType categoryType)
+      throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
 
     when(documentationUnitService.getByUuid(uuid))
         .thenReturn(
             DocumentationUnit.builder()
-                .longTexts(LongTexts.builder().reasons("<p>Reason text</p>").build())
+                .longTexts(
+                    LongTexts.builder()
+                        .reasons("<p>Reason text</p>")
+                        .tenor("<p>Tenor text</p>")
+                        .decisionReasons("<p>Decision reasons text</p>")
+                        .caseFacts("<p>Case facts text</p>")
+                        .otherLongText("<p>OtherLongText text</p>")
+                        .dissentingOpinion("<p>DissentingOpinion text</p>")
+                        .outline("<p>Outline text</p>")
+                        .build())
+                .shortTexts(
+                    ShortTexts.builder()
+                        .guidingPrinciple("<p>Guiding principle text</p>")
+                        .headnote("<p>Headnote text</p>")
+                        .decisionName("<p>Decision name text</p>")
+                        .headline("<p>Headline text</p>")
+                        .build())
                 .build());
 
-    TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, CategoryType.REASONS);
+    if (categoryType.equals(CategoryType.UNKNOWN)) {
+      assertThrows(
+          TextCheckUnknownCategoryException.class,
+          () -> textCheckService.checkCategory(uuid, categoryType));
+    } else {
+      TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, categoryType);
+      assertNotNull(result);
+    }
 
-    assertNotNull(result);
+    TextCheckCategoryResponse resultWithNull =
+        textCheckService.checkCategory(UUID.randomUUID(), categoryType);
+    assertNull(resultWithNull);
   }
 
   @Test

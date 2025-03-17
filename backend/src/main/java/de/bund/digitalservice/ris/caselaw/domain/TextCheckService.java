@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static java.util.Arrays.stream;
+
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckUnknownCategoryException;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
@@ -203,10 +205,7 @@ public class TextCheckService {
 
     @Override
     public void tail(Node node, int depth) {
-      if (!(node instanceof TextNode)
-          && !node.nameIs("col")
-          && !node.nameIs("br")
-          && !node.nodeName().startsWith("#")) {
+      if (shouldClose(node)) {
         builder.append(buildClosingTag(node));
       }
     }
@@ -230,6 +229,13 @@ public class TextCheckService {
       }
       markupTag.append(">");
       return markupTag.toString();
+    }
+
+    public static boolean shouldClose(Node node) {
+      return !(node instanceof TextNode)
+          && stream(new String[] {"col", "img", "br", "hr"})
+              .noneMatch(node.nodeName()::equals) // self-closing tags do not need to be closed
+          && !node.nodeName().startsWith("#");
     }
 
     @NotNull
