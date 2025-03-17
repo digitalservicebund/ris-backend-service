@@ -80,8 +80,8 @@ class LanguageToolServiceTest {
     Assertions.assertEquals("<td>", ((JSONObject) result.get(12)).get("markup"));
     Assertions.assertEquals("<p>", ((JSONObject) result.get(13)).get("markup"));
     Assertions.assertEquals("table", ((JSONObject) result.get(14)).get("text"));
-    Assertions.assertEquals("<img>", ((JSONObject) result.get(15)).get("markup"));
-    Assertions.assertEquals("</p>", ((JSONObject) result.get(16)).get("markup"));
+    Assertions.assertEquals("</p>", ((JSONObject) result.get(15)).get("markup"));
+    Assertions.assertEquals("<img>", ((JSONObject) result.get(16)).get("markup"));
     Assertions.assertEquals("</td>", ((JSONObject) result.get(17)).get("markup"));
     Assertions.assertEquals("</tr>", ((JSONObject) result.get(18)).get("markup"));
     Assertions.assertEquals("</tbody>", ((JSONObject) result.get(19)).get("markup"));
