@@ -298,12 +298,14 @@ class InternalPortalTransformerTest {
             .longTexts(
                 LongTexts.builder()
                     .reasons(
-                        "<border-number>\n"
-                            + "                    <number>1</number>\n"
-                            + "                    <content>\n"
-                            + "                      <p>Lorem ipsum</p>\n"
-                            + "                    </content>\n"
-                            + "                </border-number>")
+                        """
+                                    <border-number>
+                                        <number>1</number>
+                                        <content>
+                                            <p>Lorem ipsum</p>
+                                        </content>
+                                    </border-number>
+                                    """)
                     .build())
             .build();
 
