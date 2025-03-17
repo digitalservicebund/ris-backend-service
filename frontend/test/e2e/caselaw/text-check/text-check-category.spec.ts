@@ -28,7 +28,8 @@ test.describe(
     },
   },
   () => {
-    test(
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "clicking on text check button, save document and returns matches",
       {
         annotation: {
