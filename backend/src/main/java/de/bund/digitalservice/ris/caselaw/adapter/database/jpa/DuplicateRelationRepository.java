@@ -26,6 +26,7 @@ WHERE duplicateRelation.id.documentationUnitId1 = :docUnitId
       value =
           """
 WITH
+    -- 1) Collect for each relevant criterion a full list of pairs of doc-unit-id and value, e.g. ("38e..34f", 2020-01-11)
     all_dates as(
         SELECT documentation_unit_id as id, value
         FROM incremental_migration.deviating_date
@@ -57,6 +58,14 @@ WITH
         UNION ALL
         SELECT documentation_unit_id as id, UPPER(value) as value
         FROM incremental_migration.deviating_file_number),
+
+    -- 2) Find all pairs of doc-unit-ids that have an identical value per criterion,
+    -- e.g. ("38e..34f", 2020-01-11) + ("785..eb9", 2020-01-11) -> ("38e..34f", "785..eb9")
+    -- We step-by-step narrow down the number of doc-unit-id pairs by only considering pairs for the next check that have matched by previously checked criteria.
+    -- The order of the criteria is important: We need to start with the most specific criterion that has the least matches.
+    -- If we started with doc-type instead, we would get an explosion of matches as doc units having the same doc-type is very common.
+
+    -- 2A) Combined criteria: Aktenzeichen + Entscheidungsdatum // Aktenzeichen + Gericht + Dok-Typ
      file_number_matches as (
         SELECT DISTINCT t1.id AS id_a, t2.id AS id_b
         FROM all_file_numbers t1
@@ -74,6 +83,14 @@ WITH
         JOIN all_courts d1 ON d1.id = fnm.id_a
         JOIN all_courts d2 ON d2.id = fnm.id_b
         WHERE d1.value = d2.value),
+     court_file_number_doc_type_matches as (
+        SELECT matches.id_a, matches.id_b
+        FROM court_file_number_matches matches
+        JOIN incremental_migration.documentation_unit d1 ON d1.id = matches.id_a
+        JOIN incremental_migration.documentation_unit d2 ON d2.id = matches.id_b
+        WHERE d1.document_type_id = d2.document_type_id),
+
+    -- 2B) ECLI matches
      all_eclis as (
         SELECT documentation_unit_id as id, UPPER(value) as value
         FROM incremental_migration.deviating_ecli
@@ -85,16 +102,18 @@ WITH
         FROM all_eclis t1
         JOIN all_eclis t2 ON t1.value = t2.value
         WHERE t1.id < t2.id),
+
+    -- 3) Combine all matches and reasons for the matches
      duplicate_relations_view as (
-        SELECT id_a, id_b, STRING_AGG(DISTINCT reason, ', ') as reason
+        SELECT id_a, id_b
         FROM (
-            SELECT *, 'Entscheidungsdatum + Aktenzeichen' as reason
+            SELECT *
             FROM date_file_number_matches
             UNION ALL
-            SELECT *, 'Gericht + Aktenzeichen' as reason
-            FROM court_file_number_matches
+            SELECT *
+            FROM court_file_number_doc_type_matches
             UNION ALL
-            SELECT *, 'ECLI' as reason
+            SELECT *
             FROM ecli_matches
         ) as all_matches
       GROUP BY id_a, id_b)
@@ -160,6 +179,13 @@ WITH
         JOIN all_courts d1 ON d1.id = fnm.id_a
         JOIN all_courts d2 ON d2.id = fnm.id_b
         WHERE d1.value = d2.value),
+     court_file_number_doc_type_matches as (
+        SELECT matches.id_a, matches.id_b
+        FROM court_file_number_matches matches
+        JOIN incremental_migration.documentation_unit d1 ON d1.id = matches.id_a
+        JOIN incremental_migration.documentation_unit d2 ON d2.id = matches.id_b
+        WHERE d1.document_type_id = d2.document_type_id),
+
      all_eclis as (
         SELECT documentation_unit_id as id, UPPER(value) as value
         FROM incremental_migration.deviating_ecli
@@ -172,15 +198,15 @@ WITH
         JOIN all_eclis t2 ON t1.value = t2.value
         WHERE t1.id < t2.id),
      duplicate_relations_view as (
-        SELECT id_a, id_b, STRING_AGG(DISTINCT reason, ', ') as reason
+        SELECT id_a, id_b
         FROM (
-            SELECT *, 'Entscheidungsdatum + Aktenzeichen' as reason
+            SELECT *
             FROM date_file_number_matches
             UNION ALL
-            SELECT *, 'Gericht + Aktenzeichen' as reason
-            FROM court_file_number_matches
+            SELECT *
+            FROM court_file_number_doc_type_matches
             UNION ALL
-            SELECT *, 'ECLI' as reason
+            SELECT *
             FROM ecli_matches
         ) as all_matches
       GROUP BY id_a, id_b)
