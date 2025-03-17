@@ -133,24 +133,13 @@ import IconClear from "~icons/ic/baseline-clear"
       </div>
     </KitchensinkStory>
 
-    <KitchensinkStory name="Medium">
+    <KitchensinkStory name="Large">
       <div class="flex gap-20">
         <TextButton
           button-type="primary"
           :icon="IconClear"
-          label="Button Medium"
-          size="medium"
-        />
-      </div>
-    </KitchensinkStory>
-
-    <KitchensinkStory name="Small">
-      <div class="flex gap-20">
-        <TextButton
-          button-type="primary"
-          :icon="IconClear"
-          label="Button Small"
-          size="small"
+          label="Button Large"
+          size="large"
         />
       </div>
     </KitchensinkStory>

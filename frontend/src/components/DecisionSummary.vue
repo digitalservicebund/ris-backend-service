@@ -74,7 +74,7 @@ const divider = computed(() => (props.documentNumber ? ` | ` : undefined))
             "
           >
             <button
-              class="ds-link-01-bold whitespace-nowrap leading-24 no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+              class="ds-link-01-bold leading-24 whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
               :data-testid="'document-number-link-' + documentNumber"
               @click="openSidePanelAndScrollToSection(documentNumber)"
             >

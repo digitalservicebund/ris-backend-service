@@ -161,7 +161,7 @@ watch(
           <div class="ds-label-02-reg flex flex-row">
             <div v-if="!props.isRoot" class="pl-6">
               <span
-                class="whitespace-nowrap p-2"
+                class="p-2 whitespace-nowrap"
                 :class="isSearchCandidate ? 'bg-yellow-300' : ''"
               >
                 {{ node.identifier }} |

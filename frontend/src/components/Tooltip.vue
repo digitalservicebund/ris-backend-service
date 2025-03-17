@@ -54,7 +54,7 @@ const closeTooltip = () => {
     <slot />
     <div
       v-if="tooltipVisible"
-      class="ds-label-03-reg absolute left-[50%] top-[110%] z-20 w-max max-w-[18em] translate-x-[-50%] whitespace-pre-line rounded bg-gray-900 px-8 py-4 text-center text-white"
+      class="ds-label-03-reg absolute top-[110%] left-[50%] z-20 w-max max-w-[18em] translate-x-[-50%] rounded bg-gray-900 px-8 py-4 text-center whitespace-pre-line text-white"
       role="tooltip"
     >
       {{ text }}

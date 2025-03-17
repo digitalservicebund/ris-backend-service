@@ -53,7 +53,7 @@ onMounted(() => {
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     :aria-label="ariaLabel"
-    class="popup-modal-wrapper fixed left-0 top-0 z-50 flex h-full w-screen items-center justify-center bg-background"
+    class="popup-modal-wrapper bg-background fixed top-0 left-0 z-50 flex h-full w-screen items-center justify-center"
     role="dialog"
     tabindex="0"
     @click.self="$emit('closeModal')"

@@ -76,7 +76,7 @@ function onFileSelect(event: Event) {
     </span>
     <span v-else class="flex flex-col items-center p-24">
       <span
-        class="w-icon rounded-full border-1 border-solid bg-blue-200 p-12 text-32 text-blue-800"
+        class="w-icon text-32 rounded-full border-1 border-solid bg-blue-200 p-12 text-blue-800"
       >
         <IconUpload />
       </span>

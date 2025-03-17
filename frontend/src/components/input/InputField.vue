@@ -133,7 +133,7 @@ export enum LabelPosition {
     </div>
 
     <div v-if="localValidationError" class="flex flex-row items-center">
-      <IconErrorOutline class="pr-4 text-14 text-red-800" />
+      <IconErrorOutline class="text-14 pr-4 text-red-800" />
 
       <div
         class="lex-row ds-label-03-reg mt-2 text-red-800"

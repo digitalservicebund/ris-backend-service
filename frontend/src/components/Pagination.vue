@@ -46,7 +46,7 @@ export type Page<T> = {
   <slot v-if="props.navigationPosition == 'bottom'"></slot>
   <FlexContainer
     v-if="page?.content && !page?.empty && !isLoading"
-    class="mb-24 mt-20 px-24"
+    class="mt-20 mb-24 px-24"
     flex-direction="flex-row"
     justify-content="justify-between"
   >

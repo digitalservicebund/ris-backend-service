@@ -153,7 +153,7 @@ watch(
       />
     </div>
 
-    <div v-else class="my-112 grid justify-items-center bg-white bg-opacity-60">
+    <div v-else class="bg-opacity-60 my-112 grid justify-items-center bg-white">
       <h2>Ausgabe wird geladen ...</h2>
       <LoadingSpinner />
     </div>

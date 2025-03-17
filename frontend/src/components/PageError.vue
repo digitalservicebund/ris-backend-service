@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div class="ml-48 mt-48 gap-16 p-16">
+  <div class="mt-48 ml-48 gap-16 p-16">
     <h1 class="ds-heading-02-reg mb-32">{{ props.title }}</h1>
     <p class="mb-32">{{ props.description }}</p>
     <p class="mb-16">

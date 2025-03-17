@@ -23,7 +23,7 @@ const emit = defineEmits<{
           data-testid="chip"
         >
           <span
-            class="overflow-hidden text-ellipsis whitespace-nowrap px-8 py-6 text-18"
+            class="text-18 overflow-hidden px-8 py-6 text-ellipsis whitespace-nowrap"
             :data-testid="`ListInputDisplay_${label}_${chip}`"
             >{{ chip }}
           </span>

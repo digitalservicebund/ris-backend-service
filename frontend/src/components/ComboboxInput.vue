@@ -266,7 +266,7 @@ export type InputModelProps =
 <template>
   <div ref="dropdownContainerRef" class="relative w-full">
     <div
-      class="space-between flex h-48 flex-row whitespace-nowrap bg-white px-16 py-12 shadow-button shadow-blue-800"
+      class="space-between shadow-button flex h-48 flex-row bg-white px-16 py-12 whitespace-nowrap shadow-blue-800"
       :class="conditionalClasses"
     >
       <input
@@ -275,7 +275,7 @@ export type InputModelProps =
         v-model="inputText"
         :aria-label="ariaLabel"
         autocomplete="off"
-        class="w-full bg-transparent placeholder:font-font-family-sans placeholder:not-italic placeholder:text-gray-800 focus:outline-none"
+        class="placeholder:font-font-family-sans w-full bg-transparent placeholder:text-gray-800 placeholder:not-italic focus:outline-none"
         :placeholder="placeholder"
         :readonly="readOnly"
         tabindex="0"
@@ -311,7 +311,7 @@ export type InputModelProps =
     </div>
     <div
       v-if="showDropdown && !readOnly"
-      class="absolute left-0 right-0 top-[100%] z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white px-8 py-12 drop-shadow-md"
+      class="absolute top-[100%] right-0 left-0 z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white px-8 py-12 drop-shadow-md"
       tabindex="-1"
     >
       <!-- Caution: misusage of index as key in v-for is needed for updateFocusedItem, do not remove before refactoring focus logic -->
