@@ -87,9 +87,16 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     var allDates = collectDecisionDates(decisionDTO);
     var allCourtIds = collectCourtIds(decisionDTO);
     var allDeviatingCourts = collectDeviatingCourts(decisionDTO);
+    var allDocTypeIds = collectDocumentTypeIds(decisionDTO);
 
     return findPotentialDuplicates(
-        decisionDTO, allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis);
+        decisionDTO,
+        allFileNumbers,
+        allDates,
+        allCourtIds,
+        allDeviatingCourts,
+        allEclis,
+        allDocTypeIds);
   }
 
   @Override
@@ -195,15 +202,26 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     return allDeviatingCourts;
   }
 
+  private List<UUID> collectDocumentTypeIds(DecisionDTO decisionDTO) {
+    List<UUID> allDocTypeIds = new ArrayList<>();
+    var documentationType = decisionDTO.getDocumentType();
+    if (documentationType != null) {
+      allDocTypeIds.add(documentationType.getId());
+    }
+    return allDocTypeIds;
+  }
+
   private List<DocumentationUnitIdDuplicateCheckDTO> findPotentialDuplicates(
       DecisionDTO decisionDTO,
       List<String> allFileNumbers,
       List<LocalDate> allDates,
       List<UUID> allCourtIds,
       List<String> allDeviatingCourts,
-      List<String> allEclis) {
+      List<String> allEclis,
+      List<UUID> allDocTypeIds) {
     return repository
-        .findDuplicates(allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis)
+        .findDuplicates(
+            allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis, allDocTypeIds)
         .stream()
         // Should not contain itself
         .filter(dup -> !decisionDTO.getId().equals(dup.getId()))
