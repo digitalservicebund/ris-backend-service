@@ -65,7 +65,9 @@ onMounted(() => {
       <div class="ds-label-01-bold text-black">
         {{ headerText }}
       </div>
-      <div class="ds-label-03-reg text-black">{{ contentText }}</div>
+      <div class="ds-label-03-reg whitespace-pre-line text-black">
+        {{ contentText }}
+      </div>
       <div
         class="modal-buttons-container flex w-full flex-row justify-end gap-[1rem]"
       >

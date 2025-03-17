@@ -282,7 +282,7 @@ tasks {
         }
     }
 
-    task<Test>("integrationTest") {
+    register<Test>("integrationTest") {
         description = "Runs the integration tests."
         group = "verification"
         useJUnitPlatform {

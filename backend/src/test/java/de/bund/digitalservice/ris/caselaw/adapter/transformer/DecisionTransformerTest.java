@@ -771,9 +771,16 @@ class DecisionTransformerTest {
   }
 
   @Test
-  void testTransformToDTO_withSource_withExistingSource() {
+  void testTransformToDTO_withSource_withUpdatedExistingSource() {
+    var reference = CaselawReferenceDTO.builder().build();
     List<SourceDTO> existingSources =
-        List.of(SourceDTO.builder().value(SourceValue.A).rank(1).build()); // Example list
+        List.of(
+            SourceDTO.builder()
+                .value(SourceValue.Z)
+                .sourceRawValue("z")
+                .reference(reference)
+                .rank(1)
+                .build());
 
     DecisionDTO currentDto = DecisionDTO.builder().source(existingSources).build();
 
@@ -784,8 +791,40 @@ class DecisionTransformerTest {
             .build();
 
     DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
-    assertThat(decisionDTO.getSource().getLast().getRank()).isEqualTo(2);
+    assertThat(decisionDTO.getSource()).hasSize(1);
+    assertThat(decisionDTO.getSource().getLast().getRank()).isEqualTo(1);
     assertThat(decisionDTO.getSource().getLast().getValue()).isEqualTo(SourceValue.E);
+    assertThat(decisionDTO.getSource().getLast().getReference()).isNull();
+    assertThat(decisionDTO.getSource().getLast().getSourceRawValue()).isNull();
+  }
+
+  @Test
+  void testTransformToDTO_withSource_withUnchangedExistingSources() {
+    var reference = CaselawReferenceDTO.builder().build();
+    List<SourceDTO> existingSources =
+        List.of(
+            SourceDTO.builder().value(SourceValue.A).rank(1).build(),
+            SourceDTO.builder()
+                .value(SourceValue.Z)
+                .sourceRawValue("z")
+                .reference(reference)
+                .rank(2)
+                .build());
+
+    DecisionDTO currentDto = DecisionDTO.builder().source(existingSources).build();
+
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
+            .coreData(
+                CoreData.builder().source(Source.builder().value(SourceValue.Z).build()).build())
+            .build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(decisionDTO.getSource()).hasSize(2);
+    assertThat(decisionDTO.getSource().getLast().getRank()).isEqualTo(2);
+    assertThat(decisionDTO.getSource().getLast().getValue()).isEqualTo(SourceValue.Z);
+    assertThat(decisionDTO.getSource().getLast().getSourceRawValue()).isEqualTo("z");
+    assertThat(decisionDTO.getSource().getLast().getReference()).isEqualTo(reference);
   }
 
   @Test

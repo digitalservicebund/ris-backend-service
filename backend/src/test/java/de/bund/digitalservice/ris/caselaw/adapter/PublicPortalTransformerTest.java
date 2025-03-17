@@ -69,11 +69,11 @@ class PublicPortalTransformerTest {
   @MethodSource("testCasesForIncludedAttributes")
   void transformIncludedAttributes(String testName, String expected) {
     // Act
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(testDocumentUnit);
+    CaseLawLdml ldml = subject.transformToLdml(testDocumentUnit);
 
     // Assert
-    Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -84,11 +84,11 @@ class PublicPortalTransformerTest {
   @MethodSource("testCasesForExcludedAttributes")
   void transformExcludedAttributes(String testName, String expected) {
     // Act
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(testDocumentUnit);
+    CaseLawLdml ldml = subject.transformToLdml(testDocumentUnit);
 
     // Assert
-    Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertFalse(
         StringUtils.deleteWhitespace(fileContent.get())
@@ -224,11 +224,11 @@ class PublicPortalTransformerTest {
             documentationUnitId);
 
     // Act
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(testDocumentUnit);
+    CaseLawLdml ldml = subject.transformToLdml(testDocumentUnit);
 
     // Assert
-    Assertions.assertTrue(ldml.isPresent());
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertEquals(expected, fileContent.get());
   }

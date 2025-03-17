@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue"
+import { onMounted, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
@@ -48,7 +48,7 @@ async function searchForDocumentUnit() {
 }
 
 const labels = {
-  caselawReferences: "Fundstellen",
+  caselawReferences: "Rechtsprechungsfundstellen",
   literatureReferences: "Literaturfundstellen",
   keywords: "Schlagwörter",
   fieldsOfLaw: "Sachgebiete",

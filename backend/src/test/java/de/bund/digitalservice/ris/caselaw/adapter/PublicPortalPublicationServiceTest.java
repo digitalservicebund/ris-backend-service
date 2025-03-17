@@ -118,7 +118,7 @@ class PublicPortalPublicationServiceTest {
   }
 
   @Test
-  void publish_withTransformationResultingInEmptyLdml_shouldThrowLdmlTransformationException()
+  void publish_withMissingCoreDataLdml_shouldThrowLdmlTransformationException()
       throws DocumentationUnitNotExistsException {
     DocumentationUnit invalidTestDocumentUnit =
         testDocumentUnit.toBuilder().coreData(CoreData.builder().build()).build();
@@ -128,7 +128,7 @@ class PublicPortalPublicationServiceTest {
     var documentNumber = invalidTestDocumentUnit.documentNumber();
     assertThatExceptionOfType(LdmlTransformationException.class)
         .isThrownBy(() -> subject.publishDocumentationUnit(documentNumber))
-        .withMessageContaining("Could not transform documentation unit to LDML.");
+        .withMessageContaining("LDML validation failed.");
   }
 
   @Test

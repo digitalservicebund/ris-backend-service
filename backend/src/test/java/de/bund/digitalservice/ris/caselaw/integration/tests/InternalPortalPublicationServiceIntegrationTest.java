@@ -197,7 +197,7 @@ class InternalPortalPublicationServiceIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().message())
-                    .contains("Could not transform documentation unit to LDML."));
+                    .contains("LDML validation failed."));
   }
 
   @Test
@@ -217,7 +217,7 @@ class InternalPortalPublicationServiceIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().message())
-                    .contains("Could not transform documentation unit to valid LDML."));
+                    .contains("Missing judgment body."));
   }
 
   @Test

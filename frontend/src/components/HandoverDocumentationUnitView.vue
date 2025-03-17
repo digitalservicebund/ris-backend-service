@@ -120,9 +120,19 @@ function handoverDocumentUnit() {
       title: "Gründe und Entscheidungsgründe sind befüllt.",
       description: "Die Dokumentationseinheit kann nicht übergeben werden.",
     }
-  } else if (!areBorderNumbersAndLinksValid.value) {
-    // If there are invalid border numbers, you need to confirm a modal before handing over
-    showHandoverModal.value = true
+  } else if (
+    pendingDuplicates.value?.length ||
+    !areBorderNumbersAndLinksValid.value
+  ) {
+    // With active warnings, you need to confirm a modal before handing over
+    const warnings: string[] = []
+    if (pendingDuplicates.value?.length)
+      warnings.push("Es besteht Dublettenverdacht.")
+    if (!areBorderNumbersAndLinksValid.value)
+      warnings.push("Die Randnummern sind nicht korrekt.")
+    warnings.push("Wollen Sie das Dokument dennoch übergeben?")
+    warningModalReasons.value = warnings.join("\n")
+    showHandoverWarningModal.value = true
   } else {
     emits("handoverDocument")
   }
@@ -221,11 +231,12 @@ const missingNormsFields = ref(
     }),
 )
 
-const showHandoverModal = ref(false)
+const warningModalReasons = ref("")
+const showHandoverWarningModal = ref(false)
 
 function confirmHandoverDialog() {
   emits("handoverDocument")
-  showHandoverModal.value = false
+  showHandoverWarningModal.value = false
 }
 
 const borderNumberValidationResult = ref(
@@ -330,8 +341,7 @@ const isPublishable = computed<boolean>(
     !fieldsMissing.value &&
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
-    !!preview.value?.success &&
-    pendingDuplicates.value.length === 0,
+    !!preview.value?.success,
 )
 </script>
 
@@ -641,13 +651,13 @@ const isPublishable = computed<boolean>(
         :status="InfoStatus.SUCCEED"
       />
       <PopupModal
-        v-if="showHandoverModal"
+        v-if="showHandoverWarningModal"
         aria-label="Bestätigung für Übergabe bei Fehlern"
-        content-text="Die Randnummern sind nicht korrekt. Wollen Sie das Dokument dennoch übergeben?"
-        header-text="Warnung: Randnummern inkorrekt"
+        :content-text="warningModalReasons"
+        header-text="Prüfung hat Warnungen ergeben"
         primary-button-text="Trotzdem übergeben"
         primary-button-type="primary"
-        @close-modal="showHandoverModal = false"
+        @close-modal="showHandoverWarningModal = false"
         @primary-action="confirmHandoverDialog"
       />
 

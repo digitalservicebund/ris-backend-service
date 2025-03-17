@@ -64,6 +64,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Slf4j
 @Primary
+// Repository for main entity -> depends on more than 20 classes :-/
+@SuppressWarnings("java:S6539")
 public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUnitRepository {
   private final DatabaseDocumentationUnitRepository repository;
   private final DatabaseCourtRepository databaseCourtRepository;
@@ -74,6 +76,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
   private final UserService userService;
   private final EntityManager entityManager;
+  private final DatabaseReferenceRepository referenceRepository;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -84,7 +87,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseProcedureRepository procedureRepository,
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       UserService userService,
-      EntityManager entityManager) {
+      EntityManager entityManager,
+      DatabaseReferenceRepository referenceRepository) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -93,6 +97,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.relatedDocumentationRepository = relatedDocumentationRepository;
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
+    this.referenceRepository = referenceRepository;
     this.userService = userService;
     this.entityManager = entityManager;
   }
@@ -161,6 +166,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       ReferenceDTO referenceDTO = ReferenceTransformer.transformToDTO(createdFromReference);
       referenceDTO.setDocumentationUnitRank(0);
       referenceDTO.setDocumentationUnit(documentationUnitDTO);
+
+      // There is no cascading from Source->References as the doc unit also has the references
+      // relationship directly that has cascading. Otherwise, when saving the doc unit, it would try
+      // to save the same reference twice -> JPA save error
+      referenceRepository.save(referenceDTO);
 
       // if created from reference, the source is always 'Z' (Zeitschrift)
       sources.add(SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());

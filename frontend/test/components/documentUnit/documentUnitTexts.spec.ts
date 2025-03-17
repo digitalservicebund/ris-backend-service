@@ -4,7 +4,12 @@ import type { Component } from "vue"
 import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
-import DocumentUnit, { LongTexts, ShortTexts } from "@/domain/documentUnit"
+import DocumentUnit, {
+  longTextLabels,
+  LongTexts,
+  shortTextLabels,
+  ShortTexts,
+} from "@/domain/documentUnit"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import routes from "~/test-helper/routes"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
@@ -142,7 +147,7 @@ describe("Texts", () => {
     expect(screen.getByLabelText("Gliederung Button Leiste")).toBeVisible()
   }, 10000)
 
-  test("renders all text editors with ref", async () => {
+  test("renders all tiptap text editors with ref", async () => {
     const { textEditorRefs } = renderComponent(
       {
         headline: "headline",
@@ -155,17 +160,25 @@ describe("Texts", () => {
         reasons: "reasons",
         caseFacts: "case facts",
         decisionReasons: "decision reasons",
+        otherLongText: "otherLongText",
+        outline: "outline",
       },
     )
 
-    expect(textEditorRefs.value["headline"]).toBeTruthy()
-    expect(textEditorRefs.value["guidingPrinciple"]).toBeTruthy()
-    expect(textEditorRefs.value["headnote"]).toBeTruthy()
-    expect(textEditorRefs.value["otherHeadnote"]).toBeTruthy()
+    const excludeLabels = [
+      "decisionName",
+      "dissentingOpinion",
+      "participatingJudges",
+    ]
 
-    expect(textEditorRefs.value["tenor"]).toBeTruthy()
-    expect(textEditorRefs.value["reasons"]).toBeTruthy()
-    expect(textEditorRefs.value["caseFacts"]).toBeTruthy()
-    expect(textEditorRefs.value["decisionReasons"]).toBeTruthy()
+    Object.keys({ ...shortTextLabels, ...longTextLabels })
+      .filter((category) => !excludeLabels.includes(category))
+      .forEach((category) => {
+        if (!textEditorRefs.value[category]) {
+          throw new Error(`Category '${category}' not found in textEditorRefs.`)
+        }
+
+        expect(textEditorRefs.value[category]).toBeTruthy()
+      })
   })
 })

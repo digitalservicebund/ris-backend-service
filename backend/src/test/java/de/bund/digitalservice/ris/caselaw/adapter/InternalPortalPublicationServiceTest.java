@@ -114,7 +114,7 @@ class InternalPortalPublicationServiceTest {
   }
 
   @Test
-  @DisplayName("Publish fails with transformation exception")
+  @DisplayName("Publish fails with empty core data")
   void failLdmlTransformation() throws DocumentationUnitNotExistsException {
     DocumentationUnit invalidTestDocumentUnit =
         testDocumentUnit.toBuilder().coreData(CoreData.builder().build()).build();
@@ -125,7 +125,7 @@ class InternalPortalPublicationServiceTest {
     assertThatExceptionOfType(LdmlTransformationException.class)
         .isThrownBy(
             () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
-        .withMessageContaining("Could not transform documentation unit to LDML.");
+        .withMessageContaining("LDML validation failed.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
 
@@ -141,7 +141,7 @@ class InternalPortalPublicationServiceTest {
     assertThatExceptionOfType(LdmlTransformationException.class)
         .isThrownBy(
             () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
-        .withMessageContaining("Could not transform documentation unit to valid LDML.");
+        .withMessageContaining("Missing judgment body.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
 

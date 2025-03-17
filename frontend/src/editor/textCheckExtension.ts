@@ -51,11 +51,11 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
       },
       acceptMatch:
         (matchId: number, text: string) =>
-        ({ editor }) => {
+        ({ state, dispatch }) => {
           if (matchId) {
             const service = this.options.service as TextCheckService
 
-            service.replaceMatch(editor, matchId, text)
+            service.replaceMatch(matchId, text, state, dispatch)
             return true
           }
           return false

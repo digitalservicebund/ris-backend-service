@@ -174,6 +174,19 @@ public class DecisionTransformer extends DocumentableTransformer {
     return builder.build();
   }
 
+  // No need to check for null, when accessing max of a non-empty list.
+  @SuppressWarnings("java:S3655")
+  /*
+   Currently, our UI and domain object only support one single source,
+   however our DTO and the jDV support multiple sources.
+   This is why we only update the source with the highest rank.
+
+   A) If the domain object has an empty source, we do not update the sources list in the DTO.
+   B) If the domain object has a source and the DTO has no sources, we add the source to the DTO.
+   C) If the domain object has a source and the DTO has sources...
+   C1) ... and if the value of the highest ranking source is the same -> we don't do anything.
+   C2) ... and if the value of the highest ranking source is different -> we replace the source.
+  */
   private static void addSource(
       DecisionDTO currentDto, DecisionDTOBuilder<?, ?> builder, DocumentationUnit decision) {
     if (decision.coreData().source() == null) {
@@ -185,24 +198,32 @@ public class DecisionTransformer extends DocumentableTransformer {
             ? new ArrayList<>(currentDto.getSource())
             : new ArrayList<>();
 
-    // Check if the first existing source has a reference and remove if it has been deleted in
-    // domain object
-    if (!existingSources.isEmpty()) {
+    // Create new SourceDTO
+    SourceDTO newSource = SourceDTO.builder().value(decision.coreData().source().value()).build();
+
+    if (existingSources.isEmpty()) {
+      newSource.setRank(1);
+      existingSources.add(newSource);
+    } else {
       SourceDTO firstSource = existingSources.getFirst();
       var reference = firstSource.getReference();
-
+      // Check if the first existing source has a reference and remove if it has been deleted in
+      // domain object. A reference is only linked if the doc unit is created from a reference,
+      // that's why it is enough to check the first reference.
       if (reference != null && !decisionContainsReferenceWithId(decision, reference.getId())) {
         firstSource.setReference(null); // Otherwise the source can not be deleted
       }
+
+      var latestSource = existingSources.getLast();
+      if (latestSource.getValue() != newSource.getValue()) {
+        // If the user selected a source with a different value, we replace it.
+        newSource.setRank(existingSources.size());
+        existingSources.remove(latestSource);
+        existingSources.add(newSource);
+      }
+      // else: If the user selected the same source or didn't change it, we don't do anything.
     }
 
-    Integer rank = existingSources.size() + 1;
-    // Create new SourceDTO
-    SourceDTO newSource =
-        SourceDTO.builder().value(decision.coreData().source().value()).rank(rank).build();
-
-    // Add to existing sources
-    existingSources.add(newSource);
     builder.source(existingSources); // Update builder with new list
   }
 
