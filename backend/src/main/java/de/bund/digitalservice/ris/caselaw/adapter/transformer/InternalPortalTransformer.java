@@ -67,7 +67,7 @@ public class InternalPortalTransformer extends CommonPortalTransformer {
     var builder = buildCommonRisMeta(documentationUnit);
 
     var contentRelatedIndexing = documentationUnit.contentRelatedIndexing();
-    if (contentRelatedIndexing != null) {
+    if (contentRelatedIndexing != null && contentRelatedIndexing.fieldsOfLaw() != null) {
       applyIfNotEmpty(
           contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
           builder::fieldOfLaw);

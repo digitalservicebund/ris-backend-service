@@ -307,10 +307,10 @@ class InternalPortalTransformerTest {
                     .build())
             .build();
 
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherLongTextCaseLaw);
+    CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
 
-    assertThat(ldml).isPresent();
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     assertThat(fileContent).isPresent();
     assertThat(StringUtils.deleteWhitespace(fileContent.get()))
         .contains(StringUtils.deleteWhitespace(expected));
@@ -332,10 +332,10 @@ class InternalPortalTransformerTest {
             .shortTexts(ShortTexts.builder().headline("Hello<p> paragraph</p> world!").build())
             .build();
 
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherLongTextCaseLaw);
+    CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
 
-    assertThat(ldml).isPresent();
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     assertThat(fileContent).isPresent();
     assertThat(StringUtils.deleteWhitespace(fileContent.get()))
         .contains(StringUtils.deleteWhitespace(expected));
@@ -346,24 +346,18 @@ class InternalPortalTransformerTest {
   void testTransform_keywords() {
     String expected =
         """
-                              <akn:meta>
-                                 <akn:classification source="attributsemantik-noch-undefiniert">
-                                    <akn:keyword dictionary="attributsemantik-noch-undefiniert"
-                                                 showAs="attributsemantik-noch-undefiniert"
-                                                 value="keyword1"/>
-                                 </akn:classification>
-                              </akn:meta>
-                              """;
+                                <akn:keyworddictionary="attributsemantik-noch-undefiniert"showAs="attributsemantik-noch-undefiniert"value="keyword1"/>
+                                """;
     DocumentationUnit otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .contentRelatedIndexing(
                 ContentRelatedIndexing.builder().keywords(List.of("keyword 1")).build())
             .build();
 
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherLongTextCaseLaw);
+    CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
 
-    assertThat(ldml).isPresent();
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     assertThat(fileContent).isPresent();
     assertThat(StringUtils.deleteWhitespace(fileContent.get()))
         .contains(StringUtils.deleteWhitespace(expected));
@@ -398,10 +392,10 @@ class InternalPortalTransformerTest {
             .longTexts(LongTexts.builder().reasons(inputHtml).build())
             .build();
 
-    Optional<CaseLawLdml> ldml = subject.transformToLdml(otherLongTextCaseLaw);
+    CaseLawLdml ldml = subject.transformToLdml(otherLongTextCaseLaw);
 
-    assertThat(ldml).isPresent();
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml.get());
+    Assertions.assertNotNull(ldml);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     assertThat(fileContent).isPresent();
     assertThat(StringUtils.deleteWhitespace(fileContent.get()))
         .contains(StringUtils.deleteWhitespace(expectedFragment));
