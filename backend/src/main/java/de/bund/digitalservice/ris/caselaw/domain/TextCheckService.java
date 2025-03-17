@@ -14,15 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jose4j.json.internal.json_simple.JSONArray;
-import org.jose4j.json.internal.json_simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.parser.Parser;
 import org.jsoup.select.NodeTraversor;
 import org.jsoup.select.NodeVisitor;
 
@@ -113,111 +110,48 @@ public class TextCheckService {
     return checkText(documentationUnit.longTexts().reasons(), CategoryType.REASONS);
   }
 
+  @NotNull
+  static String normalizeHTML(String htmlText, Document document) {
+    StringBuilder builder = new StringBuilder();
+    NodeTraversor.traverse(
+        new NormalizingNodeVisitor(builder, htmlText), document.body().children());
+    return builder.toString();
+  }
+
   protected TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType) {
     if (htmlText == null) {
       return null;
     }
 
-    Parser parser = Parser.htmlParser();
-    parser.setTrackPosition(true);
-    Document document = Jsoup.parse(htmlText, parser);
+    // normalize HTML to assure correct positioning
+    String normalizedHtml =
+        StringEscapeUtils.unescapeHtml4(normalizeHTML(htmlText, Jsoup.parse(htmlText)));
 
-    JSONArray annotations = getAnnotationsArray(htmlText, document);
-
-    JSONObject result = new JSONObject();
-    result.put("annotation", annotations);
-
-    List<Match> matches = check(result.toString());
+    List<Match> matches = check(normalizedHtml);
 
     StringBuilder newHtmlText = new StringBuilder();
     AtomicInteger lastPosition = new AtomicInteger(0);
-
-    String htmlWithReplacements = StringEscapeUtils.unescapeHtml4(htmlText);
 
     matches.stream()
         .map(match -> match.toBuilder().category(categoryType).build())
         .forEach(
             match -> {
               newHtmlText
-                  .append(htmlWithReplacements, lastPosition.get(), match.offset())
+                  .append(normalizedHtml, lastPosition.get(), match.offset())
                   .append(
                       "<text-check id=\"%s\" type=\"%s\">%s</text-check>"
                           .formatted(
                               match.id(),
                               match.rule().issueType().toLowerCase(),
-                              htmlWithReplacements.substring(
+                              normalizedHtml.substring(
                                   match.offset(), match.offset() + match.length())));
               lastPosition.set(match.offset() + match.length());
             });
 
-    newHtmlText.append(htmlWithReplacements, lastPosition.get(), htmlWithReplacements.length());
+    newHtmlText.append(normalizedHtml, lastPosition.get(), normalizedHtml.length());
 
     return new TextCheckCategoryResponse(newHtmlText.toString(), matches);
-  }
-
-  @SuppressWarnings("java:S3776")
-  @NotNull
-  private static JSONArray getAnnotationsArray(String htmlText, Document document) {
-    JSONArray annotations = new JSONArray();
-    NodeTraversor.traverse(
-        new NodeVisitor() {
-
-          @Override
-          public void head(Node node, int depth) {
-
-            if (node instanceof TextNode textNode) {
-              // Use getWholeText() to capture non-breaking spaces
-              String processedText = textNode.getWholeText();
-
-              if (!processedText.isEmpty()) {
-                JSONObject textEntry = new JSONObject();
-                textEntry.put("text", processedText);
-                annotations.add(textEntry);
-              }
-              // Ignore comments and other non-element nodes
-            } else if (!node.nodeName().startsWith("#") && htmlText.contains(node.nodeName())) {
-              // Start building the markup tag
-              StringBuilder markupTag = new StringBuilder();
-              markupTag.append("<").append(node.nodeName());
-
-              // Add attributes if it's an Element
-              if (node instanceof Element element) {
-                for (Attribute attr : element.attributes()) {
-                  markupTag
-                      .append(" ")
-                      .append(attr.getKey())
-                      .append("=\"")
-                      .append(attr.getValue())
-                      .append("\"");
-                }
-              }
-
-              markupTag.append(">");
-
-              JSONObject markupEntry = new JSONObject();
-              markupEntry.put("markup", markupTag.toString());
-
-              // Custom logic for specific tags (optional)
-              if (node.nodeName().equals("p")) {
-                markupEntry.put("interpretAs", "\n\n");
-              }
-
-              annotations.add(markupEntry);
-            }
-          }
-
-          @Override
-          public void tail(Node node, int depth) {
-            if (!(node instanceof TextNode) && !node.nodeName().startsWith("#")) {
-              JSONObject markupEntry = new JSONObject();
-              markupEntry.put("markup", "</" + node.nodeName() + ">");
-              annotations.add(markupEntry);
-            }
-          }
-        },
-        document.body().children());
-    return annotations;
   }
 
   private List<Match> checkCaseFacts(DocumentationUnit documentationUnit) {
@@ -245,5 +179,62 @@ public class TextCheckService {
     return checkCategoryByHTML(text, categoryType).matches().stream()
         .map(match -> match.toBuilder().category(categoryType).build())
         .toList();
+  }
+
+  @SuppressWarnings("java:S3776")
+  protected record NormalizingNodeVisitor(StringBuilder builder, String htmlText)
+      implements NodeVisitor {
+
+    @Override
+    public void head(Node node, int depth) {
+
+      if (node instanceof TextNode textNode) {
+        // Use getWholeText() to capture non-breaking spaces
+        String processedText = textNode.getWholeText();
+
+        if (!processedText.isEmpty()) {
+          builder.append(processedText);
+        }
+        // Ignore comments and other non-element nodes
+      } else if (!node.nodeName().startsWith("#") && htmlText.contains(node.nodeName())) {
+        builder.append(buildOpeningTag(node));
+      }
+    }
+
+    @Override
+    public void tail(Node node, int depth) {
+      if (!(node instanceof TextNode)
+          && !node.nameIs("col")
+          && !node.nameIs("br")
+          && !node.nodeName().startsWith("#")) {
+        builder.append(buildClosingTag(node));
+      }
+    }
+
+    @NotNull
+    public static String buildOpeningTag(Node node) {
+      // Start building the markup tag
+      StringBuilder markupTag = new StringBuilder();
+      markupTag.append("<").append(node.nodeName());
+
+      // Add attributes if it's an Element
+      if (node instanceof Element element) {
+        for (Attribute attr : element.attributes()) {
+          markupTag
+              .append(" ")
+              .append(attr.getKey())
+              .append("=\"")
+              .append(attr.getValue())
+              .append("\"");
+        }
+      }
+      markupTag.append(">");
+      return markupTag.toString();
+    }
+
+    @NotNull
+    public static String buildClosingTag(Node node) {
+      return "</" + node.nodeName() + ">";
+    }
   }
 }

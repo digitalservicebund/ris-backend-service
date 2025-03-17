@@ -184,7 +184,7 @@ class TextCheckServiceTest {
   @Test
   void testCheckCategoryByHTML_withMatchesAndEncodedHtmlChars() {
     String htmlText =
-        "<p>This is a test &gt; 10 &amp; &lt; 20. Also &quot;quoted&quot;. And &#x2665; and &#9829;</p>";
+        "<p>This is a test &gt; 10 &amp;&nbsp;&lt; 20. Also &quot;quoted&quot;. And &#x2665; and &#9829;</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
     TextCheckService mockService = mock(TextCheckService.class);
@@ -204,7 +204,34 @@ class TextCheckServiceTest {
 
     assertNotNull(response);
     assertEquals(
-        "<p>This is a test <text-check id=\"1\" type=\"typo\">> 10 & < 20</text-check>. Also \"quoted\". And ♥ and ♥</p>",
+        "<p>This is a test <text-check id=\"1\" type=\"typo\">> 10 & < 20</text-check>. Also \"quoted\". And ♥ and ♥</p>",
+        response.htmlText());
+    assertEquals(1, response.matches().size());
+  }
+
+  @Test
+  void testCheckCategoryByHTML_withMatchesAndBrs() {
+    String htmlText = "<p>This is a,<br>with line<br>breaks</p>";
+    CategoryType categoryType = CategoryType.REASONS;
+
+    TextCheckService mockService = mock(TextCheckService.class);
+    when(mockService.check(any(String.class)))
+        .thenReturn(
+            List.of(
+                Match.builder()
+                    .id(1)
+                    .offset(12)
+                    .length(9)
+                    .rule(Rule.builder().issueType("grammar").build())
+                    .build()));
+    when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
+        .thenCallRealMethod();
+
+    TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
+
+    assertNotNull(response);
+    assertEquals(
+        "<p>This is a<text-check id=\"1\" type=\"grammar\">,<br>with</text-check> line<br>breaks</p>",
         response.htmlText());
     assertEquals(1, response.matches().size());
   }
