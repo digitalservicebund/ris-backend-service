@@ -64,7 +64,7 @@ const isFirstTimeHandover = computed(() => {
   return !props.eventLog || props.eventLog.length === 0
 })
 
-const textCheck = useFeatureToggle("neuris.text-check")
+const textCheckAllToggle = useFeatureToggle("neuris.text-check-all")
 
 const preview = ref<Preview>()
 const frontendError = ref()
@@ -611,7 +611,7 @@ const isPublishable = computed<boolean>(
       />
 
       <HandoverTextCheckView
-        v-if="textCheck"
+        v-if="textCheckAllToggle"
         :document-id="store.documentUnit!.uuid"
         :document-number="store.documentUnit!.documentNumber"
       />
