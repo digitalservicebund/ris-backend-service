@@ -91,7 +91,7 @@ function emitAttachmentIndex(value: number) {
           @click="() => emitSidePanelMode('category-import')"
         />
       </Tooltip>
-      <Tooltip v-if="textCheck" shortcut="t" text="Rechtschreibprüfung">
+      <Tooltip v-if="textCheckAll" shortcut="t" text="Rechtschreibprüfung">
         <TextButton
           id="text-check"
           aria-label="Rechtschreibprüfung"
