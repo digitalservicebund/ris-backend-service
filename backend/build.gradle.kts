@@ -160,12 +160,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.3")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.4")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.0")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.30.0")
+    implementation("com.google.protobuf:protobuf-java:4.30.1")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.5.2")
@@ -213,8 +213,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.14.4")
-    implementation("io.micrometer:micrometer-core:1.14.4")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.5")
+    implementation("io.micrometer:micrometer-core:1.14.5")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
@@ -236,11 +236,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.16.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.16.1")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.3")
-    testImplementation("org.springframework.security:spring-security-test:6.4.3")
+    testImplementation("io.projectreactor:reactor-test:3.7.4")
+    testImplementation("org.springframework.security:spring-security-test:6.4.4")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
