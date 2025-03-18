@@ -278,7 +278,7 @@ public abstract class CommonPortalTransformer {
     return input;
   }
 
-  public List<Object> htmlStringToObjectList(String html) {
+  protected List<Object> htmlStringToObjectList(String html) {
     if (StringUtils.isBlank(html)) {
       return Collections.emptyList();
     }
