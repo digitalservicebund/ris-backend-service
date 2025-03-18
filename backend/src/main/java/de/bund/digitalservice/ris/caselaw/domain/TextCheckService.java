@@ -139,13 +139,16 @@ public class TextCheckService {
         matches.stream()
             .map(match -> match.toBuilder().category(categoryType).build())
             .map(
-                match ->
-                    match.toBuilder()
+                match -> {
+                  if (match.replacements() != null)
+                    return match.toBuilder()
                         .replacements(
                             match
                                 .replacements()
                                 .subList(0, Math.min(match.replacements().size(), 5)))
-                        .build())
+                        .build();
+                  return match;
+                })
             .toList();
     modifiedMatches.forEach(
         match -> {
