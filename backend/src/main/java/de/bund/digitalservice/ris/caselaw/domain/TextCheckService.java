@@ -135,25 +135,35 @@ public class TextCheckService {
     StringBuilder newHtmlText = new StringBuilder();
     AtomicInteger lastPosition = new AtomicInteger(0);
 
-    matches.stream()
-        .map(match -> match.toBuilder().category(categoryType).build())
-        .forEach(
-            match -> {
-              newHtmlText
-                  .append(normalizedHtml, lastPosition.get(), match.offset())
-                  .append(
-                      "<text-check id=\"%s\" type=\"%s\">%s</text-check>"
-                          .formatted(
-                              match.id(),
-                              match.rule().issueType().toLowerCase(),
-                              normalizedHtml.substring(
-                                  match.offset(), match.offset() + match.length())));
-              lastPosition.set(match.offset() + match.length());
-            });
+    List<Match> modifiedMatches =
+        matches.stream()
+            .map(match -> match.toBuilder().category(categoryType).build())
+            .map(
+                match ->
+                    match.toBuilder()
+                        .replacements(
+                            match
+                                .replacements()
+                                .subList(0, Math.min(match.replacements().size(), 5)))
+                        .build())
+            .toList();
+    modifiedMatches.forEach(
+        match -> {
+          newHtmlText
+              .append(normalizedHtml, lastPosition.get(), match.offset())
+              .append(
+                  "<text-check id=\"%s\" type=\"%s\">%s</text-check>"
+                      .formatted(
+                          match.id(),
+                          match.rule().issueType().toLowerCase(),
+                          normalizedHtml.substring(
+                              match.offset(), match.offset() + match.length())));
+          lastPosition.set(match.offset() + match.length());
+        });
 
     newHtmlText.append(normalizedHtml, lastPosition.get(), normalizedHtml.length());
 
-    return new TextCheckCategoryResponse(newHtmlText.toString(), matches);
+    return new TextCheckCategoryResponse(newHtmlText.toString(), modifiedMatches);
   }
 
   private List<Match> checkCaseFacts(DocumentationUnit documentationUnit) {
