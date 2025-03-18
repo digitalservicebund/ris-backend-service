@@ -11,7 +11,6 @@ import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -107,8 +106,7 @@ public class PublicPortalPublicationService {
     Changelog changelog = new Changelog(publishedDocumentNumbers, deletedDocumentNumbers);
 
     String changelogString = objectMapper.writeValueAsString(changelog);
-    publicPortalBucket.save(
-        "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogString);
+    publicPortalBucket.save(changelog.createFileName(), changelogString);
   }
 
   // Default: 0 30 4 (After migration)
