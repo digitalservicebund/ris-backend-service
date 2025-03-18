@@ -26,7 +26,7 @@ const emit = defineEmits<{
   "attachmentIndex:update": [value: number]
 }>()
 
-const textCheck = useFeatureToggle("neuris.text-check")
+const textCheckAll = useFeatureToggle("neuris.text-check-all")
 
 function emitSidePanelMode(value: SelectablePanelContent) {
   emit("panelMode:update", value)
