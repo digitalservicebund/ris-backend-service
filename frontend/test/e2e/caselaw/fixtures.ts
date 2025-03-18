@@ -1,9 +1,9 @@
 import { Locator, Page, test } from "@playwright/test"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
-import DocumentUnit from "../../../src/domain/documentUnit"
 import { navigateToCategories } from "./e2e-utils"
 import { Page as Pagination } from "@/components/Pagination.vue"
+import DocumentUnit, { SourceValue } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -102,6 +102,9 @@ export const caselawTest = test.extend<MyFixtures>({
             fileNumbers: [generateString()],
             decisionDate: "2019-12-31",
             appraisalBody: "1. Senat, 2. Kammer",
+            source: {
+              value: SourceValue.AngefordertesOriginal,
+            },
           },
           contentRelatedIndexing: {
             keywords: ["keyword"],
