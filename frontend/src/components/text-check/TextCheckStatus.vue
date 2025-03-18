@@ -13,8 +13,11 @@ defineProps<Props>()
 <template>
   <div class="flex w-full flex-col items-end">
     <div v-if="loading">
-      <div class="flex items-center gap-x-8">
-        <span class="text-gray-900">Rechtschreibprüfung wird geprüft</span>
+      <div
+        class="flex items-center gap-x-8"
+        data-testid="text-check-loading-status"
+      >
+        <span class="text-gray-900">Rechtschreibprüfung läuft</span>
         <LoadingSpinner class="mr-4 border-gray-900" size="extra-small" />
       </div>
     </div>

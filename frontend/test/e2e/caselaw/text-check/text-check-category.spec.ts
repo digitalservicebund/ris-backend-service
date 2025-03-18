@@ -57,13 +57,17 @@ test.describe(
           )
         })
 
-        await test.step("trigger category text check", async () => {
+        await test.step("trigger category text button shows loading status and highlights matches", async () => {
           const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
 
           await page
             .getByLabel("Orientierungssatz Button")
             .getByRole("button", { name: "Rechtschreibprüfung" })
             .click()
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
 
           await otherHeadNoteEditor
             .locator("text-check")
