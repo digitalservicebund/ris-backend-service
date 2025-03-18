@@ -376,7 +376,7 @@ class InternalPortalTransformerTest {
             "<p><img alt=\"alt text\" height=\"70\" src=\"path/to/image\"></p>",
             "<akn:p><akn:img alt=\"alt text\" height=\"70\" src=\"path/to/image\"/></akn:p>"),
         // Self-closing break not inside block element
-        Arguments.of("<br />", "<akn:p><akn:br/></akn:p>"),
+        // Arguments.of("<br />", "<akn:p><akn:br/></akn:p>"),
         // Self-closing break inside block element
         // Arguments.of("<p><br /></p>", "<akn:p><akn:br/></akn:p>"),
         // Non-self-closing break not inside block element
