@@ -26,8 +26,9 @@ public interface DatabaseDuplicateCheckRepository
         HAVING COUNT(*) <= 50
     )
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM incremental_migration.documentation_unit documentationUnit
+      LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
       INNER JOIN incremental_migration.decision decision
@@ -37,8 +38,9 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM incremental_migration.documentation_unit documentationUnit
+      LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_date deviatingDate
@@ -50,8 +52,9 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM incremental_migration.documentation_unit documentationUnit
+      LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
       INNER JOIN incremental_migration.decision decision
@@ -61,8 +64,9 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM incremental_migration.documentation_unit documentationUnit
+      LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_date deviatingDate
@@ -74,8 +78,9 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM incremental_migration.documentation_unit documentationUnit
+      LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
       JOIN incremental_migration.court court
@@ -90,8 +95,9 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM incremental_migration.documentation_unit documentationUnit
+      LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
       JOIN incremental_migration.court court
@@ -106,8 +112,9 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM incremental_migration.documentation_unit documentationUnit
+      LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_court deviatingCourt
@@ -122,8 +129,9 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM incremental_migration.documentation_unit documentationUnit
+      LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_court deviatingCourt
@@ -138,16 +146,18 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM incremental_migration.documentation_unit documentationUnit
+    LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
     INNER JOIN incremental_migration.decision decision
       ON decision.id = documentationUnit.id
     WHERE upper(decision.ecli) IN (:allEclis) AND decision.ecli != ''
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive, status.publication_status AS status
     FROM incremental_migration.documentation_unit documentationUnit
+    LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
     INNER JOIN incremental_migration.decision decision
       ON decision.id = documentationUnit.id
     JOIN incremental_migration.deviating_ecli deviatingEcli

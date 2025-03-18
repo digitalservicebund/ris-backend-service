@@ -254,8 +254,9 @@ public class DocumentationUnitController {
     }
 
     try {
-      Documentable documentable = service.getByDocumentNumberWithUser(documentNumber, oidcUser);
+      // Duplicate check must happen before getting the doc unit, otherwise new ones won't be shown
       checkDuplicates(documentNumber);
+      Documentable documentable = service.getByDocumentNumberWithUser(documentNumber, oidcUser);
       return ResponseEntity.ok((DocumentationUnit) documentable);
 
     } catch (DocumentationUnitNotExistsException e) {

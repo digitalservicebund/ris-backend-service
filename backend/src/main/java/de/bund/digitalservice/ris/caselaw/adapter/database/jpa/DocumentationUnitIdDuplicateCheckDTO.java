@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.util.UUID;
 
 /**
@@ -10,4 +11,6 @@ public interface DocumentationUnitIdDuplicateCheckDTO {
   UUID getId();
 
   Boolean getIsJdvDuplicateCheckActive();
+
+  PublicationStatus getStatus();
 }

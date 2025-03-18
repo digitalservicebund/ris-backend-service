@@ -399,6 +399,92 @@ class DuplicateCheckFullIntegrationTest {
 
     @Test
     void
+        checkDuplicates_withoutExistingDuplicatesAndIsJdvDuplicateCheckActiveTrueAndLockedStatus_shouldCreateNewDuplicateWithIgnoredStatus()
+            throws DocumentationUnitNotExistsException {
+      // Arrange
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123"))
+                      .publicationStatus(PublicationStatus.LOCKED)
+                      .build()));
+
+      var docUnitDuplicateDTO =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb2")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .isJdvDuplicateCheckActive(true)
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+      DuplicateRelation duplicate =
+          foundDocUnit.managementData().duplicateRelations().stream().findFirst().get();
+      assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
+      assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.IGNORED);
+    }
+
+    @Test
+    void
+        checkDuplicates_withoutExistingDuplicatesAndIsJdvDuplicateCheckActiveTrueAndDuplicatedStatus_shouldCreateNewDuplicateWithIgnoredStatus()
+            throws DocumentationUnitNotExistsException {
+      // Arrange
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .isJdvDuplicateCheckActive(true)
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      var docUnitDuplicateDTO =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb2")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .publicationStatus(PublicationStatus.DUPLICATED)
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+      DuplicateRelation duplicate =
+          foundDocUnit.managementData().duplicateRelations().stream().findFirst().get();
+      assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
+      assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.IGNORED);
+    }
+
+    @Test
+    void
         checkDuplicates_withoutExistingDuplicatesAndIsJdvDuplicateCheckActiveFalse_shouldCreateNewDuplicateWithIgnoredStatus()
             throws DocumentationUnitNotExistsException {
       // Arrange
