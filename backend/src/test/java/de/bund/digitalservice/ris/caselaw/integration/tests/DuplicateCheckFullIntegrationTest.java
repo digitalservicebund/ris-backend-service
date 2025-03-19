@@ -18,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.DuplicateRelationService;
 import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
@@ -30,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicate
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -72,6 +72,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.Builder;
 import org.junit.jupiter.api.AfterEach;
@@ -169,6 +170,14 @@ class DuplicateCheckFullIntegrationTest {
 
   private DocumentationOffice docOffice;
   private DocumentationOfficeDTO documentationOffice;
+  private static final DocumentType documentType1 =
+      DocumentType.builder().uuid(UUID.fromString("0f382996-497f-4c2f-9a30-1c73d8ac0a87")).build();
+  private static final DocumentType documentType2 =
+      DocumentType.builder().uuid(UUID.fromString("11defe05-cd4d-43e5-a07e-06c611b81a26")).build();
+  private static final Court courtAgAachen =
+      Court.builder().id(UUID.fromString("46301f85-9bd2-4690-a67f-f9fdfe725de3")).build();
+  private static final Court courtOlgDresden =
+      Court.builder().id(UUID.fromString("12e9f671-6a5c-4ec7-9b57-3fafdefd7a49")).build();
 
   @BeforeEach
   void setUp() {
@@ -286,6 +295,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -296,6 +306,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -326,6 +337,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .deviatingFileNumbers(List.of("AZ-123-match", "AZ-888", "AZ-999"))
                       .build()));
 
@@ -336,6 +348,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123-match", "AZ-777", "AZ-555"))
                       .build()));
 
@@ -367,6 +380,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -378,6 +392,7 @@ class DuplicateCheckFullIntegrationTest {
                       .documentNumber("DocumentNumb2")
                       .decisionDate(LocalDate.of(2020, 12, 1))
                       .isJdvDuplicateCheckActive(true)
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -410,6 +425,7 @@ class DuplicateCheckFullIntegrationTest {
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
                       .fileNumbers(List.of("AZ-123"))
+                      .documentType(documentType1)
                       .publicationStatus(PublicationStatus.LOCKED)
                       .build()));
 
@@ -421,6 +437,7 @@ class DuplicateCheckFullIntegrationTest {
                       .documentNumber("DocumentNumb2")
                       .decisionDate(LocalDate.of(2020, 12, 1))
                       .isJdvDuplicateCheckActive(true)
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -453,6 +470,7 @@ class DuplicateCheckFullIntegrationTest {
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
                       .isJdvDuplicateCheckActive(true)
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -464,6 +482,7 @@ class DuplicateCheckFullIntegrationTest {
                       .documentNumber("DocumentNumb2")
                       .decisionDate(LocalDate.of(2020, 12, 1))
                       .publicationStatus(PublicationStatus.DUPLICATED)
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -495,6 +514,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -506,6 +526,7 @@ class DuplicateCheckFullIntegrationTest {
                       .documentNumber("DocumentNumb2")
                       .decisionDate(LocalDate.of(2020, 12, 1))
                       .isJdvDuplicateCheckActive(false)
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -537,6 +558,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -547,6 +569,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -587,6 +610,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -596,6 +620,7 @@ class DuplicateCheckFullIntegrationTest {
               CreationParameters.builder()
                   .documentNumber("DocumentNumb2")
                   .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
                   .fileNumbers(List.of("AZ-123"))
                   .build()));
       var duplicateDTO =
@@ -605,6 +630,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb3")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -647,6 +673,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -657,6 +684,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -699,6 +727,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -708,6 +737,7 @@ class DuplicateCheckFullIntegrationTest {
               CreationParameters.builder()
                   .documentNumber("DocumentNumb2")
                   .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
                   .fileNumbers(List.of("AZ-123"))
                   .publicationStatus(PublicationStatus.UNPUBLISHED)
                   .build()));
@@ -737,6 +767,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -747,6 +778,7 @@ class DuplicateCheckFullIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
                       .decisionDate(LocalDate.of(2020, 12, 1))
+                      .documentType(documentType1)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -800,148 +832,69 @@ class DuplicateCheckFullIntegrationTest {
     }
 
     @Test
-    void checkDuplicates_pendingProceedingWithFileNumberAndDate_shouldDoNothing()
-        throws DocumentationUnitNotExistsException {
+    void
+        checkDuplicates_pendingProceedingWithFullyDuplicatedAttributes_shouldProduceNoDuplicateRelations()
+            throws DocumentationUnitNotExistsException {
       // Arrange
-      var pendingProceedingDTO =
+      var pendingProceedingDTO1 =
           PendingProceedingDTO.builder()
               .documentationOffice(documentationOffice)
               .date(LocalDate.of(2023, 12, 11))
+              .deviatingDates(
+                  List.of(
+                      DeviatingDateDTO.builder()
+                          .rank(0L)
+                          .value(LocalDate.of(2023, 12, 11))
+                          .build()))
               .documentNumber("DocumentNumb1")
+              .court(CourtTransformer.transformToDTO(courtAgAachen))
+              .deviatingCourts(
+                  List.of(DeviatingCourtDTO.builder().rank(0L).value("AG Aachen").build()))
+              .documentType(DocumentTypeTransformer.transformToDTO(documentType1))
               .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+              .deviatingFileNumbers(
+                  List.of(DeviatingFileNumberDTO.builder().rank(0L).value("123").build()))
               .build();
-      var decisionDTO =
-          DecisionDTO.builder()
+      var pendingProceedingDTO2 =
+          PendingProceedingDTO.builder()
               .documentationOffice(documentationOffice)
               .date(LocalDate.of(2023, 12, 11))
+              .deviatingDates(
+                  List.of(
+                      DeviatingDateDTO.builder()
+                          .rank(0L)
+                          .value(LocalDate.of(2023, 12, 11))
+                          .build()))
               .documentNumber("DocumentNumb2")
+              .court(CourtTransformer.transformToDTO(courtAgAachen))
+              .deviatingCourts(
+                  List.of(DeviatingCourtDTO.builder().rank(0L).value("AG Aachen").build()))
+              .documentType(DocumentTypeTransformer.transformToDTO(documentType1))
               .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
-              .build();
-
-      repository.save(pendingProceedingDTO);
-      var decision = repository.save(decisionDTO);
-
-      assertThat(duplicateRelationRepository.findAll()).isEmpty();
-
-      // Act
-      duplicateCheckService.checkAllDuplicates();
-
-      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
-    }
-
-    @Test
-    void checkDuplicates_pendingProceedingWithFileNumberAndCourt_shouldDoNothing()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      var court =
-          databaseCourtRepository.save(
-              CourtDTO.builder().type("BFH").isForeignCourt(false).isSuperiorCourt(true).build());
-      var pendingProceedingDTO =
-          PendingProceedingDTO.builder()
-              .documentationOffice(documentationOffice)
-              .court(court)
-              .documentNumber("DocumentNumb1")
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
-              .build();
-      var decisionDTO =
-          DecisionDTO.builder()
-              .documentationOffice(documentationOffice)
-              .court(court)
-              .documentNumber("DocumentNumb2")
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
-              .build();
-
-      repository.save(pendingProceedingDTO);
-      var decision = repository.save(decisionDTO);
-
-      assertThat(duplicateRelationRepository.findAll()).isEmpty();
-
-      // Act
-      duplicateCheckService.checkAllDuplicates();
-
-      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
-    }
-
-    @Test
-    void checkDuplicates_pendingProceedingWithDeviatingFileNumberAndCourt_shouldDoNothing()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      var court =
-          databaseCourtRepository.save(
-              CourtDTO.builder().type("BFH").isForeignCourt(false).isSuperiorCourt(true).build());
-      var pendingProceedingDTO =
-          PendingProceedingDTO.builder()
-              .documentationOffice(documentationOffice)
-              .court(court)
-              .documentNumber("DocumentNumb1")
               .deviatingFileNumbers(
                   List.of(DeviatingFileNumberDTO.builder().rank(0L).value("123").build()))
               .build();
       var decisionDTO =
           DecisionDTO.builder()
               .documentationOffice(documentationOffice)
-              .court(court)
-              .documentNumber("DocumentNumb2")
+              .date(LocalDate.of(2023, 12, 11))
+              .deviatingDates(
+                  List.of(
+                      DeviatingDateDTO.builder()
+                          .rank(0L)
+                          .value(LocalDate.of(2023, 12, 11))
+                          .build()))
+              .documentNumber("DocumentNumb3")
+              .court(CourtTransformer.transformToDTO(courtAgAachen))
+              .deviatingCourts(
+                  List.of(DeviatingCourtDTO.builder().rank(0L).value("AG Aachen").build()))
+              .documentType(DocumentTypeTransformer.transformToDTO(documentType1))
               .deviatingFileNumbers(
                   List.of(DeviatingFileNumberDTO.builder().rank(0L).value("123").build()))
               .build();
 
-      repository.save(pendingProceedingDTO);
-      var decision = repository.save(decisionDTO);
-
-      assertThat(duplicateRelationRepository.findAll()).isEmpty();
-
-      // Act
-      duplicateCheckService.checkAllDuplicates();
-
-      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
-    }
-
-    @Test
-    void checkDuplicates_pendingProceedingWithDeviatingDateAndFileNumber_shouldDoNothing()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      var pendingProceedingDTO =
-          PendingProceedingDTO.builder()
-              .documentationOffice(documentationOffice)
-              .deviatingDates(
-                  List.of(
-                      DeviatingDateDTO.builder()
-                          .rank(0L)
-                          .value(LocalDate.of(2023, 12, 12))
-                          .build()))
-              .documentNumber("DocumentNumb1")
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
-              .build();
-      var decisionDTO =
-          DecisionDTO.builder()
-              .documentationOffice(documentationOffice)
-              .deviatingDates(
-                  List.of(
-                      DeviatingDateDTO.builder()
-                          .rank(0L)
-                          .value(LocalDate.of(2023, 12, 12))
-                          .build()))
-              .documentNumber("DocumentNumb2")
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
-              .build();
-
-      repository.save(pendingProceedingDTO);
+      repository.save(pendingProceedingDTO1);
+      repository.save(pendingProceedingDTO2);
       var decision = repository.save(decisionDTO);
 
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -961,7 +914,7 @@ class DuplicateCheckFullIntegrationTest {
   @Nested
   class FindDuplicatesQueryTest {
     @ParameterizedTest(name = "{0}")
-    @MethodSource("provideTestCases")
+    @MethodSource("provideTestCasesWithDuplicates")
     void findDuplicateTests(
         String testName, CreationParameters firstParams, CreationParameters secondParams)
         throws DocumentationUnitNotExistsException {
@@ -971,402 +924,179 @@ class DuplicateCheckFullIntegrationTest {
 
       // Act
       duplicateCheckService.checkAllDuplicates();
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
+              foundDocUnit.managementData().duplicateRelations().stream()
+                  .findFirst()
+                  .get()
+                  .documentNumber())
           .isEqualTo(secondParams.documentNumber);
     }
 
-    @Test
-    void findNoDuplicates_withPartialMatchesOnCombinedCriteria()
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideTestCasesWithoutDuplicates")
+    void findNoDuplicateTests(
+        String testName, CreationParameters firstParams, CreationParameters secondParams)
         throws DocumentationUnitNotExistsException {
       // Arrange
-      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
-      var court = CourtTransformer.transformToDomain(courtDTO);
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().getFirst());
-      var documentType2 =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().get(1));
-      generateNewDocumentationUnit(
-          docOffice,
-          Optional.of(
-              CreationParameters.builder()
-                  .documentNumber("DocumentNumb1")
-                  .court(court)
-                  .fileNumbers(List.of("AZ-123"))
-                  .documentType(documentType)
-                  .build()));
-
-      // Court does not match
-      generateNewDocumentationUnit(
-          docOffice,
-          Optional.of(
-              CreationParameters.builder()
-                  .documentNumber("DocumentNumb2")
-                  .fileNumbers(List.of("AZ-123"))
-                  .documentType(documentType)
-                  .build()));
-
-      // documentType does not match
-      generateNewDocumentationUnit(
-          docOffice,
-          Optional.of(
-              CreationParameters.builder()
-                  .documentNumber("DocumentNumb3")
-                  .court(court)
-                  .fileNumbers(List.of("AZ-123"))
-                  .documentType(documentType2)
-                  .build()));
-
-      // fileNumber does not match
-      generateNewDocumentationUnit(
-          docOffice,
-          Optional.of(
-              CreationParameters.builder()
-                  .documentNumber("DocumentNumb4")
-                  .court(court)
-                  .fileNumbers(List.of("differentAZ"))
-                  .documentType(documentType)
-                  .build()));
+      var docUnitToBeChecked = generateNewDocumentationUnit(docOffice, Optional.of(firstParams));
+      generateNewDocumentationUnit(docOffice, Optional.of(secondParams));
 
       // Act
       duplicateCheckService.checkAllDuplicates();
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
+      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
     }
 
-    @Test
-    void findDuplicates_withCourtAndFileNumberAndDocType()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
-      var court = CourtTransformer.transformToDomain(courtDTO);
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().getFirst());
-      var docUnitToBeChecked =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .court(court)
-                      .fileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      var duplicateDTO =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .court(court)
-                      .fileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      // Act
-      duplicateCheckService.checkAllDuplicates();
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
-          .isEqualTo(duplicateDTO.getDocumentNumber());
-    }
-
-    @Test
-    void findDuplicates_withCourtAndDeviatingFileNumberAndDocType()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
-      var court = CourtTransformer.transformToDomain(courtDTO);
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().getFirst());
-      var docUnitToBeChecked =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .court(court)
-                      .fileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      var duplicateDTO =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .court(court)
-                      .deviatingFileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      // Act
-      duplicateCheckService.checkAllDuplicates();
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
-          .isEqualTo(duplicateDTO.getDocumentNumber());
-    }
-
-    @Test
-    void findDuplicates_withDeviatingCourtsAndFileNumberAndDocType()
-        throws DocumentationUnitNotExistsException {
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().getFirst());
-      // Arrange
-      var docUnitToBeChecked =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .deviatingCourts(List.of("AG Aachen", "BVerfG"))
-                      .fileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      var duplicateDTO =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .deviatingCourts(List.of("AG Aachen"))
-                      .fileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      // Act
-      duplicateCheckService.checkAllDuplicates();
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
-          .isEqualTo(duplicateDTO.getDocumentNumber());
-    }
-
-    @Test
-    void findDuplicates_withDeviatingCourtsAndRegularCourtAndDocType()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 1).getFirst();
-      var courtAgAachen = CourtTransformer.transformToDomain(courtDTO);
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().getFirst());
-      var docUnitToBeChecked =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .court(courtAgAachen)
-                      .deviatingCourts(List.of("BVerfG"))
-                      .fileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      var duplicateDTO =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .deviatingCourts(List.of("BGH", "AG Aachen"))
-                      .fileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      // Act
-      duplicateCheckService.checkAllDuplicates();
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
-          .isEqualTo(duplicateDTO.getDocumentNumber());
-    }
-
-    @Test
-    void findDuplicates_withDeviatingCourtsAndRegularCourtInverseAndDocType()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 1).getFirst();
-      var court = CourtTransformer.transformToDomain(courtDTO);
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().getFirst());
-      var docUnitToBeChecked =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .deviatingCourts(List.of("AG Aachen"))
-                      .fileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      var duplicateDTO =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .court(court)
-                      .fileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      // Act
-      duplicateCheckService.checkAllDuplicates();
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
-          .isEqualTo(duplicateDTO.getDocumentNumber());
-    }
-
-    @Test
-    void findDuplicates_withDeviatingCourtsAndDeviatingFileNumberAndDocType()
-        throws DocumentationUnitNotExistsException {
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().getFirst());
-      // Arrange
-      var docUnitToBeChecked =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .deviatingCourts(List.of("AG Aachen", "BVerfG"))
-                      .fileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      var duplicateDTO =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .deviatingCourts(List.of("AG Aachen"))
-                      .deviatingFileNumbers(List.of("AZ-123"))
-                      .documentType(documentType)
-                      .build()));
-
-      // Act
-      duplicateCheckService.checkAllDuplicates();
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
-          .isEqualTo(duplicateDTO.getDocumentNumber());
-    }
-
-    static Stream<Arguments> provideTestCases() {
+    static Stream<Arguments> provideTestCasesWithDuplicates() {
       return Stream.of(
           Arguments.of(
-              "findDuplicates_withFileNumberAndDecisionDate",
+              "findDuplicates_withFileNumberAndDecisionDateAndDocType",
               CreationParameters.builder()
                   .documentNumber("DocumentNumb1")
                   .fileNumbers(List.of("AZ-123"))
                   .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
                   .build(),
               CreationParameters.builder()
                   .documentNumber("DocumentNumb2")
                   .fileNumbers(List.of("AZ-123"))
                   .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
                   .build()),
           Arguments.of(
-              "findDuplicates_withFileNumberAndDeviatingDecisionDate",
+              "findDuplicates_withFileNumberAndDeviatingDecisionDateAndDocType",
               CreationParameters.builder()
                   .documentNumber("DocumentNumb1")
                   .fileNumbers(List.of("AZ-123"))
                   .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType2)
                   .build(),
               CreationParameters.builder()
                   .documentNumber("DocumentNumb2")
                   .fileNumbers(List.of("AZ-123"))
                   .deviatingDecisionDates(List.of(LocalDate.of(2020, 12, 1)))
+                  .documentType(documentType2)
                   .build()),
           Arguments.of(
-              "findDuplicates_withDeviatingFileNumberAndDecisionDate",
+              "findDuplicates_withDeviatingFileNumberAndDecisionDateAndDocType",
               CreationParameters.builder()
                   .documentNumber("DocumentNumb1")
                   .fileNumbers(List.of("AZ-123"))
                   .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
                   .build(),
               CreationParameters.builder()
                   .documentNumber("DocumentNumb2")
                   .deviatingFileNumbers(List.of("AZ-123"))
                   .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
                   .build()),
           Arguments.of(
-              "findDuplicates_withDeviatingFileNumberAndDeviatingDecisionDate",
+              "findDuplicates_withDeviatingFileNumberAndDeviatingDecisionDateAndDocType",
               CreationParameters.builder()
                   .documentNumber("DocumentNumb1")
                   .fileNumbers(List.of("AZ-123"))
                   .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
                   .build(),
               CreationParameters.builder()
                   .documentNumber("DocumentNumb2")
                   .deviatingFileNumbers(List.of("AZ-123"))
                   .deviatingDecisionDates(List.of(LocalDate.of(2020, 12, 1)))
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withFileNumberAndCourtAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .fileNumbers(List.of("AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withOneDeviatingFileNumberAndCourtAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .deviatingFileNumbers(List.of("AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withTwoDeviatingFileNumbersAndCourtAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .deviatingFileNumbers(List.of("abc", "AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .deviatingFileNumbers(List.of("def", "AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withFileNumberAndOneDeviatingCourtAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .fileNumbers(List.of("AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("AZ-123"))
+                  .deviatingCourts(List.of("Other", "aG aachen"))
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withFileNumberAndTwoDeviatingCourtsAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .fileNumbers(List.of("AZ-123"))
+                  .deviatingCourts(List.of("OLG Dresden"))
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("AZ-123"))
+                  .deviatingCourts(List.of("OLG Dresden"))
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withTwoDeviatingFileNumbersAndTwoDeviatingCourtsAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .deviatingFileNumbers(List.of("AZ-123"))
+                  .deviatingCourts(List.of("OLG Dresden"))
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .deviatingFileNumbers(List.of("AZ-123"))
+                  .deviatingCourts(List.of("OLG Dresden"))
+                  .documentType(documentType1)
                   .build()),
           Arguments.of(
               "findDuplicates_withEcli",
@@ -1389,6 +1119,104 @@ class DuplicateCheckFullIntegrationTest {
                   .deviatingEclis(List.of("ECLI:DE:BFH:2024:B.080980.TEST.00.0"))
                   .build()));
     }
+
+    static Stream<Arguments> provideTestCasesWithoutDuplicates() {
+      return Stream.of(
+          Arguments.of(
+              "findNoDuplicates_withFileNumberAndDecisionDateAndDifferentDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .fileNumbers(List.of("AZ-123"))
+                  .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("AZ-123"))
+                  .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType2)
+                  .build()),
+          Arguments.of(
+              "findNoDuplicates_withFileNumberAndDifferentDecisionDateAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .fileNumbers(List.of("AZ-123"))
+                  .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("AZ-123"))
+                  .decisionDate(LocalDate.of(2020, 12, 2))
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findNoDuplicates_withDifferentFileNumberAndDecisionDateAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .fileNumbers(List.of("Diff_AZ-123"))
+                  .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("AZ-123"))
+                  .decisionDate(LocalDate.of(2020, 12, 1))
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withDifferentFileNumberAndCourtAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .fileNumbers(List.of("AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("AZ-456"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withFileNumberAndDifferentCourtAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .fileNumbers(List.of("AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("AZ-123"))
+                  .court(courtOlgDresden)
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withFileNumberAndCourtAndDifferentDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .fileNumbers(List.of("AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType2)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withDifferentEcli",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .ecli("ECLI:DE:BFH:2024:B.080980.TEST.00.0")
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .ecli("ECLI:DE:BFH:2025:B.080980.TEST.00.0")
+                  .build()));
+    }
   }
 
   @Nested
@@ -1397,61 +1225,55 @@ class DuplicateCheckFullIntegrationTest {
     void findAllDuplicates_withCourtAndFileNumberAndDocType()
         throws DocumentationUnitNotExistsException {
       // Arrange
-      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
-      var court = CourtTransformer.transformToDomain(courtDTO);
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().getFirst());
-
       generateNewDocumentationUnit(
           docOffice,
           Optional.of(
               CreationParameters.builder()
                   .documentNumber("DocumentNumb1")
-                  .court(court)
+                  .court(courtAgAachen)
                   .fileNumbers(List.of("AZ-123"))
-                  .documentType(documentType)
+                  .documentType(documentType1)
                   .ecli("ECLI:DE:BFH:2024")
                   .build()));
 
-      // Gericht + AZ
+      // Gericht + AZ + DocTyp
       generateNewDocumentationUnit(
           docOffice,
           Optional.of(
               CreationParameters.builder()
                   .documentNumber("DocumentNumb2")
-                  .court(court)
-                  .documentType(documentType)
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
                   .fileNumbers(List.of("AZ-123"))
                   .build()));
-      // Gericht + abw. AZ
+      // Gericht + abw. AZ + DocTyp
       generateNewDocumentationUnit(
           docOffice,
           Optional.of(
               CreationParameters.builder()
                   .documentNumber("DocumentNumb3")
-                  .court(court)
-                  .documentType(documentType)
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
                   .deviatingFileNumbers(List.of("AZ-123"))
                   .build()));
-      // abw. Gericht + AZ
+      // abw. Gericht + AZ + DocTyp
       generateNewDocumentationUnit(
           docOffice,
           Optional.of(
               CreationParameters.builder()
                   .documentNumber("DocumentNumb4")
                   .deviatingCourts(List.of("AG Aachen"))
-                  .documentType(documentType)
+                  .documentType(documentType1)
                   .fileNumbers(List.of("AZ-123"))
                   .build()));
-      // abw. Gericht + abw. AZ
+      // abw. Gericht + abw. AZ + DocTyp
       generateNewDocumentationUnit(
           docOffice,
           Optional.of(
               CreationParameters.builder()
                   .documentNumber("DocumentNumb5")
                   .deviatingCourts(List.of("AG Aachen"))
-                  .documentType(documentType)
+                  .documentType(documentType1)
                   .deviatingFileNumbers(List.of("AZ-123"))
                   .build()));
 
@@ -1512,19 +1334,18 @@ class DuplicateCheckFullIntegrationTest {
             .build();
 
     var documentationUnitDTO =
-        (DecisionDTO)
-            repository.save(
-                DecisionTransformer.transformToDTO(
-                    DecisionDTO.builder()
-                        .documentationOffice(
-                            DocumentationOfficeTransformer.transformToDTO(
-                                docUnit.coreData().documentationOffice()))
-                        .creatingDocumentationOffice(
-                            DocumentationOfficeTransformer.transformToDTO(
-                                docUnit.coreData().creatingDocOffice()))
-                        .isJdvDuplicateCheckActive(params.isJdvDuplicateCheckActive())
-                        .build(),
-                    docUnit));
+        repository.save(
+            DecisionTransformer.transformToDTO(
+                DecisionDTO.builder()
+                    .documentationOffice(
+                        DocumentationOfficeTransformer.transformToDTO(
+                            docUnit.coreData().documentationOffice()))
+                    .creatingDocumentationOffice(
+                        DocumentationOfficeTransformer.transformToDTO(
+                            docUnit.coreData().creatingDocOffice()))
+                    .isJdvDuplicateCheckActive(params.isJdvDuplicateCheckActive())
+                    .build(),
+                docUnit));
 
     if (params.publicationStatus != null) {
       documentationUnitDTO =
