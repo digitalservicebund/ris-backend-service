@@ -65,7 +65,7 @@ WITH
     -- The order of the criteria is important: We need to start with the most specific criterion that has the least matches.
     -- If we started with doc-type instead, we would get an explosion of matches as doc units having the same doc-type is very common.
 
-    -- 2A) Combined criteria: Aktenzeichen + Entscheidungsdatum // Aktenzeichen + Gericht + Dok-Typ
+    -- 2A) Combined criteria: Aktenzeichen + Entscheidungsdatum + Dok-Typ // Aktenzeichen + Gericht + Dok-Typ
      file_number_matches as (
         SELECT DISTINCT t1.id AS id_a, t2.id AS id_b
         FROM all_file_numbers t1
@@ -77,6 +77,12 @@ WITH
         JOIN all_dates d1 ON d1.id = id_a
         JOIN all_dates d2 ON d2.id = id_b
         WHERE d1.value = d2.value),
+     date_file_number_doc_type_matches as (
+        SELECT matches.id_a, matches.id_b
+        FROM date_file_number_matches matches
+        JOIN incremental_migration.documentation_unit d1 ON d1.id = matches.id_a
+        JOIN incremental_migration.documentation_unit d2 ON d2.id = matches.id_b
+        WHERE d1.document_type_id = d2.document_type_id),
      court_file_number_matches as (
         SELECT fnm.id_a, fnm.id_b
         FROM file_number_matches fnm
@@ -108,7 +114,7 @@ WITH
         SELECT id_a, id_b
         FROM (
             SELECT *
-            FROM date_file_number_matches
+            FROM date_file_number_doc_type_matches
             UNION ALL
             SELECT *
             FROM court_file_number_doc_type_matches
@@ -173,6 +179,12 @@ WITH
         JOIN all_dates d1 ON d1.id = id_a
         JOIN all_dates d2 ON d2.id = id_b
         WHERE d1.value = d2.value),
+     date_file_number_doc_type_matches as (
+        SELECT matches.id_a, matches.id_b
+        FROM date_file_number_matches matches
+        JOIN incremental_migration.documentation_unit d1 ON d1.id = matches.id_a
+        JOIN incremental_migration.documentation_unit d2 ON d2.id = matches.id_b
+        WHERE d1.document_type_id = d2.document_type_id),
      court_file_number_matches as (
         SELECT fnm.id_a, fnm.id_b
         FROM file_number_matches fnm
@@ -201,7 +213,7 @@ WITH
         SELECT id_a, id_b
         FROM (
             SELECT *
-            FROM date_file_number_matches
+            FROM date_file_number_doc_type_matches
             UNION ALL
             SELECT *
             FROM court_file_number_doc_type_matches
