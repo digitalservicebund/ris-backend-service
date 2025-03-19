@@ -19,10 +19,15 @@ public interface DatabaseDuplicateCheckRepository
     -- We filter file numbers that occur more than 50 times (i.e. "XX"):
     -- They lead to explosion of duplicate relationships
     WITH filtered_file_numbers AS (
-        SELECT upper(trim(value)) AS value
-        FROM incremental_migration.file_number
-        WHERE upper(trim(value)) IN (:allFileNumbers)
-        GROUP BY upper(trim(value))
+        SELECT value FROM (
+            SELECT upper(trim(value)) AS value
+            FROM incremental_migration.file_number
+            WHERE upper(trim(value)) IN (:allFileNumbers)
+            UNION ALL
+            SELECT upper(trim(value)) AS value
+            FROM incremental_migration.deviating_file_number
+            WHERE upper(trim(value)) IN (:allFileNumbers)) as regular_and_deviating_file_numbers
+        GROUP BY value
         HAVING COUNT(*) <= 50
     )
 

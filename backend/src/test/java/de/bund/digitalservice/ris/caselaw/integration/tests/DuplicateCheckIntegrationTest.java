@@ -1171,6 +1171,22 @@ class DuplicateCheckIntegrationTest {
                   .documentType(documentType1)
                   .build()),
           Arguments.of(
+              "findDuplicates_withTwoDeviatingFileNumbersAndCourtAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .fileNumbers(List.of("filenumber1"))
+                  .deviatingFileNumbers(List.of("abc", "AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("filenumber2"))
+                  .deviatingFileNumbers(List.of("def", "AZ-123"))
+                  .court(courtAgAachen)
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
               "findDuplicates_withFileNumberAndOneDeviatingCourtAndDocType",
               CreationParameters.builder()
                   .documentNumber("DocumentNumb1")
@@ -1195,6 +1211,20 @@ class DuplicateCheckIntegrationTest {
               CreationParameters.builder()
                   .documentNumber("DocumentNumb2")
                   .fileNumbers(List.of("AZ-123"))
+                  .deviatingCourts(List.of("OLG Dresden"))
+                  .documentType(documentType1)
+                  .build()),
+          Arguments.of(
+              "findDuplicates_withTwoDeviatingFileNumbersAndTwoDeviatingCourtsAndDocType",
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .deviatingFileNumbers(List.of("AZ-123"))
+                  .deviatingCourts(List.of("OLG Dresden"))
+                  .documentType(documentType1)
+                  .build(),
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .deviatingFileNumbers(List.of("AZ-123"))
                   .deviatingCourts(List.of("OLG Dresden"))
                   .documentType(documentType1)
                   .build()),
