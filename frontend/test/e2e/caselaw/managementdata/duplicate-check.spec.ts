@@ -1,11 +1,9 @@
 import { expect, Page } from "@playwright/test"
 import {
-  deleteDocumentUnit,
   navigateToAttachments,
   navigateToCategories,
   navigateToHandover,
   navigateToManagementData,
-  navigateToSearch,
   save,
   uploadTestfile,
 } from "../e2e-utils"
@@ -32,6 +30,7 @@ test.describe(
           await expectNoDuplicateWarning(page)
           await setFileNumberToMatchDocUnit(page, prefilledDocumentUnit)
           await setDecisionDateToMatchDocUnit(page, prefilledDocumentUnit)
+          await setDocTypeToMatchDocUnit(page, prefilledDocumentUnit)
           await save(page)
           await expectDuplicateWarning(page)
           // Other doc unit displays same warning
@@ -56,44 +55,6 @@ test.describe(
 
           await expectDuplicateWarning(page)
         })
-
-        // eslint-disable-next-line playwright/expect-expect
-        test("A duplicate warning appears when creating from search", async ({
-          page,
-          prefilledDocumentUnit,
-        }) => {
-          await navigateToSearch(page)
-          await test.step("Enter core data into search with different court", async () => {
-            await page
-              .getByLabel("Aktenzeichen Suche")
-              .fill(prefilledDocumentUnit.coreData.fileNumbers?.[0] ?? "")
-            const date = DateUtil.formatDate(
-              prefilledDocumentUnit.coreData.decisionDate,
-            )
-            await page
-              .getByLabel("Entscheidungsdatum Suche")
-              .first()
-              .fill(date!)
-            await page.getByLabel("Gerichtstyp Suche").fill("BGH")
-          })
-
-          await test.step("Search and create doc unit from empty search results", async () => {
-            await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-            await page
-              .getByRole("button", { name: "Übernehmen und fortfahren" })
-              .click()
-          })
-
-          await expectDuplicateWarning(page)
-
-          const docNumber = await page
-            .getByTestId("document-unit-info-panel")
-            .getByRole("heading")
-            .textContent()
-
-          // If the test fails, the doc unit will not be deleted.
-          await deleteDocumentUnit(page, docNumber!)
-        })
       },
     )
 
@@ -106,6 +67,7 @@ test.describe(
         await navigateToCategories(page, documentNumber)
         await setFileNumberToMatchDocUnit(page, prefilledDocumentUnit)
         await setDecisionDateToMatchDocUnit(page, prefilledDocumentUnit)
+        await setDocTypeToMatchDocUnit(page, prefilledDocumentUnit)
         await save(page)
         await expectDuplicateWarning(page)
       })
