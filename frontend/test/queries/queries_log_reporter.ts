@@ -9,8 +9,11 @@ import type {
 import playwrightConfig from "./../../playwright.config"
 
 class QueriesReporter implements Reporter {
-  private resultsWithDuration: { test: TestCase; result: TestResult }[] = []
-  private failedTests: { test: TestCase; result: TestResult }[] = []
+  private readonly resultsWithDuration: {
+    test: TestCase
+    result: TestResult
+  }[] = []
+  private readonly failedTests: { test: TestCase; result: TestResult }[] = []
 
   onBegin(_config: FullConfig, suite: Suite) {
     console.log(
@@ -46,7 +49,7 @@ class QueriesReporter implements Reporter {
           average_duration: Math.round(
             durations.reduce((a, b) => a + b, 0) / durations.length,
           ),
-          expected: maxDuration as number,
+          expected: maxDuration,
           max_duration: Math.round(Math.max(...durations)),
           min_duration: Math.round(Math.min(...durations)),
           runs: durations.length,
@@ -69,8 +72,8 @@ class QueriesReporter implements Reporter {
   }
 
   private getRunsWithoutSetup(suite: Suite): number {
-    const setupFiles = playwrightConfig.projects?.find(
-      (project) => project.name == "setup",
+    const setupFiles = playwrightConfig.projects?.find((project) =>
+      ["setup-chromium", "setup-firefox"].includes(project.name!),
     )?.testMatch as RegExp
 
     return suite
