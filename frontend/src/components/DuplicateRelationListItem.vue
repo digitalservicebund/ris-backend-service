@@ -10,6 +10,7 @@ import {
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"
+import { PublicationState } from "@/domain/publicationStatus"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import DateUtil from "@/utils/dateUtil"
@@ -48,11 +49,24 @@ const updateStatus = async (newStatus: DuplicateRelationStatus) => {
   hasSetStateError.value = error
 }
 
-const warningIgnoredLabel = computed(() =>
-  duplicateRelation.isJdvDuplicateCheckActive
-    ? "Warnung ignorieren"
-    : `Warnung ignoriert wegen "Dupcode ausschalten" (jDV)`,
+const duplicateStates = [PublicationState.DUPLICATED, PublicationState.LOCKED]
+const hasDuplicateState = (state?: PublicationState) =>
+  state && duplicateStates.includes(state)
+const isAutomaticallyIgnored = computed(
+  () =>
+    hasDuplicateState(duplicateRelation.publicationStatus) ||
+    hasDuplicateState(documentUnit.value!.status?.publicationStatus) ||
+    !duplicateRelation.isJdvDuplicateCheckActive,
 )
+const autoIgnoreLabel = computed(() =>
+  !duplicateRelation.isJdvDuplicateCheckActive
+    ? `Warnung ignoriert wegen "Dupcode ausschalten" (jDV)`
+    : `Warnung ignoriert wegen Status "Dublette" oder "Gesperrt"`,
+)
+const ignoreWarningCheckboxLabel = computed(() =>
+  isAutomaticallyIgnored.value ? autoIgnoreLabel.value : "Warnung ignorieren",
+)
+
 const coreDataText = computed(() =>
   [
     duplicateRelation.courtLabel,
@@ -90,7 +104,7 @@ const coreDataText = computed(() =>
       :id="`is-ignored-${duplicateRelation.documentNumber}`"
       v-slot="{ id }"
       class="whitespace-nowrap"
-      :label="warningIgnoredLabel"
+      :label="ignoreWarningCheckboxLabel"
       label-class="ds-label-01-reg"
       :label-position="LabelPosition.RIGHT"
     >
@@ -99,7 +113,7 @@ const coreDataText = computed(() =>
         v-model="isIgnored"
         aria-label="Warnung ignorieren"
         class="ds-checkbox-mini"
-        :readonly="!duplicateRelation.isJdvDuplicateCheckActive"
+        :readonly="isAutomaticallyIgnored"
       />
     </InputField>
 
