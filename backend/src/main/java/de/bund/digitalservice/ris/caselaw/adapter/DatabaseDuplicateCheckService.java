@@ -7,9 +7,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -234,19 +236,12 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
       Optional<DuplicateRelationDTO> existingRelation =
           duplicateRelationService.findByDocUnitIds(decisionDTO.getId(), dup.getId());
 
-      var isJDVDuplicateCheckActive =
-          !Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
-              && !Boolean.FALSE.equals(decisionDTO.getIsJdvDuplicateCheckActive());
-
-      var status =
-          isJDVDuplicateCheckActive
-              ? DuplicateRelationStatus.PENDING
-              : DuplicateRelationStatus.IGNORED;
+      var duplicateRelationStatus = getRelationStatus(decisionDTO, dup);
 
       if (existingRelation.isEmpty()) {
-        createDuplicateRelation(decisionDTO, dup, status);
-      } else if (shouldUpdateRelationStatus(isJDVDuplicateCheckActive, existingRelation)) {
-        duplicateRelationService.setStatus(existingRelation.get(), status);
+        createDuplicateRelation(decisionDTO, dup, duplicateRelationStatus);
+      } else if (shouldUpdateRelationStatus(duplicateRelationStatus, existingRelation.get())) {
+        duplicateRelationService.setStatus(existingRelation.get(), duplicateRelationStatus);
       }
     }
   }
@@ -267,14 +262,47 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
   }
 
   /**
-   * If the relationship is PENDING and the legacy jdv "dup-code ausschalten" applies, the status
-   * must be set to IGNORED.
+   * If the duplicate relationship was already ignored in the jDV (either "Dupcode ausschalten" or
+   * by setting the doc unit state), the status must be set to IGNORED in NeuRIS as well.
+   */
+  private DuplicateRelationStatus getRelationStatus(
+      DecisionDTO decisionDTO, DocumentationUnitIdDuplicateCheckDTO dup) {
+
+    var isJDVDuplicateCheckActive =
+        !Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
+            && !Boolean.FALSE.equals(decisionDTO.getIsJdvDuplicateCheckActive());
+
+    var isIgnored =
+        isDuplicatedOrLocked(decisionDTO)
+            || isDuplicatedOrLocked(dup)
+            || !isJDVDuplicateCheckActive;
+
+    return isIgnored ? DuplicateRelationStatus.IGNORED : DuplicateRelationStatus.PENDING;
+  }
+
+  private boolean isDuplicatedOrLocked(DocumentationUnitIdDuplicateCheckDTO dup) {
+    return Optional.ofNullable(dup.getStatus()).map(this::isDuplicatedOrLocked).orElse(false);
+  }
+
+  private boolean isDuplicatedOrLocked(DecisionDTO dup) {
+    return Optional.ofNullable(dup.getStatus())
+        .map(StatusDTO::getPublicationStatus)
+        .map(this::isDuplicatedOrLocked)
+        .orElse(false);
+  }
+
+  private boolean isDuplicatedOrLocked(PublicationStatus status) {
+    return status == PublicationStatus.DUPLICATED || status == PublicationStatus.LOCKED;
+  }
+
+  /**
+   * If the relationship is currently PENDING, but should be IGNORED according to jDV it must be set
+   * to IGNORED.
    */
   private boolean shouldUpdateRelationStatus(
-      boolean isJDVDuplicateCheckActive, Optional<DuplicateRelationDTO> existingRelation) {
-    return !isJDVDuplicateCheckActive
-        && existingRelation.isPresent()
-        && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getRelationStatus());
+      DuplicateRelationStatus duplicateRelationStatus, DuplicateRelationDTO existingRelation) {
+    return duplicateRelationStatus == DuplicateRelationStatus.IGNORED
+        && DuplicateRelationStatus.PENDING.equals(existingRelation.getRelationStatus());
   }
 
   private void removeObsoleteDuplicates(

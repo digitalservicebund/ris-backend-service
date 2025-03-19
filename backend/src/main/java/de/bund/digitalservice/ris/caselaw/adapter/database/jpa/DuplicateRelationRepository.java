@@ -211,15 +211,10 @@ WITH
         ) as all_matches
       GROUP BY id_a, id_b)
 INSERT INTO incremental_migration.duplicate_relation (documentation_unit_id1, documentation_unit_id2, status)
-SELECT drel.id_a, drel.id_b,
-       CAST(CASE
-                WHEN d1.duplicate_check = FALSE OR d2.duplicate_check = FALSE THEN 'IGNORED'
-                ELSE 'PENDING' END AS incremental_migration.duplicate_relation_status)
+SELECT drel.id_a, drel.id_b, 'PENDING'
 FROM duplicate_relations_view drel
          LEFT JOIN incremental_migration.duplicate_relation ON drel.id_a = duplicate_relation.documentation_unit_id1 AND
                                                                drel.id_b = duplicate_relation.documentation_unit_id2
-         LEFT JOIN incremental_migration.documentation_unit d1 ON drel.id_a = d1.id
-         LEFT JOIN incremental_migration.documentation_unit d2 ON drel.id_b = d2.id
          -- proceeding decisions need to be filtered out -> only consider decisions
          INNER JOIN incremental_migration.decision dec1 ON dec1.id = drel.id_a
          INNER JOIN incremental_migration.decision dec2 ON dec2.id = drel.id_b
@@ -234,10 +229,15 @@ WHERE duplicate_relation.documentation_unit_id1 IS NULL;
           """
 UPDATE incremental_migration.duplicate_relation drel
 SET status = 'IGNORED'
-FROM incremental_migration.documentation_unit d1, incremental_migration.documentation_unit  d2
+FROM incremental_migration.documentation_unit d1
+        LEFT JOIN incremental_migration.status status1 ON d1.current_status_id = status1.id,
+    incremental_migration.documentation_unit d2
+        LEFT JOIN incremental_migration.status status2 ON d2.current_status_id = status2.id
 WHERE drel.status = 'PENDING'
   AND drel.documentation_unit_id1 = d1.id AND drel.documentation_unit_id2 = d2.id
-  AND (d1.duplicate_check = FALSE OR d2.duplicate_check = FALSE);
+  AND (d1.duplicate_check = FALSE OR d2.duplicate_check = FALSE
+        OR status1.publication_status = 'DUPLICATED' OR status2.publication_status = 'DUPLICATED'
+        OR status1.publication_status = 'LOCKED' OR status2.publication_status = 'LOCKED');
 """,
       nativeQuery = true)
   int ignoreDuplicateRelationsWhenJdvDupCheckDisabled();
