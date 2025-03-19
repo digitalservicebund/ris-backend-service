@@ -26,7 +26,7 @@ const emit = defineEmits<{
   "attachmentIndex:update": [value: number]
 }>()
 
-const textCheck = useFeatureToggle("neuris.text-check")
+const textCheckAll = useFeatureToggle("neuris.text-check-all")
 
 function emitSidePanelMode(value: SelectablePanelContent) {
   emit("panelMode:update", value)
@@ -91,7 +91,7 @@ function emitAttachmentIndex(value: number) {
           @click="() => emitSidePanelMode('category-import')"
         />
       </Tooltip>
-      <Tooltip v-if="textCheck" shortcut="t" text="Rechtschreibprüfung">
+      <Tooltip v-if="textCheckAll" shortcut="t" text="Rechtschreibprüfung">
         <TextButton
           id="text-check"
           aria-label="Rechtschreibprüfung"

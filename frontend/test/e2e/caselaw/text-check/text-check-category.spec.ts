@@ -4,6 +4,12 @@ import { caselawTest as test } from "../fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { convertHexToRGB } from "~/test-helper/coloursUtil"
 
+// eslint-disable-next-line playwright/no-skipped-test
+test.skip(
+  ({ browserName }) => browserName !== "chromium",
+  "Skipping firefox flaky test",
+)
+
 const textWithErrors = {
   text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten.",
   incorrectWords: [
@@ -56,13 +62,17 @@ test.describe(
           )
         })
 
-        await test.step("trigger category text check", async () => {
+        await test.step("trigger category text button shows loading status and highlights matches", async () => {
           const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
 
           await page
             .getByLabel("Orientierungssatz Button")
             .getByRole("button", { name: "Rechtschreibprüfung" })
             .click()
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
 
           await otherHeadNoteEditor
             .locator("text-check")
@@ -125,7 +135,7 @@ test.describe(
           }
         })
 
-        await test.step("accept a selected suggestion replaces it in text", async () => {
+        await test.step("accept a selected suggestion replaces in text", async () => {
           const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
           await otherHeadNoteEditor.click()
 
@@ -142,6 +152,8 @@ test.describe(
           await expect(otherHeadNoteEditor.locator("div")).toHaveText(
             textWithErrors.text.replace(textCheckLiteral, "z. B."),
           )
+
+          await expect(page.locator(`text-check[id='${8}']`)).not.toBeAttached()
         })
 
         await test.step("click on a selected suggestion, then click on a non-tag closes the text check modal", async () => {

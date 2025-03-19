@@ -16,12 +16,11 @@ plugins {
     id("com.diffplug.spotless") version "7.0.2"
     id("org.sonarqube") version "6.0.1.5171"
     id("com.github.jk1.dependency-license-report") version "2.9"
-    id("com.gorylenko.gradle-git-properties") version "2.4.2"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.3.4"
+    id("org.flywaydb.flyway") version "11.4.0"
     id("io.sentry.jvm.gradle") version "5.3.0"
 }
 
@@ -161,12 +160,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.3")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.4")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.0")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.30.0")
+    implementation("com.google.protobuf:protobuf-java:4.30.1")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.5.2")
@@ -214,8 +213,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.14.4")
-    implementation("io.micrometer:micrometer-core:1.14.4")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.5")
+    implementation("io.micrometer:micrometer-core:1.14.5")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
@@ -229,19 +228,19 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.10.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.3.4"
+    val flywayCore = "org.flywaydb:flyway-core:11.4.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.3.4")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.4.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.16.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.16.1")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.3")
-    testImplementation("org.springframework.security:spring-security-test:6.4.3")
+    testImplementation("io.projectreactor:reactor-test:3.7.4")
+    testImplementation("org.springframework.security:spring-security-test:6.4.4")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
@@ -282,7 +281,7 @@ tasks {
         }
     }
 
-    task<Test>("integrationTest") {
+    register<Test>("integrationTest") {
         description = "Runs the integration tests."
         group = "verification"
         useJUnitPlatform {

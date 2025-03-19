@@ -42,6 +42,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverR
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -202,12 +203,12 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitWithoutFileNumbers.getDocumentNumber());
 
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitWithoutFileNumbers.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitWithoutFileNumbers.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -224,12 +225,12 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitWithoutFileNumbers.getDocumentNumber());
 
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitWithoutFileNumbers.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitWithoutFileNumbers.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -298,13 +299,12 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      DuplicateRelation duplicate =
-          ((DocumentationUnit) foundDocUnit)
-              .managementData().duplicateRelations().stream().findFirst().get();
+      DuplicateRelation duplicate = foundDocUnit.managementData().duplicateRelations().getFirst();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
     }
@@ -338,13 +338,12 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      DuplicateRelation duplicate =
-          ((DocumentationUnit) foundDocUnit)
-              .managementData().duplicateRelations().stream().findFirst().get();
+      DuplicateRelation duplicate = foundDocUnit.managementData().duplicateRelations().getFirst();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
     }
@@ -380,15 +379,98 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      DuplicateRelation duplicate =
-          ((DocumentationUnit) foundDocUnit)
-              .managementData().duplicateRelations().stream().findFirst().get();
+      DuplicateRelation duplicate = foundDocUnit.managementData().duplicateRelations().getFirst();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
+    }
+
+    @Test
+    void
+        checkDuplicates_withoutExistingDuplicatesAndIsJdvDuplicateCheckActiveTrueAndLockedStatus_shouldCreateNewDuplicateWithIgnoredStatus()
+            throws DocumentationUnitNotExistsException {
+      // Arrange
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .isJdvDuplicateCheckActive(true)
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      var docUnitDuplicateDTO =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb2")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123"))
+                      .publicationStatus(PublicationStatus.LOCKED)
+                      .build()));
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+      DuplicateRelation duplicate = foundDocUnit.managementData().duplicateRelations().getFirst();
+      assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
+      assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.IGNORED);
+    }
+
+    @Test
+    void
+        checkDuplicates_withoutExistingDuplicatesAndIsJdvDuplicateCheckActiveTrueAndDuplicatedStatus_shouldCreateNewDuplicateWithIgnoredStatus()
+            throws DocumentationUnitNotExistsException {
+      // Arrange
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123"))
+                      .publicationStatus(PublicationStatus.DUPLICATED)
+                      .build()));
+
+      var docUnitDuplicateDTO =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb2")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .isJdvDuplicateCheckActive(true)
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+      DuplicateRelation duplicate = foundDocUnit.managementData().duplicateRelations().getFirst();
+      assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
+      assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.IGNORED);
     }
 
     @Test
@@ -422,13 +504,12 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      DuplicateRelation duplicate =
-          ((DocumentationUnit) foundDocUnit)
-              .managementData().duplicateRelations().stream().findFirst().get();
+      DuplicateRelation duplicate = foundDocUnit.managementData().duplicateRelations().getFirst();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.IGNORED);
     }
@@ -463,10 +544,11 @@ class DuplicateCheckIntegrationTest {
       // Create duplicate with pending status
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
       assertThat(
-              ((DocumentationUnit)
-                      ((DocumentationUnit)
-                          documentationUnitService.getByUuid(docUnitToBeChecked.getId())))
-                  .managementData().duplicateRelations().stream().findFirst().get().status())
+              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+                  .managementData()
+                  .duplicateRelations()
+                  .getFirst()
+                  .status())
           .isEqualTo(DuplicateRelationStatus.PENDING);
 
       // change isJdvDuplicateCheckActive from null to false
@@ -475,13 +557,12 @@ class DuplicateCheckIntegrationTest {
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      DuplicateRelation duplicate =
-          ((DocumentationUnit) foundDocUnit)
-              .managementData().duplicateRelations().stream().findFirst().get();
+      DuplicateRelation duplicate = foundDocUnit.managementData().duplicateRelations().getFirst();
       assertThat(duplicate.documentNumber()).isEqualTo(duplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.IGNORED);
     }
@@ -523,7 +604,10 @@ class DuplicateCheckIntegrationTest {
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
       assertThat(
               ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
-                  .managementData().duplicateRelations().stream().findFirst().get().status())
+                  .managementData()
+                  .duplicateRelations()
+                  .getFirst()
+                  .status())
           .isEqualTo(DuplicateRelationStatus.PENDING);
       assertThat(duplicateRelationRepository.findAll()).hasSize(2);
 
@@ -533,16 +617,12 @@ class DuplicateCheckIntegrationTest {
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
+      assertThat(foundDocUnit.managementData().duplicateRelations().getFirst().documentNumber())
           .isEqualTo("DocumentNumb2");
     }
 
@@ -637,6 +717,53 @@ class DuplicateCheckIntegrationTest {
     }
 
     @Test
+    void checkDuplicates_whenRequestingDocUnit_shouldIncludeNewWarningsInResponse() {
+      // Arrange
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      var docUnitDuplicateDTO =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb2")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act: GET-requesting a doc unit should trigger check
+      var docUnitResponse =
+          risWebTestClient
+              .withDefaultLogin()
+              .get()
+              .uri("/api/v1/caselaw/documentunits/" + docUnitToBeChecked.getDocumentNumber())
+              .exchange()
+              .expectStatus()
+              .isOk()
+              .expectBody(DocumentationUnit.class)
+              .returnResult()
+              .getResponseBody();
+
+      // Assert: GET response should include duplicate relations
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+      List<DuplicateRelation> duplicates = docUnitResponse.managementData().duplicateRelations();
+      assertThat(duplicates).hasSize(1);
+      assertThat(duplicates.getFirst().documentNumber())
+          .isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
+      assertThat(duplicates.getFirst().status()).isEqualTo(DuplicateRelationStatus.PENDING);
+    }
+
+    @Test
     void setStatus_withExistingPendingDuplicateRelation_shouldUpdateStatusToIgnored()
         throws DocumentationUnitNotExistsException {
       // Arrange
@@ -675,7 +802,10 @@ class DuplicateCheckIntegrationTest {
       // Assert
       assertThat(
               ((DocumentationUnit) documentationUnitService.getByUuid(original.getId()))
-                  .managementData().duplicateRelations().stream().findFirst().get().status())
+                  .managementData()
+                  .duplicateRelations()
+                  .getFirst()
+                  .status())
           .isEqualTo(DuplicateRelationStatus.IGNORED);
     }
 
@@ -723,21 +853,17 @@ class DuplicateCheckIntegrationTest {
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
+      assertThat(foundDocUnit.managementData().duplicateRelations().getFirst().documentNumber())
           .isEqualTo(secondParams.documentNumber);
     }
 
     @Test
-    void findDuplicates_withCourtAndFileNumber() throws DocumentationUnitNotExistsException {
+    void findNoDuplicates_withCourtAndFileNumber() throws DocumentationUnitNotExistsException {
       // Arrange
       var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
       var court = CourtTransformer.transformToDomain(courtDTO);
@@ -749,6 +875,36 @@ class DuplicateCheckIntegrationTest {
                       .documentNumber("DocumentNumb1")
                       .court(court)
                       .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      // Act
+      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
+    }
+
+    @Test
+    void findDuplicates_withCourtAndFileNumberAndDocType()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
+      var court = CourtTransformer.transformToDomain(courtDTO);
+      var documentType =
+          DocumentTypeTransformer.transformToDomain(
+              databaseDocumentTypeRepository.findAll().getFirst());
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .court(court)
+                      .fileNumbers(List.of("AZ-123"))
+                      .documentType(documentType)
                       .build()));
 
       var duplicateDTO =
@@ -759,29 +915,29 @@ class DuplicateCheckIntegrationTest {
                       .documentNumber("DocumentNumb2")
                       .court(court)
                       .fileNumbers(List.of("AZ-123"))
+                      .documentType(documentType)
                       .build()));
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
+      assertThat(foundDocUnit.managementData().duplicateRelations().getFirst().documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
     @Test
-    void findDuplicates_withCourtAndDeviatingFileNumber()
+    void findDuplicates_withCourtAndDeviatingFileNumberAndDocType()
         throws DocumentationUnitNotExistsException {
       // Arrange
       var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
       var court = CourtTransformer.transformToDomain(courtDTO);
+      var documentType =
+          DocumentTypeTransformer.transformToDomain(
+              databaseDocumentTypeRepository.findAll().getFirst());
       var docUnitToBeChecked =
           generateNewDocumentationUnit(
               docOffice,
@@ -790,6 +946,7 @@ class DuplicateCheckIntegrationTest {
                       .documentNumber("DocumentNumb1")
                       .court(court)
                       .fileNumbers(List.of("AZ-123"))
+                      .documentType(documentType)
                       .build()));
 
       var duplicateDTO =
@@ -800,27 +957,27 @@ class DuplicateCheckIntegrationTest {
                       .documentNumber("DocumentNumb2")
                       .court(court)
                       .deviatingFileNumbers(List.of("AZ-123"))
+                      .documentType(documentType)
                       .build()));
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
+      assertThat(foundDocUnit.managementData().duplicateRelations().getFirst().documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
     @Test
-    void findDuplicates_withDeviatingCourtsAndFileNumber()
+    void findDuplicates_withDeviatingCourtsAndFileNumberAndDocType()
         throws DocumentationUnitNotExistsException {
       // Arrange
+      var documentType =
+          DocumentTypeTransformer.transformToDomain(
+              databaseDocumentTypeRepository.findAll().getFirst());
       var docUnitToBeChecked =
           generateNewDocumentationUnit(
               docOffice,
@@ -828,6 +985,7 @@ class DuplicateCheckIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .deviatingCourts(List.of("AG Aachen", "BVerfG"))
+                      .documentType(documentType)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -838,21 +996,18 @@ class DuplicateCheckIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
                       .deviatingCourts(List.of("AG Aachen"))
+                      .documentType(documentType)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
+      assertThat(foundDocUnit.managementData().duplicateRelations().getFirst().documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
@@ -862,6 +1017,9 @@ class DuplicateCheckIntegrationTest {
       // Arrange
       var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 1).getFirst();
       var courtAgAachen = CourtTransformer.transformToDomain(courtDTO);
+      var documentType =
+          DocumentTypeTransformer.transformToDomain(
+              databaseDocumentTypeRepository.findAll().getFirst());
       var docUnitToBeChecked =
           generateNewDocumentationUnit(
               docOffice,
@@ -869,6 +1027,7 @@ class DuplicateCheckIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
                       .court(courtAgAachen)
+                      .documentType(documentType)
                       .deviatingCourts(List.of("BVerfG"))
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
@@ -880,21 +1039,18 @@ class DuplicateCheckIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
                       .deviatingCourts(List.of("BGH", "AG Aachen"))
+                      .documentType(documentType)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
+      assertThat(foundDocUnit.managementData().duplicateRelations().getFirst().documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
@@ -904,6 +1060,9 @@ class DuplicateCheckIntegrationTest {
       // Arrange
       var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 1).getFirst();
       var courtBGH = CourtTransformer.transformToDomain(courtDTO);
+      var documentType =
+          DocumentTypeTransformer.transformToDomain(
+              databaseDocumentTypeRepository.findAll().getFirst());
       var docUnitToBeChecked =
           generateNewDocumentationUnit(
               docOffice,
@@ -912,6 +1071,7 @@ class DuplicateCheckIntegrationTest {
                       .documentNumber("DocumentNumb1")
                       .deviatingCourts(List.of("AG Aachen"))
                       .fileNumbers(List.of("AZ-123"))
+                      .documentType(documentType)
                       .build()));
 
       var duplicateDTO =
@@ -921,21 +1081,18 @@ class DuplicateCheckIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
                       .court(courtBGH)
+                      .documentType(documentType)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
+      assertThat(foundDocUnit.managementData().duplicateRelations().getFirst().documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
@@ -943,6 +1100,9 @@ class DuplicateCheckIntegrationTest {
     void findDuplicates_withDeviatingCourtsAndDeviatingFileNumber()
         throws DocumentationUnitNotExistsException {
       // Arrange
+      var documentType =
+          DocumentTypeTransformer.transformToDomain(
+              databaseDocumentTypeRepository.findAll().getFirst());
       var docUnitToBeChecked =
           generateNewDocumentationUnit(
               docOffice,
@@ -951,6 +1111,7 @@ class DuplicateCheckIntegrationTest {
                       .documentNumber("DocumentNumb1")
                       .deviatingCourts(List.of("AG Aachen", "BVerfG"))
                       .fileNumbers(List.of("AZ-123"))
+                      .documentType(documentType)
                       .build()));
 
       var duplicateDTO =
@@ -961,20 +1122,17 @@ class DuplicateCheckIntegrationTest {
                       .documentNumber("DocumentNumb2")
                       .deviatingCourts(List.of("AG Aachen"))
                       .deviatingFileNumbers(List.of("AZ-123"))
+                      .documentType(documentType)
                       .build()));
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit =
+          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              ((DocumentationUnit) foundDocUnit)
-                  .managementData().duplicateRelations().stream()
-                      .findFirst()
-                      .get()
-                      .documentNumber())
+      assertThat(foundDocUnit.managementData().duplicateRelations().getFirst().documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
@@ -1005,12 +1163,11 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates("DocumentNumb2");
 
-      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
+      var foundDocUnit = (DocumentationUnit) documentationUnitService.getByUuid(decision.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -1043,12 +1200,11 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates("DocumentNumb2");
 
-      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
+      var foundDocUnit = (DocumentationUnit) documentationUnitService.getByUuid(decision.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -1083,12 +1239,11 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates("DocumentNumb2");
 
-      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
+      var foundDocUnit = (DocumentationUnit) documentationUnitService.getByUuid(decision.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -1128,12 +1283,11 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates("DocumentNumb2");
 
-      var foundDocUnit = documentationUnitService.getByUuid(decision.getId());
+      var foundDocUnit = (DocumentationUnit) documentationUnitService.getByUuid(decision.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
     }
 
     static Stream<Arguments> provideTestCases() {

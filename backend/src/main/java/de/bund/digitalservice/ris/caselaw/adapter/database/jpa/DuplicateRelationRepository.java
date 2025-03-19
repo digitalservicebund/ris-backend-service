@@ -26,6 +26,7 @@ WHERE duplicateRelation.id.documentationUnitId1 = :docUnitId
       value =
           """
 WITH
+    -- 1) Collect for each relevant criterion a full list of pairs of doc-unit-id and value, e.g. ("38e..34f", 2020-01-11)
     all_dates as(
         SELECT documentation_unit_id as id, value
         FROM incremental_migration.deviating_date
@@ -57,6 +58,14 @@ WITH
         UNION ALL
         SELECT documentation_unit_id as id, UPPER(value) as value
         FROM incremental_migration.deviating_file_number),
+
+    -- 2) Find all pairs of doc-unit-ids that have an identical value per criterion,
+    -- e.g. ("38e..34f", 2020-01-11) + ("785..eb9", 2020-01-11) -> ("38e..34f", "785..eb9")
+    -- We step-by-step narrow down the number of doc-unit-id pairs by only considering pairs for the next check that have matched by previously checked criteria.
+    -- The order of the criteria is important: We need to start with the most specific criterion that has the least matches.
+    -- If we started with doc-type instead, we would get an explosion of matches as doc units having the same doc-type is very common.
+
+    -- 2A) Combined criteria: Aktenzeichen + Entscheidungsdatum // Aktenzeichen + Gericht + Dok-Typ
      file_number_matches as (
         SELECT DISTINCT t1.id AS id_a, t2.id AS id_b
         FROM all_file_numbers t1
@@ -74,6 +83,14 @@ WITH
         JOIN all_courts d1 ON d1.id = fnm.id_a
         JOIN all_courts d2 ON d2.id = fnm.id_b
         WHERE d1.value = d2.value),
+     court_file_number_doc_type_matches as (
+        SELECT matches.id_a, matches.id_b
+        FROM court_file_number_matches matches
+        JOIN incremental_migration.documentation_unit d1 ON d1.id = matches.id_a
+        JOIN incremental_migration.documentation_unit d2 ON d2.id = matches.id_b
+        WHERE d1.document_type_id = d2.document_type_id),
+
+    -- 2B) ECLI matches
      all_eclis as (
         SELECT documentation_unit_id as id, UPPER(value) as value
         FROM incremental_migration.deviating_ecli
@@ -85,16 +102,18 @@ WITH
         FROM all_eclis t1
         JOIN all_eclis t2 ON t1.value = t2.value
         WHERE t1.id < t2.id),
+
+    -- 3) Combine all matches and reasons for the matches
      duplicate_relations_view as (
-        SELECT id_a, id_b, STRING_AGG(DISTINCT reason, ', ') as reason
+        SELECT id_a, id_b
         FROM (
-            SELECT *, 'Entscheidungsdatum + Aktenzeichen' as reason
+            SELECT *
             FROM date_file_number_matches
             UNION ALL
-            SELECT *, 'Gericht + Aktenzeichen' as reason
-            FROM court_file_number_matches
+            SELECT *
+            FROM court_file_number_doc_type_matches
             UNION ALL
-            SELECT *, 'ECLI' as reason
+            SELECT *
             FROM ecli_matches
         ) as all_matches
       GROUP BY id_a, id_b)
@@ -160,6 +179,13 @@ WITH
         JOIN all_courts d1 ON d1.id = fnm.id_a
         JOIN all_courts d2 ON d2.id = fnm.id_b
         WHERE d1.value = d2.value),
+     court_file_number_doc_type_matches as (
+        SELECT matches.id_a, matches.id_b
+        FROM court_file_number_matches matches
+        JOIN incremental_migration.documentation_unit d1 ON d1.id = matches.id_a
+        JOIN incremental_migration.documentation_unit d2 ON d2.id = matches.id_b
+        WHERE d1.document_type_id = d2.document_type_id),
+
      all_eclis as (
         SELECT documentation_unit_id as id, UPPER(value) as value
         FROM incremental_migration.deviating_ecli
@@ -172,28 +198,23 @@ WITH
         JOIN all_eclis t2 ON t1.value = t2.value
         WHERE t1.id < t2.id),
      duplicate_relations_view as (
-        SELECT id_a, id_b, STRING_AGG(DISTINCT reason, ', ') as reason
+        SELECT id_a, id_b
         FROM (
-            SELECT *, 'Entscheidungsdatum + Aktenzeichen' as reason
+            SELECT *
             FROM date_file_number_matches
             UNION ALL
-            SELECT *, 'Gericht + Aktenzeichen' as reason
-            FROM court_file_number_matches
+            SELECT *
+            FROM court_file_number_doc_type_matches
             UNION ALL
-            SELECT *, 'ECLI' as reason
+            SELECT *
             FROM ecli_matches
         ) as all_matches
       GROUP BY id_a, id_b)
 INSERT INTO incremental_migration.duplicate_relation (documentation_unit_id1, documentation_unit_id2, status)
-SELECT drel.id_a, drel.id_b,
-       CAST(CASE
-                WHEN d1.duplicate_check = FALSE OR d2.duplicate_check = FALSE THEN 'IGNORED'
-                ELSE 'PENDING' END AS incremental_migration.duplicate_relation_status)
+SELECT drel.id_a, drel.id_b, 'PENDING'
 FROM duplicate_relations_view drel
          LEFT JOIN incremental_migration.duplicate_relation ON drel.id_a = duplicate_relation.documentation_unit_id1 AND
                                                                drel.id_b = duplicate_relation.documentation_unit_id2
-         LEFT JOIN incremental_migration.documentation_unit d1 ON drel.id_a = d1.id
-         LEFT JOIN incremental_migration.documentation_unit d2 ON drel.id_b = d2.id
          -- proceeding decisions need to be filtered out -> only consider decisions
          INNER JOIN incremental_migration.decision dec1 ON dec1.id = drel.id_a
          INNER JOIN incremental_migration.decision dec2 ON dec2.id = drel.id_b
@@ -208,10 +229,15 @@ WHERE duplicate_relation.documentation_unit_id1 IS NULL;
           """
 UPDATE incremental_migration.duplicate_relation drel
 SET status = 'IGNORED'
-FROM incremental_migration.documentation_unit d1, incremental_migration.documentation_unit  d2
+FROM incremental_migration.documentation_unit d1
+        LEFT JOIN incremental_migration.status status1 ON d1.current_status_id = status1.id,
+    incremental_migration.documentation_unit d2
+        LEFT JOIN incremental_migration.status status2 ON d2.current_status_id = status2.id
 WHERE drel.status = 'PENDING'
   AND drel.documentation_unit_id1 = d1.id AND drel.documentation_unit_id2 = d2.id
-  AND (d1.duplicate_check = FALSE OR d2.duplicate_check = FALSE);
+  AND (d1.duplicate_check = FALSE OR d2.duplicate_check = FALSE
+        OR status1.publication_status = 'DUPLICATED' OR status2.publication_status = 'DUPLICATED'
+        OR status1.publication_status = 'LOCKED' OR status2.publication_status = 'LOCKED');
 """,
       nativeQuery = true)
   int ignoreDuplicateRelationsWhenJdvDupCheckDisabled();

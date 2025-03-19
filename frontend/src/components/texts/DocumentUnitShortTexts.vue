@@ -98,6 +98,7 @@ const otherHeadnote = computed({
         id="headline"
         v-bind="{ registerTextEditorRef }"
         v-model="headline"
+        data-testid="headline"
         editable
         field-size="small"
         :label="shortTextLabels.headline"
@@ -108,6 +109,7 @@ const otherHeadnote = computed({
         id="guidingPrinciple"
         v-bind="{ registerTextEditorRef }"
         v-model="guidingPrinciple"
+        data-testid="guidingPrinciple"
         editable
         :label="shortTextLabels.guidingPrinciple"
         :should-show-button="
@@ -119,6 +121,7 @@ const otherHeadnote = computed({
         v-bind="{ registerTextEditorRef }"
         id="headnote"
         v-model="headnote"
+        data-testid="headnote"
         editable
         :label="shortTextLabels.headnote"
         :should-show-button="!store.documentUnit?.shortTexts?.headnote?.length"
@@ -128,6 +131,7 @@ const otherHeadnote = computed({
         id="otherHeadnote"
         v-bind="{ registerTextEditorRef }"
         v-model="otherHeadnote"
+        data-testid="otherHeadnote"
         editable
         :label="shortTextLabels.otherHeadnote"
         :should-show-button="

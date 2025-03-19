@@ -49,7 +49,8 @@ public class DocumentationUnitService {
           "/coreData/court",
           "/coreData/deviatingCourts",
           "/coreData/decisionDate",
-          "/coreData/deviatingDecisionDates");
+          "/coreData/deviatingDecisionDates",
+          "/coreData/documentType");
 
   public DocumentationUnitService(
       DocumentationUnitRepository repository,

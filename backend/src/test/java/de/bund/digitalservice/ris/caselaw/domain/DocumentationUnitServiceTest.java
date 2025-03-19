@@ -528,13 +528,13 @@ class DocumentationUnitServiceTest {
         "/coreData/court",
         "/coreData/deviatingCourts",
         "/coreData/decisionDate",
-        "/coreData/deviatingDecisionDates");
+        "/coreData/deviatingDecisionDates",
+        "/coreData/documentType");
   }
 
   static Stream<String> provideNonDuplicateCheckPaths() {
     return Stream.of(
         "/coreData/appraisalBody",
-        "/coreData/documentType",
         "/coreData/procedure",
         "/coreData/procedure/createdAt",
         "/coreData/procedure/documentationUnitCount",

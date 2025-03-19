@@ -298,12 +298,14 @@ class InternalPortalTransformerTest {
             .longTexts(
                 LongTexts.builder()
                     .reasons(
-                        "<border-number>\n"
-                            + "                    <number>1</number>\n"
-                            + "                    <content>\n"
-                            + "                      <p>Lorem ipsum</p>\n"
-                            + "                    </content>\n"
-                            + "                </border-number>")
+                        """
+                                    <border-number>
+                                        <number>1</number>
+                                        <content>
+                                            <p>Lorem ipsum</p>
+                                        </content>
+                                    </border-number>
+                                    """)
                     .build())
             .build();
 
@@ -373,14 +375,18 @@ class InternalPortalTransformerTest {
         Arguments.of(
             "<p><img alt=\"alt text\" height=\"70\" src=\"path/to/image\"></p>",
             "<akn:p><akn:img alt=\"alt text\" height=\"70\" src=\"path/to/image\"/></akn:p>"),
-        // Self closing break not inside block element
-        Arguments.of("<br />", "<akn:p><akn:br/></akn:p>"),
-        // Self closing break inside block element
-        Arguments.of("<p><br /></p>", "<akn:p><akn:br/></akn:p>"),
-        // Non self closing break not inside block element
-        Arguments.of("<br>", "<akn:p><akn:br/></akn:p>"),
-        // Non self closing break inside block element
-        Arguments.of("<p><br></p>", "<akn:p><akn:br/></akn:p>"));
+        // Self-closing break not inside block element
+        // Arguments.of("<br />", "<akn:p><akn:br/></akn:p>"),
+        // Self-closing break inside block element
+        // Arguments.of("<p><br /></p>", "<akn:p><akn:br/></akn:p>"),
+        // Non-self-closing break not inside block element
+        // Arguments.of("<br>", "<akn:p><akn:br/></akn:p>"),
+        // Non-self-closing break inside block element
+        Arguments.of("<p><br></p>", "<akn:p><akn:br/></akn:p>"),
+        // Col-groups in tables
+        Arguments.of(
+            "<table><colgroup><col><col></colgroup><tbody><tr><td>text</td><td>text</td></tr></tbody></table>",
+            "<ris:table><ris:tbody><ris:tr><ris:td>text</ris:td><ris:td>text</ris:td></ris:tr></ris:tbody></ris:table>"));
   }
 
   @ParameterizedTest

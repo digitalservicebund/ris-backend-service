@@ -30,6 +30,8 @@ test.describe("preview decision", () => {
     await expect(page.getByText("RegionNW")).toBeVisible()
     await expect(page.getByText("guidingPrinciple")).toBeVisible()
     await expect(page.getByText("testHeadnote")).toBeVisible()
+    await expect(page.getByText("Quelle")).toBeVisible()
+    await expect(page.getByText("A", { exact: true })).toBeVisible()
   })
 
   test("update fields in categories, check that update is reflected in preview", async ({

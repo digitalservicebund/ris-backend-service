@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -94,8 +93,7 @@ public class InternalPortalPublicationService {
     }
 
     try {
-      internalPortalBucket.save(
-          "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogJson);
+      internalPortalBucket.save(changelog.createFileName(), changelogJson);
     } catch (BucketException e) {
       log.error("Could not save changelog to bucket", e);
       throw new PublishException("Could not save changelog to bucket.", e);

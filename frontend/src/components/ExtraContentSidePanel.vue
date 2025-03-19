@@ -35,7 +35,7 @@ const { panelMode, currentAttachmentIndex, importDocumentNumber } =
 
 const route = useRoute()
 
-const textCheck = useFeatureToggle("neuris.text-check")
+const textCheckAll = useFeatureToggle("neuris.text-check-all")
 
 const hasNote = computed(() => {
   return !!props.documentUnit!.note && props.documentUnit!.note.length > 0
@@ -185,7 +185,7 @@ onMounted(() => {
         />
 
         <DocumentationUnitTextCheckSummary
-          v-else-if="panelMode === 'text-check' && textCheck"
+          v-else-if="panelMode === 'text-check' && textCheckAll"
           v-bind="{ jumpToMatch }"
         />
       </div>

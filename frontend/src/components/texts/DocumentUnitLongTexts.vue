@@ -77,6 +77,7 @@ const decisionReasons = computed({
         id="tenor"
         v-bind="{ registerTextEditorRef }"
         v-model="tenor"
+        data-testid="tenor"
         :label="longTextLabels.tenor"
         :should-show-button="!store.documentUnit?.longTexts?.tenor?.length"
       />
@@ -85,6 +86,7 @@ const decisionReasons = computed({
         id="reasons"
         v-bind="{ registerTextEditorRef }"
         v-model="reasons"
+        data-testid="reasons"
         :label="longTextLabels.reasons"
         :should-show-button="!store.documentUnit?.longTexts?.reasons?.length"
       />
@@ -93,6 +95,7 @@ const decisionReasons = computed({
         id="caseFacts"
         v-bind="{ registerTextEditorRef }"
         v-model="caseFacts"
+        data-testid="caseFacts"
         :label="longTextLabels.caseFacts"
         :should-show-button="!store.documentUnit?.longTexts?.caseFacts?.length"
       />
@@ -101,6 +104,7 @@ const decisionReasons = computed({
         id="decisionReasons"
         v-bind="{ registerTextEditorRef }"
         v-model="decisionReasons"
+        data-testid="decisionReasons"
         :label="longTextLabels.decisionReasons"
         :should-show-button="
           !store.documentUnit?.longTexts?.decisionReasons?.length
