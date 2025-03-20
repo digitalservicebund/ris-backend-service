@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
@@ -7,7 +8,6 @@ import { DisplayMode } from "@/components/enumDisplayMode"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import RadioInput from "@/components/input/RadioInput.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
@@ -236,7 +236,7 @@ async function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
  * Stops propagation of scrolling event, and toggles the showModal value.
  * @param {boolean} [shouldOpen] - Optional parameter to explicitly set the modal state.
  */
-function toggleDeletionConfirmationModal(shouldOpen: boolean | undefined) {
+function toggleDeletionConfirmationModal(shouldOpen?: boolean) {
   showModal.value = shouldOpen ?? !showModal.value
 
   if (showModal.value) {
@@ -610,68 +610,67 @@ onBeforeUnmount(() => {
       <div class="flex w-full flex-row justify-between">
         <div>
           <div class="flex gap-16">
-            <TextButton
+            <Button
               v-if="!isSaved && !reference?.documentationUnit?.hasForeignSource"
               aria-label="Nach Entscheidung suchen"
-              button-type="primary"
               label="Suchen"
               size="small"
               @click="search"
-            />
-            <TextButton
+            ></Button>
+            <Button
               v-if="isSaved || reference?.documentationUnit?.hasForeignSource"
               aria-label="Fundstelle vermerken"
-              button-type="tertiary"
               data-testid="previous-decision-save-button"
               :disabled="reference.isEmpty"
               label="Übernehmen"
+              severity="secondary"
               size="small"
               @click.stop="addReference(relatedDocumentationUnit)"
-            />
-            <TextButton
+            ></Button>
+            <Button
               v-if="isSaved || reference?.documentationUnit?.hasForeignSource"
               aria-label="Abbrechen"
-              button-type="ghost"
               label="Abbrechen"
               size="small"
+              text
               @click.stop="emit('cancelEdit')"
-            />
+            ></Button>
           </div>
         </div>
         <div v-if="isSaved">
-          <TextButton
+          <Button
             v-if="
               reference?.documentationUnit?.status?.publicationStatus ===
                 PublicationState.UNPUBLISHED &&
               reference?.getIsDocumentationUnitCreatedByReference()
             "
             aria-label="Eintrag löschen"
-            button-type="destructive"
             label="Eintrag löschen"
+            severity="danger"
             size="small"
-            @click.stop="toggleDeletionConfirmationModal"
-          />
+            @click.stop="toggleDeletionConfirmationModal(true)"
+          ></Button>
 
-          <TextButton
+          <Button
             v-else-if="
               reference.documentationUnit?.status?.publicationStatus ===
                 PublicationState.EXTERNAL_HANDOVER_PENDING &&
               reference?.getIsDocumentationUnitCreatedByReference()
             "
             aria-label="Fundstelle und Dokumentationseinheit löschen"
-            button-type="destructive"
             label="Fundstelle und Dokumentationseinheit löschen"
+            severity="danger"
             size="small"
             @click.stop="deleteReferenceAndDocUnit"
-          />
-          <TextButton
+          ></Button>
+          <Button
             v-else
             aria-label="Eintrag löschen"
-            button-type="destructive"
             label="Eintrag löschen"
+            severity="danger"
             size="small"
             @click.stop="modelValue && emit('removeEntry', modelValue)"
-          />
+          ></Button>
         </div>
       </div>
       <div v-if="isLoading || searchResults" class="bg-blue-200">

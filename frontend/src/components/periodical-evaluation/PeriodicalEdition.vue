@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import Button from "primevue/button"
 import { computed, onBeforeMount, ref } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -161,12 +161,11 @@ onBeforeMount(async () => {
       </div>
 
       <FlexContainer align-items="items-center" class="gap-16">
-        <TextButton
+        <Button
           aria-label="Übernehmen und fortfahren"
-          class="ds-button-02-reg"
           label="Übernehmen und fortfahren"
           @click="saveEdition"
-        ></TextButton>
+        ></Button>
       </FlexContainer>
     </div>
   </div>

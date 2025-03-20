@@ -1,29 +1,20 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
-import FlexContainer from "@/components/FlexContainer.vue"
-import TextButton from "@/components/input/TextButton.vue"
+import Button from "primevue/button"
 import adminService from "@/services/adminService"
 
-const link = ref<string | undefined>(undefined)
-
-async function fetchUrl() {
-  link.value = (await adminService.getAccountManagementUrl()).data
+async function openBareId() {
+  const response = await adminService.getAccountManagementUrl()
+  if (response?.data) {
+    window.open(response.data, "_blank")
+  } else {
+    console.error("Failed to retrieve the account management URL.")
+  }
 }
-
-onMounted(async () => {
-  await fetchUrl()
-})
 </script>
 
 <template>
-  <FlexContainer v-if="link" flex-direction="flex-col">
+  <div class="flex flex-col gap-16">
     <span class="ds-label-02-bold">Kontoverwaltung</span>
-    <TextButton
-      class="mt-16"
-      :href="link"
-      label="Bare.ID öffnen"
-      target="_blank"
-    >
-    </TextButton>
-  </FlexContainer>
+    <Button label="Bare.ID öffnen" @click="openBareId"> </Button>
+  </div>
 </template>

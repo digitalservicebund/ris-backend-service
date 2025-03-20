@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import Button from "primevue/button"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import IconSearch from "~icons/ic/baseline-search"
 
@@ -48,12 +48,9 @@ const norm = defineModel<string>("norm")
         />
       </InputField>
 
-      <TextButton
-        aria-label="Sachgebietssuche ausführen"
-        button-type="primary"
-        :icon="IconSearch"
-        @click="emit('search')"
-      />
+      <Button aria-label="Sachgebietssuche ausführen" @click="emit('search')"
+        ><template #icon> <IconSearch /> </template
+      ></Button>
     </div>
 
     <span v-if="errorLabel" class="ds-label-03-reg min-h-[1rem] text-red-800">{{

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { DuplicateRelation } from "@/domain/documentUnit"
 import DateUtil from "@/utils/dateUtil"
@@ -72,13 +72,14 @@ const managementDataRoute = computed(() => ({
         </div>
       </div>
       <RouterLink v-if="isInternalUser" :to="managementDataRoute">
-        <TextButton
+        <Button
           aria-label="Dublettenwarnung prüfen"
-          button-type="tertiary"
           class="mt-8 w-fit"
           label="Dublettenwarnung prüfen"
+          severity="secondary"
           size="small"
-      /></RouterLink>
+        ></Button
+      ></RouterLink>
     </div>
     <div v-else class="flex flex-row gap-8">
       <IconCheck class="text-green-700" />

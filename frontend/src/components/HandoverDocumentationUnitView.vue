@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import Button from "primevue/button"
 import { computed, onMounted, ref } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
@@ -7,7 +8,6 @@ import CodeSnippet from "@/components/CodeSnippet.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
@@ -495,13 +495,13 @@ const isPublishable = computed<boolean>(
             </div>
           </div>
           <RouterLink class="inline-block" :to="categoriesRoute">
-            <TextButton
+            <Button
               aria-label="Rubriken bearbeiten"
-              button-type="tertiary"
               class="w-fit"
               label="Rubriken bearbeiten"
+              severity="secondary"
               size="small"
-            />
+            ></Button>
           </RouterLink>
         </div>
         <div v-else class="flex flex-row gap-8">
@@ -576,7 +576,7 @@ const isPublishable = computed<boolean>(
               </div>
             </div>
           </div>
-          <TextButton
+          <Button
             v-if="
               !borderNumberValidationResult.isValid &&
               !borderNumberValidationResult.hasError &&
@@ -672,16 +672,14 @@ const isPublishable = computed<boolean>(
         title="UAT Testmodus für die Übergabe an die jDV"
       />
 
-      <TextButton
+      <Button
         aria-label="Dokumentationseinheit an jDV übergeben"
-        button-type="primary"
-        class="w-fit"
         :disabled="!isPublishable || isScheduled"
-        :icon="IconCheck"
         label="Dokumentationseinheit an jDV übergeben"
-        size="medium"
+        size="small"
         @click="handoverDocumentUnit"
-      />
+        ><template #icon> <IconCheck /> </template
+      ></Button>
 
       <ScheduledPublishingDateTime :is-publishable="isPublishable" />
 

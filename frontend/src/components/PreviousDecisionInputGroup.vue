@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
@@ -6,7 +7,6 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
@@ -292,41 +292,40 @@ onMounted(async () => {
     <div class="flex w-full flex-row justify-between">
       <div>
         <div class="flex gap-16">
-          <TextButton
+          <Button
             v-if="!modelValue?.hasForeignSource"
             aria-label="Nach Entscheidung suchen"
-            button-type="primary"
             label="Suchen"
             size="small"
             @click="search"
-          />
-          <TextButton
+          ></Button>
+          <Button
             aria-label="Vorgehende Entscheidung speichern"
-            button-type="tertiary"
             data-testid="previous-decision-save-button"
             :disabled="previousDecision.isEmpty"
             label="Übernehmen"
+            severity="secondary"
             size="small"
             @click.stop="addPreviousDecision"
-          />
-          <TextButton
+          ></Button>
+          <Button
             v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
-            button-type="ghost"
             label="Abbrechen"
             size="small"
+            text
             @click.stop="emit('cancelEdit')"
-          />
+          ></Button>
         </div>
       </div>
-      <TextButton
+      <Button
         v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
-        button-type="destructive"
         label="Eintrag löschen"
+        severity="danger"
         size="small"
         @click.stop="modelValue && emit('removeEntry', modelValue)"
-      />
+      ></Button>
     </div>
 
     <div v-if="isLoading || searchResults" class="bg-blue-200">

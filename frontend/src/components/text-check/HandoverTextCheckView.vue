@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import Button from "primevue/button"
 import { onBeforeMount, ref } from "vue"
 import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import { getCategoryLabels } from "@/components/text-check/categoryLabels"
 import router from "@/router"
@@ -100,14 +100,14 @@ onBeforeMount(async () => {
               </div>
             </div>
           </div>
-          <TextButton
+          <Button
             aria-label="Rechtschreibfehler prüfen"
-            button-type="tertiary"
             class="w-fit"
             label="Rechtschreibfehler prüfen"
+            severity="secondary"
             size="small"
             @click="navigateToTextCheckSummaryInCategories"
-          />
+          ></Button>
         </div>
       </div>
       <div v-else class="flex flex-row gap-8">

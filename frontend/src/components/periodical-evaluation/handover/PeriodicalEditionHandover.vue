@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import Button from "primevue/button"
 import { watch, ref, computed } from "vue"
 import PeriodicalEditionHandoverEventLog from "./PeriodicalEditionHandoverEventLog.vue"
 import PeriodicalEditionHandoverPreview from "./PeriodicalEditionHandoverPreview.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import EventRecord, { HandoverMail, Preview } from "@/domain/eventRecord"
@@ -135,16 +135,16 @@ watch(
         v-bind="handoverSucceedMessage"
         :status="InfoStatus.SUCCEED"
       />
-      <TextButton
+      <Button
         v-if="featureToggle"
         aria-label="Fundstellen der Ausgabe an jDV übergeben"
-        button-type="secondary"
         class="w-fit"
         :disabled="!numberOfReferences"
-        :icon="IconHandover"
         label="Fundstellen der Ausgabe an jDV übergeben"
+        size="small"
         @click="handoverEdition"
-      />
+        ><template #icon> <IconHandover /> </template
+      ></Button>
 
       <!-- Event Log -->
       <PeriodicalEditionHandoverEventLog

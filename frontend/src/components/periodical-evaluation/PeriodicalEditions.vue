@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, ref, watch, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import DateUtil from "../../utils/dateUtil"
@@ -9,7 +10,6 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
@@ -169,13 +169,12 @@ onMounted(async () => {
               placeholder="Nach Periodikum suchen"
             ></ComboboxInput>
           </InputField>
-          <TextButton
+          <Button
             v-if="legalPeriodical && isInternalUser"
             aria-label="Neue Periodikumsauswertung"
-            class="ds-button-02-reg"
             label="Neue Periodikumsauswertung"
             @click="addEdition"
-          ></TextButton>
+          ></Button>
           <div v-if="saveResponseError">
             <InfoModal
               :description="saveResponseError.description"

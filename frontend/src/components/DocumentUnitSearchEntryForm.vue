@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, ref, watch } from "vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
@@ -466,14 +466,14 @@ export type DocumentUnitSearchParameter =
       </div>
       <div class="flex flex-row">
         <div class="flex flex-col gap-4">
-          <TextButton
+          <Button
             aria-label="Nach Dokumentationseinheiten suchen"
             class="self-start"
             :disabled="isLoading"
             label="Ergebnisse anzeigen"
             size="small"
             @click="handleSearchButtonClicked"
-          />
+          ></Button>
 
           <span
             v-if="submitButtonError"
@@ -483,15 +483,15 @@ export type DocumentUnitSearchParameter =
           </span>
         </div>
 
-        <TextButton
+        <Button
           v-if="!isEmptySearch"
           aria-label="Suche zurücksetzen"
-          button-type="ghost"
           class="ml-8 self-start"
           label="Suche zurücksetzen"
           size="small"
+          text
           @click="resetSearch"
-        />
+        ></Button>
       </div>
     </div>
   </div>

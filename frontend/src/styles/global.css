@@ -1,3 +1,7 @@
 @import "tailwindcss";
 @import "@digitalservicebund/ris-ui/style.css";
-@source "../node_modules/@digitalservicebund/ris-ui/dist/**/*.{js,vue,ts}";
+@source "../../node_modules/@digitalservicebund/ris-ui/dist/**/*.{js,vue,ts}";
+
+body {
+    @apply ris-body1-regular;
+}

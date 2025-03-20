@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, nextTick, ref, watch } from "vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 
 const props = defineProps<{
   label: string
@@ -106,20 +106,19 @@ watch(
     </InputField>
     <div class="flex w-full flex-row">
       <div class="flex gap-16">
-        <TextButton
+        <Button
           :aria-label="`${label} übernehmen`"
-          button-type="primary"
           label="Übernehmen"
           size="small"
           @click.stop="emit('update:modelValue', localModelValue)"
-        />
-        <TextButton
+        ></Button>
+        <Button
           aria-label="Abbrechen"
-          button-type="ghost"
           label="Abbrechen"
           size="small"
+          text
           @click.stop="cancelEdit"
-        />
+        ></Button>
       </div>
     </div>
   </div>

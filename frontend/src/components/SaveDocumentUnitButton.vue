@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { onBeforeUnmount } from "vue"
-import TextButton from "@/components/input/TextButton.vue"
 import { useSaveToRemote } from "@/composables/useSaveToRemote"
 
 const props = defineProps<{
@@ -35,7 +35,7 @@ window.onbeforeunload = function () {
       <span>{{ formattedLastSavedOn }}</span>
       Uhr
     </p>
-    <TextButton
+    <Button
       :aria-label="props.ariaLabel"
       data-testid="save-button"
       label="Speichern"

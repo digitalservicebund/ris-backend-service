@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import TextButton from "@/components/input/TextButton.vue"
+import Button from "primevue/button"
 
 defineProps<{
   label: string
@@ -30,13 +30,13 @@ const emit = defineEmits<{
         </li>
       </ul>
     </div>
-    <TextButton
+    <Button
       :aria-label="`${label} bearbeiten`"
-      button-type="tertiary"
       class="self-start"
       :label="`${label} bearbeiten`"
+      severity="secondary"
       size="small"
       @click.stop="emit('toggle')"
-    />
+    ></Button>
   </div>
 </template>

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
+import Button from "primevue/button"
 import { ref, onMounted } from "vue"
 import CopyableLabel from "@/components/CopyableLabel.vue"
-import FlexContainer from "@/components/FlexContainer.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import { ApiKey } from "@/domain/apiKey"
 import authService from "@/services/authService"
 
@@ -30,7 +29,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <FlexContainer flex-direction="flex-col">
+  <div class="flex-col gap-12">
     <span class="ds-label-02-bold">API Key</span>
     <div v-if="apiKey">
       <div class="ds-body-01-reg mt-24">
@@ -51,26 +50,20 @@ onMounted(async () => {
         </div>
       </div>
       <div v-if="apiKey.valid">
-        <TextButton
-          class="mt-20"
-          label="Sperren"
-          @click="invalidateApiKey"
-        ></TextButton>
+        <Button label="Sperren" @click="invalidateApiKey"></Button>
       </div>
       <div v-else>
-        <TextButton
-          class="mt-20"
+        <Button
           label="Neuen API-Schlüssel erstellen"
           @click="generateApiKey"
-        ></TextButton>
+        ></Button>
       </div>
     </div>
     <div v-else>
-      <TextButton
-        class="mt-20"
+      <Button
         label="Neuen API-Schlüssel erstellen"
         @click="generateApiKey"
-      ></TextButton>
+      ></Button>
     </div>
-  </FlexContainer>
+  </div>
 </template>

@@ -1,16 +1,13 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { onMounted } from "vue"
-import TextButton, { ButtonType } from "./input/TextButton.vue"
 
 defineProps<{
   ariaLabel?: string
   headerText?: string
   contentText: string
   primaryButtonText: string
-  primaryButtonType?: ButtonType
-  secondaryButtonType?: ButtonType
   secondaryButtonText?: string
-  cancelButtonType?: ButtonType | "none"
 }>()
 
 defineEmits<{
@@ -71,29 +68,27 @@ onMounted(() => {
       <div
         class="modal-buttons-container flex w-full flex-row justify-end gap-[1rem]"
       >
-        <TextButton
+        <Button
           :aria-label="primaryButtonText"
-          :button-type="primaryButtonType"
           :label="primaryButtonText"
           size="small"
           @click="$emit('primaryAction')"
-        />
-        <TextButton
+        ></Button>
+        <Button
           v-if="secondaryButtonText"
           :aria-label="secondaryButtonText"
-          :button-type="secondaryButtonType"
           :label="secondaryButtonText"
+          severity="secondary"
           size="small"
           @click="$emit('secondaryAction')"
-        />
-        <TextButton
-          v-if="cancelButtonType !== 'none'"
+        ></Button>
+        <Button
           aria-label="Abbrechen"
-          :button-type="cancelButtonType || 'tertiary'"
           label="Abbrechen"
+          severity="secondary"
           size="small"
           @click="$emit('closeModal')"
-        />
+        ></Button>
       </div>
     </div>
   </div>

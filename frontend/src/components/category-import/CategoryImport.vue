@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import Button from "primevue/button"
 import { onMounted, ref, watch } from "vue"
 import { useRouter } from "vue-router"
-
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit, {
@@ -430,14 +429,13 @@ onMounted(() => {
         />
       </InputField>
 
-      <TextButton
+      <Button
         aria-label="Dokumentationseinheit laden"
-        button-type="primary"
         :disabled="documentNumber?.length != 13"
-        :icon="IconSearch"
-        size="medium"
+        size="small"
         @click="searchForDocumentUnit"
-      />
+        ><template #icon> <IconSearch /> </template
+      ></Button>
     </div>
 
     <span v-if="errorMessage" class="ds-label-02-reg text-red-800">{{

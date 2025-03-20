@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import DateUtil from "../utils/dateUtil"
@@ -7,7 +8,6 @@ import DocumentUnitSearchEntryForm, {
   DocumentUnitSearchParameter,
 } from "@/components/DocumentUnitSearchEntryForm.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { Query } from "@/composables/useQueryFromRoute"
@@ -293,13 +293,13 @@ const showDefaultLink = computed(() => {
         @take-over-documentation-unit="handleTakeOver"
       >
         <template v-if="isInternalUser" #newlink>
-          <TextButton
+          <Button
             v-if="showDefaultLink"
             aria-label="Neue Dokumentationseinheit erstellen"
-            button-type="ghost"
             label="Neue Dokumentationseinheit erstellen"
+            text
             @click="router.push({ name: 'caselaw-documentUnit-new' })"
-          />
+          ></Button>
           <div v-else class="space-y-16 text-center">
             <div v-if="createFromSearchQueryResponseError" class="mb-24">
               <InfoModal
@@ -323,13 +323,13 @@ const showDefaultLink = computed(() => {
                   {{ DateUtil.formatDate(dateFromQuery) || "Datum unbekannt" }}
                 </span>
               </p>
-              <TextButton
-                button-type="tertiary"
+              <Button
                 class="justify-self-center"
                 label="Übernehmen und fortfahren"
+                severity="secondary"
                 size="small"
                 @click="createFromSearchQuery"
-              />
+              ></Button>
             </template>
           </div>
         </template>

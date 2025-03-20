@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import LegalPeriodical from "@/domain/legalPeriodical"
@@ -176,32 +176,34 @@ watch(
     <div class="flex w-full flex-row justify-between">
       <div>
         <div class="flex gap-16">
-          <TextButton
+          <Button
             aria-label="Literaturfundstelle speichern"
-            button-type="tertiary"
             :disabled="reference.isEmpty"
             label="Übernehmen"
+            severity="secondary"
             size="small"
             @click.stop="addReference"
-          />
-          <TextButton
+          ></Button>
+          <Button
             v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
-            button-type="ghost"
             label="Abbrechen"
             size="small"
+            text
             @click.stop="emit('cancelEdit')"
-          />
+          ></Button>
         </div>
       </div>
-      <TextButton
+
+      <Button
         v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
-        button-type="destructive"
         label="Eintrag löschen"
+        severity="destructive"
         size="small"
         @click.stop="emit('removeEntry', true)"
-      />
+      >
+      </Button>
     </div>
   </div>
 </template>

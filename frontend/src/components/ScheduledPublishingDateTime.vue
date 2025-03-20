@@ -3,12 +3,12 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
+import Button from "primevue/button"
 import { computed, ref } from "vue"
 import { ValidationError } from "./input/types"
 import InfoModal from "@/components/InfoModal.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import TimeInput from "@/components/input/TimeInput.vue"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -162,25 +162,24 @@ const dateValidationError = ref<ValidationError | undefined>()
           :read-only="isScheduled"
         ></TimeInput>
       </InputField>
-      <TextButton
+      <Button
         v-if="!isScheduled"
         aria-label="Termin setzen"
-        button-type="primary"
         class="w-fit"
         :disabled="!isPublishable || !isValidDateTime"
         label="Termin&nbsp;setzen"
-        size="medium"
+        size="small"
         @click="saveScheduling"
-      />
-      <TextButton
+      ></Button>
+      <Button
         v-if="isScheduled"
         aria-label="Termin löschen"
-        button-type="destructive"
         class="w-fit shrink-0"
         label="Termin&nbsp;löschen"
-        size="medium"
+        severity="danger"
+        size="small"
         @click="removeScheduling"
-      />
+      ></Button>
     </div>
     <div
       v-if="
