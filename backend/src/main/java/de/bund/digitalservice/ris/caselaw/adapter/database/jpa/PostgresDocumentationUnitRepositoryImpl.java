@@ -643,7 +643,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         hasNext);
   }
 
-  @Transactional(transactionManager = "jpaTransactionManager")
+  @Transactional(transactionManager = "jpaTransactionManager", readOnly = true)
   public Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       OidcUser oidcUser,
