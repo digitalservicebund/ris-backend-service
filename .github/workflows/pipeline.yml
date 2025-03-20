@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@799ee7c97e9721ef38d1a7e8486c39753b9d6102
+        uses: actions/setup-java@b8ebb8ba1d9655f7f159c0a8b8135606ae11b5c9
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -73,7 +73,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@799ee7c97e9721ef38d1a7e8486c39753b9d6102
+        uses: actions/setup-java@b8ebb8ba1d9655f7f159c0a8b8135606ae11b5c9
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -160,7 +160,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@799ee7c97e9721ef38d1a7e8486c39753b9d6102
+        uses: actions/setup-java@b8ebb8ba1d9655f7f159c0a8b8135606ae11b5c9
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -423,7 +423,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@57740294148be15fdcd6f2cab5f83595c7b502c1
+      - uses: chainguard-dev/actions/setup-gitsign@76af37936141ab4766b6578400f136c2621614fd
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -574,7 +574,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@57740294148be15fdcd6f2cab5f83595c7b502c1
+      - uses: chainguard-dev/actions/setup-gitsign@76af37936141ab4766b6578400f136c2621614fd
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -616,7 +616,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@57740294148be15fdcd6f2cab5f83595c7b502c1
+      - uses: chainguard-dev/actions/setup-gitsign@76af37936141ab4766b6578400f136c2621614fd
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -670,7 +670,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@799ee7c97e9721ef38d1a7e8486c39753b9d6102
+        uses: actions/setup-java@b8ebb8ba1d9655f7f159c0a8b8135606ae11b5c9
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -706,7 +706,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@799ee7c97e9721ef38d1a7e8486c39753b9d6102
+        uses: actions/setup-java@b8ebb8ba1d9655f7f159c0a8b8135606ae11b5c9
         with:
           java-version: "21.0"
           distribution: "temurin"

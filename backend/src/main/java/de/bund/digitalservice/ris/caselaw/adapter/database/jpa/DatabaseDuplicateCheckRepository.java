@@ -19,10 +19,15 @@ public interface DatabaseDuplicateCheckRepository
     -- We filter file numbers that occur more than 50 times (i.e. "XX"):
     -- They lead to explosion of duplicate relationships
     WITH filtered_file_numbers AS (
-        SELECT upper(trim(value)) AS value
-        FROM incremental_migration.file_number
-        WHERE upper(trim(value)) IN (:allFileNumbers)
-        GROUP BY upper(trim(value))
+        SELECT value FROM (
+            SELECT upper(trim(value)) AS value
+            FROM incremental_migration.file_number
+            WHERE upper(trim(value)) IN (:allFileNumbers)
+            UNION ALL
+            SELECT upper(trim(value)) AS value
+            FROM incremental_migration.deviating_file_number
+            WHERE upper(trim(value)) IN (:allFileNumbers)) as regular_and_deviating_file_numbers
+        GROUP BY value
         HAVING COUNT(*) <= 50
     )
 
@@ -31,10 +36,13 @@ public interface DatabaseDuplicateCheckRepository
       LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
+      JOIN incremental_migration.document_type documentType
+        ON documentationUnit.document_type_id = documentType.id
       INNER JOIN incremental_migration.decision decision
         ON decision.id = documentationUnit.id
     WHERE upper(fileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND documentationUnit.date IN (:allDates)
+      AND documentType.id IN (:allDocTypeIds)
 
     UNION
 
@@ -45,10 +53,13 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = fileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_date deviatingDate
         ON documentationUnit.id = deviatingDate.documentation_unit_id
+      JOIN incremental_migration.document_type documentType
+        ON documentationUnit.document_type_id = documentType.id
       INNER JOIN incremental_migration.decision decision
         ON decision.id = documentationUnit.id
     WHERE upper(fileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND deviatingDate.value IN (:allDates)
+      AND documentType.id IN (:allDocTypeIds)
 
     UNION
 
@@ -57,10 +68,13 @@ public interface DatabaseDuplicateCheckRepository
       LEFT JOIN incremental_migration.status status ON status.id = documentationUnit.current_status_id
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
+      JOIN incremental_migration.document_type documentType
+        ON documentationUnit.document_type_id = documentType.id
       INNER JOIN incremental_migration.decision decision
         ON decision.id = documentationUnit.id
     WHERE upper(deviatingFileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND documentationUnit.date IN (:allDates)
+      AND documentType.id IN (:allDocTypeIds)
 
     UNION
 
@@ -71,10 +85,13 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_date deviatingDate
         ON documentationUnit.id = deviatingDate.documentation_unit_id
+      JOIN incremental_migration.document_type documentType
+        ON documentationUnit.document_type_id = documentType.id
       INNER JOIN incremental_migration.decision decision
         ON decision.id = documentationUnit.id
     WHERE upper(deviatingFileNumber.value) IN (SELECT value FROM filtered_file_numbers)
       AND deviatingDate.value IN (:allDates)
+      AND documentType.id IN (:allDocTypeIds)
 
     UNION
 

@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class DateUtils {
@@ -15,12 +14,5 @@ public class DateUtils {
       return null;
     }
     return date.format(DATE_FORMATTER);
-  }
-
-  public static String toDateTimeString(LocalDateTime dateTime) {
-    if (dateTime == null) {
-      return null;
-    }
-    return dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
   }
 }

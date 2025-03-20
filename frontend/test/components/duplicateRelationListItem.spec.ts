@@ -15,13 +15,16 @@ import routes from "~/test-helper/routes"
 function mockDocUnitStore(
   {
     duplicateRelations,
+    state,
   }: {
     duplicateRelations: DuplicateRelation[]
+    state?: PublicationState
   } = { duplicateRelations: [] },
 ) {
   const mockedSessionStore = useDocumentUnitStore()
   mockedSessionStore.documentUnit = new DocumentUnit("q834", {
     documentNumber: "original",
+    status: state ? { publicationStatus: state } : undefined,
     managementData: {
       duplicateRelations,
       borderNumbers: [],
@@ -87,33 +90,6 @@ describe("DuplicateRelationListItem", () => {
       expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
     })
 
-    it("should show docnumber and disabled checked check box if jdv dup check is turned off", async () => {
-      const duplicateRelation: DuplicateRelation = {
-        documentNumber: "duplicate-1",
-        status: DuplicateRelationStatus.IGNORED,
-        isJdvDuplicateCheckActive: false,
-      }
-      renderDuplicateRelation(duplicateRelation)
-
-      const docUnitLink = screen.getByTestId("document-number-link-duplicate-1")
-      expect(docUnitLink).toHaveTextContent("duplicate-1")
-
-      const ignoreCheckbox = screen.getByLabelText("Warnung ignorieren")
-      expect(ignoreCheckbox).toBeChecked()
-      expect(ignoreCheckbox).toBeDisabled()
-
-      const checkboxLabel = screen.getByText(
-        'Warnung ignoriert wegen "Dupcode ausschalten" (jDV)',
-      )
-      expect(checkboxLabel).toBeVisible()
-
-      const warningIcon = screen.queryByTestId("warning-icon-duplicate-1")
-      // jsdom does not load tailwind classes, so toBeVisible() check does not work here.
-      expect(warningIcon).toHaveClass("invisible")
-
-      expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
-    })
-
     it("should display full data if full core data is given", async () => {
       const duplicateRelation: DuplicateRelation = {
         documentNumber: "duplicate-1",
@@ -125,7 +101,7 @@ describe("DuplicateRelationListItem", () => {
         status: DuplicateRelationStatus.PENDING,
         isJdvDuplicateCheckActive: true,
       }
-      renderDuplicateRelation(duplicateRelation)
+      renderDuplicateRelation(duplicateRelation, PublicationState.UNPUBLISHED)
 
       const decisionSummary = screen.getByTestId("decision-summary-duplicate-1")
       expect(decisionSummary).toHaveTextContent(
@@ -193,6 +169,89 @@ describe("DuplicateRelationListItem", () => {
       const warningIcon = screen.queryByTestId("warning-icon-duplicate-1")
       // jsdom does not load tailwind classes, so toBeVisible() check does not work here.
       expect(warningIcon).not.toHaveClass("invisible")
+    })
+
+    describe("automatically ignore warning", () => {
+      const jdvDupCodeWarningLabel =
+        'Warnung ignoriert wegen "Dupcode ausschalten" (jDV)'
+      const statusWarningLabel =
+        'Warnung ignoriert wegen Status "Dublette" oder "Gesperrt"'
+
+      ;[
+        {
+          currentDocUnitStatus: PublicationState.PUBLISHED,
+          duplicateDocUnitStatus: PublicationState.PUBLISHING,
+          isJdvDuplicateCheckActive: false,
+          expectedCheckboxLabel: jdvDupCodeWarningLabel,
+        },
+        {
+          currentDocUnitStatus: PublicationState.DUPLICATED,
+          duplicateDocUnitStatus: PublicationState.LOCKED,
+          isJdvDuplicateCheckActive: false,
+          expectedCheckboxLabel: jdvDupCodeWarningLabel,
+        },
+        {
+          currentDocUnitStatus: PublicationState.DUPLICATED,
+          duplicateDocUnitStatus: PublicationState.UNPUBLISHED,
+          isJdvDuplicateCheckActive: true,
+          expectedCheckboxLabel: statusWarningLabel,
+        },
+        {
+          currentDocUnitStatus: PublicationState.EXTERNAL_HANDOVER_PENDING,
+          duplicateDocUnitStatus: PublicationState.DUPLICATED,
+          isJdvDuplicateCheckActive: true,
+          expectedCheckboxLabel: statusWarningLabel,
+        },
+        {
+          currentDocUnitStatus: PublicationState.LOCKED,
+          duplicateDocUnitStatus: undefined,
+          isJdvDuplicateCheckActive: true,
+          expectedCheckboxLabel: statusWarningLabel,
+        },
+        {
+          currentDocUnitStatus: undefined,
+          duplicateDocUnitStatus: PublicationState.LOCKED,
+          isJdvDuplicateCheckActive: true,
+          expectedCheckboxLabel: statusWarningLabel,
+        },
+      ].forEach(
+        ({
+          currentDocUnitStatus,
+          duplicateDocUnitStatus,
+          isJdvDuplicateCheckActive,
+          expectedCheckboxLabel,
+        }) => {
+          it(`should show a disabled check check box if jdv dup check is turned ${isJdvDuplicateCheckActive ? "on" : "off"} and the publication statuses are ${currentDocUnitStatus} and ${duplicateDocUnitStatus}`, async () => {
+            const duplicateRelation: DuplicateRelation = {
+              documentNumber: "duplicate-1",
+              status: DuplicateRelationStatus.IGNORED,
+              publicationStatus: duplicateDocUnitStatus,
+              isJdvDuplicateCheckActive,
+            }
+            renderDuplicateRelation(duplicateRelation, currentDocUnitStatus)
+
+            const docUnitLink = screen.getByTestId(
+              "document-number-link-duplicate-1",
+            )
+            expect(docUnitLink).toHaveTextContent("duplicate-1")
+
+            const ignoreCheckbox = screen.getByLabelText("Warnung ignorieren")
+            expect(ignoreCheckbox).toBeChecked()
+            expect(ignoreCheckbox).toBeDisabled()
+
+            const checkboxLabel = screen.getByText(expectedCheckboxLabel)
+            expect(checkboxLabel).toBeVisible()
+
+            const warningIcon = screen.queryByTestId("warning-icon-duplicate-1")
+            // jsdom does not load tailwind classes, so toBeVisible() check does not work here.
+            expect(warningIcon).toHaveClass("invisible")
+
+            expect(
+              screen.queryByTestId("set-state-error"),
+            ).not.toBeInTheDocument()
+          })
+        },
+      )
     })
   })
 
@@ -275,8 +334,14 @@ describe("DuplicateRelationListItem", () => {
     })
   })
 
-  function renderDuplicateRelation(duplicateRelation: DuplicateRelation) {
-    const store = mockDocUnitStore({ duplicateRelations: [duplicateRelation] })
+  function renderDuplicateRelation(
+    duplicateRelation: DuplicateRelation,
+    state?: PublicationState,
+  ) {
+    const store = mockDocUnitStore({
+      duplicateRelations: [duplicateRelation],
+      state,
+    })
 
     const router = createRouter({
       history: createWebHistory(),
