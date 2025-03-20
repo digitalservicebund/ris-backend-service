@@ -38,7 +38,7 @@ public class LanguageToolService extends TextCheckService {
   protected List<Match> requestTool(String text) {
     Document document = Jsoup.parse(text);
 
-    JSONArray annotations = getAnnotationsArray(text, document);
+    JSONArray annotations = getAnnotationsArray(document);
 
     JSONObject data = new JSONObject();
     data.put("annotation", annotations);
@@ -69,16 +69,14 @@ public class LanguageToolService extends TextCheckService {
   }
 
   @NotNull
-  static JSONArray getAnnotationsArray(String htmlText, Document document) {
+  static JSONArray getAnnotationsArray(Document document) {
     JSONArray annotations = new JSONArray();
-    NodeTraversor.traverse(
-        new AnnotationsNodeVisitor(annotations, htmlText), document.body().children());
+    NodeTraversor.traverse(new AnnotationsNodeVisitor(annotations), document.body().children());
     return annotations;
   }
 
   @SuppressWarnings("java:S3776")
-  private record AnnotationsNodeVisitor(JSONArray annotations, String htmlText)
-      implements NodeVisitor {
+  private record AnnotationsNodeVisitor(JSONArray annotations) implements NodeVisitor {
 
     @Override
     public void head(Node node, int depth) {
@@ -93,7 +91,7 @@ public class LanguageToolService extends TextCheckService {
           annotations.add(textEntry);
         }
         // Ignore comments and other non-element nodes
-      } else if (!node.nodeName().startsWith("#") && htmlText.contains(node.nodeName())) {
+      } else if (!node.nodeName().startsWith("#")) {
         JSONObject markupEntry = new JSONObject();
         markupEntry.put("markup", NormalizingNodeVisitor.buildOpeningTag(node));
 

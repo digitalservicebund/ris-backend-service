@@ -113,10 +113,9 @@ public class TextCheckService {
   }
 
   @NotNull
-  static String normalizeHTML(String htmlText, Document document) {
+  static String normalizeHTML(Document document) {
     StringBuilder builder = new StringBuilder();
-    NodeTraversor.traverse(
-        new NormalizingNodeVisitor(builder, htmlText), document.body().children());
+    NodeTraversor.traverse(new NormalizingNodeVisitor(builder), document.body().children());
     return builder.toString();
   }
 
@@ -127,8 +126,7 @@ public class TextCheckService {
     }
 
     // normalize HTML to assure correct positioning
-    String normalizedHtml =
-        StringEscapeUtils.unescapeHtml4(normalizeHTML(htmlText, Jsoup.parse(htmlText)));
+    String normalizedHtml = StringEscapeUtils.unescapeHtml4(normalizeHTML(Jsoup.parse(htmlText)));
 
     List<Match> matches = check(normalizedHtml);
 
@@ -197,8 +195,7 @@ public class TextCheckService {
   }
 
   @SuppressWarnings("java:S3776")
-  protected record NormalizingNodeVisitor(StringBuilder builder, String htmlText)
-      implements NodeVisitor {
+  protected record NormalizingNodeVisitor(StringBuilder builder) implements NodeVisitor {
 
     @Override
     public void head(Node node, int depth) {
@@ -211,7 +208,7 @@ public class TextCheckService {
           builder.append(processedText);
         }
         // Ignore comments and other non-element nodes
-      } else if (!node.nodeName().startsWith("#") && htmlText.contains(node.nodeName())) {
+      } else if (!node.nodeName().startsWith("#")) {
         builder.append(buildOpeningTag(node));
       }
     }
