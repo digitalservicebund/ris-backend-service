@@ -22,11 +22,6 @@
   ],
   "automergeType": "pr",
   "packageRules": [
-    // FIXME: Remove this when vue-tsc fix is released, see https://github.com/vuejs/language-tools/pull/5135
-    {
-      "matchPackageNames": ["vue-tsc"],
-      "allowedVersions": "2.2.0"
-    },
     {
       "groupName": "all-frontend-non-major-dependencies",
       "matchPaths": [
