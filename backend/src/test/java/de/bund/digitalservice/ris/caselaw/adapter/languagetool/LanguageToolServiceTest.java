@@ -111,7 +111,6 @@ class LanguageToolServiceTest {
     Assertions.assertEquals("</tr>", ((JSONObject) result.get(17)).get("markup"));
     Assertions.assertEquals("</tbody>", ((JSONObject) result.get(18)).get("markup"));
     Assertions.assertEquals("</table>", ((JSONObject) result.get(19)).get("markup"));
-    ;
   }
 
   @Test
