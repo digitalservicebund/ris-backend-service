@@ -143,5 +143,8 @@
     "vite-plugin-pages": "^0.32.5",
     "vite-plugin-vue-devtools": "^7.7.2",
     "vitest": "^3.0.9"
+  },
+  "overrides": {
+    "vue-eslint-parser": "^10.1.1"
   }
 }
