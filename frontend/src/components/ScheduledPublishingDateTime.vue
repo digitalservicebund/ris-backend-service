@@ -33,7 +33,7 @@ const storedScheduledPublicationDateTime = computed({
 })
 
 // initialize local values with stored date-time
-/* eslint-disable vue/no-ref-object-destructure */
+/* eslint-disable vue/no-ref-object-reactivity-loss */
 const scheduledPublishingDate = ref<string | undefined>(
   storedScheduledPublicationDateTime.value &&
     dayjs
@@ -49,7 +49,7 @@ const scheduledPublishingTime = ref<string | undefined>(
       .format("HH:mm")) ||
     "05:00",
 )
-/* eslint-enable vue/no-ref-object-destructure */
+/* eslint-enable vue/no-ref-object-reactivity-loss */
 
 const scheduledDateTimeInput = computed(() =>
   dayjs.tz(

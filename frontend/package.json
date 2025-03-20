@@ -114,7 +114,7 @@
     "eslint-plugin-playwright": "^2.2.0",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-testing-library": "^7.1.1",
-    "eslint-plugin-vue": "^9.33.0",
+    "eslint-plugin-vue": "^10.0.0",
     "eslint-plugin-vue-scoped-css": "^2.9.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "globals": "^16.0.0",
@@ -143,5 +143,8 @@
     "vite-plugin-pages": "^0.32.5",
     "vite-plugin-vue-devtools": "^7.7.2",
     "vitest": "^3.0.9"
+  },
+  "overrides": {
+    "vue-eslint-parser": "^10.1.1"
   }
 }
