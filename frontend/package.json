@@ -34,7 +34,7 @@
     "@braintree/sanitize-url": "^7.1.1",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
-    "@sentry/vue": "^9.6.1",
+    "@sentry/vue": "^9.7.0",
     "@tiptap/extension-blockquote": "^2.11.5",
     "@tiptap/extension-bold": "^2.11.5",
     "@tiptap/extension-bullet-list": "^2.11.5",
