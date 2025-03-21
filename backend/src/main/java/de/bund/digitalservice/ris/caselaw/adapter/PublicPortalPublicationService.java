@@ -109,8 +109,12 @@ public class PublicPortalPublicationService {
     publicPortalBucket.save(changelog.createFileName(), changelogString);
   }
 
-  // Default: 0 30 4 (After migration)
-  @Scheduled(cron = "0 30 4 * * *")
+  //                        ↓ day of month (1-31)
+  //                      ↓ hour (0-23)
+  //                    ↓ minute (0-59)
+  //                 ↓ second (0-59)
+  // Default:        0 30 4 * * * (After migration)
+  @Scheduled(cron = "0 30 4 20 * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
