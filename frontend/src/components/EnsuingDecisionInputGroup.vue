@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
 import Checkbox from "primevue/checkbox"
+import InputText from "primevue/inputtext"
 import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
@@ -236,15 +236,16 @@ onMounted(() => {
           label="Aktenzeichen *"
           :validation-error="validationStore.getByField('fileNumber')"
         >
-          <TextInput
+          <InputText
             id="fileNumber"
             v-model="ensuingDecision.fileNumber"
             aria-label="Aktenzeichen Nachgehende Entscheidung"
-            :has-error="slotProps.hasError"
+            fluid
+            :invalid="slotProps.hasError"
             :readonly="ensuingDecision.hasForeignSource"
-            size="medium"
+            size="small"
             @focus="validationStore.remove('fileNumber')"
-          ></TextInput>
+          ></InputText>
         </InputField>
 
         <InputField
@@ -269,14 +270,15 @@ onMounted(() => {
       label="Vermerk"
       :validation-error="validationStore.getByField('note')"
     >
-      <TextInput
+      <InputText
         :id="id"
         v-model="ensuingDecision.note"
         aria-label="Vermerk"
-        :has-error="hasError"
-        size="medium"
+        fluid
+        :invalid="hasError"
+        size="small"
         @input="validationStore.remove('note')"
-      ></TextInput>
+      ></InputText>
     </InputField>
 
     <div class="flex w-full flex-row justify-between">

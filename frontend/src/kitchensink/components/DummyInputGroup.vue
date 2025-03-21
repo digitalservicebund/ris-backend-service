@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { ref, watch, onBeforeUnmount } from "vue"
 import InputField from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import DummyListItem from "@/kitchensink/domain/dummyListItem"
 
 const props = defineProps<{
@@ -41,13 +41,13 @@ onBeforeUnmount(() => {
 <template>
   <div class="flex flex-col gap-24">
     <InputField id="listItemText" class="flex-col" label="Editier Input">
-      <TextInput
+      <InputText
         id="listItemText"
         v-model="listEntry.text"
         aria-label="Editier Input"
-        class="ds-input-medium"
-        size="medium"
-      ></TextInput>
+        fluid
+        size="small"
+      ></InputText>
     </InputField>
 
     <div class="flex w-full flex-row justify-between">

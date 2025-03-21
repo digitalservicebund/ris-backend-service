@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import InputText from "primevue/inputtext"
 import { computed, toRefs, watch, ref, onMounted, onBeforeUnmount } from "vue"
 import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -8,7 +9,6 @@ import ChipsYearInput from "@/components/input/ChipsYearInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -233,14 +233,14 @@ onBeforeUnmount(() => {
         class="flex-col"
         label="Spruchkörper"
       >
-        <TextInput
+        <InputText
           id="appraisalBody"
           v-model="modelValue.appraisalBody"
           aria-label="Spruchkörper"
-          class="ds-input-medium"
-          :has-error="slotProps.hasError"
-          size="medium"
-        ></TextInput>
+          fluid
+          :invalid="slotProps.hasError"
+          size="small"
+        />
       </InputField>
 
       <InputField id="documentType" class="flex-col" label="Dokumenttyp *">
@@ -260,13 +260,13 @@ onBeforeUnmount(() => {
         :is-open="!!modelValue.deviatingEclis?.length"
       >
         <InputField id="ecli" class="flex-col" label="ECLI">
-          <TextInput
+          <InputText
             id="ecli"
             v-model="modelValue.ecli"
             aria-label="ECLI"
-            class="ds-input-medium"
-            size="medium"
-          ></TextInput>
+            fluid
+            size="small"
+          />
         </InputField>
         <!-- Child  -->
         <template #children>
@@ -360,26 +360,26 @@ onBeforeUnmount(() => {
         class="flex-col"
         label="Gerichtsbarkeit"
       >
-        <TextInput
+        <InputText
           id="jurisdictionType"
           v-model="jurisdictionType"
           aria-label="Gerichtsbarkeit"
-          class="ds-input-medium"
           data-test-id="jurisdiction-type"
-          read-only
-          size="medium"
-        ></TextInput>
+          fluid
+          readonly
+          size="small"
+        />
       </InputField>
 
       <InputField id="region" class="flex-col" label="Region">
-        <TextInput
+        <InputText
           id="region"
           v-model="region"
           aria-label="Region"
-          class="ds-input-medium"
-          read-only
-          size="medium"
-        ></TextInput>
+          fluid
+          readonly
+          size="small"
+        />
       </InputField>
     </div>
 

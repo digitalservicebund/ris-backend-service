@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
 import Checkbox from "primevue/checkbox"
+import InputText from "primevue/inputtext"
 import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { useIsSaved } from "@/composables/useIsSaved"
@@ -244,16 +244,16 @@ onMounted(async () => {
             label="Aktenzeichen *"
             :validation-error="validationStore.getByField('fileNumber')"
           >
-            <TextInput
+            <InputText
               id="fileNumber"
               v-model="previousDecision.fileNumber"
               aria-label="Aktenzeichen Vorgehende Entscheidung"
-              class="ds-input-medium"
-              :has-error="slotProps.hasError"
+              fluid
+              :invalid="slotProps.hasError"
               :readonly="previousDecision.hasForeignSource"
-              size="medium"
+              size="small"
               @focus="validationStore.remove('fileNumber')"
-            ></TextInput>
+            ></InputText>
           </InputField>
           <!-- Child  -->
           <template #children>
@@ -266,15 +266,15 @@ onMounted(async () => {
                 validationStore.getByField('deviatingFileNumber')
               "
             >
-              <TextInput
+              <InputText
                 id="deviatingFileNumber"
                 v-model="previousDecision.deviatingFileNumber"
                 aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
-                class="ds-input-medium"
-                :has-error="slotProps.hasError"
-                size="medium"
+                fluid
+                :invalid="slotProps.hasError"
+                size="small"
                 @input="validationStore.remove('deviatingFileNumber')"
-              ></TextInput>
+              ></InputText>
             </InputField>
           </template>
         </NestedComponent>

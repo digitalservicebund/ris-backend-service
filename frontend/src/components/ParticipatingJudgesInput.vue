@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { onMounted, ref, watch } from "vue"
 import InputField from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ParticipatingJudge from "@/domain/participatingJudge"
 
@@ -80,28 +80,28 @@ onMounted(() => {
         label="Richter *"
         :validation-error="validationStore.getByField('name')"
       >
-        <TextInput
-          id="participatingJudgeNameTextInput"
+        <InputText
+          id="participatingJudgeNameInputText"
           v-model="participatingJudge.name"
           aria-label="Name des Richters"
           data-testid="participating-judge-name-input"
-          :has-error="slotProps.hasError"
-          size="medium"
+          :invalid="slotProps.hasError"
+          size="small"
           @focus="validationStore.remove('name')"
-        ></TextInput>
+        ></InputText>
       </InputField>
       <InputField
         id="participatingJudgeReferencedOpinionsInput"
         data-testid="participating-judge-reference-opinions"
         label="Art der Mitwirkung"
       >
-        <TextInput
+        <InputText
           id="participatingJudgeReferencedOpinionsTextInput"
           v-model="participatingJudge.referencedOpinions"
           aria-label="Art der Mitwirkung"
           data-testid="participating-judge-reference-opinions-input"
-          size="medium"
-        ></TextInput>
+          size="small"
+        ></InputText>
       </InputField>
     </div>
     <div class="flex w-full flex-row justify-between">

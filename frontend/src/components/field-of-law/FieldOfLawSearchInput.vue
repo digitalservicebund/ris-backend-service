@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import InputField from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import IconSearch from "~icons/ic/baseline-search"
 
 defineProps<{
@@ -21,36 +21,45 @@ const norm = defineModel<string>("norm")
   <div class="flex w-full flex-col">
     <div class="flex w-full flex-row items-end gap-16">
       <InputField id="fieldOfLawIdentifierInput" label="Sachgebiet">
-        <TextInput
+        <InputText
           id="fieldOfLawIdentifierInput"
           v-model="identifier"
           aria-label="Sachgebietskürzel"
-          size="medium"
+          fluid
+          size="small"
           @enter-released="emit('search')"
         />
       </InputField>
       <InputField id="fieldOfLawDescriptionInput" label="Bezeichnung">
-        <TextInput
+        <InputText
           id="fieldOfLawDescriptionInput"
           v-model="description"
           aria-label="Sachgebietsbezeichnung"
-          size="medium"
+          fluid
+          size="small"
           @enter-released="emit('search')"
         />
       </InputField>
       <InputField id="fieldOfLawNormInput" label="Norm">
-        <TextInput
+        <InputText
           id="fieldOfLawNormInput"
           v-model="norm"
           aria-label="Sachgebietsnorm"
-          size="medium"
+          fluid
+          size="small"
           @enter-released="emit('search')"
         />
       </InputField>
 
-      <Button aria-label="Sachgebietssuche ausführen" @click="emit('search')"
-        ><template #icon> <IconSearch /> </template
-      ></Button>
+      <Button
+        aria-label="Sachgebietssuche ausführen"
+        class="min-w-48"
+        @click="emit('search')"
+      >
+        <template #icon>
+          <IconSearch />
+        </template>
+      </Button>
     </div>
 
     <span v-if="errorLabel" class="ds-label-03-reg min-h-[1rem] text-red-800">{{

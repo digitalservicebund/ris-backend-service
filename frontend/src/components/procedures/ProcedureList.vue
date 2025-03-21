@@ -2,6 +2,7 @@
 import { debouncedWatch } from "@vueuse/core"
 import { useRouteQuery } from "@vueuse/router"
 import dayjs from "dayjs"
+import InputText from "primevue/inputtext"
 import { computed, onBeforeMount, ref, watch } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
@@ -9,7 +10,6 @@ import ExpandableContent from "@/components/ExpandableContent.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { DropdownItem } from "@/components/input/types"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import Pagination from "@/components/Pagination.vue"
@@ -210,15 +210,16 @@ onBeforeMount(async () => {
   <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
     <h1 class="ds-heading-02-reg">Vorgänge</h1>
     <div class="mt-24 flex flex-row items-center gap-4">
-      <div class="w-480" role="search">
+      <div class="w-[480px]" role="search">
         <InputField id="procedureFilter" label="Vorgang" visually-hide-label>
-          <TextInput
+          <InputText
             id="procedureFilter"
             v-model="filter"
             aria-label="Nach Vorgängen suchen"
-            class="ds-input-medium"
+            fluid
             placeholder="Nach Vorgängen suchen"
-          ></TextInput>
+            size="small"
+          ></InputText>
         </InputField>
       </div>
       <LoadingSpinner v-if="isFetchingProcedures" size="small" />

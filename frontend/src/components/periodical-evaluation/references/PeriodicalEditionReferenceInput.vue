@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
@@ -8,7 +9,6 @@ import { DisplayMode } from "@/components/enumDisplayMode"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import RadioInput from "@/components/input/RadioInput.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
@@ -423,33 +423,34 @@ onBeforeUnmount(() => {
             :validation-error="validationStore.getByField('citation')"
           >
             <div class="flex flex-grow flex-row gap-16">
-              <TextInput
+              <InputText
                 v-if="prefix"
                 id="citation prefix"
                 v-model="prefix"
                 aria-label="Zitatstelle Präfix"
                 placeholder="Präfix"
-                read-only
-                size="medium"
-              ></TextInput>
-              <TextInput
+                readonly
+                size="small"
+              ></InputText>
+              <InputText
                 id="citation"
                 v-model="reference.citation"
                 aria-label="Zitatstelle *"
-                :has-error="slotProps.hasError"
+                fluid
+                :invalid="slotProps.hasError"
                 placeholder="Variable"
-                size="medium"
+                size="small"
                 @focus="validationStore.remove('citation')"
-              ></TextInput>
-              <TextInput
+              ></InputText>
+              <InputText
                 v-if="suffix"
                 id="citation suffix"
                 v-model="suffix"
                 aria-label="Zitatstelle Suffix"
                 placeholder="Suffix"
-                read-only
-                size="medium"
-              ></TextInput>
+                readonly
+                size="small"
+              ></InputText>
             </div>
           </InputField>
 
@@ -461,15 +462,16 @@ onBeforeUnmount(() => {
             :validation-error="validationStore.getByField('citation')"
           >
             <div class="flex flex-grow flex-row gap-16">
-              <TextInput
+              <InputText
                 id="citation"
                 v-model="reference.citation"
                 aria-label="Zitatstelle *"
-                :has-error="slotProps.hasError"
-                size="medium"
+                fluid
+                :invalid="slotProps.hasError"
+                size="small"
                 @blur="validateRequiredInput(reference)"
                 @focus="validationStore.remove('citation')"
-              ></TextInput>
+              ></InputText>
             </div>
           </InputField>
 
@@ -485,15 +487,16 @@ onBeforeUnmount(() => {
           label="Klammernzusatz *"
           :validation-error="validationStore.getByField('referenceSupplement')"
         >
-          <TextInput
+          <InputText
             id="referenceSupplement"
             v-model="reference.referenceSupplement"
             aria-label="Klammernzusatz"
-            :has-error="slotProps.hasError"
-            size="medium"
+            fluid
+            :invalid="slotProps.hasError"
+            size="small"
             @blur="validateRequiredInput(reference)"
             @focus="validationStore.remove('referenceSupplement')"
-          ></TextInput>
+          ></InputText>
         </InputField>
         <InputField
           v-if="reference.referenceType === 'literature'"
@@ -521,14 +524,15 @@ onBeforeUnmount(() => {
           label="Autor *"
           :validation-error="validationStore.getByField('author')"
         >
-          <TextInput
+          <InputText
             id="literatureReferenceAuthor"
             v-model="reference.author"
             aria-label="Autor Literaturfundstelle"
-            :has-error="slotProps.hasError"
-            size="medium"
+            fluid
+            :invalid="slotProps.hasError"
+            size="small"
             @focus="validationStore.remove('author')"
-          ></TextInput>
+          ></InputText>
         </InputField>
       </div>
 
@@ -586,14 +590,15 @@ onBeforeUnmount(() => {
               label="Aktenzeichen"
               :validation-error="validationStore.getByField('fileNumber')"
             >
-              <TextInput
+              <InputText
                 id="fileNumber"
                 v-model="relatedDocumentationUnit.fileNumber"
                 aria-label="Aktenzeichen"
-                :has-error="slotProps.hasError"
-                size="medium"
+                fluid
+                :invalid="slotProps.hasError"
+                size="small"
                 @focus="validationStore.remove('fileNumber')"
-              ></TextInput>
+              ></InputText>
             </InputField>
             <InputField id="decisionDocumentType" label="Dokumenttyp">
               <ComboboxInput

@@ -13,6 +13,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
+  <!-- Todo: replace this with InputMask -->
   <TextInput
     :id="id"
     :aria-label="($attrs.ariaLabel as string) ?? ''"

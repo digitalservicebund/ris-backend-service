@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { computed, onBeforeMount, ref } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import LegalPeriodical from "@/domain/legalPeriodical"
@@ -122,36 +122,36 @@ onBeforeMount(async () => {
         label="Name der Ausgabe *"
         :validation-error="validationStore.getByField('name')"
       >
-        <TextInput
+        <InputText
           id="name"
           v-model="editionRef.name"
           aria-label="Name der Ausgabe"
-          class="ds-input-medium"
-          :has-error="slotProps.hasError"
-          size="medium"
-        ></TextInput>
+          fluid
+          :invalid="slotProps.hasError"
+          size="small"
+        ></InputText>
       </InputField>
 
       <div class="flex-col">
         <div class="flex flex-row items-start gap-24">
           <InputField id="prefix" label="Präfix">
-            <TextInput
+            <InputText
               id="prefix"
               v-model="editionRef.prefix"
               aria-label="Präfix"
-              class="ds-input-medium"
-              size="medium"
-            ></TextInput>
+              fluid
+              size="small"
+            ></InputText>
           </InputField>
 
           <InputField id="suffix" label="Suffix">
-            <TextInput
+            <InputText
               id="suffix"
               v-model="editionRef.suffix"
               aria-label="Suffix"
-              class="ds-input-medium"
-              size="medium"
-            ></TextInput>
+              fluid
+              size="small"
+            ></InputText>
           </InputField>
         </div>
 

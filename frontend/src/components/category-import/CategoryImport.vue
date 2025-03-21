@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { onMounted, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit, {
   longTextLabels,
@@ -419,12 +419,12 @@ onMounted(() => {
         v-slot="slotProps"
         label="Dokumentnummer"
       >
-        <TextInput
+        <InputText
           id="categoryImporterDocumentNumber"
           v-model="documentNumber"
           aria-label="Dokumentnummer Eingabefeld"
-          :has-error="slotProps.hasError"
-          size="medium"
+          :ivalid="slotProps.hasError"
+          size="small"
           @enter-released="searchForDocumentUnit"
         />
       </InputField>

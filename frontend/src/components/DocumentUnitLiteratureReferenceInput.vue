@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { computed, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import Reference from "@/domain/reference"
@@ -123,14 +123,15 @@ watch(
             label="Zitatstelle *"
             :validation-error="validationStore.getByField('citation')"
           >
-            <TextInput
+            <InputText
               id="citation"
               v-model="reference.citation"
               aria-label="Zitatstelle Literaturfundstelle"
-              :has-error="slotProps.hasError"
-              size="medium"
+              fluid
+              :invalid="slotProps.hasError"
+              size="small"
               @focus="validationStore.remove('citation')"
-            ></TextInput>
+            />
           </InputField>
           <span v-if="legalPeriodical" class="ds-label-03-reg pt-4"
             >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
@@ -162,14 +163,15 @@ watch(
           label="Autor *"
           :validation-error="validationStore.getByField('author')"
         >
-          <TextInput
+          <InputText
             id="literatureReferenceDocumentType"
             v-model="reference.author"
             aria-label="Autor Literaturfundstelle"
-            :has-error="slotProps.hasError"
-            size="medium"
+            fluid
+            :invalid="slotProps.hasError"
+            size="small"
             @focus="validationStore.remove('author')"
-          ></TextInput>
+          />
         </InputField>
       </div>
     </div>

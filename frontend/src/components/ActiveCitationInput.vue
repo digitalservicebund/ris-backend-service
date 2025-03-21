@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
@@ -267,15 +267,14 @@ onMounted(() => {
           label="Aktenzeichen *"
           :validation-error="validationStore.getByField('fileNumber')"
         >
-          <TextInput
+          <InputText
             id="activeCitationDocumentType"
             v-model="activeCitation.fileNumber"
             aria-label="Aktenzeichen Aktivzitierung"
-            :has-error="slotProps.hasError"
+            :invalid="slotProps.hasError"
             :readonly="activeCitation.hasForeignSource"
-            size="medium"
             @focus="validationStore.remove('fileNumber')"
-          ></TextInput>
+          />
         </InputField>
         <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">
           <ComboboxInput

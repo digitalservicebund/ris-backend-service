@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
 import Checkbox from "primevue/checkbox"
+import InputText from "primevue/inputtext"
 import { computed, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -255,37 +255,55 @@ export type DocumentUnitSearchParameter =
       <div></div>
       <!-- Column 2 -->
       <div>
-        <InputField id="fileNumber" label="Aktenzeichen" visually-hide-label>
-          <TextInput
-            id="fileNumber"
+        <InputField
+          id="fileNumber"
+          v-slot="{ id }"
+          label="Aktenzeichen"
+          visually-hide-label
+        >
+          <InputText
+            :id="id"
             v-model="query.fileNumber"
             aria-label="Aktenzeichen Suche"
-            class="ds-input-small"
-            @focus="resetErrors"
-          ></TextInput>
+            fluid
+            size="small"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+          ></InputText>
         </InputField>
       </div>
       <div class="flex flex-row gap-10">
-        <InputField id="courtType" label="Gerichtstyp" visually-hide-label>
-          <TextInput
-            id="courtType"
+        <InputField
+          id="courtType"
+          v-slot="{ id }"
+          label="Gerichtstyp"
+          visually-hide-label
+        >
+          <InputText
+            :id="id"
             v-model="query.courtType"
             aria-label="Gerichtstyp Suche"
-            class="ds-input-small"
+            fluid
             placeholder="Gerichtstyp"
-            @focus="resetErrors"
-          ></TextInput>
+            size="small"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+          ></InputText>
         </InputField>
         <span class="pt-6">-</span>
-        <InputField id="courtLocation" label="Gerichtsort" visually-hide-label>
-          <TextInput
-            id="courtLocation"
+        <InputField
+          id="courtLocation"
+          v-slot="{ id }"
+          label="Gerichtsort"
+          visually-hide-label
+        >
+          <InputText
+            :id="id"
             v-model="query.courtLocation"
             aria-label="Gerichtsort Suche"
-            class="ds-input-small"
+            fluid
             placeholder="Ort"
-            @focus="resetErrors"
-          ></TextInput>
+            size="small"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+          ></InputText>
         </InputField>
       </div>
       <div class="flex flex-row gap-10">
@@ -391,16 +409,18 @@ export type DocumentUnitSearchParameter =
       <div class="">
         <InputField
           id="documentNumber"
+          v-slot="{ id }"
           label="Dokumentnummer"
           visually-hide-label
         >
-          <TextInput
-            id="documentNumber"
+          <InputText
+            :id="id"
             v-model="query.documentNumber"
             aria-label="Dokumentnummer Suche"
-            class="ds-input-small"
-            @focus="resetErrors"
-          ></TextInput>
+            fluid
+            size="small"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+          ></InputText>
         </InputField>
       </div>
       <div class="">
