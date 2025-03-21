@@ -21,7 +21,7 @@ import YearInput from "@/components/input/YearInput.vue"
 interface Props {
   id: string
   type?: InputType
-  modelValue: ModelType
+  modelValue?: ModelType
   attributes: InputAttributes
   validationError?: ValidationError
   disableError?: boolean

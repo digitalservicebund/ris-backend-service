@@ -108,7 +108,7 @@ export default defineConfig(
     },
     rules: {
       "vue/no-static-inline-styles": "error",
-      "vue/component-tags-order": [
+      "vue/block-order": [
         "error",
         {
           order: ["script", "template", "style"],
@@ -126,14 +126,13 @@ export default defineConfig(
       "vue/define-macros-order": "error",
       "vue/no-boolean-default": ["error", "default-false"],
       "vue/prefer-true-attribute-shorthand": "error",
-      "vue/no-ref-object-destructure": "error",
+      "vue/no-ref-object-reactivity-loss": "error",
       "vue/no-restricted-call-after-await": "error",
       "vue/no-undef-properties": "error",
       "vue/no-unused-refs": "error",
       "vue/no-useless-v-bind": "error",
       "vue/prefer-separate-static-class": "error",
       "vue/v-for-delimiter-style": "error",
-      "vue/v-on-function-call": "error",
       "vue-scoped-css/enforce-style-type": [
         "warn",
         { allows: ["module", "scoped"] },

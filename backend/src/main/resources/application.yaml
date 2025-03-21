@@ -63,15 +63,18 @@ spring:
       mode: always
   jpa:
     open-in-view: false
-  #    show-sql: true
-  #    properties:
-  #      hibernate:
-  #        format_sql: true
-  #        highlight_sql: true
-  #        use_sql_comments: true
-  #        type: trace
-  #        query:
-  #          fail_on_pagination_over_collection_fetch: true
+    #    show-sql: true
+    properties:
+      hibernate:
+        #        format_sql: true
+        #        highlight_sql: true
+        #        use_sql_comments: true
+        #        type: trace
+        dialect=org.hibernate.dialect.PostgreSQLDialect:
+        query:
+          #          fail_on_pagination_over_collection_fetch: true
+          default_batch_fetch_size: 20
+          batch_fetch_style: dynamic
   security:
     oauth2:
       client:
