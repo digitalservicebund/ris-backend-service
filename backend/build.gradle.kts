@@ -228,10 +228,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.10.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.4.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.4.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.4.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.4.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
