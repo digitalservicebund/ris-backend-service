@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
 import { computed, ref, watch } from "vue"
 import FieldOfLawTreeNode from "./FieldOfLawTreeNode.vue"
 import {
   NodeHelper,
   NodeHelperInterface,
 } from "@/components/field-of-law/fieldOfLawNode"
-import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { buildRoot, FieldOfLaw } from "@/domain/fieldOfLaw"
 
@@ -110,12 +110,7 @@ defineExpose({ collapseTree })
           label-class="ds-label-02-reg"
           :label-position="LabelPosition.RIGHT"
         >
-          <CheckboxInput
-            id="showNorms"
-            v-model="showNormsModelValue"
-            class="ds-checkbox-mini bg-white"
-            size="small"
-          />
+          <Checkbox id="showNorms" v-model="showNormsModelValue" binary />
         </InputField>
       </div>
     </div>

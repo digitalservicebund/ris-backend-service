@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
 import { computed, onMounted, ref } from "vue"
 import { ValidationError } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
@@ -209,12 +209,13 @@ onMounted(async () => {
         label-class="ds-label-01-reg"
         :label-position="LabelPosition.RIGHT"
       >
-        <CheckboxInput
+        <Checkbox
           :id="id"
           v-model="hasLegalForce"
           aria-label="Gesetzeskraft der Norm"
+          binary
           data-testid="legal-force-checkbox"
-          size="small"
+          size="large"
         />
       </InputField>
       <button

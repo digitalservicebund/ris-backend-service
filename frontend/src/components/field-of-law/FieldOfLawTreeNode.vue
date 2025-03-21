@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
 import { computed, ref, watch } from "vue"
 import { NodeHelperInterface } from "@/components/field-of-law/fieldOfLawNode"
 import FlexContainer from "@/components/FlexContainer.vue"
-import Checkbox from "@/components/input/CheckboxInput.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
@@ -141,7 +141,7 @@ watch(
         </div>
       </div>
       <span v-else class="pl-[1.3333em]" />
-      <div v-if="!props.isRoot" data-testid>
+      <div v-if="!props.isRoot" class="ml-12" data-testid>
         <Checkbox
           :id="`field-of-law-node-${node.identifier}`"
           v-model="isSelected"
@@ -151,7 +151,7 @@ watch(
             node.text +
             (isSelected ? ' entfernen' : ' hinzufügen')
           "
-          class="ds-checkbox-mini ml-12 bg-white"
+          binary
           :data-testid="`field-of-law-node-${node.identifier}`"
         />
       </div>

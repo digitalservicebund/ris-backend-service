@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
 import { computed } from "vue"
-import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -30,12 +30,13 @@ const hasLegislativeMandate = computed({
         label-class="ds-label-01-reg"
         :label-position="LabelPosition.RIGHT"
       >
-        <CheckboxInput
+        <Checkbox
           :id="id"
           v-model="hasLegislativeMandate"
           aria-label="Gesetzgebungsauftrag"
+          binary
           data-testid="legislative-mandate"
-          size="small"
+          size="large"
         />
       </InputField>
     </div>

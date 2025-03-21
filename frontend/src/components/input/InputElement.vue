@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
 import { computed, useAttrs } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
@@ -56,7 +56,7 @@ const component = computed(() => {
     case InputType.DATE:
       return DateInput
     case InputType.CHECKBOX:
-      return CheckboxInput
+      return Checkbox
     case InputType.CHIPS:
       return ChipsInput
     case InputType.DATECHIPS:

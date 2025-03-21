@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import Checkbox from "primevue/checkbox"
 import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
@@ -176,12 +176,13 @@ onMounted(async () => {
         label-class="ds-label-01-reg"
         :label-position="LabelPosition.RIGHT"
       >
-        <CheckboxInput
+        <Checkbox
           :id="id"
           v-model="dateUnknown"
           aria-label="Datum Unbekannt Vorgehende Entscheidung"
-          :readonly="previousDecision.hasForeignSource"
-          size="small"
+          binary
+          :disabled="previousDecision.hasForeignSource"
+          size="large"
         />
       </InputField>
       <div class="flex justify-between gap-24">

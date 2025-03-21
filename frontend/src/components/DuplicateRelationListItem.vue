@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
+import Checkbox from "primevue/checkbox"
 import { computed, ref } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
-import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import {
   DuplicateRelation,
@@ -108,11 +108,11 @@ const coreDataText = computed(() =>
       label-class="ds-label-01-reg"
       :label-position="LabelPosition.RIGHT"
     >
-      <CheckboxInput
+      <Checkbox
         :id="id"
         v-model="isIgnored"
         aria-label="Warnung ignorieren"
-        class="ds-checkbox-mini"
+        binary
         :readonly="isAutomaticallyIgnored"
       />
     </InputField>

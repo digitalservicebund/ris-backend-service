@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import Checkbox from "primevue/checkbox"
 import { computed, ref, watch } from "vue"
-import Checkbox from "@/components/input/CheckboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
@@ -371,8 +371,7 @@ export type DocumentUnitSearchParameter =
             :id="id"
             v-model="scheduledOnly"
             aria-label="Terminiert Filter"
-            class="ds-checkbox-mini bg-white"
-            @focus="resetErrors"
+            binary
           />
         </InputField>
       </div>
@@ -428,8 +427,7 @@ export type DocumentUnitSearchParameter =
             :id="id"
             v-model="myDocOfficeOnly"
             aria-label="Nur meine Dokstelle Filter"
-            class="ds-checkbox-mini bg-white"
-            @focus="resetErrors"
+            binary
           />
         </InputField>
         <InputField
@@ -444,8 +442,7 @@ export type DocumentUnitSearchParameter =
             :id="id"
             v-model="withError"
             aria-label="Nur fehlerhafte Dokumentationseinheiten"
-            class="ds-checkbox-mini bg-white"
-            @focus="resetErrors"
+            binary
           />
         </InputField>
         <InputField
@@ -460,8 +457,7 @@ export type DocumentUnitSearchParameter =
             :id="id"
             v-model="withDuplicateWarning"
             aria-label="Dokumentationseinheiten mit Dublettenverdacht"
-            class="ds-checkbox-mini bg-white"
-            @focus="resetErrors"
+            binary
         /></InputField>
       </div>
       <div class="flex flex-row">

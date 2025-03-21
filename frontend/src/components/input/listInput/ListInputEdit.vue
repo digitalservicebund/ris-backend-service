@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import Checkbox from "primevue/checkbox"
 import { computed, nextTick, ref, watch } from "vue"
-import Checkbox from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 
 const props = defineProps<{
@@ -101,7 +101,7 @@ watch(
         :id="`sortAlphabetically_${label}`"
         v-model="sortAlphabetically"
         aria-label="Alphabetisch sortieren"
-        class="ds-checkbox-mini bg-white"
+        binary
       />
     </InputField>
     <div class="flex w-full flex-row">
