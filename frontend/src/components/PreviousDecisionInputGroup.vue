@@ -218,7 +218,6 @@ onMounted(async () => {
               id="decisionDate"
               v-model="previousDecision.decisionDate"
               aria-label="Entscheidungsdatum Vorgehende Entscheidung"
-              class="ds-input-medium"
               :has-error="slotProps.hasError"
               :readonly="previousDecision.hasForeignSource"
               @focus="validationStore.remove('decisionDate')"

@@ -252,7 +252,6 @@ onMounted(() => {
             id="activeCitationDecisionDate"
             v-model="activeCitation.decisionDate"
             aria-label="Entscheidungsdatum Aktivzitierung"
-            class="ds-input-medium"
             :has-error="slotProps.hasError"
             :readonly="activeCitation.hasForeignSource"
             @focus="validationStore.remove('decisionDate')"

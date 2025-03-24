@@ -218,7 +218,6 @@ onMounted(() => {
               id="decisionDate"
               v-model="ensuingDecision.decisionDate"
               aria-label="Entscheidungsdatum Nachgehende Entscheidung"
-              class="ds-input-medium"
               :has-error="slotProps.hasError"
               :readonly="ensuingDecision.hasForeignSource"
               @focus="validationStore.remove('decisionDate')"

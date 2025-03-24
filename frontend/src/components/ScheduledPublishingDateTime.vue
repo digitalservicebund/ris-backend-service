@@ -4,12 +4,12 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
 import Button from "primevue/button"
+import InputMask from "primevue/inputmask"
 import { computed, ref } from "vue"
 import { ValidationError } from "./input/types"
 import InfoModal from "@/components/InfoModal.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TimeInput from "@/components/input/TimeInput.vue"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import useSessionStore from "@/stores/sessionStore"
@@ -144,7 +144,6 @@ const dateValidationError = ref<ValidationError | undefined>()
           id="publishingDate"
           v-model="scheduledPublishingDate"
           aria-label="Terminiertes Datum"
-          class="ds-input-medium"
           :disabled="!isPublishable"
           :has-error="!!dateValidationError"
           is-future-date
@@ -153,14 +152,15 @@ const dateValidationError = ref<ValidationError | undefined>()
         ></DateInput>
       </InputField>
       <InputField id="publishingTime" label="Uhrzeit *">
-        <TimeInput
+        <InputMask
           id="publishingTime"
           v-model="scheduledPublishingTime"
           aria-label="Terminierte Uhrzeit"
-          class="ds-input-medium"
           :disabled="!isPublishable"
-          :read-only="isScheduled"
-        ></TimeInput>
+          mask="99:99"
+          placeholder="HH:MM"
+          :readonly="isScheduled"
+        ></InputMask>
       </InputField>
       <Button
         v-if="!isScheduled"

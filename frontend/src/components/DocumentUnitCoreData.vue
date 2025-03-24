@@ -198,7 +198,6 @@ onBeforeUnmount(() => {
             id="decisionDate"
             v-model="modelValue.decisionDate"
             aria-label="Entscheidungsdatum"
-            class="ds-input-medium"
             :has-error="slotProps.hasError"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
