@@ -124,8 +124,8 @@ public class PublicPortalPublicationService {
   //                      ↓ hour (0-23)
   //                    ↓ minute (0-59)
   //                 ↓ second (0-59)
-  // Default:        0 30 4 * * * (After migration)
-  @Scheduled(cron = "0 25 14 * * *")
+  // Default:        0 30 4 * * * (After migration: CET: 5:30)
+  @Scheduled(cron = "0 35 13 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
@@ -162,7 +162,7 @@ public class PublicPortalPublicationService {
         inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 
-  @Scheduled(cron = "0 20 14 * * *")
+  @Scheduled(cron = "0 36 13 * * *")
   @SchedulerLock(name = "portal-publication-rii-diff-job", lockAtMostFor = "PT15M")
   public void logPortalToRiiDiff() {
     var riiDocumentNumbers = fetchRiiDocumentNumbers();
