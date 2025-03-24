@@ -125,7 +125,7 @@ public class PublicPortalPublicationService {
   //                    ↓ minute (0-59)
   //                 ↓ second (0-59)
   // Default:        0 30 4 * * * (After migration)
-  @Scheduled(cron = "0 35 12 * * *")
+  @Scheduled(cron = "0 45 12 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
@@ -162,7 +162,7 @@ public class PublicPortalPublicationService {
         inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 
-  @Scheduled(cron = "0 34 12 * * *")
+  @Scheduled(cron = "0 40 12 * * *")
   @SchedulerLock(name = "portal-publication-rii-diff-job", lockAtMostFor = "PT15M")
   public void logPortalToRiiDiff() throws IOException {
     var riiDocumentNumbers = fetchRiiDocumentNumbers();
@@ -216,6 +216,7 @@ public class PublicPortalPublicationService {
     return documentNumbers;
   }
 
+  @SuppressWarnings("java:S5852")
   private static String extractDocumentNumber(String url) {
     String pattern = ".*/jb-([^/]+)\\.zip$";
     return url.matches(pattern) ? url.replaceAll(pattern, "$1") : null;
