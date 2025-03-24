@@ -177,11 +177,13 @@ describe("Texts", () => {
         if (!textEditorRefs.value[category]) {
           throw new Error(`Category '${category}' not found in textEditorRefs.`)
         }
-        expect(textEditorRefs.value[category]).toBeTruthy()
 
-        const editor = screen.getByTestId(category)
+        expect(textEditorRefs.value[category]).toBeTruthy()
+        expect(screen.getByTestId(category)).toBeInTheDocument()
         expect(
-          within(editor).getByLabelText("Rechtschreibprüfung"),
+          within(screen.getByTestId(category)).getByLabelText(
+            "Rechtschreibprüfung",
+          ),
           `Category '${category}' should have text check button`,
         ).toBeInTheDocument()
       })
