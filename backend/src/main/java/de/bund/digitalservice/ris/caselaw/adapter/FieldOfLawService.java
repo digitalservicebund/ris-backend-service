@@ -142,8 +142,8 @@ public class FieldOfLawService {
     // split by whitespace and hyphen to get words
     for (String textPart : text.split("[\\s-]+")) {
       if (textPart.equals(searchTerm)) score += 4;
-      if (textPart.startsWith(searchTerm)) score += 3;
-      if (textPart.contains(searchTerm)) score += 1;
+      else if (textPart.startsWith(searchTerm)) score += 3;
+      else if (textPart.contains(searchTerm)) score += 1;
     }
     return score;
   }
