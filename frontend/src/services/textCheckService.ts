@@ -6,7 +6,7 @@ import {
   TextCheckResponse,
 } from "@/types/languagetool"
 
-interface LanguageToolService {
+interface TextCheckService {
   check(text: string): Promise<ServiceResponse<TextCheckResponse>>
 
   checkAll(id: string): Promise<ServiceResponse<TextCheckAllResponse>>
@@ -17,7 +17,7 @@ interface LanguageToolService {
   ): Promise<ServiceResponse<TextCheckCategoryResponse>>
 }
 
-const service: LanguageToolService = {
+const service: TextCheckService = {
   async check(text: string) {
     return await httpClient.post<string, TextCheckResponse>(
       `caselaw/documentunits/text-check`,

@@ -2,7 +2,7 @@ import { Editor } from "@tiptap/core"
 import { EditorState } from "prosemirror-state"
 import { Ref, ref } from "vue"
 import { ResponseError, ServiceResponse } from "@/services/httpClient"
-import languageToolService from "@/services/languageToolService"
+import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 import {
