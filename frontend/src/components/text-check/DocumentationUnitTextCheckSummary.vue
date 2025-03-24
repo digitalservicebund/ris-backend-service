@@ -4,9 +4,9 @@ import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import SuggestionGroup from "@/components/text-check/SuggestionGroup.vue"
 import { ResponseError } from "@/services/httpClient"
-import languageToolService from "@/services/languageToolService"
+import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { Match, Suggestion } from "@/types/languagetool"
+import { Match, Suggestion } from "@/types/textCheck"
 
 defineProps<{
   jumpToMatch?: (match: Match) => void

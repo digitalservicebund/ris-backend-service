@@ -6,8 +6,8 @@ import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView
 import errorMessages from "@/i18n/errors.json"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
-import languageToolService from "@/services/languageToolService"
-import { TextCheckAllResponse } from "@/types/languagetool"
+import languageToolService from "@/services/textCheckService"
+import { TextCheckAllResponse } from "@/types/textCheck"
 import routes from "~/test-helper/routes"
 import { suggestions } from "~/test-helper/text-check-service-mock"
 

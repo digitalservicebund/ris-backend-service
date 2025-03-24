@@ -2,14 +2,14 @@ import { Editor } from "@tiptap/core"
 import { EditorState } from "prosemirror-state"
 import { Ref, ref } from "vue"
 import { ResponseError, ServiceResponse } from "@/services/httpClient"
-import languageToolService from "@/services/languageToolService"
+import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 import {
   Match,
   TextCheckCategoryResponse,
   TextCheckTagName,
-} from "@/types/languagetool"
+} from "@/types/textCheck"
 
 interface TextCheckService {
   loading: Ref<boolean>
@@ -21,7 +21,7 @@ interface TextCheckService {
 
   handleSelection(state: EditorState): boolean
 
-  setMatch(matchId?: number): void
+  selectMatch(matchId?: number): void
 
   replaceMatch(
     matchId: number,
@@ -52,7 +52,7 @@ class NeurisTextCheckService implements TextCheckService {
   }
 
   /**
-   * Function to update the selected match by text check tags, will reset selected if not a text check tag
+   * Function to update the selected match by text check tags, will reset selected state if not a text check tag
    * @param state
    */
   handleSelection = (state: EditorState): boolean => {
@@ -72,10 +72,15 @@ class NeurisTextCheckService implements TextCheckService {
       return false
     }
 
-    this.setMatch(Number(textCheckMark.attrs.id))
+    this.selectMatch(Number(textCheckMark.attrs.id))
     return true
   }
 
+  /**
+   * Performs a spell check on a given {@link category}. The documentation unit is saved beforehand
+   * @param editor
+   * @param category
+   */
   checkCategory = async (editor: Editor, category?: string) => {
     this.loading.value = true
     this.responseError.value = undefined
@@ -95,11 +100,8 @@ class NeurisTextCheckService implements TextCheckService {
 
     if (languageToolCheckResponse.status == 200) {
       this.matches = languageToolCheckResponse.data!.matches
-      this.loading.value = false
-
       editor.commands.setContent(languageToolCheckResponse.data!.htmlText)
-    }
-    if (languageToolCheckResponse.error) {
+    } else if (languageToolCheckResponse.error) {
       this.responseError.value = languageToolCheckResponse.error
     }
 
@@ -107,7 +109,7 @@ class NeurisTextCheckService implements TextCheckService {
   }
 
   /**
-   * Received match id and the text to replace, find the mark with the id, remove the text-check html tag and set the text
+   * Finds the match with the id, removes the text-check html tag and sets the given text
    * @param matchId
    * @param text
    * @param state
@@ -153,25 +155,23 @@ class NeurisTextCheckService implements TextCheckService {
     })
   }
 
-  setMatch = (matchId?: number) => {
+  /**
+   * Selects a match by id, if no id is provided or the id is not found, the previously selected match is cleared
+   * @param matchId
+   */
+  selectMatch = (matchId?: number) => {
     if (matchId) {
       const selectedMatch = this.matches.find((match) => match.id === matchId)
       if (selectedMatch) {
         this.selectedMatch.value = selectedMatch
-      } else {
-        this.clearSelectedMatch()
+        return
       }
-    } else {
-      this.clearSelectedMatch()
     }
+    this.clearSelectedMatch()
   }
 
   clearSelectedMatch = () => {
     this.selectedMatch.value = undefined
-  }
-
-  clearMatches = () => {
-    this.matches = []
   }
 }
 

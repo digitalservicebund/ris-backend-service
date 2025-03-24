@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core"
 import { TextCheckService } from "@/editor/commands/textCheckCommands"
-import { TextCheckExtensionOptions } from "@/types/languagetool"
+import { TextCheckExtensionOptions } from "@/types/textCheck"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -45,10 +45,11 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
       setSelectedMatch: (matchId?: number) => () => {
         const service = this.options.service as TextCheckService
 
-        service.setMatch(matchId)
+        service.selectMatch(matchId)
 
         return true
       },
+
       acceptMatch:
         (matchId: number, text: string) =>
         ({ state, dispatch }) => {

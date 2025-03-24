@@ -162,17 +162,14 @@ describe("Texts", () => {
         tenor: "tenor",
         reasons: "reasons",
         caseFacts: "case facts",
+        dissentingOpinion: "dissenting opinion",
         decisionReasons: "decision reasons",
         otherLongText: "otherLongText",
         outline: "outline",
       },
     )
 
-    const excludeLabels = [
-      "decisionName",
-      "dissentingOpinion",
-      "participatingJudges",
-    ]
+    const excludeLabels = ["decisionName", "participatingJudges"]
 
     Object.keys({ ...shortTextLabels, ...longTextLabels })
       .filter((category) => !excludeLabels.includes(category))

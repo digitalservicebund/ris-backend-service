@@ -4,7 +4,7 @@ import { setActivePinia } from "pinia"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import DocumentUnit from "@/domain/documentUnit"
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
-import languageToolService from "@/services/languageToolService"
+import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 describe("check category service", () => {
