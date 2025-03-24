@@ -1,4 +1,4 @@
-import { Match, Suggestion } from "@/types/languagetool"
+import { Match, Suggestion } from "@/types/textCheck"
 
 const matches: Match[] = [
   {

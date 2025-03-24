@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
 
-import { Match, Replacement } from "@/types/languagetool"
+import { Match, Replacement } from "@/types/textCheck"
 
 defineProps<{
   match: Match

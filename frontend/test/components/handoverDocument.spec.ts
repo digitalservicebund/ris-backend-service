@@ -16,7 +16,7 @@ import handoverDocumentationUnitService from "@/services/handoverDocumentationUn
 import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
 
-import { TextCheckAllResponse } from "@/types/languagetool"
+import { TextCheckAllResponse } from "@/types/textCheck"
 import routes from "~/test-helper/routes"
 
 const router = createRouter({

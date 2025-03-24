@@ -4,7 +4,7 @@ import {
   TextCheckAllResponse,
   TextCheckCategoryResponse,
   TextCheckResponse,
-} from "@/types/languagetool"
+} from "@/types/textCheck"
 
 interface TextCheckService {
   check(text: string): Promise<ServiceResponse<TextCheckResponse>>

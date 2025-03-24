@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core"
 import { TextCheckService } from "@/editor/commands/textCheckCommands"
-import { TextCheckExtensionOptions } from "@/types/languagetool"
+import { TextCheckExtensionOptions } from "@/types/textCheck"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {

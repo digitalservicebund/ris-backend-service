@@ -1,6 +1,6 @@
 import "@/styles/text-check.scss"
 import { Mark } from "@tiptap/vue-3"
-import { TextCheckTagName } from "@/types/languagetool"
+import { TextCheckTagName } from "@/types/textCheck"
 
 export const TextCheckMark = Mark.create({
   name: TextCheckTagName,

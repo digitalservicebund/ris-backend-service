@@ -9,7 +9,7 @@ import {
   Match,
   TextCheckCategoryResponse,
   TextCheckTagName,
-} from "@/types/languagetool"
+} from "@/types/textCheck"
 
 interface TextCheckService {
   loading: Ref<boolean>

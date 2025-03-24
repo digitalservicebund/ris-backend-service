@@ -15,7 +15,7 @@ import DocumentationUnitTextCheckSummary from "@/components/text-check/Documenta
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import DocumentUnit from "@/domain/documentUnit"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
-import { Match } from "@/types/languagetool"
+import { Match } from "@/types/textCheck"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 
 const props = defineProps<{

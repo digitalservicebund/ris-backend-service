@@ -17,7 +17,7 @@ import DocumentUnit from "@/domain/documentUnit"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
-import { Match } from "@/types/languagetool"
+import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   documentNumber: string

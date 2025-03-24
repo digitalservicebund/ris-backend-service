@@ -3,7 +3,7 @@ import { getCategoryLabel } from "./categoryLabels"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import PrevNextNavigation from "@/components/PrevNextNavigation.vue"
-import { Match } from "@/types/languagetool"
+import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   matches: Match[]
