@@ -125,7 +125,7 @@ public class PublicPortalPublicationService {
   //                    ↓ minute (0-59)
   //                 ↓ second (0-59)
   // Default:        0 30 4 * * * (After migration)
-  @Scheduled(cron = "0 10 13 * * *")
+  @Scheduled(cron = "0 25 14 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
@@ -162,9 +162,9 @@ public class PublicPortalPublicationService {
         inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 
-  @Scheduled(cron = "0 15 13 * * *")
+  @Scheduled(cron = "0 20 14 * * *")
   @SchedulerLock(name = "portal-publication-rii-diff-job", lockAtMostFor = "PT15M")
-  public void logPortalToRiiDiff() throws IOException {
+  public void logPortalToRiiDiff() {
     var riiDocumentNumbers = fetchRiiDocumentNumbers();
     var publishJobsDocumentNumbers =
         portalPublicationJobRepository.findAllDocumentNumbersPublishJobs();
@@ -194,31 +194,35 @@ public class PublicPortalPublicationService {
         inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 
-  private List<String> fetchRiiDocumentNumbers() throws IOException {
+  private List<String> fetchRiiDocumentNumbers() {
     final String URL = "https://www.rechtsprechung-im-internet.de/rii-toc.xml";
-
     List<String> documentNumbers = new ArrayList<>();
+    try {
+      Document doc =
+          Jsoup.connect(URL).maxBodySize(0).parser(Parser.xmlParser()).timeout(10_000).get();
 
-    Document doc = Jsoup.connect(URL).maxBodySize(0).parser(Parser.xmlParser()).get();
+      Elements links = doc.select("link");
 
-    Elements links = doc.select("link");
+      for (Element link : links) {
+        String linkText = link.text();
+        String documentNumber = extractDocumentNumber(linkText);
 
-    for (Element link : links) {
-      String linkText = link.text();
-
-      String documentNumber = extractDocumentNumber(linkText);
-
-      if (documentNumber != null) {
-        documentNumbers.add(documentNumber);
+        if (documentNumber != null) {
+          documentNumbers.add(documentNumber);
+        }
       }
-    }
 
-    return documentNumbers;
+      return documentNumbers;
+    } catch (IOException e) {
+      log.info(
+          "Error fetching document numbers from Rechtsprechung im Internet: " + e.getMessage());
+    }
+    return List.of();
   }
 
   @SuppressWarnings("java:S5852")
-  private static String extractDocumentNumber(String url) {
+  private static String extractDocumentNumber(String link) {
     String pattern = ".*/jb-([^/]+)\\.zip$";
-    return url.matches(pattern) ? url.replaceAll(pattern, "$1") : null;
+    return link.matches(pattern) ? link.replaceAll(pattern, "$1") : null;
   }
 }

@@ -531,7 +531,10 @@ public class DecisionTransformer extends DocumentableTransformer {
         .decisionName(
             (decisionDTO.getDecisionNames() == null || decisionDTO.getDecisionNames().isEmpty())
                 ? null
-                : decisionDTO.getDecisionNames().stream().findFirst().get().getValue())
+                : decisionDTO.getDecisionNames().stream()
+                    .findFirst()
+                    .map(DecisionNameDTO::getValue)
+                    .orElse(null))
         .guidingPrinciple(decisionDTO.getGuidingPrinciple())
         .headnote(decisionDTO.getHeadnote())
         .otherHeadnote(decisionDTO.getOtherHeadnote())
