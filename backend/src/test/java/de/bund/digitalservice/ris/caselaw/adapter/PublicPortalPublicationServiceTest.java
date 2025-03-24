@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
@@ -51,19 +52,23 @@ class PublicPortalPublicationServiceTest {
   static String testDocumentNumber;
   static ObjectMapper objectMapper;
 
+  static PortalPublicationJobRepository portalPublicationJobRepository;
+
   @BeforeAll
   static void setUpBeforeClass() {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
     publicPortalBucket = mock(PublicPortalBucket.class);
     objectMapper = mock(ObjectMapper.class);
     xmlUtilService = mock(XmlUtilService.class);
+    portalPublicationJobRepository = mock(PortalPublicationJobRepository.class);
     subject =
         new PublicPortalPublicationService(
             documentationUnitRepository,
             xmlUtilService,
             documentBuilderFactory,
             publicPortalBucket,
-            objectMapper);
+            objectMapper,
+            portalPublicationJobRepository);
 
     PreviousDecision related1 =
         PreviousDecision.builder()

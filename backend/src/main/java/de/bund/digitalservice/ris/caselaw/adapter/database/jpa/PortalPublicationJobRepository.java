@@ -11,6 +11,10 @@ public interface PortalPublicationJobRepository
     extends JpaRepository<PortalPublicationJobDTO, UUID> {
 
   @Query(
+      "SELECT DISTINCT p.documentNumber FROM PortalPublicationJobDTO p WHERE p.publicationType = 'PUBLISH'")
+  List<String> findAllDocumentNumbersPublishJobs();
+
+  @Query(
       value =
           """
 SELECT portalPublicationJob

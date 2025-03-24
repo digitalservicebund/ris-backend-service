@@ -172,11 +172,12 @@ public interface DatabaseDocumentationUnitRepository
         JOIN d.court c
         JOIN d.status s
         JOIN d.documentType dt
+        JOIN d.documentationOffice o
         WHERE cast(d.date as date) > cast('2009-12-31' as date)
         AND s.publicationStatus = 'PUBLISHED'
-        AND (d.fedst is null OR d.fedst != 'juris')
-        AND c.type IN ('BSG', 'BAG', 'BGH', 'BFH', 'BVerfG', 'BVerwG', 'BPatG')
         AND dt.abbreviation <> 'Anh'
+        AND (c.type = o.abbreviation AND c.type IN ('BSG', 'BAG', 'BGH', 'BFH', 'BVerfG', 'BVerwG', 'BPatG')
+          OR (o.abbreviation = 'juris' AND c.type = 'BPatG'))
     """)
   List<String> getAllMatchingPublishCriteria();
 }

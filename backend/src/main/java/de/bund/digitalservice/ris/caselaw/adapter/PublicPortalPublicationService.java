@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
@@ -11,12 +12,19 @@ import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,6 +34,7 @@ import org.springframework.stereotype.Service;
 public class PublicPortalPublicationService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
+  private final PortalPublicationJobRepository portalPublicationJobRepository;
   private final PublicPortalBucket publicPortalBucket;
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
@@ -37,13 +46,15 @@ public class PublicPortalPublicationService {
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,
       PublicPortalBucket publicPortalBucket,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      PortalPublicationJobRepository portalPublicationJobRepository) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.publicPortalBucket = publicPortalBucket;
     this.objectMapper = objectMapper;
     this.xmlUtilService = xmlUtilService;
     this.ldmlTransformer = new PublicPortalTransformer(documentBuilderFactory);
+    this.portalPublicationJobRepository = portalPublicationJobRepository;
   }
 
   /**
@@ -114,7 +125,7 @@ public class PublicPortalPublicationService {
   //                    ↓ minute (0-59)
   //                 ↓ second (0-59)
   // Default:        0 30 4 * * * (After migration)
-  @Scheduled(cron = "0 30 4 20 * *")
+  @Scheduled(cron = "0 35 12 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logDatabaseToBucketDiff() {
     log.info(
@@ -149,5 +160,64 @@ public class PublicPortalPublicationService {
     log.info(
         "Document numbers found in bucket but not in database: {}",
         inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
+  }
+
+  @Scheduled(cron = "0 34 12 * * *")
+  @SchedulerLock(name = "portal-publication-rii-diff-job", lockAtMostFor = "PT15M")
+  public void logPortalToRiiDiff() throws IOException {
+    var riiDocumentNumbers = fetchRiiDocumentNumbers();
+    var publishJobsDocumentNumbers =
+        portalPublicationJobRepository.findAllDocumentNumbersPublishJobs();
+    List<String> inRiiNotInPortal =
+        riiDocumentNumbers.stream()
+            .filter(documentNumber -> !publishJobsDocumentNumbers.contains(documentNumber))
+            .toList();
+
+    List<String> inPortalNotInRii =
+        publishJobsDocumentNumbers.stream()
+            .filter(documentNumber -> !riiDocumentNumbers.contains(documentNumber))
+            .toList();
+
+    log.info("Number of documents in Rechtsprechung im Internet: {}", riiDocumentNumbers.size());
+    log.info("Number of documents in Portal: {}", publishJobsDocumentNumbers.size());
+    log.info(
+        "Found {} doc units in Portal but not in Rechtsprechung im Internet.",
+        inPortalNotInRii.size());
+    log.info(
+        "Found {} doc units in Rechtsprechung im Internet but not in Portal.",
+        inRiiNotInPortal.size());
+    log.info(
+        "Document numbers found in Rechtsprechung im Internet but not in Portal: {}",
+        inRiiNotInPortal.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    log.info(
+        "Document numbers found in Portal but not in Rechtsprechung im Internet: {}",
+        inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
+  }
+
+  private List<String> fetchRiiDocumentNumbers() throws IOException {
+    final String URL = "https://www.rechtsprechung-im-internet.de/rii-toc.xml";
+
+    List<String> documentNumbers = new ArrayList<>();
+
+    Document doc = Jsoup.connect(URL).maxBodySize(0).parser(Parser.xmlParser()).get();
+
+    Elements links = doc.select("link");
+
+    for (Element link : links) {
+      String linkText = link.text();
+
+      String documentNumber = extractDocumentNumber(linkText);
+
+      if (documentNumber != null) {
+        documentNumbers.add(documentNumber);
+      }
+    }
+
+    return documentNumbers;
+  }
+
+  private static String extractDocumentNumber(String url) {
+    String pattern = ".*/jb-([^/]+)\\.zip$";
+    return url.matches(pattern) ? url.replaceAll(pattern, "$1") : null;
   }
 }
