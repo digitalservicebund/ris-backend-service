@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/vue"
-import { createHead } from "@unhead/vue"
+import { createHead } from "@unhead/vue/client"
 import { createPinia } from "pinia"
 import { createApp } from "vue"
 import "@/styles/global.scss"
