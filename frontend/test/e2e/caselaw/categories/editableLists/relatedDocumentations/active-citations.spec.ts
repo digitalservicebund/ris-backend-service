@@ -104,7 +104,7 @@ test.describe("active citations", () => {
     test(
       `Generate headnote possible, when citation style ' ${type}'`,
       {
-        tag: ["@RISDEV-4829", "@RISDEV-5146", "@RISDEV-5920"],
+        tag: ["@RISDEV-4829", "@RISDEV-5146", "@RISDEV-5920", "@RISDEV-5722"],
         annotation: {
           type: "story",
           description:
@@ -148,27 +148,46 @@ test.describe("active citations", () => {
           ),
         ).toBeVisible()
 
-        const generateButton = page.getByTestId("generate-headnote")
-        await expect(generateButton).toBeVisible()
-        await generateButton.click()
-        await expect(
-          page.getByText("Orientierungssatz", { exact: true }),
-        ).toBeVisible()
-        await expect(page.getByTestId("Orientierungssatz")).toHaveText(
-          `${type} zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}${headnoteAddition}.`,
-        )
+        // RISDEV-5920
+        await test.step("generate headnote is possible", async () => {
+          const generateButton = page.getByTestId("generate-headnote")
+          await expect(generateButton).toBeVisible()
+          await generateButton.click()
+          await expect(
+            page
+              .getByTestId("headnote")
+              .getByText("Orientierungssatz", { exact: true }),
+          ).toBeVisible()
+          await expect(page.getByTestId("Orientierungssatz")).toHaveText(
+            `${type} zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}${headnoteAddition}.`,
+          )
+        })
 
+        // RISDEV-5920
         await test.step("disable button and display tooltip when headnote is already filled", async () => {
           const element = page.getByRole("button", {
             name: "O-Satz generieren",
           })
 
           await expect(element).toBeDisabled()
+          await element.hover()
           await element.dispatchEvent("mouseenter")
 
           await expect(
             page.getByText("Zielrubrik Orientierungssatz bereits ausgefüllt"),
           ).toBeVisible()
+        })
+
+        // RISDEV-5722
+        await test.step("import categories is possible", async () => {
+          const importButton = page.getByTestId("import-categories")
+          await expect(importButton).toBeVisible()
+          await expect(importButton).toBeEnabled()
+          await importButton.click()
+          await expect(page.getByText("Rubriken importieren")).toBeVisible()
+          await expect(
+            page.getByLabel("Dokumentnummer Eingabefeld"),
+          ).toHaveValue(prefilledDocumentUnit.documentNumber)
         })
       },
     )
