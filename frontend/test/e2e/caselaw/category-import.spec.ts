@@ -59,12 +59,22 @@ test.describe("category import", () => {
         ).toBeDisabled()
       })
 
-      await test.step("search for document unit displays core data", async () => {
+      await test.step("search for document unit displays core data, status and document number", async () => {
         await searchForDocumentUnitToImport(page, "YYTestDoc0013")
         await expect(
           page.getByText(
             "BVerfG, 02.02.2080, fileNumber5, allgemeine Geschäftsbedingungen",
           ),
+        ).toBeVisible()
+        await expect(
+          page
+            .getByTestId("category-import")
+            .getByText("Veröffentlicht", { exact: true }),
+        ).toBeVisible()
+        await expect(
+          page
+            .getByTestId("category-import")
+            .getByTestId("document-number-link-YYTestDoc0013"),
         ).toBeVisible()
       })
     },
