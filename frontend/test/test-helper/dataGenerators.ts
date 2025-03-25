@@ -6,6 +6,11 @@ export function generateRandomNumber(minimum = 0, maximum = 10): number {
   return Math.floor(Math.random() * (maximum - minimum) + minimum)
 }
 
+/**
+ * Generates a random string with a given length and character set.
+ * It will always be prefixed with 'e2e-' to allow identifying it as test data and enable thorough cleanup.
+ * @param options
+ */
 export function generateString(options?: {
   characterSet?: string
   length?: number
@@ -13,7 +18,7 @@ export function generateString(options?: {
 }): string {
   const characterSet = options?.characterSet ?? ALPHABET_CHARACTERS
   const length = options?.length ?? 5
-  let output = options?.prefix ?? ""
+  let output = options?.prefix ?? "e2e-"
 
   for (let i = 0; i < length; i++) {
     output += characterSet.charAt(

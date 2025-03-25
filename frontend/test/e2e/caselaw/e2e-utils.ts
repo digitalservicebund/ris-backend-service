@@ -650,7 +650,7 @@ export async function assignProcedureToDocUnit(
   let procedureName = ""
   await test.step("Internal user assigns new procedure to doc unit", async () => {
     await navigateToCategories(page, documentNumber)
-    procedureName = prefix + generateString({ length: 10 })
+    procedureName = generateString({ length: 10, prefix: prefix })
     await page.locator("[aria-label='Vorgang']").fill(procedureName)
     await page
       .getByText(`${procedureName} neu erstellen`)

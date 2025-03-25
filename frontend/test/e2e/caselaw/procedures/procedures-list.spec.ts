@@ -1,4 +1,4 @@
-import { expect, BrowserContext, APIRequestContext } from "@playwright/test"
+import { APIRequestContext, BrowserContext, expect } from "@playwright/test"
 import {
   assignProcedureToDocUnit,
   deleteAllProcedures,
@@ -13,7 +13,7 @@ const timeout = 15_000
 
 test.describe("Procedures search list (Vorgänge)", () => {
   // If tests run in parallel, we do not want to delete other procedures -> random prefix
-  const procedurePrefix = `test_${generateString({ length: 10 })}`
+  const procedurePrefix = generateString({ length: 10 })
   const createdDocUnitUuids: string[] = []
 
   test("Search for procedures by name", async ({
