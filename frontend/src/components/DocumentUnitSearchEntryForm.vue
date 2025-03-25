@@ -2,9 +2,9 @@
 import Button from "primevue/button"
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
+import InputSelect from "primevue/select"
 import { computed, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
-import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
@@ -421,14 +421,22 @@ export type DocumentUnitSearchParameter =
         </InputField>
       </div>
       <div class="">
-        <InputField id="status" label="Status" visually-hide-label>
-          <DropdownInput
-            id="status"
+        <InputField
+          id="status"
+          v-slot="{ id }"
+          label="Status"
+          visually-hide-label
+        >
+          <InputSelect
+            :id="id"
             v-model="query.publicationStatus"
             aria-label="Status Suche"
-            class="ds-select-small"
-            :items="dropdownItems"
-            @focus="resetErrors"
+            fluid
+            option-label="label"
+            option-value="value"
+            :options="dropdownItems"
+            placeholder="Bitte auswählen"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
           />
         </InputField>
       </div>

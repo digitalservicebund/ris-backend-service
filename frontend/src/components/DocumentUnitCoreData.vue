@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import InputText from "primevue/inputtext"
+import InputSelect from "primevue/select"
 import { computed, toRefs, watch, ref, onMounted, onBeforeUnmount } from "vue"
 import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -7,7 +8,6 @@ import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import ChipsYearInput from "@/components/input/ChipsYearInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
-import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
 import TitleElement from "@/components/TitleElement.vue"
@@ -310,11 +310,13 @@ onBeforeUnmount(() => {
 
     <div :class="layoutClass">
       <InputField id="legalEffect" v-slot="{ id }" label="Rechtskraft *">
-        <DropdownInput
+        <InputSelect
           :id="id"
           v-model="modelValue.legalEffect"
           aria-label="Rechtskraft"
-          :items="legalEffectTypes.items"
+          option-label="label"
+          option-value="value"
+          :options="legalEffectTypes.items"
           placeholder="Bitte auswählen"
         />
       </InputField>
@@ -343,12 +345,14 @@ onBeforeUnmount(() => {
         label="Quelle"
         :validation-error="validationStore.getByField('source')"
       >
-        <DropdownInput
+        <InputSelect
           :id="slotProps.id"
           v-model="source"
           aria-label="Quelle"
-          :has-error="slotProps.hasError"
-          :items="sourceItems"
+          :invalid="slotProps.hasError"
+          option-label="label"
+          option-value="value"
+          :options="sourceItems"
           placeholder="Bitte auswählen"
         />
       </InputField>

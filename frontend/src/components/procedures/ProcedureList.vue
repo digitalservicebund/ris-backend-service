@@ -3,12 +3,12 @@ import { debouncedWatch } from "@vueuse/core"
 import { useRouteQuery } from "@vueuse/router"
 import dayjs from "dayjs"
 import InputText from "primevue/inputtext"
+import InputSelect from "primevue/select"
 import { computed, onBeforeMount, ref, watch } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import { DropdownItem } from "@/components/input/types"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
@@ -48,7 +48,15 @@ const {
   canAbort: canAbortFetchingProcedures,
   execute: fetchProcedures,
 } = service.get(itemsPerPage, currentPage, debouncedFilter)
-const procedures = computed(() => procedurePage.value?.content)
+
+// Initialize procedures properly with a fallback
+const procedures = computed(
+  () =>
+    (procedurePage.value?.content.map((procedure) => ({
+      ...procedure,
+      userGroupId: procedure.userGroupId ?? "Nicht zugewiesen",
+    })) as Procedure[]) ?? [],
+)
 
 async function updateProcedures() {
   if (canAbortFetchingProcedures.value) {
@@ -174,7 +182,7 @@ const getDropdownItems = (): DropdownItem[] => {
     label: getLastSubgroup(userGroupPathName),
     value: id,
   }))
-  dropdownItems.push({ label: "Nicht zugewiesen", value: "" })
+  dropdownItems.push({ label: "Nicht zugewiesen", value: "Nicht zugewiesen" })
   return dropdownItems
 }
 
@@ -276,13 +284,14 @@ onBeforeMount(async () => {
                   </span>
                 </div>
               </div>
-              <DropdownInput
+              <InputSelect
                 v-if="isInternalUser"
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
-                class="ml-auto w-auto"
-                is-small
-                :items="getDropdownItems()"
+                class="ml-auto"
+                option-label="label"
+                option-value="value"
+                :options="getDropdownItems()"
                 @click.stop
                 @update:model-value="
                   (value: string | undefined) =>
