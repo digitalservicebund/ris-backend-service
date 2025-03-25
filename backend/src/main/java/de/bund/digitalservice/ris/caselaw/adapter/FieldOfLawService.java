@@ -160,8 +160,8 @@ public class FieldOfLawService {
           norm.singleNormDescription() == null ? "" : norm.singleNormDescription().toLowerCase();
       String normText = description + " " + abbreviation;
       if (description.equals(normStr)) score += 8;
-      if (description.startsWith(normStr)) score += 5;
-      if (normText.contains(normStr)) score += 5;
+      else if (description.startsWith(normStr)) score += 5;
+      else if (normText.contains(normStr)) score += 5;
     }
     return score;
   }
