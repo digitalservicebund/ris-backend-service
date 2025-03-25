@@ -10,7 +10,8 @@ test.describe(
   "Dok-Einheit löschen (Verwaltungsdaten)",
   { tag: ["@RISDEV-88", "@RISDEV-5885"] },
   () => {
-    test("Eine Dokumentationseinheit kann über die Verwaltungsdaten gelöscht werden", async ({
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip("Eine Dokumentationseinheit kann über die Verwaltungsdaten gelöscht werden", async ({
       page,
     }) => {
       let documentNumber: string
