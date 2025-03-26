@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,17 +22,17 @@ public interface DatabaseIgnoredTextCheckWordRepository
 
   /**
    * @param documentationOfficeIds the documentation office ids to filter by
-   * @param documentationUnitIds the documentation unit ids to filter by
+   * @param documentationUnitId optional documentation unit id to filter by
    * @param words to search for
    * @return a list of all ignored text check word that were found
    */
   @Query(
       "SELECT i FROM IgnoredTextCheckWordDTO i "
           + "WHERE i.documentationOffice.id IN :documentationOfficeIds "
-          + "OR i.documentationUnit.id IN :documentationUnitIds "
+          + "AND (:documentationUnitId IS NULL OR i.documentationUnit.id = :documentationUnitId) "
           + "AND (UPPER(i.word) IN :words)")
   List<IgnoredTextCheckWordDTO> findAllByDocumentationOfficesIdsOrUnitIdsAndWords(
       @Param("documentationOfficeIds") List<UUID> documentationOfficeIds,
-      @Param("documentationUnitIds") List<UUID> documentationUnitIds,
+      @Nullable @Param("documentationUnitId") UUID documentationUnitId,
       @Param("words") List<String> words);
 }
