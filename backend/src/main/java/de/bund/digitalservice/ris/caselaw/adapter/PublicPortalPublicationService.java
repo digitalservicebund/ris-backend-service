@@ -162,36 +162,42 @@ public class PublicPortalPublicationService {
         inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 
-  @Scheduled(cron = "0 20 8 * * *")
+  @Scheduled(cron = "0 55 8 * * *")
   @SchedulerLock(name = "portal-publication-rii-diff-job", lockAtMostFor = "PT15M")
   public void logPortalToRiiDiff() {
+    log.info(
+        "Checking for discrepancies between published doc units and Rechtsprechung im Internet...");
     var riiDocumentNumbers = fetchRiiDocumentNumbers();
     var publishJobsDocumentNumbers =
         portalPublicationJobRepository.findAllDocumentNumbersPublishJobs();
-    List<String> inRiiNotInPortal =
-        riiDocumentNumbers.stream()
-            .filter(documentNumber -> !publishJobsDocumentNumbers.contains(documentNumber))
-            .toList();
-
-    List<String> inPortalNotInRii =
-        publishJobsDocumentNumbers.stream()
-            .filter(documentNumber -> !riiDocumentNumbers.contains(documentNumber))
-            .toList();
 
     log.info("Number of documents in Rechtsprechung im Internet: {}", riiDocumentNumbers.size());
     log.info("Number of documents in Portal: {}", publishJobsDocumentNumbers.size());
-    log.info(
-        "Found {} doc units in Portal but not in Rechtsprechung im Internet.",
-        inPortalNotInRii.size());
-    log.info(
-        "Found {} doc units in Rechtsprechung im Internet but not in Portal.",
-        inRiiNotInPortal.size());
-    log.info(
-        "Document numbers found in Rechtsprechung im Internet but not in Portal: {}",
-        inRiiNotInPortal.stream().map(Object::toString).collect(Collectors.joining(", ")));
-    log.info(
-        "Document numbers found in Portal but not in Rechtsprechung im Internet: {}",
-        inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
+
+    if (!riiDocumentNumbers.isEmpty()) {
+      List<String> inRiiNotInPortal =
+          riiDocumentNumbers.stream()
+              .filter(documentNumber -> !publishJobsDocumentNumbers.contains(documentNumber))
+              .toList();
+
+      List<String> inPortalNotInRii =
+          publishJobsDocumentNumbers.stream()
+              .filter(documentNumber -> !riiDocumentNumbers.contains(documentNumber))
+              .toList();
+
+      log.info(
+          "Found {} doc units in Portal but not in Rechtsprechung im Internet.",
+          inPortalNotInRii.size());
+      log.info(
+          "Found {} doc units in Rechtsprechung im Internet but not in Portal.",
+          inRiiNotInPortal.size());
+      log.info(
+          "Document numbers found in Rechtsprechung im Internet but not in Portal: {}",
+          inRiiNotInPortal.stream().map(Object::toString).collect(Collectors.joining(", ")));
+      log.info(
+          "Document numbers found in Portal but not in Rechtsprechung im Internet: {}",
+          inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    }
   }
 
   private List<String> fetchRiiDocumentNumbers() {
@@ -199,7 +205,7 @@ public class PublicPortalPublicationService {
     List<String> documentNumbers = new ArrayList<>();
     try {
       Document doc =
-          Jsoup.connect(URL).maxBodySize(0).parser(Parser.xmlParser()).timeout(10_000).get();
+          Jsoup.connect(URL).maxBodySize(0).parser(Parser.xmlParser()).timeout(15_000).get();
 
       Elements links = doc.select("link");
 
