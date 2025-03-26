@@ -162,7 +162,7 @@ public class PublicPortalPublicationService {
         inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 
-  @Scheduled(cron = "0 45 7 * * *")
+  @Scheduled(cron = "0 20 8 * * *")
   @SchedulerLock(name = "portal-publication-rii-diff-job", lockAtMostFor = "PT15M")
   public void logPortalToRiiDiff() {
     var riiDocumentNumbers = fetchRiiDocumentNumbers();
