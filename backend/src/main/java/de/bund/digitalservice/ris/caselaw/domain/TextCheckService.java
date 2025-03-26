@@ -233,7 +233,7 @@ public class TextCheckService {
               .append(" ")
               .append(attr.getKey())
               .append("=\"")
-              .append(attr.getValue())
+              .append(attr.getValue().replace("\"", "&quot;"))
               .append("\"");
         }
       }

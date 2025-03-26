@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResp
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -340,5 +341,22 @@ class TextCheckServiceTest {
     assertNotNull(response);
     assertEquals(htmlText, response.htmlText());
     assertEquals(0, response.matches().size());
+  }
+
+  @Test
+  void testTransformAttributeWithQuotes() {
+    String htmlText =
+        "<p class=\"font-bold text-white bg-blue-700 before:content-[&quot;Rd_&quot;] ml-1 pr-1\" >test text</p>";
+    String normalizedHtml = TextCheckService.normalizeHTML(Jsoup.parse(htmlText));
+    assertEquals(
+        "<p class=\"font-bold text-white bg-blue-700 before:content-[&quot;Rd_&quot;] ml-1 pr-1\">test text</p>",
+        normalizedHtml);
+  }
+
+  @Test
+  void testTransformGtAndLt() {
+    String htmlText = "<p>test with gt &lt; and lt &gt; text</p>";
+    String normalizedHtml = TextCheckService.normalizeHTML(Jsoup.parse(htmlText));
+    assertEquals("<p>test with gt &lt; and lt &gt; text</p>", normalizedHtml);
   }
 }
