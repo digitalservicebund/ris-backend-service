@@ -199,7 +199,6 @@ public class TextCheckService {
 
     @Override
     public void head(Node node, int depth) {
-
       if (node instanceof TextNode textNode) {
         // Use getWholeText() to capture non-breaking spaces
         String processedText = textNode.getWholeText();
@@ -242,10 +241,10 @@ public class TextCheckService {
     }
 
     public static boolean shouldClose(Node node) {
-      return !(node instanceof TextNode)
+      return !node.nodeName().startsWith("#")
+          && !(node instanceof TextNode)
           && stream(new String[] {"col", "img", "br", "hr"})
-              .noneMatch(node.nodeName()::equals) // self-closing tags do not need to be closed
-          && !node.nodeName().startsWith("#");
+              .noneMatch(node.nodeName()::equals); // self-closing tags do not need to be closed;
     }
 
     @NotNull
