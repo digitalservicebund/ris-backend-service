@@ -95,24 +95,25 @@ public class LanguageToolService extends TextCheckService {
       StringBuilder currentText = new StringBuilder();
       for (char c : text.toCharArray()) {
         if (c == '<') {
-          addTextEntry(currentText);
+          addTextEntry(currentText.toString());
+          currentText.setLength(0); // Reset
           addMarkupEntry("&lt;", "&lt;");
         } else if (c == '>') {
-          addTextEntry(currentText);
+          addTextEntry(currentText.toString());
+          currentText.setLength(0); // Reset
           addMarkupEntry("&gt;", "&gt;");
         } else {
           currentText.append(c);
         }
       }
-      addTextEntry(currentText);
+      addTextEntry(currentText.toString());
     }
 
-    private void addTextEntry(StringBuilder text) {
+    private void addTextEntry(String text) {
       if (text.isEmpty()) return;
       JsonObject textEntry = new JsonObject();
-      textEntry.add("text", new JsonPrimitive(text.toString()));
+      textEntry.add("text", new JsonPrimitive(text));
       annotations.add(textEntry);
-      text.setLength(0); // Reset
     }
 
     private void addMarkupEntry(String markup, String nodeName) {
