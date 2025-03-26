@@ -256,7 +256,7 @@ class TextCheckServiceTest {
                 Match.builder()
                     .id(1)
                     .offset(18)
-                    .length(11)
+                    .length(17)
                     .rule(Rule.builder().issueType("typo").build())
                     .build()));
     when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
@@ -266,7 +266,34 @@ class TextCheckServiceTest {
 
     assertNotNull(response);
     assertEquals(
-        "<p>This is a test <text-check id=\"1\" type=\"typo\">> 10 & < 20</text-check>. Also \"quoted\". And ♥ and ♥</p>",
+        "<p>This is a test <text-check id=\"1\" type=\"typo\">&gt; 10 & &lt; 20</text-check>. Also \"quoted\". And ♥ and ♥</p>",
+        response.htmlText());
+    assertEquals(1, response.matches().size());
+  }
+
+  @Test
+  void testCheckCategoryByHTML_withMatchesAndEncodedTags() {
+    String htmlText = "<p>This text contains a fake &lt;tag&gt;</p>";
+    CategoryType categoryType = CategoryType.REASONS;
+
+    TextCheckService mockService = mock(TextCheckService.class);
+    when(mockService.check(any(String.class)))
+        .thenReturn(
+            List.of(
+                Match.builder()
+                    .id(1)
+                    .offset(33)
+                    .length(3)
+                    .rule(Rule.builder().issueType("typo").build())
+                    .build()));
+    when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
+        .thenCallRealMethod();
+
+    TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
+
+    assertNotNull(response);
+    assertEquals(
+        "<p>This text contains a fake &lt;<text-check id=\"1\" type=\"typo\">tag</text-check>&gt;</p>",
         response.htmlText());
     assertEquals(1, response.matches().size());
   }

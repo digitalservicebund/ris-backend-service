@@ -204,4 +204,24 @@ class LanguageToolServiceTest {
     Assertions.assertEquals("<br>", result.get(3).getAsJsonObject().get("markup").getAsString());
     Assertions.assertEquals("</div>", result.get(4).getAsJsonObject().get("markup").getAsString());
   }
+
+  @Test
+  void testKeepEncodedGtAndLtChars() {
+    String html = "<p>This text contains a fake &lt;tag&gt; and text afterwards</p>";
+    Document doc = Jsoup.parse(html);
+    JsonArray result = getAnnotationsArray(doc);
+
+    Assertions.assertEquals(7, result.size());
+    Assertions.assertEquals("<p>", result.get(0).getAsJsonObject().get("markup").getAsString());
+    Assertions.assertEquals(
+        "This text contains a fake ", result.get(1).getAsJsonObject().get("text").getAsString());
+    Assertions.assertEquals("&lt;", result.get(2).getAsJsonObject().get("markup").getAsString());
+    Assertions.assertEquals("<", result.get(2).getAsJsonObject().get("interpretAs").getAsString());
+    Assertions.assertEquals("tag", result.get(3).getAsJsonObject().get("text").getAsString());
+    Assertions.assertEquals("&gt;", result.get(4).getAsJsonObject().get("markup").getAsString());
+    Assertions.assertEquals(">", result.get(4).getAsJsonObject().get("interpretAs").getAsString());
+    Assertions.assertEquals(
+        " and text afterwards", result.get(5).getAsJsonObject().get("text").getAsString());
+    Assertions.assertEquals("</p>", result.get(6).getAsJsonObject().get("markup").getAsString());
+  }
 }

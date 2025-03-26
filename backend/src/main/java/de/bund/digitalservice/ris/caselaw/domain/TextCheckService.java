@@ -14,7 +14,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
@@ -126,7 +125,7 @@ public class TextCheckService {
     }
 
     // normalize HTML to assure correct positioning
-    String normalizedHtml = StringEscapeUtils.unescapeHtml4(normalizeHTML(Jsoup.parse(htmlText)));
+    String normalizedHtml = normalizeHTML(Jsoup.parse(htmlText));
 
     List<Match> matches = check(normalizedHtml);
 
@@ -202,6 +201,8 @@ public class TextCheckService {
       if (node instanceof TextNode textNode) {
         // Use getWholeText() to capture non-breaking spaces
         String processedText = textNode.getWholeText();
+        processedText = processedText.replace("<", "&lt;");
+        processedText = processedText.replace(">", "&gt;");
 
         if (!processedText.isEmpty()) {
           builder.append(processedText);

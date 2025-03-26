@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -78,65 +79,69 @@ public class LanguageToolService extends TextCheckService {
     return annotations;
   }
 
-  private record AnnotationsNodeVisitor(JsonArray annotations) implements NodeVisitor {
-    @Override
-    public void head(Node node, int depth) {
-      proceedText(node);
-      proceedElements(node);
+  private record AnnotationsNodeVisitor(JsonArray annotations)
+      implements NodeVisitor { // interpretAs is used to specify how to interpret the text of the
+    // node
+    static Map<String, String> interpretAs =
+        Map.of("p", "\n\n", "br", "\n", "&gt;", ">", "&lt;", "<", "img", "Bild");
+
+    /**
+     * Adds the given text to the annotations. Treats characters '<' and '>' as markup and all other
+     * characters as text.
+     *
+     * @param text the text to process
+     */
+    private void processTextNode(String text) {
+      StringBuilder currentText = new StringBuilder();
+      for (char c : text.toCharArray()) {
+        if (c == '<') {
+          addTextEntry(currentText);
+          addMarkupEntry("&lt;", "&lt;");
+        } else if (c == '>') {
+          addTextEntry(currentText);
+          addMarkupEntry("&gt;", "&gt;");
+        } else {
+          currentText.append(c);
+        }
+      }
+      addTextEntry(currentText);
     }
 
-    private void proceedElements(Node node) {
-      if (node.nodeName().startsWith("#")) {
-        return;
-      }
+    private void addTextEntry(StringBuilder text) {
+      if (text.isEmpty()) return;
+      JsonObject textEntry = new JsonObject();
+      textEntry.add("text", new JsonPrimitive(text.toString()));
+      annotations.add(textEntry);
+      text.setLength(0); // Reset
+    }
 
+    private void addMarkupEntry(String markup, String nodeName) {
       JsonObject markupEntry = new JsonObject();
-      markupEntry.add("markup", new JsonPrimitive(NormalizingNodeVisitor.buildOpeningTag(node)));
-
-      proceedParagraph(node, markupEntry);
-      proceedBreaks(node, markupEntry);
-
+      markupEntry.add("markup", new JsonPrimitive(markup));
+      if (nodeName != null && interpretAs.containsKey(nodeName)) {
+        markupEntry.add("interpretAs", new JsonPrimitive(interpretAs.get(nodeName)));
+      }
       annotations.add(markupEntry);
     }
 
-    private void proceedBreaks(Node node, JsonObject markupEntry) {
-      if (node.nodeName().startsWith("#") || !node.nodeName().equals("br")) {
-        return;
-      }
-
-      markupEntry.add("interpretAs", new JsonPrimitive("\n"));
-    }
-
-    private void proceedParagraph(Node node, JsonObject markupEntry) {
-      if (node.nodeName().startsWith("#") || !node.nodeName().equals("p")) {
-        return;
-      }
-
-      markupEntry.add("interpretAs", new JsonPrimitive("\n\n"));
-    }
-
-    private void proceedText(Node node) {
+    @Override
+    public void head(Node node, int depth) {
       if (node instanceof TextNode textNode) {
-        // Use getWholeText() to capture non-breaking spaces
         String processedText = textNode.getWholeText();
-
         if (!processedText.isEmpty()) {
-          JsonObject textEntry = new JsonObject();
-          textEntry.add("text", new JsonPrimitive(processedText));
-          annotations.add(textEntry);
+          processTextNode(processedText);
         }
+      } else if (!node.nodeName().startsWith("#")) {
+        String openingTag = NormalizingNodeVisitor.buildOpeningTag(node);
+        addMarkupEntry(openingTag, node.nodeName());
       }
     }
 
     @Override
     public void tail(Node node, int depth) {
-      if (!NormalizingNodeVisitor.shouldClose(node)) {
-        return;
+      if (NormalizingNodeVisitor.shouldClose(node)) {
+        addMarkupEntry(NormalizingNodeVisitor.buildClosingTag(node), null);
       }
-
-      JsonObject markupEntry = new JsonObject();
-      markupEntry.add("markup", new JsonPrimitive(NormalizingNodeVisitor.buildClosingTag(node)));
-      annotations.add(markupEntry);
     }
   }
 }
