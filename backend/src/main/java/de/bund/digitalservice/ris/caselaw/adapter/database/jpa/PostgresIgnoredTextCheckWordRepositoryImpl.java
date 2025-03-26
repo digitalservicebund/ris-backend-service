@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.IgnoredTextCheckWo
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
@@ -19,10 +18,10 @@ public class PostgresIgnoredTextCheckWordRepositoryImpl implements IgnoredTextCh
 
   @Override
   public List<IgnoredTextCheckWord> findAllByDocumentationOfficesOrUnitAndWords(
-      List<UUID> documentationOfficeIds, List<UUID> documentationUnitIds, List<String> words) {
+      List<UUID> documentationOfficeIds, UUID documentationUnitId, List<String> words) {
     return repository
         .findAllByDocumentationOfficesIdsOrUnitIdsAndWords(
-            documentationOfficeIds, documentationUnitIds, words)
+            documentationOfficeIds, documentationUnitId, words)
         .stream()
         .map(IgnoredTextCheckWordTransformer::transformToDomain)
         .toList();

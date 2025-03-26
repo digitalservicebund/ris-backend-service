@@ -5,9 +5,11 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.repository.NoRepositoryBean;
 
+import javax.annotation.Nullable;
+
 @NoRepositoryBean
 public interface IgnoredTextCheckWordRepository {
 
   List<IgnoredTextCheckWord> findAllByDocumentationOfficesOrUnitAndWords(
-      List<UUID> documentationOfficeIds, List<UUID> documentationUnitIds, List<String> words);
+      List<UUID> documentationOfficeIds, @Nullable UUID documentationUnitId, List<String> words);
 }
