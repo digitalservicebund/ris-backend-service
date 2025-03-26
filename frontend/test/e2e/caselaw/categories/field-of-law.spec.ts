@@ -410,6 +410,9 @@ test.describe("field of law", () => {
     await page.keyboard.press("Enter")
 
     await expect(page.getByLabel("BR-05-01-06 hinzufügen")).toBeVisible()
+    await expect(
+      page.getByText("BR-05-01-06 | entgangener Gewinn"),
+    ).toBeVisible() // await tree view
 
     await page.getByRole("button", { name: "Suche zurücksetzen" }).click()
 
