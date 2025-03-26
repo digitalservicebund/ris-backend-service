@@ -76,4 +76,4 @@ where
 delete from
     incremental_migration.edition
 where
-    name LIKE '2024, e2e\-%';
+    name LIKE '%e2e\-%';
