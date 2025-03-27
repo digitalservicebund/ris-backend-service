@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
@@ -34,7 +33,6 @@ import org.springframework.stereotype.Service;
 public class PublicPortalPublicationService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final PortalPublicationJobRepository portalPublicationJobRepository;
   private final PublicPortalBucket publicPortalBucket;
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
@@ -46,15 +44,13 @@ public class PublicPortalPublicationService {
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,
       PublicPortalBucket publicPortalBucket,
-      ObjectMapper objectMapper,
-      PortalPublicationJobRepository portalPublicationJobRepository) {
+      ObjectMapper objectMapper) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.publicPortalBucket = publicPortalBucket;
     this.objectMapper = objectMapper;
     this.xmlUtilService = xmlUtilService;
     this.ldmlTransformer = new PublicPortalTransformer(documentBuilderFactory);
-    this.portalPublicationJobRepository = portalPublicationJobRepository;
   }
 
   /**
@@ -125,44 +121,23 @@ public class PublicPortalPublicationService {
   //                    ↓ minute (0-59)
   //                 ↓ second (0-59)
   // Default:        0 30 4 * * * (After migration: CET: 5:30)
-  @Scheduled(cron = "0 30 11 * * *")
+  @Scheduled(cron = "0 50 11 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
-  public void logDatabaseToBucketDiff() {
-    log.info(
-        "Checking for discrepancies between publishable doc units in database and files in portal bucket.");
-    List<String> databaseDocumentNumbers =
-        documentationUnitRepository.findAllDocumentNumbersByMatchingPublishCriteria();
+  public void logPortalPublicationSanityCheck() {
     List<String> portalBucketDocumentNumbers =
         publicPortalBucket.getAllFilenames().stream()
             .filter(fileName -> fileName.contains(".xml"))
             .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
             .toList();
 
-    List<String> inBucketNotInDatabase =
-        portalBucketDocumentNumbers.stream()
-            .filter(documentNumber -> !databaseDocumentNumbers.contains(documentNumber))
-            .toList();
+    logDatabaseToBucketDiff(portalBucketDocumentNumbers);
+    logBucketToRechtsprechungImInternetDiff(portalBucketDocumentNumbers);
+  }
 
-    List<String> inDatabaseNotInBucket =
-        databaseDocumentNumbers.stream()
-            .filter(documentNumber -> !portalBucketDocumentNumbers.contains(documentNumber))
-            .toList();
-
-    log.info("Number of LDML files in bucket: {}", portalBucketDocumentNumbers.size());
-    log.info(
-        "Found {} publishable doc units by database query but not in bucket.",
-        inDatabaseNotInBucket.size());
-    log.info(
-        "Document numbers found in database but not in bucket: {}",
-        inDatabaseNotInBucket.stream().map(Object::toString).collect(Collectors.joining(", ")));
-    log.info(
-        "Found {} doc units in bucket but not by database query.", inBucketNotInDatabase.size());
-    log.info(
-        "Document numbers found in bucket but not in database: {}",
-        inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
-
+  private void logBucketToRechtsprechungImInternetDiff(List<String> portalBucketDocumentNumbers) {
     log.info(
         "Checking for discrepancies between published doc units and Rechtsprechung im Internet...");
+
     var riiDocumentNumbers = fetchRiiDocumentNumbers();
     log.info("Number of documents in Rechtsprechung im Internet: {}", riiDocumentNumbers.size());
 
@@ -190,6 +165,33 @@ public class PublicPortalPublicationService {
           "Document numbers found in Portal but not in Rechtsprechung im Internet: {}",
           inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
     }
+  }
+
+  private void logDatabaseToBucketDiff(List<String> portalBucketDocumentNumbers) {
+    List<String> databaseDocumentNumbers =
+        documentationUnitRepository.findAllDocumentNumbersByMatchingPublishCriteria();
+    List<String> inBucketNotInDatabase =
+        portalBucketDocumentNumbers.stream()
+            .filter(documentNumber -> !databaseDocumentNumbers.contains(documentNumber))
+            .toList();
+
+    List<String> inDatabaseNotInBucket =
+        databaseDocumentNumbers.stream()
+            .filter(documentNumber -> !portalBucketDocumentNumbers.contains(documentNumber))
+            .toList();
+
+    log.info("Number of LDML files in bucket: {}", portalBucketDocumentNumbers.size());
+    log.info(
+        "Found {} publishable doc units by database query but not in bucket.",
+        inDatabaseNotInBucket.size());
+    log.info(
+        "Document numbers found in database but not in bucket: {}",
+        inDatabaseNotInBucket.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    log.info(
+        "Found {} doc units in bucket but not by database query.", inBucketNotInDatabase.size());
+    log.info(
+        "Document numbers found in bucket but not in database: {}",
+        inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
   }
 
   private List<String> fetchRiiDocumentNumbers() {
