@@ -6,6 +6,11 @@ import { IgnoredTextCheckWord, Match } from "@/types/textCheck"
 const props = defineProps<{
   match: Match
 }>()
+
+const emit = defineEmits<{
+  "ignoreTextCheckWord:add": [void]
+}>()
+
 const store = useDocumentUnitStore()
 
 async function addWordToDocOffice() {
@@ -17,6 +22,7 @@ async function addWordToDocOffice() {
     await languageToolService.addIgnoredWordForDocumentationOffice(
       newIgnoredTextCheckWord,
     )
+  emit("ignoreTextCheckWord:add")
 }
 </script>
 <template>
