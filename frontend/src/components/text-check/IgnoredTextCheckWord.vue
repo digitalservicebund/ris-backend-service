@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { IgnoredTextCheckWord, Match } from "@/types/textCheck"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { IgnoredTextCheckWord, Match } from "@/types/textCheck"
 
-const store = useDocumentUnitStore()
 const props = defineProps<{
   match: Match
 }>()
+const store = useDocumentUnitStore()
 
 async function addWordToDocOffice() {
   const newIgnoredTextCheckWord: IgnoredTextCheckWord = {
@@ -20,7 +20,7 @@ async function addWordToDocOffice() {
 }
 </script>
 <template>
-  <div>
+  <div v-if="match.rule.issueType == 'misspelling'">
     <button class="ds-link-01-bold" @click="addWordToDocOffice">
       Zum globalen Wörterbuch hinzufügen
     </button>
