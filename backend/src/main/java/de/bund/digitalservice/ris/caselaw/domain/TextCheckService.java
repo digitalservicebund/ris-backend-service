@@ -289,4 +289,9 @@ public class TextCheckService {
 
     return matches.stream().filter(match -> !ignoredTextCheckWords.contains(match.word())).toList();
   }
+
+  public IgnoredTextCheckWord addIgnoredTextCheckWord(IgnoredTextCheckWord ignoredTextCheckWord) {
+
+    return ignoredTextCheckWordRepository.addIgnoredTextCheckWord(ignoredTextCheckWord);
+  }
 }
