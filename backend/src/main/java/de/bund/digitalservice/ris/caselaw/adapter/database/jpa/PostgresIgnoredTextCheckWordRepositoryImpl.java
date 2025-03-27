@@ -17,6 +17,12 @@ public class PostgresIgnoredTextCheckWordRepositoryImpl implements IgnoredTextCh
   }
 
   @Override
+  public IgnoredTextCheckWord addIgnoredTextCheckWord(IgnoredTextCheckWord ignoredTextCheckWord) {
+    return IgnoredTextCheckWordTransformer.transformToDomain(
+        repository.save(IgnoredTextCheckWordTransformer.transformToDTO(ignoredTextCheckWord)));
+  }
+
+  @Override
   public List<IgnoredTextCheckWord> findAllByDocumentationOfficesOrUnitAndWords(
       List<UUID> documentationOfficeIds, UUID documentationUnitId, List<String> words) {
     return repository
