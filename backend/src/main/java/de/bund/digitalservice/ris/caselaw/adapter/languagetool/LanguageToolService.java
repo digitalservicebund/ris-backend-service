@@ -36,9 +36,10 @@ public class LanguageToolService extends TextCheckService {
   public LanguageToolService(
       LanguageToolConfig languageToolConfig,
       DocumentationUnitService documentationUnitService,
-      DocumentationOfficeService documentationOfficeService,IgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
+      DocumentationOfficeService documentationOfficeService,
+      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
 
-    super(documentationUnitService, documentationOfficeService, ignoredTextCheckWordRepository );
+    super(documentationUnitService, documentationOfficeService, ignoredTextCheckWordRepository);
     this.languageToolConfig = languageToolConfig;
   }
 
