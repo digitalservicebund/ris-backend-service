@@ -32,7 +32,7 @@ text-check {
     }
   }
 
-  &[ignored="true"] {
+  &[type="ignored"] {
     border-bottom: none;
     background-color: rgba($color: #eeb55c, $alpha: 20%);
 
