@@ -36,7 +36,6 @@ public class IgnoredTextCheckWordDTO {
   private DocumentationOfficeDTO documentationOffice;
 
   @ManyToOne
-  @NotNull
   @JoinColumn(name = "documentation_unit_id")
   private DocumentationUnitDTO documentationUnit;
 
