@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.TextCheckMockService;
@@ -16,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,12 +30,18 @@ import org.junit.jupiter.params.provider.EnumSource;
 class TextCheckServiceTest {
 
   private DocumentationUnitService documentationUnitService;
+  private DocumentationOfficeService documentationOfficeService;
+  private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
   private TextCheckService textCheckService;
 
   @BeforeEach
   void setUp() {
     documentationUnitService = mock(DocumentationUnitService.class);
-    textCheckService = new TextCheckMockService(documentationUnitService);
+    documentationOfficeService = mock(DocumentationOfficeService.class);
+    ignoredTextCheckWordRepository = mock(IgnoredTextCheckWordRepository.class);
+    textCheckService =
+        new TextCheckMockService(
+            documentationUnitService, documentationOfficeService, ignoredTextCheckWordRepository);
   }
 
   @Test
@@ -151,7 +159,7 @@ class TextCheckServiceTest {
     String htmlText = "<p>text text widt missspelling</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
             List.of(
@@ -190,7 +198,7 @@ class TextCheckServiceTest {
     String htmlText = "<p>z</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
             List.of(
@@ -222,7 +230,7 @@ class TextCheckServiceTest {
     String htmlText = "<p>text with a <border-number number=\"2\">missspelling</border-number></p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
             List.of(
@@ -250,7 +258,7 @@ class TextCheckServiceTest {
         "<p>This is a test &gt; 10 &amp;&nbsp;&lt; 20. Also &quot;quoted&quot;. And &#x2665; and &#9829;</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
             List.of(
@@ -277,8 +285,9 @@ class TextCheckServiceTest {
     String htmlText = "<p>This text contains a fake &lt;tag&gt;</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
-    when(mockService.check(any(String.class)))
+    TextCheckService spyService = spy(textCheckService);
+
+    when(spyService.check(any(String.class)))
         .thenReturn(
             List.of(
                 Match.builder()
@@ -287,10 +296,10 @@ class TextCheckServiceTest {
                     .length(3)
                     .rule(Rule.builder().issueType("typo").build())
                     .build()));
-    when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
+    when(spyService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
         .thenCallRealMethod();
 
-    TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
+    TextCheckCategoryResponse response = spyService.checkCategoryByHTML(htmlText, categoryType);
 
     assertNotNull(response);
     assertEquals(
@@ -304,7 +313,7 @@ class TextCheckServiceTest {
     String htmlText = "<p>This is a,<br>with line<br>breaks</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
             List.of(
@@ -331,7 +340,8 @@ class TextCheckServiceTest {
     String htmlText = "<p>test text</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
+
     when(mockService.check(any(String.class))).thenReturn(new ArrayList<>());
     when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
         .thenCallRealMethod();

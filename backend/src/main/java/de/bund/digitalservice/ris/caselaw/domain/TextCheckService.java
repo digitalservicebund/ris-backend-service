@@ -7,6 +7,8 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckUnknownCateg
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,13 +25,24 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.NodeTraversor;
 import org.jsoup.select.NodeVisitor;
+import org.springframework.stereotype.Service;
 
 @Slf4j
+@Service
 public class TextCheckService {
   private final DocumentationUnitService documentationUnitService;
 
-  public TextCheckService(DocumentationUnitService documentationUnitService) {
+  private final DocumentationOfficeService documentationOfficeService;
+
+  private final IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+
+  public TextCheckService(
+      DocumentationUnitService documentationUnitService,
+      DocumentationOfficeService documentationOfficeService,
+      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
     this.documentationUnitService = documentationUnitService;
+    this.documentationOfficeService = documentationOfficeService;
+    this.ignoredTextCheckWordRepository = ignoredTextCheckWordRepository;
   }
 
   public List<Match> check(String text) {
@@ -70,7 +83,6 @@ public class TextCheckService {
     }
 
     Documentable documentable = documentationUnitService.getByUuid(id);
-
     if (documentable instanceof DocumentationUnit documentationUnit) {
       return switch (category) {
         case REASONS -> checkCategoryByHTML(documentationUnit.longTexts().reasons(), category);
@@ -124,6 +136,11 @@ public class TextCheckService {
       return null;
     }
 
+    List<UUID> docOfficeIds =
+        documentationOfficeService.getDocumentationOffices("juris").stream()
+            .map(DocumentationOffice::uuid)
+            .toList();
+
     // normalize HTML to assure correct positioning
     String normalizedHtml = normalizeHTML(Jsoup.parse(htmlText));
 
@@ -132,8 +149,10 @@ public class TextCheckService {
     StringBuilder newHtmlText = new StringBuilder();
     AtomicInteger lastPosition = new AtomicInteger(0);
 
+    List<Match> filteredMatches = filterIgnoredTextCheckWords(docOfficeIds, null, matches);
+
     List<Match> modifiedMatches =
-        matches.stream()
+        filteredMatches.stream()
             .map(match -> match.toBuilder().category(categoryType).build())
             .map(
                 match -> {
@@ -147,6 +166,7 @@ public class TextCheckService {
                   return match;
                 })
             .toList();
+
     modifiedMatches.forEach(
         match -> {
           newHtmlText
@@ -252,5 +272,21 @@ public class TextCheckService {
     public static String buildClosingTag(Node node) {
       return "</" + node.nodeName() + ">";
     }
+  }
+
+  public List<Match> filterIgnoredTextCheckWords(
+      List<UUID> documentationOfficeIds, UUID documentationUnitId, List<Match> matches) {
+
+    List<String> ignoredTextCheckWords =
+        ignoredTextCheckWordRepository
+            .findAllByDocumentationOfficesOrUnitAndWords(
+                documentationOfficeIds,
+                documentationUnitId,
+                matches.stream().map(Match::word).toList())
+            .stream()
+            .map(IgnoredTextCheckWord::getWord)
+            .toList();
+
+    return matches.stream().filter(match -> !ignoredTextCheckWords.contains(match.word())).toList();
   }
 }

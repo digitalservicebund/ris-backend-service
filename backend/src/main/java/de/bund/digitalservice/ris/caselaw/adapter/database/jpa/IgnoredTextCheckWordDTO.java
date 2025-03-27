@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -29,15 +30,23 @@ public class IgnoredTextCheckWordDTO {
 
   @Id @GeneratedValue private UUID id;
 
-  @ManyToOne @NotNull private DocumentationOfficeDTO documentationOffice;
+  @ManyToOne
+  @NotNull
+  @JoinColumn(name = "documentation_office_id")
+  private DocumentationOfficeDTO documentationOffice;
 
-  @ManyToOne @NotNull private DocumentationUnitDTO documentationUnit;
+  @ManyToOne
+  @NotNull
+  @JoinColumn(name = "documentation_unit_id")
+  private DocumentationUnitDTO documentationUnit;
 
   @Column
   @Size(max = 255)
   private String word;
 
-  @Column @ToString.Include private Integer jurisId;
+  @Column(name = "juris_id")
+  @ToString.Include
+  private Integer jurisId;
 
   @Column(name = "created_at", updatable = false)
   @CreationTimestamp
