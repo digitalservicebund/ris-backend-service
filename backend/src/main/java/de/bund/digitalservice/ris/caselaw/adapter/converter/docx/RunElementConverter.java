@@ -28,6 +28,7 @@ import org.docx4j.dml.wordprocessingDrawing.STAlignH;
 import org.docx4j.dml.wordprocessingDrawing.STWrapText;
 import org.docx4j.vml.CTImageData;
 import org.docx4j.vml.CTShape;
+import org.docx4j.vml.CTShapetype;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.FldChar;
 import org.docx4j.wml.Pict;
@@ -157,6 +158,8 @@ public class RunElementConverter {
               if (child instanceof JAXBElement<?> jaxbElement) {
                 if (jaxbElement.getDeclaredType() == CTShape.class) {
                   parseCTShape(parent, (CTShape) jaxbElement.getValue(), converter);
+                } else if (jaxbElement.getValue() instanceof CTShapetype) {
+                  LOGGER.warn("Ignore shape type information.");
                 } else {
                   LOGGER.error(
                       "unknown jaxb child '{}' in pict element: {}",
@@ -166,7 +169,7 @@ public class RunElementConverter {
               } else if (child instanceof CTShape shape) {
                 parseCTShape(parent, shape, converter);
               } else {
-                LOGGER.info("unknown child in pict element: {}", child);
+                LOGGER.error("unknown child in pict element: {}", child);
               }
             });
   }
