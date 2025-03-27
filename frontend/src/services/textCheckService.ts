@@ -1,6 +1,10 @@
 import errorMessages from "@/i18n/errors.json"
-import httpClient, { ServiceResponse } from "@/services/httpClient"
+import httpClient, {
+  ResponseError,
+  ServiceResponse,
+} from "@/services/httpClient"
 import {
+  IgnoredTextCheckWord,
   TextCheckAllResponse,
   TextCheckCategoryResponse,
   TextCheckResponse,
@@ -15,6 +19,10 @@ interface TextCheckService {
     id: string,
     category?: string,
   ): Promise<ServiceResponse<TextCheckCategoryResponse>>
+
+  addIgnoredWordForDocumentationOffice(
+    ignoredTextCheckWord: IgnoredTextCheckWord,
+  ): Promise<ServiceResponse<IgnoredTextCheckWord>>
 }
 
 const service: TextCheckService = {
@@ -30,6 +38,7 @@ const service: TextCheckService = {
       text,
     )
   },
+
   async checkAll(id: string) {
     const response = await httpClient.get<TextCheckAllResponse>(
       `caselaw/documentunits/${id}/text-check/all`,
@@ -51,6 +60,30 @@ const service: TextCheckService = {
       response.error = {
         title: errorMessages.TEXT_CHECK_FAILED.title,
       }
+    }
+    return response
+  },
+
+  async addIgnoredWordForDocumentationOffice(
+    ignoredTextCheckWord: IgnoredTextCheckWord,
+  ) {
+    const response = await httpClient.post<
+      IgnoredTextCheckWord,
+      IgnoredTextCheckWord
+    >(
+      `caselaw/documentunits/text-check/ignored-words/add`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      ignoredTextCheckWord,
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.IGNORED_TEXT_CHECK_WORD_COULD_NOT_BE_SAVED.title,
+      } as ResponseError
     }
     return response
   },

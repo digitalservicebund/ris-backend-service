@@ -30,7 +30,7 @@ public interface DatabaseIgnoredTextCheckWordRepository
       "SELECT i FROM IgnoredTextCheckWordDTO i "
           + "WHERE i.documentationOffice.id IN :documentationOfficeIds "
           + "AND (:documentationUnitId IS NULL OR i.documentationUnit.id = :documentationUnitId) "
-          + "AND (UPPER(i.word) IN :words)")
+          + "AND (i.word IN :words)")
   List<IgnoredTextCheckWordDTO> findAllByDocumentationOfficesIdsOrUnitIdsAndWords(
       @Param("documentationOfficeIds") List<UUID> documentationOfficeIds,
       @Nullable @Param("documentationUnitId") UUID documentationUnitId,
