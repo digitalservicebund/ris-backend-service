@@ -5,6 +5,7 @@ import { IgnoredTextCheckWord, Match } from "@/types/textCheck"
 
 const props = defineProps<{
   match: Match
+  enabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -35,7 +36,7 @@ async function addWordToDocOffice() {
 }
 </script>
 <template>
-  <div v-if="match.rule.issueType == 'misspelling'">
+  <div v-if="match.rule.issueType == 'misspelling' && enabled">
     <button class="ds-link-01-bold" @click="addWordToDocOffice">
       Zum globalen Wörterbuch hinzufügen
     </button>
