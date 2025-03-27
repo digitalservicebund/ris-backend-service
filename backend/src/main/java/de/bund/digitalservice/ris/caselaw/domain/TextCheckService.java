@@ -90,29 +90,62 @@ public class TextCheckService {
 
       return switch (category) {
         case REASONS ->
-            checkCategoryByHTML(documentationUnit.longTexts().reasons(), category, docOfficeIds);
+            checkCategoryByHTML(
+                documentationUnit.longTexts().reasons(),
+                category,
+                docOfficeIds,
+                documentable.uuid());
         case CASE_FACTS ->
-            checkCategoryByHTML(documentationUnit.longTexts().caseFacts(), category, docOfficeIds);
+            checkCategoryByHTML(
+                documentationUnit.longTexts().caseFacts(),
+                category,
+                docOfficeIds,
+                documentable.uuid());
         case DECISION_REASONS ->
             checkCategoryByHTML(
-                documentationUnit.longTexts().decisionReasons(), category, docOfficeIds);
+                documentationUnit.longTexts().decisionReasons(),
+                category,
+                docOfficeIds,
+                documentable.uuid());
         case HEADNOTE ->
-            checkCategoryByHTML(documentationUnit.shortTexts().headnote(), category, docOfficeIds);
+            checkCategoryByHTML(
+                documentationUnit.shortTexts().headnote(),
+                category,
+                docOfficeIds,
+                documentable.uuid());
         case HEADLINE ->
-            checkCategoryByHTML(documentationUnit.shortTexts().headline(), category, docOfficeIds);
+            checkCategoryByHTML(
+                documentationUnit.shortTexts().headline(),
+                category,
+                docOfficeIds,
+                documentable.uuid());
         case GUIDING_PRINCIPLE ->
             checkCategoryByHTML(
-                documentationUnit.shortTexts().guidingPrinciple(), category, docOfficeIds);
+                documentationUnit.shortTexts().guidingPrinciple(),
+                category,
+                docOfficeIds,
+                documentable.uuid());
         case TENOR ->
-            checkCategoryByHTML(documentationUnit.longTexts().tenor(), category, docOfficeIds);
+            checkCategoryByHTML(
+                documentationUnit.longTexts().tenor(), category, docOfficeIds, documentable.uuid());
         case OTHER_LONG_TEXT ->
             checkCategoryByHTML(
-                documentationUnit.longTexts().otherLongText(), category, docOfficeIds);
+                documentationUnit.longTexts().otherLongText(),
+                category,
+                docOfficeIds,
+                documentable.uuid());
         case DISSENTING_OPINION ->
             checkCategoryByHTML(
-                documentationUnit.longTexts().dissentingOpinion(), category, docOfficeIds);
+                documentationUnit.longTexts().dissentingOpinion(),
+                category,
+                docOfficeIds,
+                documentable.uuid());
         case OUTLINE ->
-            checkCategoryByHTML(documentationUnit.longTexts().outline(), category, docOfficeIds);
+            checkCategoryByHTML(
+                documentationUnit.longTexts().outline(),
+                category,
+                docOfficeIds,
+                documentable.uuid());
         case UNKNOWN -> throw new TextCheckUnknownCategoryException(category.toString());
       };
     }
@@ -145,7 +178,7 @@ public class TextCheckService {
   }
 
   protected TextCheckCategoryResponse checkCategoryByHTML(
-      String htmlText, CategoryType categoryType, List<UUID> docOfficeIds) {
+      String htmlText, CategoryType categoryType, List<UUID> docOfficeIds, UUID docUnitId) {
     if (htmlText == null) {
       return null;
     }
@@ -158,7 +191,7 @@ public class TextCheckService {
     StringBuilder newHtmlText = new StringBuilder();
     AtomicInteger lastPosition = new AtomicInteger(0);
 
-    List<Match> filteredMatches = filterIgnoredTextCheckWords(docOfficeIds, null, matches);
+    List<Match> filteredMatches = addIgnoredTextChecks(docOfficeIds, docUnitId, matches);
 
     List<Match> modifiedMatches =
         filteredMatches.stream()
@@ -181,10 +214,11 @@ public class TextCheckService {
           newHtmlText
               .append(normalizedHtml, lastPosition.get(), match.offset())
               .append(
-                  "<text-check id=\"%s\" type=\"%s\">%s</text-check>"
+                  "<text-check id=\"%s\" type=\"%s\" ignored=\"%s\">%s</text-check>"
                       .formatted(
                           match.id(),
                           match.rule().issueType().toLowerCase(),
+                          !match.ignoredTextCheckWords().isEmpty(),
                           normalizedHtml.substring(
                               match.offset(), match.offset() + match.length())));
           lastPosition.set(match.offset() + match.length());
@@ -217,7 +251,7 @@ public class TextCheckService {
       return Collections.emptyList();
     }
 
-    return checkCategoryByHTML(text, categoryType, null).matches().stream()
+    return checkCategoryByHTML(text, categoryType, null, null).matches().stream()
         .map(match -> match.toBuilder().category(categoryType).build())
         .toList();
   }
@@ -283,20 +317,28 @@ public class TextCheckService {
     }
   }
 
-  public List<Match> filterIgnoredTextCheckWords(
+  public List<Match> addIgnoredTextChecks(
       List<UUID> documentationOfficeIds, UUID documentationUnitId, List<Match> matches) {
 
-    List<String> ignoredTextCheckWords =
+    List<IgnoredTextCheckWord> ignoredTextCheckWords =
         ignoredTextCheckWordRepository
             .findAllByDocumentationOfficesOrUnitAndWords(
-                documentationOfficeIds,
-                documentationUnitId,
-                matches.stream().map(Match::word).toList())
+                documentationOfficeIds, null, matches.stream().map(Match::word).toList())
             .stream()
-            .map(IgnoredTextCheckWord::getWord)
             .toList();
 
-    return matches.stream().filter(match -> !ignoredTextCheckWords.contains(match.word())).toList();
+    return matches.stream()
+        .map(
+            match ->
+                match.toBuilder()
+                    .ignoredTextCheckWords(
+                        ignoredTextCheckWords.stream()
+                            .filter(
+                                ignoredTextCheckWord ->
+                                    ignoredTextCheckWord.getWord().equals(match.word()))
+                            .toList())
+                    .build())
+        .toList();
   }
 
   public List<UUID> getDocumentationOfficeIds(UUID documentationOfficeId) {

@@ -17,6 +17,7 @@ export const TextCheckMark = Mark.create({
       {
         id: HTMLAttributes.id,
         type: HTMLAttributes.type,
+        ignored: HTMLAttributes.ignored,
       },
     ]
   },
@@ -32,6 +33,10 @@ export const TextCheckMark = Mark.create({
       type: {
         parseHTML: (element) => element.getAttribute("type"),
         renderHTML: (attributes) => ({ type: attributes.type }),
+      },
+      ignored: {
+        parseHTML: (element) => element.getAttribute("ignored"),
+        renderHTML: (attributes) => ({ ignored: attributes.ignored }),
       },
     }
   },
