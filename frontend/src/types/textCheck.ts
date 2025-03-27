@@ -67,7 +67,7 @@ export interface Suggestion {
 }
 
 export interface IgnoredTextCheckWord {
-  id: string
+  id?: string
   word: string
   documentationOffice: DocumentationOffice
 }

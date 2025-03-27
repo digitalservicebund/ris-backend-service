@@ -14,15 +14,24 @@ const emit = defineEmits<{
 const store = useDocumentUnitStore()
 
 async function addWordToDocOffice() {
+  if (!store.documentUnit?.coreData.documentationOffice) {
+    console.error("Documentation office does not exist")
+    return
+  }
+
   const newIgnoredTextCheckWord: IgnoredTextCheckWord = {
     word: props.match.word,
-    documentationOffice: store.documentUnit?.coreData.documentationOffice!,
+    documentationOffice: store.documentUnit.coreData.documentationOffice,
   }
-  const response =
+
+  try {
     await languageToolService.addIgnoredWordForDocumentationOffice(
       newIgnoredTextCheckWord,
     )
-  emit("ignoreTextCheckWord:add")
+    emit("ignoreTextCheckWord:add")
+  } catch (error) {
+    console.error("Error adding ignored word:", error)
+  }
 }
 </script>
 <template>
