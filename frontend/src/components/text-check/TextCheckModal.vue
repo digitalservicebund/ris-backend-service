@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import IgnoredTextCheckWord from "@/components/text-check/IgnoredTextCheckWord.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
 
 import { Match, Replacement } from "@/types/textCheck"
@@ -35,6 +36,8 @@ function getValues(replacements: Replacement[]) {
         {{ match.word }}
       </span>
     </div>
+
+    <IgnoredTextCheckWord :match="match" />
 
     <p>{{ match.shortMessage || match.message }}</p>
 

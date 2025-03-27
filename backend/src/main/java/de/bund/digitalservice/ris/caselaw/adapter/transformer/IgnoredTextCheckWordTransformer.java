@@ -22,6 +22,9 @@ public class IgnoredTextCheckWordTransformer {
     return IgnoredTextCheckWord.builder()
         .id(ignoredTextCheckWordDTO.getId())
         .word(ignoredTextCheckWordDTO.getWord())
+        .documentationOffice(
+            DocumentationOfficeTransformer.transformToDomain(
+                ignoredTextCheckWordDTO.getDocumentationOffice()))
         .build();
   }
 }
