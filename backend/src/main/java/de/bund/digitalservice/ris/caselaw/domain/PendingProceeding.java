@@ -41,6 +41,7 @@ public record PendingProceeding(
     ContentRelatedIndexing contentRelatedIndexing,
     List<Reference> caselawReferences,
     List<Reference> literatureReferences,
+    List<String> documentalists,
     String resolutionNote,
     boolean isResolved,
     String legalIssue,
