@@ -37,7 +37,10 @@ function getValues(replacements: Replacement[]) {
       </span>
     </div>
 
-    <IgnoredTextCheckWord :match="match" />
+    <IgnoredTextCheckWord
+      :match="match"
+      @ignore-text-check-word:add="ignoreSuggestion"
+    />
 
     <p>{{ match.shortMessage || match.message }}</p>
 
