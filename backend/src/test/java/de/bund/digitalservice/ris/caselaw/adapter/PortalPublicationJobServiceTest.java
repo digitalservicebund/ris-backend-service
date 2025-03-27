@@ -57,7 +57,7 @@ class PortalPublicationJobServiceTest {
 
     verify(publicPortalPublicationService, times(1)).publishDocumentationUnit("123");
     verify(publicPortalPublicationService, never()).deleteDocumentationUnit(anyString());
-    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of("123"), List.of());
+    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of("123.xml"), List.of());
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationStatus())
         .isEqualTo(PortalPublicationTaskStatus.SUCCESS);
@@ -73,7 +73,7 @@ class PortalPublicationJobServiceTest {
 
     verify(publicPortalPublicationService, never()).publishDocumentationUnit(anyString());
     verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("456");
-    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(), List.of("456"));
+    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(), List.of("456.xml"));
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationStatus())
         .isEqualTo(PortalPublicationTaskStatus.SUCCESS);
@@ -128,7 +128,7 @@ class PortalPublicationJobServiceTest {
 
     verify(publicPortalPublicationService, never()).publishDocumentationUnit(anyString());
     verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("312");
-    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(), List.of("312"));
+    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(), List.of("312.xml"));
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationStatus())
         .isEqualTo(PortalPublicationTaskStatus.SUCCESS);
@@ -160,7 +160,7 @@ class PortalPublicationJobServiceTest {
     verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("2");
     verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("4");
     verify(publicPortalPublicationService, times(1))
-        .uploadChangelog(List.of("3", "5"), List.of("4"));
+        .uploadChangelog(List.of("3.xml", "5.xml"), List.of("4.xml"));
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationStatus()).isEqualTo(PortalPublicationTaskStatus.ERROR);
     assertThat(jobs.get(1).getPublicationStatus()).isEqualTo(PortalPublicationTaskStatus.ERROR);

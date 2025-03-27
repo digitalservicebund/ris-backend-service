@@ -74,12 +74,14 @@ public class PortalPublicationJobService {
             .filter(job -> job.getPublicationType() == PortalPublicationTaskType.PUBLISH)
             .filter(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS)
             .map(PortalPublicationJobDTO::getDocumentNumber)
+            .map(documentNumber -> documentNumber + ".xml")
             .toList();
     List<String> deletedDocNumbers =
         pendingJobs.stream()
             .filter(job -> job.getPublicationType() == PortalPublicationTaskType.DELETE)
             .filter(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS)
             .map(PortalPublicationJobDTO::getDocumentNumber)
+            .map(documentNumber -> documentNumber + ".xml")
             .toList();
 
     if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {

@@ -29,7 +29,7 @@ public interface PortalPublicationJobRepository
 SELECT portalPublicationJob
 FROM PortalPublicationJobDTO portalPublicationJob
 WHERE portalPublicationJob.publicationStatus = 'PENDING'
-ORDER BY portalPublicationJob.createdAt ASC LIMIT 500
+ORDER BY portalPublicationJob.createdAt ASC LIMIT 50
 """)
   List<PortalPublicationJobDTO> findPendingJobsOrderedByCreationDate();
 }

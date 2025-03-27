@@ -219,7 +219,7 @@ class PortalPublicationJobIntegrationTest {
     assertThat(changelogContent)
         .isEqualTo(
             """
-                {"changed":["1","2"],"deleted":["1"]}""");
+                {"changed":["1.xml","2.xml"],"deleted":["1.xml"]}""");
 
     var deleteRequestBuilder = DeleteObjectRequest.builder();
     deleteCaptor.getValue().accept(deleteRequestBuilder);

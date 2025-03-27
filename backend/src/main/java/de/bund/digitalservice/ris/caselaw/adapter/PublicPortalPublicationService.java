@@ -79,7 +79,7 @@ public class PublicPortalPublicationService {
     }
 
     try {
-      publicPortalBucket.save(ldml.getUniqueId() + ".xml", fileContent.get());
+      publicPortalBucket.save(ldml.getFileName(), fileContent.get());
     } catch (BucketException e) {
       throw new PublishException("Could not save LDML to bucket.", e);
     }
