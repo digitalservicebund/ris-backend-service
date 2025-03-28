@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
 import InputText from "primevue/inputtext"
+import RadioButton from "primevue/radiobutton"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
@@ -8,7 +9,6 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import RadioInput from "@/components/input/RadioInput.vue"
 import { ValidationError } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
@@ -383,11 +383,10 @@ onBeforeUnmount(() => {
             label-class="ris-body1-regular"
             :label-position="LabelPosition.RIGHT"
           >
-            <RadioInput
+            <RadioButton
               v-model="reference.referenceType"
               aria-label="Rechtsprechung Fundstelle"
               name="referenceType"
-              size="medium"
               value="caselaw"
               @click="validationStore.reset()"
             />
@@ -402,7 +401,7 @@ onBeforeUnmount(() => {
             label-class="ris-body1-regular"
             :label-position="LabelPosition.RIGHT"
           >
-            <RadioInput
+            <RadioButton
               v-model="reference.referenceType"
               aria-label="Literatur Fundstelle"
               name="referenceType"

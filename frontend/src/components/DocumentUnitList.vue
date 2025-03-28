@@ -266,7 +266,7 @@ function onDelete() {
               listEntry.status?.publicationStatus ===
               PublicationState.EXTERNAL_HANDOVER_PENDING
             "
-            class="ds-body-reg-02"
+            class="ris-body2-regular"
           >
             {{
               " aus " +

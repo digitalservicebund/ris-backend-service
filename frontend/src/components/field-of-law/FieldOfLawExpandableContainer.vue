@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
+import RadioButton from "primevue/radiobutton"
 import { computed, nextTick, ref, watch } from "vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import FieldOfLawSummary from "@/components/field-of-law/FieldOfLawSummary.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import RadioInput from "@/components/input/RadioInput.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconAdd from "~icons/ic/baseline-add"
 
@@ -95,11 +95,10 @@ export enum InputMethod {
             :label-position="LabelPosition.RIGHT"
             @click="() => (inputMethod = InputMethod.DIRECT)"
           >
-            <RadioInput
+            <RadioButton
               id="direct"
               v-model="inputMethod"
               aria-label="Direkteingabe auswählen"
-              size="small"
               value="direct"
             />
           </InputField>
@@ -111,11 +110,10 @@ export enum InputMethod {
             :label-position="LabelPosition.RIGHT"
             @click="inputMethod = InputMethod.SEARCH"
           >
-            <RadioInput
+            <RadioButton
               id="search"
               v-model="inputMethod"
               aria-label="Sachgebietsuche auswählen"
-              size="small"
               value="search"
             />
           </InputField>

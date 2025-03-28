@@ -17,7 +17,6 @@ import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
     <div class="ris-label2-bold">.ris-label2-bold</div>
     <div class="ris-label3-regular">.ris-label3-regular</div>
     <div class="ris-label3-bold">.ris-label3-bold</div>
-    <div class="ds-label-section">.ds-label-section</div>
     <div class="ris-body1-regular">.ris-body1-regular</div>
     <div class="ris-body1-bold">.ris-body1-bold</div>
     <div class="ris-body2-regular">.ris-body2-regular</div>
