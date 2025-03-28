@@ -103,17 +103,17 @@ test("create and validate border number links", async ({
 
   await expect(validLink).toHaveAttribute("valid", "true")
   await expect(validLink).toHaveClass(
-    'font-bold text-white bg-blue-700 before:content-["Rd_"] ml-1 pr-1',
+    'ris-body1-bold text-white bg-blue-700 before:content-["Rd_"] ml-1 pr-1',
   )
 
   // check invalid border number links
   await expect(invalidLink).toHaveAttribute("valid", "false")
   await expect(invalidLink).toHaveClass(
-    'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
+    'ris-body1-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
   await expect(invalidHighestNumberLink).toHaveAttribute("valid", "false")
   await expect(invalidHighestNumberLink).toHaveClass(
-    'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
+    'ris-body1-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
 
   // Delete border numbers in reasons
@@ -128,6 +128,6 @@ test("create and validate border number links", async ({
   // check first border number link: should be invalid now
   await expect(validLink).toHaveAttribute("valid", "false")
   await expect(validLink).toHaveClass(
-    'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
+    'ris-body1-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
 })

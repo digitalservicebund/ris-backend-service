@@ -31,7 +31,7 @@ function getValues(replacements: Replacement[]) {
     data-testid="text-check-modal"
   >
     <div class="flex flex-row gap-8">
-      <span class="font-bold" data-testid="text-check-modal-word">
+      <span class="ris-body1-regular" data-testid="text-check-modal-word">
         {{ match.word }}
       </span>
     </div>

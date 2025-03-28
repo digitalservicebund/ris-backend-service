@@ -33,7 +33,7 @@ const service: HandoverEditionService = {
       response.data?.statusMessages?.forEach(
         (value) =>
           (description +=
-            '<li class="ris-body2-regular font-bold ml-[1rem] list-item">' +
+            '<li class="ris-body2-regular ris-body1-bold ml-[1rem] list-item">' +
             value +
             "</li>"),
       )

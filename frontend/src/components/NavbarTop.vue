@@ -40,7 +40,7 @@ const badge = computed(() => {
   >
     <div class="flex items-center gap-44">
       <div class="flex items-center">
-        <span class="text-14 px-[1rem] leading-16 font-bold uppercase">
+        <span class="ris-body1-bold px-24">
           <span aria-hidden="true" :style="{ color: fontColor }">
             Rechtsinformationen</span
           >

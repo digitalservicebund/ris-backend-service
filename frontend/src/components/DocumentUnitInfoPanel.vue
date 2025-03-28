@@ -83,7 +83,7 @@ watchEffect(() => {
   <div
     class="sticky top-0 z-30 flex h-[64px] flex-row items-center border-b border-solid border-gray-400 bg-blue-100 px-24 py-12"
   >
-    <h1 class="text font-bold">{{ props.heading }}</h1>
+    <h1 class="ris-body1-bold">{{ props.heading }}</h1>
     <span v-if="formattedInfo.length > 0" class="m-4"> | </span>
     <span
       class="overflow-hidden text-ellipsis whitespace-nowrap"
