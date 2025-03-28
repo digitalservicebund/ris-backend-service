@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import { computed } from "vue"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
 
+import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { Match, Replacement } from "@/types/textCheck"
 
 const props = defineProps<{
@@ -24,6 +26,10 @@ function ignoreSuggestion() {
 function getValues(replacements: Replacement[]) {
   return replacements.flatMap((replacement) => replacement.value)
 }
+
+const isMatchIgnored = computed(() => {
+  return NeurisTextCheckService.isMatchIgnored(props.match)
+})
 </script>
 
 <template>
@@ -38,15 +44,15 @@ function getValues(replacements: Replacement[]) {
     </div>
 
     <IgnoredWordHandler
-      adding-to-dictionary-enabled
+      v-if="isMatchIgnored"
       :match="match"
       @ignore-text-check-word:add="ignoreSuggestion"
     />
 
-    <p>{{ match.shortMessage || match.message }}</p>
+    <p v-if="!isMatchIgnored">{{ match.shortMessage || match.message }}</p>
 
     <ReplacementBar
-      v-if="match.ignoredTextCheckWords"
+      v-if="!isMatchIgnored"
       replacement-mode="single"
       :replacements="getValues(match.replacements)"
       @suggestion:ignore="ignoreSuggestion"

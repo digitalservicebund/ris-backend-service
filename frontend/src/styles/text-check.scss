@@ -33,11 +33,10 @@ text-check {
   }
 
   &[type="ignored"] {
-    border-bottom: none;
-    background-color: rgba($color: #eeb55c, $alpha: 20%);
+    border-bottom: 2px solid #01854A;
 
     &:hover {
-      background: rgba($color: #eeb55c, $alpha: 20%) !important;
+      background: rgba($color: #01854A, $alpha: 20%) !important;
     }
   }
 }

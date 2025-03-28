@@ -23,5 +23,5 @@ public class IgnoredTextCheckWord {
 
   @NotNull private IgnoredTextCheckType type;
 
-  boolean isEditable;
+  Boolean isEditable;
 }
