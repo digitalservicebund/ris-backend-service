@@ -6,7 +6,6 @@ text-check {
     background: rgba($color: #e86a69, $alpha: 20%);
   }
 
-
   &[type="style"] {
     border-bottom: 2px solid #9d8eff;
 
@@ -33,10 +32,10 @@ text-check {
   }
 
   &[type="ignored"] {
-    border-bottom: 2px solid #01854A;
+    border-bottom: 2px solid #01854a;
 
     &:hover {
-      background: rgba($color: #01854A, $alpha: 20%) !important;
+      background: rgba($color: #01854a, $alpha: 20%) !important;
     }
   }
 }
