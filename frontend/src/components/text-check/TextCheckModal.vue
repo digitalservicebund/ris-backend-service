@@ -45,7 +45,6 @@ const isMatchIgnored = computed(() => {
 
     <IgnoredWordHandler
       v-if="isMatchIgnored"
-      adding-to-dictionary-enabled
       :match="match"
       @ignore-text-check-word:add="ignoreSuggestion"
     />
