@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationJobService;
 import de.bund.digitalservice.ris.caselaw.adapter.PublicPortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PublicPortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
@@ -104,7 +105,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
       OAuthService.class,
       TestConfig.class,
       PortalPublicationJobService.class,
-      DocumentNumberPatternConfig.class
+      DocumentNumberPatternConfig.class,
+      RiiService.class
     },
     controllers = {DocumentationUnitController.class})
 class PortalPublicationJobIntegrationTest {
