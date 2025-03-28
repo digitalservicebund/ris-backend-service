@@ -141,7 +141,7 @@ function focusNext() {
         @keydown.right.stop.prevent="focusNext"
       >
         <span
-          class="ris-label3-regular text-18 inline overflow-hidden py-6 pl-8 text-ellipsis whitespace-nowrap"
+          class="ris-label3-regular inline overflow-hidden py-6 pl-8 text-ellipsis whitespace-nowrap"
           :class="{ 'pr-12': readOnly }"
           data-testid="chip-value"
           >{{ chip }}
@@ -150,7 +150,7 @@ function focusNext() {
         <button
           v-if="!readOnly"
           aria-label="Löschen"
-          class="text-14 absolute inset-y-0 right-0 flex h-full items-center rounded-r-full pr-6 pl-3 group-focus:bg-blue-900 group-focus:text-white"
+          class="absolute inset-y-0 right-0 flex h-full items-center rounded-r-full pr-6 pl-3 group-focus:bg-blue-900 group-focus:text-white"
           tabindex="-1"
           type="button"
           @click="deleteChip(i, chip)"

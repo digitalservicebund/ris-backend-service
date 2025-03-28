@@ -322,7 +322,7 @@ onBeforeMount(async () => {
         <span
           class="flex h-128 w-128 items-center justify-center rounded-full bg-blue-200"
         >
-          <IconFolderOpen class="text-64 text-blue-700" />
+          <IconFolderOpen class="text-blue-700" />
         </span>
         <span>Es wurden noch keine Vorgänge angelegt.</span>
       </div>
