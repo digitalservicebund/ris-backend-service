@@ -221,7 +221,7 @@ class PublicPortalPublicationServiceTest {
     when(publicPortalBucket.getAllFilenames()).thenReturn(List.of("123.xml", "456.xml", "789.xml"));
     ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> fileContentCaptor = ArgumentCaptor.forClass(String.class);
-    when(objectMapper.writeValueAsString(eq(new Changelog(List.of(), List.of("789.xml")))))
+    when(objectMapper.writeValueAsString(new Changelog(List.of(), List.of("789.xml"))))
         .thenReturn(
             """
                 {"changed":[],"deleted":["789.xml"]}""");
