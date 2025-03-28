@@ -78,14 +78,14 @@ public class TextCheckController {
   }
 
   @PostMapping(
-      value = "/text-check/ignored-words/add",
+      value = "{id}/text-check/ignored-words/add",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<IgnoredTextCheckWord> addIgnoredWord(
-      @RequestBody IgnoredTextCheckWord ignoredWord) {
+      @PathVariable("id") UUID id, @RequestBody IgnoredTextCheckWord ignoredWord) {
     try {
-      return ResponseEntity.ok(textCheckService.addIgnoredTextCheckWord(ignoredWord));
+      return ResponseEntity.ok(textCheckService.addIgnoredTextCheckWord(ignoredWord, id));
 
     } catch (Exception e) {
       log.error("Adding word failed", e);
