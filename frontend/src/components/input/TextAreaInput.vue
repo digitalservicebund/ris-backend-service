@@ -99,7 +99,7 @@ defineExpose({ focus })
     ref="textareaRef"
     v-model="localValue"
     :aria-label="ariaLabel"
-    class="ds-input h-unset py-12"
+    class="shadow-blue h-unset py-12"
     :class="{
       'has-error': hasError,
       'px-16': size === 'small',

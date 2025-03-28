@@ -85,7 +85,7 @@ watch(
         id="list-input-id"
         v-model="localModelValue"
         :aria-label="`${label} Input`"
-        class="ds-input h-auto resize-none overflow-hidden p-20"
+        class="shadow-blue h-auto resize-none overflow-hidden p-20"
         :data-testid="`${label}_ListInputEdit`"
         placeholder="Geben Sie jeden Wert in eine eigene Zeile ein"
         :rows="listItemCount"
