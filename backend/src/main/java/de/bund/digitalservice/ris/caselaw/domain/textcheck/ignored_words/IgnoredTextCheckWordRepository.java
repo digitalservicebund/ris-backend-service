@@ -8,7 +8,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface IgnoredTextCheckWordRepository {
 
-  IgnoredTextCheckWord addIgnoredTextCheckWord(IgnoredTextCheckWord ignoredTextCheckWord);
+  IgnoredTextCheckWord addIgnoredTextCheckWord(
+      IgnoredTextCheckWord ignoredTextCheckWord,
+      UUID documentationOfficeId,
+      UUID documentationUnitId);
 
   List<IgnoredTextCheckWord> findAllByDocumentationOfficesOrUnitAndWords(
       List<UUID> documentationOfficeIds, @Nullable UUID documentationUnitId, List<String> words);
