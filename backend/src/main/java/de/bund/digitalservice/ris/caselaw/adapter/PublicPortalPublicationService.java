@@ -117,7 +117,7 @@ public class PublicPortalPublicationService {
   //                    ↓ minute (0-59)
   //                 ↓ second (0-59)
   // Default:        0 30 4 * * * (After migration: CET: 5:30)
-  @Scheduled(cron = "0 30 9 * * *")
+  @Scheduled(cron = "0 30 4 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logPortalPublicationSanityCheck() {
     List<String> portalBucketDocumentNumbers =
