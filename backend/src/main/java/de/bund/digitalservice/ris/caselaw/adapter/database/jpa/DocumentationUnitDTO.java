@@ -67,8 +67,11 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   private DocumentTypeDTO documentType;
 
   // Aktenzeichen
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @OneToMany(
+      mappedBy = "documentationUnit",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
   @Builder.Default
   @OrderBy("rank")
   private List<FileNumberDTO> fileNumbers = new ArrayList<>();
@@ -158,8 +161,11 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   //  private Set<DeviatingDocumentNumber> deviatingDocumentNumbers = new HashSet<>();
   //
   // Abweichendes Aktenzeichen
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @OneToMany(
+      mappedBy = "documentationUnit",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
   @Builder.Default
   @OrderBy("rank")
   private List<DeviatingFileNumberDTO> deviatingFileNumbers = new ArrayList<>();

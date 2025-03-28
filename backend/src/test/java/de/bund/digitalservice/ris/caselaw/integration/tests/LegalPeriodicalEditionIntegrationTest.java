@@ -752,9 +752,11 @@ class LegalPeriodicalEditionIntegrationTest {
     referenceRepository.save(reference);
 
     // add status and source
+    var fileNumber = EntityBuilderTestUtil.createTestFileNumberDTO();
+    fileNumber.setDocumentationUnit(docUnit);
     documentationUnitRepository.save(
         docUnit.toBuilder()
-            .fileNumbers(List.of(EntityBuilderTestUtil.createTestFileNumberDTO()))
+            .fileNumbers(List.of(fileNumber))
             .source(
                 new ArrayList<>(
                     List.of(

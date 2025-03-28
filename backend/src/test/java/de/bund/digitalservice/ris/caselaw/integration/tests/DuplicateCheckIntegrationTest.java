@@ -40,6 +40,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigr
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -920,23 +921,34 @@ class DuplicateCheckIntegrationTest {
     void checkDuplicates_pendingProceedingWithFileNumberAndDate_shouldDoNothing()
         throws DocumentationUnitNotExistsException {
       // Arrange
+      var dto1 =
+          repository.save(
+              PendingProceedingDTO.builder()
+                  .documentationOffice(documentationOffice)
+                  .date(LocalDate.of(2023, 12, 11))
+                  .documentNumber("DocumentNumb1")
+                  .build());
       var pendingProceedingDTO =
-          PendingProceedingDTO.builder()
-              .documentationOffice(documentationOffice)
-              .date(LocalDate.of(2023, 12, 11))
-              .documentNumber("DocumentNumb1")
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+          dto1.toBuilder()
+              .fileNumbers(
+                  List.of(
+                      FileNumberDTO.builder()
+                          .rank(0L)
+                          .value("123")
+                          .documentationUnit(dto1)
+                          .build()))
               .build();
-      var decisionDTO =
-          DecisionDTO.builder()
-              .documentationOffice(documentationOffice)
-              .date(LocalDate.of(2023, 12, 11))
-              .documentNumber("DocumentNumb2")
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
-              .build();
+      var decision =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .deviatingDecisionDates(List.of(LocalDate.of(2023, 12, 11)))
+                      .documentNumber("DocumentNumb2")
+                      .fileNumbers(List.of("123"))
+                      .build()));
 
       repository.save(pendingProceedingDTO);
-      var decision = repository.save(decisionDTO);
 
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
 
@@ -957,23 +969,35 @@ class DuplicateCheckIntegrationTest {
       var court =
           databaseCourtRepository.save(
               CourtDTO.builder().type("BFH").isForeignCourt(false).isSuperiorCourt(true).build());
+      var dto1 =
+          repository.save(
+              PendingProceedingDTO.builder()
+                  .documentationOffice(documentationOffice)
+                  .court(court)
+                  .documentNumber("DocumentNumb1")
+                  .build());
       var pendingProceedingDTO =
-          PendingProceedingDTO.builder()
-              .documentationOffice(documentationOffice)
-              .court(court)
-              .documentNumber("DocumentNumb1")
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
+          dto1.toBuilder()
+              .fileNumbers(
+                  List.of(
+                      FileNumberDTO.builder()
+                          .rank(0L)
+                          .value("123")
+                          .documentationUnit(dto1)
+                          .build()))
               .build();
-      var decisionDTO =
-          DecisionDTO.builder()
-              .documentationOffice(documentationOffice)
-              .court(court)
-              .documentNumber("DocumentNumb2")
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
-              .build();
+      var decision =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .court(CourtTransformer.transformToDomain(court))
+                      .deviatingDecisionDates(List.of(LocalDate.of(2023, 12, 12)))
+                      .documentNumber("DocumentNumb2")
+                      .fileNumbers(List.of("123"))
+                      .build()));
 
       repository.save(pendingProceedingDTO);
-      var decision = repository.save(decisionDTO);
 
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
 
@@ -994,25 +1018,34 @@ class DuplicateCheckIntegrationTest {
       var court =
           databaseCourtRepository.save(
               CourtDTO.builder().type("BFH").isForeignCourt(false).isSuperiorCourt(true).build());
+      var dto1 =
+          repository.save(
+              PendingProceedingDTO.builder()
+                  .documentationOffice(documentationOffice)
+                  .court(court)
+                  .documentNumber("DocumentNumb1")
+                  .build());
       var pendingProceedingDTO =
-          PendingProceedingDTO.builder()
-              .documentationOffice(documentationOffice)
-              .court(court)
-              .documentNumber("DocumentNumb1")
+          dto1.toBuilder()
               .deviatingFileNumbers(
-                  List.of(DeviatingFileNumberDTO.builder().rank(0L).value("123").build()))
+                  List.of(
+                      DeviatingFileNumberDTO.builder()
+                          .rank(0L)
+                          .value("123")
+                          .documentationUnit(dto1)
+                          .build()))
               .build();
-      var decisionDTO =
-          DecisionDTO.builder()
-              .documentationOffice(documentationOffice)
-              .court(court)
-              .documentNumber("DocumentNumb2")
-              .deviatingFileNumbers(
-                  List.of(DeviatingFileNumberDTO.builder().rank(0L).value("123").build()))
-              .build();
+      var decision =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .deviatingFileNumbers(List.of("123"))
+                      .documentNumber("DocumentNumb2")
+                      .fileNumbers(List.of("123"))
+                      .build()));
 
       repository.save(pendingProceedingDTO);
-      var decision = repository.save(decisionDTO);
 
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
 
@@ -1030,33 +1063,39 @@ class DuplicateCheckIntegrationTest {
     void checkDuplicates_pendingProceedingWithDeviatingDateAndFileNumber_shouldDoNothing()
         throws DocumentationUnitNotExistsException {
       // Arrange
+      var dto1 =
+          repository.save(
+              PendingProceedingDTO.builder()
+                  .documentationOffice(documentationOffice)
+                  .deviatingDates(
+                      List.of(
+                          DeviatingDateDTO.builder()
+                              .rank(0L)
+                              .value(LocalDate.of(2023, 12, 12))
+                              .build()))
+                  .documentNumber("DocumentNumb1")
+                  .build());
       var pendingProceedingDTO =
-          PendingProceedingDTO.builder()
-              .documentationOffice(documentationOffice)
-              .deviatingDates(
+          dto1.toBuilder()
+              .fileNumbers(
                   List.of(
-                      DeviatingDateDTO.builder()
+                      FileNumberDTO.builder()
                           .rank(0L)
-                          .value(LocalDate.of(2023, 12, 12))
+                          .value("123")
+                          .documentationUnit(dto1)
                           .build()))
-              .documentNumber("DocumentNumb1")
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
               .build();
-      var decisionDTO =
-          DecisionDTO.builder()
-              .documentationOffice(documentationOffice)
-              .deviatingDates(
-                  List.of(
-                      DeviatingDateDTO.builder()
-                          .rank(0L)
-                          .value(LocalDate.of(2023, 12, 12))
-                          .build()))
-              .documentNumber("DocumentNumb2")
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
-              .build();
+      var decision =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .deviatingDecisionDates(List.of(LocalDate.of(2023, 12, 12)))
+                      .documentNumber("DocumentNumb2")
+                      .fileNumbers(List.of("123"))
+                      .build()));
 
       repository.save(pendingProceedingDTO);
-      var decision = repository.save(decisionDTO);
 
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
 
@@ -1383,8 +1422,6 @@ class DuplicateCheckIntegrationTest {
             .coreData(
                 CoreData.builder()
                     .documentationOffice(params.documentationOffice())
-                    .fileNumbers(params.fileNumbers())
-                    .deviatingFileNumbers(params.deviatingFileNumbers())
                     .documentType(params.documentType())
                     .decisionDate(params.decisionDate())
                     .deviatingDecisionDates(params.deviatingDecisionDates())
@@ -1420,6 +1457,39 @@ class DuplicateCheckIntegrationTest {
                       .documentationUnit(documentationUnitDTO)
                       .build())
               .build();
+    }
+
+    if (params.fileNumbers() != null) {
+      DecisionDTO finalDocumentationUnitDTO = documentationUnitDTO;
+      var fileNumbers =
+          params.fileNumbers.stream()
+              .map(
+                  fileNumber ->
+                      FileNumberDTO.builder()
+                          .documentationUnit(finalDocumentationUnitDTO)
+                          .value(fileNumber)
+                          .rank(0L)
+                          .build())
+              .toList();
+
+      documentationUnitDTO = documentationUnitDTO.toBuilder().fileNumbers(fileNumbers).build();
+    }
+
+    if (params.deviatingFileNumbers() != null) {
+      DecisionDTO finalDocumentationUnitDTO = documentationUnitDTO;
+      var devfileNumbers =
+          params.deviatingFileNumbers.stream()
+              .map(
+                  fileNumber ->
+                      DeviatingFileNumberDTO.builder()
+                          .documentationUnit(finalDocumentationUnitDTO)
+                          .value(fileNumber)
+                          .rank(0L)
+                          .build())
+              .toList();
+
+      documentationUnitDTO =
+          documentationUnitDTO.toBuilder().deviatingFileNumbers(devfileNumbers).build();
     }
 
     return repository.save(documentationUnitDTO);
