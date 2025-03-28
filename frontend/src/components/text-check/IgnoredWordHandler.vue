@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { IgnoredTextCheckWord, Match } from "@/types/textCheck"
@@ -39,13 +40,11 @@ async function addWordToDocOffice() {
 
 <template>
   <div>
-    <div v-if="match.ignoredTextCheckWords?.length">
-      Dieses Wort wird im Wörterbuch ignoriert
+    <div v-if="!NeurisTextCheckService.isMatchEditable(match)">
+      von juris ignoriert
     </div>
 
-    <div
-      v-if="!match.ignoredTextCheckWords?.length && addingToDictionaryEnabled"
-    >
+    <div v-else-if="addingToDictionaryEnabled">
       <div
         v-if="
           match.rule.issueType == 'misspelling' &&

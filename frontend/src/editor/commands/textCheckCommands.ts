@@ -3,6 +3,7 @@ import { EditorState } from "prosemirror-state"
 import { Ref, ref } from "vue"
 import { ResponseError, ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
+import TextCheckService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 import {
@@ -172,6 +173,22 @@ class NeurisTextCheckService implements TextCheckService {
 
   clearSelectedMatch = () => {
     this.selectedMatch.value = undefined
+  }
+
+  static isMatchIgnored(match: Match): boolean {
+    return match.ignoredTextCheckWords?.length !== undefined
+  }
+
+  /**
+   * Returns true if all ignored words are editable, otherwise false
+   * @param match
+   */
+  static isMatchEditable(match: Match): boolean {
+    return (
+      match.ignoredTextCheckWords?.every(
+        (ignoredWord) => ignoredWord.isEditable === true,
+      ) ?? false
+    )
   }
 }
 
