@@ -94,10 +94,10 @@ public class DecisionTransformer extends DocumentableTransformer {
       addLeadingDecisionNormReferences(updatedDomainObject, builder);
       addYearsOfDisputeToDTO(builder, coreData);
 
-      addFileNumbers(builder, coreData, currentDto);
+      addFileNumbers(builder, coreData);
       addDeviationCourts(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
-      addDeviatingFileNumbers(builder, coreData, currentDto);
+      addDeviatingFileNumbers(builder, coreData);
       addSource(currentDto, builder, updatedDomainObject);
 
     } else {

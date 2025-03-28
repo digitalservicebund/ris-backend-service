@@ -83,8 +83,7 @@ class DocumentationUnitServiceTest {
         DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
-        .thenReturn(documentationUnit);
+    when(repository.createNewDocumentationUnit(any(), any(), any())).thenReturn(documentationUnit);
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
     // Can we use a captor to check if the document number was correctly created?
@@ -110,7 +109,6 @@ class DocumentationUnitServiceTest {
                 .publicationStatus(PublicationStatus.UNPUBLISHED)
                 .withError(false)
                 .build(),
-            null,
             null);
   }
 
@@ -138,8 +136,7 @@ class DocumentationUnitServiceTest {
                     .build())
             .build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
-        .thenReturn(documentationUnit);
+    when(repository.createNewDocumentationUnit(any(), any(), any())).thenReturn(documentationUnit);
 
     when(documentNumberService.generateDocumentNumber(designatedDocumentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
@@ -161,6 +158,7 @@ class DocumentationUnitServiceTest {
                     CoreData.builder()
                         .creatingDocOffice(userDocumentationOffice)
                         .documentationOffice(designatedDocumentationOffice)
+                        .fileNumbers(List.of(parameters.fileNumber()))
                         .court(parameters.court())
                         .legalEffect(LegalEffect.YES.getLabel())
                         .decisionDate(parameters.decisionDate())
@@ -171,8 +169,7 @@ class DocumentationUnitServiceTest {
                 .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
                 .withError(false)
                 .build(),
-            parameters.reference(),
-            parameters.fileNumber());
+            parameters.reference());
   }
 
   @Test
