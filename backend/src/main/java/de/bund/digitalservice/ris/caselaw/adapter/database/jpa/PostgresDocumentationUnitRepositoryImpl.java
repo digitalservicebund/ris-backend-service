@@ -40,15 +40,18 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -143,7 +146,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit docUnit, Status status, Reference createdFromReference, String fileNumber) {
+      DocumentationUnit docUnit, Status status, Reference createdFromReference) {
 
     var documentationUnitDTO =
         repository.save(
@@ -176,15 +179,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     DecisionDTO.DecisionDTOBuilder<?, ?> builder =
         documentationUnitDTO.toBuilder()
             .source(sources)
-            .fileNumbers(
-                fileNumber == null
-                    ? null
-                    : List.of(
-                        FileNumberDTO.builder()
-                            .documentationUnit(documentationUnitDTO)
-                            .value(fileNumber)
-                            .rank(0L)
-                            .build()))
             .status(
                 StatusTransformer.transformToDTO(status).toBuilder()
                     .documentationUnit(documentationUnitDTO)
@@ -554,21 +548,99 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Boolean myDocOfficeOnly,
       Boolean withDuplicateWarning,
       DocumentationOfficeDTO documentationOfficeDTO) {
-    return repository.searchByDocumentationUnitSearchInput(
-        documentationOfficeDTO.getId(),
-        documentNumber,
-        fileNumber,
-        courtType,
-        courtLocation,
-        decisionDate,
-        decisionDateEnd,
-        publicationDate,
-        scheduledOnly,
-        status,
-        withError,
-        myDocOfficeOnly,
-        withDuplicateWarning,
-        pageable);
+    if ((fileNumber == null || fileNumber.trim().isEmpty())) {
+      return repository.searchByDocumentationUnitSearchInput(
+          documentationOfficeDTO.getId(),
+          documentNumber,
+          courtType,
+          courtLocation,
+          decisionDate,
+          decisionDateEnd,
+          publicationDate,
+          scheduledOnly,
+          status,
+          withError,
+          myDocOfficeOnly,
+          withDuplicateWarning,
+          pageable);
+    }
+
+    // The highest possible number of results - For page 0: 30, for page 1: 60, for page 2: 90, etc.
+    int maxResultsUpToCurrentPage = (pageable.getPageNumber() + 1) * pageable.getPageSize();
+
+    // We need to start with index 0 because we collect 3 results sets, each of the desired size of
+    // the page. Then we sort the full ist and cut it to the page size (possibly leaving 2x page
+    // size results behind). If we don't always start with index 0, we might miss results.
+    // This approach could even be better if we replace the next/previous with a "load more" button
+    Pageable fixedPageRequest = PageRequest.of(0, maxResultsUpToCurrentPage);
+
+    Slice<DocumentationUnitListItemDTO> fileNumberResults = new SliceImpl<>(List.of());
+    Slice<DocumentationUnitListItemDTO> deviatingFileNumberResults = new SliceImpl<>(List.of());
+
+    if (!fileNumber.trim().isEmpty()) {
+      fileNumberResults =
+          repository.searchByDocumentationUnitSearchInputFileNumber(
+              documentationOfficeDTO.getId(),
+              documentNumber,
+              fileNumber.trim(),
+              courtType,
+              courtLocation,
+              decisionDate,
+              decisionDateEnd,
+              publicationDate,
+              scheduledOnly,
+              status,
+              withError,
+              myDocOfficeOnly,
+              withDuplicateWarning,
+              fixedPageRequest);
+
+      deviatingFileNumberResults =
+          repository.searchByDocumentationUnitSearchInputDeviatingFileNumber(
+              documentationOfficeDTO.getId(),
+              documentNumber,
+              fileNumber.trim(),
+              courtType,
+              courtLocation,
+              decisionDate,
+              decisionDateEnd,
+              publicationDate,
+              scheduledOnly,
+              status,
+              withError,
+              myDocOfficeOnly,
+              withDuplicateWarning,
+              fixedPageRequest);
+    }
+
+    Set<DocumentationUnitListItemDTO> allResults = new HashSet<>();
+
+    allResults.addAll(fileNumberResults.getContent());
+    allResults.addAll(deviatingFileNumberResults.getContent());
+
+    // We can provide entries for a next page if ...
+    // A) we already have collected more results than fit on the current page, or
+    // B) at least one of the queries has more results
+    boolean hasNext =
+        allResults.size() >= maxResultsUpToCurrentPage
+            || fileNumberResults.hasNext()
+            || deviatingFileNumberResults.hasNext();
+
+    return new SliceImpl<>(
+        allResults.stream()
+            .sorted(
+                (o1, o2) -> {
+                  if (o1.getDate() != null && o2.getDate() != null) {
+                    return o1.getDocumentNumber().compareTo(o2.getDocumentNumber());
+                  }
+                  return 0;
+                })
+            .toList()
+            .subList(
+                pageable.getPageNumber() * pageable.getPageSize(),
+                Math.min(allResults.size(), maxResultsUpToCurrentPage)),
+        pageable,
+        hasNext);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager", readOnly = true)
