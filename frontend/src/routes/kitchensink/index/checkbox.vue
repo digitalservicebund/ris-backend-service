@@ -65,7 +65,7 @@ const values = reactive({
         label="Large"
         :label-position="LabelPosition.RIGHT"
       >
-        <Checkbox :id="id" v-model="values.size" value="Large" />
+        <Checkbox :id="id" v-model="values.size" size="large" value="Large" />
       </InputField>
     </KitchensinkStory>
   </KitchensinkPage>
