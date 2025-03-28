@@ -3,7 +3,6 @@ import { EditorState } from "prosemirror-state"
 import { Ref, ref } from "vue"
 import { ResponseError, ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
-import TextCheckService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 import {
