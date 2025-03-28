@@ -70,6 +70,7 @@ const validationStore = useValidationStore<["date", "dateInFuture"][number]>()
         <InputMask
           :id="id"
           v-model="values.yearInput"
+          fluid
           :invalid="hasError"
           mask="9999"
           placeholder="JJJJ"
@@ -81,6 +82,7 @@ const validationStore = useValidationStore<["date", "dateInFuture"][number]>()
           :id="id"
           v-model="values.timeInput"
           aria-label="Time input"
+          fluid
           mask="99:99"
           placeholder="HH:MM"
         ></InputMask>

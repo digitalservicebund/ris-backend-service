@@ -76,24 +76,22 @@ const badge = computed(() => {
       </router-link>
     </div>
 
-    <div v-if="session.user" class="grid grid-cols-[auto,1fr] gap-10">
+    <div v-if="session.user" class="flex gap-10">
       <IconPermIdentity />
       <div>
-        <div class="ris-label1-regular">
-          <router-link :to="{ name: 'settings' }">
-            <FlexContainer>
-              <FlexItem class="pe-8">{{ session.user?.name }}</FlexItem>
-              <FlexItem>
-                <IconBadge
-                  v-if="session.user.documentationOffice"
-                  :background-color="badge.color"
-                  color="text-black"
-                  :label="badge.label"
-                />
-              </FlexItem>
-            </FlexContainer>
-          </router-link>
-        </div>
+        <router-link :to="{ name: 'settings' }">
+          <FlexContainer class="gap-10">
+            <FlexItem>{{ session.user?.name }}</FlexItem>
+            <FlexItem>
+              <IconBadge
+                v-if="session.user.documentationOffice"
+                :background-color="badge.color"
+                color="text-black"
+                :label="badge.label"
+              />
+            </FlexItem>
+          </FlexContainer>
+        </router-link>
       </div>
     </div>
   </nav>

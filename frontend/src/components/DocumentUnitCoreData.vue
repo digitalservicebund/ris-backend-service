@@ -314,6 +314,7 @@ onBeforeUnmount(() => {
           :id="id"
           v-model="modelValue.legalEffect"
           aria-label="Rechtskraft"
+          fluid
           option-label="label"
           option-value="value"
           :options="legalEffectTypes.items"
@@ -349,6 +350,7 @@ onBeforeUnmount(() => {
           :id="slotProps.id"
           v-model="source"
           aria-label="Quelle"
+          fluid
           :invalid="slotProps.hasError"
           option-label="label"
           option-value="value"

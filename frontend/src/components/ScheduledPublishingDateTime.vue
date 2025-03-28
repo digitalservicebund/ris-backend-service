@@ -191,7 +191,7 @@ const dateValidationError = ref<ValidationError | undefined>()
       class="flex flex-row items-center"
       data-testid="scheduledPublishingDate_errors"
     >
-      <IconErrorOutline class="text-14 pr-4 text-red-800" />
+      <IconErrorOutline class="pr-4 text-red-800" />
 
       <div class="flex-col">
         <div

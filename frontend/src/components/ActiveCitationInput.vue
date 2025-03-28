@@ -270,6 +270,7 @@ onMounted(() => {
             id="activeCitationDocumentType"
             v-model="activeCitation.fileNumber"
             aria-label="Aktenzeichen Aktivzitierung"
+            fluid
             :invalid="slotProps.hasError"
             :readonly="activeCitation.hasForeignSource"
             @focus="validationStore.remove('fileNumber')"
@@ -292,7 +293,7 @@ onMounted(() => {
           <Button
             v-if="!activeCitation.hasForeignSource"
             aria-label="Nach Entscheidung suchen"
-            mlabel="Suchen"
+            label="Suchen"
             size="small"
             @click="search"
           >
