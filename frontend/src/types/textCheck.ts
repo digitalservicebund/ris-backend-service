@@ -1,4 +1,3 @@
-import DocumentationOffice from "@/domain/documentationOffice"
 import { TextCheckService } from "@/editor/commands/textCheckCommands"
 
 export interface Replacement {
@@ -43,7 +42,7 @@ export interface Match {
   contextForSureMatch: number
   word: string
   category: string
-  ignoredWords?: [IgnoredTextCheckWord]
+  ignoredTextCheckWords?: [IgnoredTextCheckWord]
 }
 
 export interface TextCheckResponse {
@@ -69,8 +68,11 @@ export interface Suggestion {
 export interface IgnoredTextCheckWord {
   id?: string
   word: string
-  documentationOffice: DocumentationOffice
+  type: DocumentationType
+  isEditable?: boolean
 }
+
+export type DocumentationType = "documentation_office" | "documentation_unit"
 
 export type TextCheckExtensionOptions = {
   category?: string

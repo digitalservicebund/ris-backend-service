@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
-import IgnoredTextCheckWord from "@/components/text-check/IgnoredTextCheckWord.vue"
+import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import MatchLinkingButton from "@/components/text-check/MatchLinkingButton.vue"
 import MatchNavigator from "@/components/text-check/MatchNavigator.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
@@ -65,7 +65,7 @@ function updateCurrentIndex(index: number) {
       />
     </div>
 
-    <IgnoredTextCheckWord :match="selectedMatch" />
+    <IgnoredWordHandler :match="selectedMatch" />
     <div>
       {{ selectedMatch.message }}
     </div>

@@ -21,6 +21,7 @@ interface TextCheckService {
   ): Promise<ServiceResponse<TextCheckCategoryResponse>>
 
   addIgnoredWordForDocumentationOffice(
+    id: string,
     ignoredTextCheckWord: IgnoredTextCheckWord,
   ): Promise<ServiceResponse<IgnoredTextCheckWord>>
 }
@@ -65,13 +66,14 @@ const service: TextCheckService = {
   },
 
   async addIgnoredWordForDocumentationOffice(
+    id: string,
     ignoredTextCheckWord: IgnoredTextCheckWord,
   ) {
     const response = await httpClient.post<
       IgnoredTextCheckWord,
       IgnoredTextCheckWord
     >(
-      `caselaw/documentunits/text-check/ignored-words/add`,
+      `caselaw/documentunits/${id}/text-check/ignored-words/add`,
       {
         headers: {
           Accept: "application/json",

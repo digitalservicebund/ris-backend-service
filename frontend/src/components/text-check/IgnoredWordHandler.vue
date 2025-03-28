@@ -5,7 +5,7 @@ import { IgnoredTextCheckWord, Match } from "@/types/textCheck"
 
 const props = defineProps<{
   match: Match
-  enabled?: boolean
+  addingToDictionaryEnabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -15,18 +15,19 @@ const emit = defineEmits<{
 const store = useDocumentUnitStore()
 
 async function addWordToDocOffice() {
-  if (!store.documentUnit?.coreData.documentationOffice) {
-    console.error("Documentation office does not exist")
+  if (!store.documentUnit?.uuid) {
+    console.error("Documentation unit does not exist")
     return
   }
 
   const newIgnoredTextCheckWord: IgnoredTextCheckWord = {
     word: props.match.word,
-    documentationOffice: store.documentUnit.coreData.documentationOffice,
+    type: "documentation_office",
   }
 
   try {
     await languageToolService.addIgnoredWordForDocumentationOffice(
+      store.documentUnit.uuid,
       newIgnoredTextCheckWord,
     )
     emit("ignoreTextCheckWord:add")
@@ -35,10 +36,26 @@ async function addWordToDocOffice() {
   }
 }
 </script>
+
 <template>
-  <div v-if="match.rule.issueType == 'misspelling' && enabled">
-    <button class="ds-link-01-bold" @click="addWordToDocOffice">
-      Zum globalen Wörterbuch hinzufügen
-    </button>
+  <div>
+    <div v-if="match.ignoredTextCheckWords?.length">
+      Dieses Wort wird im Wörterbuch ignoriert
+    </div>
+
+    <div
+      v-if="!match.ignoredTextCheckWords?.length && addingToDictionaryEnabled"
+    >
+      <div
+        v-if="
+          match.rule.issueType == 'misspelling' &&
+          !match.ignoredTextCheckWords?.length
+        "
+      >
+        <button class="ds-link-01-bold" @click="addWordToDocOffice">
+          Zum globalen Wörterbuch hinzufügen
+        </button>
+      </div>
+    </div>
   </div>
 </template>

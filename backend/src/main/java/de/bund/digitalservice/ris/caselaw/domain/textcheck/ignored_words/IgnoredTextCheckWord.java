@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -21,6 +21,7 @@ public class IgnoredTextCheckWord {
   @NotBlank
   private String word;
 
-  @Size(max = 255)
-  private DocumentationOffice documentationOffice;
+  @NotNull private IgnoredTextCheckType type;
+
+  boolean isEditable;
 }

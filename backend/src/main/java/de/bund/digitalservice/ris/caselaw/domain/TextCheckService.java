@@ -354,8 +354,14 @@ public class TextCheckService {
     return docOfficeIds;
   }
 
-  public IgnoredTextCheckWord addIgnoredTextCheckWord(IgnoredTextCheckWord ignoredTextCheckWord) {
+  public IgnoredTextCheckWord addIgnoredTextCheckWord(
+      IgnoredTextCheckWord ignoredTextCheckWord, UUID documentationUnitId)
+      throws DocumentationUnitNotExistsException {
+    Documentable documentable = documentationUnitService.getByUuid(documentationUnitId);
 
-    return ignoredTextCheckWordRepository.addIgnoredTextCheckWord(ignoredTextCheckWord);
+    return ignoredTextCheckWordRepository.addIgnoredTextCheckWord(
+        ignoredTextCheckWord,
+        documentable.coreData().documentationOffice().uuid(),
+        documentationUnitId);
   }
 }
