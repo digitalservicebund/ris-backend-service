@@ -1,15 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.adapter.languagetool;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.TextCheckResponseTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.jose4j.json.internal.json_simple.JSONArray;
-import org.jose4j.json.internal.json_simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
@@ -24,6 +27,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 public class LanguageToolService extends TextCheckService {
   private final LanguageToolConfig languageToolConfig;
 
@@ -38,10 +42,10 @@ public class LanguageToolService extends TextCheckService {
   protected List<Match> requestTool(String text) {
     Document document = Jsoup.parse(text);
 
-    JSONArray annotations = getAnnotationsArray(document);
+    JsonArray annotations = getAnnotationsArray(document);
 
-    JSONObject data = new JSONObject();
-    data.put("annotation", annotations);
+    JsonObject data = new JsonObject();
+    data.add("annotation", annotations);
 
     RestTemplate restTemplate = new RestTemplate();
 
@@ -69,50 +73,75 @@ public class LanguageToolService extends TextCheckService {
   }
 
   @NotNull
-  static JSONArray getAnnotationsArray(Document document) {
-    JSONArray annotations = new JSONArray();
+  static JsonArray getAnnotationsArray(Document document) {
+    JsonArray annotations = new JsonArray();
     NodeTraversor.traverse(new AnnotationsNodeVisitor(annotations), document.body().children());
     return annotations;
   }
 
-  @SuppressWarnings("java:S3776")
-  private record AnnotationsNodeVisitor(JSONArray annotations) implements NodeVisitor {
+  private record AnnotationsNodeVisitor(JsonArray annotations)
+      implements NodeVisitor { // interpretAs is used to specify how to interpret the text of the
+    // node
+    static Map<String, String> interpretAs =
+        Map.of("p", "\n\n", "br", "\n", "&gt;", ">", "&lt;", "<", "img", "Bild");
+
+    /**
+     * Adds the given text to the annotations. Treats characters '<' and '>' as markup and all other
+     * characters as text.
+     *
+     * @param text the text to process
+     */
+    private void processTextNode(String text) {
+      StringBuilder currentText = new StringBuilder();
+      for (char c : text.toCharArray()) {
+        if (c == '<') {
+          addTextEntry(currentText.toString());
+          currentText.setLength(0); // Reset
+          addMarkupEntry("&lt;", "&lt;");
+        } else if (c == '>') {
+          addTextEntry(currentText.toString());
+          currentText.setLength(0); // Reset
+          addMarkupEntry("&gt;", "&gt;");
+        } else {
+          currentText.append(c);
+        }
+      }
+      addTextEntry(currentText.toString());
+    }
+
+    private void addTextEntry(String text) {
+      if (text.isEmpty()) return;
+      JsonObject textEntry = new JsonObject();
+      textEntry.add("text", new JsonPrimitive(text));
+      annotations.add(textEntry);
+    }
+
+    private void addMarkupEntry(String markup, String nodeName) {
+      JsonObject markupEntry = new JsonObject();
+      markupEntry.add("markup", new JsonPrimitive(markup));
+      if (nodeName != null && interpretAs.containsKey(nodeName)) {
+        markupEntry.add("interpretAs", new JsonPrimitive(interpretAs.get(nodeName)));
+      }
+      annotations.add(markupEntry);
+    }
 
     @Override
     public void head(Node node, int depth) {
-
       if (node instanceof TextNode textNode) {
-        // Use getWholeText() to capture non-breaking spaces
         String processedText = textNode.getWholeText();
-
         if (!processedText.isEmpty()) {
-          JSONObject textEntry = new JSONObject();
-          textEntry.put("text", processedText);
-          annotations.add(textEntry);
+          processTextNode(processedText);
         }
-        // Ignore comments and other non-element nodes
       } else if (!node.nodeName().startsWith("#")) {
-        JSONObject markupEntry = new JSONObject();
-        markupEntry.put("markup", NormalizingNodeVisitor.buildOpeningTag(node));
-
-        // Custom logic for specific tags (optional)
-        if (node.nodeName().equals("p")) {
-          markupEntry.put("interpretAs", "\n\n");
-        }
-        if (node.nodeName().equals("br")) {
-          markupEntry.put("interpretAs", "\n");
-        }
-
-        annotations.add(markupEntry);
+        String openingTag = NormalizingNodeVisitor.buildOpeningTag(node);
+        addMarkupEntry(openingTag, node.nodeName());
       }
     }
 
     @Override
     public void tail(Node node, int depth) {
       if (NormalizingNodeVisitor.shouldClose(node)) {
-        JSONObject markupEntry = new JSONObject();
-        markupEntry.put("markup", NormalizingNodeVisitor.buildClosingTag(node));
-        annotations.add(markupEntry);
+        addMarkupEntry(NormalizingNodeVisitor.buildClosingTag(node), null);
       }
     }
   }

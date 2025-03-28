@@ -1,7 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { createHead } from "@unhead/vue"
+import { createHead } from "@unhead/vue/client"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnit from "@/domain/documentUnit"
 import categories from "@/routes/caselaw/documentUnit/[documentNumber]/categories.vue"

@@ -142,8 +142,8 @@ public class FieldOfLawService {
     // split by whitespace and hyphen to get words
     for (String textPart : text.split("[\\s-]+")) {
       if (textPart.equals(searchTerm)) score += 4;
-      if (textPart.startsWith(searchTerm)) score += 3;
-      if (textPart.contains(searchTerm)) score += 1;
+      else if (textPart.startsWith(searchTerm)) score += 3;
+      else if (textPart.contains(searchTerm)) score += 1;
     }
     return score;
   }
@@ -160,8 +160,8 @@ public class FieldOfLawService {
           norm.singleNormDescription() == null ? "" : norm.singleNormDescription().toLowerCase();
       String normText = description + " " + abbreviation;
       if (description.equals(normStr)) score += 8;
-      if (description.startsWith(normStr)) score += 5;
-      if (normText.contains(normStr)) score += 5;
+      else if (description.startsWith(normStr)) score += 5;
+      else if (normText.contains(normStr)) score += 5;
     }
     return score;
   }

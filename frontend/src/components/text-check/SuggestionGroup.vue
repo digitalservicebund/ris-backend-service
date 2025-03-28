@@ -4,7 +4,7 @@ import IconBadge from "@/components/IconBadge.vue"
 import MatchLinkingButton from "@/components/text-check/MatchLinkingButton.vue"
 import MatchNavigator from "@/components/text-check/MatchNavigator.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
-import { Match, Replacement, Suggestion } from "@/types/languagetool"
+import { Match, Replacement, Suggestion } from "@/types/textCheck"
 
 const props = defineProps<{
   suggestion: Suggestion

@@ -13,9 +13,9 @@ import SingleNorm from "@/domain/singleNorm"
 import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ServiceResponse } from "@/services/httpClient"
-import languageToolService from "@/services/languageToolService"
+import languageToolService from "@/services/textCheckService"
 
-import { TextCheckAllResponse } from "@/types/languagetool"
+import { TextCheckAllResponse } from "@/types/textCheck"
 import routes from "~/test-helper/routes"
 
 const router = createRouter({

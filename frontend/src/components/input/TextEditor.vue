@@ -44,7 +44,7 @@ import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
 import FeatureToggleService from "@/services/featureToggleService"
-import { Match } from "@/types/languagetool"
+import { Match } from "@/types/textCheck"
 
 interface Props {
   value?: string

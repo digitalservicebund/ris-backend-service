@@ -24,7 +24,7 @@ test.describe(
   },
   () => {
     // If tests run in parallel, we do not want to delete other procedures -> random prefix
-    const procedurePrefix = `test_${generateString({ length: 10 })}`
+    const procedurePrefix = generateString({ length: 10 })
 
     test(
       "In doc unit search, external user can not edit/delete unassigned doc units, but preview them",
@@ -118,12 +118,15 @@ test.describe(
         prefilledDocumentUnit,
         secondPrefilledDocumentUnit,
       }) => {
-        const testCaseInfix = `_${generateString({ length: 10 })}_`
+        const testCaseInfix = generateString({
+          length: 10,
+          prefix: procedurePrefix,
+        })
 
         const procedureName = await assignProcedureToDocUnit(
           page,
           documentNumber,
-          procedurePrefix + testCaseInfix,
+          testCaseInfix,
         )
         await assignUserGroupToProcedure(page, procedureName)
 
@@ -131,19 +134,16 @@ test.describe(
         await assignProcedureToDocUnit(
           page,
           prefilledDocumentUnit.documentNumber!,
-          procedurePrefix + testCaseInfix,
+          testCaseInfix,
         )
         await assignProcedureToDocUnit(
           page,
           secondPrefilledDocumentUnit.documentNumber!,
-          procedurePrefix + testCaseInfix,
+          testCaseInfix,
         )
 
         await test.step("External user sees only the single procedure they are assigned to", async () => {
-          await navigateToProcedures(
-            pageWithExternalUser,
-            procedurePrefix + testCaseInfix,
-          )
+          await navigateToProcedures(pageWithExternalUser, testCaseInfix)
           await expect(
             pageWithExternalUser.getByLabel("Vorgang Listenelement"),
           ).toHaveCount(1)

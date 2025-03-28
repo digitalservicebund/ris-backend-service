@@ -5,7 +5,7 @@ import Tooltip from "@/components/Tooltip.vue"
 import { useScroll } from "@/composables/useScroll"
 import router from "@/router"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { Match } from "@/types/languagetool"
+import { Match } from "@/types/textCheck"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 
 const props = defineProps<{

@@ -1,6 +1,6 @@
 import { RisUiLocale, RisUiTheme } from "@digitalservicebund/ris-ui/primevue"
 import * as Sentry from "@sentry/vue"
-import { createHead } from "@unhead/vue"
+import { createHead } from "@unhead/vue/client"
 import { createPinia } from "pinia"
 import PrimeVue from "primevue/config"
 import { createApp } from "vue"

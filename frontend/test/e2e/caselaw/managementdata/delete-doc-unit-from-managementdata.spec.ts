@@ -3,8 +3,10 @@ import {
   navigateToCategories,
   navigateToManagementData,
   navigateToSearch,
+  save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe(
   "Dok-Einheit löschen (Verwaltungsdaten)",
@@ -14,6 +16,7 @@ test.describe(
       page,
     }) => {
       let documentNumber: string
+      const fileNumber = "e2e_" + generateString()
       await navigateToSearch(page)
       await test.step("Erstelle neue Dokumentationseinheit", async () => {
         await page
@@ -32,6 +35,11 @@ test.describe(
         )?.[1] as string
       })
 
+      // We add a file number to be able to identify the document. If multiple tests run in parallel, the docnumber might be recycled for a new doc unit and makes it seems as it was not deleted.
+      await navigateToCategories(page, documentNumber!)
+      await page.getByTestId("chips-input_fileNumber").fill(fileNumber)
+      await save(page)
+
       await navigateToManagementData(page, documentNumber!)
       await test.step("Lösche die Dokumentationseinheit", async () => {
         await page
@@ -46,12 +54,12 @@ test.describe(
       })
 
       await test.step("Dokumentationseinheit existiert nicht mehr", async () => {
-        await navigateToCategories(page, documentNumber!, { skipAssert: true })
+        await page.goto(
+          `/caselaw?documentNumber=${documentNumber}&fileNumber=${fileNumber}`,
+        )
 
         await expect(
-          page.getByText(
-            "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung.",
-          ),
+          page.getByText("Keine Suchergebnisse gefunden"),
         ).toBeVisible()
       })
     })

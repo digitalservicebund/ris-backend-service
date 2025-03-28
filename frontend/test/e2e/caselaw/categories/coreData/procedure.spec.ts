@@ -12,7 +12,7 @@ import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("procedure", () => {
   // If tests run in parallel, we do not want to delete other procedures -> random prefix
-  const testPrefix = "test_" + generateString({ length: 10 })
+  const testPrefix = generateString({ length: 10 })
   test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage()
     await navigateToProcedures(page, testPrefix)

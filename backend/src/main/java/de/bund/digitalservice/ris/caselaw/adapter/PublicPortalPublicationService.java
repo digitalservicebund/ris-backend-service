@@ -11,12 +11,19 @@ import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -109,20 +116,60 @@ public class PublicPortalPublicationService {
     publicPortalBucket.save(changelog.createFileName(), changelogString);
   }
 
-  // Default: 0 30 4 (After migration)
-  @Scheduled(cron = "0 30 4 * * *")
+  //                        ↓ day of month (1-31)
+  //                      ↓ hour (0-23)
+  //                    ↓ minute (0-59)
+  //                 ↓ second (0-59)
+  // Default:        0 30 4 * * * (After migration: CET: 5:30)
+  @Scheduled(cron = "0 50 11 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
-  public void logDatabaseToBucketDiff() {
-    log.info(
-        "Checking for discrepancies between publishable doc units in database and files in portal bucket.");
-    List<String> databaseDocumentNumbers =
-        documentationUnitRepository.findAllDocumentNumbersByMatchingPublishCriteria();
+  public void logPortalPublicationSanityCheck() {
     List<String> portalBucketDocumentNumbers =
         publicPortalBucket.getAllFilenames().stream()
             .filter(fileName -> fileName.contains(".xml"))
             .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
             .toList();
 
+    logDatabaseToBucketDiff(portalBucketDocumentNumbers);
+    logBucketToRechtsprechungImInternetDiff(portalBucketDocumentNumbers);
+  }
+
+  private void logBucketToRechtsprechungImInternetDiff(List<String> portalBucketDocumentNumbers) {
+    log.info(
+        "Checking for discrepancies between published doc units and Rechtsprechung im Internet...");
+
+    var riiDocumentNumbers = fetchRiiDocumentNumbers();
+    log.info("Number of documents in Rechtsprechung im Internet: {}", riiDocumentNumbers.size());
+
+    if (!riiDocumentNumbers.isEmpty()) {
+      List<String> inRiiNotInPortal =
+          riiDocumentNumbers.stream()
+              .filter(documentNumber -> !portalBucketDocumentNumbers.contains(documentNumber))
+              .toList();
+
+      List<String> inPortalNotInRii =
+          portalBucketDocumentNumbers.stream()
+              .filter(documentNumber -> !riiDocumentNumbers.contains(documentNumber))
+              .toList();
+
+      log.info(
+          "Found {} doc units in Portal but not in Rechtsprechung im Internet.",
+          inPortalNotInRii.size());
+      log.info(
+          "Found {} doc units in Rechtsprechung im Internet but not in Portal.",
+          inRiiNotInPortal.size());
+      log.info(
+          "Document numbers found in Rechtsprechung im Internet but not in Portal: {}",
+          inRiiNotInPortal.stream().map(Object::toString).collect(Collectors.joining(", ")));
+      log.info(
+          "Document numbers found in Portal but not in Rechtsprechung im Internet: {}",
+          inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    }
+  }
+
+  private void logDatabaseToBucketDiff(List<String> portalBucketDocumentNumbers) {
+    List<String> databaseDocumentNumbers =
+        documentationUnitRepository.findAllDocumentNumbersByMatchingPublishCriteria();
     List<String> inBucketNotInDatabase =
         portalBucketDocumentNumbers.stream()
             .filter(documentNumber -> !databaseDocumentNumbers.contains(documentNumber))
@@ -145,5 +192,37 @@ public class PublicPortalPublicationService {
     log.info(
         "Document numbers found in bucket but not in database: {}",
         inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
+  }
+
+  private List<String> fetchRiiDocumentNumbers() {
+    final String URL = "https://www.rechtsprechung-im-internet.de/rii-toc.xml";
+    List<String> documentNumbers = new ArrayList<>();
+    try {
+      Document doc =
+          Jsoup.connect(URL).maxBodySize(0).parser(Parser.xmlParser()).timeout(15_000).get();
+
+      Elements links = doc.select("link");
+
+      for (Element link : links) {
+        String linkText = link.text();
+        String documentNumber = extractDocumentNumber(linkText);
+
+        if (documentNumber != null) {
+          documentNumbers.add(documentNumber);
+        }
+      }
+
+      return documentNumbers;
+    } catch (IOException e) {
+      log.info(
+          "Error fetching document numbers from Rechtsprechung im Internet: " + e.getMessage());
+    }
+    return List.of();
+  }
+
+  @SuppressWarnings("java:S5852")
+  private static String extractDocumentNumber(String link) {
+    String pattern = ".*/jb-([^/]+)\\.zip$";
+    return link.matches(pattern) ? link.replaceAll(pattern, "$1") : null;
   }
 }

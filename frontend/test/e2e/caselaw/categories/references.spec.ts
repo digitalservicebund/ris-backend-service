@@ -8,6 +8,7 @@ import {
   waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe(
   "references",
@@ -30,6 +31,11 @@ test.describe(
         },
       },
       async ({ page, documentNumber }) => {
+        const citationPrefix = generateString()
+        const citation1 = citationPrefix + ", 2-5"
+        const citation2 = citationPrefix + ", 10-12"
+        const citation3 = citationPrefix + ", 2"
+
         await test.step("References is a new selectable menu item in a documentation unit", async () => {
           await navigateToReferences(page, documentNumber)
         })
@@ -52,13 +58,15 @@ test.describe(
         })
 
         await test.step("citation and supplement can be added", async () => {
-          await fillInput(page, "Zitatstelle", "2024, Nr 1, 2-5")
+          await fillInput(page, "Zitatstelle", citation1)
           await fillInput(page, "Klammernzusatz", "LT")
         })
 
         await test.step("Reference can be added to editable list", async () => {
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("MM 2024, Nr 1, 2-5 (LT)")).toBeVisible()
+          await expect(
+            page.getByText("MM " + citation1 + " (LT)"),
+          ).toBeVisible()
           await expect(
             page.getByText("sekundär", { exact: true }),
           ).toBeVisible()
@@ -68,7 +76,9 @@ test.describe(
 
         await test.step("Reference is persisted and shown after reload", async () => {
           await page.reload()
-          await expect(page.getByText("MM 2024, Nr 1, 2-5 (LT)")).toBeVisible()
+          await expect(
+            page.getByText("MM " + citation1 + " (LT)"),
+          ).toBeVisible()
           await expect(
             page.getByText("sekundär", { exact: true }),
           ).toBeVisible()
@@ -89,7 +99,7 @@ test.describe(
           ).toBeVisible()
           await page.locator("[aria-label='Fundstelle speichern']").click()
           await expect(
-            page.getByText("GVBl BB 2024, Nr 1, 2-5 (LT)"),
+            page.getByText("GVBl BB " + citation1 + " (LT)"),
           ).toBeVisible()
 
           await expect(page.getByText("primär", { exact: true })).toBeVisible()
@@ -101,10 +111,10 @@ test.describe(
 
           await page.locator("[aria-label='Fundstelle speichern']").click()
           await expect(
-            page.getByText("GVBl BB 2024, Nr 1, 2-5 (LT)"),
+            page.getByText("GVBl BB " + citation1 + " (LT)"),
           ).toBeHidden()
           await expect(
-            page.getByText("GVBl BB 2024, Nr 1, 2-5 (S)"),
+            page.getByText("GVBl BB " + citation1 + " (S)"),
           ).toBeVisible()
 
           await expect(page.getByText("primär", { exact: true })).toBeVisible()
@@ -116,10 +126,10 @@ test.describe(
 
           await page.getByLabel("Abbrechen").click()
           await expect(
-            page.getByText("GVBl BB 2024, Nr 1, 2-5 (LT)"),
+            page.getByText("GVBl BB " + citation1 + " (LT)"),
           ).toBeHidden()
           await expect(
-            page.getByText("GVBl BB 2024, Nr 1, 2-5 (S)"),
+            page.getByText("GVBl BB " + citation1 + " (S)"),
           ).toBeVisible()
 
           await expect(page.getByText("primär", { exact: true })).toBeVisible()
@@ -134,10 +144,12 @@ test.describe(
             })
             .click()
           await waitForInputValue(page, "[aria-label='Periodikum']", "WdG")
-          await fillInput(page, "Zitatstelle", "2024, 10-12")
+          await fillInput(page, "Zitatstelle", citation2)
           await fillInput(page, "Klammernzusatz", "ST")
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("WdG 2024, 10-12 (ST)")).toBeVisible()
+          await expect(
+            page.getByText("WdG " + citation2 + " (ST)"),
+          ).toBeVisible()
         })
         await save(page)
 
@@ -149,38 +161,44 @@ test.describe(
             })
             .click()
           await waitForInputValue(page, "[aria-label='Periodikum']", "AllMBl")
-          await fillInput(page, "Zitatstelle", "2024, 2")
+          await fillInput(page, "Zitatstelle", citation3)
           await fillInput(page, "Klammernzusatz", "L")
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("AllMBl 2024, 2 (L)")).toBeVisible()
+          await expect(
+            page.getByText("AllMBl " + citation3 + " (L)"),
+          ).toBeVisible()
         })
         await save(page)
         await test.step("Delete second of 3 reference and verify it disappears, order of remaining items stays the same", async () => {
           await page.getByTestId("list-entry-1").click()
           await page.locator("[aria-label='Eintrag löschen']").click()
-          await expect(page.getByText("WdG 2024, 10-12 (ST)")).toBeHidden()
+          await expect(
+            page.getByText("WdG " + citation2 + " (ST)"),
+          ).toBeHidden()
 
           await expect(page.getByLabel("Listen Eintrag").nth(0)).toHaveText(
-            "GVBl BB 2024, Nr 1, 2-5 (S)primär",
+            "GVBl BB " + citation1 + " (S)primär",
           )
           await expect(page.getByLabel("Listen Eintrag").nth(1)).toHaveText(
-            "AllMBl 2024, 2 (L)primär",
+            "AllMBl " + citation3 + " (L)primär",
           )
         })
 
         await test.step("Delete second of 2 references and verify it disappears from the list, first item stays the same", async () => {
           await page.getByTestId("list-entry-1").click()
           await page.locator("[aria-label='Eintrag löschen']").click()
-          await expect(page.getByText("AllMBl 2024, 2 (L)")).toBeHidden()
           await expect(
-            page.getByText("GVBl BB 2024, Nr 1, 2-5 (S)"),
+            page.getByText("AllMBl " + citation3 + " (L)"),
+          ).toBeHidden()
+          await expect(
+            page.getByText("GVBl BB " + citation1 + " (S)"),
           ).toBeVisible()
         })
         await test.step("Delete last reference and verify the list is empty", async () => {
           await page.getByTestId("list-entry-0").click()
           await page.locator("[aria-label='Eintrag löschen']").click()
           await expect(
-            page.getByText("GVBl BB 2024, Nr 1, 2-5 (S)"),
+            page.getByText("GVBl BB " + citation1 + " (S)"),
           ).toBeHidden()
           await save(page)
 
@@ -206,6 +224,8 @@ test.describe(
         },
       },
       async ({ page, prefilledDocumentUnit }) => {
+        const citation = generateString() + ", 10-12"
+
         await navigateToReferences(
           page,
           prefilledDocumentUnit.documentNumber ?? "",
@@ -231,13 +251,13 @@ test.describe(
           )
         })
         await test.step("Add 'Zitatstelle' removes error, reference can be saved", async () => {
-          await fillInput(page, "Zitatstelle", "2024, 10-12")
+          await fillInput(page, "Zitatstelle", citation)
           await page.locator("[aria-label='Fundstelle speichern']").click()
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
         })
         await test.step("Add 'Periodikum' with empty Klammernzusatz (referenceSupplement)", async () => {
           await fillInput(page, "Periodikum", "wdg")
-          await fillInput(page, "Zitatstelle", "2024, 10-12")
+          await fillInput(page, "Zitatstelle", citation)
           await fillInput(page, "Klammernzusatz", "")
 
           await page.locator("[aria-label='Fundstelle speichern']").click()
@@ -255,6 +275,7 @@ test.describe(
         tag: ["@RISDEV-5236", "@RISDEV-5454", "@RISDEV-5240"],
       },
       async ({ page, prefilledDocumentUnit }) => {
+        const citation = generateString() + ", 2"
         await navigateToReferences(
           page,
           prefilledDocumentUnit.documentNumber ?? "",
@@ -276,7 +297,7 @@ test.describe(
             "[aria-label='Periodikum Literaturfundstelle']",
             "AllMBl",
           )
-          await fillInput(page, "Zitatstelle Literaturfundstelle", "2024, 2")
+          await fillInput(page, "Zitatstelle Literaturfundstelle", citation)
 
           await page
             .locator("[aria-label='Literaturfundstelle speichern']")
@@ -314,6 +335,10 @@ test.describe(
       },
       async ({ page, prefilledDocumentUnit }) => {
         const documentNumber = prefilledDocumentUnit.documentNumber!
+        const citationPrefix = generateString()
+        const citation1 = citationPrefix + ", 10-12"
+        const citation2 = citationPrefix + ", 01-99"
+
         await test.step("References are not rendered in preview when empty", async () => {
           await navigateToPreview(page, documentNumber)
           await expect(page.getByText("Fundstellen")).toBeHidden()
@@ -328,10 +353,12 @@ test.describe(
               exact: true,
             })
             .click()
-          await fillInput(page, "Zitatstelle", "2024, 10-12")
+          await fillInput(page, "Zitatstelle", citation1)
           await fillInput(page, "Klammernzusatz", "LT")
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("WdG 2024, 10-12 (LT)")).toBeVisible()
+          await expect(
+            page.getByText("WdG " + citation1 + " (LT)"),
+          ).toBeVisible()
           await expect(
             page.getByText("sekundär", {
               exact: true,
@@ -344,10 +371,12 @@ test.describe(
               { exact: true },
             )
             .click()
-          await fillInput(page, "Zitatstelle", "2020, 01-99")
+          await fillInput(page, "Zitatstelle", citation2)
           await fillInput(page, "Klammernzusatz", "L")
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("GVBl BB 2020, 01-99 (L)")).toBeVisible()
+          await expect(
+            page.getByText("GVBl BB " + citation2 + " (L)"),
+          ).toBeVisible()
           await expect(
             page.getByText("primär", {
               exact: true,
@@ -361,10 +390,10 @@ test.describe(
           await navigateToPreview(page, documentNumber)
           await expect(page.getByText("Literaturfundstellen")).toBeHidden()
           await expect(
-            page.getByText("Primäre FundstellenGVBl BB 2020, 01-99 (L)"),
+            page.getByText("Primäre FundstellenGVBl BB " + citation2 + " (L)"),
           ).toBeVisible()
           await expect(
-            page.getByText("Sekundäre FundstellenWdG 2024, 10-12 (LT)"),
+            page.getByText("Sekundäre FundstellenWdG " + citation1 + " (LT)"),
           ).toBeVisible()
         })
 
@@ -397,10 +426,10 @@ test.describe(
             .locator('code:has-text("<zitstelle>")')
             .all()
           await expect(citationNodes[0]).toHaveText(
-            "<zitstelle>2024, 10-12 (LT)</zitstelle>",
+            "<zitstelle>" + citation1 + " (LT)</zitstelle>",
           )
           await expect(citationNodes[1]).toHaveText(
-            "<zitstelle>2020, 01-99 (L)</zitstelle>",
+            "<zitstelle>" + citation2 + " (L)</zitstelle>",
           )
         })
       },
@@ -412,6 +441,10 @@ test.describe(
         tag: ["@RISDEV-5240", "@RISDEV-5242", "@RISDEV-5670"],
       },
       async ({ page, documentNumber }) => {
+        const citationPrefix = generateString()
+        const citation1 = citationPrefix + ", 2"
+        const citation2 = citationPrefix + ", 4-6"
+
         await test.step("References are not rendered in preview when empty", async () => {
           await navigateToPreview(page, documentNumber)
           await expect(page.getByText("Literaturfundstellen")).toBeHidden()
@@ -436,7 +469,7 @@ test.describe(
             "[aria-label='Periodikum Literaturfundstelle']",
             "AllMBl",
           )
-          await fillInput(page, "Zitatstelle Literaturfundstelle", "2024, 2")
+          await fillInput(page, "Zitatstelle Literaturfundstelle", citation1)
           await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
           await page.getByText("Ean", { exact: true }).click()
@@ -450,7 +483,7 @@ test.describe(
             .locator("[aria-label='Literaturfundstelle speichern']")
             .click()
           await expect(
-            page.getByText("AllMBl 2024, 2, Bilen, Ulviye (Ean)"),
+            page.getByText("AllMBl " + citation1 + ", Bilen, Ulviye (Ean)"),
           ).toBeVisible()
         })
 
@@ -467,7 +500,7 @@ test.describe(
           ).toBeHidden()
 
           await expect(
-            preview.getByText("AllMBl 2024, 2, Bilen, Ulviye (Ean)"),
+            preview.getByText("AllMBl " + citation1 + ", Bilen, Ulviye (Ean)"),
           ).toBeVisible()
         })
 
@@ -486,11 +519,7 @@ test.describe(
             "[aria-label='Periodikum Literaturfundstelle']",
             "GVBl BB",
           )
-          await fillInput(
-            page,
-            "Zitatstelle Literaturfundstelle",
-            "01/2025, 4-6",
-          )
+          await fillInput(page, "Zitatstelle Literaturfundstelle", citation2)
           await fillInput(page, "Autor Literaturfundstelle", "Kästner, Erich")
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ebs")
           await page.getByText("Ebs", { exact: true }).click()
@@ -507,10 +536,10 @@ test.describe(
 
         await test.step("Verify second literature citation it is added at the bottom of editable list", async () => {
           await expect(page.getByLabel("Listen Eintrag").nth(1)).toHaveText(
-            "AllMBl 2024, 2, Bilen, Ulviye (Ean)primär",
+            "AllMBl " + citation1 + ", Bilen, Ulviye (Ean)primär",
           )
           await expect(page.getByLabel("Listen Eintrag").nth(2)).toHaveText(
-            "GVBl BB 01/2025, 4-6, Kästner, Erich (Ebs)primär",
+            "GVBl BB " + citation2 + ", Kästner, Erich (Ebs)primär",
           )
         })
 
@@ -522,8 +551,12 @@ test.describe(
 
           // Make sure the literature citations are in the correct order
           expect(texts).toContain(
-            "AllMBl 2024, 2, Bilen, Ulviye (Ean)" +
-              "GVBl BB 01/2025, 4-6, Kästner, Erich (Ebs)",
+            "AllMBl " +
+              citation1 +
+              ", Bilen, Ulviye (Ean)" +
+              "GVBl BB " +
+              citation2 +
+              ", Kästner, Erich (Ebs)",
           )
         })
       },
