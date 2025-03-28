@@ -100,14 +100,14 @@ defineExpose({ collapseTree })
   <div class="flex flex-1 flex-col bg-blue-200 p-16">
     <div class="mb-20 flex w-full flex-row justify-between">
       <div class="flex">
-        <p class="ds-label-01-reg">Sachgebietsbaum</p>
+        <p class="ris-label1-regular">Sachgebietsbaum</p>
       </div>
       <div class="flex">
         <InputField
           id="showNorms"
           aria-label="Normen anzeigen"
           label="Mit Normen"
-          label-class="ds-label-02-reg"
+          label-class="ris-label2-regular"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox id="showNorms" v-model="showNormsModelValue" binary />

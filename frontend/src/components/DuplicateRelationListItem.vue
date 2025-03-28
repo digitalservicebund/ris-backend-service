@@ -91,7 +91,7 @@ const coreDataText = computed(() =>
       </span>
 
       <DecisionSummary
-        class="ds-label-01-reg"
+        class="ris-label1-regular"
         :document-number="duplicateRelation.documentNumber"
         :status="{
           publicationStatus: duplicateRelation.publicationStatus,
@@ -105,7 +105,7 @@ const coreDataText = computed(() =>
       v-slot="{ id }"
       class="whitespace-nowrap"
       :label="ignoreWarningCheckboxLabel"
-      label-class="ds-label-01-reg"
+      label-class="ris-label1-regular"
       :label-position="LabelPosition.RIGHT"
     >
       <Checkbox

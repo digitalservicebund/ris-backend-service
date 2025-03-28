@@ -312,7 +312,7 @@ const showDefaultLink = computed(() => {
                 Sie können die folgenden Stammdaten übernehmen und eine neue<br />Dokumentationseinheit
                 erstellen:
               </p>
-              <p class="ds-label-01-bold mb-16 text-center">
+              <p class="ris-label1-bold mb-16 text-center">
                 <span :class="{ 'text-gray-800': !fileNumberFromQuery }">{{
                   `${fileNumberFromQuery ?? "Aktenzeichen unbekannt"}, `
                 }}</span>

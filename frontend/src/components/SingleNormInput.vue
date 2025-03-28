@@ -210,7 +210,7 @@ onMounted(async () => {
         :id="'legalForce' + index"
         v-slot="{ id }"
         label="Mit Gesetzeskraft"
-        label-class="ds-label-01-reg"
+        label-class="ris-label1-regular"
         :label-position="LabelPosition.RIGHT"
       >
         <Checkbox

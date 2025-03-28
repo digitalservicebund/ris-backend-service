@@ -29,7 +29,7 @@ async function generateNewEntryFromExisting() {
 <template>
   <div class="flex w-full justify-between" data-testid="reference-list-summary">
     <div v-if="props.data.documentationUnit?.documentNumber">
-      <div class="ds-label-01-bold" data-testid="citation-summary">
+      <div class="ris-label1-bold" data-testid="citation-summary">
         {{ props.data.renderSummary }}
       </div>
       <DecisionSummary

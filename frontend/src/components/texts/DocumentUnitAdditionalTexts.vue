@@ -61,7 +61,7 @@ const outline = computed({
 
 <template>
   <div aria-label="Weitere Langtexte">
-    <h2 class="ds-label-01-bold mb-16">Weitere Langtexte</h2>
+    <h2 class="ris-label1-bold mb-16">Weitere Langtexte</h2>
     <div class="flex flex-col gap-24">
       <TextEditorCategory
         id="otherLongText"

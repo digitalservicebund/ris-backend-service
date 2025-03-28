@@ -104,7 +104,7 @@ watch(
 <template>
   <div class="flex flex-col gap-24 bg-blue-200 p-24">
     <div>
-      <p class="ds-label-01-bold">Keine passende Entscheidung gefunden?</p>
+      <p class="ris-label1-bold">Keine passende Entscheidung gefunden?</p>
       <p>
         Übernehmen Sie die Stammdaten und erstellen Sie eine neue Entscheidung.
       </p>

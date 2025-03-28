@@ -62,8 +62,10 @@ const norm = defineModel<string>("norm")
       </Button>
     </div>
 
-    <span v-if="errorLabel" class="ds-label-03-reg min-h-[1rem] text-red-800">{{
-      errorLabel
-    }}</span>
+    <span
+      v-if="errorLabel"
+      class="ris-label3-regular min-h-[1rem] text-red-800"
+      >{{ errorLabel }}</span
+    >
   </div>
 </template>

@@ -39,7 +39,7 @@ function handleClick() {
         ><template #icon> <IconAdd /> </template
       ></Button>
       <span
-        class="ds-label-01-reg"
+        class="ris-label1-regular"
         :class="hasContent && importable ? 'text-blue-800' : 'text-gray-900'"
         >{{ label }}</span
       >

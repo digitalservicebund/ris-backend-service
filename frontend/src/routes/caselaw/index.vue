@@ -11,7 +11,7 @@ const isInternalUser = useInternalUser()
 <template>
   <div class="flex flex-col gap-16 p-16">
     <div class="flex justify-between">
-      <h1 class="ds-heading-02-reg">Übersicht Rechtsprechung</h1>
+      <h1 class="ris-heading2-regular">Übersicht Rechtsprechung</h1>
 
       <Button
         v-if="isInternalUser"

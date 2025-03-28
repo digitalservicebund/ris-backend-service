@@ -61,7 +61,7 @@ onBeforeMount(async () => {
 
 <template>
   <div aria-label="Rechtschreibprüfung" class="flex flex-col">
-    <h2 class="ds-label-01-bold mb-16">Rechtschreibprüfung</h2>
+    <h2 class="ris-label1-bold mb-16">Rechtschreibprüfung</h2>
 
     <div v-if="responseError">
       <InfoModal
@@ -87,12 +87,12 @@ onBeforeMount(async () => {
                     class="grid grid-cols-[auto_1fr] gap-x-16 px-0"
                     data-testid="total-text-check-errors"
                   >
-                    <dt class="ds-label-02-bold self-center">Anzahl</dt>
-                    <dd class="ds-body-02-reg">
+                    <dt class="ris-label2-bold self-center">Anzahl</dt>
+                    <dd class="ris-body2-regular">
                       {{ totalTextCheckErrors }}
                     </dd>
-                    <dt class="ds-label-02-bold self-center">Rubrik</dt>
-                    <dd class="ds-body-02-reg">
+                    <dt class="ris-label2-bold self-center">Rubrik</dt>
+                    <dd class="ris-body2-regular">
                       {{ textCategories?.join(", ") }}
                     </dd>
                   </div>

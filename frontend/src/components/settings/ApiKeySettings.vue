@@ -30,9 +30,9 @@ onMounted(async () => {
 
 <template>
   <div class="flex-col gap-12">
-    <span class="ds-label-02-bold">API Key</span>
+    <span class="ris-label2-bold">API Key</span>
     <div v-if="apiKey">
-      <div class="ds-body-01-reg mt-24">
+      <div class="ris-body1-regular mt-24">
         <CopyableLabel
           v-if="apiKey.valid"
           name="API Key"
@@ -40,12 +40,12 @@ onMounted(async () => {
         />
         <div
           v-if="apiKey.valid"
-          class="ds-label-02-reg-italic mt-24 text-gray-900"
+          class="ris-label2-regular-italic mt-24 text-gray-900"
         >
           gültig bis:
           {{ dayjs(apiKey.validUntil).format("DD.MM.YYYY HH:mm:ss") }}
         </div>
-        <div v-else class="ds-label-02-bold mt-24 text-red-900">
+        <div v-else class="ris-label2-bold mt-24 text-red-900">
           API-Key ist abgelaufen!
         </div>
       </div>

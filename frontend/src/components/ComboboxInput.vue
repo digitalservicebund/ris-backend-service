@@ -208,7 +208,7 @@ watch(existingItems, () => {
     createNewItem.value = {
       label: `${inputText.value} neu erstellen`,
       value: { label: inputText.value! },
-      labelCssClasses: "ds-label-01-bold text-blue-800 underline",
+      labelCssClasses: "ris-label1-bold text-blue-800 underline",
     }
   } else {
     createNewItem.value = undefined
@@ -344,7 +344,7 @@ export type InputModelProps =
             <div
               v-if="item.additionalInformation"
               aria-label="additional-dropdown-info"
-              class="ds-label-02-reg text-neutral-700"
+              class="ris-label2-regular text-neutral-700"
             >
               {{ item.additionalInformation }}
             </div>
@@ -353,7 +353,7 @@ export type InputModelProps =
           <span
             v-if="item.sideInformation"
             id="dropDownSideInformation"
-            class="ds-label-02-reg text-neutral-700"
+            class="ris-label2-regular text-neutral-700"
           >
             {{ item.sideInformation }}
           </span>

@@ -55,7 +55,7 @@ const divider = computed(() => (props.documentNumber ? ` | ` : undefined))
           <!-- open preview in new tab -->
           <RouterLink
             v-else-if="documentNumber && props.displayMode === DisplayMode.TAB"
-            class="ds-link-01-bold whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+            class="ris-link1-bold whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
             :data-testid="'document-number-link-' + documentNumber"
             tabindex="-1"
             target="_blank"
@@ -74,7 +74,7 @@ const divider = computed(() => (props.documentNumber ? ` | ` : undefined))
             "
           >
             <button
-              class="ds-link-01-bold leading-24 whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+              class="ris-link1-bold leading-24 whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
               :data-testid="'document-number-link-' + documentNumber"
               @click="openSidePanelAndScrollToSection(documentNumber)"
             >

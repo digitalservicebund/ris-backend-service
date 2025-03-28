@@ -173,7 +173,7 @@ onMounted(async () => {
         id="dateKnown"
         v-slot="{ id }"
         label="Datum unbekannt"
-        label-class="ds-label-01-reg"
+        label-class="ris-label1-regular"
         :label-position="LabelPosition.RIGHT"
       >
         <Checkbox

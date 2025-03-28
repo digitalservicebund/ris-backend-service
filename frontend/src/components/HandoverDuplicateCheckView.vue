@@ -38,15 +38,15 @@ const managementDataRoute = computed(() => ({
 </script>
 <template>
   <div aria-label="Dublettenprüfung" class="flex flex-col">
-    <h2 class="ds-label-01-bold mb-16">Dublettenprüfung</h2>
+    <h2 class="ris-label1-bold mb-16">Dublettenprüfung</h2>
 
     <div v-if="hasPendingDuplicateWarning">
       <div class="flex flex-row gap-8">
         <IconErrorOutline class="text-red-800" />
-        <div class="ds-body-01-reg flex flex-col gap-8">
+        <div class="ris-body1-regular flex flex-col gap-8">
           Es besteht Dublettenverdacht.
           <div class="grid grid-cols-[auto_1fr] gap-24">
-            <div class="ds-label-02-bold mt-12 self-start">
+            <div class="ris-label2-bold mt-12 self-start">
               {{
                 pendingDuplicates.length > 1
                   ? "Dokumentationseinheiten"

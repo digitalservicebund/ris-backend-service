@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 <template>
   <div class="mt-48 ml-48 gap-16 p-16">
-    <h1 class="ds-heading-02-reg mb-32">{{ props.title }}</h1>
+    <h1 class="ris-heading2-regular mb-32">{{ props.title }}</h1>
     <p class="mb-32">{{ props.description }}</p>
     <p class="mb-16">
       <strong>Haben Sie die Internetadresse direkt eingegeben?</strong><br />

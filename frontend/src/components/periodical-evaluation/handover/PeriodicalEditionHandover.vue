@@ -102,13 +102,13 @@ watch(
           class="flex flex-row items-center gap-8"
         >
           <IconErrorOutline class="text-red-800" />
-          <p class="flexds-body-01-reg">
+          <p class="flexris-body1-regular">
             Es wurden noch keine Fundstellen hinzugefügt
           </p>
         </div>
         <div v-else class="flex flex-row items-center gap-8">
           <IconCheck class="text-green-700" />
-          <p class="ds-body-01-reg">
+          <p class="ris-body1-regular">
             Die Ausgabe enthält {{ numberOfReferences }} Fundstellen
           </p>
         </div>

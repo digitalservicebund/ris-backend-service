@@ -50,7 +50,7 @@ const badge = computed(() => {
       </div>
 
       <router-link
-        class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
+        class="ris-label1-regular p-8 hover:bg-yellow-500 hover:underline"
         :class="{
           underline:
             route.path === '/caselaw' ||
@@ -61,13 +61,13 @@ const badge = computed(() => {
         >Suche
       </router-link>
       <router-link
-        class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
+        class="ris-label1-regular p-8 hover:bg-yellow-500 hover:underline"
         :class="{ underline: route.path.includes('procedures') }"
         :to="{ name: 'caselaw-procedures' }"
         >Vorgänge
       </router-link>
       <router-link
-        class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
+        class="ris-label1-regular p-8 hover:bg-yellow-500 hover:underline"
         :class="{
           underline: route.path.includes('periodical-evaluation'),
         }"
@@ -79,7 +79,7 @@ const badge = computed(() => {
     <div v-if="session.user" class="grid grid-cols-[auto,1fr] gap-10">
       <IconPermIdentity />
       <div>
-        <div class="ds-label-01-reg">
+        <div class="ris-label1-regular">
           <router-link :to="{ name: 'settings' }">
             <FlexContainer>
               <FlexItem class="pe-8">{{ session.user?.name }}</FlexItem>

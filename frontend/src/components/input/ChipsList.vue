@@ -130,7 +130,7 @@ function focusNext() {
       <li
         v-for="(chip, i) in modelValue"
         :key="i"
-        class="group ds-body-01-reg relative -mt-1 mr-6 flex min-w-0 cursor-pointer items-center rounded-full bg-blue-300 outline-none"
+        class="group ris-body1-regular relative -mt-1 mr-6 flex min-w-0 cursor-pointer items-center rounded-full bg-blue-300 outline-none"
         :class="{ 'pr-32': !readOnly }"
         data-testid="chip"
         tabindex="0"
@@ -141,7 +141,7 @@ function focusNext() {
         @keydown.right.stop.prevent="focusNext"
       >
         <span
-          class="ds-label-03-reg text-18 inline overflow-hidden py-6 pl-8 text-ellipsis whitespace-nowrap"
+          class="ris-label3-regular text-18 inline overflow-hidden py-6 pl-8 text-ellipsis whitespace-nowrap"
           :class="{ 'pr-12': readOnly }"
           data-testid="chip-value"
           >{{ chip }}

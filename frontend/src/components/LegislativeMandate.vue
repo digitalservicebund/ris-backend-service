@@ -21,13 +21,13 @@ const hasLegislativeMandate = computed({
 
 <template>
   <div class="gap-0">
-    <div class="ds-label-02-reg mb-16">{{ headline }}</div>
+    <div class="ris-label2-regular mb-16">{{ headline }}</div>
     <div class="flex flex-row">
       <InputField
         id="legislativeMandate"
         v-slot="{ id }"
         :label="label"
-        label-class="ds-label-01-reg"
+        label-class="ris-label1-regular"
         :label-position="LabelPosition.RIGHT"
       >
         <Checkbox

@@ -78,7 +78,7 @@ watch(
 <template>
   <div class="flex flex-col gap-24">
     <div class="flex flex-col gap-4">
-      <label id="list-input" class="ds-label-02-reg" for="list-input-id">
+      <label id="list-input" class="ris-label2-regular" for="list-input-id">
         {{ label }}</label
       >
       <textarea

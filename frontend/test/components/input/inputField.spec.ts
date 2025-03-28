@@ -232,10 +232,10 @@ describe("InputField", () => {
   })
 
   it("renders custom label classes", async () => {
-    renderComponent({ label: "foo", labelClass: "ds-label-01-reg" })
+    renderComponent({ label: "foo", labelClass: "ris-label1-regular" })
 
     const element = screen.getByText("foo")
     // eslint-disable-next-line testing-library/no-node-access
-    expect(element.parentNode).toHaveClass("ds-label-01-reg")
+    expect(element.parentNode).toHaveClass("ris-label1-regular")
   })
 })

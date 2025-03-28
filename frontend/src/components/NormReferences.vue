@@ -63,7 +63,7 @@ function generateUniqueSingleNormKey(singleNorm: SingleNorm): string {
 </script>
 <template>
   <div aria-label="Norm">
-    <h2 :id="DocumentUnitCategoriesEnum.NORMS" class="ds-label-01-bold mb-16">
+    <h2 :id="DocumentUnitCategoriesEnum.NORMS" class="ris-label1-bold mb-16">
       Normen
     </h2>
     <div class="flex flex-row">

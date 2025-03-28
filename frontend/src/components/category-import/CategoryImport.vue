@@ -412,7 +412,7 @@ onMounted(() => {
     class="scrollable-container relative overflow-auto"
     data-testid="category-import"
   >
-    <span class="ds-label-01-bold">Rubriken importieren</span>
+    <span class="ris-label1-bold">Rubriken importieren</span>
     <div class="mt-16 flex flex-row items-end gap-8">
       <InputField
         id="categoryImporterDocumentNumber"
@@ -438,13 +438,13 @@ onMounted(() => {
       ></Button>
     </div>
 
-    <span v-if="errorMessage" class="ds-label-02-reg text-red-800">{{
+    <span v-if="errorMessage" class="ris-label2-regular text-red-800">{{
       errorMessage
     }}</span>
 
     <div
       v-if="documentUnitToImport"
-      class="ds-label-01-reg mt-24 flex flex-col gap-16 bg-blue-100 p-16"
+      class="ris-label1-regular mt-24 flex flex-col gap-16 bg-blue-100 p-16"
     >
       <DecisionSummary
         :document-number="documentUnitToImport.documentNumber"

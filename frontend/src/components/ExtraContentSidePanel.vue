@@ -164,7 +164,7 @@ onMounted(() => {
               props.documentUnit!.attachments[currentAttachmentIndex].s3path
             "
           />
-          <div v-else class="ds-label-01-reg">
+          <div v-else class="ris-label1-regular">
             Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.
           </div>
         </div>

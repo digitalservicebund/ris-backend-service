@@ -359,7 +359,7 @@ onBeforeUnmount(() => {
       @primary-action="deleteReferenceAndDocUnit"
       @secondary-action="deleteReference"
     />
-    <h2 v-if="!isSaved" id="reference-input" class="ds-label-01-bold mb-16">
+    <h2 v-if="!isSaved" id="reference-input" class="ris-label1-bold mb-16">
       Fundstelle hinzufügen
     </h2>
     <div class="flex flex-col gap-24">
@@ -380,7 +380,7 @@ onBeforeUnmount(() => {
             id="caselaw"
             class="flex items-center"
             label="Rechtsprechung"
-            label-class="ds-body-01-reg"
+            label-class="ris-body1-regular"
             :label-position="LabelPosition.RIGHT"
           >
             <RadioInput
@@ -399,7 +399,7 @@ onBeforeUnmount(() => {
             id="literature"
             class="flex items-center"
             label="Literatur"
-            label-class="ds-body-01-reg"
+            label-class="ris-body1-regular"
             :label-position="LabelPosition.RIGHT"
           >
             <RadioInput
@@ -475,7 +475,7 @@ onBeforeUnmount(() => {
             </div>
           </InputField>
 
-          <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
+          <div v-if="legalPeriodical" class="ris-label3-regular pt-4">
             Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
           </div>
         </div>
@@ -540,7 +540,7 @@ onBeforeUnmount(() => {
         v-if="!reference?.documentationUnit?.hasForeignSource"
         id="documentationUnit"
       >
-        <h2 class="ds-label-01-bold mb-16">Entscheidung hinzufügen</h2>
+        <h2 class="ris-label1-bold mb-16">Entscheidung hinzufügen</h2>
 
         <div class="flex flex-col gap-24">
           <div class="flex justify-between gap-24">

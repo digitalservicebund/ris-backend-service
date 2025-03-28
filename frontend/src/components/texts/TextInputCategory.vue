@@ -32,7 +32,7 @@ async function focusInput() {
     @toggled="focusInput"
   >
     <div class="flex flex-col">
-      <label class="ds-label-02-reg mb-4" :for="id">{{ label }}</label>
+      <label class="ris-label2-regular mb-4" :for="id">{{ label }}</label>
 
       <InputText
         :id="id"

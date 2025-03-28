@@ -148,7 +148,10 @@ onMounted(async () => {
   <div class="flex flex-col gap-24 p-24">
     <div>
       <FlexContainer class="pb-16" justify-content="justify-between">
-        <h1 class="ds-heading-02-reg" data-testid="periodical-evaluation-title">
+        <h1
+          class="ris-heading2-regular"
+          data-testid="periodical-evaluation-title"
+        >
           Periodika
         </h1>
       </FlexContainer>

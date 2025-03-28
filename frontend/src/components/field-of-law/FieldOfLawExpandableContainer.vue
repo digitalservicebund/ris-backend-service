@@ -71,7 +71,7 @@ export enum InputMethod {
           <h2
             :id="DocumentUnitCategoriesEnum.FIELDS_OF_LAW"
             ref="titleRef"
-            class="ds-label-01-bold mb-16"
+            class="ris-label1-bold mb-16"
           >
             Sachgebiete
           </h2>
@@ -91,7 +91,7 @@ export enum InputMethod {
           <InputField
             id="direct"
             label="Direkteingabe"
-            label-class="ds-label-01-reg"
+            label-class="ris-label1-regular"
             :label-position="LabelPosition.RIGHT"
             @click="() => (inputMethod = InputMethod.DIRECT)"
           >
@@ -107,7 +107,7 @@ export enum InputMethod {
           <InputField
             id="search"
             label="Suche"
-            label-class="ds-label-01-reg"
+            label-class="ris-label1-regular"
             :label-position="LabelPosition.RIGHT"
             @click="inputMethod = InputMethod.SEARCH"
           >

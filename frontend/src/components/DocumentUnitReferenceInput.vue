@@ -129,7 +129,7 @@ watch(
               @focus="validationStore.remove('citation')"
             />
           </InputField>
-          <span v-if="legalPeriodical" class="ds-label-03-reg pt-4"
+          <span v-if="legalPeriodical" class="ris-label3-regular pt-4"
             >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
           >
         </div>

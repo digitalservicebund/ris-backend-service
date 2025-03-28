@@ -45,7 +45,7 @@ function updateCurrentIndex(index: number) {
   <div class="flex flex-col gap-4 bg-blue-100 p-24">
     <div class="flex flex-row justify-between gap-8">
       <div class="flex flex-row items-center gap-8">
-        <div class="ds-label-01-bold">
+        <div class="ris-label1-bold">
           {{ suggestion.word }}
         </div>
         <span v-if="suggestion.matches.length > 1">
@@ -65,7 +65,7 @@ function updateCurrentIndex(index: number) {
     </div>
 
     <div>
-      <span class="ds-link-01-bold"> Zum globalen Wörterbuch hinzufügen </span>
+      <span class="ris-link1-bold"> Zum globalen Wörterbuch hinzufügen </span>
     </div>
     <div>
       {{ selectedMatch.message }}

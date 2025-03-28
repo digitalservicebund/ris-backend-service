@@ -59,10 +59,10 @@ onMounted(() => {
     <div
       class="modal-container box-border flex flex-col items-start gap-[1rem] rounded-sm bg-white px-[1.5rem] py-[1.5rem]"
     >
-      <div class="ds-label-01-bold text-black">
+      <div class="ris-label1-bold text-black">
         {{ headerText }}
       </div>
-      <div class="ds-label-03-reg whitespace-pre-line text-black">
+      <div class="ris-label3-regular whitespace-pre-line text-black">
         {{ contentText }}
       </div>
       <div

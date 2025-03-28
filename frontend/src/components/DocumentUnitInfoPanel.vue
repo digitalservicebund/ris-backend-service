@@ -121,7 +121,7 @@ watchEffect(() => {
       />
       <RouterLink
         v-if="isInternalUser"
-        class="ds-link-01-bold text-red-900"
+        class="ris-link1-bold text-red-900"
         :to="managementDataRoute"
       >
         Bitte prüfen</RouterLink

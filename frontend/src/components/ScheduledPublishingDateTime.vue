@@ -196,25 +196,25 @@ const dateValidationError = ref<ValidationError | undefined>()
       <div class="flex-col">
         <div
           v-if="!isDateInFuture"
-          class="lex-row ds-label-03-reg mt-2 text-red-800"
+          class="lex-row ris-label3-regular mt-2 text-red-800"
         >
           Der Terminierungszeitpunkt muss in der Zukunft liegen.
         </div>
         <div
           v-if="dateValidationError"
-          class="lex-row ds-label-03-reg mt-2 text-red-800"
+          class="lex-row ris-label3-regular mt-2 text-red-800"
         >
           {{ dateValidationError.message }}.
         </div>
         <div
           v-if="!isTimeValid"
-          class="lex-row ds-label-03-reg mt-2 text-red-800"
+          class="lex-row ris-label3-regular mt-2 text-red-800"
         >
           Unvollständige Uhrzeit.
         </div>
         <div
           v-if="!isPublishable && scheduledPublishingDate"
-          class="lex-row ds-label-03-reg mt-2 text-red-800"
+          class="lex-row ris-label3-regular mt-2 text-red-800"
         >
           Die terminierte Abgabe wird aufgrund von Fehlern in der
           Plausibilitätsprüfung fehlschlagen.

@@ -14,7 +14,7 @@ const emit = defineEmits<{
 <template>
   <div class="flex scroll-m-64 flex-col gap-16">
     <div class="flex flex-col gap-4">
-      <span class="ds-label-02-reg">{{ label }}</span>
+      <span class="ris-label2-regular">{{ label }}</span>
       <ul class="m-0 flex flex-row flex-wrap gap-8 p-0">
         <li
           v-for="chip in modelValue"

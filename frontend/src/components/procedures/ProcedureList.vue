@@ -216,7 +216,7 @@ onBeforeMount(async () => {
 
 <template>
   <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
-    <h1 class="ds-heading-02-reg">Vorgänge</h1>
+    <h1 class="ris-heading2-regular">Vorgänge</h1>
     <div class="mt-24 flex flex-row items-center gap-4">
       <div class="w-[480px]" role="search">
         <InputField id="procedureFilter" label="Vorgang" visually-hide-label>
@@ -272,11 +272,11 @@ onBeforeMount(async () => {
             <div class="flex w-full justify-between gap-24">
               <div class="flex flex-row items-center gap-16">
                 <IconFolderOpen />
-                <span class="ds-label-01-reg" :title="procedure.label">{{
+                <span class="ris-label1-regular" :title="procedure.label">{{
                   procedure.label
                 }}</span>
                 <div
-                  class="ds-label-02-reg flex flex-row items-center gap-4 rounded-full bg-blue-300 px-8 py-2 outline-none"
+                  class="ris-label2-regular flex flex-row items-center gap-4 rounded-full bg-blue-300 px-8 py-2 outline-none"
                 >
                   <IconBaselineDescription class="w-16 text-blue-800" />
                   <span>

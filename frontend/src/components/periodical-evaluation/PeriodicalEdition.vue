@@ -155,7 +155,7 @@ onBeforeMount(async () => {
           </InputField>
         </div>
 
-        <div v-if="editionRef.legalPeriodical" class="ds-label-03-reg pt-4">
+        <div v-if="editionRef.legalPeriodical" class="ris-label3-regular pt-4">
           Zitierbeispiel: {{ editionRef.legalPeriodical.citationStyle }}
         </div>
       </div>

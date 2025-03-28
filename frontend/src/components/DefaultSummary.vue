@@ -22,7 +22,7 @@ const showErrorBadge = computed(() => {
   <div class="flex w-full justify-between">
     <div class="flex flex-row items-center">
       <component :is="iconComponent" class="mr-8" />
-      <div class="ds-label-01-reg mr-8">{{ data?.renderSummary }}</div>
+      <div class="ris-label1-regular mr-8">{{ data?.renderSummary }}</div>
       <IconBadge
         v-if="showErrorBadge"
         background-color="bg-red-300"

@@ -158,7 +158,7 @@ watch(
 
       <div>
         <div class="flex flex-col">
-          <div class="ds-label-02-reg flex flex-row">
+          <div class="ris-label2-regular flex flex-row">
             <div v-if="!props.isRoot" class="pl-6">
               <span
                 class="p-2 whitespace-nowrap"

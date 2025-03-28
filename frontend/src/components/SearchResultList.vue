@@ -61,7 +61,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
       data-testid="search-results"
       flex-direction="flex-col"
     >
-      <p class="ds-label-01-bold">Passende Suchergebnisse:</p>
+      <p class="ris-label1-bold">Passende Suchergebnisse:</p>
       <FlexContainer
         v-for="searchResult in searchResults"
         :key="searchResult.decision.uuid"

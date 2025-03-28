@@ -240,14 +240,14 @@ export type DocumentUnitSearchParameter =
       class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
     >
       <!-- Column 1 -->
-      <div class="ds-body-01-reg ml-3 flex flex-row items-center">
+      <div class="ris-body1-regular ml-3 flex flex-row items-center">
         Aktenzeichen
       </div>
-      <div class="ds-body-01-reg flex flex-row items-center">Gericht</div>
-      <div class="ds-body-01-reg flex flex-row items-center">Datum</div>
+      <div class="ris-body1-regular flex flex-row items-center">Gericht</div>
+      <div class="ris-body1-regular flex flex-row items-center">Datum</div>
       <div
         v-if="myDocOfficeOnly"
-        class="ds-body-01-reg flex flex-row items-center"
+        class="ris-body1-regular flex flex-row items-center"
       >
         jDV Übergabe
       </div>
@@ -379,7 +379,7 @@ export type DocumentUnitSearchParameter =
           id="scheduled"
           v-slot="{ id }"
           label="Nur terminiert"
-          label-class="ds-label-01-reg"
+          label-class="ris-label1-regular"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
@@ -393,10 +393,10 @@ export type DocumentUnitSearchParameter =
       <div v-if="!myDocOfficeOnly" />
       <div class="pl-32"></div>
       <!-- Column 3 -->
-      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
+      <div class="ris-body1-regular flex flex-row items-center pl-24 lg:pl-48">
         Dokumentnummer
       </div>
-      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
+      <div class="ris-body1-regular flex flex-row items-center pl-24 lg:pl-48">
         Status
       </div>
       <div></div>
@@ -445,7 +445,7 @@ export type DocumentUnitSearchParameter =
           id="documentationOffice"
           v-slot="{ id }"
           label="Nur meine Dokstelle"
-          label-class="ds-label-01-reg"
+          label-class="ris-label1-regular"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
@@ -460,7 +460,7 @@ export type DocumentUnitSearchParameter =
           id="withErrorsOnly"
           v-slot="{ id }"
           label="Nur Fehler"
-          label-class="ds-label-01-reg"
+          label-class="ris-label1-regular"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
@@ -475,7 +475,7 @@ export type DocumentUnitSearchParameter =
           id="withDuplicateWaring"
           v-slot="{ id }"
           label="Dublettenverdacht"
-          label-class="ds-label-01-reg"
+          label-class="ris-label1-regular"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
@@ -498,7 +498,7 @@ export type DocumentUnitSearchParameter =
 
           <span
             v-if="submitButtonError"
-            class="ds-label-03-reg min-h-[1rem] text-red-800"
+            class="ris-label3-regular min-h-[1rem] text-red-800"
           >
             {{ submitButtonError }}
           </span>
