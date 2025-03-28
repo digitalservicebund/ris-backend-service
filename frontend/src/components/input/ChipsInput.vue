@@ -159,7 +159,7 @@ watch(newChipText, async () => {
     <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
     <div
       ref="wrapperEl"
-      class="shadow-button flex min-h-48 w-full cursor-text flex-wrap bg-white p-8 shadow-blue-800"
+      class="shadow-blue flex min-h-48 w-full cursor-text flex-wrap bg-white p-8 shadow-blue-800"
       :class="conditionalClasses"
       :data-testid="`chips-input-wrapper_${id}`"
       @click="focusInput"

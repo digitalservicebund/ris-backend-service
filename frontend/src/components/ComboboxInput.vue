@@ -266,7 +266,7 @@ export type InputModelProps =
 <template>
   <div ref="dropdownContainerRef" class="relative w-full">
     <div
-      class="space-between shadow-button flex h-48 flex-row bg-white px-16 py-12 whitespace-nowrap shadow-blue-800"
+      class="space-between shadow-blue flex h-48 flex-row bg-white px-16 py-12 whitespace-nowrap"
       :class="conditionalClasses"
     >
       <input
@@ -344,7 +344,7 @@ export type InputModelProps =
             <div
               v-if="item.additionalInformation"
               aria-label="additional-dropdown-info"
-              class="ris-label2-regular text-neutral-700"
+              class="ris-label2-regular text-gray-700"
             >
               {{ item.additionalInformation }}
             </div>
@@ -353,7 +353,7 @@ export type InputModelProps =
           <span
             v-if="item.sideInformation"
             id="dropDownSideInformation"
-            class="ris-label2-regular text-neutral-700"
+            class="ris-label2-regular text-gray-700"
           >
             {{ item.sideInformation }}
           </span>
