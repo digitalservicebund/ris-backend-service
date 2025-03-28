@@ -51,18 +51,8 @@ public class IgnoredTextCheckWordTransformer {
         .id(ignoredTextCheckWordDTO.getId())
         .word(ignoredTextCheckWordDTO.getWord())
         .type(transformType(ignoredTextCheckWordDTO))
-        .isEditable(isEditable(ignoredTextCheckWordDTO.getDocumentationOffice()))
+        .isEditable(ignoredTextCheckWordDTO.getJurisId() == null)
         .build();
-  }
-
-  /**
-   * returns whether an entry is editable
-   *
-   * @param documentationOfficeDTO the documentation office DTO to check
-   * @return true if the entry isn't juris
-   */
-  public static boolean isEditable(DocumentationOfficeDTO documentationOfficeDTO) {
-    return !documentationOfficeDTO.getAbbreviation().equals("juris");
   }
 
   public static IgnoredTextCheckType transformType(
