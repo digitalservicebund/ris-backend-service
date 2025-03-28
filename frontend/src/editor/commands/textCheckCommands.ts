@@ -176,7 +176,10 @@ class NeurisTextCheckService implements TextCheckService {
   }
 
   static isMatchIgnored(match: Match): boolean {
-    return match.ignoredTextCheckWords?.length !== undefined
+    return (
+      Array.isArray(match.ignoredTextCheckWords) &&
+      match.ignoredTextCheckWords.length > 0
+    )
   }
 
   /**
