@@ -18,14 +18,28 @@ public interface DatabaseDocumentationUnitRepository
   Optional<DocumentationUnitListItemDTO> findDocumentationUnitListItemByDocumentNumber(
       String documentNumber);
 
-  String BASE_QUERY =
-      """
-  (:documentNumber IS NULL OR upper(documentationUnit.documentNumber) like concat('%', upper(cast(:documentNumber as text)), '%'))
+  @Query(
+      value =
+          """
+  SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
+  LEFT JOIN FETCH documentationUnit.court court
+  LEFT JOIN FETCH documentationUnit.status status
+  LEFT JOIN FETCH documentationUnit.documentType documentType
+  WHERE
+    (:documentNumber IS NULL OR upper(documentationUnit.documentNumber) like concat('%', upper(cast(:documentNumber as text)), '%'))
    AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
    AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
    AND (cast(:decisionDate as date) IS NULL
        OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.date = :decisionDate)
        OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.date BETWEEN :decisionDate AND :decisionDateEnd))
+   AND (:fileNumber IS NULL
+     OR (
+     (EXISTS (SELECT 1 FROM FileNumberDTO fileNumber
+                   WHERE documentationUnit.id = fileNumber.documentationUnit.id
+                   AND upper(fileNumber.value) LIKE concat(upper(trim(cast(:fileNumber as text))), '%')))
+       OR (EXISTS (SELECT 1 FROM DeviatingFileNumberDTO devFileNumber
+              WHERE documentationUnit.id = devFileNumber.documentationUnit.id
+              AND upper(devFileNumber.value) LIKE concat(upper(trim(cast(:fileNumber as text))), '%')))))
    AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND documentationUnit.documentationOffice.id = :documentationOfficeId))
    AND (:scheduledOnly = FALSE OR cast(documentationUnit.scheduledPublicationDateTime as date) IS NOT NULL)
    AND (cast(:publicationDate as date) IS NULL
@@ -59,48 +73,12 @@ public interface DatabaseDocumentationUnitRepository
    ORDER BY
      (CASE WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.scheduledPublicationDateTime END) DESC NULLS LAST,
      (CASE WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.lastPublicationDateTime END) DESC NULLS LAST,
-     documentationUnit.date DESC NULLS LAST
-""";
-
-  @Query(
-      value =
-          """
-  SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
-  LEFT JOIN documentationUnit.court court
-  LEFT JOIN documentationUnit.status status
-  WHERE
-  """
-              + BASE_QUERY)
+     documentationUnit.date DESC NULLS LAST,
+     documentationUnit.documentNumber DESC
+  """)
   @SuppressWarnings("java:S107")
   // We use JPA repository interface magic, so reducing parameter count is not possible.
   Slice<DocumentationUnitListItemDTO> searchByDocumentationUnitSearchInput(
-      @Param("documentationOfficeId") UUID documentationOfficeId,
-      @Param("documentNumber") String documentNumber,
-      @Param("courtType") String courtType,
-      @Param("courtLocation") String courtLocation,
-      @Param("decisionDate") LocalDate decisionDate,
-      @Param("decisionDateEnd") LocalDate decisionDateEnd,
-      @Param("publicationDate") LocalDate publicationDate,
-      @Param("scheduledOnly") Boolean scheduledOnly,
-      @Param("status") PublicationStatus status,
-      @Param("withErrorOnly") Boolean withErrorOnly,
-      @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
-      @Param("withDuplicateWarning") Boolean withDuplicateWarning,
-      @Param("pageable") Pageable pageable);
-
-  @Query(
-      value =
-          """
-  SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
-  LEFT JOIN documentationUnit.court court
-  LEFT JOIN documentationUnit.fileNumbers fileNumber
-  WHERE (upper(fileNumber.value) like upper(concat(:fileNumber,'%')))
-  AND
-  """
-              + BASE_QUERY)
-  @SuppressWarnings("java:S107")
-  // We use JPA repository interface magic, so reducing parameter count is not possible.
-  Slice<DocumentationUnitListItemDTO> searchByDocumentationUnitSearchInputFileNumber(
       @Param("documentationOfficeId") UUID documentationOfficeId,
       @Param("documentNumber") String documentNumber,
       @Param("fileNumber") String fileNumber,
@@ -115,34 +93,6 @@ public interface DatabaseDocumentationUnitRepository
       @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
       @Param("withDuplicateWarning") Boolean withDuplicateWarning,
       @Param("pageable") Pageable pageable);
-
-  @Query(
-      value =
-          """
-  SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
-  LEFT JOIN documentationUnit.court court
-  LEFT JOIN documentationUnit.deviatingFileNumbers deviatingFileNumber
-  WHERE (upper(deviatingFileNumber.value) like upper(concat(:fileNumber,'%')))
-  AND
-  """
-              + BASE_QUERY)
-  @SuppressWarnings("java:S107")
-  // We use JPA repository interface magic, so reducing parameter count is not possible.
-  Slice<DocumentationUnitListItemDTO> searchByDocumentationUnitSearchInputDeviatingFileNumber(
-      UUID documentationOfficeId,
-      String documentNumber,
-      String fileNumber,
-      String courtType,
-      String courtLocation,
-      LocalDate decisionDate,
-      LocalDate decisionDateEnd,
-      LocalDate publicationDate,
-      Boolean scheduledOnly,
-      PublicationStatus status,
-      Boolean withErrorOnly,
-      Boolean myDocOfficeOnly,
-      Boolean withDuplicateWarning,
-      Pageable pageable);
 
   // temporarily needed for the ldml handover phase, can be removed once we integrate ldml
   // generation into the doc-unit lifecycle
