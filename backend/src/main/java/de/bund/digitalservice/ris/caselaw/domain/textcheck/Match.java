@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.domain.textcheck;
 
 import java.util.List;
+
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
@@ -19,4 +21,5 @@ public record Match(
     Type type,
     Rule rule,
     boolean ignoreForIncompleteSentence,
-    int contextForSureMatch) {}
+    int contextForSureMatch,
+    List<IgnoredTextCheckWord> ignoredTextCheckWords) {}

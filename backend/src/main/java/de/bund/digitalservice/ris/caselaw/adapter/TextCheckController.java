@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -74,5 +75,22 @@ public class TextCheckController {
     } catch (DocumentationUnitNotExistsException ex) {
       return ResponseEntity.internalServerError().build();
     }
+  }
+
+  @PostMapping(
+      value = "{id}/text-check/ignored-words/add",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<IgnoredTextCheckWord> addIgnoredWord(
+      @PathVariable("id") UUID id, @RequestBody IgnoredTextCheckWord ignoredWord) {
+    try {
+      return ResponseEntity.ok(textCheckService.addIgnoredTextCheckWord(ignoredWord, id));
+
+    } catch (Exception e) {
+      log.error("Adding word failed", e);
+    }
+
+    return ResponseEntity.internalServerError().build();
   }
 }

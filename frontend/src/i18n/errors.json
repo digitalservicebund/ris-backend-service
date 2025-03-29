@@ -226,5 +226,8 @@
   },
   "TEXT_CHECK_FAILED": {
     "title": "Fehler beim Prüfen der Rechtschreibung"
+  },
+  "IGNORED_TEXT_CHECK_WORD_COULD_NOT_BE_SAVED": {
+    "title": "Wort konnte nicht gespeichert werden"
   }
 }

@@ -42,6 +42,7 @@ export interface Match {
   contextForSureMatch: number
   word: string
   category: string
+  ignoredTextCheckWords?: [IgnoredTextCheckWord]
 }
 
 export interface TextCheckResponse {
@@ -63,6 +64,15 @@ export interface Suggestion {
   word: string
   matches: Match[]
 }
+
+export interface IgnoredTextCheckWord {
+  id?: string
+  word: string
+  type: DocumentationType
+  isEditable?: boolean
+}
+
+export type DocumentationType = "documentation_office" | "documentation_unit"
 
 export type TextCheckExtensionOptions = {
   category?: string
