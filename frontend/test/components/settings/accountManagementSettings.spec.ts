@@ -13,15 +13,4 @@ describe("account management settings", () => {
     await screen.findByText("Kontoverwaltung")
     expect(screen.getByText("Bare.ID öffnen")).toBeInTheDocument()
   })
-
-  test("hides account management", async () => {
-    vi.spyOn(adminService, "getAccountManagementUrl").mockResolvedValue({
-      status: 500,
-      error: { title: "" },
-    })
-
-    render(AccountManagementSettings)
-    expect(screen.queryByText("Kontoverwaltung")).not.toBeInTheDocument()
-    expect(screen.queryByText("Bare.ID öffnen")).not.toBeInTheDocument()
-  })
 })

@@ -132,8 +132,7 @@ describe("Core Data", () => {
     }
 
     renderComponent({ modelValue: coreData })
-    expect(screen.getByTestId("jurisdiction-type")).toBeVisible()
-    expect(screen.getByLabelText("Quelle")).toHaveValue(
+    expect(screen.getByLabelText("Quelle Input")).toHaveTextContent(
       SourceValue.AngefordertesOriginal,
     )
   })
@@ -143,12 +142,19 @@ describe("Core Data", () => {
       "onUpdate:modelValue": onUpdate,
     })
 
-    const input = screen.getByLabelText("Quelle")
+    const dropdown = await screen.findByLabelText("Quelle Input")
+    await user.click(dropdown)
 
-    await user.selectOptions(input, SourceValue.Zeitschrift)
+    const options = screen.getAllByRole("option")
+    expect(options.length).toBe(6)
+    expect(options[0]).toHaveTextContent(
+      "unaufgefordert eingesandtes Original (O)",
+    )
+    await user.click(options[0])
+
     expect(onUpdate).toHaveBeenCalledWith({
       source: {
-        value: SourceValue.Zeitschrift,
+        value: SourceValue.UnaufgefordertesOriginal,
       },
     })
   })

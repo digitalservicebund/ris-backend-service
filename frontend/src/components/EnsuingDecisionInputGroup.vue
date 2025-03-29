@@ -181,7 +181,7 @@ onMounted(() => {
           v-model="isPending"
           aria-label="Anhängige Entscheidung"
           binary
-          :disbaled="ensuingDecision.hasForeignSource"
+          :disabled="ensuingDecision.hasForeignSource"
           size="large"
         />
       </InputField>

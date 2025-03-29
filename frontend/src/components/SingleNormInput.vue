@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import Checkbox from "primevue/checkbox"
-import InputMask from "primevue/inputmask"
 import InputText from "primevue/inputtext"
 import { computed, onMounted, ref } from "vue"
 import { ValidationError } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
+import YearInput from "@/components/input/YearInput.vue"
 import { useInjectCourtType } from "@/composables/useCourtType"
 import { useValidationStore } from "@/composables/useValidationStore"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
@@ -285,14 +285,11 @@ onMounted(async () => {
             updateDateFormatValidation(validationError, 'dateOfRelevance')
         "
       >
-        <InputMask
+        <YearInput
           id="dateOfRelevance"
           v-model="singleNorm.dateOfRelevance"
           aria-label="Jahr der Norm"
-          :invalid="slotProps.hasError"
-          mask="9999"
-          placeholder="JJJJ"
-          size="small"
+          :has-error="slotProps.hasError"
           @focus="validationStore.remove('dateOfRelevance')"
           @update:validation-error="slotProps.updateValidationError"
         />

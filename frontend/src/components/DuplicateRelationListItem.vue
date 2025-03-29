@@ -113,7 +113,7 @@ const coreDataText = computed(() =>
         v-model="isIgnored"
         aria-label="Warnung ignorieren"
         binary
-        :readonly="isAutomaticallyIgnored"
+        :disabled="isAutomaticallyIgnored"
       />
     </InputField>
 

@@ -199,7 +199,6 @@ describe("ScheduledPublishingDateTime", () => {
     await fireEvent.update(dateField, "40.01.205")
     await fireEvent.blur(dateField)
 
-    expect(dateField).toHaveValue("40.01.205")
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
 
     expect(

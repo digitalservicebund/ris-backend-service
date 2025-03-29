@@ -38,7 +38,6 @@ function ignoreSuggestion() {
           : 'Vorschläge ignorieren'
       "
       data-testid="suggestion-ignore-button"
-      disabled
       :label="replacementMode === 'single' ? 'Ignorieren ' : 'Alle ignorieren'"
       severity="secondary"
       size="small"
