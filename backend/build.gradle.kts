@@ -14,7 +14,7 @@ plugins {
     id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.0.2"
-    id("org.sonarqube") version "6.0.1.5171"
+    id("org.sonarqube") version "6.1.0.5360"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
@@ -165,7 +165,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.1")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.30.1")
+    implementation("com.google.protobuf:protobuf-java:4.30.2")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.5.2")
@@ -222,16 +222,16 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.13.0")
     implementation("org.jsoup:jsoup:1.19.1")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.3.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.3.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.3.1")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.3.1")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.10.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.4.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.5.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.4.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.5.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
