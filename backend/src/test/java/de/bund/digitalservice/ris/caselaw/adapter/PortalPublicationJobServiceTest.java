@@ -37,7 +37,7 @@ class PortalPublicationJobServiceTest {
 
   @Test
   void shouldDoNothingOnEmptyJobs() throws DocumentationUnitNotExistsException {
-    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(List.of());
+    when(this.publicationJobRepository.findAllPendingJobs()).thenReturn(List.of());
 
     this.service.executePendingJobs();
 
@@ -50,7 +50,7 @@ class PortalPublicationJobServiceTest {
   void shouldPublishASingleDocUnit()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("123", PortalPublicationTaskType.PUBLISH));
-    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
+    when(this.publicationJobRepository.findAllPendingJobs()).thenReturn(jobs);
 
     this.service.executePendingJobs();
 
@@ -66,7 +66,7 @@ class PortalPublicationJobServiceTest {
   void shouldDeleteASingleDocUnit()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("456", PortalPublicationTaskType.DELETE));
-    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
+    when(this.publicationJobRepository.findAllPendingJobs()).thenReturn(jobs);
 
     this.service.executePendingJobs();
 
@@ -82,7 +82,7 @@ class PortalPublicationJobServiceTest {
   void shouldHandleErrorWhenPublishingASingleDocUnit()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("789", PortalPublicationTaskType.PUBLISH));
-    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
+    when(this.publicationJobRepository.findAllPendingJobs()).thenReturn(jobs);
     doThrow(RuntimeException.class)
         .when(publicPortalPublicationService)
         .publishDocumentationUnit("789");
@@ -100,7 +100,7 @@ class PortalPublicationJobServiceTest {
   void shouldHandleErrorWhenDeletingASingleDocUnit()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("312", PortalPublicationTaskType.DELETE));
-    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
+    when(this.publicationJobRepository.findAllPendingJobs()).thenReturn(jobs);
     doThrow(RuntimeException.class)
         .when(publicPortalPublicationService)
         .deleteDocumentationUnit("312");
@@ -118,7 +118,7 @@ class PortalPublicationJobServiceTest {
   void shouldCatchErrorWhenUploadingChangelogFails()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("312", PortalPublicationTaskType.DELETE));
-    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
+    when(this.publicationJobRepository.findAllPendingJobs()).thenReturn(jobs);
     doThrow(RuntimeException.class)
         .when(publicPortalPublicationService)
         .uploadChangelog(any(), any());
@@ -143,7 +143,7 @@ class PortalPublicationJobServiceTest {
             createPublicationJob("3", PortalPublicationTaskType.PUBLISH),
             createPublicationJob("4", PortalPublicationTaskType.DELETE),
             createPublicationJob("5", PortalPublicationTaskType.PUBLISH));
-    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
+    when(this.publicationJobRepository.findAllPendingJobs()).thenReturn(jobs);
     doThrow(RuntimeException.class)
         .when(publicPortalPublicationService)
         .publishDocumentationUnit("1");

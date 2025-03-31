@@ -11,29 +11,26 @@ import org.springframework.stereotype.Repository;
 public interface PortalPublicationJobRepository
     extends JpaRepository<PortalPublicationJobDTO, UUID> {
 
-  @Query(
-      """
-    SELECT p.documentNumber
-    FROM PortalPublicationJobDTO p
-    WHERE p.createdAt = (
-        SELECT MAX(p2.createdAt)
-        FROM PortalPublicationJobDTO p2
-        WHERE p2.documentNumber = p.documentNumber
-    )
-    AND p.publicationType = 'PUBLISH'
-      """)
-  List<String> findAllDocumentNumbersPublishJobs();
+  //  @Query(
+  //      value =
+  //          """
+  //     SELECT DISTINCT ON (document_number) * FROM incremental_migration.portal_publication_job
+  //        WHERE portal_publication_status = 'PENDING'
+  //        ORDER BY document_number, created_at DESC
+  //        LIMIT 500
+  //    """,
+  //      nativeQuery = true)
+  //  List<PortalPublicationJobDTO> findLatestPendingJobs();
 
   @Query(
       value =
           """
-     SELECT DISTINCT ON (document_number) * FROM incremental_migration.portal_publication_job
-        WHERE portal_publication_status = 'PENDING'
-        ORDER BY document_number, created_at DESC
-        LIMIT 500
-    """,
-      nativeQuery = true)
-  List<PortalPublicationJobDTO> findLatestPendingJobs();
+      SELECT portalPublicationJob
+      FROM PortalPublicationJobDTO portalPublicationJob
+      WHERE portalPublicationJob.publicationStatus = 'PENDING'
+      ORDER BY portalPublicationJob.createdAt ASC LIMIT 500
+    """)
+  List<PortalPublicationJobDTO> findAllPendingJobs();
 
   @Modifying
   @Query(
