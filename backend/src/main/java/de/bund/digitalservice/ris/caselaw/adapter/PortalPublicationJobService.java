@@ -7,8 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskType;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +24,8 @@ public class PortalPublicationJobService {
     this.internalPortalPublicationService = publicPortalPublicationService;
   }
 
-  @Scheduled(fixedDelayString = "PT5S")
-  @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT1H")
+  //  @Scheduled(fixedDelayString = "PT5S")
+  //  @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT1H")
   @Transactional
   public void executePendingJobs() {
     List<PortalPublicationJobDTO> pendingJobs = publicationJobRepository.findLatestPendingJobs();
