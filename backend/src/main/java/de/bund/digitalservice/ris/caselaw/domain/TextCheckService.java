@@ -329,7 +329,9 @@ public class TextCheckService {
     List<IgnoredTextCheckWord> ignoredTextCheckWords =
         ignoredTextCheckWordRepository
             .findAllByDocumentationOfficesOrUnitAndWords(
-                documentationOfficeIds, null, matches.stream().map(Match::word).toList())
+                documentationOfficeIds,
+                documentationUnitId,
+                matches.stream().map(Match::word).toList())
             .stream()
             .toList();
 
