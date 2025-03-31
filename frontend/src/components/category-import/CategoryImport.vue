@@ -423,6 +423,7 @@ onMounted(() => {
           id="categoryImporterDocumentNumber"
           v-model="documentNumber"
           aria-label="Dokumentnummer Eingabefeld"
+          fluid
           :ivalid="slotProps.hasError"
           size="small"
           @enter-released="searchForDocumentUnit"
@@ -432,7 +433,6 @@ onMounted(() => {
       <Button
         aria-label="Dokumentationseinheit laden"
         :disabled="documentNumber?.length != 13"
-        size="small"
         @click="searchForDocumentUnit"
         ><template #icon> <IconSearch /> </template
       ></Button>
