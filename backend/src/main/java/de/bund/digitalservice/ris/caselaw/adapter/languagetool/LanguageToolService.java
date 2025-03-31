@@ -4,9 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.TextCheckResponseTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +34,12 @@ public class LanguageToolService extends TextCheckService {
   private final LanguageToolConfig languageToolConfig;
 
   public LanguageToolService(
-      LanguageToolConfig languageToolConfig, DocumentationUnitService documentationUnitService) {
+      LanguageToolConfig languageToolConfig,
+      DocumentationUnitService documentationUnitService,
+      DocumentationOfficeService documentationOfficeService,
+      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
 
-    super(documentationUnitService);
+    super(documentationUnitService, documentationOfficeService, ignoredTextCheckWordRepository);
     this.languageToolConfig = languageToolConfig;
   }
 

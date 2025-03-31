@@ -173,6 +173,25 @@ class NeurisTextCheckService implements TextCheckService {
   clearSelectedMatch = () => {
     this.selectedMatch.value = undefined
   }
+
+  static isMatchIgnored(match: Match): boolean {
+    return (
+      Array.isArray(match.ignoredTextCheckWords) &&
+      match.ignoredTextCheckWords.length > 0
+    )
+  }
+
+  /**
+   * Returns true if all ignored words are editable, otherwise false
+   * @param match
+   */
+  static isMatchEditable(match: Match): boolean {
+    return (
+      match.ignoredTextCheckWords?.every(
+        (ignoredWord) => ignoredWord.isEditable === true,
+      ) ?? false
+    )
+  }
 }
 
 export { NeurisTextCheckService, TextCheckService }

@@ -201,10 +201,10 @@ const shouldShowBubbleMenu = (): boolean => {
 }
 
 /**
- * Ignore match and remove the text check tag
+ * Closing text check menu and resets selected match when ignoring word
  */
 function ignoreSuggestion() {
-  alert("Not implemented yet")
+  editor.commands.setSelectedMatch()
 }
 
 /**

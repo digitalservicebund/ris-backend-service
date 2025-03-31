@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.TextCheckMockService;
@@ -16,7 +19,10 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.jsoup.Jsoup;
@@ -28,12 +34,21 @@ import org.junit.jupiter.params.provider.EnumSource;
 class TextCheckServiceTest {
 
   private DocumentationUnitService documentationUnitService;
+  private DocumentationOfficeService documentationOfficeService;
+  private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
   private TextCheckService textCheckService;
 
   @BeforeEach
   void setUp() {
     documentationUnitService = mock(DocumentationUnitService.class);
-    textCheckService = new TextCheckMockService(documentationUnitService);
+    documentationOfficeService = mock(DocumentationOfficeService.class);
+    ignoredTextCheckWordRepository = mock(IgnoredTextCheckWordRepository.class);
+
+    textCheckService =
+        new TextCheckMockService(
+            documentationUnitService, documentationOfficeService, ignoredTextCheckWordRepository);
+
+    when(textCheckService.getDocumentationOfficeIds(any())).thenReturn(Collections.emptyList());
   }
 
   @Test
@@ -51,6 +66,7 @@ class TextCheckServiceTest {
                         .decisionReasons("<p>Decision reasons text</p>")
                         .tenor("<p>Tenor text</p>")
                         .build())
+                .coreData(CoreData.builder().build())
                 .shortTexts(
                     ShortTexts.builder()
                         .headnote("<p>Headnote text</p>")
@@ -95,6 +111,11 @@ class TextCheckServiceTest {
                         .dissentingOpinion("<p>DissentingOpinion text</p>")
                         .outline("<p>Outline text</p>")
                         .build())
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        .build())
                 .shortTexts(
                     ShortTexts.builder()
                         .guidingPrinciple("<p>Guiding principle text</p>")
@@ -128,8 +149,17 @@ class TextCheckServiceTest {
   @Test
   void testCheckCategory_unknownCategory() throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
-    when(documentationUnitService.getByUuid(uuid)).thenReturn(DocumentationUnit.builder().build());
+    when(documentationUnitService.getByUuid(uuid))
+        .thenReturn(
+            DocumentationUnit.builder()
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        .build())
+                .build());
 
+    when(textCheckService.getDocumentationOfficeIds(any())).thenReturn(Collections.emptyList());
     assertThrows(
         TextCheckUnknownCategoryException.class,
         () -> textCheckService.checkCategory(uuid, CategoryType.UNKNOWN));
@@ -140,7 +170,15 @@ class TextCheckServiceTest {
     UUID uuid = UUID.randomUUID();
 
     when(documentationUnitService.getByUuid(uuid))
-        .thenReturn(DocumentationUnit.builder().longTexts(LongTexts.builder().build()).build());
+        .thenReturn(
+            DocumentationUnit.builder()
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        .build())
+                .longTexts(LongTexts.builder().build())
+                .build());
 
     TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, CategoryType.REASONS);
     assertNull(result);
@@ -151,7 +189,7 @@ class TextCheckServiceTest {
     String htmlText = "<p>text text widt missspelling</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
             List.of(
@@ -190,7 +228,7 @@ class TextCheckServiceTest {
     String htmlText = "<p>z</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
             List.of(
@@ -222,7 +260,7 @@ class TextCheckServiceTest {
     String htmlText = "<p>text with a <border-number number=\"2\">missspelling</border-number></p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
             List.of(
@@ -250,7 +288,7 @@ class TextCheckServiceTest {
         "<p>This is a test &gt; 10 &amp;&nbsp;&lt; 20. Also &quot;quoted&quot;. And &#x2665; and &#9829;</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
             List.of(
@@ -277,8 +315,9 @@ class TextCheckServiceTest {
     String htmlText = "<p>This text contains a fake &lt;tag&gt;</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
-    when(mockService.check(any(String.class)))
+    TextCheckService spyService = spy(textCheckService);
+
+    when(spyService.check(any(String.class)))
         .thenReturn(
             List.of(
                 Match.builder()
@@ -287,10 +326,10 @@ class TextCheckServiceTest {
                     .length(3)
                     .rule(Rule.builder().issueType("typo").build())
                     .build()));
-    when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
+    when(spyService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
         .thenCallRealMethod();
 
-    TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
+    TextCheckCategoryResponse response = spyService.checkCategoryByHTML(htmlText, categoryType);
 
     assertNotNull(response);
     assertEquals(
@@ -304,7 +343,7 @@ class TextCheckServiceTest {
     String htmlText = "<p>This is a,<br>with line<br>breaks</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
             List.of(
@@ -331,7 +370,8 @@ class TextCheckServiceTest {
     String htmlText = "<p>test text</p>";
     CategoryType categoryType = CategoryType.REASONS;
 
-    TextCheckService mockService = mock(TextCheckService.class);
+    TextCheckService mockService = spy(textCheckService);
+
     when(mockService.check(any(String.class))).thenReturn(new ArrayList<>());
     when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
         .thenCallRealMethod();
@@ -358,5 +398,43 @@ class TextCheckServiceTest {
     String htmlText = "<p>test with gt &lt; and lt &gt; text</p>";
     String normalizedHtml = TextCheckService.normalizeHTML(Jsoup.parse(htmlText));
     assertEquals("<p>test with gt &lt; and lt &gt; text</p>", normalizedHtml);
+  }
+
+  @Test
+  void testCheckCategoryByHTML_withIgnoredMatches() {
+    String htmlText = "<p>text text with ignored match</p>";
+    CategoryType categoryType = CategoryType.REASONS;
+
+    final String ignoredWord = "ignored match";
+
+    when(ignoredTextCheckWordRepository.findAllByDocumentationOfficesOrUnitAndWords(
+            any(), any(), any()))
+        .thenReturn(List.of(IgnoredTextCheckWord.builder().word(ignoredWord).build()));
+
+    TextCheckService mockService = spy(textCheckService);
+    when(mockService.check(any(String.class)))
+        .thenReturn(
+            List.of(
+                Match.builder()
+                    .id(1)
+                    .word(ignoredWord)
+                    .offset(18)
+                    .length(ignoredWord.length())
+                    .rule(Rule.builder().issueType("ignored").build())
+                    .build()));
+    when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
+        .thenCallRealMethod();
+
+    TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
+
+    verify(ignoredTextCheckWordRepository)
+        .findAllByDocumentationOfficesOrUnitAndWords(
+            any(), any(), argThat(words -> words.contains(ignoredWord)));
+
+    assertNotNull(response);
+    assertEquals(
+        "<p>text text with <text-check id=\"1\" type=\"ignored\">ignored match</text-check></p>",
+        response.htmlText());
+    assertEquals(1, response.matches().size());
   }
 }
