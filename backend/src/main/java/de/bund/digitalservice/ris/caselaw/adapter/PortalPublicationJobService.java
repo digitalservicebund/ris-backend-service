@@ -7,8 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskType;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,51 +24,35 @@ public class PortalPublicationJobService {
     this.internalPortalPublicationService = publicPortalPublicationService;
   }
 
-  @Scheduled(fixedDelayString = "PT5S")
-  @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT15M")
+  //  @Scheduled(fixedDelayString = "PT5S")
+  //  @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT1H")
   @Transactional
   public void executePendingJobs() {
-
-    try {
-      List<PortalPublicationJobDTO> pendingJobs = publicationJobRepository.findLatestPendingJobs();
-      if (pendingJobs.isEmpty()) {
-        return;
-      }
-
-      log.info("Executing {} portal publication jobs", pendingJobs.size());
-      log.info(
-          "Executing portal publication jobs for doc numbers: {}",
-          pendingJobs.stream()
-              .map(PortalPublicationJobDTO::getDocumentNumber)
-              .collect(Collectors.joining(", ")));
-      for (PortalPublicationJobDTO job : pendingJobs) {
-        executeJob(job);
-      }
-      var publicationResult = publishChangelog(pendingJobs);
-      var savedJobs = publicationJobRepository.saveAll(pendingJobs);
-      savedJobs.forEach(
-          pendingJob -> {
-            try {
-              publicationJobRepository.ignoreOlderJobsByDocumentNumber(
-                  pendingJob.getDocumentNumber());
-            } catch (Exception e) {
-              log.error(
-                  "Error while ignoring old job for document number {}",
-                  pendingJob.getDocumentNumber(),
-                  e);
-              throw e;
-            }
-          });
-
-      log.info(
-          "Portal publication jobs successfully executed: {} units published, {} units deleted.",
-          publicationResult.publishedCount,
-          publicationResult.deletedCount);
-
-    } catch (Exception ex) {
-      log.error("Exception on transaction", ex);
-      throw ex;
+    List<PortalPublicationJobDTO> pendingJobs = publicationJobRepository.findLatestPendingJobs();
+    if (pendingJobs.isEmpty()) {
+      return;
     }
+
+    log.info("Executing {} portal publication jobs", pendingJobs.size());
+    log.info(
+        "Executing portal publication jobs for doc numbers: {}",
+        pendingJobs.stream()
+            .map(PortalPublicationJobDTO::getDocumentNumber)
+            .collect(Collectors.joining(", ")));
+    for (PortalPublicationJobDTO job : pendingJobs) {
+      executeJob(job);
+    }
+    var publicationResult = publishChangelog(pendingJobs);
+    publicationJobRepository.saveAll(pendingJobs);
+    pendingJobs.forEach(
+        pendingJob ->
+            publicationJobRepository.ignoreOlderJobsByDocumentNumber(
+                pendingJob.getDocumentNumber()));
+
+    log.info(
+        "Portal publication jobs successfully executed: {} units published, {} units deleted.",
+        publicationResult.publishedCount,
+        publicationResult.deletedCount);
   }
 
   private void executeJob(PortalPublicationJobDTO job) {
