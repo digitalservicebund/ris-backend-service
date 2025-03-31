@@ -257,7 +257,6 @@ describe("NormReferenceEntry", () => {
     expect(singleNormInput).toBeVisible()
   })
 
-  // Todo: typing in InputMask
   // it("does not add norm with invalid version date input", async () => {
   //   const { user } = renderComponent({
   //     modelValue: {
@@ -275,7 +274,6 @@ describe("NormReferenceEntry", () => {
   //   expect(dateInput).toBeVisible()
   // })
 
-  // Todo: typing in InputMask
   // it("does not add norm with incomplete version date input", async () => {
   //   const { user } = renderComponent({
   //     modelValue: {
@@ -391,33 +389,31 @@ describe("NormReferenceEntry", () => {
     expect(singleNormInput).toHaveValue("§ 123")
   })
 
-  // Todo: typing in InputMask
-  // it("correctly updates the value of the version date input", async () => {
-  //   const { user } = renderComponent({
-  //     modelValue: {
-  //       normAbbreviation: { id: "123", abbreviation: "ABC" },
-  //     } as NormReference,
-  //   })
+  it("correctly updates the value of the version date input", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
 
-  //   const versionField = screen.getByLabelText("Fassungsdatum der Norm")
-  //   await user.type(versionField, "31.01.2022")
+    const versionField = screen.getByLabelText("Fassungsdatum der Norm")
+    await user.type(versionField, "31.01.2022")
 
-  //   expect(versionField).toHaveValue("31.01.2022")
-  // })
+    expect(versionField).toHaveValue("31.01.2022")
+  })
 
-  // Todo: typing in InputMask
-  // it("correctly updates the value of the version date input", async () => {
-  //   const { user } = renderComponent({
-  //     modelValue: {
-  //       normAbbreviation: { id: "123", abbreviation: "ABC" },
-  //     } as NormReference,
-  //   })
+  it("correctly updates the value of the version date input", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
 
-  //   const relevanceField = screen.getByLabelText("Jahr der Norm")
-  //   await user.type(relevanceField, "2023")
+    const relevanceField = screen.getByLabelText("Jahr der Norm")
+    await user.type(relevanceField, "2023")
 
-  //   expect(relevanceField).toHaveValue("2023")
-  // })
+    expect(relevanceField).toHaveValue("2023")
+  })
 
   it("emits add event", async () => {
     const { user, emitted } = renderComponent({

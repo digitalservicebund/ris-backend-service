@@ -214,10 +214,10 @@ describe("ScheduledPublishingDateTime", () => {
     })
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
-    await fireEvent.update(timeField, "invalid")
+    await fireEvent.update(timeField, "a")
     await fireEvent.blur(timeField)
 
-    expect(timeField).toHaveValue("")
+    expect(timeField).toHaveValue("a")
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
 
     expect(

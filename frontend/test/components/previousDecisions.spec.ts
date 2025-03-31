@@ -183,18 +183,17 @@ describe("PreviousDecisions", () => {
     expect(screen.getByText(/345/)).toBeInTheDocument()
   })
 
-  // Todo: typing in InputMask
-  // it("creates new previous desision manually", async () => {
-  //   const { user } = renderComponent()
-  //   const input = await screen.findByLabelText(
-  //     "Aktenzeichen Vorgehende Entscheidung",
-  //   )
-  //   await user.type(input, "123")
-  //   const button = screen.getByLabelText("Vorgehende Entscheidung speichern")
-  //   await user.click(button)
+  it("creates new previous desision manually", async () => {
+    const { user } = renderComponent()
+    const input = await screen.findByLabelText(
+      "Aktenzeichen Vorgehende Entscheidung",
+    )
+    await user.type(input, "123")
+    const button = screen.getByLabelText("Vorgehende Entscheidung speichern")
+    await user.click(button)
 
-  //   expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(2)
-  // })
+    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(2)
+  })
 
   it("click on list item, opens the list entry in edit mode", async () => {
     const { user } = renderComponent([
@@ -279,24 +278,23 @@ describe("PreviousDecisions", () => {
     expect(checkbox).toBeChecked()
   })
 
-  // Todo: typing in InputMask
-  // it("correctly updates value of decision date input", async () => {
-  //   const { user } = renderComponent([generatePreviousDecision()])
+  it("correctly updates value of decision date input", async () => {
+    const { user } = renderComponent([generatePreviousDecision()])
 
-  //   expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
-  //   await user.click(screen.getByTestId("list-entry-0"))
+    expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
+    await user.click(screen.getByTestId("list-entry-0"))
 
-  //   const fileNumberInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Vorgehende Entscheidung",
-  //   )
+    const fileNumberInput = await screen.findByLabelText(
+      "Entscheidungsdatum Vorgehende Entscheidung",
+    )
 
-  //   await user.clear(fileNumberInput)
-  //   await user.type(fileNumberInput, "02.02.2022")
-  //   const button = screen.getByLabelText("Vorgehende Entscheidung speichern")
-  //   await user.click(button)
+    await user.clear(fileNumberInput)
+    await user.type(fileNumberInput, "02.02.2022")
+    const button = screen.getByLabelText("Vorgehende Entscheidung speichern")
+    await user.click(button)
 
-  //   expect(screen.getByText(/02.02.2022/)).toBeVisible()
-  // })
+    expect(screen.getByText(/02.02.2022/)).toBeVisible()
+  })
 
   it("correctly deletes manually added previous decisions", async () => {
     const { user } = renderComponent([
@@ -407,53 +405,50 @@ describe("PreviousDecisions", () => {
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 
-  // Todo: typing in InputMask
-  // it("does not add previous decision with invalid date input", async () => {
-  //   const { user } = renderComponent()
+  it("does not add previous decision with invalid date input", async () => {
+    const { user } = renderComponent()
 
-  //   const dateInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Vorgehende Entscheidung",
-  //   )
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Vorgehende Entscheidung",
+    )
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "00.00.0231")
+    await user.type(dateInput, "00.00.0231")
 
-  //   await screen.findByText(/Kein valides Datum/)
-  //   screen.getByLabelText("Vorgehende Entscheidung speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Kein valides Datum/)
+    screen.getByLabelText("Vorgehende Entscheidung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 
-  // Todo: typing in InputMask
-  // it("does not add previous decision with incomplete date input", async () => {
-  //   const { user } = renderComponent()
+  it("does not add previous decision with incomplete date input", async () => {
+    const { user } = renderComponent()
 
-  //   const dateInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Vorgehende Entscheidung",
-  //   )
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Vorgehende Entscheidung",
+    )
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "01")
-  //   await user.tab()
+    await user.type(dateInput, "01")
+    await user.tab()
 
-  //   await screen.findByText(/Unvollständiges Datum/)
-  //   screen.getByLabelText("Vorgehende Entscheidung speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Unvollständiges Datum/)
+    screen.getByLabelText("Vorgehende Entscheidung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 
-  // Todo: typing in InputMask
-  // it("does not add previous decision with date in future", async () => {
-  //   const { user } = renderComponent()
+  it("does not add previous decision with date in future", async () => {
+    const { user } = renderComponent()
 
-  //   const dateInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Vorgehende Entscheidung",
-  //   )
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Vorgehende Entscheidung",
+    )
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "01.02.2090")
-  //   await user.tab()
+    await user.type(dateInput, "01.02.2090")
+    await user.tab()
 
-  //   await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
-  //   screen.getByLabelText("Vorgehende Entscheidung speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
+    screen.getByLabelText("Vorgehende Entscheidung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 })

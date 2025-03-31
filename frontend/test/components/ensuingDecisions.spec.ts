@@ -267,24 +267,23 @@ describe("EnsuingDecisions", () => {
     expect(screen.getByText(/new fileNumber/)).toBeVisible()
   })
 
-  // Todo: typing in InputMask
-  // it("correctly updates value of decision date input", async () => {
-  //   const { user } = renderComponent([generateEnsuingDecision()])
+  it("correctly updates value of decision date input", async () => {
+    const { user } = renderComponent([generateEnsuingDecision()])
 
-  //   expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
-  //   await user.click(screen.getByTestId("list-entry-0"))
+    expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
+    await user.click(screen.getByTestId("list-entry-0"))
 
-  //   const fileNumberInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Nachgehende Entscheidung",
-  //   )
+    const fileNumberInput = await screen.findByLabelText(
+      "Entscheidungsdatum Nachgehende Entscheidung",
+    )
 
-  //   await user.clear(fileNumberInput)
-  //   await user.type(fileNumberInput, "02.02.2022")
-  //   const button = screen.getByLabelText("Nachgehende Entscheidung speichern")
-  //   await user.click(button)
+    await user.clear(fileNumberInput)
+    await user.type(fileNumberInput, "02.02.2022")
+    const button = screen.getByLabelText("Nachgehende Entscheidung speichern")
+    await user.click(button)
 
-  //   expect(screen.getByText(/02.02.2022/)).toBeVisible()
-  // })
+    expect(screen.getByText(/02.02.2022/)).toBeVisible()
+  })
 
   it("correctly deletes ensuing decision", async () => {
     const { user } = renderComponent([
@@ -382,53 +381,50 @@ describe("EnsuingDecisions", () => {
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 
-  // Todo: typing in InputMask
-  // it("does not add ensuing decision with invalid date input", async () => {
-  //   const { user } = renderComponent()
+  it("does not add ensuing decision with invalid date input", async () => {
+    const { user } = renderComponent()
 
-  //   const dateInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Nachgehende Entscheidung",
-  //   )
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Nachgehende Entscheidung",
+    )
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "00.00.0231")
+    await user.type(dateInput, "00.00.0231")
 
-  //   await screen.findByText(/Kein valides Datum/)
-  //   screen.getByLabelText("Nachgehende Entscheidung speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Kein valides Datum/)
+    screen.getByLabelText("Nachgehende Entscheidung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 
-  // Todo: typing in InputMask
-  // it("does not add ensuing decision with incomplete date input", async () => {
-  //   const { user } = renderComponent()
+  it("does not add ensuing decision with incomplete date input", async () => {
+    const { user } = renderComponent()
 
-  //   const dateInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Nachgehende Entscheidung",
-  //   )
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Nachgehende Entscheidung",
+    )
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "01")
-  //   await user.tab()
+    await user.type(dateInput, "01")
+    await user.tab()
 
-  //   await screen.findByText(/Unvollständiges Datum/)
-  //   screen.getByLabelText("Nachgehende Entscheidung speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Unvollständiges Datum/)
+    screen.getByLabelText("Nachgehende Entscheidung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 
-  // Todo: typing in InputMask
-  // it("does not add ensuing decision with date in future", async () => {
-  //   const { user } = renderComponent()
+  it("does not add ensuing decision with date in future", async () => {
+    const { user } = renderComponent()
 
-  //   const dateInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Nachgehende Entscheidung",
-  //   )
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Nachgehende Entscheidung",
+    )
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "01.02.2090")
-  //   await user.tab()
+    await user.type(dateInput, "01.02.2090")
+    await user.tab()
 
-  //   await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
-  //   screen.getByLabelText("Nachgehende Entscheidung speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
+    screen.getByLabelText("Nachgehende Entscheidung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 })

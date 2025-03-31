@@ -316,25 +316,24 @@ describe("active citations", () => {
     expect(screen.getByText(/new fileNumber/)).toBeVisible()
   })
 
-  // Todo: typing in InputMask
-  // it("correctly updates value of decision date input", async () => {
-  //   const { user } = renderComponent([generateActiveCitation()])
+  it("correctly updates value of decision date input", async () => {
+    const { user } = renderComponent([generateActiveCitation()])
 
-  //   expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
-  //   const itemHeader = screen.getByTestId("list-entry-0")
-  //   await user.click(itemHeader)
+    expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
+    const itemHeader = screen.getByTestId("list-entry-0")
+    await user.click(itemHeader)
 
-  //   const fileNumberInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Aktivzitierung",
-  //   )
+    const fileNumberInput = await screen.findByLabelText(
+      "Entscheidungsdatum Aktivzitierung",
+    )
 
-  //   await user.clear(fileNumberInput)
-  //   await user.type(fileNumberInput, "02.02.2022")
-  //   const button = screen.getByLabelText("Aktivzitierung speichern")
-  //   await user.click(button)
+    await user.clear(fileNumberInput)
+    await user.type(fileNumberInput, "02.02.2022")
+    const button = screen.getByLabelText("Aktivzitierung speichern")
+    await user.click(button)
 
-  //   expect(screen.getByText(/02.02.2022/)).toBeVisible()
-  // })
+    expect(screen.getByText(/02.02.2022/)).toBeVisible()
+  })
 
   it("correctly deletes manually added active citations", async () => {
     const { user } = renderComponent([
@@ -470,55 +469,52 @@ describe("active citations", () => {
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 
-  // Todo: typing in InputMask
-  // it("does not add active citation with invalid date input", async () => {
-  //   const { user } = renderComponent()
+  it("does not add active citation with invalid date input", async () => {
+    const { user } = renderComponent()
 
-  //   const dateInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Aktivzitierung",
-  //   )
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Aktivzitierung",
+    )
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "00.00.0231")
+    await user.type(dateInput, "00.00.0231")
 
-  //   await screen.findByText(/Kein valides Datum/)
-  //   screen.getByLabelText("Aktivzitierung speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Kein valides Datum/)
+    screen.getByLabelText("Aktivzitierung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 
-  // Todo: typing in InputMask
-  // it("does not add active citation with incomplete date input", async () => {
-  //   const { user } = renderComponent()
+  it("does not add active citation with incomplete date input", async () => {
+    const { user } = renderComponent()
 
-  //   const dateInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Aktivzitierung",
-  //   )
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Aktivzitierung",
+    )
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "01.02.")
-  //   await user.tab()
+    await user.type(dateInput, "01.02.")
+    await user.tab()
 
-  //   await screen.findByText(/Unvollständiges Datum/)
-  //   screen.getByLabelText("Aktivzitierung speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Unvollständiges Datum/)
+    screen.getByLabelText("Aktivzitierung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 
-  // Todo: typing in InputMask
-  // it("does not add active citation with date in the future", async () => {
-  //   const { user } = renderComponent()
+  it("does not add active citation with date in the future", async () => {
+    const { user } = renderComponent()
 
-  //   const dateInput = await screen.findByLabelText(
-  //     "Entscheidungsdatum Aktivzitierung",
-  //   )
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Aktivzitierung",
+    )
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "01.02.2090")
-  //   await user.tab()
+    await user.type(dateInput, "01.02.2090")
+    await user.tab()
 
-  //   await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
-  //   screen.getByLabelText("Aktivzitierung speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
+    screen.getByLabelText("Aktivzitierung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 
   it("should copy text of active citation summary", async () => {
     const { user } = renderComponent([generateActiveCitation()])
