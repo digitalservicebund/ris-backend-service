@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublication
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskType;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -35,6 +36,11 @@ public class PortalPublicationJobService {
     }
 
     log.info("Executing {} portal publication jobs", pendingJobs.size());
+    log.info(
+        "Executing portal publication jobs for doc numbers: {}",
+        pendingJobs.stream()
+            .map(PortalPublicationJobDTO::getDocumentNumber)
+            .collect(Collectors.joining(", ")));
     for (PortalPublicationJobDTO job : pendingJobs) {
       executeJob(job);
     }

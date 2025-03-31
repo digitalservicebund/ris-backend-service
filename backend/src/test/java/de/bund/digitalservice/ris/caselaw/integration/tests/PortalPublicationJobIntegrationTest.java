@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
+import static de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus.SKIPPED;
+import static de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -227,7 +229,13 @@ class PortalPublicationJobIntegrationTest {
     assertThat(deleteRequest.key()).isEqualTo("1.xml");
 
     assertThat(portalPublicationJobRepository.findAll())
-        .allMatch(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS);
+        .satisfiesExactly(
+            job -> assertThat(job.getPublicationStatus()).isEqualTo(SUCCESS),
+            job -> assertThat(job.getPublicationStatus()).isEqualTo(SUCCESS),
+            job -> assertThat(job.getPublicationStatus()).isEqualTo(SKIPPED),
+            job -> assertThat(job.getPublicationStatus()).isEqualTo(SKIPPED),
+            job -> assertThat(job.getPublicationStatus()).isEqualTo(SKIPPED),
+            job -> assertThat(job.getPublicationStatus()).isEqualTo(SKIPPED));
   }
 
   @Test

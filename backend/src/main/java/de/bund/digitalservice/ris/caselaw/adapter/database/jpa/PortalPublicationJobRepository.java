@@ -39,7 +39,7 @@ public interface PortalPublicationJobRepository
   @Query(
       """
     UPDATE PortalPublicationJobDTO portalPublicationJob
-    SET portalPublicationJob.publicationStatus = 'SUCCESS'
+    SET portalPublicationJob.publicationStatus = 'SKIPPED'
     WHERE portalPublicationJob.documentNumber = :documentNumber
     AND portalPublicationJob.publicationStatus = 'PENDING'
 """)
