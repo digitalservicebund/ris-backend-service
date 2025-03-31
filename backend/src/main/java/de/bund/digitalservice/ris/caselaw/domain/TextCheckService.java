@@ -178,6 +178,11 @@ public class TextCheckService {
   }
 
   protected TextCheckCategoryResponse checkCategoryByHTML(
+      String htmlText, CategoryType categoryType) {
+    return checkCategoryByHTML(htmlText, categoryType, null, null);
+  }
+
+  protected TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType, List<UUID> docOfficeIds, UUID docUnitId) {
     if (htmlText == null) {
       return null;

@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.jsoup.Jsoup;
@@ -39,9 +40,12 @@ class TextCheckServiceTest {
     documentationUnitService = mock(DocumentationUnitService.class);
     documentationOfficeService = mock(DocumentationOfficeService.class);
     ignoredTextCheckWordRepository = mock(IgnoredTextCheckWordRepository.class);
+
     textCheckService =
         new TextCheckMockService(
             documentationUnitService, documentationOfficeService, ignoredTextCheckWordRepository);
+
+    when(textCheckService.getDocumentationOfficeIds(any())).thenReturn(Collections.emptyList());
   }
 
   @Test
@@ -59,6 +63,7 @@ class TextCheckServiceTest {
                         .decisionReasons("<p>Decision reasons text</p>")
                         .tenor("<p>Tenor text</p>")
                         .build())
+                .coreData(CoreData.builder().build())
                 .shortTexts(
                     ShortTexts.builder()
                         .headnote("<p>Headnote text</p>")
@@ -103,6 +108,11 @@ class TextCheckServiceTest {
                         .dissentingOpinion("<p>DissentingOpinion text</p>")
                         .outline("<p>Outline text</p>")
                         .build())
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        .build())
                 .shortTexts(
                     ShortTexts.builder()
                         .guidingPrinciple("<p>Guiding principle text</p>")
@@ -136,8 +146,17 @@ class TextCheckServiceTest {
   @Test
   void testCheckCategory_unknownCategory() throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
-    when(documentationUnitService.getByUuid(uuid)).thenReturn(DocumentationUnit.builder().build());
+    when(documentationUnitService.getByUuid(uuid))
+        .thenReturn(
+            DocumentationUnit.builder()
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        .build())
+                .build());
 
+    when(textCheckService.getDocumentationOfficeIds(any())).thenReturn(Collections.emptyList());
     assertThrows(
         TextCheckUnknownCategoryException.class,
         () -> textCheckService.checkCategory(uuid, CategoryType.UNKNOWN));
@@ -148,7 +167,15 @@ class TextCheckServiceTest {
     UUID uuid = UUID.randomUUID();
 
     when(documentationUnitService.getByUuid(uuid))
-        .thenReturn(DocumentationUnit.builder().longTexts(LongTexts.builder().build()).build());
+        .thenReturn(
+            DocumentationUnit.builder()
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        .build())
+                .longTexts(LongTexts.builder().build())
+                .build());
 
     TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, CategoryType.REASONS);
     assertNull(result);
