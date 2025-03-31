@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -26,9 +27,9 @@ public class PortalPublicationJobService {
 
   @Scheduled(fixedDelayString = "PT5S")
   @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT1H")
+  @Transactional
   public void executePendingJobs() {
-    List<PortalPublicationJobDTO> pendingJobs =
-        publicationJobRepository.findPendingJobsOrderedByCreationDate();
+    List<PortalPublicationJobDTO> pendingJobs = publicationJobRepository.findLatestPendingJobs();
     if (pendingJobs.isEmpty()) {
       return;
     }
@@ -39,6 +40,10 @@ public class PortalPublicationJobService {
     }
     var publicationResult = publishChangelog(pendingJobs);
     publicationJobRepository.saveAll(pendingJobs);
+    pendingJobs.forEach(
+        pendingJob ->
+            publicationJobRepository.ignoreOlderJobsByDocumentNumber(
+                pendingJob.getDocumentNumber()));
 
     log.info(
         "Portal publication jobs successfully executed: {} units published, {} units deleted.",
@@ -74,12 +79,14 @@ public class PortalPublicationJobService {
             .filter(job -> job.getPublicationType() == PortalPublicationTaskType.PUBLISH)
             .filter(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS)
             .map(PortalPublicationJobDTO::getDocumentNumber)
+            .map(documentNumber -> documentNumber + ".xml")
             .toList();
     List<String> deletedDocNumbers =
         pendingJobs.stream()
             .filter(job -> job.getPublicationType() == PortalPublicationTaskType.DELETE)
             .filter(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS)
             .map(PortalPublicationJobDTO::getDocumentNumber)
+            .map(documentNumber -> documentNumber + ".xml")
             .toList();
 
     if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {

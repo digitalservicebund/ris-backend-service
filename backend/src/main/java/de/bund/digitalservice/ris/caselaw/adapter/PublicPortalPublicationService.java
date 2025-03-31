@@ -11,19 +11,12 @@ import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.parser.Parser;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -37,6 +30,7 @@ public class PublicPortalPublicationService {
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
   private final PublicPortalTransformer ldmlTransformer;
+  private final RiiService riiService;
 
   @Autowired
   public PublicPortalPublicationService(
@@ -44,13 +38,15 @@ public class PublicPortalPublicationService {
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,
       PublicPortalBucket publicPortalBucket,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      RiiService riiService) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.publicPortalBucket = publicPortalBucket;
     this.objectMapper = objectMapper;
     this.xmlUtilService = xmlUtilService;
     this.ldmlTransformer = new PublicPortalTransformer(documentBuilderFactory);
+    this.riiService = riiService;
   }
 
   /**
@@ -79,7 +75,7 @@ public class PublicPortalPublicationService {
     }
 
     try {
-      publicPortalBucket.save(ldml.getUniqueId() + ".xml", fileContent.get());
+      publicPortalBucket.save(ldml.getFileName(), fileContent.get());
     } catch (BucketException e) {
       throw new PublishException("Could not save LDML to bucket.", e);
     }
@@ -121,7 +117,7 @@ public class PublicPortalPublicationService {
   //                    ↓ minute (0-59)
   //                 ↓ second (0-59)
   // Default:        0 30 4 * * * (After migration: CET: 5:30)
-  @Scheduled(cron = "0 50 11 * * *")
+  @Scheduled(cron = "0 30 4 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logPortalPublicationSanityCheck() {
     List<String> portalBucketDocumentNumbers =
@@ -138,7 +134,7 @@ public class PublicPortalPublicationService {
     log.info(
         "Checking for discrepancies between published doc units and Rechtsprechung im Internet...");
 
-    var riiDocumentNumbers = fetchRiiDocumentNumbers();
+    var riiDocumentNumbers = riiService.fetchRiiDocumentNumbers();
     log.info("Number of documents in Rechtsprechung im Internet: {}", riiDocumentNumbers.size());
 
     if (!riiDocumentNumbers.isEmpty()) {
@@ -158,12 +154,28 @@ public class PublicPortalPublicationService {
       log.info(
           "Found {} doc units in Rechtsprechung im Internet but not in Portal.",
           inRiiNotInPortal.size());
-      log.info(
-          "Document numbers found in Rechtsprechung im Internet but not in Portal: {}",
-          inRiiNotInPortal.stream().map(Object::toString).collect(Collectors.joining(", ")));
-      log.info(
-          "Document numbers found in Portal but not in Rechtsprechung im Internet: {}",
-          inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
+      if (!inRiiNotInPortal.isEmpty()) {
+        log.info(
+            "Document numbers found in Rechtsprechung im Internet but not in Portal: {}",
+            inRiiNotInPortal.stream().map(Object::toString).collect(Collectors.joining(", ")));
+      }
+      if (!inPortalNotInRii.isEmpty()) {
+        log.info(
+            "Document numbers found in Portal but not in Rechtsprechung im Internet: {}",
+            inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
+        log.info("Deleting documents not in Rechtsprechung im Internet...");
+        try {
+          inPortalNotInRii.forEach(this::deleteDocumentationUnit);
+          uploadChangelog(
+              List.of(),
+              inPortalNotInRii.stream().map(documentNumber -> documentNumber + ".xml").toList());
+
+        } catch (JsonProcessingException | PublishException e) {
+          log.error(
+              "Deleting documents not in Rechtsprechung im Internet failed with exception: {}",
+              e.getMessage());
+        }
+      }
     }
   }
 
@@ -184,45 +196,17 @@ public class PublicPortalPublicationService {
     log.info(
         "Found {} publishable doc units by database query but not in bucket.",
         inDatabaseNotInBucket.size());
-    log.info(
-        "Document numbers found in database but not in bucket: {}",
-        inDatabaseNotInBucket.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    if (!inDatabaseNotInBucket.isEmpty()) {
+      log.info(
+          "Document numbers found in database but not in bucket: {}",
+          inDatabaseNotInBucket.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    }
     log.info(
         "Found {} doc units in bucket but not by database query.", inBucketNotInDatabase.size());
-    log.info(
-        "Document numbers found in bucket but not in database: {}",
-        inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
-  }
-
-  private List<String> fetchRiiDocumentNumbers() {
-    final String URL = "https://www.rechtsprechung-im-internet.de/rii-toc.xml";
-    List<String> documentNumbers = new ArrayList<>();
-    try {
-      Document doc =
-          Jsoup.connect(URL).maxBodySize(0).parser(Parser.xmlParser()).timeout(15_000).get();
-
-      Elements links = doc.select("link");
-
-      for (Element link : links) {
-        String linkText = link.text();
-        String documentNumber = extractDocumentNumber(linkText);
-
-        if (documentNumber != null) {
-          documentNumbers.add(documentNumber);
-        }
-      }
-
-      return documentNumbers;
-    } catch (IOException e) {
+    if (!inBucketNotInDatabase.isEmpty()) {
       log.info(
-          "Error fetching document numbers from Rechtsprechung im Internet: " + e.getMessage());
+          "Document numbers found in bucket but not in database: {}",
+          inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
     }
-    return List.of();
-  }
-
-  @SuppressWarnings("java:S5852")
-  private static String extractDocumentNumber(String link) {
-    String pattern = ".*/jb-([^/]+)\\.zip$";
-    return link.matches(pattern) ? link.replaceAll(pattern, "$1") : null;
   }
 }

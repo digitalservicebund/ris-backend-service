@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationJobService;
 import de.bund.digitalservice.ris.caselaw.adapter.PublicPortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PublicPortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
@@ -70,7 +70,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -106,7 +105,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
       OAuthService.class,
       TestConfig.class,
       PortalPublicationJobService.class,
-      DocumentNumberPatternConfig.class
+      DocumentNumberPatternConfig.class,
+      RiiService.class
     },
     controllers = {DocumentationUnitController.class})
 class PortalPublicationJobIntegrationTest {
@@ -178,7 +178,7 @@ class PortalPublicationJobIntegrationTest {
   }
 
   @Test
-  void shouldPublishAndDeleteInOrder() throws IOException {
+  void shouldProcessOnlyLatestPublicationJobsForEachDocumentNumber() throws IOException {
     DocumentationUnitDTO dto1 =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, buildValidDocumentationUnit("1"));
@@ -189,6 +189,9 @@ class PortalPublicationJobIntegrationTest {
     portalPublicationJobRepository.saveAll(
         List.of(
             createPublicationJob(dto1, PortalPublicationTaskType.PUBLISH),
+            createPublicationJob(dto2, PortalPublicationTaskType.DELETE),
+            createPublicationJob(dto1, PortalPublicationTaskType.PUBLISH),
+            createPublicationJob(dto2, PortalPublicationTaskType.PUBLISH),
             createPublicationJob(dto1, PortalPublicationTaskType.DELETE),
             createPublicationJob(dto2, PortalPublicationTaskType.PUBLISH)));
 
@@ -199,27 +202,24 @@ class PortalPublicationJobIntegrationTest {
     ArgumentCaptor<Consumer<DeleteObjectRequest.Builder>> deleteCaptor =
         ArgumentCaptor.forClass(Consumer.class);
 
-    InOrder inOrder = inOrder(s3Client);
-
-    // PUT 1.xml
-    inOrder.verify(s3Client, times(1)).putObject(putCaptor.capture(), bodyCaptor.capture());
     // DELETE 1.xml
-    inOrder.verify(s3Client, times(1)).deleteObject(deleteCaptor.capture());
+    verify(s3Client, times(1)).deleteObject(deleteCaptor.capture());
     // PUT 2.xml + PUT changelog
-    inOrder.verify(s3Client, times(2)).putObject(putCaptor.capture(), bodyCaptor.capture());
+    verify(s3Client, times(2)).putObject(putCaptor.capture(), bodyCaptor.capture());
 
     var capturedPutRequests = putCaptor.getAllValues();
     var changelogContent =
         new String(
-            bodyCaptor.getAllValues().get(2).contentStreamProvider().newStream().readAllBytes(),
+            bodyCaptor.getAllValues().get(1).contentStreamProvider().newStream().readAllBytes(),
             StandardCharsets.UTF_8);
-    assertThat(capturedPutRequests.get(0).key()).isEqualTo("1.xml");
-    assertThat(capturedPutRequests.get(1).key()).isEqualTo("2.xml");
-    assertThat(capturedPutRequests.get(2).key()).contains("changelogs/");
+
+    assertThat(capturedPutRequests.get(0).key()).isEqualTo("2.xml");
+    assertThat(capturedPutRequests.get(1).key()).contains("changelogs/");
+    // ensure that each document number only appears either in changed or deleted section
     assertThat(changelogContent)
         .isEqualTo(
             """
-                {"changed":["1","2"],"deleted":["1"]}""");
+                {"changed":["2.xml"],"deleted":["1.xml"]}""");
 
     var deleteRequestBuilder = DeleteObjectRequest.builder();
     deleteCaptor.getValue().accept(deleteRequestBuilder);
@@ -235,6 +235,9 @@ class PortalPublicationJobIntegrationTest {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, buildValidDocumentationUnit("1"));
+    DocumentationUnitDTO dto2 =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, buildValidDocumentationUnit("2"));
 
     // PUBLISH job and upload changelog will fail
     when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
@@ -243,7 +246,7 @@ class PortalPublicationJobIntegrationTest {
     portalPublicationJobRepository.saveAll(
         List.of(
             createPublicationJob(dto, PortalPublicationTaskType.PUBLISH),
-            createPublicationJob(dto, PortalPublicationTaskType.DELETE)));
+            createPublicationJob(dto2, PortalPublicationTaskType.DELETE)));
 
     portalPublicationJobService.executePendingJobs();
 

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -50,6 +52,7 @@ class PublicPortalPublicationServiceTest {
   static DocumentationUnit testDocumentUnit;
   static String testDocumentNumber;
   static ObjectMapper objectMapper;
+  static RiiService riiService;
 
   @BeforeAll
   static void setUpBeforeClass() {
@@ -57,13 +60,15 @@ class PublicPortalPublicationServiceTest {
     publicPortalBucket = mock(PublicPortalBucket.class);
     objectMapper = mock(ObjectMapper.class);
     xmlUtilService = mock(XmlUtilService.class);
+    riiService = mock(RiiService.class);
     subject =
         new PublicPortalPublicationService(
             documentationUnitRepository,
             xmlUtilService,
             documentBuilderFactory,
             publicPortalBucket,
-            objectMapper);
+            objectMapper,
+            riiService);
 
     PreviousDecision related1 =
         PreviousDecision.builder()
@@ -208,5 +213,27 @@ class PublicPortalPublicationServiceTest {
 
     assertThatExceptionOfType(JsonProcessingException.class)
         .isThrownBy(() -> subject.uploadChangelog(List.of(), List.of()));
+  }
+
+  @Test
+  void sanityCheck_shouldDeleteDocumentNumbersInPortalButNotInRii() throws JsonProcessingException {
+    when(riiService.fetchRiiDocumentNumbers()).thenReturn(List.of("123", "456"));
+    when(publicPortalBucket.getAllFilenames()).thenReturn(List.of("123.xml", "456.xml", "789.xml"));
+    ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<String> fileContentCaptor = ArgumentCaptor.forClass(String.class);
+    when(objectMapper.writeValueAsString(new Changelog(List.of(), List.of("789.xml"))))
+        .thenReturn(
+            """
+                {"changed":[],"deleted":["789.xml"]}""");
+
+    subject.logPortalPublicationSanityCheck();
+
+    verify(publicPortalBucket).delete("789.xml");
+    verify(publicPortalBucket).save(fileNameCaptor.capture(), fileContentCaptor.capture());
+    assertThat(fileNameCaptor.getValue()).contains("changelogs");
+    assertThat(fileContentCaptor.getValue())
+        .isEqualTo(
+            """
+                {"changed":[],"deleted":["789.xml"]}""");
   }
 }

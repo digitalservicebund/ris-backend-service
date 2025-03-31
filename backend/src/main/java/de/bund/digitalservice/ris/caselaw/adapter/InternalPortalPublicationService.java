@@ -81,7 +81,7 @@ public class InternalPortalPublicationService {
           "Could not transform documentation unit to valid LDML.", null);
     }
 
-    Changelog changelog = new Changelog(List.of(ldml.getUniqueId()), null);
+    Changelog changelog = new Changelog(List.of(ldml.getFileName()), null);
     String changelogJson;
     try {
       changelogJson = objectMapper.writeValueAsString(changelog);
@@ -100,7 +100,7 @@ public class InternalPortalPublicationService {
     }
 
     try {
-      internalPortalBucket.save(ldml.getUniqueId() + ".xml", fileContent.get());
+      internalPortalBucket.save(ldml.getFileName(), fileContent.get());
       log.info("LDML for documentation unit {} successfully published.", ldml.getUniqueId());
     } catch (BucketException e) {
       log.error("Could not save LDML to bucket", e);

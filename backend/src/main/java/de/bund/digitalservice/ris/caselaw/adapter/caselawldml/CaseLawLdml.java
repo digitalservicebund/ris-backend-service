@@ -33,4 +33,8 @@ public class CaseLawLdml {
   public String getUniqueId() {
     return judgment.getMeta().getIdentification().getFrbrWork().getFrbrThis().getValue();
   }
+
+  public String getFileName() {
+    return getUniqueId() + ".xml";
+  }
 }

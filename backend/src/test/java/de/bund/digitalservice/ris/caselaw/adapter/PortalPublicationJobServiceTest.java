@@ -37,8 +37,7 @@ class PortalPublicationJobServiceTest {
 
   @Test
   void shouldDoNothingOnEmptyJobs() throws DocumentationUnitNotExistsException {
-    when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate())
-        .thenReturn(List.of());
+    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(List.of());
 
     this.service.executePendingJobs();
 
@@ -51,13 +50,13 @@ class PortalPublicationJobServiceTest {
   void shouldPublishASingleDocUnit()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("123", PortalPublicationTaskType.PUBLISH));
-    when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
+    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
 
     this.service.executePendingJobs();
 
     verify(publicPortalPublicationService, times(1)).publishDocumentationUnit("123");
     verify(publicPortalPublicationService, never()).deleteDocumentationUnit(anyString());
-    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of("123"), List.of());
+    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of("123.xml"), List.of());
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationStatus())
         .isEqualTo(PortalPublicationTaskStatus.SUCCESS);
@@ -67,13 +66,13 @@ class PortalPublicationJobServiceTest {
   void shouldDeleteASingleDocUnit()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("456", PortalPublicationTaskType.DELETE));
-    when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
+    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
 
     this.service.executePendingJobs();
 
     verify(publicPortalPublicationService, never()).publishDocumentationUnit(anyString());
     verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("456");
-    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(), List.of("456"));
+    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(), List.of("456.xml"));
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationStatus())
         .isEqualTo(PortalPublicationTaskStatus.SUCCESS);
@@ -83,7 +82,7 @@ class PortalPublicationJobServiceTest {
   void shouldHandleErrorWhenPublishingASingleDocUnit()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("789", PortalPublicationTaskType.PUBLISH));
-    when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
+    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
     doThrow(RuntimeException.class)
         .when(publicPortalPublicationService)
         .publishDocumentationUnit("789");
@@ -101,7 +100,7 @@ class PortalPublicationJobServiceTest {
   void shouldHandleErrorWhenDeletingASingleDocUnit()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("312", PortalPublicationTaskType.DELETE));
-    when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
+    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
     doThrow(RuntimeException.class)
         .when(publicPortalPublicationService)
         .deleteDocumentationUnit("312");
@@ -119,7 +118,7 @@ class PortalPublicationJobServiceTest {
   void shouldCatchErrorWhenUploadingChangelogFails()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("312", PortalPublicationTaskType.DELETE));
-    when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
+    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
     doThrow(RuntimeException.class)
         .when(publicPortalPublicationService)
         .uploadChangelog(any(), any());
@@ -128,7 +127,7 @@ class PortalPublicationJobServiceTest {
 
     verify(publicPortalPublicationService, never()).publishDocumentationUnit(anyString());
     verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("312");
-    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(), List.of("312"));
+    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(), List.of("312.xml"));
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationStatus())
         .isEqualTo(PortalPublicationTaskStatus.SUCCESS);
@@ -144,7 +143,7 @@ class PortalPublicationJobServiceTest {
             createPublicationJob("3", PortalPublicationTaskType.PUBLISH),
             createPublicationJob("4", PortalPublicationTaskType.DELETE),
             createPublicationJob("5", PortalPublicationTaskType.PUBLISH));
-    when(this.publicationJobRepository.findPendingJobsOrderedByCreationDate()).thenReturn(jobs);
+    when(this.publicationJobRepository.findLatestPendingJobs()).thenReturn(jobs);
     doThrow(RuntimeException.class)
         .when(publicPortalPublicationService)
         .publishDocumentationUnit("1");
@@ -160,7 +159,7 @@ class PortalPublicationJobServiceTest {
     verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("2");
     verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("4");
     verify(publicPortalPublicationService, times(1))
-        .uploadChangelog(List.of("3", "5"), List.of("4"));
+        .uploadChangelog(List.of("3.xml", "5.xml"), List.of("4.xml"));
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationStatus()).isEqualTo(PortalPublicationTaskStatus.ERROR);
     assertThat(jobs.get(1).getPublicationStatus()).isEqualTo(PortalPublicationTaskStatus.ERROR);
