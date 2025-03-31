@@ -39,7 +39,7 @@ async function addWordToDocOffice() {
 </script>
 
 <template>
-  <div>
+  <div data-testid="ignored-word-handler">
     <div v-if="!NeurisTextCheckService.isMatchEditable(match)">
       von juris ignoriert
     </div>
