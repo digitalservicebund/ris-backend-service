@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.TextCheckMockService;
@@ -17,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -395,5 +398,43 @@ class TextCheckServiceTest {
     String htmlText = "<p>test with gt &lt; and lt &gt; text</p>";
     String normalizedHtml = TextCheckService.normalizeHTML(Jsoup.parse(htmlText));
     assertEquals("<p>test with gt &lt; and lt &gt; text</p>", normalizedHtml);
+  }
+
+  @Test
+  void testCheckCategoryByHTML_withIgnoredMatches() {
+    String htmlText = "<p>text text with ignored match</p>";
+    CategoryType categoryType = CategoryType.REASONS;
+
+    final String ignoredWord = "ignored match";
+
+    when(ignoredTextCheckWordRepository.findAllByDocumentationOfficesOrUnitAndWords(
+            any(), any(), any()))
+        .thenReturn(List.of(IgnoredTextCheckWord.builder().word(ignoredWord).build()));
+
+    TextCheckService mockService = spy(textCheckService);
+    when(mockService.check(any(String.class)))
+        .thenReturn(
+            List.of(
+                Match.builder()
+                    .id(1)
+                    .word(ignoredWord)
+                    .offset(18)
+                    .length(ignoredWord.length())
+                    .rule(Rule.builder().issueType("ignored").build())
+                    .build()));
+    when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
+        .thenCallRealMethod();
+
+    TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
+
+    verify(ignoredTextCheckWordRepository)
+        .findAllByDocumentationOfficesOrUnitAndWords(
+            any(), any(), argThat(words -> words.contains(ignoredWord)));
+
+    assertNotNull(response);
+    assertEquals(
+        "<p>text text with <text-check id=\"1\" type=\"ignored\">ignored match</text-check></p>",
+        response.htmlText());
+    assertEquals(, response.matches().size());
   }
 }
