@@ -1,8 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain.textcheck;
 
-import java.util.List;
-
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
+import java.util.List;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
