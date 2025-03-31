@@ -435,6 +435,6 @@ class TextCheckServiceTest {
     assertEquals(
         "<p>text text with <text-check id=\"1\" type=\"ignored\">ignored match</text-check></p>",
         response.htmlText());
-    assertEquals(, response.matches().size());
+    assertEquals(1, response.matches().size());
   }
 }
