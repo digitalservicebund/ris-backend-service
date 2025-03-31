@@ -1,7 +1,9 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { config } from "@vue/test-utils"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
+import InputText from "primevue/inputtext"
 import { beforeEach, vi } from "vitest"
 import { ref } from "vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
@@ -46,8 +48,23 @@ describe("NormReferenceEntry", () => {
       Promise.resolve({ status: 200, data: "Ok" }),
     )
   })
-  beforeAll(() => server.listen())
-  afterAll(() => server.close())
+  beforeAll(() => {
+    // InputMask evaluates cursor position on every keystroke, however, our browser vitest setup does not
+    // implement any layout-related functionality, meaning the required functions for cursor offset
+    // calculation are missing. When we deal with typing in date/ year / time inputs, we can mock it with
+    // TextInput, as we only need the string and do not need to test the actual mask behaviour.
+    config.global.stubs = {
+      InputMask: InputText,
+    }
+    server.listen()
+  })
+  afterAll(() => {
+    // Mock needs to be reset (and can not be mocked globally) because InputMask has interdependencies
+    // with the PrimeVue select component. When testing the select components with InputMask
+    // mocked globally, they fail due to these dependencies.
+    config.global.stubs = {}
+    server.close()
+  })
 
   it("render empty norm input group on initial load", async () => {
     renderComponent()
@@ -257,60 +274,60 @@ describe("NormReferenceEntry", () => {
     expect(singleNormInput).toBeVisible()
   })
 
-  // it("does not add norm with invalid version date input", async () => {
-  //   const { user } = renderComponent({
-  //     modelValue: {
-  //       normAbbreviation: { id: "123", abbreviation: "ABC" },
-  //     } as NormReference,
-  //   })
+  it("does not add norm with invalid version date input", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
 
-  //   const dateInput = await screen.findByLabelText("Fassungsdatum der Norm")
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText("Fassungsdatum der Norm")
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "00.00.0231")
+    await user.type(dateInput, "00.00.0231")
 
-  //   await screen.findByText(/Kein valides Datum/)
-  //   screen.getByLabelText("Norm speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Kein valides Datum/)
+    screen.getByLabelText("Norm speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 
-  // it("does not add norm with incomplete version date input", async () => {
-  //   const { user } = renderComponent({
-  //     modelValue: {
-  //       normAbbreviation: { id: "123", abbreviation: "ABC" },
-  //     } as NormReference,
-  //   })
+  it("does not add norm with incomplete version date input", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
 
-  //   const dateInput = await screen.findByLabelText("Fassungsdatum der Norm")
-  //   expect(dateInput).toHaveValue("")
+    const dateInput = await screen.findByLabelText("Fassungsdatum der Norm")
+    expect(dateInput).toHaveValue("")
 
-  //   await user.type(dateInput, "01")
-  //   await user.tab()
+    await user.type(dateInput, "01")
+    await user.tab()
 
-  //   await screen.findByText(/Unvollständiges Datum/)
-  //   screen.getByLabelText("Norm speichern").click()
-  //   expect(dateInput).toBeVisible()
-  // })
+    await screen.findByText(/Unvollständiges Datum/)
+    screen.getByLabelText("Norm speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 
-  // it("does not add norm with invalid year input", async () => {
-  //   renderComponent({
-  //     modelValue: {
-  //       normAbbreviation: { id: "123", abbreviation: "ABC" },
-  //       singleNorms: [
-  //         {
-  //           dateOfRelevance: "0000",
-  //         },
-  //       ],
-  //     } as NormReference,
-  //   })
+  it("does not add norm with invalid year input", async () => {
+    renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+        singleNorms: [
+          {
+            dateOfRelevance: "0000",
+          },
+        ],
+      } as NormReference,
+    })
 
-  //   const yearInput = await screen.findByLabelText("Jahr der Norm")
-  //   expect(yearInput).toHaveValue("0000")
+    const yearInput = await screen.findByLabelText("Jahr der Norm")
+    expect(yearInput).toHaveValue("0000")
 
-  //   await screen.findByText(/Kein valides Jahr/)
-  //   screen.getByLabelText("Norm speichern").click()
-  //   expect(yearInput).toBeVisible()
-  // })
+    await screen.findByText(/Kein valides Jahr/)
+    screen.getByLabelText("Norm speichern").click()
+    expect(yearInput).toBeVisible()
+  })
 
   it("validates ambiguous norm reference input", async () => {
     renderComponent({

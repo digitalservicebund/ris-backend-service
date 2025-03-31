@@ -137,27 +137,26 @@ describe("Core Data", () => {
     )
   })
 
-  // Todo: Mocking InputMask globally let this test fail
-  // test("updates source", async () => {
-  //   const onUpdate = vi.fn()
-  //   const { user } = renderComponent({
-  //     "onUpdate:modelValue": onUpdate,
-  //   })
+  test("updates source", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+    })
 
-  //   const dropdown = await screen.findByLabelText("Quelle Input")
-  //   await user.click(dropdown)
+    const dropdown = await screen.findByLabelText("Quelle Input")
+    await user.click(dropdown)
 
-  //   const options = screen.getAllByRole("option")
-  //   expect(options.length).toBe(6)
-  //   expect(options[0]).toHaveTextContent(
-  //     "unaufgefordert eingesandtes Original (O)",
-  //   )
-  //   await user.click(options[0])
+    const options = screen.getAllByRole("option")
+    expect(options.length).toBe(6)
+    expect(options[0]).toHaveTextContent(
+      "unaufgefordert eingesandtes Original (O)",
+    )
+    await user.click(options[0])
 
-  //   expect(onUpdate).toHaveBeenCalledWith({
-  //     source: {
-  //       value: SourceValue.UnaufgefordertesOriginal,
-  //     },
-  //   })
-  // })
+    expect(onUpdate).toHaveBeenCalledWith({
+      source: {
+        value: SourceValue.UnaufgefordertesOriginal,
+      },
+    })
+  })
 })
