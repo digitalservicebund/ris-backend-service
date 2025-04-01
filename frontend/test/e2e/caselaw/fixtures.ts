@@ -1,4 +1,10 @@
-import { Locator, Page, test } from "@playwright/test"
+import {
+  APIRequestContext,
+  Cookie,
+  Locator,
+  Page,
+  test,
+} from "@playwright/test"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import { navigateToCategories } from "./e2e-utils"
@@ -30,6 +36,42 @@ type MyFixtures = {
   prefilledDocumentUnitWithManyReferences: DocumentUnit
 }
 
+/**
+ * The deletion fails if two doc units are deleted at the same time that have a common relationship (e.g. duplicate relation). As we do not lock the entity, it might try to delete a stale reference and fail. This is very unlikely to happen in production. If so, it would succeed on retry as well.
+ */
+async function deleteWithRetry(
+  request: APIRequestContext,
+  uuid: string,
+  csrfToken: Cookie | undefined,
+  documentNumber: string,
+) {
+  const deleteResponse = await request.delete(
+    `/api/v1/caselaw/documentunits/${uuid}`,
+    {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    },
+  )
+
+  if (!deleteResponse.ok()) {
+    console.log(
+      `Deletion for ${documentNumber} failed with status ${deleteResponse.status()}, retrying deletion...`,
+    )
+    const retryWaitDuration = Math.floor(Math.random() * 1900) + 100
+    await new Promise((resolve) => setTimeout(resolve, retryWaitDuration))
+    const retryDeleteResponse = await request.delete(
+      `/api/v1/caselaw/documentunits/${uuid}`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    if (!retryDeleteResponse.ok()) {
+      throw Error(`DocumentUnit with number ${documentNumber} couldn't be deleted:
+      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
+    }
+  }
+}
+
 export const caselawTest = test.extend<MyFixtures>({
   documentNumber: async ({ request, context }, use) => {
     const cookies = await context.cookies()
@@ -41,17 +83,7 @@ export const caselawTest = test.extend<MyFixtures>({
     const { uuid, documentNumber } = await response.json()
 
     await use(documentNumber)
-    const deleteResponse = await request.delete(
-      `/api/v1/caselaw/documentunits/${uuid}`,
-      {
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      },
-    )
-
-    if (!deleteResponse.ok()) {
-      throw Error(`DocumentUnit with number ${documentNumber} couldn't be deleted:
-      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
-    }
+    await deleteWithRetry(request, uuid, csrfToken, documentNumber)
   },
 
   prefilledDocumentUnit: async ({ request, context }, use) => {
@@ -143,14 +175,12 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await use(await updateResponse.json())
 
-    const deleteResponse = await request.delete(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    await deleteWithRetry(
+      request,
+      prefilledDocumentUnit.uuid,
+      csrfToken,
+      prefilledDocumentUnit.documentNumber,
     )
-    if (!deleteResponse.ok()) {
-      throw Error(`DocumentUnit with number ${prefilledDocumentUnit.documentNumber} couldn't be deleted:
-      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
-    }
   },
 
   prefilledDocumentUnitWithReferences: async ({ request, context }, use) => {
@@ -224,14 +254,12 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await use(await updateResponse.json())
 
-    const deleteResponse = await request.delete(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    await deleteWithRetry(
+      request,
+      prefilledDocumentUnit.uuid,
+      csrfToken,
+      prefilledDocumentUnit.documentNumber,
     )
-    if (!deleteResponse.ok()) {
-      throw Error(`DocumentUnit with number ${prefilledDocumentUnit.documentNumber} couldn't be deleted:
-      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
-    }
   },
 
   prefilledDocumentUnitWithManyReferences: async (
@@ -393,14 +421,12 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await use(await updateResponse.json())
 
-    const deleteResponse = await request.delete(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    await deleteWithRetry(
+      request,
+      prefilledDocumentUnit.uuid,
+      csrfToken,
+      prefilledDocumentUnit.documentNumber,
     )
-    if (!deleteResponse.ok()) {
-      throw Error(`DocumentUnit with number ${prefilledDocumentUnit.documentNumber} couldn't be deleted:
-      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
-    }
   },
 
   prefilledDocumentUnitWithTexts: async ({ request, context }, use) => {
@@ -455,14 +481,12 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await use(await updateResponse.json())
 
-    const deleteResponse = await request.delete(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnitWithLongTexts.uuid}`,
-      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    await deleteWithRetry(
+      request,
+      prefilledDocumentUnitWithLongTexts.uuid,
+      csrfToken,
+      prefilledDocumentUnitWithLongTexts.documentNumber,
     )
-    if (!deleteResponse.ok()) {
-      throw Error(`DocumentUnit with number ${prefilledDocumentUnitWithLongTexts.documentNumber} couldn't be deleted:
-      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
-    }
   },
 
   secondPrefilledDocumentUnit: async ({ request, context }, use) => {
@@ -501,17 +525,15 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await use(await updateResponse.json())
 
-    const deleteResponse = await request.delete(
-      `/api/v1/caselaw/documentunits/${secondPrefilledDocumentUnit.uuid}`,
-      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    await deleteWithRetry(
+      request,
+      secondPrefilledDocumentUnit.uuid,
+      csrfToken,
+      secondPrefilledDocumentUnit.documentNumber,
     )
-    if (!deleteResponse.ok()) {
-      throw Error(`DocumentUnit with number ${secondPrefilledDocumentUnit.documentNumber} couldn't be deleted:
-      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
-    }
   },
 
-  // The prefilledDocumentUnit fixture is a dependant worker fixture, because it nees to be setup before and teared down after this function (in order to be deletable).
+  // The prefilledDocumentUnit fixture is a dependant worker fixture, because it needs to be setup before and teared down after this function (in order to be deletable).
   linkedDocumentNumber: async (
     { request, context, prefilledDocumentUnit },
     use,
@@ -528,16 +550,12 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await use(documentNumber)
 
-    const deleteResponse = await request.delete(
-      `/api/v1/caselaw/documentunits/${uuid}`,
-      {
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      },
-    )
-
-    if (!deleteResponse.ok()) {
-      throw Error(`DocumentUnit with number ${documentNumber}, linked to ${prefilledDocumentUnit} couldn't be deleted:
-      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
+    try {
+      await deleteWithRetry(request, uuid, csrfToken, documentNumber)
+    } catch (error) {
+      throw Error(
+        `DocumentUnit with number ${documentNumber}, linked to ${prefilledDocumentUnit} couldn't be deleted: ${error}`,
+      )
     }
   },
 
