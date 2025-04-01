@@ -4,8 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublication
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskType;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +29,7 @@ public class PortalPublicationJobService {
   @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT15M")
   public void executePendingJobs() {
 
-    List<PortalPublicationJobDTO> pendingJobs = publicationJobRepository.findAllPendingJobs();
+    List<PortalPublicationJobDTO> pendingJobs = publicationJobRepository.findNextPendingJobsBatch();
     if (pendingJobs.isEmpty()) {
       return;
     }
@@ -77,43 +75,35 @@ public class PortalPublicationJobService {
   }
 
   private PublicationResult publishChangelog(List<PortalPublicationJobDTO> pendingJobs) {
-    HashSet<String> publishDocNumbers =
+    List<PortalPublicationJobDTO> successFullJobsWithoutDuplicates =
         pendingJobs.stream()
-            .filter(job -> job.getPublicationType() == PortalPublicationTaskType.PUBLISH)
             .filter(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS)
-            .map(PortalPublicationJobDTO::getDocumentNumber)
-            .collect(Collectors.toCollection(HashSet::new));
-    HashSet<String> deletedDocNumbers =
-        pendingJobs.stream()
-            .filter(job -> job.getPublicationType() == PortalPublicationTaskType.DELETE)
-            .filter(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS)
-            .map(PortalPublicationJobDTO::getDocumentNumber)
-            .collect(Collectors.toCollection(HashSet::new));
+            .collect(
+                Collectors.toMap(
+                    PortalPublicationJobDTO::getDocumentNumber,
+                    job -> job,
+                    (existing, replacement) ->
+                        existing.getCreatedAt().isAfter(replacement.getCreatedAt())
+                            ? existing
+                            : replacement))
+            .values()
+            .stream()
+            .toList();
 
-    var overlap = new HashSet<>(publishDocNumbers);
-    overlap.retainAll(deletedDocNumbers);
-    if (!overlap.isEmpty()) {
-      overlap.forEach(
-          docNumber -> {
-            var latest =
-                pendingJobs.stream()
-                    .filter(job -> job.getDocumentNumber().equals(docNumber))
-                    .sorted(Comparator.comparing(PortalPublicationJobDTO::getCreatedAt))
-                    .toList()
-                    .getLast();
-            if (latest.getPublicationType() == PortalPublicationTaskType.PUBLISH) {
-              deletedDocNumbers.removeAll(List.of(docNumber));
-            } else {
-              publishDocNumbers.removeAll(List.of(docNumber));
-            }
-          });
-    }
+    List<String> publishDocNumbers =
+        successFullJobsWithoutDuplicates.stream()
+            .filter(job -> job.getPublicationType() == PortalPublicationTaskType.PUBLISH)
+            .map(job -> job.getDocumentNumber() + ".xml")
+            .toList();
+    List<String> deletedDocNumbers =
+        successFullJobsWithoutDuplicates.stream()
+            .filter(job -> job.getPublicationType() == PortalPublicationTaskType.DELETE)
+            .map(job -> job.getDocumentNumber() + ".xml")
+            .toList();
 
     if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {
       try {
-        this.internalPortalPublicationService.uploadChangelog(
-            publishDocNumbers.stream().map(it -> it + ".xml").toList(),
-            deletedDocNumbers.stream().map(it -> it + ".xml").toList());
+        this.internalPortalPublicationService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
       } catch (Exception e) {
         log.error("Could not upload changelog file.", e);
       }

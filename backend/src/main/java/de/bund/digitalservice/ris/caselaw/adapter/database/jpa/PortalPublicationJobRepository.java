@@ -18,5 +18,5 @@ public interface PortalPublicationJobRepository
       WHERE portalPublicationJob.publicationStatus = 'PENDING'
       ORDER BY portalPublicationJob.createdAt ASC LIMIT 500
     """)
-  List<PortalPublicationJobDTO> findAllPendingJobs();
+  List<PortalPublicationJobDTO> findNextPendingJobsBatch();
 }
