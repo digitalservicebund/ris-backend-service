@@ -11,7 +11,7 @@ test.skip(
 )
 
 const textWithErrors = {
-  text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten.",
+  text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist grün markiert",
   incorrectWords: [
     "sie",
     "Rechtshcreibfehler",
@@ -23,6 +23,7 @@ const textWithErrors = {
     "zB.",
     "Donnerstag, dem 13",
   ],
+  ignoredWords: ["Testgnorierteswort"],
 }
 
 test.describe(
@@ -85,7 +86,12 @@ test.describe(
             .getByTestId("Orientierungssatz")
             .locator("text-check")
 
-          for (let i = 0; i < textWithErrors.incorrectWords.length; i++) {
+          const allIgnoredWords = [
+            ...textWithErrors.ignoredWords,
+            ...textWithErrors.incorrectWords,
+          ]
+
+          for (let i = 0; i < allIgnoredWords.length; i++) {
             await expect(textCheckTags.nth(i)).not.toHaveText("")
 
             const type =
@@ -101,6 +107,7 @@ test.describe(
                 style: "#9d8eff",
                 grammar: "#eeb55c",
                 typographical: "#eeb55c",
+                ignored: "#01854a",
               }[type] || uncategorized
 
             const rgbColors = convertHexToRGB(expectedBorder)
@@ -163,6 +170,20 @@ test.describe(
           await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
           await otherHeadNoteEditor.getByText("LanguageTool").click()
           await expect(page.getByTestId("text-check-modal-word")).toBeHidden()
+        })
+
+        await test.step("clicking on an ignored words shows ignore reason", async () => {
+          const allTextCheckById = page.locator(`text-check[type='ignored']`)
+          const totalTextCheckTags = await allTextCheckById.count()
+
+          for (let index = 0; index < totalTextCheckTags; index++) {
+            const textCheckTag = allTextCheckById.nth(index)
+            await textCheckTag.click()
+            await expect(page.getByTestId("text-check-modal")).toBeVisible()
+            await expect(
+              page.getByTestId("ignored-word-handler"),
+            ).toContainText("von juris ignoriert")
+          }
         })
       },
     )

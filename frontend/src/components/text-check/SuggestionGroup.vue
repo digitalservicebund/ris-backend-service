@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
+import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import MatchLinkingButton from "@/components/text-check/MatchLinkingButton.vue"
 import MatchNavigator from "@/components/text-check/MatchNavigator.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
@@ -64,9 +65,7 @@ function updateCurrentIndex(index: number) {
       />
     </div>
 
-    <div>
-      <span class="ris-link1-bold"> Zum globalen Wörterbuch hinzufügen </span>
-    </div>
+    <IgnoredWordHandler :match="selectedMatch" />
     <div>
       {{ selectedMatch.message }}
     </div>
