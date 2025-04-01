@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -30,7 +29,6 @@ public class PortalPublicationJobService {
 
   @Scheduled(fixedDelayString = "PT5S")
   @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT1H")
-  @Transactional
   public void executePendingJobs() {
 
     List<PortalPublicationJobDTO> pendingJobs = publicationJobRepository.findAllPendingJobs();
