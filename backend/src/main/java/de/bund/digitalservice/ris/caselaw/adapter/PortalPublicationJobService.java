@@ -28,7 +28,7 @@ public class PortalPublicationJobService {
   }
 
   @Scheduled(fixedDelayString = "PT5S")
-  @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT1H")
+  @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT15M")
   public void executePendingJobs() {
 
     List<PortalPublicationJobDTO> pendingJobs = publicationJobRepository.findAllPendingJobs();

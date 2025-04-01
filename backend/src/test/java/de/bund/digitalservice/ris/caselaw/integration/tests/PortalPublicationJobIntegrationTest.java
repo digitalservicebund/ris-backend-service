@@ -178,66 +178,6 @@ class PortalPublicationJobIntegrationTest {
     repository.deleteAll();
   }
 
-  //  @Test
-  //  void shouldProcessOnlyLatestPublicationJobsForEachDocumentNumber() throws IOException {
-  //    DocumentationUnitDTO dto1 =
-  //        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-  //            repository, buildValidDocumentationUnit("1"));
-  //    DocumentationUnitDTO dto2 =
-  //        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-  //            repository, buildValidDocumentationUnit("2"));
-  //
-  //    portalPublicationJobRepository.saveAll(
-  //        List.of(
-  //            createPublicationJob(dto1, PortalPublicationTaskType.PUBLISH),
-  //            createPublicationJob(dto2, PortalPublicationTaskType.DELETE),
-  //            createPublicationJob(dto1, PortalPublicationTaskType.PUBLISH),
-  //            createPublicationJob(dto2, PortalPublicationTaskType.PUBLISH),
-  //            createPublicationJob(dto1, PortalPublicationTaskType.DELETE),
-  //            createPublicationJob(dto2, PortalPublicationTaskType.PUBLISH)));
-  //
-  //    portalPublicationJobService.executePendingJobs();
-  //
-  //    ArgumentCaptor<PutObjectRequest> putCaptor =
-  // ArgumentCaptor.forClass(PutObjectRequest.class);
-  //    ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
-  //    ArgumentCaptor<Consumer<DeleteObjectRequest.Builder>> deleteCaptor =
-  //        ArgumentCaptor.forClass(Consumer.class);
-  //
-  //    // DELETE 1.xml
-  //    verify(s3Client, times(1)).deleteObject(deleteCaptor.capture());
-  //    // PUT 2.xml + PUT changelog
-  //    verify(s3Client, times(2)).putObject(putCaptor.capture(), bodyCaptor.capture());
-  //
-  //    var capturedPutRequests = putCaptor.getAllValues();
-  //    var changelogContent =
-  //        new String(
-  //            bodyCaptor.getAllValues().get(1).contentStreamProvider().newStream().readAllBytes(),
-  //            StandardCharsets.UTF_8);
-  //
-  //    assertThat(capturedPutRequests.get(0).key()).isEqualTo("2.xml");
-  //    assertThat(capturedPutRequests.get(1).key()).contains("changelogs/");
-  //    // ensure that each document number only appears either in changed or deleted section
-  //    assertThat(changelogContent)
-  //        .isEqualTo(
-  //            """
-  //                {"changed":["2.xml"],"deleted":["1.xml"]}""");
-  //
-  //    var deleteRequestBuilder = DeleteObjectRequest.builder();
-  //    deleteCaptor.getValue().accept(deleteRequestBuilder);
-  //    var deleteRequest = deleteRequestBuilder.build();
-  //    assertThat(deleteRequest.key()).isEqualTo("1.xml");
-  //
-  //    assertThat(portalPublicationJobRepository.findAll())
-  //        .satisfiesExactly(
-  //            job -> assertThat(job.getPublicationStatus()).isEqualTo(SUCCESS),
-  //            job -> assertThat(job.getPublicationStatus()).isEqualTo(SUCCESS),
-  //            job -> assertThat(job.getPublicationStatus()).isEqualTo(SKIPPED),
-  //            job -> assertThat(job.getPublicationStatus()).isEqualTo(SKIPPED),
-  //            job -> assertThat(job.getPublicationStatus()).isEqualTo(SKIPPED),
-  //            job -> assertThat(job.getPublicationStatus()).isEqualTo(SKIPPED));
-  //  }
-
   @Test
   void shouldOnlyAddDocumentNumberToChangelogForLatestKindOfJob() throws IOException {
     DocumentationUnitDTO dto1 =
