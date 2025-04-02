@@ -6,6 +6,7 @@ import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 import {
+  IgnoredTextCheckWord,
   Match,
   TextCheckCategoryResponse,
   TextCheckTagName,
@@ -32,6 +33,8 @@ interface TextCheckService {
   ): void
 
   clearSelectedMatch(): void
+
+  ignoreWord(documentationUnitId: string, word: string): Promise<void>
 }
 
 class NeurisTextCheckService implements TextCheckService {
@@ -191,6 +194,19 @@ class NeurisTextCheckService implements TextCheckService {
         (ignoredWord) => ignoredWord.isEditable === true,
       ) ?? false
     )
+  }
+
+  ignoreWord = async (word: string) => {
+    const store = useDocumentUnitStore()
+
+    if (store.documentUnit?.uuid) {
+      const response: ServiceResponse<IgnoredTextCheckWord> =
+        await languageToolService.addLocalIgnore(store.documentUnit?.uuid, word)
+
+      if (response.status >= 300) {
+        this.responseError.value = response.error
+      }
+    }
   }
 }
 

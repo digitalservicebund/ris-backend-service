@@ -8,15 +8,15 @@ defineProps<{
 
 const emit = defineEmits<{
   "suggestion:update": [value: string]
-  "suggestion:ignore": [void]
+  "ignored-word:add": [void]
 }>()
 
 function acceptSuggestion(replacement: string) {
   emit("suggestion:update", replacement)
 }
 
-function ignoreSuggestion() {
-  emit("suggestion:ignore")
+function addIgnoredWord() {
+  emit("ignored-word:add")
 }
 </script>
 
@@ -41,11 +41,10 @@ function ignoreSuggestion() {
       "
       button-type="tertiary"
       data-testid="suggestion-ignore-button"
-      disabled
       :label="replacementMode === 'single' ? 'Ignorieren ' : 'Alle ignorieren'"
       size="small"
       width="w-max"
-      @click="ignoreSuggestion"
+      @click="addIgnoredWord"
     />
   </div>
 </template>

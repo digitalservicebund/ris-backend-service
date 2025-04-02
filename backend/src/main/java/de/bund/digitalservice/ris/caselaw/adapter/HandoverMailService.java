@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -42,6 +43,7 @@ public class HandoverMailService implements MailService {
   private final HttpMailSender mailSender;
 
   private final HandoverRepository repository;
+  private final TextCheckService textCheckService;
 
   private final Environment env;
 
@@ -55,10 +57,12 @@ public class HandoverMailService implements MailService {
       XmlExporter xmlExporter,
       HttpMailSender mailSender,
       HandoverRepository repository,
+      TextCheckService textCheckService,
       Environment env) {
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
+    this.textCheckService = textCheckService;
     this.env = env;
   }
 
@@ -74,18 +78,22 @@ public class HandoverMailService implements MailService {
   @Override
   public HandoverMail handOver(
       DocumentationUnit documentationUnit, String receiverAddress, String issuerAddress) {
+
+    DocumentationUnit modifiedDocumentationUnit =
+        textCheckService.addNoIndexTags(documentationUnit);
+
     XmlTransformationResult xml;
     try {
-      xml = xmlExporter.transformToXml(getTestDocumentationUnit(documentationUnit));
+      xml = xmlExporter.transformToXml(getTestDocumentationUnit(modifiedDocumentationUnit));
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new HandoverException("Couldn't generate xml for documentationUnit.", ex);
     }
 
-    String mailSubject = generateMailSubject(documentationUnit);
+    String mailSubject = generateMailSubject(modifiedDocumentationUnit);
 
     HandoverMail handoverMail =
         generateXmlHandoverMail(
-            documentationUnit.uuid(),
+            modifiedDocumentationUnit.uuid(),
             receiverAddress,
             mailSubject,
             List.of(xml),

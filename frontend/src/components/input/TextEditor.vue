@@ -207,6 +207,10 @@ function ignoreSuggestion() {
   editor.commands.setSelectedMatch()
 }
 
+function addIgnoredWord(word: string) {
+  textCheckService.ignoreWord(word)
+}
+
 /**
  * Replace and reset selected match
  * @param suggestion
@@ -332,7 +336,7 @@ defineExpose({ jumpToMatch })
         <TextCheckModal
           v-if="selectedMatch"
           :match="selectedMatch"
-          @suggestion:ignore="ignoreSuggestion"
+          @ignored-word:add="addIgnoredWord"
           @suggestion:update="acceptSuggestion"
         />
       </BubbleMenu>

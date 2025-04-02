@@ -12,15 +12,15 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "suggestion:update": [value: string]
-  "suggestion:ignore": [void]
+  "ignored-word:add": [word: string]
 }>()
 
 function acceptSuggestion(replacement: string) {
   emit("suggestion:update", replacement)
 }
 
-function ignoreSuggestion() {
-  emit("suggestion:ignore")
+function addIgnoredWord(word: string) {
+  emit("ignored-word:add", word)
 }
 
 function getValues(replacements: Replacement[]) {
@@ -55,7 +55,7 @@ const isMatchIgnored = computed(() => {
       v-if="!isMatchIgnored"
       replacement-mode="single"
       :replacements="getValues(match.replacements)"
-      @suggestion:ignore="ignoreSuggestion"
+      @ignored-word:add="addIgnoredWord(match.word)"
       @suggestion:update="acceptSuggestion"
     />
   </div>

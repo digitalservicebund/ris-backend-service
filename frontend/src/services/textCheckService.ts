@@ -5,6 +5,7 @@ import httpClient, {
 } from "@/services/httpClient"
 import {
   IgnoredTextCheckWord,
+  IgnoredTextCheckWordRequest,
   TextCheckAllResponse,
   TextCheckCategoryResponse,
   TextCheckResponse,
@@ -20,9 +21,9 @@ interface TextCheckService {
     category?: string,
   ): Promise<ServiceResponse<TextCheckCategoryResponse>>
 
-  addIgnoredWordForDocumentationOffice(
+  addLocalIgnore(
     id: string,
-    ignoredTextCheckWord: IgnoredTextCheckWord,
+    word: string,
   ): Promise<ServiceResponse<IgnoredTextCheckWord>>
 }
 
@@ -64,13 +65,9 @@ const service: TextCheckService = {
     }
     return response
   },
-
-  async addIgnoredWordForDocumentationOffice(
-    id: string,
-    ignoredTextCheckWord: IgnoredTextCheckWord,
-  ) {
+  async addLocalIgnore(id: string, word: string) {
     const response = await httpClient.post<
-      IgnoredTextCheckWord,
+      IgnoredTextCheckWordRequest,
       IgnoredTextCheckWord
     >(
       `caselaw/documentunits/${id}/text-check/ignored-words/add`,
@@ -80,7 +77,7 @@ const service: TextCheckService = {
           "Content-Type": "application/json",
         },
       },
-      ignoredTextCheckWord,
+      { word },
     )
     if (response.status >= 300) {
       response.error = {

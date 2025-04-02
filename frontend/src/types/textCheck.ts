@@ -65,6 +65,10 @@ export interface Suggestion {
   matches: Match[]
 }
 
+export interface IgnoredTextCheckWordRequest {
+  word: string
+}
+
 export interface IgnoredTextCheckWord {
   id?: string
   word: string
