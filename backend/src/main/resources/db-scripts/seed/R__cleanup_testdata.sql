@@ -61,10 +61,16 @@ FROM incremental_migration.documentation_unit
 WHERE f.documentation_unit_id = incremental_migration.documentation_unit.id
   AND f.value LIKE 'e2e\-%';
 
+-- SOURCES
+DELETE
+FROM incremental_migration.source AS source
+USING incremental_migration.reference r
+WHERE r.id = source.reference_id AND r.citation LIKE '%e2e\-%';
+
 -- REFERENCES
 delete
 from incremental_migration.reference
-where citation LIKE 'e2e\-%';
+where citation LIKE '%e2e\-%';
 
 -- EDITIONS
 delete
