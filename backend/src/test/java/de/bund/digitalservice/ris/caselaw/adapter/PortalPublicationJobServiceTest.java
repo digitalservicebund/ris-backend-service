@@ -47,8 +47,7 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldPublishASingleDocUnit()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
+  void shouldPublishASingleDocUnit() throws DocumentationUnitNotExistsException {
     var jobs = List.of(createPublicationJob("123", PortalPublicationTaskType.PUBLISH));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
 
@@ -65,8 +64,7 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldDeleteASingleDocUnit()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
+  void shouldDeleteASingleDocUnit() throws DocumentationUnitNotExistsException {
     var jobs = List.of(createPublicationJob("456", PortalPublicationTaskType.DELETE));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
 
@@ -140,8 +138,7 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldContinueExecutionOnErrors()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
+  void shouldContinueExecutionOnErrors() throws DocumentationUnitNotExistsException {
     var jobs =
         List.of(
             createPublicationJob("1", PortalPublicationTaskType.PUBLISH),
