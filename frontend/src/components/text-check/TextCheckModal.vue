@@ -46,7 +46,7 @@ const isMatchIgnored = computed(() => {
     <IgnoredWordHandler
       v-if="isMatchIgnored"
       :match="match"
-      @ignore-text-check-word:add="ignoreSuggestion"
+      @ignore-text-check-word:add="addIgnoredWord"
     />
 
     <p v-if="!isMatchIgnored">{{ match.shortMessage || match.message }}</p>

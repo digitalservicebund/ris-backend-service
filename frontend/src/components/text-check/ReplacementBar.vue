@@ -40,7 +40,7 @@ function addIgnoredWord() {
           : 'Vorschläge ignorieren'
       "
       button-type="tertiary"
-      data-testid="suggestion-ignore-button"
+      data-testid="ignored-word-add-button"
       :label="replacementMode === 'single' ? 'Ignorieren ' : 'Alle ignorieren'"
       size="small"
       width="w-max"

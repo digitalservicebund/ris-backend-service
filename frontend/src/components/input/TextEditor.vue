@@ -201,14 +201,11 @@ const shouldShowBubbleMenu = (): boolean => {
 }
 
 /**
- * Closing text check menu and resets selected match when ignoring word
+ * Adds word to doc level ignore and closes the modal
  */
-function ignoreSuggestion() {
+async function addIgnoredWord(word: string) {
+  await textCheckService.ignoreWord(word)
   editor.commands.setSelectedMatch()
-}
-
-function addIgnoredWord(word: string) {
-  textCheckService.ignoreWord(word)
 }
 
 /**

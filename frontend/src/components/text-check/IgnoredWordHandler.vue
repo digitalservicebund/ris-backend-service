@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
-import languageToolService from "@/services/textCheckService"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { IgnoredTextCheckWord, Match } from "@/types/textCheck"
+import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   match: Match
@@ -10,31 +8,11 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  "ignoreTextCheckWord:add": [void]
+  "ignoreTextCheckWord:add": [string]
 }>()
 
-const store = useDocumentUnitStore()
-
 async function addWordToDocOffice() {
-  if (!store.documentUnit?.uuid) {
-    console.error("Documentation unit does not exist")
-    return
-  }
-
-  const newIgnoredTextCheckWord: IgnoredTextCheckWord = {
-    word: props.match.word,
-    type: "documentation_office",
-  }
-
-  try {
-    await languageToolService.addIgnoredWordForDocumentationOffice(
-      store.documentUnit.uuid,
-      newIgnoredTextCheckWord,
-    )
-    emit("ignoreTextCheckWord:add")
-  } catch (error) {
-    console.error("Error adding ignored word:", error)
-  }
+  emit("ignoreTextCheckWord:add", props.match.word)
 }
 </script>
 

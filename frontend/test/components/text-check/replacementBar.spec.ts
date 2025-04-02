@@ -43,7 +43,7 @@ describe("Match replacement bar single and multiple test", () => {
       expectedAriaLabel: string
     }) => {
       renderComponent({ replacementMode: mode })
-      expect(screen.getByTestId("suggestion-ignore-button")).toHaveTextContent(
+      expect(screen.getByTestId("ignored-word-add-button")).toHaveTextContent(
         expectedLabel,
       )
       expect(screen.getByLabelText(expectedAriaLabel)).toBeInTheDocument()
@@ -62,8 +62,8 @@ describe("Match replacement bar single and multiple test", () => {
 
   it("accept replacement emits ignore", async () => {
     const { emitted, user } = renderComponent()
-    const ignoreButton = screen.getByTestId("suggestion-ignore-button")
+    const ignoreButton = screen.getByTestId("ignored-word-add-button")
     await user.click(ignoreButton)
-    expect(emitted()["suggestion:ignore"]).toHaveLength(1)
+    expect(emitted()["ignored-word:add"]).toHaveLength(1)
   })
 })
