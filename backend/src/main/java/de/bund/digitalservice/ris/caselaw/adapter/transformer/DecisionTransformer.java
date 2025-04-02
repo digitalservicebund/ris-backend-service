@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
@@ -55,9 +56,6 @@ public class DecisionTransformer extends DocumentableTransformer {
   @SuppressWarnings({"java:S6541", "java:S3776"})
   public static DecisionDTO transformToDTO(
       DecisionDTO currentDto, DocumentationUnit updatedDomainObject) {
-
-    log.debug("transform database decision '{}'", currentDto.getId());
-
     final var builder = currentDto.toBuilder();
 
     builder
@@ -517,6 +515,10 @@ public class DecisionTransformer extends DocumentableTransformer {
                 : decisionDTO.getLiteratureReferences().stream()
                     .map(ReferenceTransformer::transformToDomain)
                     .toList())
+        .documentalists(
+            decisionDTO.getDocumentalists() == null
+                ? new ArrayList<>()
+                : decisionDTO.getDocumentalists().stream().map(DocumentalistDTO::getValue).toList())
         .previousDecisions(getPreviousDecisions(decisionDTO))
         .attachments(buildOriginalFileDocuments(decisionDTO))
         .ensuingDecisions(buildEnsuingDecisions(decisionDTO))

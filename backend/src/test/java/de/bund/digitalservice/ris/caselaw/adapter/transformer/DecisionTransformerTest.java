@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
@@ -1370,7 +1371,8 @@ class DecisionTransformerTest {
                 .hasLegislativeMandate(false)
                 .build())
         .caselawReferences(Collections.emptyList())
-        .literatureReferences(Collections.emptyList());
+        .literatureReferences(Collections.emptyList())
+        .documentalists(Collections.emptyList());
   }
 
   private CoreDataBuilder generateSimpleCoreDataBuilder() {
@@ -1596,5 +1598,30 @@ class DecisionTransformerTest {
     assertThat(transformedRelations).hasSize(5);
     assertThat(transformedRelations.stream().map(DuplicateRelation::documentNumber))
         .containsExactly("duplicate3", "duplicate4", "duplicate1", "duplicate05", "duplicate2");
+  }
+
+  @Test
+  void testTransformToDomain_withDocumentalists_shouldAddDocumentalists() {
+    DecisionDTO decisionDTO =
+        generateSimpleDTOBuilder()
+            .documentalists(
+                List.of(
+                    DocumentalistDTO.builder().value("documentalist1").build(),
+                    DocumentalistDTO.builder().value("documentalist2").build()))
+            .build();
+
+    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(documentationUnit.documentalists())
+        .containsExactly("documentalist1", "documentalist2");
+  }
+
+  @Test
+  void testTransformToDomain_withoutDocumentalists_shouldNotAddDocumentalists() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(documentationUnit.documentalists()).isEmpty();
   }
 }

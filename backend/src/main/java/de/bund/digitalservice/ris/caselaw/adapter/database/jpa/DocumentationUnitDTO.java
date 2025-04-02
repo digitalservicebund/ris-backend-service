@@ -17,6 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -225,5 +226,14 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @Column(name = "duplicate_check")
   private Boolean isJdvDuplicateCheckActive;
 
-  @Column() private String fedst;
+  @Column private String fedst;
+
+  @OneToMany(
+      mappedBy = "documentationUnit",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
+  @Builder.Default
+  @Valid
+  private List<DocumentalistDTO> documentalists = new ArrayList<>();
 }
