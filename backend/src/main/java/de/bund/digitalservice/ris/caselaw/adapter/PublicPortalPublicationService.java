@@ -101,23 +101,36 @@ public class PublicPortalPublicationService {
    *     changed or added.
    * @param deletedDocumentNumbers the document numbers of the documentation units which have been
    *     deleted.
+   * @param changeAll should be true if all files in the bucket need to be indexed, otherwise null.
+   *     If set to true, all other params should be null.
    * @throws JsonProcessingException if the changelog cannot be generated.
    */
   public void uploadChangelog(
-      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
+      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers, Boolean changeAll)
       throws JsonProcessingException {
-    Changelog changelog = new Changelog(publishedDocumentNumbers, deletedDocumentNumbers);
+    Changelog changelog =
+        new Changelog(publishedDocumentNumbers, deletedDocumentNumbers, changeAll);
 
     String changelogString = objectMapper.writeValueAsString(changelog);
     publicPortalBucket.save(changelog.createFileName(), changelogString);
+  }
+
+  public void uploadChangelog(
+      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
+      throws JsonProcessingException {
+    uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers, null);
+  }
+
+  public void uploadChangelog() throws JsonProcessingException {
+    uploadChangelog(null, null, true);
   }
 
   //                        ↓ day of month (1-31)
   //                      ↓ hour (0-23)
   //                    ↓ minute (0-59)
   //                 ↓ second (0-59)
-  // Default:        0 30 4 * * * (After migration: CET: 5:30)
-  @Scheduled(cron = "0 30 4 * * *")
+  // Default:        0 30 3 * * * (After migration: CET: 5:30)
+  @Scheduled(cron = "0 30 3 * * *")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logPortalPublicationSanityCheck() {
     List<String> portalBucketDocumentNumbers =
@@ -167,7 +180,7 @@ public class PublicPortalPublicationService {
         try {
           inPortalNotInRii.forEach(this::deleteDocumentationUnit);
           uploadChangelog(
-              List.of(),
+              null,
               inPortalNotInRii.stream().map(documentNumber -> documentNumber + ".xml").toList());
 
         } catch (JsonProcessingException | PublishException e) {

@@ -16,13 +16,27 @@ import org.springframework.stereotype.Service;
 public class PortalPublicationJobService {
 
   private final PortalPublicationJobRepository publicationJobRepository;
-  private final PublicPortalPublicationService internalPortalPublicationService;
+  private final PublicPortalPublicationService publicPortalPublicationService;
 
   public PortalPublicationJobService(
       PortalPublicationJobRepository publicationJobRepository,
       PublicPortalPublicationService publicPortalPublicationService) {
     this.publicationJobRepository = publicationJobRepository;
-    this.internalPortalPublicationService = publicPortalPublicationService;
+    this.publicPortalPublicationService = publicPortalPublicationService;
+  }
+
+  //                        ↓ day of month (1-31)
+  //                      ↓ hour (0-23)
+  //                    ↓ minute (0-59)
+  //                 ↓ second (0-59)
+  // Default:        0 30 2 * * * (After migration: CET: 4:30)
+  @Scheduled(cron = "0 30 2 * * *")
+  public void publishNightlyChangelog() {
+    try {
+      publicPortalPublicationService.uploadChangelog();
+    } catch (Exception e) {
+      log.error("Could not upload nightly changelog file.", e);
+    }
   }
 
   @Scheduled(fixedDelayString = "PT5S")
@@ -43,7 +57,7 @@ public class PortalPublicationJobService {
     for (PortalPublicationJobDTO job : pendingJobs) {
       executeJob(job);
     }
-    var publicationResult = publishChangelog(pendingJobs);
+    var publicationResult = writeChangelog(pendingJobs);
     publicationJobRepository.saveAll(pendingJobs);
 
     log.info(
@@ -55,7 +69,7 @@ public class PortalPublicationJobService {
   private void executeJob(PortalPublicationJobDTO job) {
     if (job.getPublicationType() == PortalPublicationTaskType.PUBLISH) {
       try {
-        this.internalPortalPublicationService.publishDocumentationUnit(job.getDocumentNumber());
+        this.publicPortalPublicationService.publishDocumentationUnit(job.getDocumentNumber());
         job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
       } catch (Exception e) {
         log.error("Could not publish documentation unit {}", job.getDocumentNumber(), e);
@@ -65,7 +79,7 @@ public class PortalPublicationJobService {
 
     if (job.getPublicationType() == PortalPublicationTaskType.DELETE) {
       try {
-        this.internalPortalPublicationService.deleteDocumentationUnit(job.getDocumentNumber());
+        this.publicPortalPublicationService.deleteDocumentationUnit(job.getDocumentNumber());
         job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
       } catch (Exception e) {
         log.error("Could not unpublish documentation unit {}", job.getDocumentNumber(), e);
@@ -74,7 +88,7 @@ public class PortalPublicationJobService {
     }
   }
 
-  private PublicationResult publishChangelog(List<PortalPublicationJobDTO> pendingJobs) {
+  private PublicationResult writeChangelog(List<PortalPublicationJobDTO> pendingJobs) {
     List<PortalPublicationJobDTO> successFullJobsWithoutDuplicates =
         pendingJobs.stream()
             .filter(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS)
@@ -101,13 +115,15 @@ public class PortalPublicationJobService {
             .map(job -> job.getDocumentNumber() + ".xml")
             .toList();
 
-    if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {
-      try {
-        this.internalPortalPublicationService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
-      } catch (Exception e) {
-        log.error("Could not upload changelog file.", e);
-      }
-    }
+    // disabled until portal team tells us to write individual batch changelogs again
+    //    if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {
+    //      try {
+    //        this.internalPortalPublicationService.uploadChangelog(publishDocNumbers,
+    // deletedDocNumbers);
+    //      } catch (Exception e) {
+    //        log.error("Could not upload changelog file.", e);
+    //      }
+    //    }
 
     return new PublicationResult(publishDocNumbers.size(), deletedDocNumbers.size());
   }
