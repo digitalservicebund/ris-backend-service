@@ -56,7 +56,8 @@ async function deleteWithRetry(
     console.log(
       `Deletion for ${documentNumber} failed with status ${deleteResponse.status()}, retrying deletion...`,
     )
-    const retryWaitDuration = Math.floor(Math.random() * 1900) + 100
+    // Retry after a random delay between 0.1s and 2s
+    const retryWaitDuration = Math.floor(Math.random() * 1_900) + 100
     await new Promise((resolve) => setTimeout(resolve, retryWaitDuration))
     const retryDeleteResponse = await request.delete(
       `/api/v1/caselaw/documentunits/${uuid}`,
