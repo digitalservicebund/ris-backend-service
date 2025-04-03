@@ -303,9 +303,14 @@ public class DocumentableTransformer {
               if (sourceDTO.getValue() != null) {
                 sourceValue = sourceDTO.getValue();
               }
+              var reference =
+                  Optional.ofNullable(sourceDTO.getReference())
+                      .map(ReferenceTransformer::transformToDomain)
+                      .orElse(null);
               return Source.builder()
                   .value(sourceValue)
                   .sourceRawValue(sourceDTO.getSourceRawValue())
+                  .reference(reference)
                   .build();
             })
         .orElse(null);
