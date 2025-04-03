@@ -3,7 +3,6 @@ import TextButton from "@/components/input/TextButton.vue"
 
 defineProps<{
   replacements: string[]
-  replacementMode: "single" | "multiple"
 }>()
 
 const emit = defineEmits<{
@@ -34,14 +33,10 @@ function addIgnoredWord() {
       />
     </div>
     <TextButton
-      :aria-label="
-        replacementMode === 'single'
-          ? 'Vorschlag ignorieren'
-          : 'Vorschläge ignorieren'
-      "
+      aria-label="Vorschlag ignorieren"
       button-type="tertiary"
       data-testid="ignored-word-add-button"
-      :label="replacementMode === 'single' ? 'Ignorieren ' : 'Alle ignorieren'"
+      label="Ignorieren"
       size="small"
       width="w-max"
       @click="addIgnoredWord"

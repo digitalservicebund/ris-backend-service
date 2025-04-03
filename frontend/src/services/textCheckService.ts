@@ -25,6 +25,11 @@ interface TextCheckService {
     id: string,
     word: string,
   ): Promise<ServiceResponse<IgnoredTextCheckWord>>
+
+  removeLocalIgnore(
+    id: string,
+    word: string,
+  ): Promise<ServiceResponse<IgnoredTextCheckWord>>
 }
 
 const service: TextCheckService = {
@@ -71,6 +76,28 @@ const service: TextCheckService = {
       IgnoredTextCheckWord
     >(
       `caselaw/documentunits/${id}/text-check/ignored-words/add`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      { word },
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.IGNORED_TEXT_CHECK_WORD_COULD_NOT_BE_SAVED.title,
+      } as ResponseError
+    }
+    return response
+  },
+
+  async removeLocalIgnore(id: string, word: string) {
+    const response = await httpClient.post<
+      IgnoredTextCheckWordRequest,
+      IgnoredTextCheckWord
+    >(
+      `caselaw/documentunits/${id}/text-check/ignored-words/remove`,
       {
         headers: {
           Accept: "application/json",

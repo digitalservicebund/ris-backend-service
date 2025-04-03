@@ -29,20 +29,13 @@ const textWithErrors = {
 test.describe(
   "check text category",
   {
-    annotation: {
-      description: "https://digitalservicebund.atlassian.net/browse/RISDEV-254",
-      type: "epic",
-    },
+    tag: ["@RISDEV-254"],
   },
   () => {
     test(
       "clicking on text check button, save document and returns matches",
       {
-        annotation: {
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-6154",
-          type: "story",
-        },
+        tag: ["@RISDEV-6205", "@RISDEV-6154"],
       },
       async ({ page, prefilledDocumentUnit }) => {
         await test.step("navigate to other headnote (Orientierungssatz) in categories", async () => {

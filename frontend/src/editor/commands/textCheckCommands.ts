@@ -34,7 +34,9 @@ interface TextCheckService {
 
   clearSelectedMatch(): void
 
-  ignoreWord(documentationUnitId: string, word: string): Promise<void>
+  ignoreWord(word: string): Promise<void>
+
+  removeIgnoredWord(word: string): Promise<void>
 }
 
 class NeurisTextCheckService implements TextCheckService {
@@ -202,6 +204,22 @@ class NeurisTextCheckService implements TextCheckService {
     if (store.documentUnit?.uuid) {
       const response: ServiceResponse<IgnoredTextCheckWord> =
         await languageToolService.addLocalIgnore(store.documentUnit?.uuid, word)
+
+      if (response.status >= 300) {
+        this.responseError.value = response.error
+      }
+    }
+  }
+
+  removeIgnoredWord = async (word: string): Promise<void> => {
+    const store = useDocumentUnitStore()
+
+    if (store.documentUnit?.uuid) {
+      const response: ServiceResponse<IgnoredTextCheckWord> =
+        await languageToolService.removeLocalIgnore(
+          store.documentUnit?.uuid,
+          word,
+        )
 
       if (response.status >= 300) {
         this.responseError.value = response.error

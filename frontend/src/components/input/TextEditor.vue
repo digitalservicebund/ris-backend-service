@@ -218,6 +218,15 @@ const acceptSuggestion = (suggestion: string) => {
   }
 }
 
+/**
+ * Remove ignored word from doc
+ * @param word
+ */
+const removeIgnoredWord = async (word: string) => {
+  await textCheckService.removeIgnoredWord(word)
+  editor.commands.setSelectedMatch()
+}
+
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
 /**
@@ -333,8 +342,9 @@ defineExpose({ jumpToMatch })
         <TextCheckModal
           v-if="selectedMatch"
           :match="selectedMatch"
-          @ignored-word:add="addIgnoredWord"
-          @suggestion:update="acceptSuggestion"
+          @word:add="addIgnoredWord"
+          @word:remove="removeIgnoredWord"
+          @word:replace="acceptSuggestion"
         />
       </BubbleMenu>
     </div>

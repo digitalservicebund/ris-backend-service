@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TextButton from "@/components/input/TextButton.vue"
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { Match } from "@/types/textCheck"
 
@@ -8,11 +9,11 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  "ignoreTextCheckWord:add": [string]
+  "ignored-word:remove": [string]
 }>()
 
-async function addWordToDocOffice() {
-  emit("ignoreTextCheckWord:add", props.match.word)
+async function removeWord() {
+  emit("ignored-word:remove", props.match.word)
 }
 </script>
 
@@ -21,18 +22,15 @@ async function addWordToDocOffice() {
     <div v-if="!NeurisTextCheckService.isMatchEditable(match)">
       von juris ignoriert
     </div>
-
-    <div v-else-if="addingToDictionaryEnabled">
-      <div
-        v-if="
-          match.rule.issueType == 'misspelling' &&
-          !match.ignoredTextCheckWords?.length
-        "
-      >
-        <button class="ds-link-01-bold" @click="addWordToDocOffice">
-          Zum globalen Wörterbuch hinzufügen
-        </button>
-      </div>
-    </div>
   </div>
+
+  <TextButton
+    aria-label="Wort nicht ignorieren"
+    button-type="tertiary"
+    data-testid="ignored-word-add-button"
+    label="Nicht ignorieren"
+    size="small"
+    width="w-max"
+    @click="removeWord"
+  />
 </template>
