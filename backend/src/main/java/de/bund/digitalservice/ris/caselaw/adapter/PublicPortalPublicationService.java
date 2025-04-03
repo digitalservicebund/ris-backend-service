@@ -94,18 +94,7 @@ public class PublicPortalPublicationService {
     }
   }
 
-  /**
-   * Generates a changelog file with the given parameters and saves it to the public portal bucket.
-   *
-   * @param publishedDocumentNumbers the document numbers of the documentation units which have been
-   *     changed or added.
-   * @param deletedDocumentNumbers the document numbers of the documentation units which have been
-   *     deleted.
-   * @param changeAll should be true if all files in the bucket need to be indexed, otherwise null.
-   *     If set to true, all other params should be null.
-   * @throws JsonProcessingException if the changelog cannot be generated.
-   */
-  public void uploadChangelog(
+  private void uploadChangelog(
       List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers, Boolean changeAll)
       throws JsonProcessingException {
     Changelog changelog =
@@ -115,13 +104,27 @@ public class PublicPortalPublicationService {
     publicPortalBucket.save(changelog.createFileName(), changelogString);
   }
 
+  /**
+   * Generates a changelog file with the given parameters and saves it to the public portal bucket.
+   *
+   * @param publishedDocumentNumbers the document numbers of the documentation units which have been
+   *     changed or added.
+   * @param deletedDocumentNumbers the document numbers of the documentation units which have been
+   *     deleted.
+   * @throws JsonProcessingException if the changelog cannot be generated.
+   */
   public void uploadChangelog(
       List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
       throws JsonProcessingException {
     uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers, null);
   }
 
-  public void uploadChangelog() throws JsonProcessingException {
+  /**
+   * Generates a changelog file to trigger a full re-indexing of all documents in the bucket
+   *
+   * @throws JsonProcessingException if the changelog cannot be generated.
+   */
+  public void uploadFullReindexChangelog() throws JsonProcessingException {
     uploadChangelog(null, null, true);
   }
 

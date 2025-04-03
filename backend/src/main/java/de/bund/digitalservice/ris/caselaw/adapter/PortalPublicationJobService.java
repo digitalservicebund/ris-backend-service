@@ -31,9 +31,10 @@ public class PortalPublicationJobService {
   //                 ↓ second (0-59)
   // Default:        0 30 2 * * * (After migration: CET: 4:30)
   @Scheduled(cron = "0 30 2 * * *")
+  @SchedulerLock(name = "nightly-changelog-publish")
   public void publishNightlyChangelog() {
     try {
-      publicPortalPublicationService.uploadChangelog();
+      publicPortalPublicationService.uploadFullReindexChangelog();
     } catch (Exception e) {
       log.error("Could not upload nightly changelog file.", e);
     }
