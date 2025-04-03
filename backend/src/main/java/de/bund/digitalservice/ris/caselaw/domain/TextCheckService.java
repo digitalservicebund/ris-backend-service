@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckUnknownCateg
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
@@ -41,20 +40,7 @@ public class TextCheckService {
   }
 
   public List<Match> check(String text) {
-    return requestTool(text).stream().map(this::addIgnoreInformationToMatch).toList();
-  }
-
-  private Match addIgnoreInformationToMatch(Match match) {
-    List<IgnoredTextCheckWord> ignoredTextCheckWordDTOs =
-        ignoredTextCheckWordRepository.findByWord(match.word());
-
-    if (!ignoredTextCheckWordDTOs.isEmpty()) {
-      List<IgnoredTextCheckWord> ignoredTextCheckWords =
-          ignoredTextCheckWordDTOs.stream().distinct().toList();
-      return match.toBuilder().ignoredTextCheckWords(ignoredTextCheckWords).build();
-    }
-
-    return match;
+    return requestTool(text).stream().toList();
   }
 
   protected List<Match> requestTool(String text) {
@@ -68,18 +54,32 @@ public class TextCheckService {
     Documentable documentable = documentationUnitRepository.findByUuid(id);
 
     if (documentable instanceof DocumentationUnit documentationUnit) {
-      allMatches.addAll(checkText(documentationUnit.longTexts().reasons(), CategoryType.REASONS));
-      allMatches.addAll(
-          checkText(documentationUnit.longTexts().caseFacts(), CategoryType.CASE_FACTS));
       allMatches.addAll(
           checkText(
-              documentationUnit.longTexts().decisionReasons(), CategoryType.DECISION_REASONS));
-      allMatches.addAll(checkText(documentationUnit.longTexts().tenor(), CategoryType.TENOR));
-      allMatches.addAll(
-          checkText(documentationUnit.shortTexts().headnote(), CategoryType.HEADNOTE));
+              documentationUnit.longTexts().reasons(), CategoryType.REASONS, documentable.uuid()));
       allMatches.addAll(
           checkText(
-              documentationUnit.shortTexts().guidingPrinciple(), CategoryType.GUIDING_PRINCIPLE));
+              documentationUnit.longTexts().caseFacts(),
+              CategoryType.CASE_FACTS,
+              documentable.uuid()));
+      allMatches.addAll(
+          checkText(
+              documentationUnit.longTexts().decisionReasons(),
+              CategoryType.DECISION_REASONS,
+              documentable.uuid()));
+      allMatches.addAll(
+          checkText(
+              documentationUnit.longTexts().tenor(), CategoryType.TENOR, documentable.uuid()));
+      allMatches.addAll(
+          checkText(
+              documentationUnit.shortTexts().headnote(),
+              CategoryType.HEADNOTE,
+              documentable.uuid()));
+      allMatches.addAll(
+          checkText(
+              documentationUnit.shortTexts().guidingPrinciple(),
+              CategoryType.GUIDING_PRINCIPLE,
+              documentable.uuid()));
     } else {
       throw new UnsupportedOperationException();
     }
@@ -97,20 +97,36 @@ public class TextCheckService {
     if (documentable instanceof DocumentationUnit documentationUnit) {
 
       return switch (category) {
-        case REASONS -> checkCategoryByHTML(documentationUnit.longTexts().reasons(), category);
-        case CASE_FACTS -> checkCategoryByHTML(documentationUnit.longTexts().caseFacts(), category);
+        case REASONS ->
+            checkCategoryByHTML(
+                documentationUnit.longTexts().reasons(), category, documentable.uuid());
+        case CASE_FACTS ->
+            checkCategoryByHTML(
+                documentationUnit.longTexts().caseFacts(), category, documentable.uuid());
         case DECISION_REASONS ->
-            checkCategoryByHTML(documentationUnit.longTexts().decisionReasons(), category);
-        case HEADNOTE -> checkCategoryByHTML(documentationUnit.shortTexts().headnote(), category);
-        case HEADLINE -> checkCategoryByHTML(documentationUnit.shortTexts().headline(), category);
+            checkCategoryByHTML(
+                documentationUnit.longTexts().decisionReasons(), category, documentable.uuid());
+        case HEADNOTE ->
+            checkCategoryByHTML(
+                documentationUnit.shortTexts().headnote(), category, documentable.uuid());
+        case HEADLINE ->
+            checkCategoryByHTML(
+                documentationUnit.shortTexts().headline(), category, documentable.uuid());
         case GUIDING_PRINCIPLE ->
-            checkCategoryByHTML(documentationUnit.shortTexts().guidingPrinciple(), category);
-        case TENOR -> checkCategoryByHTML(documentationUnit.longTexts().tenor(), category);
+            checkCategoryByHTML(
+                documentationUnit.shortTexts().guidingPrinciple(), category, documentable.uuid());
+        case TENOR ->
+            checkCategoryByHTML(
+                documentationUnit.longTexts().tenor(), category, documentable.uuid());
         case OTHER_LONG_TEXT ->
-            checkCategoryByHTML(documentationUnit.longTexts().otherLongText(), category);
+            checkCategoryByHTML(
+                documentationUnit.longTexts().otherLongText(), category, documentable.uuid());
         case DISSENTING_OPINION ->
-            checkCategoryByHTML(documentationUnit.longTexts().dissentingOpinion(), category);
-        case OUTLINE -> checkCategoryByHTML(documentationUnit.longTexts().outline(), category);
+            checkCategoryByHTML(
+                documentationUnit.longTexts().dissentingOpinion(), category, documentable.uuid());
+        case OUTLINE ->
+            checkCategoryByHTML(
+                documentationUnit.longTexts().outline(), category, documentable.uuid());
         case UNKNOWN -> throw new TextCheckUnknownCategoryException(category.toString());
       };
     }
@@ -127,6 +143,11 @@ public class TextCheckService {
 
   protected TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType) {
+    return checkCategoryByHTML(htmlText, categoryType, null);
+  }
+
+  protected TextCheckCategoryResponse checkCategoryByHTML(
+      String htmlText, CategoryType categoryType, UUID documentationUnitId) {
     if (htmlText == null) {
       return null;
     }
@@ -140,20 +161,12 @@ public class TextCheckService {
     AtomicInteger lastPosition = new AtomicInteger(0);
 
     List<Match> modifiedMatches =
-        matches.stream()
-            .map(match -> match.toBuilder().category(categoryType).build())
-            .map(
-                match -> {
-                  if (match.replacements() != null)
-                    return match.toBuilder()
-                        .replacements(
-                            match
-                                .replacements()
-                                .subList(0, Math.min(match.replacements().size(), 5)))
-                        .build();
-                  return match;
-                })
-            .toList();
+        addIgnoredTextChecksIndividually(
+            documentationUnitId,
+            matches.stream()
+                .map(match -> match.toBuilder().category(categoryType).build())
+                .map(this::limitReplacements)
+                .toList());
 
     modifiedMatches.forEach(
         match -> {
@@ -177,46 +190,23 @@ public class TextCheckService {
     return new TextCheckCategoryResponse(newHtmlText.toString(), modifiedMatches);
   }
 
-  private List<Match> checkText(String text, CategoryType categoryType) {
+  private Match limitReplacements(Match match) {
+    if (match.replacements() != null) {
+      return match.toBuilder()
+          .replacements(match.replacements().subList(0, Math.min(match.replacements().size(), 5)))
+          .build();
+    }
+    return match;
+  }
+
+  private List<Match> checkText(String text, CategoryType categoryType, UUID documentationUnitId) {
     if (text == null) {
       return Collections.emptyList();
     }
 
-    return checkCategoryByHTML(text, categoryType).matches().stream()
+    return checkCategoryByHTML(text, categoryType, documentationUnitId).matches().stream()
         .map(match -> match.toBuilder().category(categoryType).build())
         .toList();
-  }
-
-  public DocumentationUnit addNoIndexTags(DocumentationUnit documentationUnit) {
-    String normalizedHtml = normalizeHTML(Jsoup.parse(documentationUnit.longTexts().tenor()));
-
-    List<Match> matches = check(normalizedHtml);
-
-    StringBuilder newHtmlText = new StringBuilder();
-    AtomicInteger lastPosition = new AtomicInteger(0);
-
-    matches.stream()
-        .filter(
-            match ->
-                match.ignoredTextCheckWords().stream()
-                    .anyMatch(
-                        ignoredTextCheckWord ->
-                            ignoredTextCheckWord.type() == IgnoredTextCheckType.DOCUMENTATION_UNIT))
-        .forEach(
-            match -> {
-              newHtmlText
-                  .append(normalizedHtml, lastPosition.get(), match.offset())
-                  .append("<noindex>")
-                  .append(normalizedHtml, match.offset(), match.offset() + match.length())
-                  .append("</noindex>");
-              lastPosition.set(match.offset() + match.length());
-            });
-    newHtmlText.append(normalizedHtml, lastPosition.get(), normalizedHtml.length());
-
-    LongTexts newLongTexts =
-        documentationUnit.longTexts().toBuilder().tenor(newHtmlText.toString()).build();
-
-    return documentationUnit.toBuilder().longTexts(newLongTexts).build();
   }
 
   public void removeIgnoredWord(UUID documentationUnitId, String word) {
@@ -224,9 +214,25 @@ public class TextCheckService {
   }
 
   public IgnoredTextCheckWord addIgnoreWord(UUID documentationUnitId, String word) {
-    List<IgnoredTextCheckWord> ignoredTextCheckWords =
-        ignoredTextCheckWordRepository.findByWord(word);
     return ignoredTextCheckWordRepository.addIgnoredTextCheckWord(word, documentationUnitId);
+  }
+
+  public List<Match> addIgnoredTextChecksIndividually(
+      UUID documentationUnitId, List<Match> matches) {
+
+    if (documentationUnitId == null) {
+      return matches;
+    }
+    return matches.stream()
+        .map(
+            match -> {
+              List<IgnoredTextCheckWord> ignoredWords =
+                  ignoredTextCheckWordRepository.findByWordAndDocumentationUnitIdAndExternal(
+                      match.word(), documentationUnitId);
+
+              return match.toBuilder().ignoredTextCheckWords(ignoredWords).build();
+            })
+        .toList();
   }
 
   @SuppressWarnings("java:S3776")

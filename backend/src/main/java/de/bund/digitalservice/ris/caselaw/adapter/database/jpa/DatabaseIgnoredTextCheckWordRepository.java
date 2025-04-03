@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -13,7 +14,15 @@ import org.springframework.stereotype.Repository;
 public interface DatabaseIgnoredTextCheckWordRepository
     extends JpaRepository<IgnoredTextCheckWordDTO, Long> {
 
-  List<IgnoredTextCheckWordDTO> findByWord(String word);
-
   void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId);
+
+  @Query(
+      """
+                      SELECT i FROM IgnoredTextCheckWordDTO i
+                      WHERE i.word = :word AND (
+                          i.jurisId IS NOT NULL OR i.documentationUnitId = :documentationUnitId
+                      )
+                  """)
+  List<IgnoredTextCheckWordDTO> findByWordAndDocumentationUnitIdAndExternal(
+      String word, UUID documentationUnitId);
 }

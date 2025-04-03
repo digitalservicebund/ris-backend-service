@@ -186,18 +186,6 @@ class NeurisTextCheckService implements TextCheckService {
     )
   }
 
-  /**
-   * Returns true if all ignored words are editable, otherwise false
-   * @param match
-   */
-  static isMatchEditable(match: Match): boolean {
-    return (
-      match.ignoredTextCheckWords?.every(
-        (ignoredWord) => ignoredWord.isEditable === true,
-      ) ?? false
-    )
-  }
-
   ignoreWord = async (word: string) => {
     const store = useDocumentUnitStore()
 

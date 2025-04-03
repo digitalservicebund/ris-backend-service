@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import TextButton from "@/components/input/TextButton.vue"
-import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
@@ -19,18 +18,29 @@ async function removeWord() {
 
 <template>
   <div data-testid="ignored-word-handler">
-    <div v-if="!NeurisTextCheckService.isMatchEditable(match)">
-      von juris ignoriert
+    <div
+      v-if="
+        match.ignoredTextCheckWords?.some(
+          (ignoredWord) => ignoredWord.type === 'global',
+        )
+      "
+    >
+      Von jDV ignoriert
     </div>
-  </div>
 
-  <TextButton
-    aria-label="Wort nicht ignorieren"
-    button-type="tertiary"
-    data-testid="ignored-word-add-button"
-    label="Nicht ignorieren"
-    size="small"
-    width="w-max"
-    @click="removeWord"
-  />
+    <TextButton
+      v-if="
+        match.ignoredTextCheckWords?.some(
+          (ignoredWord) => ignoredWord.type === 'documentation_unit',
+        )
+      "
+      aria-label="Wort nicht ignorieren"
+      button-type="tertiary"
+      data-testid="ignored-word-add-button"
+      label="Nicht ignorieren"
+      size="small"
+      width="w-max"
+      @click="removeWord"
+    />
+  </div>
 </template>

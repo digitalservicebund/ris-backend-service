@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRequest;
 import jakarta.transaction.Transactional;
@@ -34,23 +33,6 @@ public class TextCheckController {
 
   public TextCheckController(TextCheckService textCheckService) {
     this.textCheckService = textCheckService;
-  }
-
-  @PostMapping(
-      value = "/text-check",
-      consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<TextCheckResponse> check(@RequestBody String text) {
-    try {
-      return ResponseEntity.ok(
-          TextCheckResponseTransformer.transformToDomain(textCheckService.check(text)));
-
-    } catch (Exception e) {
-      log.error("Text check failed", e);
-    }
-
-    return ResponseEntity.internalServerError().build();
   }
 
   @GetMapping("{id}/text-check/all")

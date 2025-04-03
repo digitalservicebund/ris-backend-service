@@ -17,12 +17,9 @@ public class IgnoredTextCheckWordTransformer {
 
   private static IgnoredTextCheckType getIgnoredTextCheckType(
       IgnoredTextCheckWordDTO ignoredTextCheckWordDTO) {
-    if (ignoredTextCheckWordDTO.getDocumentationUnitId() != null) {
-      return IgnoredTextCheckType.DOCUMENTATION_UNIT;
-    } else if (ignoredTextCheckWordDTO.getDocumentationOfficeId() != null) {
-      return IgnoredTextCheckType.DOCUMENTATION_OFFICE;
-    } else {
+    if (ignoredTextCheckWordDTO.getJurisId() != null) {
       return IgnoredTextCheckType.GLOBAL;
     }
+    return IgnoredTextCheckType.DOCUMENTATION_UNIT;
   }
 }

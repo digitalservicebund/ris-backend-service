@@ -76,7 +76,7 @@ export interface IgnoredTextCheckWord {
   isEditable?: boolean
 }
 
-export type DocumentationType = "documentation_office" | "documentation_unit"
+export type DocumentationType = "global" | "documentation_unit"
 
 export type TextCheckExtensionOptions = {
   category?: string
