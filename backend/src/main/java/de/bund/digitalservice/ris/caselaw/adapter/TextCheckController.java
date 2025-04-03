@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResp
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRequest;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +91,24 @@ public class TextCheckController {
 
     } catch (Exception e) {
       log.error("Adding word failed", e);
+    }
+
+    return ResponseEntity.internalServerError().build();
+  }
+
+  @PostMapping(
+      value = "{id}/text-check/ignored-words/remove",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  @Transactional
+  public ResponseEntity<IgnoredTextCheckWord> removeIgnoredWord(
+      @PathVariable("id") UUID id, @RequestBody IgnoredTextCheckWordRequest request) {
+    try {
+      textCheckService.removeIgnoredWord(id, request.word());
+      return ResponseEntity.ok().build();
+    } catch (Exception e) {
+      log.error("Removing word failed", e);
     }
 
     return ResponseEntity.internalServerError().build();

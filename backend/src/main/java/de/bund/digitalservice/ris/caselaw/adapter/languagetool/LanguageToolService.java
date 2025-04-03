@@ -3,11 +3,11 @@ package de.bund.digitalservice.ris.caselaw.adapter.languagetool;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseIgnoredTextCheckWordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.TextCheckResponseTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class LanguageToolService extends TextCheckService {
   public LanguageToolService(
       LanguageToolConfig languageToolConfig,
       DocumentationUnitRepository documentationUnitRepository,
-      DatabaseIgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
+      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
 
     super(documentationUnitRepository, ignoredTextCheckWordRepository);
     this.languageToolConfig = languageToolConfig;

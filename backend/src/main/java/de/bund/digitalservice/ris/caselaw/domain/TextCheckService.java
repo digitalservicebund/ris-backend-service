@@ -2,9 +2,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import static java.util.Arrays.stream;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseIgnoredTextCheckWordRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IgnoredTextCheckWordDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.IgnoredTextCheckWordTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckUnknownCategoryException;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
@@ -12,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,11 +30,11 @@ import org.jsoup.select.NodeVisitor;
 @Slf4j
 public class TextCheckService {
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final DatabaseIgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+  private final IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
 
   public TextCheckService(
       DocumentationUnitRepository documentationUnitRepository,
-      DatabaseIgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
+      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.ignoredTextCheckWordRepository = ignoredTextCheckWordRepository;
@@ -47,15 +45,12 @@ public class TextCheckService {
   }
 
   private Match addIgnoreInformationToMatch(Match match) {
-    List<IgnoredTextCheckWordDTO> ignoredTextCheckWordDTOs =
+    List<IgnoredTextCheckWord> ignoredTextCheckWordDTOs =
         ignoredTextCheckWordRepository.findByWord(match.word());
 
     if (!ignoredTextCheckWordDTOs.isEmpty()) {
       List<IgnoredTextCheckWord> ignoredTextCheckWords =
-          ignoredTextCheckWordDTOs.stream()
-              .map(IgnoredTextCheckWordTransformer::transformToDomain)
-              .distinct()
-              .toList();
+          ignoredTextCheckWordDTOs.stream().distinct().toList();
       return match.toBuilder().ignoredTextCheckWords(ignoredTextCheckWords).build();
     }
 
@@ -85,8 +80,9 @@ public class TextCheckService {
       allMatches.addAll(
           checkText(
               documentationUnit.shortTexts().guidingPrinciple(), CategoryType.GUIDING_PRINCIPLE));
+    } else {
+      throw new UnsupportedOperationException();
     }
-
     return allMatches;
   }
 
@@ -223,66 +219,14 @@ public class TextCheckService {
     return documentationUnit.toBuilder().longTexts(newLongTexts).build();
   }
 
+  public void removeIgnoredWord(UUID documentationUnitId, String word) {
+    ignoredTextCheckWordRepository.deleteAllByWordAndDocumentationUnitId(word, documentationUnitId);
+  }
+
   public IgnoredTextCheckWord addIgnoreWord(UUID documentationUnitId, String word) {
-    List<IgnoredTextCheckWordDTO> ignoredTextCheckWords =
+    List<IgnoredTextCheckWord> ignoredTextCheckWords =
         ignoredTextCheckWordRepository.findByWord(word);
-
-    IgnoredTextCheckWordDTO ignoredTextCheckWord = null;
-    if (!ignoredTextCheckWords.isEmpty()) {
-      if (ignoredTextCheckWords.stream()
-          .anyMatch(
-              ignoredTextCheckWordDTO ->
-                  ignoredTextCheckWordDTO.getDocumentationUnitId() == null)) {
-        log.warn("Global ignore word {} exist!", word);
-        return null;
-      }
-
-      List<IgnoredTextCheckWordDTO> ignoredTextCheckWordsForDocumentationUnit =
-          ignoredTextCheckWords.stream()
-              .filter(
-                  ignoredTextCheckWordDTO ->
-                      ignoredTextCheckWordDTO.getDocumentationUnitId() != null
-                          && ignoredTextCheckWordDTO
-                              .getDocumentationUnitId()
-                              .equals(documentationUnitId))
-              .toList();
-
-      if (ignoredTextCheckWordsForDocumentationUnit.size() > 1) {
-        log.error(
-            "More than one ({}) entities for word '{}' and documentation unit '{}' exist!",
-            ignoredTextCheckWordsForDocumentationUnit.size(),
-            word,
-            documentationUnitId);
-        return null;
-      }
-
-      if (!ignoredTextCheckWordsForDocumentationUnit.isEmpty()) {
-        ignoredTextCheckWord = ignoredTextCheckWordsForDocumentationUnit.get(0);
-      }
-    }
-
-    if (ignoredTextCheckWord == null) {
-      try {
-        Documentable documentable = documentationUnitRepository.findByUuid(documentationUnitId);
-
-        if (documentable instanceof DocumentationUnit documentationUnit) {
-          ignoredTextCheckWord =
-              IgnoredTextCheckWordDTO.builder()
-                  .word(word)
-                  .documentationUnitId(documentationUnit.uuid())
-                  .build();
-        }
-      } catch (DocumentationUnitNotExistsException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    if (ignoredTextCheckWord != null) {
-      return IgnoredTextCheckWordTransformer.transformToDomain(
-          ignoredTextCheckWordRepository.save(ignoredTextCheckWord));
-    }
-
-    return null;
+    return ignoredTextCheckWordRepository.addIgnoredTextCheckWord(word, documentationUnitId);
   }
 
   @SuppressWarnings("java:S3776")

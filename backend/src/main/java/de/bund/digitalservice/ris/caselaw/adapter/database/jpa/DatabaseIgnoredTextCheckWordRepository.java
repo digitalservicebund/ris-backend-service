@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +14,6 @@ public interface DatabaseIgnoredTextCheckWordRepository
     extends JpaRepository<IgnoredTextCheckWordDTO, Long> {
 
   List<IgnoredTextCheckWordDTO> findByWord(String word);
+
+  void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId);
 }
