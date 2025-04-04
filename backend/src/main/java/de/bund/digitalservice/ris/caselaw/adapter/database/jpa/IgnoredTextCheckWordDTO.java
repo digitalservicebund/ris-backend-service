@@ -27,9 +27,6 @@ public class IgnoredTextCheckWordDTO {
 
   @Id @GeneratedValue private UUID id;
 
-  @Column(name = "documentation_office_id")
-  private UUID documentationOfficeId;
-
   @Column(name = "documentation_unit_id")
   private UUID documentationUnitId;
 
