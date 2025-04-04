@@ -453,6 +453,7 @@ export type DocumentUnitSearchParameter =
             v-model="myDocOfficeOnly"
             aria-label="Nur meine Dokstelle Filter"
             binary
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
           />
         </InputField>
         <InputField
@@ -468,6 +469,7 @@ export type DocumentUnitSearchParameter =
             v-model="withError"
             aria-label="Nur fehlerhafte Dokumentationseinheiten"
             binary
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
           />
         </InputField>
         <InputField
@@ -483,6 +485,7 @@ export type DocumentUnitSearchParameter =
             v-model="withDuplicateWarning"
             aria-label="Dokumentationseinheiten mit Dublettenverdacht"
             binary
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
         /></InputField>
       </div>
       <div class="flex flex-row">
