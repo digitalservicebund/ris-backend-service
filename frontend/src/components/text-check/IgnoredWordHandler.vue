@@ -36,7 +36,7 @@ async function removeWord() {
       "
       aria-label="Wort nicht ignorieren"
       button-type="tertiary"
-      data-testid="ignored-word-add-button"
+      data-testid="ignored-word-remove-button"
       label="Nicht ignorieren"
       size="small"
       width="w-max"

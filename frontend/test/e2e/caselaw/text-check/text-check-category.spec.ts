@@ -178,6 +178,56 @@ test.describe(
             ).toContainText("Von jDV ignoriert")
           }
         })
+
+        await test.step("ignoring a word highlights it in green after text re-check", async () => {
+          await page.locator(`text-check[id='${1}']`).click()
+          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
+          await page.getByTestId("ignored-word-add-button").click()
+          await page
+            .getByLabel("Orientierungssatz Button")
+            .getByRole("button", { name: "Rechtschreibprüfung" })
+            .click()
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
+
+          const rgbColors = convertHexToRGB("#01854a")
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toBeHidden()
+
+          await expect(page.locator(`text-check[id='${1}']`)).toHaveCSS(
+            "border-bottom",
+            "2px solid " +
+              `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
+          )
+        })
+
+        await test.step("removing ignored word highlights it in red after text re-check", async () => {
+          await page.locator(`text-check[id='${1}']`).click()
+          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
+          await page.getByTestId("ignored-word-remove-button").click()
+          await page
+            .getByLabel("Orientierungssatz Button")
+            .getByRole("button", { name: "Rechtschreibprüfung" })
+            .click()
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
+
+          const rgbColors = convertHexToRGB("#e86a69")
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toBeHidden()
+
+          await expect(page.locator(`text-check[id='${1}']`)).toHaveCSS(
+            "border-bottom",
+            "2px solid " +
+              `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
+          )
+        })
       },
     )
   },
