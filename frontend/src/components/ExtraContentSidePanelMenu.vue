@@ -44,8 +44,7 @@ function emitAttachmentIndex(value: number) {
         <Button
           id="note"
           aria-label="Notiz anzeigen"
-          class="flex"
-          :class="panelMode === 'note' ? 'bg-blue-200' : ''"
+          class="focus-visible:z-20"
           data-testid="note-button"
           severity="secondary"
           size="small"
@@ -58,7 +57,7 @@ function emitAttachmentIndex(value: number) {
         <Button
           id="attachments"
           aria-label="Dokumente anzeigen"
-          :class="panelMode === 'attachments' ? 'bg-blue-200' : ''"
+          class="focus-visible:z-20"
           data-testid="attachments-button"
           severity="secondary"
           size="small"
@@ -72,7 +71,7 @@ function emitAttachmentIndex(value: number) {
         <Button
           id="preview"
           aria-label="Vorschau anzeigen"
-          :class="panelMode === 'preview' ? 'bg-blue-200' : ''"
+          class="focus-visible:z-20"
           data-testid="preview-button"
           severity="secondary"
           size="small"
@@ -86,7 +85,7 @@ function emitAttachmentIndex(value: number) {
         <Button
           id="category-import"
           aria-label="Rubriken-Import anzeigen"
-          :class="panelMode === 'category-import' ? 'bg-blue-200' : ''"
+          class="focus-visible:z-20"
           data-testid="category-import-button"
           severity="secondary"
           size="small"
@@ -98,7 +97,7 @@ function emitAttachmentIndex(value: number) {
         <Button
           id="text-check"
           aria-label="Rechtschreibprüfung"
-          :class="panelMode === 'text-check' ? 'bg-blue-200' : ''"
+          class="focus-visible:z-20"
           data-testid="text-check-button"
           severity="secondary"
           size="small"

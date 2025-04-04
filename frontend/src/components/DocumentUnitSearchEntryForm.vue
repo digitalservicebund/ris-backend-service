@@ -486,7 +486,7 @@ export type DocumentUnitSearchParameter =
         /></InputField>
       </div>
       <div class="flex flex-row">
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-8">
           <Button
             aria-label="Nach Dokumentationseinheiten suchen"
             class="self-start"
