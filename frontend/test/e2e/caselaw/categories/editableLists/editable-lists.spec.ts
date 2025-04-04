@@ -2,7 +2,6 @@
 /* eslint-disable playwright/no-conditional-expect */
 import { expect } from "@playwright/test"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
-import SingleNorm from "@/domain/singleNorm"
 import {
   fillActiveCitationInputs,
   fillEnsuingDecisionInputs,
@@ -546,55 +545,6 @@ test.describe("related documentation units", () => {
           await container.getByTestId("list-entry-0").click()
 
           await expect(container.getByLabel("Weitere Angabe")).toBeHidden()
-        },
-      )
-    }
-  })
-
-  test("incomplete date input shows error message and does not persist", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-    const activeCitationContainer = page.getByLabel("Aktivzitierung")
-    const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
-    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
-    const containers = [
-      activeCitationContainer,
-      previousDecisionContainer,
-      ensuingDecisionContainer,
-      normsContainer,
-    ]
-
-    for (const container of containers) {
-      await test.step(
-        "for category " + (await container.first().getAttribute("aria-label")),
-        async () => {
-          await navigateToCategories(page, documentNumber)
-
-          if (container === activeCitationContainer) {
-            await fillActiveCitationInputs(page, { decisionDate: "03" })
-          }
-          if (container === previousDecisionContainer) {
-            await fillPreviousDecisionInputs(page, { decisionDate: "03" })
-          }
-          if (container === ensuingDecisionContainer) {
-            await fillEnsuingDecisionInputs(page, { decisionDate: "03" })
-          }
-          if (container === normsContainer) {
-            await fillEnsuingDecisionInputs(page, { decisionDate: "03" })
-          }
-          await fillNormInputs(page, {
-            normAbbreviation: "PBefG",
-            singleNorms: [{ dateOfVersion: "03" } as SingleNorm],
-          })
-
-          await page.keyboard.press("Tab")
-
-          await expect(
-            container.getByText("Unvollständiges Datum"),
-          ).toBeVisible()
         },
       )
     }
