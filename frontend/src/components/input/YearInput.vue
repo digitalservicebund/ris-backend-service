@@ -18,110 +18,84 @@ const emit = defineEmits<{
   "update:validationError": [value?: ValidationError]
 }>()
 
-/* -------------------------------------------------- *
- * Model handling                                     *
- * -------------------------------------------------- */
+const inputCompleted = computed(() => {
+  return !!inputValue.value && /\d{4}/.test(inputValue.value)
+})
 
-// We'll need to keep an internal state for the input value since there are
-// some conditions that need to be checked before we can emit the value to the
-// parent component.
-const localModelValue = ref(props.modelValue)
-
-// This will be true if we think that the user is no longer working on the
-// input, e.g. on blur. We'll set it to false if the local value changes, i.e.
-// the user is typing. We'll try not to annoy users with validation errors
-// if they are still changing the value.
-const userHasFinished = ref<boolean>(false)
-
-const shouldShowValidationState = computed(() =>
-  Boolean(
-    localModelValue.value && (inputCompleted.value || userHasFinished.value),
-  ),
+const inputValue = ref(
+  props.modelValue ? dayjs(props.modelValue).format("YYYY") : undefined,
 )
-
-watch(
-  () => props.modelValue,
-  () => {
-    localModelValue.value = props.modelValue
-  },
-)
-
-// Use this for changing the localModelValue. This will automatically clean up
-// the new value, update dependent states, and communicate the state change to
-// the parent.
-function emitModelValue(value: string | undefined): void {
-  if (value === localModelValue.value) return
-
-  const nextValue = onlyAllowNumbers(value)
-  userHasFinished.value = false
-
-  localModelValue.value = nextValue
-
-  if (validateYear(nextValue)) emit("update:modelValue", nextValue)
-  else if (!nextValue) emit("update:modelValue", undefined)
-}
-
-function onlyAllowNumbers(input: string | undefined): string | undefined {
-  return input ? input.replace(/\D/g, "") : input
-}
-
-/* -------------------------------------------------- *
- * Validation                                         *
- * -------------------------------------------------- */
 
 dayjs.extend(customParseFormat)
 
-const inputCompleted = computed(() => {
-  return !!localModelValue.value && /\d{4}/.test(localModelValue.value)
+const isValidYear = computed(() => {
+  return dayjs(inputValue.value, "YYYY", true).isValid()
 })
 
-const isValid = computed(() => validateYear(localModelValue.value))
-
 function validateInput() {
-  if (!isValid.value && localModelValue.value) {
+  if (!inputCompleted.value) {
+    console.log(inputValue.value)
+    emit("update:validationError", {
+      message: "Unvollständiges Jahr",
+      instance: props.id,
+    })
+    return
+  }
+
+  if (!isValidYear.value) {
     emit("update:validationError", {
       message: "Kein valides Jahr",
       instance: props.id,
     })
+    return
   } else {
     emit("update:validationError", undefined)
   }
 }
 
+onMounted(() => {
+  if (inputValue.value) validateInput()
+})
+
 function backspaceDelete() {
   emit("update:validationError", undefined)
-  if (localModelValue.value === "")
-    emit("update:modelValue", localModelValue.value)
+  if (inputValue.value === "") emit("update:modelValue", inputValue.value)
 }
 
-watch(shouldShowValidationState, (is) => {
-  if (is) validateInput()
-})
-
-onMounted(() => {
-  if (localModelValue.value) validateInput()
-})
-
-// Valid years = 1000 - 9999
-function validateYear(input: string | undefined): boolean {
-  if (!input || input.length < 4) return false
-
-  const date = dayjs(input, "YYYY", true)
-  return date.isValid() && date.year() >= 1000 && date.year() <= 9999
+function onBlur() {
+  validateInput()
 }
+
+watch(
+  () => props.modelValue,
+  () => {
+    inputValue.value = props.modelValue
+  },
+)
+
+watch(inputValue, () => {
+  if (inputValue.value === "") emit("update:modelValue", undefined)
+  if (isValidYear.value && inputCompleted.value) {
+    emit("update:modelValue", inputValue.value)
+  }
+
+  if (inputCompleted.value) {
+    validateInput()
+  }
+})
 </script>
 
 <template>
   <InputMask
     :id="id"
-    v-model="localModelValue"
+    v-model="inputValue"
     :aria-label="($attrs.ariaLabel as string) ?? ''"
-    :invalid="hasError || (shouldShowValidationState && !isValid)"
+    fluid
+    :invalid="hasError"
     mask="9999"
     placeholder="JJJJ"
     size="small"
-    @blur="userHasFinished = true"
+    @blur="onBlur"
     @keydown.delete="backspaceDelete"
-    @update:model-value="emitModelValue"
   />
 </template>

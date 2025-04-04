@@ -250,6 +250,7 @@ onMounted(async () => {
           ref="singleNormInput"
           v-model.trim="singleNorm.singleNorm"
           aria-label="Einzelnorm der Norm"
+          fluid
           :invalid="slotProps.hasError"
           size="small"
           @blur="validateNorm"
