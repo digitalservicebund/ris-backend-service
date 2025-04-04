@@ -75,7 +75,9 @@ function onFileSelect(event: Event) {
       <div>{{ status.file ? status.file.name : "" }}</div>
     </span>
     <span v-else class="flex flex-col items-center p-24">
-      <IconUpload class="h-32 w-32 text-blue-800" />
+      <span class="rounded-full bg-blue-200 p-12 text-blue-800">
+        <IconUpload class="h-32 w-32 text-blue-800" />
+      </span>
 
       <div class="ris-label1-bold mt-[0.5rem] pt-6">
         Ziehen Sie Ihre Dateien in diesen Bereich.
