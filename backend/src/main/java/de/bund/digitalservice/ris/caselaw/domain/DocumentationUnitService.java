@@ -38,6 +38,7 @@ public class DocumentationUnitService {
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
   private final AuthService authService;
+  private final UserService userService;
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
   private static final List<String> pathsForDuplicateCheck =
@@ -57,6 +58,7 @@ public class DocumentationUnitService {
       DocumentNumberService documentNumberService,
       DocumentationUnitStatusService statusService,
       DocumentNumberRecyclingService documentNumberRecyclingService,
+      UserService userService,
       Validator validator,
       AttachmentService attachmentService,
       @Lazy AuthService authService,
@@ -66,6 +68,7 @@ public class DocumentationUnitService {
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
+    this.userService = userService;
     this.validator = validator;
     this.attachmentService = attachmentService;
     this.patchMapperService = patchMapperService;
@@ -229,7 +232,10 @@ public class DocumentationUnitService {
 
   public Documentable getByDocumentNumberWithUser(String documentNumber, OidcUser oidcUser)
       throws DocumentationUnitNotExistsException {
-    var documentable = repository.findByDocumentNumber(documentNumber);
+    var userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
+    var documentable =
+        repository.findByDocumentNumberWithUserDocumentationOffice(
+            documentNumber, userDocumentationOffice);
     if (documentable instanceof DocumentationUnit documentationUnit) {
       return documentationUnit.toBuilder()
           .isEditable(

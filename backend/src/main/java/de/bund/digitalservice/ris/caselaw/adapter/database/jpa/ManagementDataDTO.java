@@ -1,0 +1,63 @@
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Entity
+@Table(name = "management_data", schema = "incremental_migration")
+public class ManagementDataDTO {
+
+  @Id
+  @OneToOne()
+  @JoinColumn(name = "documentation_unit_id", referencedColumnName = "id")
+  private DecisionDTO documentationUnitId;
+
+  @OneToOne()
+  @JoinColumn(name = "created_by_documentation_office", referencedColumnName = "id")
+  private DocumentationOfficeDTO createdByDocumentationOffice;
+
+  @Column(name = "created_by_user_id")
+  private UUID createdByUserId;
+
+  @Column(name = "created_at_date_time")
+  private LocalDateTime createdAtDateTime;
+
+  @Column(name = "created_by_user_name")
+  private String createdByUserName;
+
+  @Column(name = "created_by_system_name")
+  private String createdBySystemName;
+
+  @OneToOne()
+  @JoinColumn(name = "last_updated_by_documentation_office", referencedColumnName = "id")
+  private DocumentationOfficeDTO lastUpdatedByDocumentationOffice;
+
+  @Column(name = "last_updated_by_user_id")
+  private UUID lastUpdatedByUserId;
+
+  @Column(name = "last_updated_at_date_time")
+  private LocalDateTime lastUpdatedAtDateTime;
+
+  @Column(name = "last_updated_by_user_name")
+  private String lastUpdatedByUserName;
+
+  @Column(name = "last_updated_by_system_name")
+  private String lastUpdatedBySystemName;
+
+  @Column(name = "first_published_at_date_time")
+  private LocalDateTime firstPublishedAtDateTime;
+}

@@ -203,4 +203,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   @Builder.Default
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
+
+  @OneToOne(mappedBy = "documentationUnitId")
+  private ManagementDataDTO managementData;
 }

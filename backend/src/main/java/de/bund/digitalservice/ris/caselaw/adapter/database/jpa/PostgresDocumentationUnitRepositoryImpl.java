@@ -113,10 +113,34 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     return getDocumentationUnit(documentationUnit);
   }
 
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public Documentable findByDocumentNumberWithUserDocumentationOffice(
+      String documentNumber, DocumentationOffice userDocumentationOffice)
+      throws DocumentationUnitNotExistsException {
+    var documentationUnit =
+        repository
+            .findByDocumentNumber(documentNumber)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+    return getDocumentationUnitWithUserDocumentationOffice(
+        documentationUnit, userDocumentationOffice);
+  }
+
   @Nullable
   private static Documentable getDocumentationUnit(DocumentationUnitDTO documentationUnit) {
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
-      return DecisionTransformer.transformToDomain(decisionDTO);
+      return DecisionTransformer.transformToDomain(decisionDTO, null);
+    }
+    if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
+      return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
+    }
+    return null;
+  }
+
+  private static Documentable getDocumentationUnitWithUserDocumentationOffice(
+      DocumentationUnitDTO documentationUnit, DocumentationOffice userDocumentationOffice) {
+    if (documentationUnit instanceof DecisionDTO decisionDTO) {
+      return DecisionTransformer.transformToDomain(decisionDTO, userDocumentationOffice);
     }
     if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
       return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
@@ -189,7 +213,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // persisted documentation unit
     DecisionDTO savedDocUnit = repository.save(builder.build());
 
-    return DecisionTransformer.transformToDomain(savedDocUnit);
+    return DecisionTransformer.transformToDomain(savedDocUnit, null);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -696,7 +720,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     return repository.getScheduledDocumentationUnitsDueNow().stream()
         .limit(50)
         .filter(DecisionDTO.class::isInstance) // TODO transform pending proceedings as well
-        .map(decision -> DecisionTransformer.transformToDomain((DecisionDTO) decision))
+        .map(decision -> DecisionTransformer.transformToDomain((DecisionDTO) decision, null))
         .toList();
   }
 

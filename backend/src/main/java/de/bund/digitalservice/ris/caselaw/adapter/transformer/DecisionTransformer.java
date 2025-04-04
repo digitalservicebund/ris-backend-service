@@ -19,11 +19,11 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
-import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import java.util.ArrayList;
@@ -486,7 +486,8 @@ public class DecisionTransformer extends DocumentableTransformer {
    * @param decisionDTO the database documentation unit
    * @return a transformed domain object, or an empty domain object if the input is null
    */
-  public static DocumentationUnit transformToDomain(DecisionDTO decisionDTO) {
+  public static DocumentationUnit transformToDomain(
+      DecisionDTO decisionDTO, DocumentationOffice userDocumentationOffice) {
     if (decisionDTO == null) {
       throw new DocumentationUnitTransformerException("Document unit is null and won't transform");
     }
@@ -502,7 +503,8 @@ public class DecisionTransformer extends DocumentableTransformer {
         .shortTexts(buildShortTexts(decisionDTO))
         .longTexts(buildLongTexts(decisionDTO))
         .contentRelatedIndexing(buildContentRelatedIndexing(decisionDTO))
-        .managementData(buildManagementData(decisionDTO))
+        .managementData(
+            ManagementDataTransformer.transformToDomain(decisionDTO, userDocumentationOffice))
         .caselawReferences(
             decisionDTO.getCaselawReferences() == null
                 ? new ArrayList<>()
@@ -540,25 +542,6 @@ public class DecisionTransformer extends DocumentableTransformer {
         .guidingPrinciple(decisionDTO.getGuidingPrinciple())
         .headnote(decisionDTO.getHeadnote())
         .otherHeadnote(decisionDTO.getOtherHeadnote())
-        .build();
-  }
-
-  private static ManagementData buildManagementData(DecisionDTO decisionDTO) {
-    List<String> borderNumbers =
-        extractBorderNumbers(
-            decisionDTO.getTenor(),
-            decisionDTO.getGrounds(),
-            decisionDTO.getCaseFacts(),
-            decisionDTO.getDecisionGrounds(),
-            decisionDTO.getOtherLongText(),
-            decisionDTO.getDissentingOpinion());
-
-    return ManagementData.builder()
-        .lastPublicationDateTime(decisionDTO.getLastPublicationDateTime())
-        .scheduledPublicationDateTime(decisionDTO.getScheduledPublicationDateTime())
-        .scheduledByEmail(decisionDTO.getScheduledByEmail())
-        .borderNumbers(borderNumbers)
-        .duplicateRelations(transformDuplicateRelations(decisionDTO))
         .build();
   }
 
