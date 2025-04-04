@@ -30,16 +30,16 @@ import org.junit.jupiter.params.provider.EnumSource;
 class TextCheckServiceTest {
 
   private DocumentationUnitRepository documentationUnitRepository;
-    private TextCheckService textCheckService;
+  private TextCheckService textCheckService;
 
   @BeforeEach
   void setUp() {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
-      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository = mock(IgnoredTextCheckWordRepository.class);
+    IgnoredTextCheckWordRepository ignoredTextCheckWordRepository =
+        mock(IgnoredTextCheckWordRepository.class);
 
     textCheckService =
         new TextCheckMockService(documentationUnitRepository, ignoredTextCheckWordRepository);
-
   }
 
   @Test
