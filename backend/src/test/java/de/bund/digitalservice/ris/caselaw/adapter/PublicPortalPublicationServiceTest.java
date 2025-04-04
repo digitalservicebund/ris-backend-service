@@ -221,10 +221,10 @@ class PublicPortalPublicationServiceTest {
     when(publicPortalBucket.getAllFilenames()).thenReturn(List.of("123.xml", "456.xml", "789.xml"));
     ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> fileContentCaptor = ArgumentCaptor.forClass(String.class);
-    when(objectMapper.writeValueAsString(new Changelog(List.of(), List.of("789.xml"))))
+    when(objectMapper.writeValueAsString(new Changelog(null, List.of("789.xml"), null)))
         .thenReturn(
             """
-                {"changed":[],"deleted":["789.xml"]}""");
+                {"deleted":["789.xml"]}""");
 
     subject.logPortalPublicationSanityCheck();
 
@@ -234,6 +234,6 @@ class PublicPortalPublicationServiceTest {
     assertThat(fileContentCaptor.getValue())
         .isEqualTo(
             """
-                {"changed":[],"deleted":["789.xml"]}""");
+                {"deleted":["789.xml"]}""");
   }
 }

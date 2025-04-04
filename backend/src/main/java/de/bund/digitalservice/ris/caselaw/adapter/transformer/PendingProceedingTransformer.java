@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
@@ -52,6 +53,12 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
                 ? new ArrayList<>()
                 : pendingProceedingDTO.getLiteratureReferences().stream()
                     .map(ReferenceTransformer::transformToDomain)
+                    .toList())
+        .documentalists(
+            pendingProceedingDTO.getDocumentalists() == null
+                ? new ArrayList<>()
+                : pendingProceedingDTO.getDocumentalists().stream()
+                    .map(DocumentalistDTO::getValue)
                     .toList())
         .status(getStatus(pendingProceedingDTO))
         .previousDecisions(getPreviousDecisions(pendingProceedingDTO))

@@ -81,7 +81,7 @@ public class InternalPortalPublicationService {
           "Could not transform documentation unit to valid LDML.", null);
     }
 
-    Changelog changelog = new Changelog(List.of(ldml.getFileName()), null);
+    Changelog changelog = new Changelog(List.of(ldml.getFileName()), null, null);
     String changelogJson;
     try {
       changelogJson = objectMapper.writeValueAsString(changelog);

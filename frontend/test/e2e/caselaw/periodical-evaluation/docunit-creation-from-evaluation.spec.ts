@@ -583,7 +583,7 @@ test.describe(
       {
         tag: ["@RISDEV-4832", "@RISDEV-4980, @RISDEV-6381"],
       },
-      async ({ page, pageWithBghUser, edition }) => {
+      async ({ page, pageWithBghUser, edition, browserName }) => {
         await navigateToPeriodicalReferences(page, edition.id ?? "")
         const randomFileNumber = generateString()
         let documentNumber = ""
@@ -646,6 +646,11 @@ test.describe(
             ),
           ).toBeVisible()
         })
+
+        // Todo: Known error in firefox (NS_BINDING_ABORTED),
+        // when navigating with a concurrent navigation triggered
+        // eslint-disable-next-line playwright/no-wait-for-timeout,playwright/no-conditional-in-test
+        if (browserName === "firefox") await page.waitForTimeout(500)
 
         await test.step("Created documentation unit is not visible to creating doc office in search with Fremdanlage status", async () => {
           await navigateToSearch(newTab)
