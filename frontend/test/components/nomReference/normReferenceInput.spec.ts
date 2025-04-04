@@ -310,19 +310,17 @@ describe("NormReferenceEntry", () => {
   })
 
   it("does not add norm with invalid year input", async () => {
-    renderComponent({
+    const { user } = renderComponent({
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
-        singleNorms: [
-          {
-            dateOfRelevance: "0000",
-          },
-        ],
       } as NormReference,
     })
 
     const yearInput = await screen.findByLabelText("Jahr der Norm")
-    expect(yearInput).toHaveValue("0000")
+    expect(yearInput).toHaveValue("")
+
+    await user.type(yearInput, "0000")
+    await user.tab()
 
     await screen.findByText(/Kein valides Jahr/)
     screen.getByLabelText("Norm speichern").click()
