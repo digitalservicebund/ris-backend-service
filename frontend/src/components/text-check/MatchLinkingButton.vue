@@ -35,7 +35,7 @@ async function navigateToCategoriesAndJumpToMatch(match: Match) {
   <Tooltip :text="`Zu ${getCategoryLabel(match.category)} springen`">
     <button
       aria-label="jump-to-match"
-      class="ds-link-01-bold whitespace-nowrap leading-24 no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+      class="ris-link1-bold whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
       @click="() => navigateToCategoriesAndJumpToMatch(match)"
     >
       <BaselineArrowOutward class="mb-4 inline w-24" />

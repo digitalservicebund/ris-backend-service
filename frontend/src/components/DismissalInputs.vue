@@ -22,7 +22,7 @@ const dismissalGrounds = computed({
 <template>
   <div class="flex flex-row gap-24">
     <div class="basis-1/2 gap-0">
-      <div class="ds-label-02-reg mb-4" data-testid="dismissal-types">
+      <div class="ris-label2-regular mb-4" data-testid="dismissal-types">
         Kündigungsarten
       </div>
       <ChipsInput
@@ -32,7 +32,7 @@ const dismissalGrounds = computed({
       ></ChipsInput>
     </div>
     <div class="basis-1/2 gap-0">
-      <div class="ds-label-02-reg mb-4" data-testid="dismissal-grounds">
+      <div class="ris-label2-regular mb-4" data-testid="dismissal-grounds">
         Kündigungsgründe
       </div>
       <ChipsInput

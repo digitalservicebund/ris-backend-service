@@ -6,8 +6,8 @@ import ApiKeySettings from "@/components/settings/ApiKeySettings.vue"
 
 <template>
   <FlexContainer flex-direction="flex-col">
-    <h3 class="ds-heading-03-bold ml-64 mt-48">Einstellungen</h3>
-    <div class="mt-56 min-h-screen bg-gray-100 pl-64 pt-56" v-bind="$attrs">
+    <h3 class="ris-heading3-bold mt-48 ml-64">Einstellungen</h3>
+    <div class="mt-56 min-h-screen bg-gray-100 pt-56 pl-64" v-bind="$attrs">
       <AccountManagementSettings />
       <ApiKeySettings class="mt-32" />
     </div>

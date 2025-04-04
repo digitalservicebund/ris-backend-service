@@ -1,9 +1,9 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, ref, watch } from "vue"
 import { ValidationError } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import SingleNormInput from "@/components/SingleNormInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import LegalForce from "@/domain/legalForce"
@@ -227,38 +227,37 @@ watch(
       <div class="flex w-full flex-row justify-between">
         <div>
           <div class="flex gap-24">
-            <TextButton
+            <Button
               aria-label="Weitere Einzelnorm"
-              button-type="tertiary"
-              :icon="IconAdd"
               label="Weitere Einzelnorm"
+              severity="secondary"
               size="small"
               @click.stop="addSingleNormEntry"
-            />
-            <TextButton
+              ><template #icon> <IconAdd /> </template
+            ></Button>
+            <Button
               aria-label="Norm speichern"
-              button-type="primary"
               label="Übernehmen"
               size="small"
               @click.stop="addNormReference"
-            />
-            <TextButton
+            ></Button>
+            <Button
               aria-label="Abbrechen"
-              button-type="ghost"
               label="Abbrechen"
               size="small"
+              text
               @click.stop="cancelEdit"
-            />
+            ></Button>
           </div>
         </div>
-        <TextButton
+        <Button
           v-if="!lastSavedModelValue.isEmpty"
           aria-label="Eintrag löschen"
-          button-type="destructive"
           label="Eintrag löschen"
+          severity="danger"
           size="small"
           @click.stop="removeNormReference"
-        />
+        ></Button>
       </div>
     </div>
   </div>

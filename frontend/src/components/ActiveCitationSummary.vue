@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import Button from "primevue/button"
 import { computed } from "vue"
 import Tooltip from "./Tooltip.vue"
 import DocumentationUnitSummary from "@/components/DocumentationUnitSummary.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
-import TextButton from "@/components/input/TextButton.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
@@ -58,15 +58,16 @@ async function generateHeadnote() {
     <!-- Button group -->
     <div class="flex flex-row -space-x-2">
       <Tooltip v-if="isParallelDecision" text="Rubriken importieren">
-        <TextButton
+        <Button
           id="category-import"
           aria-label="Rubriken-Import anzeigen"
-          button-type="ghost"
           data-testid="import-categories"
-          :icon="IconImportCategories"
           size="small"
+          text
           @click="openCategoryImport(data.documentNumber)"
-        />
+        >
+          <template #icon><IconImportCategories /></template
+        ></Button>
       </Tooltip>
       <Tooltip
         v-if="isParallelDecision"
@@ -76,28 +77,31 @@ async function generateHeadnote() {
             : 'O-Satz generieren'
         "
       >
-        <TextButton
+        <Button
           id="generate-headnote"
           aria-label="O-Satz generieren"
-          button-type="ghost"
           data-testid="generate-headnote"
           :disabled="!!documentUnitStore.documentUnit!.shortTexts.headnote"
-          :icon="IconGenerateText"
           size="small"
+          text
           @click="generateHeadnote"
-        />
+        >
+          <template #icon><IconGenerateText /></template
+        ></Button>
       </Tooltip>
       <Tooltip text="Kopieren">
-        <TextButton
+        <Button
           id="category-import"
           aria-label="Rubriken-Import anzeigen"
-          button-type="ghost"
           data-testid="copy-summary"
-          :icon="IconBaselineContentCopy"
+          :disabled="!!documentUnitStore.documentUnit!.shortTexts.headnote"
           size="small"
+          text
           @click="copySummary"
           @keypress.enter="copySummary"
-        />
+        >
+          <template #icon><IconBaselineContentCopy /></template
+        ></Button>
       </Tooltip>
     </div>
   </div>

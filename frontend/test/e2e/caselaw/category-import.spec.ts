@@ -485,11 +485,9 @@ test.describe("category import", () => {
         await page.getByLabel("Normen übernehmen").click()
 
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(3) // the last entry is the input field
-
-        const correctOrder = ["PBefG", "BGB"]
         await expect(
           normContainer.getByTestId("editable-list-container"),
-        ).toHaveText(correctOrder.join("") + "RIS-Abkürzung *")
+        ).toHaveText("PBefG BGB RIS-Abkürzung * ")
       })
 
       await test.step("show success badge", async () => {
@@ -512,10 +510,9 @@ test.describe("category import", () => {
 
         await page.getByLabel("Normen übernehmen").click()
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(4) // the last entry is the input field
-        const correctOrder = ["PBefG", "BGB", "KBErrG, § 8"]
         await expect(
           normContainer.getByTestId("editable-list-container"),
-        ).toHaveText(correctOrder.join("") + "RIS-Abkürzung *")
+        ).toHaveText("PBefG BGB KBErrG, § 8 RIS-Abkürzung *")
       })
     },
   )
@@ -1010,10 +1007,7 @@ test.describe("category import", () => {
   async function navigateToCategoryImport(page: Page, documentNumber: string) {
     await navigateToCategories(page, documentNumber)
     await page.getByLabel("Seitenpanel öffnen").click()
-    await page
-      .getByTestId("category-import-button")
-      .getByLabel("Rubriken-Import anzeigen")
-      .click()
+    await page.getByTestId("category-import-button").click()
 
     await expect(page.getByText("Rubriken importieren")).toBeVisible()
     await expect(page.getByLabel("Dokumentnummer Eingabefeld")).toBeVisible()

@@ -62,7 +62,7 @@ export enum OpeningDirection {
     >
       <button
         :aria-label="props.label + ' ' + postFix"
-        class="w-icon relative flex min-h-32 min-w-32 items-center justify-center rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900"
+        class="w-icon relative flex min-h-32 min-w-32 cursor-pointer items-center justify-center rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900"
         @click="toggle"
       >
         <component :is="icon" v-if="icon" class="text-blue-800" />

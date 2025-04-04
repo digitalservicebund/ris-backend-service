@@ -21,7 +21,7 @@ defineProps<{
       class="border-b-1 border-gray-400 pb-24"
       :data-set="preview"
       header="XML Vorschau"
-      header-class="font-bold"
+      header-class="ris-body1-bold"
       :is-expanded="false"
       title="XML Vorschau"
     >

@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { fireEvent, render, screen, within } from "@testing-library/vue"
+import { render, screen, within } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import PeriodicalEditionReferences from "@/components/periodical-evaluation/references/PeriodicalEditionReferences.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -124,30 +124,6 @@ describe("Legal periodical edition evaluation", () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
-  })
-
-  it("reference supplement (Klammernzusatz) should display validation on blur and hide on focus", async () => {
-    await renderComponent()
-    const referenceSupplementInput = screen.getByLabelText("Klammernzusatz")
-    expect(
-      referenceSupplementInput,
-      "should not have error while typing",
-    ).not.toHaveClass("has-error")
-    await fireEvent.blur(referenceSupplementInput)
-    expect(
-      referenceSupplementInput,
-      "should have error if empty and unfocused",
-    ).toHaveClass("has-error")
-    await fireEvent.focus(referenceSupplementInput)
-    expect(
-      referenceSupplementInput,
-      "should hide error while editing",
-    ).not.toHaveClass("has-error")
-    await fireEvent.blur(referenceSupplementInput)
-    expect(
-      referenceSupplementInput,
-      "should have error if empty and unfocused",
-    ).toHaveClass("has-error")
   })
 
   test("renders legal periodical reference input", async () => {

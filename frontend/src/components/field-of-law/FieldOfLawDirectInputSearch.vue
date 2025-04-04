@@ -17,7 +17,7 @@ watch(fieldOfLawNode, () => {
 
 <template>
   <div class="flex w-full flex-col">
-    <p class="ds-label-02-reg pb-4">Direkteingabe Sachgebiet</p>
+    <p class="ris-label2-regular pb-4">Direkteingabe Sachgebiet</p>
     <ComboboxInput
       id="directInputCombobox"
       v-model="fieldOfLawNode"

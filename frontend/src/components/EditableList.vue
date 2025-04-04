@@ -1,9 +1,9 @@
 <script lang="ts" setup generic="T extends ListItem">
+import Button from "primevue/button"
 import type { Component, Ref } from "vue"
 import { ref, watch, computed } from "vue"
 import Tooltip from "./Tooltip.vue"
 import DefaultSummary from "@/components/DefaultSummary.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import { useScroll } from "@/composables/useScroll"
 import ListItem from "@/domain/editableListItem"
 import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
@@ -173,12 +173,11 @@ defineExpose({
         />
 
         <Tooltip text="Aufklappen">
-          <TextButton
+          <Button
             id="editable-list-select-button"
-            button-type="ghost"
             :data-testid="`list-entry-${index}`"
-            :icon="IconArrowDown"
             size="small"
+            text
             @click="
               () => {
                 toggleNewEntry(false)
@@ -191,7 +190,8 @@ defineExpose({
                 setEditEntry(entry as T)
               }
             "
-          />
+            ><template #icon> <IconArrowDown /> </template
+          ></Button>
         </Tooltip>
       </div>
       <component
@@ -207,15 +207,15 @@ defineExpose({
       />
     </div>
 
-    <TextButton
+    <Button
       v-if="!editEntry"
       aria-label="Weitere Angabe"
-      button-type="tertiary"
       class="my-24 first:mt-0"
-      :icon="IconAdd"
       label="Weitere Angabe"
+      severity="secondary"
       size="small"
       @click="toggleNewEntry(true)"
-    />
+      ><template #icon> <IconAdd /> </template
+    ></Button>
   </div>
 </template>

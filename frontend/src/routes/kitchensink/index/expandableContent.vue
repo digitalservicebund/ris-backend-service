@@ -7,7 +7,7 @@ import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
   <KitchensinkPage name="Expandable content">
     <ExpandableContent>
       <template #header>
-        <h1 class="ds-heading-03-bold">Expandable Content</h1>
+        <h1 class="ris-heading3-bold">Expandable Content</h1>
       </template>
       <div>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem

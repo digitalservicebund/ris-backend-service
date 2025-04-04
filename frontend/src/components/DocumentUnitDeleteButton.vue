@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { useScrollLock } from "@vueuse/core"
+import Button from "primevue/button"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
-import TextButton from "@/components/input/TextButton.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import documentUnitService from "@/services/documentUnitService"
 
@@ -63,10 +63,14 @@ const deleteDocumentUnit = async () => {
     @close-modal="showErrorModal = false"
     @primary-action="showErrorModal = false"
   />
-  <TextButton
-    button-type="destructive"
-    label="Dokumentationseinheit löschen"
-    size="small"
-    @click="showDeleteModal = true"
-  />
+  <div>
+    <Button
+      aria-label="Dokumentationseinheit löschen"
+      label="Dokumentationseinheit löschen"
+      severity="danger"
+      size="small"
+      @click="showDeleteModal = true"
+    >
+    </Button>
+  </div>
 </template>

@@ -1,8 +1,10 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { config } from "@vue/test-utils"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
+import InputText from "primevue/inputtext"
 import { createRouter, createWebHistory } from "vue-router"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
@@ -99,8 +101,23 @@ function generatePreviousDecision(options?: {
 }
 
 describe("PreviousDecisions", () => {
-  beforeAll(() => server.listen())
-  afterAll(() => server.close())
+  beforeAll(() => {
+    // InputMask evaluates cursor position on every keystroke, however, our browser vitest setup does not
+    // implement any layout-related functionality, meaning the required functions for cursor offset
+    // calculation are missing. When we deal with typing in date/ year / time inputs, we can mock it with
+    // TextInput, as we only need the string and do not need to test the actual mask behaviour.
+    config.global.stubs = {
+      InputMask: InputText,
+    }
+    server.listen()
+  })
+  afterAll(() => {
+    // Mock needs to be reset (and can not be mocked globally) because InputMask has interdependencies
+    // with the PrimeVue select component. When testing the select components with InputMask
+    // mocked globally, they fail due to these dependencies.
+    config.global.stubs = {}
+    server.close()
+  })
 
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()

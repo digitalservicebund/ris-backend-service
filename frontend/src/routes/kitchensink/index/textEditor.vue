@@ -6,7 +6,7 @@ import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 
 <template>
   <KitchensinkPage name="Text editor">
-    <p class="ds-body-01-reg">
+    <p class="ris-body1-regular">
       Resize the window to see different views of text editor.
     </p>
 

@@ -1,10 +1,8 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { Mask } from "maska"
-import { vMaska } from "maska/vue"
+import InputMask from "primevue/inputmask"
 import { computed, onMounted, ref, watch } from "vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
 
 interface Props {
@@ -73,12 +71,9 @@ function onlyAllowNumbers(input: string | undefined): string | undefined {
 
 dayjs.extend(customParseFormat)
 
-const mask = "####"
-const inputCompleted = computed(
-  () =>
-    localModelValue.value &&
-    new Mask({ mask }).completed(localModelValue.value),
-)
+const inputCompleted = computed(() => {
+  return !!localModelValue.value && /\d{4}/.test(localModelValue.value)
+})
 
 const isValid = computed(() => validateYear(localModelValue.value))
 
@@ -117,15 +112,14 @@ function validateYear(input: string | undefined): boolean {
 </script>
 
 <template>
-  <TextInput
+  <InputMask
     :id="id"
-    v-maska="mask"
+    v-model="localModelValue"
     :aria-label="($attrs.ariaLabel as string) ?? ''"
-    :has-error="hasError || (shouldShowValidationState && !isValid)"
-    maxlength="4"
-    :model-value="localModelValue"
+    :invalid="hasError || (shouldShowValidationState && !isValid)"
+    mask="9999"
     placeholder="JJJJ"
-    type="text"
+    size="small"
     @blur="userHasFinished = true"
     @keydown.delete="backspaceDelete"
     @update:model-value="emitModelValue"

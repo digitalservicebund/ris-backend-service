@@ -8,7 +8,7 @@ const props = defineProps<{
   <div
     class="sticky top-0 z-30 flex h-[64px] flex-row items-center border-b border-solid border-gray-400 bg-blue-100 px-24 py-12"
   >
-    <h1 class="text font-bold" data-testid="periodical-info-panel-title">
+    <h1 class="ris-body1-bold" data-testid="periodical-info-panel-title">
       Periodikumsauswertung
     </h1>
     <span v-if="props.subtitle" class="m-4"> | </span>

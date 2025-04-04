@@ -1,9 +1,9 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, ref } from "vue"
 import DocumentUnitLiteratureReferenceInput from "@/components/DocumentUnitLiteratureReferenceInput.vue"
 import DocumentUnitReferenceInput from "@/components/DocumentUnitReferenceInput.vue"
 import EditableList from "@/components/EditableList.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import ReferenceSummary from "@/components/ReferenceSummary.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useScroll } from "@/composables/useScroll"
@@ -56,22 +56,22 @@ async function addNewEntry(entryType: "caselaw" | "literature") {
       v-if="caselawReferences.length + literatureReferences.length > 3"
       class="flex flex-row gap-24 pb-24"
     >
-      <TextButton
+      <Button
         aria-label="Weitere Angabe Rechtsprechung Top"
-        button-type="tertiary"
-        :icon="IconAdd"
         label="Weitere Rechtsprechungsfundstelle"
+        severity="secondary"
         size="small"
         @click="addNewEntry('caselaw')"
-      />
-      <TextButton
+        ><template #icon> <IconAdd /> </template
+      ></Button>
+      <Button
         aria-label="Weitere Angabe Literatur Top"
-        button-type="tertiary"
-        :icon="IconAdd"
         label="Weitere Literaturfundstelle"
+        severity="secondary"
         size="small"
         @click="addNewEntry('literature')"
-      />
+        ><template #icon> <IconAdd /> </template
+      ></Button>
     </div>
 
     <div

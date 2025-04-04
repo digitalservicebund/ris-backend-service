@@ -51,7 +51,7 @@ async function addWordToDocOffice() {
           !match.ignoredTextCheckWords?.length
         "
       >
-        <button class="ds-link-01-bold" @click="addWordToDocOffice">
+        <button class="ris-link1-bold" @click="addWordToDocOffice">
           Zum globalen Wörterbuch hinzufügen
         </button>
       </div>

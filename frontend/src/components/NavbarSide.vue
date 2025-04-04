@@ -70,7 +70,7 @@ const isOnlyParentActive = (currentNavItem: MenuItem) => {
         <div v-if="!props.isChild">
           <FlexItem
             id="parent-menu-item"
-            class="ds-label-02-bold flex min-h-64 justify-center px-24 py-12"
+            class="ris-label2-bold flex min-h-64 justify-center px-24 py-12"
             :class="isOnlyParentActive(navItem) ? 'bg-blue-200' : ''"
             :data-testid="navItem.label"
           >
@@ -83,7 +83,7 @@ const isOnlyParentActive = (currentNavItem: MenuItem) => {
           <FlexItem
             v-if="isParentActive(navItem)"
             id="child-menu-item"
-            class="ds-label-02-reg block py-[1rem] pl-[2rem]"
+            class="ris-label2-regular block py-[1rem] pl-[2rem]"
             :class="isChildActive(navItem) ? 'bg-blue-200 underline' : ''"
             :data-testid="navItem.label"
           >

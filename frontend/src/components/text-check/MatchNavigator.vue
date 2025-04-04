@@ -15,7 +15,7 @@ const emit = defineEmits<(event: "select", index: number) => void>()
 
 <template>
   <FlexContainer v-if="matches.length > 1" class="float-end items-center gap-4">
-    <FlexItem class="ds-label-01-bold self-center">
+    <FlexItem class="ris-label1-bold self-center">
       {{ getCategoryLabel(props.matches[currentIndex]?.category) }}
     </FlexItem>
     <PrevNextNavigation

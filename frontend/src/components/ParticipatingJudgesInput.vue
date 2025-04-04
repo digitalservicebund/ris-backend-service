@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { onMounted, ref, watch } from "vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ParticipatingJudge from "@/domain/participatingJudge"
 
@@ -80,61 +80,61 @@ onMounted(() => {
         label="Richter *"
         :validation-error="validationStore.getByField('name')"
       >
-        <TextInput
-          id="participatingJudgeNameTextInput"
+        <InputText
+          id="participatingJudgeNameInputText"
           v-model="participatingJudge.name"
           aria-label="Name des Richters"
           data-testid="participating-judge-name-input"
-          :has-error="slotProps.hasError"
-          size="medium"
+          :invalid="slotProps.hasError"
+          size="small"
           @focus="validationStore.remove('name')"
-        ></TextInput>
+        ></InputText>
       </InputField>
       <InputField
         id="participatingJudgeReferencedOpinionsInput"
         data-testid="participating-judge-reference-opinions"
         label="Art der Mitwirkung"
       >
-        <TextInput
+        <InputText
           id="participatingJudgeReferencedOpinionsTextInput"
           v-model="participatingJudge.referencedOpinions"
           aria-label="Art der Mitwirkung"
           data-testid="participating-judge-reference-opinions-input"
-          size="medium"
-        ></TextInput>
+          size="small"
+        ></InputText>
       </InputField>
     </div>
     <div class="flex w-full flex-row justify-between">
       <div>
         <div class="flex gap-16">
-          <TextButton
+          <Button
             aria-label="Mitwirkenden Richter speichern"
-            button-type="tertiary"
             :disabled="
               !participatingJudge.nameIsSet || participatingJudge.isEmpty
             "
             label="Übernehmen"
+            severity="secondary"
             size="small"
             @click.stop="addParticipatingJudge"
-          />
-          <TextButton
+          ></Button>
+          <Button
             v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
-            button-type="ghost"
             label="Abbrechen"
             size="small"
+            text
             @click.stop="emit('cancelEdit')"
-          />
+          ></Button>
         </div>
       </div>
-      <TextButton
+      <Button
         v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
-        button-type="destructive"
         label="Eintrag löschen"
+        severity="danger"
         size="small"
         @click.stop="emit('removeEntry', true)"
-      />
+      ></Button>
     </div>
   </div>
 </template>

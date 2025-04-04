@@ -17,7 +17,7 @@ const ensuingDecisions = computed({
 </script>
 <template>
   <div aria-label="Nachgehende Entscheidung">
-    <h2 class="ds-label-01-bold mb-16">Nachgehende Entscheidungen</h2>
+    <h2 class="ris-label1-bold mb-16">Nachgehende Entscheidungen</h2>
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList

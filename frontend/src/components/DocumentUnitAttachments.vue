@@ -170,11 +170,11 @@ const attachments = computed({
         </div>
       </div>
       <div class="flex flex-row justify-between">
-        <div class="ds-label-02-reg text-gray-900">
+        <div class="ris-label2-regular text-gray-900">
           Zulässige Dateiformate:
           {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
         </div>
-        <div class="ds-label-02-reg text-gray-900">
+        <div class="ris-label2-regular text-gray-900">
           Maximale Dateigröße: 20 MB
         </div>
       </div>

@@ -36,21 +36,25 @@ const badge = computed(() => {
 
 <template>
   <nav
-    class="flex items-center justify-between border-y border-gray-400 py-16 pe-16 print:hidden"
+    class="flex items-center justify-between border-y border-gray-400 px-16 py-16 print:hidden"
   >
     <div class="flex items-center gap-44">
-      <div class="flex items-center">
-        <span class="px-[1rem] text-14 font-bold uppercase leading-16">
-          <span aria-hidden="true" :style="{ color: fontColor }">
-            Rechtsinformationen</span
-          >
-          <br />
-          <span aria-hidden="true">des Bundes</span>
-        </span>
+      <div class="flex flex-col">
+        <span
+          aria-hidden="true"
+          class="ris-body1-bold"
+          :style="{ color: fontColor }"
+        >
+          Rechtsinformationen</span
+        >
+
+        <span aria-hidden="true" class="leading-none text-gray-900"
+          >des Bundes</span
+        >
       </div>
 
       <router-link
-        class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
+        class="ris-label1-regular p-8 hover:bg-yellow-500 hover:underline"
         :class="{
           underline:
             route.path === '/caselaw' ||
@@ -61,13 +65,13 @@ const badge = computed(() => {
         >Suche
       </router-link>
       <router-link
-        class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
+        class="ris-label1-regular p-8 hover:bg-yellow-500 hover:underline"
         :class="{ underline: route.path.includes('procedures') }"
         :to="{ name: 'caselaw-procedures' }"
         >Vorgänge
       </router-link>
       <router-link
-        class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
+        class="ris-label1-regular p-8 hover:bg-yellow-500 hover:underline"
         :class="{
           underline: route.path.includes('periodical-evaluation'),
         }"
@@ -76,24 +80,22 @@ const badge = computed(() => {
       </router-link>
     </div>
 
-    <div v-if="session.user" class="grid grid-cols-[auto,1fr] gap-10">
+    <div v-if="session.user" class="flex gap-10">
       <IconPermIdentity />
       <div>
-        <div class="ds-label-01-reg">
-          <router-link :to="{ name: 'settings' }">
-            <FlexContainer>
-              <FlexItem class="pe-8">{{ session.user?.name }}</FlexItem>
-              <FlexItem>
-                <IconBadge
-                  v-if="session.user.documentationOffice"
-                  :background-color="badge.color"
-                  color="text-black"
-                  :label="badge.label"
-                />
-              </FlexItem>
-            </FlexContainer>
-          </router-link>
-        </div>
+        <router-link :to="{ name: 'settings' }">
+          <FlexContainer class="gap-10">
+            <FlexItem>{{ session.user?.name }}</FlexItem>
+            <FlexItem>
+              <IconBadge
+                v-if="session.user.documentationOffice"
+                :background-color="badge.color"
+                color="text-black"
+                :label="badge.label"
+              />
+            </FlexItem>
+          </FlexContainer>
+        </router-link>
       </div>
     </div>
   </nav>

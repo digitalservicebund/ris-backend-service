@@ -12,7 +12,7 @@ defineProps<{
 
 <template>
   <div
-    class="ds-label-02-reg w-[fit-content] rounded-full px-4 py-2"
+    class="ris-label2-regular w-[fit-content] rounded-full px-4 py-2"
     :class="backgroundColor"
   >
     <component :is="icon" class="inline-block" :class="color" />

@@ -40,7 +40,7 @@ describe("Periodical Edition Handover Event Log", () => {
     })
 
     expect(screen.getByLabelText("Letzte Ereignisse")).toHaveTextContent(
-      `Letzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrÜBERE-Mail an: receiver address Betreff: mail subjectALSfile.xml1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
+      `Letzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subjectfile.xml1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
     )
   })
 

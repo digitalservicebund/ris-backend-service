@@ -130,7 +130,7 @@ function focusNext() {
       <li
         v-for="(chip, i) in modelValue"
         :key="i"
-        class="group ds-body-01-reg relative -mt-1 mr-6 flex min-w-0 cursor-pointer items-center rounded-full bg-blue-300 outline-none"
+        class="group ris-body1-regular relative -mt-1 mr-6 flex min-w-0 cursor-pointer items-center rounded-full bg-blue-300 outline-none"
         :class="{ 'pr-32': !readOnly }"
         data-testid="chip"
         tabindex="0"
@@ -141,7 +141,7 @@ function focusNext() {
         @keydown.right.stop.prevent="focusNext"
       >
         <span
-          class="ds-label-03-reg inline overflow-hidden text-ellipsis whitespace-nowrap py-6 pl-8 text-18"
+          class="ris-label3-regular inline overflow-hidden py-6 pl-8 text-ellipsis whitespace-nowrap"
           :class="{ 'pr-12': readOnly }"
           data-testid="chip-value"
           >{{ chip }}
@@ -150,7 +150,7 @@ function focusNext() {
         <button
           v-if="!readOnly"
           aria-label="Löschen"
-          class="absolute inset-y-0 right-0 flex h-full items-center rounded-r-full pl-3 pr-6 text-14 group-focus:bg-blue-900 group-focus:text-white"
+          class="absolute inset-y-0 right-0 flex h-full items-center rounded-r-full pr-6 pl-3 group-focus:bg-blue-900 group-focus:text-white"
           tabindex="-1"
           type="button"
           @click="deleteChip(i, chip)"

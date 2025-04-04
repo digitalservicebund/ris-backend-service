@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import Button from "primevue/button"
 import FileNavigator from "@/components/FileNavigator.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import DocumentUnit from "@/domain/documentUnit"
@@ -41,67 +41,69 @@ function emitAttachmentIndex(value: number) {
   <div class="m-24 flex flex-row justify-between">
     <div v-if="!hidePanelModeBar" class="flex flex-row -space-x-2">
       <Tooltip shortcut="n" text="Notiz">
-        <TextButton
+        <Button
           id="note"
           aria-label="Notiz anzeigen"
-          button-type="tertiary"
-          class="flex"
-          :class="panelMode === 'note' ? 'bg-blue-200' : ''"
+          class="focus-visible:z-20"
           data-testid="note-button"
-          :icon="IconStickyNote"
+          severity="secondary"
           size="small"
           @click="() => emitSidePanelMode('note')"
-        />
+        >
+          <template #icon> <IconStickyNote /> </template
+        ></Button>
       </Tooltip>
       <Tooltip shortcut="d" text="Datei">
-        <TextButton
+        <Button
           id="attachments"
           aria-label="Dokumente anzeigen"
-          button-type="tertiary"
-          :class="panelMode === 'attachments' ? 'bg-blue-200' : ''"
+          class="focus-visible:z-20"
           data-testid="attachments-button"
-          :icon="IconAttachFile"
+          severity="secondary"
           size="small"
           @click="() => emitSidePanelMode('attachments')"
-        />
+        >
+          <template #icon> <IconAttachFile /> </template
+        ></Button>
       </Tooltip>
 
       <Tooltip shortcut="v" text="Vorschau">
-        <TextButton
+        <Button
           id="preview"
           aria-label="Vorschau anzeigen"
-          button-type="tertiary"
-          :class="panelMode === 'preview' ? 'bg-blue-200' : ''"
+          class="focus-visible:z-20"
           data-testid="preview-button"
-          :icon="IconPreview"
+          severity="secondary"
           size="small"
           @click="() => emitSidePanelMode('preview')"
-        />
+        >
+          <template #icon> <IconPreview /> </template
+        ></Button>
       </Tooltip>
 
       <Tooltip shortcut="r" text="Rubriken-Import">
-        <TextButton
+        <Button
           id="category-import"
           aria-label="Rubriken-Import anzeigen"
-          button-type="tertiary"
-          :class="panelMode === 'category-import' ? 'bg-blue-200' : ''"
+          class="focus-visible:z-20"
           data-testid="category-import-button"
-          :icon="IconImportCategories"
+          severity="secondary"
           size="small"
           @click="() => emitSidePanelMode('category-import')"
-        />
+          ><template #icon> <IconImportCategories /> </template
+        ></Button>
       </Tooltip>
       <Tooltip v-if="textCheckAll" shortcut="t" text="Rechtschreibprüfung">
-        <TextButton
+        <Button
           id="text-check"
           aria-label="Rechtschreibprüfung"
-          button-type="tertiary"
-          :class="panelMode === 'text-check' ? 'bg-blue-200' : ''"
+          class="focus-visible:z-20"
           data-testid="text-check-button"
-          :icon="IconSpellCheck"
+          severity="secondary"
           size="small"
           @click="() => emitSidePanelMode('text-check')"
-        />
+          ><template #icon> <IconSpellCheck /> </template
+        ></Button>
       </Tooltip>
     </div>
 
@@ -127,7 +129,9 @@ function emitAttachmentIndex(value: number) {
             },
           }"
         >
-          <TextButton button-type="ghost" :icon="IconEdit" size="small" />
+          <Button text
+            ><template #icon> <IconEdit /> </template
+          ></Button>
         </router-link>
       </Tooltip>
       <Tooltip text="In neuem Tab öffnen">
@@ -141,11 +145,9 @@ function emitAttachmentIndex(value: number) {
             },
           }"
         >
-          <TextButton
-            button-type="ghost"
-            :icon="IconOpenInNewTab"
-            size="small"
-          />
+          <Button text
+            ><template #icon> <IconOpenInNewTab /> </template
+          ></Button>
         </router-link>
       </Tooltip>
     </div>

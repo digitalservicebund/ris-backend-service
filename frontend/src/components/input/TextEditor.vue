@@ -312,7 +312,7 @@ defineExpose({ jumpToMatch })
         (isExpanded) => (editorExpanded = isExpanded)
       "
     />
-    <hr v-if="editable" class="ml-8 mr-8 border-blue-300" />
+    <hr v-if="editable" class="mr-8 ml-8 border-blue-300" />
     <div>
       <EditorContent
         :class="editorStyleClasses"

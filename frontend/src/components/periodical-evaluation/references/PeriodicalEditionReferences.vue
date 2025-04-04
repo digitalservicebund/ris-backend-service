@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { UUID } from "crypto"
 import { useInterval } from "@vueuse/core"
+import Button from "primevue/button"
 import { computed, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import PeriodicalEditionReferenceInput from "./PeriodicalEditionReferenceInput.vue"
 import PeriodicalEditionReferenceSummary from "./PeriodicalEditionReferenceSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import Reference from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
@@ -85,15 +85,15 @@ watch(loadEditionIntervalCounter, async () => {
           :title="responseError.title"
         />
       </div>
-      <TextButton
+      <Button
         v-if="references.length > 3"
         aria-label="Weitere Angabe Top"
-        button-type="tertiary"
-        :icon="IconAdd"
         label="Weitere Angabe"
+        severity="secondary"
         size="small"
         @click="addNewEntry"
-      />
+        ><template #icon> <IconAdd /> </template
+      ></Button>
       <div aria-label="Fundstellen">
         <EditableList
           ref="editableListRef"

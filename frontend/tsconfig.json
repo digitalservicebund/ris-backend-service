@@ -3,9 +3,9 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
+    "moduleResolution": "Bundler",
     "skipLibCheck": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "moduleResolution": "Node",
     "strict": true,
     "sourceMap": true,
     "jsx": "preserve",
@@ -30,7 +30,6 @@
   },
   "include": ["src", "src/**/*.vue", "test/**/*.ts", "vite.config.ts"],
   "vueCompilerOptions": {
-    "htmlAttributes": [],
-    "jsxTemplates": true
+    "htmlAttributes": []
   }
 }

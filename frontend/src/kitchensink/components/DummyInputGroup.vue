@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { ref, watch, onBeforeUnmount } from "vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import DummyListItem from "@/kitchensink/domain/dummyListItem"
 
 const props = defineProps<{
@@ -41,44 +41,44 @@ onBeforeUnmount(() => {
 <template>
   <div class="flex flex-col gap-24">
     <InputField id="listItemText" class="flex-col" label="Editier Input">
-      <TextInput
+      <InputText
         id="listItemText"
         v-model="listEntry.text"
         aria-label="Editier Input"
-        class="ds-input-medium"
-        size="medium"
-      ></TextInput>
+        fluid
+        size="small"
+      ></InputText>
     </InputField>
 
     <div class="flex w-full flex-row justify-between">
       <div>
         <div class="flex gap-16">
-          <TextButton
+          <Button
             aria-label="Listeneintrag speichern"
-            button-type="tertiary"
             :disabled="listEntry.isEmpty"
             label="Übernehmen"
+            severity="secondary"
             size="small"
             @click.stop="addListEntry"
-          />
-          <TextButton
+          ></Button>
+          <Button
             v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
-            button-type="ghost"
             label="Abbrechen"
             size="small"
+            text
             @click.stop="emit('cancelEdit')"
-          />
+          ></Button>
         </div>
       </div>
-      <TextButton
+      <Button
         v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
-        button-type="destructive"
         label="Eintrag löschen"
+        severity="danger"
         size="small"
         @click.stop="emit('removeEntry', true)"
-      />
+      ></Button>
     </div>
   </div>
 </template>

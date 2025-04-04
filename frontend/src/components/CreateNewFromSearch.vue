@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
 import DocumentUnit, {
   DocumentationUnitParameters,
@@ -104,7 +104,7 @@ watch(
 <template>
   <div class="flex flex-col gap-24 bg-blue-200 p-24">
     <div>
-      <p class="ds-label-01-bold">Keine passende Entscheidung gefunden?</p>
+      <p class="ris-label1-bold">Keine passende Entscheidung gefunden?</p>
       <p>
         Übernehmen Sie die Stammdaten und erstellen Sie eine neue Entscheidung.
       </p>
@@ -124,22 +124,23 @@ watch(
     </InputField>
 
     <div class="flex flex-row gap-8">
-      <TextButton
+      <Button
         aria-label="Dokumentationseinheit erstellen"
-        button-type="primary"
         :disabled="!responsibleDocOffice"
         label="Übernehmen"
         size="small"
         @click="() => createNewFromSearch()"
-      />
-      <TextButton
+      >
+      </Button>
+      <Button
         aria-label="Dokumentationseinheit erstellen und direkt bearbeiten"
-        button-type="tertiary"
         :disabled="!responsibleDocOffice"
         label="Übernehmen und weiter bearbeiten"
+        severity="secondary"
         size="small"
         @click="() => createNewFromSearch(true)"
-      />
+      >
+      </Button>
     </div>
   </div>
 

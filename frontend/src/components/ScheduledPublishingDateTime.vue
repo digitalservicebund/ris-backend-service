@@ -3,13 +3,13 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
+import Button from "primevue/button"
+import InputMask from "primevue/inputmask"
 import { computed, ref } from "vue"
 import { ValidationError } from "./input/types"
 import InfoModal from "@/components/InfoModal.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
-import TimeInput from "@/components/input/TimeInput.vue"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import useSessionStore from "@/stores/sessionStore"
@@ -144,7 +144,6 @@ const dateValidationError = ref<ValidationError | undefined>()
           id="publishingDate"
           v-model="scheduledPublishingDate"
           aria-label="Terminiertes Datum"
-          class="ds-input-medium"
           :disabled="!isPublishable"
           :has-error="!!dateValidationError"
           is-future-date
@@ -153,34 +152,34 @@ const dateValidationError = ref<ValidationError | undefined>()
         ></DateInput>
       </InputField>
       <InputField id="publishingTime" label="Uhrzeit *">
-        <TimeInput
+        <InputMask
           id="publishingTime"
           v-model="scheduledPublishingTime"
           aria-label="Terminierte Uhrzeit"
-          class="ds-input-medium"
           :disabled="!isPublishable"
-          :read-only="isScheduled"
-        ></TimeInput>
+          mask="99:99"
+          placeholder="HH:MM"
+          :readonly="isScheduled"
+        ></InputMask>
       </InputField>
-      <TextButton
+      <Button
         v-if="!isScheduled"
         aria-label="Termin setzen"
-        button-type="primary"
         class="w-fit"
         :disabled="!isPublishable || !isValidDateTime"
         label="Termin&nbsp;setzen"
-        size="medium"
+        size="small"
         @click="saveScheduling"
-      />
-      <TextButton
+      ></Button>
+      <Button
         v-if="isScheduled"
         aria-label="Termin löschen"
-        button-type="destructive"
         class="w-fit shrink-0"
         label="Termin&nbsp;löschen"
-        size="medium"
+        severity="danger"
+        size="small"
         @click="removeScheduling"
-      />
+      ></Button>
     </div>
     <div
       v-if="
@@ -192,30 +191,30 @@ const dateValidationError = ref<ValidationError | undefined>()
       class="flex flex-row items-center"
       data-testid="scheduledPublishingDate_errors"
     >
-      <IconErrorOutline class="pr-4 text-14 text-red-800" />
+      <IconErrorOutline class="pr-4 text-red-800" />
 
       <div class="flex-col">
         <div
           v-if="!isDateInFuture"
-          class="lex-row ds-label-03-reg mt-2 text-red-800"
+          class="lex-row ris-label3-regular mt-2 text-red-800"
         >
           Der Terminierungszeitpunkt muss in der Zukunft liegen.
         </div>
         <div
           v-if="dateValidationError"
-          class="lex-row ds-label-03-reg mt-2 text-red-800"
+          class="lex-row ris-label3-regular mt-2 text-red-800"
         >
           {{ dateValidationError.message }}.
         </div>
         <div
           v-if="!isTimeValid"
-          class="lex-row ds-label-03-reg mt-2 text-red-800"
+          class="lex-row ris-label3-regular mt-2 text-red-800"
         >
           Unvollständige Uhrzeit.
         </div>
         <div
           v-if="!isPublishable && scheduledPublishingDate"
-          class="lex-row ds-label-03-reg mt-2 text-red-800"
+          class="lex-row ris-label3-regular mt-2 text-red-800"
         >
           Die terminierte Abgabe wird aufgrund von Fehlern in der
           Plausibilitätsprüfung fehlschlagen.

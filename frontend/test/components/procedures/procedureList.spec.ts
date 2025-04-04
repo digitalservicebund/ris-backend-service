@@ -260,11 +260,11 @@ describe("ProcedureList", () => {
 
   it("should list all user groups and default option in dropdown", async () => {
     isInternalUser = true
-    const { mockedGetProcedures } = await renderComponent()
+    const { mockedGetProcedures, user } = await renderComponent()
     expect(mockedGetProcedures).toHaveBeenCalledOnce()
 
     const dropdown = await screen.findByLabelText("dropdown input")
-    expect(dropdown).toBeEnabled()
+    await user.click(dropdown)
 
     const options = screen.getAllByRole("option")
     expect(options.length).toBe(3)

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { ref } from "vue"
-import TextButton from "@/components/input/TextButton.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 
@@ -13,11 +13,7 @@ const toggleModal = () => {
 <template>
   <KitchensinkPage name="Popup modal">
     <div>
-      <TextButton
-        button-type="primary"
-        label="Open Modal"
-        @click="toggleModal"
-      />
+      <Button label="Open Modal" @click="toggleModal"></Button>
       <PopupModal
         v-if="showModal"
         aria-label="Popup Modal"

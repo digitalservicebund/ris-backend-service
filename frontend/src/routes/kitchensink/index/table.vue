@@ -65,7 +65,7 @@ const isLoading = ref(true)
         ></SearchResultStatus>
         <div
           v-if="isLoading"
-          class="grid justify-items-center bg-white bg-opacity-60 py-112"
+          class="bg-opacity-60 grid justify-items-center bg-white py-112"
         >
           <LoadingSpinner />
         </div>

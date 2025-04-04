@@ -1,16 +1,13 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { onMounted } from "vue"
-import TextButton, { ButtonType } from "./input/TextButton.vue"
 
 defineProps<{
   ariaLabel?: string
   headerText?: string
   contentText: string
   primaryButtonText: string
-  primaryButtonType?: ButtonType
-  secondaryButtonType?: ButtonType
   secondaryButtonText?: string
-  cancelButtonType?: ButtonType | "none"
 }>()
 
 defineEmits<{
@@ -53,7 +50,7 @@ onMounted(() => {
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     :aria-label="ariaLabel"
-    class="popup-modal-wrapper fixed left-0 top-0 z-50 flex h-full w-screen items-center justify-center bg-background"
+    class="popup-modal-wrapper fixed top-0 left-0 z-50 flex h-full w-screen items-center justify-center"
     role="dialog"
     tabindex="0"
     @click.self="$emit('closeModal')"
@@ -62,38 +59,36 @@ onMounted(() => {
     <div
       class="modal-container box-border flex flex-col items-start gap-[1rem] rounded-sm bg-white px-[1.5rem] py-[1.5rem]"
     >
-      <div class="ds-label-01-bold text-black">
+      <div class="ris-label1-bold text-black">
         {{ headerText }}
       </div>
-      <div class="ds-label-03-reg whitespace-pre-line text-black">
+      <div class="ris-label3-regular whitespace-pre-line text-black">
         {{ contentText }}
       </div>
       <div
         class="modal-buttons-container flex w-full flex-row justify-end gap-[1rem]"
       >
-        <TextButton
+        <Button
           :aria-label="primaryButtonText"
-          :button-type="primaryButtonType"
           :label="primaryButtonText"
           size="small"
           @click="$emit('primaryAction')"
-        />
-        <TextButton
+        ></Button>
+        <Button
           v-if="secondaryButtonText"
           :aria-label="secondaryButtonText"
-          :button-type="secondaryButtonType"
           :label="secondaryButtonText"
+          severity="secondary"
           size="small"
           @click="$emit('secondaryAction')"
-        />
-        <TextButton
-          v-if="cancelButtonType !== 'none'"
+        ></Button>
+        <Button
           aria-label="Abbrechen"
-          :button-type="cancelButtonType || 'tertiary'"
           label="Abbrechen"
+          severity="secondary"
           size="small"
           @click="$emit('closeModal')"
-        />
+        ></Button>
       </div>
     </div>
   </div>

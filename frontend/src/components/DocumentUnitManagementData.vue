@@ -15,10 +15,10 @@ const { documentUnit } = storeToRefs(useDocumentUnitStore())
       <TitleElement>Verwaltungsdaten</TitleElement>
       <dl class="my-16">
         <div class="flex gap-24 px-0">
-          <dt class="ds-label-02-bold shrink-0 grow-0 basis-160">
+          <dt class="ris-label2-bold shrink-0 grow-0 basis-160">
             Dublettenverdacht:
           </dt>
-          <dd class="ds-body-02-reg flex flex-col gap-32">
+          <dd class="ris-body2-regular flex flex-col gap-32">
             <DuplicateRelationListItem
               v-for="duplicateRelation in documentUnit?.managementData
                 .duplicateRelations"

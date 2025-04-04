@@ -34,7 +34,7 @@ function getHeader(item: EventRecord) {
 
 <template>
   <div aria-label="Letzte Ereignisse">
-    <h2 class="ds-label-01-bold mb-16">Letzte Ereignisse</h2>
+    <h2 class="ris-label1-bold mb-16">Letzte Ereignisse</h2>
     <InfoModal
       v-if="eventLogError"
       aria-label="Fehler beim Laden des Event Logs"
@@ -50,10 +50,9 @@ function getHeader(item: EventRecord) {
         <div v-for="(item, index) in eventLog" :key="index">
           <ExpandableContent
             as-column
-            class="border-b-1 border-gray-400 bg-white p-10"
+            class="border-b-1 border-gray-400 bg-white pb-10"
             :data-set="item"
             :header="getHeader(item)"
-            header-class="font-bold"
             :is-expanded="index == 0"
             :title="item.type"
           >
@@ -68,22 +67,25 @@ function getHeader(item: EventRecord) {
             <!-- eslint-disable vue/no-v-html -->
             <div
               v-if="item.type == EventRecordType.HANDOVER_REPORT"
-              class="p-20"
+              class="pt-24"
               v-html="item.getContent()"
             />
-            <div v-else-if="item.type == EventRecordType.HANDOVER">
-              <div class="ds-label-section pt-20 text-gray-900">ÜBER</div>
-              <div class="ds-label-02-reg">
+
+            <div
+              v-else-if="item.type == EventRecordType.HANDOVER"
+              class="flex flex-col gap-24 pt-24"
+            >
+              <div class="ris-label2-regular">
                 <div>
-                  <span class="ds-label-02-bold">E-Mail an:</span>
+                  <span class="ris-label2-bold">E-Mail an:</span>
                   {{ (item as HandoverMail).receiverAddress }}
                 </div>
                 <div>
-                  <span class="ds-label-02-bold"> Betreff: </span>
+                  <span class="ris-label2-bold"> Betreff: </span>
                   {{ (item as HandoverMail).mailSubject }}
                 </div>
               </div>
-              <div class="ds-label-section text-gray-900">ALS</div>
+
               <CodeSnippet
                 v-for="(attachment, attachmentIndex) in (item as HandoverMail)
                   .attachments"

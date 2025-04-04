@@ -21,10 +21,10 @@ function toggleContentVisibility(): void {
 </script>
 
 <template>
-  <div class="right-[-9px] top-36 z-10">
+  <div class="top-36 right-[-9px] z-10">
     <button
       :aria-label="`${ariaLabel} ${localIsExpanded ? 'schließen' : 'anzeigen'}`"
-      class="w-icon rounded-full bg-blue-800 text-white focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 focus-visible:ring-4 focus-visible:ring-white"
+      class="w-icon cursor-pointer rounded-full bg-blue-800 text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
       @click="toggleContentVisibility"
     >
       <slot v-if="localIsExpanded" name="close-icon">
