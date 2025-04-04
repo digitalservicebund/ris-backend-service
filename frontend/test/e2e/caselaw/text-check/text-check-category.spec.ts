@@ -55,7 +55,7 @@ test.describe(
     test(
       "clicking on text check button, save document and returns matches",
       {
-        tag: ["@RISDEV-6205", "@RISDEV-6154"],
+        tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],
       },
       async ({ page, prefilledDocumentUnit }) => {
         await test.step("navigate to other headnote (Orientierungssatz) in categories", async () => {

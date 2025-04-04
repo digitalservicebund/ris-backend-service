@@ -17,11 +17,6 @@ public interface DatabaseIgnoredTextCheckWordRepository
 
   void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId);
 
-  /**
-   * @param documentationUnitId optional documentation unit id to filter by
-   * @param words list of words to search for
-   * @return a list of ignored text check words matching the criteria
-   */
   @Query(
       "SELECT i FROM IgnoredTextCheckWordDTO i "
           + "WHERE i.documentationUnitId = :documentationUnitId "
