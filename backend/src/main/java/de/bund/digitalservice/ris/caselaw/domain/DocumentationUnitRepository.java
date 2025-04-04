@@ -22,6 +22,10 @@ public interface DocumentationUnitRepository {
   Documentable findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
 
+  Documentable findByDocumentNumberWithUserDocumentationOffice(
+      String documentNumber, DocumentationOffice userDocumentationOffice)
+      throws DocumentationUnitNotExistsException;
+
   DocumentationUnitListItem findDocumentationUnitListItemByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
 

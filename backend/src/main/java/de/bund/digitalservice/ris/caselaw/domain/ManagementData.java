@@ -13,4 +13,11 @@ public record ManagementData(
     @Future LocalDateTime scheduledPublicationDateTime,
     @Email String scheduledByEmail,
     List<DuplicateRelation> duplicateRelations,
-    List<String> borderNumbers) {}
+    List<String> borderNumbers,
+    LocalDateTime lastUpdatedAtDateTime,
+    String lastUpdatedByName,
+    String lastUpdatedByDocOffice,
+    LocalDateTime createdAtDateTime,
+    String createdByName,
+    String createdByDocOffice,
+    LocalDateTime firstPublishedAtDateTime) {}
