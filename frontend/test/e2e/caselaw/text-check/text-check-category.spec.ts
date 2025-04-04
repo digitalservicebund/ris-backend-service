@@ -175,7 +175,7 @@ test.describe(
             await expect(page.getByTestId("text-check-modal")).toBeVisible()
             await expect(
               page.getByTestId("ignored-word-handler"),
-            ).toContainText("von juris ignoriert")
+            ).toContainText("Von jDV ignoriert")
           }
         })
       },
