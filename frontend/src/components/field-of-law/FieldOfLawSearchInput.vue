@@ -27,7 +27,7 @@ const norm = defineModel<string>("norm")
           aria-label="Sachgebietskürzel"
           fluid
           size="small"
-          @enter-released="emit('search')"
+          @keyup.enter="emit('search')"
         />
       </InputField>
       <InputField id="fieldOfLawDescriptionInput" label="Bezeichnung">
@@ -37,7 +37,7 @@ const norm = defineModel<string>("norm")
           aria-label="Sachgebietsbezeichnung"
           fluid
           size="small"
-          @enter-released="emit('search')"
+          @keyup.enter="emit('search')"
         />
       </InputField>
       <InputField id="fieldOfLawNormInput" label="Norm">
@@ -47,7 +47,7 @@ const norm = defineModel<string>("norm")
           aria-label="Sachgebietsnorm"
           fluid
           size="small"
-          @enter-released="emit('search')"
+          @keyup.enter="emit('search')"
         />
       </InputField>
 
