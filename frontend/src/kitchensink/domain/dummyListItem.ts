@@ -6,9 +6,7 @@ export default class DummyListItem implements EditableListItem {
 
   constructor(data: Partial<DummyListItem> = {}) {
     Object.assign(this, data)
-    if (this.uuid == undefined) {
-      this.uuid = crypto.randomUUID()
-    }
+    this.uuid ??= crypto.randomUUID()
   }
 
   get id() {
