@@ -63,12 +63,14 @@ const deleteDocumentUnit = async () => {
     @close-modal="showErrorModal = false"
     @primary-action="showErrorModal = false"
   />
-  <Button
-    aria-label="Dokumentationseinheit löschen"
-    label="Dokumentationseinheit löschen"
-    severity="danger"
-    size="small"
-    @click="showDeleteModal = true"
-  >
-  </Button>
+  <div>
+    <Button
+      aria-label="Dokumentationseinheit löschen"
+      label="Dokumentationseinheit löschen"
+      severity="danger"
+      size="small"
+      @click="showDeleteModal = true"
+    >
+    </Button>
+  </div>
 </template>

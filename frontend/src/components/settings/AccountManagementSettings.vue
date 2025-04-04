@@ -13,8 +13,10 @@ async function openBareId() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-16">
+  <div class="flex-col gap-16">
     <span class="ris-label2-bold">Kontoverwaltung</span>
-    <Button label="Bare.ID öffnen" @click="openBareId"> </Button>
+    <div>
+      <Button label="Bare.ID öffnen" @click="openBareId"> </Button>
+    </div>
   </div>
 </template>

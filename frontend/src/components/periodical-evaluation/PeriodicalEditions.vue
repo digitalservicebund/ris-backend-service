@@ -172,12 +172,14 @@ onMounted(async () => {
               placeholder="Nach Periodikum suchen"
             ></ComboboxInput>
           </InputField>
-          <Button
-            v-if="legalPeriodical && isInternalUser"
-            aria-label="Neue Periodikumsauswertung"
-            label="Neue Periodikumsauswertung"
-            @click="addEdition"
-          ></Button>
+          <div>
+            <Button
+              v-if="legalPeriodical && isInternalUser"
+              aria-label="Neue Periodikumsauswertung"
+              label="Neue Periodikumsauswertung"
+              @click="addEdition"
+            ></Button>
+          </div>
           <div v-if="saveResponseError">
             <InfoModal
               :description="saveResponseError.description"

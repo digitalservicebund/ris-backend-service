@@ -29,7 +29,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex-col gap-12">
+  <div class="flex-col gap-16">
     <span class="ris-label2-bold">API Key</span>
     <div v-if="apiKey">
       <div class="ris-body1-regular mt-24">
