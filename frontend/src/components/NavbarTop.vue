@@ -36,17 +36,21 @@ const badge = computed(() => {
 
 <template>
   <nav
-    class="flex items-center justify-between border-y border-gray-400 py-16 pe-16 print:hidden"
+    class="flex items-center justify-between border-y border-gray-400 px-16 py-16 print:hidden"
   >
     <div class="flex items-center gap-44">
-      <div class="flex items-center">
-        <span class="ris-body1-bold px-24">
-          <span aria-hidden="true" :style="{ color: fontColor }">
-            Rechtsinformationen</span
-          >
-          <br />
-          <span aria-hidden="true">des Bundes</span>
-        </span>
+      <div class="flex flex-col">
+        <span
+          aria-hidden="true"
+          class="ris-body1-bold"
+          :style="{ color: fontColor }"
+        >
+          Rechtsinformationen</span
+        >
+
+        <span aria-hidden="true" class="leading-none text-gray-900"
+          >des Bundes</span
+        >
       </div>
 
       <router-link
