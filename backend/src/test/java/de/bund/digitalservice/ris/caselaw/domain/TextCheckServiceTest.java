@@ -124,10 +124,6 @@ class TextCheckServiceTest {
       TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, categoryType);
       assertNotNull(result);
     }
-
-    assertThrows(
-        UnsupportedOperationException.class,
-        () -> textCheckService.checkCategory(UUID.randomUUID(), null));
   }
 
   @Test

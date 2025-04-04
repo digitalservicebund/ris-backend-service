@@ -10,7 +10,6 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResp
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -191,16 +190,6 @@ public class TextCheckService {
           .build();
     }
     return match;
-  }
-
-  private List<Match> checkText(String text, CategoryType categoryType, UUID documentationUnitId) {
-    if (text == null) {
-      return Collections.emptyList();
-    }
-
-    return checkCategoryByHTML(text, categoryType, documentationUnitId).matches().stream()
-        .map(match -> match.toBuilder().category(categoryType).build())
-        .toList();
   }
 
   public void removeIgnoredWord(UUID documentationUnitId, String word) {
