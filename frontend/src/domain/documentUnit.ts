@@ -149,9 +149,9 @@ export type ManagementData = {
   scheduledByEmail?: string
   duplicateRelations: DuplicateRelation[]
   borderNumbers: string[]
-  lastEditedAtDateTime?: string
-  lastEditedByName?: string
-  lastEditedByDocOffice?: string
+  lastUpdatedAtDateTime?: string
+  lastUpdatedByName?: string
+  lastUpdatedByDocOffice?: string
   createdAtDateTime?: string
   createdByName?: string
   createdByDocOffice?: string

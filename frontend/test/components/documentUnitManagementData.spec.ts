@@ -18,6 +18,16 @@ describe("DocumentUnitManagementData", () => {
     vi.resetAllMocks()
   })
 
+  it("should show doc unit metadata", () => {
+    const managementData: ManagementData = {
+      borderNumbers: [],
+      duplicateRelations: [],
+    }
+    renderManagementData(managementData)
+
+    expect(screen.getByText(`Zuletzt bearbeitet am`)).toBeVisible()
+  })
+
   describe("Duplicate relations", () => {
     it("should show empty duplicate relations", async () => {
       const managementData: ManagementData = {
