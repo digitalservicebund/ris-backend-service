@@ -201,9 +201,10 @@ const shouldShowBubbleMenu = (): boolean => {
 }
 
 /**
- * Closing text check menu and resets selected match when ignoring word
+ * Adds word to doc level ignore and closes the modal
  */
-function ignoreSuggestion() {
+async function addIgnoredWord(word: string) {
+  await textCheckService.ignoreWord(word)
   editor.commands.setSelectedMatch()
 }
 
@@ -215,6 +216,15 @@ const acceptSuggestion = (suggestion: string) => {
   if (selectedMatch.value && selectedMatch.value?.id) {
     editor.commands.acceptMatch(selectedMatch.value.id, suggestion)
   }
+}
+
+/**
+ * Remove ignored word from doc
+ * @param word
+ */
+const removeIgnoredWord = async (word: string) => {
+  await textCheckService.removeIgnoredWord(word)
+  editor.commands.setSelectedMatch()
 }
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
@@ -332,8 +342,9 @@ defineExpose({ jumpToMatch })
         <TextCheckModal
           v-if="selectedMatch"
           :match="selectedMatch"
-          @suggestion:ignore="ignoreSuggestion"
-          @suggestion:update="acceptSuggestion"
+          @word:add="addIgnoredWord"
+          @word:remove="removeIgnoredWord"
+          @word:replace="acceptSuggestion"
         />
       </BubbleMenu>
     </div>

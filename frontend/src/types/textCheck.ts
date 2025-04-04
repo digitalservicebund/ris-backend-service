@@ -65,6 +65,10 @@ export interface Suggestion {
   matches: Match[]
 }
 
+export interface IgnoredTextCheckWordRequest {
+  word: string
+}
+
 export interface IgnoredTextCheckWord {
   id?: string
   word: string
@@ -72,7 +76,7 @@ export interface IgnoredTextCheckWord {
   isEditable?: boolean
 }
 
-export type DocumentationType = "documentation_office" | "documentation_unit"
+export type DocumentationType = "global" | "documentation_unit"
 
 export type TextCheckExtensionOptions = {
   category?: string

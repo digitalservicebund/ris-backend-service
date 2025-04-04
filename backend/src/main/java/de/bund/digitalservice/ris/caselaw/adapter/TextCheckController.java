@@ -7,8 +7,9 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckAllResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckResponse;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRequest;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -32,23 +33,6 @@ public class TextCheckController {
 
   public TextCheckController(TextCheckService textCheckService) {
     this.textCheckService = textCheckService;
-  }
-
-  @PostMapping(
-      value = "/text-check",
-      consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<TextCheckResponse> check(@RequestBody String text) {
-    try {
-      return ResponseEntity.ok(
-          TextCheckResponseTransformer.transformToDomain(textCheckService.check(text)));
-
-    } catch (Exception e) {
-      log.error("Text check failed", e);
-    }
-
-    return ResponseEntity.internalServerError().build();
   }
 
   @GetMapping("{id}/text-check/all")
@@ -83,12 +67,30 @@ public class TextCheckController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<IgnoredTextCheckWord> addIgnoredWord(
-      @PathVariable("id") UUID id, @RequestBody IgnoredTextCheckWord ignoredWord) {
+      @PathVariable("id") UUID id, @RequestBody IgnoredTextCheckWordRequest request) {
     try {
-      return ResponseEntity.ok(textCheckService.addIgnoredTextCheckWord(ignoredWord, id));
+      return ResponseEntity.ok(textCheckService.addIgnoreWord(id, request.word()));
 
     } catch (Exception e) {
       log.error("Adding word failed", e);
+    }
+
+    return ResponseEntity.internalServerError().build();
+  }
+
+  @PostMapping(
+      value = "{id}/text-check/ignored-words/remove",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  @Transactional
+  public ResponseEntity<IgnoredTextCheckWord> removeIgnoredWord(
+      @PathVariable("id") UUID id, @RequestBody IgnoredTextCheckWordRequest request) {
+    try {
+      textCheckService.removeIgnoredWord(id, request.word());
+      return ResponseEntity.ok().build();
+    } catch (Exception e) {
+      log.error("Removing word failed", e);
     }
 
     return ResponseEntity.internalServerError().build();

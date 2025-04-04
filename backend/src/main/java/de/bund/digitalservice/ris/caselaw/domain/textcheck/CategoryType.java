@@ -16,7 +16,6 @@ public enum CategoryType {
   DISSENTING_OPINION("dissentingOpinion"),
   OUTLINE("outline"),
   UNKNOWN("unbekannt");
-
   @JsonValue private final String name;
 
   CategoryType(String name) {
@@ -30,6 +29,6 @@ public enum CategoryType {
       }
     }
 
-    return UNKNOWN;
+    return null;
   }
 }
