@@ -9,6 +9,26 @@ test.skip(
   ({ browserName }) => browserName !== "chromium",
   "Skipping firefox flaky test",
 )
+const textCheckUnderlinesColors = {
+  uncategorized: "#e86a69",
+  style: "#9d8eff",
+  grammar: "#eeb55c",
+  typographical: "#eeb55c",
+  ignored: "#01854a",
+  misspelling: "#e86a69",
+} as const
+
+type TextCheckType = keyof typeof textCheckUnderlinesColors
+
+function getTextCheckColorRGB(type: string | null): {
+  red: number
+  green: number
+  blue: number
+} {
+  const typeKey = (type ?? "uncategorized") as TextCheckType
+  const hex = textCheckUnderlinesColors[typeKey]
+  return convertHexToRGB(hex)
+}
 
 const textWithErrors = {
   text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist grün markiert",
@@ -92,18 +112,7 @@ test.describe(
               (await textCheckTags.nth(i).getAttribute("type")) ??
               "uncategorized"
 
-            const uncategorized = "#e86a69"
-            const expectedBorder =
-              // eslint-disable-next-line playwright/no-conditional-in-test
-              {
-                uncategorized: uncategorized,
-                style: "#9d8eff",
-                grammar: "#eeb55c",
-                typographical: "#eeb55c",
-                ignored: "#01854a",
-              }[type] || uncategorized
-
-            const rgbColors = convertHexToRGB(expectedBorder)
+            const rgbColors = getTextCheckColorRGB(type)
 
             await expect(textCheckTags.nth(i)).toHaveCSS(
               "border-bottom",
@@ -192,7 +201,7 @@ test.describe(
             page.getByTestId("text-check-loading-status"),
           ).toHaveText("Rechtschreibprüfung läuft")
 
-          const rgbColors = convertHexToRGB("#01854a")
+          const rgbColors = convertHexToRGB(textCheckUnderlinesColors.ignored)
           await expect(
             page.getByTestId("text-check-loading-status"),
           ).toBeHidden()
@@ -217,7 +226,10 @@ test.describe(
             page.getByTestId("text-check-loading-status"),
           ).toHaveText("Rechtschreibprüfung läuft")
 
-          const rgbColors = convertHexToRGB("#e86a69")
+          const rgbColors = convertHexToRGB(
+            textCheckUnderlinesColors.uncategorized,
+          )
+
           await expect(
             page.getByTestId("text-check-loading-status"),
           ).toBeHidden()
