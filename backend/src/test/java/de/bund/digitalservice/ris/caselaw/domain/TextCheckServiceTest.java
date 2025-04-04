@@ -30,18 +30,16 @@ import org.junit.jupiter.params.provider.EnumSource;
 class TextCheckServiceTest {
 
   private DocumentationUnitRepository documentationUnitRepository;
-  private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
-  private TextCheckService textCheckService;
+    private TextCheckService textCheckService;
 
   @BeforeEach
   void setUp() {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
-    ignoredTextCheckWordRepository = mock(IgnoredTextCheckWordRepository.class);
+      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository = mock(IgnoredTextCheckWordRepository.class);
 
     textCheckService =
         new TextCheckMockService(documentationUnitRepository, ignoredTextCheckWordRepository);
 
-    // when(textCheckService.getDocumentationOfficeIds(any())).thenReturn(Collections.emptyList());
   }
 
   @Test
@@ -127,14 +125,41 @@ class TextCheckServiceTest {
       assertNotNull(result);
     }
 
-    TextCheckCategoryResponse resultWithNull =
-        textCheckService.checkCategory(UUID.randomUUID(), categoryType);
-    assertNull(resultWithNull);
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> textCheckService.checkCategory(UUID.randomUUID(), null));
   }
 
   @Test
-  void testCheckCategory_nullCategory() {
+  void testCheckCategory_nullCategory() throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
+
+    when(documentationUnitRepository.findByUuid(uuid))
+        .thenReturn(
+            DocumentationUnit.builder()
+                .longTexts(
+                    LongTexts.builder()
+                        .reasons("<p>Reason text</p>")
+                        .tenor("<p>Tenor text</p>")
+                        .decisionReasons("<p>Decision reasons text</p>")
+                        .caseFacts("<p>Case facts text</p>")
+                        .otherLongText("<p>OtherLongText text</p>")
+                        .dissentingOpinion("<p>DissentingOpinion text</p>")
+                        .outline("<p>Outline text</p>")
+                        .build())
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        .build())
+                .shortTexts(
+                    ShortTexts.builder()
+                        .guidingPrinciple("<p>Guiding principle text</p>")
+                        .headnote("<p>Headnote text</p>")
+                        .decisionName("<p>Decision name text</p>")
+                        .headline("<p>Headline text</p>")
+                        .build())
+                .build());
     assertThrows(
         TextCheckUnknownCategoryException.class, () -> textCheckService.checkCategory(uuid, null));
   }

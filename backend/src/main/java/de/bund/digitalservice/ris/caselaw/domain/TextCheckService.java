@@ -49,89 +49,81 @@ public class TextCheckService {
 
   public List<Match> checkWholeDocumentationUnit(UUID id)
       throws DocumentationUnitNotExistsException {
+
     List<Match> allMatches = new ArrayList<>();
 
     Documentable documentable = documentationUnitRepository.findByUuid(id);
 
     if (documentable instanceof DocumentationUnit documentationUnit) {
-      allMatches.addAll(
-          checkText(
-              documentationUnit.longTexts().reasons(), CategoryType.REASONS, documentable.uuid()));
-      allMatches.addAll(
-          checkText(
-              documentationUnit.longTexts().caseFacts(),
-              CategoryType.CASE_FACTS,
-              documentable.uuid()));
-      allMatches.addAll(
-          checkText(
-              documentationUnit.longTexts().decisionReasons(),
-              CategoryType.DECISION_REASONS,
-              documentable.uuid()));
-      allMatches.addAll(
-          checkText(
-              documentationUnit.longTexts().tenor(), CategoryType.TENOR, documentable.uuid()));
-      allMatches.addAll(
-          checkText(
-              documentationUnit.shortTexts().headnote(),
-              CategoryType.HEADNOTE,
-              documentable.uuid()));
-      allMatches.addAll(
-          checkText(
-              documentationUnit.shortTexts().guidingPrinciple(),
-              CategoryType.GUIDING_PRINCIPLE,
-              documentable.uuid()));
+      for (CategoryType type : CategoryType.values()) {
+        try {
+          TextCheckCategoryResponse response = checkCategory(documentationUnit, type);
+          allMatches.addAll(response.matches());
+        } catch (Exception e) {
+          log.error("Could not process category", e);
+        }
+      }
+      return allMatches;
+
     } else {
       throw new UnsupportedOperationException();
     }
-    return allMatches;
   }
 
-  public TextCheckCategoryResponse checkCategory(UUID id, CategoryType category)
+  public TextCheckCategoryResponse checkCategory(UUID id, CategoryType categoryType)
       throws DocumentationUnitNotExistsException {
+    Documentable documentable = documentationUnitRepository.findByUuid(id);
+
+    if (documentable instanceof DocumentationUnit documentationUnit) {
+      return checkCategory(documentationUnit, categoryType);
+    } else {
+      throw new UnsupportedOperationException();
+    }
+  }
+
+  private TextCheckCategoryResponse checkCategory(
+      DocumentationUnit documentationUnit, CategoryType category) {
     if (category == null) {
       throw new TextCheckUnknownCategoryException();
     }
 
-    Documentable documentable = documentationUnitRepository.findByUuid(id);
-
-    if (documentable instanceof DocumentationUnit documentationUnit) {
-
-      return switch (category) {
-        case REASONS ->
-            checkCategoryByHTML(
-                documentationUnit.longTexts().reasons(), category, documentable.uuid());
-        case CASE_FACTS ->
-            checkCategoryByHTML(
-                documentationUnit.longTexts().caseFacts(), category, documentable.uuid());
-        case DECISION_REASONS ->
-            checkCategoryByHTML(
-                documentationUnit.longTexts().decisionReasons(), category, documentable.uuid());
-        case HEADNOTE ->
-            checkCategoryByHTML(
-                documentationUnit.shortTexts().headnote(), category, documentable.uuid());
-        case HEADLINE ->
-            checkCategoryByHTML(
-                documentationUnit.shortTexts().headline(), category, documentable.uuid());
-        case GUIDING_PRINCIPLE ->
-            checkCategoryByHTML(
-                documentationUnit.shortTexts().guidingPrinciple(), category, documentable.uuid());
-        case TENOR ->
-            checkCategoryByHTML(
-                documentationUnit.longTexts().tenor(), category, documentable.uuid());
-        case OTHER_LONG_TEXT ->
-            checkCategoryByHTML(
-                documentationUnit.longTexts().otherLongText(), category, documentable.uuid());
-        case DISSENTING_OPINION ->
-            checkCategoryByHTML(
-                documentationUnit.longTexts().dissentingOpinion(), category, documentable.uuid());
-        case OUTLINE ->
-            checkCategoryByHTML(
-                documentationUnit.longTexts().outline(), category, documentable.uuid());
-        case UNKNOWN -> throw new TextCheckUnknownCategoryException(category.toString());
-      };
-    }
-
-    return null;
+    return switch (category) {
+      case REASONS ->
+          checkCategoryByHTML(
+              documentationUnit.longTexts().reasons(), category, documentationUnit.uuid());
+      case CASE_FACTS ->
+          checkCategoryByHTML(
+              documentationUnit.longTexts().caseFacts(), category, documentationUnit.uuid());
+      case DECISION_REASONS ->
+          checkCategoryByHTML(
+              documentationUnit.longTexts().decisionReasons(), category, documentationUnit.uuid());
+      case HEADNOTE ->
+          checkCategoryByHTML(
+              documentationUnit.shortTexts().headnote(), category, documentationUnit.uuid());
+      case HEADLINE ->
+          checkCategoryByHTML(
+              documentationUnit.shortTexts().headline(), category, documentationUnit.uuid());
+      case GUIDING_PRINCIPLE ->
+          checkCategoryByHTML(
+              documentationUnit.shortTexts().guidingPrinciple(),
+              category,
+              documentationUnit.uuid());
+      case TENOR ->
+          checkCategoryByHTML(
+              documentationUnit.longTexts().tenor(), category, documentationUnit.uuid());
+      case OTHER_LONG_TEXT ->
+          checkCategoryByHTML(
+              documentationUnit.longTexts().otherLongText(), category, documentationUnit.uuid());
+      case DISSENTING_OPINION ->
+          checkCategoryByHTML(
+              documentationUnit.longTexts().dissentingOpinion(),
+              category,
+              documentationUnit.uuid());
+      case OUTLINE ->
+          checkCategoryByHTML(
+              documentationUnit.longTexts().outline(), category, documentationUnit.uuid());
+      default -> throw new TextCheckUnknownCategoryException(category.toString());
+    };
   }
 
   @NotNull
