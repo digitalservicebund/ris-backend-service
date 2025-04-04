@@ -344,7 +344,7 @@ onBeforeUnmount(() => {
     id="periodical-references"
     ref="parentRef"
     v-ctrl-enter="search"
-    class="flex flex-col border-b-1"
+    class="flex flex-col border-b-1 border-b-gray-400"
   >
     <PopupModal
       v-if="showModal"
