@@ -51,9 +51,7 @@ export default class Reference implements EditableListItem {
         ...data.documentationUnit,
       })
     }
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-    }
+    this.id ??= crypto.randomUUID()
   }
 
   /**

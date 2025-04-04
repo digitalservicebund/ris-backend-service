@@ -16,12 +16,11 @@ export default class DummyListItem implements EditableListItem {
   }
 
   get renderSummary(): string {
-    return this.text ? this.text : "default text"
+    return this.text || "default text"
   }
 
   get isEmpty(): boolean {
-    if (!this.text) return true
-    return false
+    return !this.text
   }
 
   equals(entry: DummyListItem): boolean {
