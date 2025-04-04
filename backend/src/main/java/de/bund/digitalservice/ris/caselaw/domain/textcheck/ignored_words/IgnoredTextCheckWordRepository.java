@@ -11,6 +11,6 @@ public interface IgnoredTextCheckWordRepository {
 
   void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId);
 
-  List<IgnoredTextCheckWord> findByWordAndDocumentationUnitIdAndExternal(
-      String word, UUID documentationUnitId);
+  List<IgnoredTextCheckWord> findByDocumentationUnitIdOrByGlobalWords(
+      List<String> words, UUID documentationUnitId);
 }

@@ -12,7 +12,8 @@ public class IgnoredTextCheckWordTransformer {
     return new IgnoredTextCheckWord(
         ignoredTextCheckWordDTO.getId(),
         getIgnoredTextCheckType(ignoredTextCheckWordDTO),
-        ignoredTextCheckWordDTO.getDocumentationUnitId() != null);
+        ignoredTextCheckWordDTO.getDocumentationUnitId() != null,
+        ignoredTextCheckWordDTO.getWord());
   }
 
   private static IgnoredTextCheckType getIgnoredTextCheckType(

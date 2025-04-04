@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -16,13 +17,15 @@ public interface DatabaseIgnoredTextCheckWordRepository
 
   void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId);
 
+  /**
+   * @param documentationUnitId optional documentation unit id to filter by
+   * @param words list of words to search for
+   * @return a list of ignored text check words matching the criteria
+   */
   @Query(
-      """
-                      SELECT i FROM IgnoredTextCheckWordDTO i
-                      WHERE i.word = :word AND (
-                          i.jurisId IS NOT NULL OR i.documentationUnitId = :documentationUnitId
-                      )
-                  """)
-  List<IgnoredTextCheckWordDTO> findByWordAndDocumentationUnitIdAndExternal(
-      String word, UUID documentationUnitId);
+      "SELECT i FROM IgnoredTextCheckWordDTO i "
+          + "WHERE i.documentationUnitId = :documentationUnitId "
+          + "OR (i.jurisId IS NOT NULL AND i.word IN :words)")
+  List<IgnoredTextCheckWordDTO> findByDocumentationUnitIdOrByGlobalWords(
+      @Param("documentationUnitId") UUID documentationUnitId, @Param("words") List<String> words);
 }

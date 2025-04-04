@@ -12,8 +12,10 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.Ignored
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
@@ -211,6 +213,15 @@ public class TextCheckService {
 
   public List<Match> addIgnoredTextChecksIndividually(
       UUID documentationUnitId, List<Match> matches) {
+    var words = matches.stream().map(Match::word).toList();
+
+    List<IgnoredTextCheckWord> globalAndDocumentationUnitIgnoredWords =
+        ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
+            words, documentationUnitId);
+
+    Map<String, List<IgnoredTextCheckWord>> groupedByWord =
+        globalAndDocumentationUnitIgnoredWords.stream()
+            .collect(Collectors.groupingBy(IgnoredTextCheckWord::word));
 
     if (documentationUnitId == null) {
       return matches;
@@ -219,9 +230,7 @@ public class TextCheckService {
         .map(
             match -> {
               List<IgnoredTextCheckWord> ignoredWords =
-                  ignoredTextCheckWordRepository.findByWordAndDocumentationUnitIdAndExternal(
-                      match.word(), documentationUnitId);
-
+                  groupedByWord.getOrDefault(match.word(), null);
               return match.toBuilder().ignoredTextCheckWords(ignoredWords).build();
             })
         .toList();
