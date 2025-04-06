@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import TextButton from "@/components/input/TextButton.vue"
+import Button from "primevue/button"
 import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
@@ -28,7 +28,7 @@ async function removeWord() {
       Von jDV ignoriert
     </div>
 
-    <TextButton
+    <Button
       v-if="
         match.ignoredTextCheckWords?.some(
           (ignoredWord) => ignoredWord.type === 'documentation_unit',
@@ -38,8 +38,8 @@ async function removeWord() {
       button-type="tertiary"
       data-testid="ignored-word-remove-button"
       label="Nicht ignorieren"
+      severity="secondary"
       size="small"
-      width="w-max"
       @click="removeWord"
     />
   </div>
