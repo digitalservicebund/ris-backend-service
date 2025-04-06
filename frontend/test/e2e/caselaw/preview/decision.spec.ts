@@ -104,7 +104,7 @@ test.describe("preview decision", () => {
         prefilledDocumentUnit.documentNumber as string,
       )
 
-      await fillInput(page, "Entscheidungsdatum", "")
+      await page.getByLabel("Entscheidungsdatum", { exact: true }).fill("")
 
       await page.locator("[aria-label='Aktenzeichen']").click()
       // Navigate back and delete on enter
