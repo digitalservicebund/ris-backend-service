@@ -44,6 +44,10 @@ const isInPast = computed(() => {
 })
 
 function validateInput() {
+  if (!inputValue.value) {
+    emit("update:validationError", undefined)
+    return
+  }
   if (!inputCompleted.value) {
     emit("update:validationError", {
       message: "Unvollständiges Datum",

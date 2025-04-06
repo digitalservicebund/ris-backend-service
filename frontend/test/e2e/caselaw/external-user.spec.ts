@@ -335,15 +335,20 @@ test.describe(
         await page
           .getByLabel("Vorgang Listenelement")
           .getByLabel("dropdown input")
-          .selectOption("Extern", { timeout: 5_000 })
-
+          .click()
+        await page
+          .getByRole("option", {
+            name: "Extern",
+            exact: true,
+          })
+          .click()
         await assignRequest
         await page.reload()
 
         await expect(
           page.getByLabel("Vorgang Listenelement").getByLabel("dropdown input"),
           // The id of the user group "Extern"
-        ).toHaveValue(/.+/, { timeout: 5_000 })
+        ).toHaveText(/.+/, { timeout: 5_000 })
       })
     }
 
@@ -362,7 +367,14 @@ test.describe(
         await page
           .getByLabel("Vorgang Listenelement")
           .getByLabel("dropdown input")
-          .selectOption("Nicht zugewiesen", { timeout: 5_000 })
+          .click()
+
+        await page
+          .getByRole("option", {
+            name: "Nicht zugewiesen",
+            exact: true,
+          })
+          .click({ timeout: 5000 })
 
         await unassignRequest
         await page.reload()
@@ -370,7 +382,7 @@ test.describe(
         await expect(
           page.getByLabel("Vorgang Listenelement").getByLabel("dropdown input"),
           // The unassigned option has an empty value
-        ).toHaveValue(/^$/, { timeout: 5_000 })
+        ).toHaveText("Nicht zugewiesen", { timeout: 5_000 })
       })
     }
   },

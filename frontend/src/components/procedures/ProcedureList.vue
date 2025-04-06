@@ -131,10 +131,10 @@ async function handleAssignUserGroup(
   userGroupId: string | undefined,
 ) {
   let response: ServiceResponse<unknown> | undefined
-  if (procedureId && userGroupId) {
-    response = await service.assignUserGroup(procedureId, userGroupId)
-  } else if (procedureId) {
+  if (procedureId && userGroupId == "Nicht zugewiesen") {
     response = await service.unassignUserGroup(procedureId)
+  } else if (procedureId && userGroupId) {
+    response = await service.assignUserGroup(procedureId, userGroupId)
   }
   if (response?.error) {
     assignError.value = response.error
