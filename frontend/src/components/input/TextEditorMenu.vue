@@ -41,7 +41,6 @@ interface Props {
   buttonsDisabled: boolean
   editor: Editor
   containerWidth?: number
-  textCheckEnabled?: boolean
 }
 
 const props = defineProps<Props>()
@@ -295,18 +294,16 @@ const buttons = computed(() => {
     callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
   })
 
-  if (props.textCheckEnabled) {
-    buttons.push({
-      type: "textCheck",
-      icon: IconSpellCheck,
-      ariaLabel: "Rechtschreibprüfung",
-      group: "textCheck",
-      isCollapsable: false,
-      callback: async () => {
-        props.editor.chain().focus().textCheck().run()
-      },
-    })
-  }
+  buttons.push({
+    type: "textCheck",
+    icon: IconSpellCheck,
+    ariaLabel: "Rechtschreibprüfung",
+    group: "textCheck",
+    isCollapsable: false,
+    callback: async () => {
+      props.editor.chain().focus().textCheck().run()
+    },
+  })
 
   return buttons
 })

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
-import languageToolService from "@/services/textCheckService"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { IgnoredTextCheckWord, Match } from "@/types/textCheck"
+import TextButton from "@/components/input/TextButton.vue"
+import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   match: Match
@@ -10,51 +8,39 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  "ignoreTextCheckWord:add": [void]
+  "ignored-word:remove": [string]
 }>()
 
-const store = useDocumentUnitStore()
-
-async function addWordToDocOffice() {
-  if (!store.documentUnit?.uuid) {
-    console.error("Documentation unit does not exist")
-    return
-  }
-
-  const newIgnoredTextCheckWord: IgnoredTextCheckWord = {
-    word: props.match.word,
-    type: "documentation_office",
-  }
-
-  try {
-    await languageToolService.addIgnoredWordForDocumentationOffice(
-      store.documentUnit.uuid,
-      newIgnoredTextCheckWord,
-    )
-    emit("ignoreTextCheckWord:add")
-  } catch (error) {
-    console.error("Error adding ignored word:", error)
-  }
+async function removeWord() {
+  emit("ignored-word:remove", props.match.word)
 }
 </script>
 
 <template>
   <div data-testid="ignored-word-handler">
-    <div v-if="!NeurisTextCheckService.isMatchEditable(match)">
-      von juris ignoriert
+    <div
+      v-if="
+        match.ignoredTextCheckWords?.some(
+          (ignoredWord) => ignoredWord.type === 'global',
+        )
+      "
+    >
+      Von jDV ignoriert
     </div>
 
-    <div v-else-if="addingToDictionaryEnabled">
-      <div
-        v-if="
-          match.rule.issueType == 'misspelling' &&
-          !match.ignoredTextCheckWords?.length
-        "
-      >
-        <button class="ris-link1-bold" @click="addWordToDocOffice">
-          Zum globalen Wörterbuch hinzufügen
-        </button>
-      </div>
-    </div>
+    <TextButton
+      v-if="
+        match.ignoredTextCheckWords?.some(
+          (ignoredWord) => ignoredWord.type === 'documentation_unit',
+        )
+      "
+      aria-label="Wort nicht ignorieren"
+      button-type="tertiary"
+      data-testid="ignored-word-remove-button"
+      label="Nicht ignorieren"
+      size="small"
+      width="w-max"
+      @click="removeWord"
+    />
   </div>
 </template>

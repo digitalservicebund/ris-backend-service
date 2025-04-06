@@ -17,24 +17,27 @@ public class PostgresIgnoredTextCheckWordRepositoryImpl implements IgnoredTextCh
   }
 
   @Override
-  public IgnoredTextCheckWord addIgnoredTextCheckWord(
-      IgnoredTextCheckWord ignoredTextCheckWord,
-      UUID documentationOfficeId,
-      UUID documentationUnitId) {
+  public IgnoredTextCheckWord addIgnoredTextCheckWord(String word, UUID documentationUnitId) {
+
     return IgnoredTextCheckWordTransformer.transformToDomain(
         repository.save(
-            IgnoredTextCheckWordTransformer.transformToDTO(
-                ignoredTextCheckWord, documentationOfficeId, documentationUnitId)));
+            IgnoredTextCheckWordDTO.builder()
+                .word(word)
+                .documentationUnitId(documentationUnitId)
+                .build()));
   }
 
   @Override
-  public List<IgnoredTextCheckWord> findAllByDocumentationOfficesOrUnitAndWords(
-      List<UUID> documentationOfficeIds, UUID documentationUnitId, List<String> words) {
-    return repository
-        .findAllByDocumentationOfficesIdsOrUnitIdsAndWords(
-            documentationOfficeIds, documentationUnitId, words)
-        .stream()
+  public void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId) {
+    this.repository.deleteAllByWordAndDocumentationUnitId(word, documentationUnitId);
+  }
+
+  @Override
+  public List<IgnoredTextCheckWord> findByDocumentationUnitIdOrByGlobalWords(
+      List<String> words, UUID documentationUnitId) {
+    return repository.findByDocumentationUnitIdOrByGlobalWords(documentationUnitId, words).stream()
         .map(IgnoredTextCheckWordTransformer::transformToDomain)
+        .distinct()
         .toList();
   }
 }

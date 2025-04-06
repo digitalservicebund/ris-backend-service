@@ -3,20 +3,19 @@ import Button from "primevue/button"
 
 defineProps<{
   replacements: string[]
-  replacementMode: "single" | "multiple"
 }>()
 
 const emit = defineEmits<{
   "suggestion:update": [value: string]
-  "suggestion:ignore": [void]
+  "ignored-word:add": [void]
 }>()
 
 function acceptSuggestion(replacement: string) {
   emit("suggestion:update", replacement)
 }
 
-function ignoreSuggestion() {
-  emit("suggestion:ignore")
+function addIgnoredWord() {
+  emit("ignored-word:add")
 }
 </script>
 
@@ -32,16 +31,12 @@ function ignoreSuggestion() {
       ></Button>
     </div>
     <Button
-      :aria-label="
-        replacementMode === 'single'
-          ? 'Vorschlag ignorieren'
-          : 'Vorschläge ignorieren'
-      "
-      data-testid="suggestion-ignore-button"
-      :label="replacementMode === 'single' ? 'Ignorieren ' : 'Alle ignorieren'"
+      aria-label="Vorschlag ignorieren"
+      data-testid="ignored-word-add-button"
+      label="Ignorieren"
       severity="secondary"
       size="small"
-      @click="ignoreSuggestion"
-    ></Button>
+      @click="addIgnoredWord"
+    />
   </div>
 </template>
