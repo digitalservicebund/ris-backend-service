@@ -98,10 +98,10 @@ watch(
       :label-position="LabelPosition.RIGHT"
     >
       <Checkbox
-        :id="`sortAlphabetically_${label}`"
         v-model="sortAlphabetically"
         aria-label="Alphabetisch sortieren"
         binary
+        :input-id="`sortAlphabetically_${label}`"
       />
     </InputField>
     <div class="flex w-full flex-row">

@@ -110,7 +110,7 @@ defineExpose({ collapseTree })
           label-class="ris-label2-regular"
           :label-position="LabelPosition.RIGHT"
         >
-          <Checkbox id="showNorms" v-model="showNormsModelValue" binary />
+          <Checkbox v-model="showNormsModelValue" binary input-id="showNorms" />
         </InputField>
       </div>
     </div>

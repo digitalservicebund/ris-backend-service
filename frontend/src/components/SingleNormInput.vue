@@ -214,11 +214,11 @@ onMounted(async () => {
         :label-position="LabelPosition.RIGHT"
       >
         <Checkbox
-          :id="id"
           v-model="hasLegalForce"
           aria-label="Gesetzeskraft der Norm"
           binary
           data-testid="legal-force-checkbox"
+          :input-id="id"
           size="large"
         />
       </InputField>

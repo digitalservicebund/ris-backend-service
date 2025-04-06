@@ -31,11 +31,11 @@ const hasLegislativeMandate = computed({
         :label-position="LabelPosition.RIGHT"
       >
         <Checkbox
-          :id="id"
           v-model="hasLegislativeMandate"
           aria-label="Gesetzgebungsauftrag"
           binary
           data-testid="legislative-mandate"
+          :input-id="id"
           size="large"
         />
       </InputField>

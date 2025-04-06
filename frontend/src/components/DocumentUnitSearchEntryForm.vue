@@ -383,10 +383,10 @@ export type DocumentUnitSearchParameter =
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
-            :id="id"
             v-model="scheduledOnly"
             aria-label="Terminiert Filter"
             binary
+            :input-id="id"
           />
         </InputField>
       </div>
@@ -449,10 +449,10 @@ export type DocumentUnitSearchParameter =
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
-            :id="id"
             v-model="myDocOfficeOnly"
             aria-label="Nur meine Dokstelle Filter"
             binary
+            :input-id="id"
             @focus="resetErrors(id as DocumentUnitSearchParameter)"
           />
         </InputField>
@@ -465,10 +465,10 @@ export type DocumentUnitSearchParameter =
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
-            :id="id"
             v-model="withError"
             aria-label="Nur fehlerhafte Dokumentationseinheiten"
             binary
+            :input-id="id"
             @focus="resetErrors(id as DocumentUnitSearchParameter)"
           />
         </InputField>
@@ -481,10 +481,10 @@ export type DocumentUnitSearchParameter =
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
-            :id="id"
             v-model="withDuplicateWarning"
             aria-label="Dokumentationseinheiten mit Dublettenverdacht"
             binary
+            :input-id="id"
             @focus="resetErrors(id as DocumentUnitSearchParameter)"
         /></InputField>
       </div>

@@ -143,7 +143,6 @@ watch(
       <span v-else class="pl-[1.3333em]" />
       <div v-if="!props.isRoot" class="ml-12" data-testid>
         <Checkbox
-          :id="`field-of-law-node-${node.identifier}`"
           v-model="isSelected"
           :aria-label="
             node.identifier +
@@ -153,6 +152,7 @@ watch(
           "
           binary
           :data-testid="`field-of-law-node-${node.identifier}`"
+          :input-id="`field-of-law-node-${node.identifier}`"
         />
       </div>
 

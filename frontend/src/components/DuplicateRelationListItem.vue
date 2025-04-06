@@ -109,11 +109,11 @@ const coreDataText = computed(() =>
       :label-position="LabelPosition.RIGHT"
     >
       <Checkbox
-        :id="id"
         v-model="isIgnored"
         aria-label="Warnung ignorieren"
         binary
         :disabled="isAutomaticallyIgnored"
+        :input-id="id"
       />
     </InputField>
 

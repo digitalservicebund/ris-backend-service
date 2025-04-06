@@ -24,7 +24,7 @@ const values = reactive({
         label="Regular"
         :label-position="LabelPosition.RIGHT"
       >
-        <Checkbox :id="id" v-model="values.regular" binary />
+        <Checkbox v-model="values.regular" binary :input-id="id" />
       </InputField>
     </KitchensinkStory>
 
@@ -35,7 +35,7 @@ const values = reactive({
         label="Disabled"
         :label-position="LabelPosition.RIGHT"
       >
-        <Checkbox :id="id" v-model="values.disabled" binary disabled />
+        <Checkbox v-model="values.disabled" binary disabled :input-id="id" />
       </InputField>
     </KitchensinkStory>
 
@@ -46,7 +46,7 @@ const values = reactive({
         label="Invalid"
         :label-position="LabelPosition.RIGHT"
       >
-        <Checkbox :id="id" v-model="values.invalid" binary invalid />
+        <Checkbox v-model="values.invalid" binary :input-id="id" invalid />
       </InputField>
     </KitchensinkStory>
 
@@ -57,7 +57,7 @@ const values = reactive({
         label="Normal"
         :label-position="LabelPosition.RIGHT"
       >
-        <Checkbox :id="id" v-model="values.size" value="Normal" />
+        <Checkbox v-model="values.size" :input-id="id" value="Normal" />
       </InputField>
       <InputField
         id="small"
@@ -65,7 +65,12 @@ const values = reactive({
         label="Large"
         :label-position="LabelPosition.RIGHT"
       >
-        <Checkbox :id="id" v-model="values.size" size="large" value="Large" />
+        <Checkbox
+          v-model="values.size"
+          :input-id="id"
+          size="large"
+          value="Large"
+        />
       </InputField>
     </KitchensinkStory>
   </KitchensinkPage>

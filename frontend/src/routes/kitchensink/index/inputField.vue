@@ -24,9 +24,9 @@ const validationError = computed<ValidationError | undefined>(() =>
         :label-position="LabelPosition.RIGHT"
       >
         <Checkbox
-          id="defaultInputField"
           v-model="showValidationErrors"
           binary
+          input-id="defaultInputField"
         />
       </InputField>
     </KitchensinkStory>

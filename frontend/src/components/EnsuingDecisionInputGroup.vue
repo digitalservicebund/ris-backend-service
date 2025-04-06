@@ -177,11 +177,11 @@ onMounted(() => {
         :label-position="LabelPosition.RIGHT"
       >
         <Checkbox
-          :id="id"
           v-model="isPending"
           aria-label="Anhängige Entscheidung"
           binary
           :disabled="ensuingDecision.hasForeignSource"
+          :input-id="id"
           size="large"
         />
       </InputField>

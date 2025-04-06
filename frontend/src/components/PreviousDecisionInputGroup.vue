@@ -177,11 +177,11 @@ onMounted(async () => {
         :label-position="LabelPosition.RIGHT"
       >
         <Checkbox
-          :id="id"
           v-model="dateUnknown"
           aria-label="Datum Unbekannt Vorgehende Entscheidung"
           binary
           :disabled="previousDecision.hasForeignSource"
+          :input-id="id"
           size="large"
         />
       </InputField>
