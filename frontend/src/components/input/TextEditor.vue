@@ -53,7 +53,6 @@ interface Props {
   /* If true, the color formatting of border numbers is disabled */
   plainBorderNumbers?: boolean
   fieldSize?: TextAreaInputAttributes["fieldSize"]
-  textCheck?: boolean
   category?: string
 }
 
@@ -64,7 +63,6 @@ const props = withDefaults(defineProps<Props>(), {
   plainBorderNumbers: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
-  textCheck: false,
   category: "",
 })
 
@@ -322,7 +320,7 @@ defineExpose({ jumpToMatch })
       />
     </div>
 
-    <div v-if="props.textCheck">
+    <div>
       <BubbleMenu
         v-if="editor"
         class="bubble-menu"
@@ -339,9 +337,8 @@ defineExpose({ jumpToMatch })
         />
       </BubbleMenu>
     </div>
-    <TextEditorFooter v-if="textCheck">
+    <TextEditorFooter>
       <TextCheckStatus
-        v-if="textCheck"
         :loading="textCheckService.loading.value"
         :response-error="textCheckService.responseError.value ?? undefined"
       />
