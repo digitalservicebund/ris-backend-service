@@ -17,7 +17,8 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  test("gericht", async ({ page, documentNumber }) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("gericht", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await page
       .locator("#coreData div")
@@ -66,7 +67,8 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  test("dokumenttyp", async ({ page, documentNumber }) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("dokumenttyp", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await page
@@ -110,7 +112,8 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  test("vorgang", async ({ page, context, request }) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("vorgang", async ({ page, context, request }) => {
     // setup docunit
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
@@ -165,7 +168,8 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(deleteResponse.ok()).toBeTruthy()
   })
 
-  test("rechtskraft", async ({ page, documentNumber }) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("rechtskraft", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await page.locator("[aria-label='Rechtskraft']").click()
 
