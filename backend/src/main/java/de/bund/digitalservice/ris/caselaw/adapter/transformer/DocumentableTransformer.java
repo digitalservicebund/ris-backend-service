@@ -12,16 +12,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferen
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
-import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Source;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
@@ -30,7 +27,6 @@ import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -38,11 +34,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 /**
  * This class is responsible for transforming a documentation unit object from its domain
@@ -350,40 +342,6 @@ public class DocumentableTransformer {
     return contentRelatedIndexingBuilder.build();
   }
 
-  @NotNull
-  static List<DuplicateRelation> transformDuplicateRelations(DocumentationUnitDTO decisionDTO) {
-    return Stream.concat(
-            decisionDTO.getDuplicateRelations1().stream()
-                .filter(
-                    relation ->
-                        isPublishedDuplicateOrSameDocOffice(
-                            decisionDTO, relation.getDocumentationUnit2())),
-            decisionDTO.getDuplicateRelations2().stream()
-                .filter(
-                    relation ->
-                        isPublishedDuplicateOrSameDocOffice(
-                            decisionDTO, relation.getDocumentationUnit1())))
-        .map(relation -> DuplicateRelationTransformer.transformToDomain(relation, decisionDTO))
-        .sorted(
-            Comparator.comparing(
-                    (DuplicateRelation relation) ->
-                        Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
-                    Comparator.reverseOrder())
-                .thenComparing(DuplicateRelation::documentNumber))
-        .toList();
-  }
-
-  static Boolean isPublishedDuplicateOrSameDocOffice(
-      DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
-    var duplicateStatus =
-        Optional.ofNullable(duplicate.getStatus())
-            .map(StatusDTO::getPublicationStatus)
-            .orElse(null);
-    return original.getDocumentationOffice().equals(duplicate.getDocumentationOffice())
-        || PublicationStatus.PUBLISHED.equals(duplicateStatus)
-        || PublicationStatus.PUBLISHING.equals(duplicateStatus);
-  }
-
   /**
    * Adds norm references to the domain object based on the provided documentation unit DTO. A list
    * of NormReferenceDTOs with the same normAbbreviation are grouped into one NormReference, with a
@@ -586,40 +544,5 @@ public class DocumentableTransformer {
     }
 
     return size;
-  }
-
-  /**
-   * Extracts all border numbers from the passed strings and returns them as a list based on the
-   * following rules: For all <border-number> elements that contain a single <number> element with
-   * non-blank content, that content will be added to the list of border numbers.
-   *
-   * @param input the strings to be searched for border numbers
-   * @return a list of found border numbers or an empty list, if the input is null
-   */
-  static List<String> extractBorderNumbers(String... input) {
-    if (Objects.isNull(input)) {
-      return new ArrayList<>();
-    }
-    List<String> borderNumbers = new ArrayList<>();
-    Arrays.stream(input)
-        .forEach(
-            longText -> {
-              if (Objects.isNull(longText)) {
-                return;
-              }
-              Document doc = Jsoup.parse(longText);
-              var borderNumberElements = doc.getElementsByTag("border-number");
-              borderNumberElements.forEach(
-                  element -> {
-                    var numberElement = element.getElementsByTag("number");
-                    if (numberElement.size() == 1) {
-                      var number = numberElement.getFirst().text();
-                      if (org.apache.commons.lang3.StringUtils.isNotBlank(number)) {
-                        borderNumbers.add(numberElement.text());
-                      }
-                    }
-                  });
-            });
-    return borderNumbers;
   }
 }

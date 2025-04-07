@@ -1,17 +1,27 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentableTransformer.extractBorderNumbers;
-import static de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentableTransformer.transformDuplicateRelations;
-
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 /**
  * Utility class responsible for transforming {@link ManagementDataDTO} entities into their
@@ -37,7 +47,7 @@ public class ManagementDataTransformer {
    * @param user the currently authenticated user, can be {@code null}
    * @return a {@link ManagementData} domain object built from the input DTO
    */
-  static ManagementData transformToDomain(DecisionDTO decisionDTO, @Nullable User user) {
+  public static ManagementData transformToDomain(DecisionDTO decisionDTO, @Nullable User user) {
     List<String> borderNumbers =
         extractBorderNumbers(
             decisionDTO.getTenor(),
@@ -90,6 +100,76 @@ public class ManagementDataTransformer {
         .build();
   }
 
+  /**
+   * Extracts all border numbers from the passed strings and returns them as a list based on the
+   * following rules: For all <border-number> elements that contain a single <number> element with
+   * non-blank content, that content will be added to the list of border numbers.
+   *
+   * @param input the strings to be searched for border numbers
+   * @return a list of found border numbers or an empty list, if the input is null
+   */
+  private static List<String> extractBorderNumbers(String... input) {
+    if (Objects.isNull(input)) {
+      return new ArrayList<>();
+    }
+    List<String> borderNumbers = new ArrayList<>();
+    Arrays.stream(input)
+        .forEach(
+            longText -> {
+              if (Objects.isNull(longText)) {
+                return;
+              }
+              Document doc = Jsoup.parse(longText);
+              var borderNumberElements = doc.getElementsByTag("border-number");
+              borderNumberElements.forEach(
+                  element -> {
+                    var numberElement = element.getElementsByTag("number");
+                    if (numberElement.size() == 1) {
+                      var number = numberElement.getFirst().text();
+                      if (org.apache.commons.lang3.StringUtils.isNotBlank(number)) {
+                        borderNumbers.add(numberElement.text());
+                      }
+                    }
+                  });
+            });
+    return borderNumbers;
+  }
+
+  @NotNull
+  private static List<DuplicateRelation> transformDuplicateRelations(
+      DocumentationUnitDTO decisionDTO) {
+    return Stream.concat(
+            decisionDTO.getDuplicateRelations1().stream()
+                .filter(
+                    relation ->
+                        isPublishedDuplicateOrSameDocOffice(
+                            decisionDTO, relation.getDocumentationUnit2())),
+            decisionDTO.getDuplicateRelations2().stream()
+                .filter(
+                    relation ->
+                        isPublishedDuplicateOrSameDocOffice(
+                            decisionDTO, relation.getDocumentationUnit1())))
+        .map(relation -> DuplicateRelationTransformer.transformToDomain(relation, decisionDTO))
+        .sorted(
+            Comparator.comparing(
+                    (DuplicateRelation relation) ->
+                        Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
+                    Comparator.reverseOrder())
+                .thenComparing(DuplicateRelation::documentNumber))
+        .toList();
+  }
+
+  private static Boolean isPublishedDuplicateOrSameDocOffice(
+      DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
+    var duplicateStatus =
+        Optional.ofNullable(duplicate.getStatus())
+            .map(StatusDTO::getPublicationStatus)
+            .orElse(null);
+    return original.getDocumentationOffice().equals(duplicate.getDocumentationOffice())
+        || PublicationStatus.PUBLISHED.equals(duplicateStatus)
+        || PublicationStatus.PUBLISHING.equals(duplicateStatus);
+  }
+
   private static String transformLastUpdatedByUserName(
       ManagementDataDTO managementDataDTO, DocumentationOffice userDocumentationOffice) {
     var lastUpdatedByUserName = managementDataDTO.getLastUpdatedByUserName();
@@ -121,6 +201,6 @@ public class ManagementDataTransformer {
       return createdByUserName;
     }
 
-    return managementDataDTO.getCreatedByUserName();
+    return managementDataDTO.getCreatedBySystemName();
   }
 }
