@@ -116,6 +116,7 @@ watch(inputValue, (is) => {
     :id="id"
     v-model="inputValue"
     :aria-label="ariaLabel"
+    :auto-clear="false"
     :disabled="disabled"
     fluid
     :invalid="hasError"

@@ -77,7 +77,7 @@ test.describe("decision date", () => {
     await page.keyboard.press("Tab")
 
     await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "",
+      "03.__.____",
     )
 
     await expect(page.getByText("Unvollständiges Datum")).toBeVisible()
