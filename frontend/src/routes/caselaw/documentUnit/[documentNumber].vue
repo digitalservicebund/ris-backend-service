@@ -27,7 +27,7 @@ useHead({
   title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
 })
 
-const textCheck = useFeatureToggle("neuris.text-check-all")
+const textCheck = useFeatureToggle("neuris.text-check")
 
 const store = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
