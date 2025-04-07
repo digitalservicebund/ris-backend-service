@@ -71,6 +71,7 @@ class DocumentationUnitServiceTest {
   @MockitoBean private OidcUser oidcUser;
   @MockitoBean private AuthService authService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean UserService userService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
