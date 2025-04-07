@@ -53,8 +53,13 @@ async function verifyDocUnitCanBeTakenOver(
 
   await pageWithBghUser.getByLabel("Dokumentnummer Suche").fill(documentNumber)
 
-  const select = pageWithBghUser.locator(`select[id="status"]`)
-  await select.selectOption("Fremdanlage")
+  await pageWithBghUser.getByLabel("Status Suche").click()
+  await pageWithBghUser
+    .getByRole("option", {
+      name: "Fremdanlage",
+      exact: true,
+    })
+    .click()
   await pageWithBghUser
     .getByLabel("Nach Dokumentationseinheiten suchen")
     .click()
@@ -288,9 +293,9 @@ test.describe(
             newTab.getByLabel("Dokumenttyp", { exact: true }),
           ).toHaveValue("Anerkenntnisurteil")
 
-          await expect(
-            newTab.locator("[aria-label='Rechtskraft']"),
-          ).toHaveValue("Keine Angabe")
+          await expect(newTab.locator("[aria-label='Rechtskraft']")).toHaveText(
+            "Keine Angabe",
+          )
         })
 
         // this test has nothing to do with the other test steps
@@ -657,8 +662,13 @@ test.describe(
 
           await newTab.getByLabel("Dokumentnummer Suche").fill(documentNumber)
 
-          const select = newTab.locator(`select[id="status"]`)
-          await select.selectOption("Fremdanlage")
+          await newTab.getByLabel("Status Suche").click()
+          await newTab
+            .getByRole("option", {
+              name: "Fremdanlage",
+              exact: true,
+            })
+            .click()
           await newTab.getByLabel("Nach Dokumentationseinheiten suchen").click()
           const listEntry = newTab.getByRole("row")
           await expect(listEntry).toHaveCount(0)
@@ -813,8 +823,13 @@ test.describe(
             .getByLabel("Dokumentnummer Suche")
             .fill(documentNumber1)
 
-          const select = pageWithBghUser.locator(`select[id="status"]`)
-          await select.selectOption("Fremdanlage")
+          await pageWithBghUser.getByLabel("Status Suche").click()
+          await pageWithBghUser
+            .getByRole("option", {
+              name: "Fremdanlage",
+              exact: true,
+            })
+            .click()
           await pageWithBghUser
             .getByLabel("Nach Dokumentationseinheiten suchen")
             .click()

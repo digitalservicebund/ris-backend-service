@@ -36,7 +36,7 @@ test.describe("decision date", () => {
     await page.keyboard.press("Backspace")
 
     await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "03.02.202",
+      "03.02.202_",
     )
   })
 
@@ -77,7 +77,7 @@ test.describe("decision date", () => {
     await page.keyboard.press("Tab")
 
     await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "03",
+      "03.__.____",
     )
 
     await expect(page.getByText("Unvollständiges Datum")).toBeVisible()

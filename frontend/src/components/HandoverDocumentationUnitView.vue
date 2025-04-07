@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import Button from "primevue/button"
 import { computed, onMounted, ref } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
@@ -7,7 +8,6 @@ import CodeSnippet from "@/components/CodeSnippet.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
@@ -351,7 +351,7 @@ const isPublishable = computed<boolean>(
       <TitleElement>Übergabe an jDV</TitleElement>
 
       <div aria-label="Plausibilitätsprüfung" class="flex flex-col">
-        <h2 class="ds-label-01-bold mb-16">Plausibilitätsprüfung</h2>
+        <h2 class="ris-label1-bold mb-16">Plausibilitätsprüfung</h2>
 
         <div
           v-if="
@@ -364,7 +364,7 @@ const isPublishable = computed<boolean>(
           <div class="flex flex-row gap-8">
             <IconErrorOutline class="text-red-800" />
 
-            <div class="ds-body-01-reg flex flex-col">
+            <div class="ris-body1-regular flex flex-col">
               <div v-if="fieldsMissing" class="flex flex-col gap-24">
                 <div>
                   <p>
@@ -385,12 +385,12 @@ const isPublishable = computed<boolean>(
                         <li
                           v-for="fields in missingPreviousDecisionFields"
                           :key="missingPreviousDecisionFields.indexOf(fields)"
-                          class="ds-body-01-reg ml-[1rem]"
+                          class="ris-body1-regular ml-[1rem]"
                         >
                           <div v-if="fields && fields.missingFields.length > 0">
                             <span>{{ fields.identifier }}</span>
                             -
-                            <span class="ds-label-02-bold">{{
+                            <span class="ris-label2-bold">{{
                               fields.missingFields.join(", ")
                             }}</span>
                           </div>
@@ -402,19 +402,19 @@ const isPublishable = computed<boolean>(
                         missingEnsuingDecisionFields &&
                         missingEnsuingDecisionFields.length > 0
                       "
-                      class="ds-body-01-reg ml-[1rem]"
+                      class="ris-body1-regular ml-[1rem]"
                     >
                       Nachgehende Entscheidungen
                       <ul>
                         <li
                           v-for="fields in missingEnsuingDecisionFields"
                           :key="missingEnsuingDecisionFields.indexOf(fields)"
-                          class="ds-body-01-reg ml-[1rem]"
+                          class="ris-body1-regular ml-[1rem]"
                         >
                           <div v-if="fields && fields.missingFields.length > 0">
                             <span>{{ fields.identifier }}</span>
                             -
-                            <span class="ds-label-02-bold">{{
+                            <span class="ris-label2-bold">{{
                               fields.missingFields.join(", ")
                             }}</span>
                           </div>
@@ -423,19 +423,19 @@ const isPublishable = computed<boolean>(
                     </li>
                     <li
                       v-if="missingNormsFields && missingNormsFields.length > 0"
-                      class="ds-body-01-reg ml-[1rem]"
+                      class="ris-body1-regular ml-[1rem]"
                     >
                       Normen
                       <ul>
                         <li
                           v-for="fields in missingNormsFields"
                           :key="missingNormsFields.indexOf(fields)"
-                          class="ds-body-01-reg ml-[1rem]"
+                          class="ris-body1-regular ml-[1rem]"
                         >
                           <div v-if="fields && fields.missingFields.length > 0">
                             <span>{{ fields.identifier }}</span>
                             -
-                            <span class="ds-label-02-bold">{{
+                            <span class="ris-label2-bold">{{
                               fields.missingFields.join(", ")
                             }}</span>
                           </div>
@@ -447,19 +447,19 @@ const isPublishable = computed<boolean>(
                         missingActiveCitationFields &&
                         missingActiveCitationFields.length > 0
                       "
-                      class="ds-body-01-reg ml-[1rem]"
+                      class="ris-body1-regular ml-[1rem]"
                     >
                       Aktivzitierung
                       <ul>
                         <li
                           v-for="fields in missingActiveCitationFields"
                           :key="missingActiveCitationFields.indexOf(fields)"
-                          class="ds-body-01-reg ml-[1rem]"
+                          class="ris-body1-regular ml-[1rem]"
                         >
                           <div v-if="fields && fields.missingFields.length > 0">
                             <span>{{ fields.identifier }}</span>
                             -
-                            <span class="ds-label-02-bold">{{
+                            <span class="ris-label2-bold">{{
                               fields.missingFields.join(", ")
                             }}</span>
                           </div>
@@ -495,13 +495,13 @@ const isPublishable = computed<boolean>(
             </div>
           </div>
           <RouterLink class="inline-block" :to="categoriesRoute">
-            <TextButton
+            <Button
               aria-label="Rubriken bearbeiten"
-              button-type="tertiary"
               class="w-fit"
               label="Rubriken bearbeiten"
+              severity="secondary"
               size="small"
-            />
+            ></Button>
           </RouterLink>
         </div>
         <div v-else class="flex flex-row gap-8">
@@ -510,13 +510,13 @@ const isPublishable = computed<boolean>(
         </div>
       </div>
       <div aria-label="Randnummernprüfung" class="flex flex-col">
-        <h2 class="ds-label-01-bold mb-16">Randnummernprüfung</h2>
+        <h2 class="ris-label1-bold mb-16">Randnummernprüfung</h2>
 
         <div v-if="!areBorderNumbersAndLinksValid">
           <div class="flex flex-row gap-8">
             <IconErrorOutline class="text-red-800" />
 
-            <div class="ds-body-01-reg flex flex-col gap-24">
+            <div class="ris-body1-regular flex flex-col gap-24">
               <div
                 v-if="
                   !borderNumberValidationResult.isValid &&
@@ -526,8 +526,8 @@ const isPublishable = computed<boolean>(
                 Die Reihenfolge der Randnummern ist nicht korrekt.
                 <dl class="my-16">
                   <div class="grid grid-cols-2 gap-24 px-0">
-                    <dt class="ds-label-02-bold self-center">Rubrik</dt>
-                    <dd class="ds-body-02-reg">
+                    <dt class="ris-label2-bold self-center">Rubrik</dt>
+                    <dd class="ris-body2-regular">
                       {{
                         longTextLabels[
                           borderNumberValidationResult.invalidCategory
@@ -536,18 +536,18 @@ const isPublishable = computed<boolean>(
                     </dd>
                   </div>
                   <div class="grid grid-cols-2 gap-24 px-0">
-                    <dt class="ds-label-02-bold self-center">
+                    <dt class="ris-label2-bold self-center">
                       Erwartete Randnummer
                     </dt>
-                    <dd class="ds-body-02-reg">
+                    <dd class="ris-body2-regular">
                       {{ borderNumberValidationResult.expectedBorderNumber }}
                     </dd>
                   </div>
                   <div class="grid grid-cols-2 gap-24 px-0">
-                    <dt class="ds-label-02-bold self-center">
+                    <dt class="ris-label2-bold self-center">
                       Tatsächliche Randnummer
                     </dt>
-                    <dd class="ds-body-02-reg">
+                    <dd class="ris-body2-regular">
                       {{
                         borderNumberValidationResult.firstInvalidBorderNumber
                       }}
@@ -576,7 +576,7 @@ const isPublishable = computed<boolean>(
               </div>
             </div>
           </div>
-          <TextButton
+          <Button
             v-if="
               !borderNumberValidationResult.isValid &&
               !borderNumberValidationResult.hasError &&
@@ -630,7 +630,7 @@ const isPublishable = computed<boolean>(
         class="border-b-1 border-gray-400 pb-24"
         :data-set="preview"
         header="XML Vorschau"
-        header-class="font-bold"
+        header-class="ris-body1-bold"
         :is-expanded="false"
         title="XML Vorschau"
       >
@@ -672,21 +672,19 @@ const isPublishable = computed<boolean>(
         title="UAT Testmodus für die Übergabe an die jDV"
       />
 
-      <TextButton
+      <Button
         aria-label="Dokumentationseinheit an jDV übergeben"
-        button-type="primary"
-        class="w-fit"
         :disabled="!isPublishable || isScheduled"
-        :icon="IconCheck"
         label="Dokumentationseinheit an jDV übergeben"
-        size="medium"
+        size="small"
         @click="handoverDocumentUnit"
-      />
+        ><template #icon> <IconCheck /> </template
+      ></Button>
 
       <ScheduledPublishingDateTime :is-publishable="isPublishable" />
 
       <div aria-label="Letzte Ereignisse">
-        <h2 class="ds-label-01-bold mb-16">Letzte Ereignisse</h2>
+        <h2 class="ris-label1-bold mb-16">Letzte Ereignisse</h2>
         <div class="flex flex-col gap-24">
           <p v-if="isFirstTimeHandover">
             Diese Dokumentationseinheit wurde bisher nicht an die jDV übergeben
@@ -718,13 +716,13 @@ const isPublishable = computed<boolean>(
                   v-else-if="item instanceof HandoverMail"
                   class="flex flex-col gap-24 pt-24"
                 >
-                  <div class="ds-label-02-reg">
+                  <div class="ris-label2-regular">
                     <div>
-                      <span class="ds-label-02-bold">E-Mail an:</span>
+                      <span class="ris-label2-bold">E-Mail an:</span>
                       {{ (item as HandoverMail).receiverAddress }}
                     </div>
                     <div>
-                      <span class="ds-label-02-bold"> Betreff: </span>
+                      <span class="ris-label2-bold"> Betreff: </span>
                       {{ (item as HandoverMail).mailSubject }}
                     </div>
                   </div>

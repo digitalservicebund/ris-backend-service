@@ -266,7 +266,7 @@ function onDelete() {
               listEntry.status?.publicationStatus ===
               PublicationState.EXTERNAL_HANDOVER_PENDING
             "
-            class="ds-body-reg-02"
+            class="ris-body2-regular"
           >
             {{
               " aus " +
@@ -381,7 +381,7 @@ function onDelete() {
     <!-- Loading State -->
     <div
       v-if="isLoading"
-      class="my-112 grid justify-items-center bg-white bg-opacity-60"
+      class="bg-opacity-60 my-112 grid justify-items-center bg-white"
     >
       <LoadingSpinner />
     </div>

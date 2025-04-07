@@ -17,7 +17,7 @@ const emit = defineEmits<(event: "select", index: number) => void>()
     v-if="attachments.length > 1"
     class="float-end items-center gap-4"
   >
-    <FlexItem class="ds-label-01-bold self-center">
+    <FlexItem class="ris-label1-bold self-center">
       {{ props.attachments[currentIndex]?.name }}
     </FlexItem>
     <PrevNextNavigation

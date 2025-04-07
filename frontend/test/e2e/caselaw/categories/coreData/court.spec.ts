@@ -204,9 +204,9 @@ test.describe("court", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await expect(page.getByLabel("Rechtskraft", { exact: true })).toHaveValue(
-      "Keine Angabe",
-    )
+    const dropdown = page.getByRole("combobox", { name: "Rechtskraft" })
+    await expect(dropdown).toHaveText("Keine Angabe")
+
     await page.getByLabel("Gericht", { exact: true }).fill("bgh")
     await page.getByText("BGH").click()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("BGH")
@@ -214,15 +214,15 @@ test.describe("court", () => {
     // Rechtskraft wird beim Speichern durch Backend gesetzt
     await save(page)
 
-    await expect(page.getByLabel("Rechtskraft", { exact: true })).toHaveValue(
-      "Ja",
-    )
+    await expect(dropdown).toHaveText("Ja")
+    await dropdown.click()
     await page
-      .getByRole("combobox", { name: "Rechtskraft" })
-      .selectOption("Nein")
-    await expect(page.getByLabel("Rechtskraft", { exact: true })).toHaveValue(
-      "Nein",
-    )
+      .getByRole("option", {
+        name: "Nein",
+      })
+      .click()
+
+    await expect(dropdown).toHaveText("Nein")
   })
 
   test("that setting a non-special court leaves legal effect unchanged", async ({
@@ -230,9 +230,8 @@ test.describe("court", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await expect(page.getByLabel("Rechtskraft", { exact: true })).toHaveValue(
-      "Keine Angabe",
-    )
+    const dropdown = page.getByRole("combobox", { name: "Rechtskraft" })
+    await expect(dropdown).toHaveText("Keine Angabe")
 
     await page.getByLabel("Gericht", { exact: true }).fill("aachen")
     await page.getByText("AG Aachen").click()
@@ -241,8 +240,6 @@ test.describe("court", () => {
     )
     await save(page)
 
-    await expect(
-      page.getByRole("combobox", { name: "Rechtskraft" }),
-    ).toHaveValue("Keine Angabe")
+    await expect(dropdown).toHaveText("Keine Angabe")
   })
 })

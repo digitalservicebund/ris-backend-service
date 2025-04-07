@@ -30,7 +30,7 @@ function fieldOfLawClicked(fieldOfLaw: FieldOfLaw) {
         :key="fieldOfLaw.identifier"
         class="field-of-law flex w-full flex-row items-center border-b-1 border-blue-300 py-16 first:mt-16 first:border-t-1"
       >
-        <div class="ds-label-01-reg mr-8 flex-grow">
+        <div class="ris-label1-regular mr-8 flex-grow">
           <button
             :aria-label="
               fieldOfLaw.identifier +
@@ -38,7 +38,7 @@ function fieldOfLawClicked(fieldOfLaw: FieldOfLaw) {
               fieldOfLaw.text +
               ' im Sachgebietsbaum anzeigen'
             "
-            class="ds-link-01-bold mr-8"
+            class="ris-link1-bold mr-8"
             @click="fieldOfLawClicked(fieldOfLaw)"
           >
             {{ fieldOfLaw.identifier }}

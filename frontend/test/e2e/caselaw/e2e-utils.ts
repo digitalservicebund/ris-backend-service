@@ -348,8 +348,13 @@ export async function fillSearchInput(
   }
 
   if (values?.status) {
-    const select = page.locator(`select[id="status"]`)
-    await select.selectOption(values?.status)
+    await page.getByLabel("Status Suche").click()
+    await page
+      .getByRole("option", {
+        name: values?.status,
+        exact: true,
+      })
+      .click()
   }
 
   await page.getByLabel("Nach Dokumentationseinheiten suchen").click()

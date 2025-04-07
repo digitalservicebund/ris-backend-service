@@ -1,9 +1,9 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { computed, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import Reference from "@/domain/reference"
@@ -119,16 +119,17 @@ watch(
             label="Zitatstelle *"
             :validation-error="validationStore.getByField('citation')"
           >
-            <TextInput
+            <InputText
               id="citation"
               v-model="reference.citation"
               aria-label="Zitatstelle"
-              :has-error="slotProps.hasError"
-              size="medium"
+              fluid
+              :invalid="slotProps.hasError"
+              size="small"
               @focus="validationStore.remove('citation')"
-            ></TextInput>
+            />
           </InputField>
-          <span v-if="legalPeriodical" class="ds-label-03-reg pt-4"
+          <span v-if="legalPeriodical" class="ris-label3-regular pt-4"
             >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
           >
         </div>
@@ -138,46 +139,47 @@ watch(
           label="Klammernzusatz"
           :validation-error="validationStore.getByField('referenceSupplement')"
         >
-          <TextInput
+          <InputText
             id="referenceSupplement"
             v-model="reference.referenceSupplement"
             aria-label="Klammernzusatz"
-            :has-error="slotProps.hasError"
-            size="medium"
+            fluid
+            :invalid="slotProps.hasError"
+            size="small"
             @focus="validationStore.remove('referenceSupplement')"
-          ></TextInput>
+          />
         </InputField>
       </div>
     </div>
     <div class="flex w-full flex-row justify-between">
       <div>
         <div class="flex gap-16">
-          <TextButton
+          <Button
             aria-label="Fundstelle speichern"
-            button-type="tertiary"
             :disabled="reference.isEmpty"
             label="Übernehmen"
+            severity="secondary"
             size="small"
             @click.stop="addReference"
-          />
-          <TextButton
+          ></Button>
+          <Button
             v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
-            button-type="ghost"
             label="Abbrechen"
             size="small"
+            text
             @click.stop="emit('cancelEdit')"
-          />
+          ></Button>
         </div>
       </div>
-      <TextButton
+      <Button
         v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
-        button-type="destructive"
         label="Eintrag löschen"
+        severity="danger"
         size="small"
         @click.stop="emit('removeEntry', true)"
-      />
+      ></Button>
     </div>
   </div>
 </template>

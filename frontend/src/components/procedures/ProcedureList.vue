@@ -2,14 +2,14 @@
 import { debouncedWatch } from "@vueuse/core"
 import { useRouteQuery } from "@vueuse/router"
 import dayjs from "dayjs"
+import InputText from "primevue/inputtext"
+import InputSelect from "primevue/select"
 import { computed, onBeforeMount, ref, watch } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { DropdownItem } from "@/components/input/types"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import Pagination from "@/components/Pagination.vue"
@@ -48,7 +48,15 @@ const {
   canAbort: canAbortFetchingProcedures,
   execute: fetchProcedures,
 } = service.get(itemsPerPage, currentPage, debouncedFilter)
-const procedures = computed(() => procedurePage.value?.content)
+
+// Initialize procedures properly with a fallback
+const procedures = computed(
+  () =>
+    (procedurePage.value?.content.map((procedure) => ({
+      ...procedure,
+      userGroupId: procedure.userGroupId ?? "Nicht zugewiesen",
+    })) as Procedure[]) ?? [],
+)
 
 async function updateProcedures() {
   if (canAbortFetchingProcedures.value) {
@@ -123,10 +131,10 @@ async function handleAssignUserGroup(
   userGroupId: string | undefined,
 ) {
   let response: ServiceResponse<unknown> | undefined
-  if (procedureId && userGroupId) {
-    response = await service.assignUserGroup(procedureId, userGroupId)
-  } else if (procedureId) {
+  if (procedureId && userGroupId == "Nicht zugewiesen") {
     response = await service.unassignUserGroup(procedureId)
+  } else if (procedureId && userGroupId) {
+    response = await service.assignUserGroup(procedureId, userGroupId)
   }
   if (response?.error) {
     assignError.value = response.error
@@ -174,7 +182,7 @@ const getDropdownItems = (): DropdownItem[] => {
     label: getLastSubgroup(userGroupPathName),
     value: id,
   }))
-  dropdownItems.push({ label: "Nicht zugewiesen", value: "" })
+  dropdownItems.push({ label: "Nicht zugewiesen", value: "Nicht zugewiesen" })
   return dropdownItems
 }
 
@@ -208,17 +216,18 @@ onBeforeMount(async () => {
 
 <template>
   <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
-    <h1 class="ds-heading-02-reg">Vorgänge</h1>
+    <h1 class="ris-heading2-regular">Vorgänge</h1>
     <div class="mt-24 flex flex-row items-center gap-4">
-      <div class="w-480" role="search">
+      <div class="w-[480px]" role="search">
         <InputField id="procedureFilter" label="Vorgang" visually-hide-label>
-          <TextInput
+          <InputText
             id="procedureFilter"
             v-model="filter"
             aria-label="Nach Vorgängen suchen"
-            class="ds-input-medium"
+            fluid
             placeholder="Nach Vorgängen suchen"
-          ></TextInput>
+            size="small"
+          ></InputText>
         </InputField>
       </div>
       <LoadingSpinner v-if="isFetchingProcedures" size="small" />
@@ -263,11 +272,11 @@ onBeforeMount(async () => {
             <div class="flex w-full justify-between gap-24">
               <div class="flex flex-row items-center gap-16">
                 <IconFolderOpen />
-                <span class="ds-label-01-reg" :title="procedure.label">{{
+                <span class="ris-label1-regular" :title="procedure.label">{{
                   procedure.label
                 }}</span>
                 <div
-                  class="ds-label-02-reg flex flex-row items-center gap-4 rounded-full bg-blue-300 px-8 py-2 outline-none"
+                  class="ris-label2-regular flex flex-row items-center gap-4 rounded-full bg-blue-300 px-8 py-2 outline-none"
                 >
                   <IconBaselineDescription class="w-16 text-blue-800" />
                   <span>
@@ -275,13 +284,14 @@ onBeforeMount(async () => {
                   </span>
                 </div>
               </div>
-              <DropdownInput
+              <InputSelect
                 v-if="isInternalUser"
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
-                class="ml-auto w-auto"
-                is-small
-                :items="getDropdownItems()"
+                class="ml-auto"
+                option-label="label"
+                option-value="value"
+                :options="getDropdownItems()"
                 @click.stop
                 @update:model-value="
                   (value: string | undefined) =>
@@ -312,7 +322,7 @@ onBeforeMount(async () => {
         <span
           class="flex h-128 w-128 items-center justify-center rounded-full bg-blue-200"
         >
-          <IconFolderOpen class="text-64 text-blue-700" />
+          <IconFolderOpen class="text-blue-700" />
         </span>
         <span>Es wurden noch keine Vorgänge angelegt.</span>
       </div>

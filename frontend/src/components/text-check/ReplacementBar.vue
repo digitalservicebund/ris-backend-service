@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import TextButton from "@/components/input/TextButton.vue"
+import Button from "primevue/button"
 
 defineProps<{
   replacements: string[]
@@ -22,23 +22,20 @@ function addIgnoredWord() {
 <template>
   <div class="flex w-full flex-row flex-wrap gap-16">
     <div v-for="(replacement, i) in replacements" :key="i + replacement">
-      <TextButton
+      <Button
         :aria-label="`${replacement} übernehmen`"
-        button-type="primary"
         data-testid="suggestion-accept-button"
         :label="replacement"
         size="small"
-        width="w-max"
         @click="acceptSuggestion(replacement)"
-      />
+      ></Button>
     </div>
-    <TextButton
+    <Button
       aria-label="Vorschlag ignorieren"
-      button-type="tertiary"
       data-testid="ignored-word-add-button"
       label="Ignorieren"
+      severity="secondary"
       size="small"
-      width="w-max"
       @click="addIgnoredWord"
     />
   </div>

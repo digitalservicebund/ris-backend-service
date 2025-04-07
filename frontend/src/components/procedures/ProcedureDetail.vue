@@ -37,7 +37,7 @@ const isLoading = computed(
     >
     </DocumentUnitList>
   </div>
-  <div v-else class="pb-12 pl-40 pr-48 pt-36">
+  <div v-else class="pt-36 pr-48 pb-12 pl-40">
     <div class="flex w-full items-center justify-center bg-blue-200 py-16">
       <span>Keine Dokeinheiten sind zugewiesen.</span>
     </div>

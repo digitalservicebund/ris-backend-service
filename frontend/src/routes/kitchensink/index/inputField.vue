@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
 import { computed, ref } from "vue"
-import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { ValidationError } from "@/components/input/types"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
@@ -23,7 +23,11 @@ const validationError = computed<ValidationError | undefined>(() =>
         label="Show validation errors"
         :label-position="LabelPosition.RIGHT"
       >
-        <CheckboxInput v-model="showValidationErrors" />
+        <Checkbox
+          v-model="showValidationErrors"
+          binary
+          input-id="defaultInputField"
+        />
       </InputField>
     </KitchensinkStory>
 

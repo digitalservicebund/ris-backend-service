@@ -87,7 +87,7 @@ test.describe(
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
       await test.step("uncheck legislative mandate", async () => {
-        const checkBox = page.getByTestId("legislative-mandate")
+        const checkBox = page.getByLabel("Gesetzgebungsauftrag")
         await checkBox.uncheck()
         await expect(checkBox).not.toBeChecked()
         await save(page)
@@ -113,7 +113,7 @@ test.describe(
     async function reloadWithCheck(page: Page) {
       await test.step("reload page and check that checkbox is checked and button is hidden", async () => {
         await page.reload()
-        const checkBox = page.getByTestId("legislative-mandate")
+        const checkBox = page.getByLabel("Gesetzgebungsauftrag")
         await expect(checkBox).toBeChecked()
         await expect(
           page.getByText("Gesetzgebungsauftrag vorhanden"),
@@ -140,7 +140,7 @@ test.describe(
 
     async function checkLegislativeMandate(page: Page) {
       await test.step("check legislative mandate", async () => {
-        const checkBox = page.getByTestId("legislative-mandate")
+        const checkBox = page.getByLabel("Gesetzgebungsauftrag")
         await checkBox.check()
         await expect(checkBox).toBeChecked()
         await save(page)

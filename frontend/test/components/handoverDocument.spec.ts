@@ -1,7 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
-import { Stubs } from "@vue/test-utils/dist/types"
 import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
@@ -28,7 +27,8 @@ function renderComponent(
   options: {
     props?: unknown
     documentUnit?: DocumentUnit
-    stubs?: Stubs
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    stubs?: any
     env?: Env
   } = {},
 ) {

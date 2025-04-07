@@ -105,7 +105,7 @@ test.describe("procedure", () => {
     const listItems = await page.getByLabel("Vorgang Listenelement").all()
 
     for (const listItem of listItems) {
-      const spanLocator = listItem.locator("span.ds-label-01-reg")
+      const spanLocator = listItem.locator("span.ris-label1-regular")
       const title = await spanLocator.getAttribute("title")
       const response = await page.request.get(
         `/api/v1/caselaw/procedure?sz=10&pg=0&q=${title}`,

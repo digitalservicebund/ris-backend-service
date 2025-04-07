@@ -63,7 +63,7 @@ onMounted(async () => {
       @handover-document="handoverDocument"
     />
 
-    <div v-else class="my-112 grid justify-items-center bg-white bg-opacity-60">
+    <div v-else class="bg-opacity-60 my-112 grid justify-items-center bg-white">
       <h2>Überprüfung der Daten ...</h2>
       <LoadingSpinner />
     </div>

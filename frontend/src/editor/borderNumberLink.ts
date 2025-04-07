@@ -28,7 +28,7 @@ export const BorderNumberLink = Mark.create({
     return [
       "border-number-link",
       {
-        class: `font-bold ${styleClasses}`,
+        class: `ris-body1-bold ${styleClasses}`,
         valid: mark.attrs.valid,
         nr: mark.attrs.nr,
       },

@@ -7,10 +7,9 @@ const layout = inject(previewLayoutInjectionKey) || "wide"
 </script>
 <template>
   <FlexItem
-    class="ds-body-01-reg px-16 text-black"
+    class="ris-body1-regular px-16 text-black"
     :class="{
       'py-4': layout === 'wide',
-      'mt-[-2px] pb-6': layout === 'narrow',
     }"
   >
     <slot></slot>

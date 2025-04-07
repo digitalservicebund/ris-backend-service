@@ -57,7 +57,7 @@ onMounted(async () => {
 <template>
   <div class="flex flex-col gap-8">
     <div class="flex flex-row gap-4">
-      <span class="ds-label-01-bold">Rechtschreibprüfung </span>
+      <span class="ris-label1-bold">Rechtschreibprüfung </span>
       <span v-if="!loading">({{ totalTextCheckErrors }})</span>
     </div>
 
