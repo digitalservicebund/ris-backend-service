@@ -2,7 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { createRouter, createWebHistory } from "vue-router"
-import DuplicateRelationListItem from "@/components/DuplicateRelationListItem.vue"
+import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
 import DocumentUnit, {
   DuplicateRelation,
   DuplicateRelationStatus,

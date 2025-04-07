@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
-import DuplicateRelationListItem from "@/components/DuplicateRelationListItem.vue"
-import ManagementDataMetadata from "@/components/ManagementDataMetadata.vue"
+import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
+import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
