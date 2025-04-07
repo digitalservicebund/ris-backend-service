@@ -808,7 +808,7 @@ test.describe("search", () => {
 
     const infoPanel = page.getByText(new RegExp(`${documentNumber}|.*`))
 
-    await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
       `${courtType} ${courtLocation}`,
     )
     await expect(

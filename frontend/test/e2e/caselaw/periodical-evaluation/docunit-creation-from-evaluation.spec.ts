@@ -293,9 +293,9 @@ test.describe(
             newTab.getByLabel("Dokumenttyp", { exact: true }),
           ).toHaveValue("Anerkenntnisurteil")
 
-          await expect(newTab.locator("[aria-label='Rechtskraft']")).toHaveText(
-            "Keine Angabe",
-          )
+          await expect(
+            newTab.getByLabel("Rechtskraft", { exact: true }),
+          ).toHaveText("Keine Angabe")
         })
 
         // this test has nothing to do with the other test steps
@@ -312,7 +312,7 @@ test.describe(
           ).toBeVisible()
 
           await page.getByTestId("list-entry-0").first().click()
-          await page.locator("[aria-label='Eintrag löschen']").click()
+          await page.getByLabel("Eintrag löschen", { exact: true }).click()
 
           await expect(
             page.getByText(referenceSummary, {

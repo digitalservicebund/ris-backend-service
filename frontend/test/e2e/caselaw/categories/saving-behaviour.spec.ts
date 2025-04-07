@@ -1,8 +1,7 @@
 import { expect } from "@playwright/test"
 import {
-  navigateToCategories,
-  waitForInputValue,
   fillActiveCitationInputs,
+  navigateToCategories,
   save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -16,8 +15,8 @@ test.describe("saving behaviour", () => {
       await route.abort("internetdisconnected")
     })
 
-    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
-    await page.locator("[aria-label='Speichern Button']").click()
+    await page.getByLabel("Spruchkörper", { exact: true }).fill("VG-001")
+    await page.getByLabel("Speichern Button", { exact: true }).click()
 
     await expect(page.getByText("Fehler beim Speichern")).toBeVisible()
   })
@@ -25,12 +24,14 @@ test.describe("saving behaviour", () => {
   test("input during save not lost", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
-    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
+    await page.getByLabel("Spruchkörper", { exact: true }).fill("VG-001")
+    await expect(page.getByLabel("Spruchkörper", { exact: true })).toHaveValue(
+      "VG-001",
+    )
 
     await save(page)
 
-    await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
+    await expect(page.getByLabel("Spruchkörper", { exact: true })).toHaveValue(
       "VG-001",
     )
   })
@@ -41,8 +42,10 @@ test.describe("saving behaviour", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
-    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
+    await page.getByLabel("Spruchkörper", { exact: true }).fill("VG-001")
+    await expect(page.getByLabel("Spruchkörper", { exact: true })).toHaveValue(
+      "VG-001",
+    )
 
     await expect(page.getByText(/Zuletzt .* Uhr/)).toBeHidden()
     await page.locator("a:has-text('Übergabe an jDV')").click()
@@ -51,7 +54,7 @@ test.describe("saving behaviour", () => {
     })
     await navigateToCategories(page, documentNumber)
 
-    await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
+    await expect(page.getByLabel("Spruchkörper", { exact: true })).toHaveValue(
       "VG-001",
       { timeout: 500 },
     )
@@ -63,7 +66,9 @@ test.describe("saving behaviour", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Aktenzeichen']").type(generateString())
+    await page
+      .getByLabel("Aktenzeichen", { exact: true })
+      .type(generateString())
     await page.keyboard.press("Enter")
 
     const labels = [
@@ -95,19 +100,23 @@ test.describe("saving behaviour", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
-    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
+    await page.getByLabel("Spruchkörper", { exact: true }).fill("VG-001")
+    await expect(page.getByLabel("Spruchkörper", { exact: true })).toHaveValue(
+      "VG-001",
+    )
 
     await save(page)
 
     await page.reload()
-    await page.locator("[aria-label='Spruchkörper']").fill("VG-002")
-    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-002")
+    await page.getByLabel("Spruchkörper", { exact: true }).fill("VG-002")
+    await expect(page.getByLabel("Spruchkörper", { exact: true })).toHaveValue(
+      "VG-002",
+    )
 
     await save(page)
 
     await page.reload()
-    await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
+    await expect(page.getByLabel("Spruchkörper", { exact: true })).toHaveValue(
       "VG-002",
     )
   })
@@ -136,7 +145,7 @@ test.describe("saving behaviour", () => {
 
     const fileNumber = generateString()
 
-    await page.locator("[aria-label='Aktenzeichen']").fill(fileNumber)
+    await page.getByLabel("Aktenzeichen", { exact: true }).fill(fileNumber)
     await page.keyboard.press("Enter")
 
     await save(page)
@@ -183,8 +192,8 @@ test.describe("saving behaviour", () => {
         await route.continue()
       })
 
-      await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
-      await page.locator("[aria-label='Speichern Button']").click()
+      await page.getByLabel("Spruchkörper", { exact: true }).fill("VG-001")
+      await page.getByLabel("Speichern Button", { exact: true }).click()
 
       // Fill an input while a save request is in progress
       await page.getByLabel("ECLI", { exact: true }).fill("ECLI-123")
@@ -202,9 +211,9 @@ test.describe("saving behaviour", () => {
       // After the page reload, the three changed inputs should still be filled.
       await page.reload()
 
-      await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
-        "VG-001",
-      )
+      await expect(
+        page.getByLabel("Spruchkörper", { exact: true }),
+      ).toHaveValue("VG-001")
       await expect(page.getByLabel("ECLI", { exact: true })).toHaveValue(
         "ECLI-123",
       )

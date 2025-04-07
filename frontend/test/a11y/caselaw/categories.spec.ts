@@ -31,8 +31,10 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     await expect(page.getByText("AG Aachen")).toBeVisible()
     await expect(page.getByText("AG Aalen")).toBeVisible()
-    await page.locator("[aria-label='Gericht']").fill("bayern")
-    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("bayern")
+    await page.getByLabel("Gericht", { exact: true }).fill("bayern")
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      "bayern",
+    )
     await expect(
       page.locator("[aria-label='dropdown-option'] >> nth=2"),
     ).toBeVisible()
@@ -45,10 +47,10 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("aktenzeichen", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Aktenzeichen']").type("testone")
+    await page.getByLabel("Aktenzeichen", { exact: true }).type("testone")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Aktenzeichen']").type("testtwo")
+    await page.getByLabel("Aktenzeichen", { exact: true }).type("testtwo")
     await page.keyboard.press("Enter")
 
     await page
@@ -78,15 +80,17 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .click()
 
     await expect(
-      page.locator("[aria-label='dropdown-option']"),
+      page.getByLabel("dropdown-option", { exact: true }),
     ).not.toHaveCount(0)
 
     // type search string: 3 results for "zwischen"
-    await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
-    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue(
+    await page.getByLabel("Dokumenttyp", { exact: true }).fill("zwischen")
+    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
       "zwischen",
     )
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
+    await expect(
+      page.getByLabel("dropdown-option", { exact: true }),
+    ).toHaveCount(3)
 
     const accessibilityScanResults = await useAxeBuilder(page)
       .disableRules(["duplicate-id-aria"])
@@ -97,13 +101,13 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("ecli", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='ECLI']").type("one")
+    await page.getByLabel("ECLI", { exact: true }).type("one")
 
-    await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
+    await page.getByLabel("Abweichender ECLI anzeigen", { exact: true }).click()
 
-    await page.locator("[aria-label='Abweichender ECLI']").type("two")
+    await page.getByLabel("Abweichender ECLI", { exact: true }).type("two")
     await page.keyboard.press("Enter")
-    await page.locator("[aria-label='Abweichender ECLI']").type("three")
+    await page.getByLabel("Abweichender ECLI", { exact: true }).type("three")
     await page.keyboard.press("Enter")
 
     const accessibilityScanResults = await useAxeBuilder(page)
@@ -137,7 +141,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     await page.getByLabel("Vorgang", { exact: true }).click()
     await expect(
-      page.locator("[aria-label='additional-dropdown-info']"),
+      page.getByLabel("additional-dropdown-info", { exact: true }),
     ).toBeVisible()
     await expect(page.getByText("1 Dokumentationseinheiten")).toBeVisible()
 
@@ -171,7 +175,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   // eslint-disable-next-line playwright/no-skipped-test
   test.skip("rechtskraft", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    await page.locator("[aria-label='Rechtskraft']").click()
+    await page.getByLabel("Rechtskraft", { exact: true }).click()
 
     const accessibilityScanResults = await useAxeBuilder(page)
       .disableRules(["duplicate-id-aria"])

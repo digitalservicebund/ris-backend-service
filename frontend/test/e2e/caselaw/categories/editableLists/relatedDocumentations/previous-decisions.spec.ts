@@ -44,7 +44,9 @@ test.describe("previous decisions", () => {
       .click()
 
     await expect(
-      page.locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']"),
+      page.getByLabel("Entscheidungsdatum Vorgehende Entscheidung", {
+        exact: true,
+      }),
     ).toBeHidden()
 
     await page

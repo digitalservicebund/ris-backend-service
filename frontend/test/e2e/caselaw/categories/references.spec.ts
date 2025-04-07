@@ -5,7 +5,6 @@ import {
   navigateToPreview,
   navigateToReferences,
   save,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -48,7 +47,9 @@ test.describe(
             }),
           ).toBeVisible()
           await page.getByText("MM | Mieter Magazin", { exact: true }).click()
-          await waitForInputValue(page, "[aria-label='Periodikum']", "MM")
+          await expect(
+            page.getByLabel("Periodikum", { exact: true }),
+          ).toHaveValue("MM")
         })
 
         await test.step("citation shows citation example", async () => {
@@ -63,7 +64,7 @@ test.describe(
         })
 
         await test.step("Reference can be added to editable list", async () => {
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(
             page.getByText("MM " + citation1 + " (LT)"),
           ).toBeVisible()
@@ -93,11 +94,13 @@ test.describe(
               { exact: true },
             )
             .click()
-          await waitForInputValue(page, "[aria-label='Periodikum']", "GVBl BB")
+          await expect(
+            page.getByLabel("Periodikum", { exact: true }),
+          ).toHaveValue("GVBl BB")
           await expect(
             page.getByText("Zitierbeispiel: 1991, 676-681"),
           ).toBeVisible()
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(
             page.getByText("GVBl BB " + citation1 + " (LT)"),
           ).toBeVisible()
@@ -109,7 +112,7 @@ test.describe(
           await page.getByTestId("list-entry-0").click()
           await fillInput(page, "Klammernzusatz", "S")
 
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(
             page.getByText("GVBl BB " + citation1 + " (LT)"),
           ).toBeHidden()
@@ -143,10 +146,12 @@ test.describe(
               exact: true,
             })
             .click()
-          await waitForInputValue(page, "[aria-label='Periodikum']", "WdG")
+          await expect(
+            page.getByLabel("Periodikum", { exact: true }),
+          ).toHaveValue("WdG")
           await fillInput(page, "Zitatstelle", citation2)
           await fillInput(page, "Klammernzusatz", "ST")
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(
             page.getByText("WdG " + citation2 + " (ST)"),
           ).toBeVisible()
@@ -160,10 +165,12 @@ test.describe(
               exact: true,
             })
             .click()
-          await waitForInputValue(page, "[aria-label='Periodikum']", "AllMBl")
+          await expect(
+            page.getByLabel("Periodikum", { exact: true }),
+          ).toHaveValue("AllMBl")
           await fillInput(page, "Zitatstelle", citation3)
           await fillInput(page, "Klammernzusatz", "L")
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(
             page.getByText("AllMBl " + citation3 + " (L)"),
           ).toBeVisible()
@@ -171,7 +178,7 @@ test.describe(
         await save(page)
         await test.step("Delete second of 3 reference and verify it disappears, order of remaining items stays the same", async () => {
           await page.getByTestId("list-entry-1").click()
-          await page.locator("[aria-label='Eintrag löschen']").click()
+          await page.getByLabel("Eintrag löschen", { exact: true }).click()
           await expect(
             page.getByText("WdG " + citation2 + " (ST)"),
           ).toBeHidden()
@@ -186,7 +193,7 @@ test.describe(
 
         await test.step("Delete second of 2 references and verify it disappears from the list, first item stays the same", async () => {
           await page.getByTestId("list-entry-1").click()
-          await page.locator("[aria-label='Eintrag löschen']").click()
+          await page.getByLabel("Eintrag löschen", { exact: true }).click()
           await expect(
             page.getByText("AllMBl " + citation3 + " (L)"),
           ).toBeHidden()
@@ -196,7 +203,7 @@ test.describe(
         })
         await test.step("Delete last reference and verify the list is empty", async () => {
           await page.getByTestId("list-entry-0").click()
-          await page.locator("[aria-label='Eintrag löschen']").click()
+          await page.getByLabel("Eintrag löschen", { exact: true }).click()
           await expect(
             page.getByText("GVBl BB " + citation1 + " (S)"),
           ).toBeHidden()
@@ -233,7 +240,7 @@ test.describe(
 
         await test.step("Add reference with only 'Klammerzusatz' shows error in 'Periodikum' & 'Zitatstelle'", async () => {
           await fillInput(page, "Klammernzusatz", "LT")
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
             2,
           )
@@ -245,14 +252,14 @@ test.describe(
               exact: true,
             })
             .click()
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
             1,
           )
         })
         await test.step("Add 'Zitatstelle' removes error, reference can be saved", async () => {
           await fillInput(page, "Zitatstelle", citation)
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
         })
         await test.step("Add 'Periodikum' with empty Klammernzusatz (referenceSupplement)", async () => {
@@ -260,7 +267,7 @@ test.describe(
           await fillInput(page, "Zitatstelle", citation)
           await fillInput(page, "Klammernzusatz", "")
 
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(
             page.getByText("Pflichtfeld nicht befüllt"),
             "Should not count empty reference supplement error",
@@ -283,7 +290,7 @@ test.describe(
 
         await test.step("Literature references are validated for required inputs", async () => {
           await expect(
-            page.locator("[aria-label='Literaturfundstelle speichern']"),
+            page.getByLabel("Literaturfundstelle speichern", { exact: true }),
           ).toBeDisabled()
 
           await fillInput(page, "Periodikum Literaturfundstelle", "AllMBl")
@@ -292,11 +299,9 @@ test.describe(
               exact: true,
             })
             .click()
-          await waitForInputValue(
-            page,
-            "[aria-label='Periodikum Literaturfundstelle']",
-            "AllMBl",
-          )
+          await expect(
+            page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
+          ).toHaveValue("AllMBl")
           await fillInput(page, "Zitatstelle Literaturfundstelle", citation)
 
           await page
@@ -304,25 +309,23 @@ test.describe(
             .click()
           // check that both fields display error message
           await expect(
-            page.locator("text=Pflichtfeld nicht befüllt"),
+            page.getByText("Pflichtfeld nicht befüllt", { exact: true }),
           ).toHaveCount(2)
 
           await fillInput(page, "Autor Literaturfundstelle", "Einstein, Albert")
 
           await expect(
-            page.locator("text=Pflichtfeld nicht befüllt"),
+            page.getByText("Pflichtfeld nicht befüllt", { exact: true }),
           ).toHaveCount(1)
 
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
           await page.getByText("Ean", { exact: true }).click()
-          await waitForInputValue(
-            page,
-            "[aria-label='Dokumenttyp Literaturfundstelle']",
-            "Anmerkung",
-          )
+          await expect(
+            page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+          ).toHaveValue("Anmerkung")
 
           await expect(
-            page.locator("text=Pflichtfeld nicht befüllt"),
+            page.getByText("Pflichtfeld nicht befüllt", { exact: true }),
           ).toBeHidden()
         })
       },
@@ -355,7 +358,7 @@ test.describe(
             .click()
           await fillInput(page, "Zitatstelle", citation1)
           await fillInput(page, "Klammernzusatz", "LT")
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(
             page.getByText("WdG " + citation1 + " (LT)"),
           ).toBeVisible()
@@ -373,7 +376,7 @@ test.describe(
             .click()
           await fillInput(page, "Zitatstelle", citation2)
           await fillInput(page, "Klammernzusatz", "L")
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page.getByLabel("Fundstelle speichern", { exact: true }).click()
           await expect(
             page.getByText("GVBl BB " + citation2 + " (L)"),
           ).toBeVisible()
@@ -464,20 +467,16 @@ test.describe(
               exact: true,
             })
             .click()
-          await waitForInputValue(
-            page,
-            "[aria-label='Periodikum Literaturfundstelle']",
-            "AllMBl",
-          )
+          await expect(
+            page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
+          ).toHaveValue("AllMBl")
           await fillInput(page, "Zitatstelle Literaturfundstelle", citation1)
           await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
           await page.getByText("Ean", { exact: true }).click()
-          await waitForInputValue(
-            page,
-            "[aria-label='Dokumenttyp Literaturfundstelle']",
-            "Anmerkung",
-          )
+          await expect(
+            page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+          ).toHaveValue("Anmerkung")
 
           await page
             .locator("[aria-label='Literaturfundstelle speichern']")
@@ -514,20 +513,16 @@ test.describe(
               },
             )
             .click()
-          await waitForInputValue(
-            page,
-            "[aria-label='Periodikum Literaturfundstelle']",
-            "GVBl BB",
-          )
+          await expect(
+            page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
+          ).toHaveValue("GVBl BB")
           await fillInput(page, "Zitatstelle Literaturfundstelle", citation2)
           await fillInput(page, "Autor Literaturfundstelle", "Kästner, Erich")
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ebs")
           await page.getByText("Ebs", { exact: true }).click()
-          await waitForInputValue(
-            page,
-            "[aria-label='Dokumenttyp Literaturfundstelle']",
-            "Entscheidungsbesprechung",
-          )
+          await expect(
+            page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+          ).toHaveValue("Entscheidungsbesprechung")
 
           await page
             .locator("[aria-label='Literaturfundstelle speichern']")

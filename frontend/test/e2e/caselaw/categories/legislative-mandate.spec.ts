@@ -4,7 +4,6 @@ import {
   navigateToHandover,
   navigateToPreview,
   save,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -57,7 +56,7 @@ test.describe(
       await reloadWithCheck(page)
 
       await test.step("remove court type", async () => {
-        await page.locator("[aria-label='Gericht']").fill("")
+        await page.getByLabel("Gericht", { exact: true }).fill("")
         await save(page)
       })
 
@@ -126,13 +125,17 @@ test.describe(
 
     async function addCourtType(page: Page, courtType: string) {
       await test.step(`add court type : ${courtType}`, async () => {
-        await page.locator("[aria-label='Gericht']").fill(courtType)
-        await waitForInputValue(page, "[aria-label='Gericht']", courtType)
+        await page.getByLabel("Gericht", { exact: true }).fill(courtType)
+        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+          courtType,
+        )
         await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
           courtType,
         )
         await page.getByText(courtType).click()
-        await waitForInputValue(page, "[aria-label='Gericht']", courtType)
+        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+          courtType,
+        )
 
         await save(page)
       })

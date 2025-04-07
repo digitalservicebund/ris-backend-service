@@ -6,16 +6,18 @@ test.describe("core data", () => {
   test("core data change", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Aktenzeichen']").fill("abc")
+    await page.getByLabel("Aktenzeichen", { exact: true }).fill("abc")
     await page.keyboard.press("Enter")
-    await page.locator("[aria-label='ECLI']").fill("abc123")
+    await page.getByLabel("ECLI", { exact: true }).fill("abc123")
     await page.keyboard.press("Enter")
 
     await save(page)
 
     await page.reload()
-    await expect(page.locator("[aria-label='Aktenzeichen']")).toHaveValue("")
-    await expect(page.locator("[aria-label='ECLI']")).toHaveValue("abc123")
+    await expect(page.getByLabel("Aktenzeichen", { exact: true })).toHaveValue(
+      "",
+    )
+    await expect(page.getByLabel("ECLI", { exact: true })).toHaveValue("abc123")
   })
 
   test("nested 'ECLI' input toggles child input and correctly saves and displays data", async ({
@@ -24,18 +26,18 @@ test.describe("core data", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='ECLI']").type("one")
+    await page.getByLabel("ECLI", { exact: true }).type("one")
     await expect(page.getByText("one").first()).toBeVisible()
 
     await expect(page.getByText("Abweichender ECLI>")).toBeHidden()
 
-    await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
+    await page.getByLabel("Abweichender ECLI anzeigen", { exact: true }).click()
 
     await expect(page.getByText("Abweichender ECLI").first()).toBeVisible()
 
-    await page.locator("[aria-label='Abweichender ECLI']").type("two")
+    await page.getByLabel("Abweichender ECLI", { exact: true }).type("two")
     await page.keyboard.press("Enter")
-    await page.locator("[aria-label='Abweichender ECLI']").type("three")
+    await page.getByLabel("Abweichender ECLI", { exact: true }).type("three")
     await page.keyboard.press("Enter")
 
     await save(page)
@@ -46,7 +48,9 @@ test.describe("core data", () => {
     await expect(page.getByText("two").first()).toBeVisible()
     await expect(page.getByText("three").first()).toBeVisible()
 
-    await page.locator("[aria-label='Abweichender ECLI schließen']").click()
+    await page
+      .getByLabel("Abweichender ECLI schließen", { exact: true })
+      .click()
     await expect(page.getByText("Abweichender ECLI").first()).toBeHidden()
   })
 
@@ -56,10 +60,10 @@ test.describe("core data", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Aktenzeichen']").type("one")
+    await page.getByLabel("Aktenzeichen", { exact: true }).type("one")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Aktenzeichen']").type("two")
+    await page.getByLabel("Aktenzeichen", { exact: true }).type("two")
     await page.keyboard.press("Enter")
 
     await expect(page.getByText("one").first()).toBeVisible()
@@ -75,7 +79,9 @@ test.describe("core data", () => {
       page.getByText("Abweichendes Aktenzeichen").first(),
     ).toBeVisible()
 
-    await page.locator("[aria-label='Abweichendes Aktenzeichen']").type("three")
+    await page
+      .getByLabel("Abweichendes Aktenzeichen", { exact: true })
+      .type("three")
     await page.keyboard.press("Enter")
 
     await save(page)
@@ -97,13 +103,13 @@ test.describe("core data", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Aktenzeichen']").type("testone")
+    await page.getByLabel("Aktenzeichen", { exact: true }).type("testone")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Aktenzeichen']").type("testtwo")
+    await page.getByLabel("Aktenzeichen", { exact: true }).type("testtwo")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Aktenzeichen']").type("testthree")
+    await page.getByLabel("Aktenzeichen", { exact: true }).type("testthree")
     await page.keyboard.press("Enter")
 
     await expect(page.getByText("testone").first()).toBeVisible()
@@ -160,9 +166,13 @@ test.describe("core data", () => {
     await navigateToCategories(page, documentNumber)
 
     // on start: closed dropdown, no input text
-    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
+    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
+      "",
+    )
     await expect(page.getByText("AnU - Anerkenntnisurteil")).toBeHidden()
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+    await expect(
+      page.getByLabel("dropdown-option", { exact: true }),
+    ).toBeHidden()
 
     // open dropdown
     await page
@@ -171,38 +181,50 @@ test.describe("core data", () => {
       .getByLabel("Dropdown öffnen")
       .click()
     await expect(
-      page.locator("[aria-label='dropdown-option']"),
+      page.getByLabel("dropdown-option", { exact: true }),
     ).not.toHaveCount(0)
     await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
     await expect(page.getByText("EuGH-Vorlage")).toBeVisible()
 
     // type search string: 3 results for "zwischen"
-    await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
-    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue(
+    await page.getByLabel("Dokumenttyp", { exact: true }).fill("zwischen")
+    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
       "zwischen",
     )
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
+    await expect(
+      page.getByLabel("dropdown-option", { exact: true }),
+    ).toHaveCount(3)
 
     // use the clear icon
-    await page.locator("[aria-label='Auswahl zurücksetzen']").click()
-    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
+    await page.getByLabel("Auswahl zurücksetzen", { exact: true }).click()
+    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
+      "",
+    )
     await expect(
-      page.locator("[aria-label='dropdown-option']"),
+      page.getByLabel("dropdown-option", { exact: true }),
     ).not.toHaveCount(0)
     await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
 
     // close dropdown
     await page.getByLabel("Dropdown schließen").click()
-    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
+      "",
+    )
+    await expect(
+      page.getByLabel("dropdown-option", { exact: true }),
+    ).toBeHidden()
 
     // open dropdown again by focussing
-    await page.locator("[aria-label='Dokumenttyp']").focus()
+    await page.getByLabel("Dokumenttyp", { exact: true }).focus()
 
     // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
+    await expect(
+      page.getByLabel("dropdown-option", { exact: true }),
+    ).toBeHidden()
+    await expect(page.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
+      "",
+    )
   })
 
   // skipped as we don't show the Dokstelle anymore as of RISDEV-4177
@@ -276,12 +298,12 @@ test.describe("core data", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    const nswInput = page.locator("[aria-label='BGH Nachschlagewerk']")
+    const nswInput = page.getByLabel("BGH Nachschlagewerk", { exact: true })
     const CITATION = "1968, 249-252 (ST)"
     const nswChipTag = page.getByText(CITATION)
     await expect(nswInput).toBeHidden()
 
-    await page.locator("[aria-label='Gericht']").fill("BGH")
+    await page.getByLabel("Gericht", { exact: true }).fill("BGH")
     await page.getByText("BGH").click()
     await expect(nswInput).toBeVisible()
     await nswInput.fill(CITATION)
@@ -301,7 +323,7 @@ test.describe("core data", () => {
 
     await expect(nswChipTag, "Citation was not deleted").toBeHidden()
 
-    await page.locator("[aria-label='Gericht']").fill("AG Aalen")
+    await page.getByLabel("Gericht", { exact: true }).fill("AG Aalen")
     await page.getByText("AG Aalen").click()
     await expect(
       nswInput,
@@ -477,7 +499,7 @@ test.describe("core data", () => {
       })
 
       await test.step("Gericht und Fehlerhaftes Gericht sind bearbeitbar", async () => {
-        const court = page.locator("[aria-label='Gericht']")
+        const court = page.getByLabel("Gericht", { exact: true })
         const deviatingCourt = page.getByTestId("chips-input_deviatingCourt")
         await expect(court).toBeEditable()
         await expect(deviatingCourt).toBeEditable()
@@ -493,7 +515,9 @@ test.describe("core data", () => {
       })
 
       await test.step("Entscheidungsdatum und abweichendes Entscheidungsdatum sind bearbeitbar", async () => {
-        const decisionDate = page.locator("[aria-label='Entscheidungsdatum']")
+        const decisionDate = page.getByLabel("Entscheidungsdatum", {
+          exact: true,
+        })
         const deviatingDecisionDate = page.getByTestId(
           "chips-input_deviatingDecisionDates",
         )
@@ -502,39 +526,39 @@ test.describe("core data", () => {
       })
 
       await test.step("Spruchkörper ist bearbeitbar", async () => {
-        const appraisalBody = page.locator("[aria-label='Spruchkörper']")
+        const appraisalBody = page.getByLabel("Spruchkörper", { exact: true })
         await expect(appraisalBody).toBeEditable()
       })
 
       await test.step("Dokumenttyp ist bearbeitbar", async () => {
-        const documentType = page.locator("[aria-label='Dokumenttyp']")
+        const documentType = page.getByLabel("Dokumenttyp", { exact: true })
         await expect(documentType).toBeEditable()
       })
 
       await test.step("ECLI und abweichender ECLI sind bearbeitbar", async () => {
-        const ecli = page.locator("[aria-label='ECLI']")
+        const ecli = page.getByLabel("ECLI", { exact: true })
         const deviatingEcli = page.getByTestId("chips-input_deviatingEclis")
         await expect(ecli).toBeEditable()
         await expect(deviatingEcli).toBeEditable()
       })
 
       await test.step("Vorgang ist bearbeitbar", async () => {
-        const procedure = page.locator("[aria-label='Vorgang']")
+        const procedure = page.getByLabel("Vorgang", { exact: true })
         await expect(procedure).toBeEditable()
       })
 
       await test.step("Rechtskraft ist bearbeitbar", async () => {
-        const legalEffect = page.locator("[aria-label='Rechtskraft']")
+        const legalEffect = page.getByLabel("Rechtskraft", { exact: true })
         await expect(legalEffect).toBeEnabled()
       })
 
       await test.step("Region ist readonly", async () => {
-        const region = page.locator("[aria-label='Region']")
+        const region = page.getByLabel("Region", { exact: true })
         await expect(region).not.toBeEditable()
       })
 
       await test.step("Streitjahr ist bearbeitbar", async () => {
-        const yearsOfDispute = page.locator("[aria-label='Streitjahr']")
+        const yearsOfDispute = page.getByLabel("Streitjahr", { exact: true })
         await expect(yearsOfDispute).toBeEditable()
       })
     },
@@ -547,14 +571,16 @@ test.describe("core data", () => {
     },
     async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
-      const jurisidictionType = page.locator("[aria-label='Gerichtsbarkeit']")
+      const jurisidictionType = page.getByLabel("Gerichtsbarkeit", {
+        exact: true,
+      })
 
       await test.step("Gerichtsbarkeit ist initial nicht ausgefüllt", async () => {
         await expect(jurisidictionType).toHaveValue("")
       })
 
       await test.step("Auswahl eines Gerichts mit Gerichtsbarkeit - Gerichtsbarkeit wird angezeigt", async () => {
-        await page.locator("[aria-label='Gericht']").fill("AG Aalen")
+        await page.getByLabel("Gericht", { exact: true }).fill("AG Aalen")
         await page.getByText("AG Aalen").click()
         await expect(jurisidictionType).toHaveValue(
           "Ordentliche Gerichtsbarkeit",
@@ -562,7 +588,7 @@ test.describe("core data", () => {
       })
 
       await test.step("Auswahl eines Gerichts ohne Gerichtsbarkeit - Gerichtsbarkeit wird nicht angezeigt", async () => {
-        await page.locator("[aria-label='Gericht']").fill("GStA")
+        await page.getByLabel("Gericht", { exact: true }).fill("GStA")
         await page.getByText("GStA Berlin").click()
         await expect(jurisidictionType).toHaveValue("")
       })

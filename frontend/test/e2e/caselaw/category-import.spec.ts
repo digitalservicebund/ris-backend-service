@@ -5,7 +5,6 @@ import {
   fillNormInputs,
   navigateToCategories,
   save,
-  waitForInputValue,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 import SingleNorm from "@/domain/singleNorm"
@@ -182,12 +181,14 @@ test.describe("category import", () => {
           }),
         ).toBeVisible()
         await page.getByText("MM | Mieter Magazin", { exact: true }).click()
-        await waitForInputValue(page, "[aria-label='Periodikum']", "MM")
+        await expect(
+          page.getByLabel("Periodikum", { exact: true }),
+        ).toHaveValue("MM")
 
         await fillInput(page, "Zitatstelle", "2024, 50-53, Heft 1")
         await fillInput(page, "Klammernzusatz", "LT")
 
-        await page.locator("[aria-label='Fundstelle speichern']").click()
+        await page.getByLabel("Fundstelle speichern", { exact: true }).click()
         await expect(
           page.getByText("MM 2024, 50-53, Heft 1 (LT)"),
         ).toBeVisible()
@@ -278,11 +279,9 @@ test.describe("category import", () => {
           }),
         ).toBeVisible()
         await page.getByText("MM | Mieter Magazin", { exact: true }).click()
-        await waitForInputValue(
-          page,
-          "[aria-label='Periodikum Literaturfundstelle']",
-          "MM",
-        )
+        await expect(
+          page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
+        ).toHaveValue("MM")
 
         await fillInput(
           page,
@@ -292,13 +291,11 @@ test.describe("category import", () => {
         await fillInput(page, "Autor Literaturfundstelle", "Einstein, Albert")
         await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
         await page.getByText("Ean", { exact: true }).click()
-        await waitForInputValue(
-          page,
-          "[aria-label='Dokumenttyp Literaturfundstelle']",
-          "Anmerkung",
-        )
+        await expect(
+          page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+        ).toHaveValue("Anmerkung")
         await page
-          .locator("[aria-label='Literaturfundstelle speichern']")
+          .getByLabel("Literaturfundstelle speichern", { exact: true })
           .click()
         await expect(
           page.getByText("MM 2024, 50-53, Heft 1, Einstein, Albert (Ean)"),
