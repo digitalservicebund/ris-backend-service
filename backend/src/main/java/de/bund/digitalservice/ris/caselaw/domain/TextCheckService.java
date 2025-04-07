@@ -41,7 +41,7 @@ public class TextCheckService {
   }
 
   public List<Match> check(String text) {
-    return requestTool(text).stream().toList();
+    return requestTool(text);
   }
 
   protected List<Match> requestTool(String text) {
@@ -51,11 +51,11 @@ public class TextCheckService {
   public List<Match> checkWholeDocumentationUnit(UUID id)
       throws DocumentationUnitNotExistsException {
 
-    List<Match> allMatches = new ArrayList<>();
-
     Documentable documentable = documentationUnitRepository.findByUuid(id);
 
     if (documentable instanceof DocumentationUnit documentationUnit) {
+      List<Match> allMatches = new ArrayList<>();
+
       for (CategoryType type : CategoryType.values()) {
         try {
           TextCheckCategoryResponse response = checkCategory(documentationUnit, type);
@@ -70,7 +70,8 @@ public class TextCheckService {
       return allMatches;
 
     } else {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException(
+          "Check not supported for Documentable type: " + documentable.getClass());
     }
   }
 
@@ -204,6 +205,10 @@ public class TextCheckService {
 
   public List<Match> addIgnoredTextChecksIndividually(
       UUID documentationUnitId, List<Match> matches) {
+    if (documentationUnitId == null) {
+      return matches;
+    }
+
     var words = matches.stream().map(Match::word).toList();
 
     List<IgnoredTextCheckWord> globalAndDocumentationUnitIgnoredWords =
@@ -214,9 +219,6 @@ public class TextCheckService {
         globalAndDocumentationUnitIgnoredWords.stream()
             .collect(Collectors.groupingBy(IgnoredTextCheckWord::word));
 
-    if (documentationUnitId == null) {
-      return matches;
-    }
     return matches.stream()
         .map(
             match -> {

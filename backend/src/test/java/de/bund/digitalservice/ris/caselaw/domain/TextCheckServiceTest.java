@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -82,9 +83,12 @@ class TextCheckServiceTest {
 
     when(documentationUnitRepository.findByUuid(uuid)).thenReturn(documentable);
 
-    assertThrows(
-        UnsupportedOperationException.class,
-        () -> textCheckService.checkWholeDocumentationUnit(uuid));
+    var exception =
+        assertThrows(
+            UnsupportedOperationException.class,
+            () -> textCheckService.checkWholeDocumentationUnit(uuid));
+
+    assertTrue(exception.getMessage().contains("Check not supported for Documentable type: "));
   }
 
   @ParameterizedTest
