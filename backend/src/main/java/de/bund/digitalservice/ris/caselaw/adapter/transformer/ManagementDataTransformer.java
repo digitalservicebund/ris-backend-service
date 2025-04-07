@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +18,7 @@ public class ManagementDataTransformer {
     // Private constructor to prevent instantiation of this utility class.
   }
 
-  static ManagementData transformToDomain(
-      DecisionDTO decisionDTO, DocumentationOffice userDocumentationOffice) {
+  static ManagementData transformToDomain(DecisionDTO decisionDTO, User user) {
     List<String> borderNumbers =
         extractBorderNumbers(
             decisionDTO.getTenor(),
@@ -28,6 +28,12 @@ public class ManagementDataTransformer {
             decisionDTO.getOtherLongText(),
             decisionDTO.getDissentingOpinion());
 
+    DocumentationOffice userDocumentationOffice =
+        Optional.ofNullable(user).map(User::documentationOffice).orElse(null);
+
+    Optional<ManagementDataDTO> managementDataOptional =
+        Optional.ofNullable(decisionDTO.getManagementData());
+
     return ManagementData.builder()
         .lastPublicationDateTime(decisionDTO.getLastPublicationDateTime())
         .scheduledPublicationDateTime(decisionDTO.getScheduledPublicationDateTime())
@@ -35,89 +41,67 @@ public class ManagementDataTransformer {
         .borderNumbers(borderNumbers)
         .duplicateRelations(transformDuplicateRelations(decisionDTO))
         .lastUpdatedAtDateTime(
-            Optional.ofNullable(decisionDTO.getManagementData())
-                .map(ManagementDataDTO::getLastUpdatedAtDateTime)
+            managementDataOptional.map(ManagementDataDTO::getLastUpdatedAtDateTime).orElse(null))
+        .lastUpdatedByName(
+            managementDataOptional
+                .map(
+                    managementDataDTO ->
+                        transformLastUpdatedByUserName(managementDataDTO, userDocumentationOffice))
                 .orElse(null))
-        .lastUpdatedByName(transformLastUpdatedByName(decisionDTO, userDocumentationOffice))
         .lastUpdatedByDocOffice(
-            Optional.ofNullable(decisionDTO.getManagementData())
+            managementDataOptional
                 .map(ManagementDataDTO::getLastUpdatedByDocumentationOffice)
                 .map(DocumentationOfficeDTO::getAbbreviation)
                 .orElse(null))
         .createdAtDateTime(
-            Optional.ofNullable(decisionDTO.getManagementData())
-                .map(ManagementDataDTO::getCreatedAtDateTime)
+            managementDataOptional.map(ManagementDataDTO::getCreatedAtDateTime).orElse(null))
+        .createdByName(
+            managementDataOptional
+                .map(
+                    managementDataDTO ->
+                        transformCreatedByUserName(managementDataDTO, userDocumentationOffice))
                 .orElse(null))
-        .createdByName(transformCreatedByName(decisionDTO, userDocumentationOffice))
         .createdByDocOffice(
-            Optional.ofNullable(decisionDTO.getManagementData())
+            managementDataOptional
                 .map(ManagementDataDTO::getCreatedByDocumentationOffice)
                 .map(DocumentationOfficeDTO::getAbbreviation)
                 .orElse(null))
         .firstPublishedAtDateTime(
-            Optional.ofNullable(decisionDTO.getManagementData())
-                .map(ManagementDataDTO::getFirstPublishedAtDateTime)
-                .orElse(null))
+            managementDataOptional.map(ManagementDataDTO::getFirstPublishedAtDateTime).orElse(null))
         .build();
   }
 
-  private static String transformLastUpdatedByName(
-      DecisionDTO decisionDTO, DocumentationOffice userDocumentationOffice) {
-    var lastUpdatedByUserName = getLastUpdatedByUserName(decisionDTO);
-    var lastUpdatedByDocumentationOffice = getLastUpdatedByDocumentationOffice(decisionDTO);
-    if (isUserAllowedToSeeName(userDocumentationOffice, lastUpdatedByDocumentationOffice)
-        && lastUpdatedByUserName != null) {
+  private static String transformLastUpdatedByUserName(
+      ManagementDataDTO managementDataDTO, DocumentationOffice userDocumentationOffice) {
+    var lastUpdatedByUserName = managementDataDTO.getLastUpdatedByUserName();
+    var lastUpdatedByDocumentationOffice = managementDataDTO.getLastUpdatedByDocumentationOffice();
+    if (lastUpdatedByUserName != null
+        && isUserAllowedToSeeUserName(userDocumentationOffice, lastUpdatedByDocumentationOffice)) {
       return lastUpdatedByUserName;
     }
 
-    return Optional.ofNullable(decisionDTO.getManagementData())
-        .map(ManagementDataDTO::getLastUpdatedBySystemName)
-        .orElse(null);
+    return managementDataDTO.getLastUpdatedBySystemName();
   }
 
-  private static boolean isUserAllowedToSeeName(
-      DocumentationOffice userDocumentationOffice, DocumentationOfficeDTO documentationOfficeDTO) {
-    return userDocumentationOffice != null
-        && documentationOfficeDTO != null
-        && documentationOfficeDTO.getId().equals(userDocumentationOffice.uuid());
+  private static boolean isUserAllowedToSeeUserName(
+      DocumentationOffice userDocumentationOffice, DocumentationOfficeDTO documentationOffice) {
+
+    if (userDocumentationOffice == null || documentationOffice == null) {
+      return false;
+    }
+
+    return documentationOffice.getId().equals(userDocumentationOffice.uuid());
   }
 
-  private static String getLastUpdatedByUserName(DecisionDTO decisionDTO) {
-    return Optional.ofNullable(decisionDTO.getManagementData())
-        .map(ManagementDataDTO::getLastUpdatedByUserName)
-        .orElse(null);
-  }
-
-  private static String transformCreatedByName(
-      DecisionDTO decisionDTO, DocumentationOffice userDocumentationOffice) {
-    var createdByUserName = getCreatedByUserName(decisionDTO);
-    var createdByDocumentationOffice = getCreatedByDocumentationOffice(decisionDTO);
-    if (isUserAllowedToSeeName(userDocumentationOffice, createdByDocumentationOffice)
-        && createdByUserName != null) {
+  private static String transformCreatedByUserName(
+      ManagementDataDTO managementDataDTO, DocumentationOffice userDocumentationOffice) {
+    var createdByUserName = managementDataDTO.getCreatedByUserName();
+    var createdByDocumentationOffice = managementDataDTO.getCreatedByDocumentationOffice();
+    if (createdByUserName != null
+        && isUserAllowedToSeeUserName(userDocumentationOffice, createdByDocumentationOffice)) {
       return createdByUserName;
     }
 
-    return Optional.ofNullable(decisionDTO.getManagementData())
-        .map(ManagementDataDTO::getCreatedBySystemName)
-        .orElse(null);
-  }
-
-  private static String getCreatedByUserName(DecisionDTO decisionDTO) {
-    return Optional.ofNullable(decisionDTO.getManagementData())
-        .map(ManagementDataDTO::getCreatedByUserName)
-        .orElse(null);
-  }
-
-  private static DocumentationOfficeDTO getCreatedByDocumentationOffice(DecisionDTO decisionDTO) {
-    return Optional.ofNullable(decisionDTO.getManagementData())
-        .map(ManagementDataDTO::getCreatedByDocumentationOffice)
-        .orElse(null);
-  }
-
-  private static DocumentationOfficeDTO getLastUpdatedByDocumentationOffice(
-      DecisionDTO decisionDTO) {
-    return Optional.ofNullable(decisionDTO.getManagementData())
-        .map(ManagementDataDTO::getLastUpdatedByDocumentationOffice)
-        .orElse(null);
+    return managementDataDTO.getCreatedByUserName();
   }
 }

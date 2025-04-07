@@ -22,8 +22,14 @@ public interface DocumentationUnitRepository {
   Documentable findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
 
-  Documentable findByDocumentNumberWithUserDocumentationOffice(
-      String documentNumber, DocumentationOffice userDocumentationOffice)
+  /**
+   * Find a documentation unit by its document number
+   *
+   * @param documentNumber the document number
+   * @param user is optional and can be null
+   * @return the documentation unit found (decision or pending proceeding)
+   */
+  Documentable findByDocumentNumber(String documentNumber, User user)
       throws DocumentationUnitNotExistsException;
 
   DocumentationUnitListItem findDocumentationUnitListItemByDocumentNumber(String documentNumber)

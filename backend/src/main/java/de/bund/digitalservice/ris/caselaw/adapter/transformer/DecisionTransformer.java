@@ -19,13 +19,13 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -479,6 +479,10 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.inputTypes(inputTypeDTOs);
   }
 
+  public static DocumentationUnit transformToDomain(DecisionDTO decisionDTO) {
+    return transformToDomain(decisionDTO, null);
+  }
+
   /**
    * Transforms a documentation unit object from its database representation into a domain object
    * that is suitable to be consumed by clients of the REST service.
@@ -486,8 +490,7 @@ public class DecisionTransformer extends DocumentableTransformer {
    * @param decisionDTO the database documentation unit
    * @return a transformed domain object, or an empty domain object if the input is null
    */
-  public static DocumentationUnit transformToDomain(
-      DecisionDTO decisionDTO, DocumentationOffice userDocumentationOffice) {
+  public static DocumentationUnit transformToDomain(DecisionDTO decisionDTO, User user) {
     if (decisionDTO == null) {
       throw new DocumentationUnitTransformerException("Document unit is null and won't transform");
     }
@@ -503,8 +506,7 @@ public class DecisionTransformer extends DocumentableTransformer {
         .shortTexts(buildShortTexts(decisionDTO))
         .longTexts(buildLongTexts(decisionDTO))
         .contentRelatedIndexing(buildContentRelatedIndexing(decisionDTO))
-        .managementData(
-            ManagementDataTransformer.transformToDomain(decisionDTO, userDocumentationOffice))
+        .managementData(ManagementDataTransformer.transformToDomain(decisionDTO, user))
         .caselawReferences(
             decisionDTO.getCaselawReferences() == null
                 ? new ArrayList<>()

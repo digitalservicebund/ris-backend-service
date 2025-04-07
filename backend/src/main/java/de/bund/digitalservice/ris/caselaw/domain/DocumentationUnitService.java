@@ -232,10 +232,8 @@ public class DocumentationUnitService {
 
   public Documentable getByDocumentNumberWithUser(String documentNumber, OidcUser oidcUser)
       throws DocumentationUnitNotExistsException {
-    var userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
     var documentable =
-        repository.findByDocumentNumberWithUserDocumentationOffice(
-            documentNumber, userDocumentationOffice);
+        repository.findByDocumentNumber(documentNumber, userService.getUser(oidcUser));
     if (documentable instanceof DocumentationUnit documentationUnit) {
       return documentationUnit.toBuilder()
           .isEditable(

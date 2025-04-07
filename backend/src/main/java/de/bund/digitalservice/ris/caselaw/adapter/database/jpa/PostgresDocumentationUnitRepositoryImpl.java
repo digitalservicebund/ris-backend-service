@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
@@ -49,7 +50,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -115,37 +115,28 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Documentable findByDocumentNumberWithUserDocumentationOffice(
-      String documentNumber, DocumentationOffice userDocumentationOffice)
+  public Documentable findByDocumentNumber(String documentNumber, User user)
       throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository
             .findByDocumentNumber(documentNumber)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-    return getDocumentationUnitWithUserDocumentationOffice(
-        documentationUnit, userDocumentationOffice);
+    return getDocumentationUnit(documentationUnit, user);
   }
 
-  @Nullable
+  private static Documentable getDocumentationUnit(
+      DocumentationUnitDTO documentationUnit, User user) {
+    if (documentationUnit instanceof DecisionDTO decisionDTO) {
+      return DecisionTransformer.transformToDomain(decisionDTO, user);
+    }
+    if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
+      return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
+    }
+    return null;
+  }
+
   private static Documentable getDocumentationUnit(DocumentationUnitDTO documentationUnit) {
-    if (documentationUnit instanceof DecisionDTO decisionDTO) {
-      return DecisionTransformer.transformToDomain(decisionDTO, null);
-    }
-    if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
-      return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
-    }
-    return null;
-  }
-
-  private static Documentable getDocumentationUnitWithUserDocumentationOffice(
-      DocumentationUnitDTO documentationUnit, DocumentationOffice userDocumentationOffice) {
-    if (documentationUnit instanceof DecisionDTO decisionDTO) {
-      return DecisionTransformer.transformToDomain(decisionDTO, userDocumentationOffice);
-    }
-    if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
-      return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
-    }
-    return null;
+    return getDocumentationUnit(documentationUnit, null);
   }
 
   @Override
@@ -213,7 +204,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // persisted documentation unit
     DecisionDTO savedDocUnit = repository.save(builder.build());
 
-    return DecisionTransformer.transformToDomain(savedDocUnit, null);
+    return DecisionTransformer.transformToDomain(savedDocUnit);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -720,7 +711,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     return repository.getScheduledDocumentationUnitsDueNow().stream()
         .limit(50)
         .filter(DecisionDTO.class::isInstance) // TODO transform pending proceedings as well
-        .map(decision -> DecisionTransformer.transformToDomain((DecisionDTO) decision, null))
+        .map(decision -> DecisionTransformer.transformToDomain((DecisionDTO) decision))
         .toList();
   }
 
