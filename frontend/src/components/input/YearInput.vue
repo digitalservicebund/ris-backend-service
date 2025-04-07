@@ -47,7 +47,6 @@ function validateInput() {
       message: "Kein valides Jahr",
       instance: props.id,
     })
-    return
   } else {
     emit("update:validationError", undefined)
   }
