@@ -22,7 +22,7 @@ import java.util.UUID;
 import lombok.Builder;
 import org.junit.jupiter.api.Test;
 
-class MetaDataTransformerTest {
+class ManagementDataTransformerTest {
   @Test
   void testTransformToDomain_withoutManagementData_shouldTransformToEmptyManagementData() {
     // Arrange
