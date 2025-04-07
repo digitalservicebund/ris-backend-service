@@ -1,14 +1,16 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.TextCheckMockService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckUnknownCategoryException;
@@ -65,7 +67,9 @@ class TextCheckServiceTest {
                         .build())
                 .build());
 
+    TestMemoryAppender memoryAppender = new TestMemoryAppender(TextCheckService.class);
     List<Match> result = textCheckService.checkWholeDocumentationUnit(uuid);
+    assertThat(memoryAppender.count(Level.ERROR)).isZero();
 
     assertNotNull(result);
   }
@@ -116,14 +120,8 @@ class TextCheckServiceTest {
                         .build())
                 .build());
 
-    if (categoryType.equals(CategoryType.UNKNOWN)) {
-      assertThrows(
-          TextCheckUnknownCategoryException.class,
-          () -> textCheckService.checkCategory(uuid, categoryType));
-    } else {
-      TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, categoryType);
-      assertNotNull(result);
-    }
+    TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, categoryType);
+    assertNotNull(result);
   }
 
   @Test
@@ -174,8 +172,7 @@ class TextCheckServiceTest {
                 .build());
 
     assertThrows(
-        TextCheckUnknownCategoryException.class,
-        () -> textCheckService.checkCategory(uuid, CategoryType.UNKNOWN));
+        TextCheckUnknownCategoryException.class, () -> textCheckService.checkCategory(uuid, null));
   }
 
   @Test
@@ -194,7 +191,7 @@ class TextCheckServiceTest {
                 .build());
 
     TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, CategoryType.REASONS);
-    assertNull(result);
+    assertEquals(TextCheckCategoryResponse.builder().matches(List.of()).build(), result);
   }
 
   @Test

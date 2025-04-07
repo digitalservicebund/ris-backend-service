@@ -14,8 +14,7 @@ public enum CategoryType {
   HEADLINE("headline"),
   OTHER_LONG_TEXT("otherLongText"),
   DISSENTING_OPINION("dissentingOpinion"),
-  OUTLINE("outline"),
-  UNKNOWN("unbekannt");
+  OUTLINE("outline");
   @JsonValue private final String name;
 
   CategoryType(String name) {

@@ -59,6 +59,9 @@ public class TextCheckService {
       for (CategoryType type : CategoryType.values()) {
         try {
           TextCheckCategoryResponse response = checkCategory(documentationUnit, type);
+          if (response == null) {
+            continue;
+          }
           allMatches.addAll(response.matches());
         } catch (Exception e) {
           log.error("Could not process category", e);
@@ -123,7 +126,6 @@ public class TextCheckService {
       case OUTLINE ->
           checkCategoryByHTML(
               documentationUnit.longTexts().outline(), category, documentationUnit.uuid());
-      default -> throw new TextCheckUnknownCategoryException(category.toString());
     };
   }
 
@@ -142,7 +144,7 @@ public class TextCheckService {
   protected TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType, UUID documentationUnitId) {
     if (htmlText == null) {
-      return null;
+      return TextCheckCategoryResponse.builder().matches(List.of()).build();
     }
 
     // normalize HTML to assure correct positioning
