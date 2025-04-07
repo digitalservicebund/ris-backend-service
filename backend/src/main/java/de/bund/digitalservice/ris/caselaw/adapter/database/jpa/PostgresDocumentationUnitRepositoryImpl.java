@@ -50,6 +50,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -124,8 +125,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     return getDocumentationUnit(documentationUnit, user);
   }
 
+  @Nullable
   private static Documentable getDocumentationUnit(
-      DocumentationUnitDTO documentationUnit, User user) {
+      DocumentationUnitDTO documentationUnit, @Nullable User user) {
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
       return DecisionTransformer.transformToDomain(decisionDTO, user);
     }
@@ -135,6 +137,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     return null;
   }
 
+  @Nullable
   private static Documentable getDocumentationUnit(DocumentationUnitDTO documentationUnit) {
     return getDocumentationUnit(documentationUnit, null);
   }

@@ -11,14 +11,33 @@ import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
+/**
+ * Utility class responsible for transforming {@link ManagementDataDTO} entities into their
+ * corresponding domain model {@link ManagementData}.
+ *
+ * <p>This class is not meant to be instantiated and provides only static transformation logic.
+ */
 public class ManagementDataTransformer {
 
   private ManagementDataTransformer() {
     // Private constructor to prevent instantiation of this utility class.
   }
 
-  static ManagementData transformToDomain(DecisionDTO decisionDTO, User user) {
+  /**
+   * Transforms a {@link DecisionDTO} and optional {@link User} context into a {@link
+   * ManagementData} domain object.
+   *
+   * <p>The transformation extracts relevant metadata like publication dates, user info,
+   * documentation office abbreviations, and access-controlled names. If the user is provided,
+   * additional visibility checks are applied to restrict sensitive data.
+   *
+   * @param decisionDTO the decision DTO containing management data and other metadata
+   * @param user the currently authenticated user, can be {@code null}
+   * @return a {@link ManagementData} domain object built from the input DTO
+   */
+  static ManagementData transformToDomain(DecisionDTO decisionDTO, @Nullable User user) {
     List<String> borderNumbers =
         extractBorderNumbers(
             decisionDTO.getTenor(),

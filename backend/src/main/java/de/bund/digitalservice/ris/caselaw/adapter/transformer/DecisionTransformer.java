@@ -35,6 +35,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -488,9 +489,10 @@ public class DecisionTransformer extends DocumentableTransformer {
    * that is suitable to be consumed by clients of the REST service.
    *
    * @param decisionDTO the database documentation unit
+   * @param user the {@link User}, may be null
    * @return a transformed domain object, or an empty domain object if the input is null
    */
-  public static DocumentationUnit transformToDomain(DecisionDTO decisionDTO, User user) {
+  public static DocumentationUnit transformToDomain(DecisionDTO decisionDTO, @Nullable User user) {
     if (decisionDTO == null) {
       throw new DocumentationUnitTransformerException("Document unit is null and won't transform");
     }
