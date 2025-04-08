@@ -233,4 +233,7 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @Builder.Default
   @Valid
   private List<DocumentalistDTO> documentalists = new ArrayList<>();
+
+  @OneToOne(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
+  private ManagementDataDTO managementData;
 }

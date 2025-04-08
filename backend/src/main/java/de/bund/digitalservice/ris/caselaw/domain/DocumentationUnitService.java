@@ -4,7 +4,6 @@ import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpa
 
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
-import de.bund.digitalservice.ris.caselaw.adapter.CurrentUser;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -42,7 +41,6 @@ public class DocumentationUnitService {
   private final UserService userService;
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
-  private final CurrentUser currentUser;
   private static final List<String> pathsForDuplicateCheck =
       List.of(
           "/coreData/ecli",
@@ -65,8 +63,7 @@ public class DocumentationUnitService {
       AttachmentService attachmentService,
       @Lazy AuthService authService,
       PatchMapperService patchMapperService,
-      DuplicateCheckService duplicateCheckService,
-      CurrentUser currentUser) {
+      DuplicateCheckService duplicateCheckService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -78,14 +75,13 @@ public class DocumentationUnitService {
     this.statusService = statusService;
     this.authService = authService;
     this.duplicateCheckService = duplicateCheckService;
-    this.currentUser = currentUser;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit generateNewDocumentationUnit(
-      DocumentationOffice userDocOffice, Optional<DocumentationUnitCreationParameters> parameters)
+      User user, Optional<DocumentationUnitCreationParameters> parameters)
       throws DocumentationUnitException {
-
+    var userDocOffice = user.documentationOffice();
     // default office is user office
     DocumentationUnitCreationParameters params =
         parameters.orElse(
@@ -109,6 +105,7 @@ public class DocumentationUnitService {
                     .court(params.court())
                     .creatingDocOffice(
                         params.documentationOffice() == null
+                                || userDocOffice == null
                                 || userDocOffice.uuid().equals(params.documentationOffice().uuid())
                             ? null
                             : userDocOffice)
@@ -122,14 +119,17 @@ public class DocumentationUnitService {
     Status status =
         Status.builder()
             .publicationStatus(
-                userDocOffice.uuid().equals(docUnit.coreData().documentationOffice().uuid())
+                userDocOffice == null
+                        || userDocOffice
+                            .uuid()
+                            .equals(docUnit.coreData().documentationOffice().uuid())
                     ? PublicationStatus.UNPUBLISHED
                     : PublicationStatus.EXTERNAL_HANDOVER_PENDING)
             .withError(false)
             .build();
 
     var newDocumentationUnit =
-        repository.createNewDocumentationUnit(docUnit, status, params.reference());
+        repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
 
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
     return newDocumentationUnit;
@@ -442,7 +442,7 @@ public class DocumentationUnitService {
       }
     }
 
-    return (DocumentationUnit) repository.findByUuid(documentationUnit.uuid());
+    return (DocumentationUnit) repository.findByUuid(documentationUnit.uuid(), user);
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
