@@ -6,17 +6,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Entity
 @Table(name = "management_data", schema = "incremental_migration")
 public class ManagementDataDTO {
@@ -34,7 +36,7 @@ public class ManagementDataDTO {
   private UUID createdByUserId;
 
   @Column(name = "created_at_date_time")
-  private LocalDateTime createdAtDateTime;
+  private Instant createdAtDateTime;
 
   @Column(name = "created_by_user_name")
   private String createdByUserName;
@@ -50,7 +52,7 @@ public class ManagementDataDTO {
   private UUID lastUpdatedByUserId;
 
   @Column(name = "last_updated_at_date_time")
-  private LocalDateTime lastUpdatedAtDateTime;
+  private Instant lastUpdatedAtDateTime;
 
   @Column(name = "last_updated_by_user_name")
   private String lastUpdatedByUserName;
@@ -59,5 +61,5 @@ public class ManagementDataDTO {
   private String lastUpdatedBySystemName;
 
   @Column(name = "first_published_at_date_time")
-  private LocalDateTime firstPublishedAtDateTime;
+  private Instant firstPublishedAtDateTime;
 }

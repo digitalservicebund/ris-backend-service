@@ -155,10 +155,21 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
+  public Documentable findByUuid(UUID uuid, User user) throws DocumentationUnitNotExistsException {
+    return this.findByUuidNonTransactional(uuid, user);
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Documentable findByUuid(UUID uuid) throws DocumentationUnitNotExistsException {
+    return this.findByUuidNonTransactional(uuid, null);
+  }
+
+  private Documentable findByUuidNonTransactional(UUID uuid, User user)
+      throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
-    return getDocumentationUnit(documentationUnit);
+    return getDocumentationUnit(documentationUnit, user);
   }
 
   @Override
@@ -213,7 +224,16 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(Documentable documentable) {
+    saveNonTransactional(documentable, null);
+  }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
+  @Override
+  public void save(Documentable documentable, @Nullable User currentUser) {
+    saveNonTransactional(documentable, currentUser);
+  }
+
+  private void saveNonTransactional(Documentable documentable, @Nullable User currentUser) {
     DocumentationUnitDTO documentationUnitDTO =
         repository.findById(documentable.uuid()).orElse(null);
     if (documentationUnitDTO == null) {
@@ -249,6 +269,24 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
+      if (currentUser != null) {
+        if (decisionDTO.getManagementData() == null) {
+          decisionDTO.setManagementData(new ManagementDataDTO());
+          decisionDTO.getManagementData().setDocumentationUnitId(decisionDTO);
+        }
+
+        UUID userId = Optional.of(currentUser).map(User::id).orElse(null);
+        DocumentationOfficeDTO userDocOffice =
+            Optional.of(currentUser)
+                .map(User::documentationOffice)
+                .map(DocumentationOfficeTransformer::transformToDTO)
+                .orElse(null);
+        decisionDTO.getManagementData().setLastUpdatedByUserId(userId);
+        decisionDTO.getManagementData().setLastUpdatedByUserName(currentUser.name());
+        decisionDTO.getManagementData().setLastUpdatedByDocumentationOffice(userDocOffice);
+        decisionDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
+      }
+
       documentationUnitDTO =
           DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);
       repository.save(documentationUnitDTO);

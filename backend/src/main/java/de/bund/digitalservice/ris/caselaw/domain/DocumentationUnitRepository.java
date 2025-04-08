@@ -41,6 +41,14 @@ public interface DocumentationUnitRepository {
    * @param uuid the UUID to search for
    * @return the documentation unit found
    */
+  Documentable findByUuid(UUID uuid, User user) throws DocumentationUnitNotExistsException;
+
+  /**
+   * Find a documentation unit by its UUID
+   *
+   * @param uuid the UUID to search for
+   * @return the documentation unit found
+   */
   Documentable findByUuid(UUID uuid) throws DocumentationUnitNotExistsException;
 
   /**
@@ -60,6 +68,8 @@ public interface DocumentationUnitRepository {
    * @param documentationUnit the documentation unit to save
    */
   void save(Documentable documentationUnit);
+
+  void save(Documentable documentable, User currentUser);
 
   /**
    * Save the keywords of a documentation unit

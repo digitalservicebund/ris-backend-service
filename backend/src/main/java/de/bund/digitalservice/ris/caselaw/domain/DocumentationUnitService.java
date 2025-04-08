@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpa
 
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
+import de.bund.digitalservice.ris.caselaw.adapter.CurrentUser;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -41,6 +42,7 @@ public class DocumentationUnitService {
   private final UserService userService;
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
+  private final CurrentUser currentUser;
   private static final List<String> pathsForDuplicateCheck =
       List.of(
           "/coreData/ecli",
@@ -63,7 +65,8 @@ public class DocumentationUnitService {
       AttachmentService attachmentService,
       @Lazy AuthService authService,
       PatchMapperService patchMapperService,
-      DuplicateCheckService duplicateCheckService) {
+      DuplicateCheckService duplicateCheckService,
+      CurrentUser currentUser) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -75,6 +78,7 @@ public class DocumentationUnitService {
     this.statusService = statusService;
     this.authService = authService;
     this.duplicateCheckService = duplicateCheckService;
+    this.currentUser = currentUser;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -251,7 +255,12 @@ public class DocumentationUnitService {
 
   public Documentable getByUuid(UUID documentationUnitId)
       throws DocumentationUnitNotExistsException {
-    return repository.findByUuid(documentationUnitId);
+    return repository.findByUuid(documentationUnitId, null);
+  }
+
+  public Documentable getByUuid(UUID documentationUnitId, User user)
+      throws DocumentationUnitNotExistsException {
+    return repository.findByUuid(documentationUnitId, user);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -298,12 +307,14 @@ public class DocumentationUnitService {
    *
    * @param documentationUnitId id of the documentation unit
    * @param patch patch to update the documentation unit
+   * @param user current logged-in user
    * @return a patch with changes the client not know yet (automatically set fields, fields update
    *     by other user)
    * @throws DocumentationUnitNotExistsException if the documentation unit not exist
    * @throws DocumentationUnitPatchException if the documentation unit couldn't updated
    */
-  public RisJsonPatch updateDocumentationUnit(UUID documentationUnitId, RisJsonPatch patch)
+  public RisJsonPatch updateDocumentationUnit(
+      UUID documentationUnitId, RisJsonPatch patch, User user)
       throws DocumentationUnitNotExistsException, DocumentationUnitPatchException {
 
     /*
@@ -312,7 +323,7 @@ public class DocumentationUnitService {
        * handle unique following operation (sometimes by add and remove operations at the same time)
     */
 
-    Documentable documentable = getByUuid(documentationUnitId);
+    Documentable documentable = getByUuid(documentationUnitId, user);
 
     if (!(documentable instanceof DocumentationUnit existingDocumentationUnit)) {
       throw new UnsupportedOperationException(
@@ -356,7 +367,7 @@ public class DocumentationUnitService {
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
         DocumentationUnit updatedDocumentationUnit =
-            updateDocumentationUnit(patchedDocumentationUnit, duplicateCheckStatus);
+            updateDocumentationUnit(patchedDocumentationUnit, duplicateCheckStatus, user);
 
         toFrontendJsonPatch =
             patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
@@ -411,17 +422,17 @@ public class DocumentationUnitService {
 
   public DocumentationUnit updateDocumentationUnit(DocumentationUnit documentationUnit)
       throws DocumentationUnitNotExistsException {
-    return this.updateDocumentationUnit(documentationUnit, DuplicateCheckStatus.DISABLED);
+    return this.updateDocumentationUnit(documentationUnit, DuplicateCheckStatus.DISABLED, null);
   }
 
   public DocumentationUnit updateDocumentationUnit(
-      DocumentationUnit documentationUnit, DuplicateCheckStatus duplicateCheckStatus)
+      DocumentationUnit documentationUnit, DuplicateCheckStatus duplicateCheckStatus, User user)
       throws DocumentationUnitNotExistsException {
     repository.saveKeywords(documentationUnit);
     repository.saveFieldsOfLaw(documentationUnit);
     repository.saveProcedures(documentationUnit);
 
-    repository.save(documentationUnit);
+    repository.save(documentationUnit, user);
 
     if (duplicateCheckStatus == DuplicateCheckStatus.ENABLED) {
       try {

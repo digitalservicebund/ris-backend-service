@@ -204,6 +204,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
 
-  @OneToOne(mappedBy = "documentationUnitId")
+  // TODO: Should this be in docUnitDTO?
+  @OneToOne(mappedBy = "documentationUnitId", cascade = CascadeType.ALL, orphanRemoval = true)
   private ManagementDataDTO managementData;
 }

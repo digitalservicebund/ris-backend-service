@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.PastOrPresent;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -14,10 +15,10 @@ public record ManagementData(
     @Email String scheduledByEmail,
     List<DuplicateRelation> duplicateRelations,
     List<String> borderNumbers,
-    LocalDateTime lastUpdatedAtDateTime,
+    Instant lastUpdatedAtDateTime,
     String lastUpdatedByName,
     String lastUpdatedByDocOffice,
-    LocalDateTime createdAtDateTime,
+    Instant createdAtDateTime,
     String createdByName,
     String createdByDocOffice,
-    LocalDateTime firstPublishedAtDateTime) {}
+    Instant firstPublishedAtDateTime) {}
