@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Builder;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ManagementDataTransformerTest {
@@ -38,7 +39,7 @@ class ManagementDataTransformerTest {
   }
 
   @Test
-  void testTransformToDomain_withBorderNumbers_shouldExtractBorderNumbers() {
+  void testTransformToDomain_withBorderNumbers_shouldExtractOnlyRelevantBorderNumbers() {
     // Arrange
     DecisionDTO decisionDTO =
         DecisionDTO.builder()
@@ -54,6 +55,10 @@ class ManagementDataTransformerTest {
             .headnote("<border-number><number>7</number><content>hello</content></border-number>")
             .guidingPrinciple(
                 "<border-number><number>8</number><content>hello</content></border-number>")
+            .headline("<border-number><number>9</number><content>hello</content></border-number>")
+            .otherHeadnote(
+                "<border-number><number>10</number><content>hello</content></border-number>")
+            .outline("<border-number><number>11</number><content>hello</content></border-number>")
             .build();
     ManagementData expected =
         generateManagementData(
@@ -69,389 +74,633 @@ class ManagementDataTransformerTest {
     assertThat(managementData).isEqualTo(expected);
   }
 
-  @Test
-  void
-      testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations1_shouldFilterOutWarning() {
-    // Arrange
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var unpublishedStatus =
-        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
-    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
-    var unpublishedDuplicateFromOtherDocOffice =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate")
-            .documentationOffice(otherDocOffice)
-            .id(UUID.randomUUID())
-            .status(unpublishedStatus)
-            .build();
-    var duplicateRelationship =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(original)
-            .documentationUnit2(unpublishedDuplicateFromOtherDocOffice)
-            .build();
-    original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
+  @Nested
+  class DuplicateRelations {
+    @Test
+    void
+        testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations1_shouldFilterOutWarning() {
+      // Arrange
+      var original =
+          generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+      var unpublishedStatus =
+          StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
+      var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+      var unpublishedDuplicateFromOtherDocOffice =
+          generateSimpleDTOBuilder()
+              .documentNumber("duplicate")
+              .documentationOffice(otherDocOffice)
+              .id(UUID.randomUUID())
+              .status(unpublishedStatus)
+              .build();
+      var duplicateRelationship =
+          DuplicateRelationDTO.builder()
+              .documentationUnit1(original)
+              .documentationUnit2(unpublishedDuplicateFromOtherDocOffice)
+              .build();
+      original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
 
-    // Act
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+      // Act
+      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
 
-    // Assert
-    assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
+      // Assert
+      assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
+    }
+
+    @Test
+    void
+        testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations2_shouldFilterOutWarning() {
+      // Arrange
+      var original =
+          generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+      var unpublishedStatus =
+          StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
+      var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+      var unpublishedDuplicateFromOtherDocOffice =
+          generateSimpleDTOBuilder()
+              .documentNumber("duplicate")
+              .documentationOffice(otherDocOffice)
+              .id(UUID.randomUUID())
+              .status(unpublishedStatus)
+              .build();
+      var duplicateRelationship =
+          DuplicateRelationDTO.builder()
+              .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
+              .documentationUnit2(original)
+              .build();
+      original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+
+      // Act
+      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+
+      // Assert
+      assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
+    }
+
+    @Test
+    void
+        testTransformToDomain_withUnpublishedDuplicateWarningFromSameDocOffice_shouldNotFilterOutWarning() {
+      // Arrange
+      var original =
+          generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+      var unpublishedStatus =
+          StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
+      var unpublishedDuplicateFromOtherDocOffice =
+          generateSimpleDTOBuilder()
+              .documentNumber("duplicate")
+              .id(UUID.randomUUID())
+              .status(unpublishedStatus)
+              .build();
+      var duplicateRelationship =
+          DuplicateRelationDTO.builder()
+              .documentationUnit1(original)
+              .documentationUnit2(unpublishedDuplicateFromOtherDocOffice)
+              .build();
+      original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
+
+      // Act
+      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+
+      // Assert
+      assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+    }
+
+    @Test
+    void
+        testTransformToDomain_withPublishedDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
+      // Arrange
+      var original =
+          generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+      var publishedStatus =
+          StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHED).build();
+      var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+      var unpublishedDuplicateFromOtherDocOffice =
+          generateSimpleDTOBuilder()
+              .documentNumber("duplicate")
+              .documentationOffice(otherDocOffice)
+              .id(UUID.randomUUID())
+              .status(publishedStatus)
+              .build();
+      var duplicateRelationship =
+          DuplicateRelationDTO.builder()
+              .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
+              .documentationUnit2(original)
+              .build();
+      original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+
+      // Act
+      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+
+      // Assert
+      assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+      assertThat(
+              documentationUnit.managementData().duplicateRelations().stream()
+                  .findFirst()
+                  .get()
+                  .documentNumber())
+          .isEqualTo("duplicate");
+    }
+
+    @Test
+    void
+        testTransformToDomain_withPublishingDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
+      // Arrange
+      var original =
+          generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+      var publishedStatus =
+          StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHING).build();
+      var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+      var unpublishedDuplicateFromOtherDocOffice =
+          generateSimpleDTOBuilder()
+              .documentNumber("duplicate")
+              .documentationOffice(otherDocOffice)
+              .id(UUID.randomUUID())
+              .status(publishedStatus)
+              .build();
+      var duplicateRelationship =
+          DuplicateRelationDTO.builder()
+              .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
+              .documentationUnit2(original)
+              .build();
+      original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+
+      // Act
+      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+
+      // Assert
+      assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+      assertThat(
+              documentationUnit.managementData().duplicateRelations().stream()
+                  .findFirst()
+                  .get()
+                  .documentNumber())
+          .isEqualTo("duplicate");
+    }
+
+    @Test
+    void
+        testTransformToDomain_withMultipleDuplicateWarnings_shouldSortByDecisionDateAndDocNumber() {
+      // Arrange
+      var original =
+          generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+      var duplicate1 =
+          generateSimpleDTOBuilder()
+              .documentNumber("duplicate1")
+              .date(LocalDate.of(2020, 1, 1))
+              .id(UUID.randomUUID())
+              .build();
+      var duplicate2 =
+          generateSimpleDTOBuilder().documentNumber("duplicate2").id(UUID.randomUUID()).build();
+      var duplicate3 =
+          generateSimpleDTOBuilder()
+              .documentNumber("duplicate3")
+              .date(LocalDate.of(2021, 1, 1))
+              .id(UUID.randomUUID())
+              .build();
+      var duplicate4 =
+          generateSimpleDTOBuilder()
+              .documentNumber("duplicate4")
+              .date(LocalDate.of(2021, 1, 1))
+              .id(UUID.randomUUID())
+              .build();
+      var duplicate5 =
+          generateSimpleDTOBuilder().documentNumber("duplicate05").id(UUID.randomUUID()).build();
+      var duplicateRelationship1 =
+          DuplicateRelationDTO.builder()
+              .documentationUnit1(duplicate1)
+              .documentationUnit2(original)
+              .build();
+      var duplicateRelationship2 =
+          DuplicateRelationDTO.builder()
+              .documentationUnit1(duplicate2)
+              .documentationUnit2(original)
+              .build();
+      var duplicateRelationship3 =
+          DuplicateRelationDTO.builder()
+              .documentationUnit1(duplicate3)
+              .documentationUnit2(original)
+              .build();
+      var duplicateRelationship4 =
+          DuplicateRelationDTO.builder()
+              .documentationUnit1(duplicate4)
+              .documentationUnit2(original)
+              .build();
+      var duplicateRelationship5 =
+          DuplicateRelationDTO.builder()
+              .documentationUnit1(duplicate5)
+              .documentationUnit2(original)
+              .build();
+      original =
+          original.toBuilder()
+              .duplicateRelations2(
+                  Set.of(duplicateRelationship1, duplicateRelationship2, duplicateRelationship5))
+              .duplicateRelations1(Set.of(duplicateRelationship4, duplicateRelationship3))
+              .build();
+
+      // Act
+      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+
+      // Assert
+      var transformedRelations = documentationUnit.managementData().duplicateRelations();
+      assertThat(transformedRelations).hasSize(5);
+      assertThat(transformedRelations.stream().map(DuplicateRelation::documentNumber))
+          .containsExactly("duplicate3", "duplicate4", "duplicate1", "duplicate05", "duplicate2");
+    }
   }
 
-  @Test
-  void
-      testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations2_shouldFilterOutWarning() {
-    // Arrange
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var unpublishedStatus =
-        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
-    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
-    var unpublishedDuplicateFromOtherDocOffice =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate")
-            .documentationOffice(otherDocOffice)
-            .id(UUID.randomUUID())
-            .status(unpublishedStatus)
-            .build();
-    var duplicateRelationship =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
-            .documentationUnit2(original)
-            .build();
-    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+  @Nested
+  class MetaData {
+    @Test
+    void testTransformToDomain_withAllMetaDataAndUser_shouldTransformAll() {
+      // Arrange
+      LocalDateTime lastUpdatedAtDateTime = LocalDateTime.now();
+      DocumentationOfficeDTO creatingAndUpdatingDocOffice =
+          DocumentationOfficeDTO.builder().id(UUID.randomUUID()).abbreviation("BGH").build();
+      String lastUpdatedByName = "Winnie Puuh";
+      LocalDateTime createdAtDateTime = LocalDateTime.now();
+      String createdByName = "I Aah";
+      LocalDateTime firstPublishedAtDateTime = LocalDateTime.now();
 
-    // Act
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedAtDateTime(lastUpdatedAtDateTime)
+              .lastUpdatedByUserName(lastUpdatedByName)
+              .lastUpdatedByDocumentationOffice(creatingAndUpdatingDocOffice)
+              .createdAtDateTime(createdAtDateTime)
+              .createdByUserName(createdByName)
+              .createdByDocumentationOffice(creatingAndUpdatingDocOffice)
+              .firstPublishedAtDateTime(firstPublishedAtDateTime)
+              .build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      CreationParameters parameters =
+          CreationParameters.builder()
+              .lastUpdatedAtDateTime(lastUpdatedAtDateTime)
+              .lastUpdatedByName(lastUpdatedByName)
+              .lastUpdatedByDocumentationOffice(creatingAndUpdatingDocOffice.getAbbreviation())
+              .createdAtDateTime(createdAtDateTime)
+              .createdByName(createdByName)
+              .createdByDocumentationOffice(creatingAndUpdatingDocOffice.getAbbreviation())
+              .firstPublishedAtDateTime(firstPublishedAtDateTime)
+              .build();
+      ManagementData expected = generateManagementData(Optional.of(parameters));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder()
+                      .uuid(creatingAndUpdatingDocOffice.getId())
+                      .abbreviation(creatingAndUpdatingDocOffice.getAbbreviation())
+                      .build())
+              .build();
 
-    // Assert
-    assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
-  }
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, user);
 
-  @Test
-  void
-      testTransformToDomain_withUnpublishedDuplicateWarningFromSameDocOffice_shouldNotFilterOutWarning() {
-    // Arrange
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var unpublishedStatus =
-        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
-    var unpublishedDuplicateFromOtherDocOffice =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate")
-            .id(UUID.randomUUID())
-            .status(unpublishedStatus)
-            .build();
-    var duplicateRelationship =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(original)
-            .documentationUnit2(unpublishedDuplicateFromOtherDocOffice)
-            .build();
-    original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
 
-    // Act
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+    @Test
+    void testTransformToDomain_withAllowedUserDocOffice_shouldTransformUserName() {
+      // Arrange
+      UUID docOfficeId = UUID.randomUUID();
+      DocumentationOfficeDTO documentationOfficeDTO =
+          DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation("BGH").build();
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedByUserName("Winnie Puuh")
+              .lastUpdatedByDocumentationOffice(documentationOfficeDTO)
+              .build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByName("Winnie Puuh")
+                      .lastUpdatedByDocumentationOffice("BGH")
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().uuid(docOfficeId).abbreviation("BGH").build())
+              .build();
 
-    // Assert
-    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
-  }
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, user);
 
-  @Test
-  void
-      testTransformToDomain_withPublishedDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
-    // Arrange
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var publishedStatus =
-        StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHED).build();
-    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
-    var unpublishedDuplicateFromOtherDocOffice =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate")
-            .documentationOffice(otherDocOffice)
-            .id(UUID.randomUUID())
-            .status(publishedStatus)
-            .build();
-    var duplicateRelationship =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
-            .documentationUnit2(original)
-            .build();
-    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
 
-    // Act
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+    @Test
+    void
+        testTransformToDomain_withOtherUserDocOfficeAndSystemName_shouldTransformLastUpdatedByNameToSystemName() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedByUserName("Winnie Puuh")
+              .lastUpdatedBySystemName("NeuRIS")
+              .lastUpdatedByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByName("NeuRIS")
+                      .lastUpdatedByDocumentationOffice("BGH")
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
 
-    // Assert
-    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
-    assertThat(
-            documentationUnit.managementData().duplicateRelations().stream()
-                .findFirst()
-                .get()
-                .documentNumber())
-        .isEqualTo("duplicate");
-  }
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, user);
 
-  @Test
-  void
-      testTransformToDomain_withPublishingDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
-    // Arrange
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var publishedStatus =
-        StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHING).build();
-    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
-    var unpublishedDuplicateFromOtherDocOffice =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate")
-            .documentationOffice(otherDocOffice)
-            .id(UUID.randomUUID())
-            .status(publishedStatus)
-            .build();
-    var duplicateRelationship =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
-            .documentationUnit2(original)
-            .build();
-    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
 
-    // Act
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+    @Test
+    void testTransformToDomain_withOtherUserDocOffice_shouldTransformLastUpdatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedByUserName("Winnie Puuh")
+              .lastUpdatedByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByDocumentationOffice("BGH")
+                      .lastUpdatedByName(null)
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
 
-    // Assert
-    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
-    assertThat(
-            documentationUnit.managementData().duplicateRelations().stream()
-                .findFirst()
-                .get()
-                .documentNumber())
-        .isEqualTo("duplicate");
-  }
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, user);
 
-  @Test
-  void testTransformToDomain_withMultipleDuplicateWarnings_shouldSortByDecisionDateAndDocNumber() {
-    // Arrange
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var duplicate1 =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate1")
-            .date(LocalDate.of(2020, 1, 1))
-            .id(UUID.randomUUID())
-            .build();
-    var duplicate2 =
-        generateSimpleDTOBuilder().documentNumber("duplicate2").id(UUID.randomUUID()).build();
-    var duplicate3 =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate3")
-            .date(LocalDate.of(2021, 1, 1))
-            .id(UUID.randomUUID())
-            .build();
-    var duplicate4 =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate4")
-            .date(LocalDate.of(2021, 1, 1))
-            .id(UUID.randomUUID())
-            .build();
-    var duplicate5 =
-        generateSimpleDTOBuilder().documentNumber("duplicate05").id(UUID.randomUUID()).build();
-    var duplicateRelationship1 =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(duplicate1)
-            .documentationUnit2(original)
-            .build();
-    var duplicateRelationship2 =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(duplicate2)
-            .documentationUnit2(original)
-            .build();
-    var duplicateRelationship3 =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(duplicate3)
-            .documentationUnit2(original)
-            .build();
-    var duplicateRelationship4 =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(duplicate4)
-            .documentationUnit2(original)
-            .build();
-    var duplicateRelationship5 =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(duplicate5)
-            .documentationUnit2(original)
-            .build();
-    original =
-        original.toBuilder()
-            .duplicateRelations2(
-                Set.of(duplicateRelationship1, duplicateRelationship2, duplicateRelationship5))
-            .duplicateRelations1(Set.of(duplicateRelationship4, duplicateRelationship3))
-            .build();
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
 
-    // Act
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+    @Test
+    void testTransformToDomain_withoutDocOffice_shouldTransformLastUpdatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder().lastUpdatedByUserName("Winnie Puuh").build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByDocumentationOffice(null)
+                      .lastUpdatedByName(null)
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
 
-    // Assert
-    var transformedRelations = documentationUnit.managementData().duplicateRelations();
-    assertThat(transformedRelations).hasSize(5);
-    assertThat(transformedRelations.stream().map(DuplicateRelation::documentNumber))
-        .containsExactly("duplicate3", "duplicate4", "duplicate1", "duplicate05", "duplicate2");
-  }
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, user);
 
-  @Test
-  void testTransformToDomain_withAllowedUserDocOffice_shouldTransformUserName() {
-    // Arrange
-    UUID docOfficeId = UUID.randomUUID();
-    DocumentationOfficeDTO documentationOfficeDTO =
-        DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation("BGH").build();
-    ManagementDataDTO managementDataDTO =
-        ManagementDataDTO.builder()
-            .lastUpdatedByUserName("Winnie Puh")
-            .lastUpdatedByDocumentationOffice(documentationOfficeDTO)
-            .build();
-    DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
-    ManagementData expected =
-        generateManagementData(
-            Optional.of(
-                CreationParameters.builder()
-                    .lastUpdatedByName("Winnie Puh")
-                    .lastUpdatedByDocumentationOffice("BGH")
-                    .build()));
-    User user =
-        User.builder()
-            .documentationOffice(
-                DocumentationOffice.builder().uuid(docOfficeId).abbreviation("BGH").build())
-            .build();
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
 
-    // Act
-    ManagementData managementData = ManagementDataTransformer.transformToDomain(decisionDTO, user);
+    @Test
+    void testTransformToDomain_withoutUser_shouldTransformLastUpdatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedByUserName("Winnie Puuh")
+              .lastUpdatedByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByDocumentationOffice("BGH")
+                      .lastUpdatedByName(null)
+                      .build()));
 
-    // Assert
-    assertThat(managementData).isEqualTo(expected);
-  }
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, null);
 
-  @Test
-  void
-      testTransformToDomain_withOtherUserDocOfficeAndSystemName_shouldTransformLastUpdatedByNameToSystemName() {
-    // Arrange
-    ManagementDataDTO managementDataDTO =
-        ManagementDataDTO.builder()
-            .lastUpdatedByUserName("Winnie Puh")
-            .lastUpdatedBySystemName("NeuRIS")
-            .lastUpdatedByDocumentationOffice(
-                DocumentationOfficeDTO.builder().id(UUID.randomUUID()).abbreviation("BGH").build())
-            .build();
-    DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
-    ManagementData expected =
-        generateManagementData(
-            Optional.of(
-                CreationParameters.builder()
-                    .lastUpdatedByName("NeuRIS")
-                    .lastUpdatedByDocumentationOffice("BGH")
-                    .build()));
-    User user =
-        User.builder()
-            .documentationOffice(
-                DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
-            .build();
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
 
-    // Act
-    ManagementData managementData = ManagementDataTransformer.transformToDomain(decisionDTO, user);
+    @Test
+    void testTransformToDomain_withoutUserDocOffice_shouldTransformLastUpdatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedByUserName("Winnie Puuh")
+              .lastUpdatedByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByDocumentationOffice("BGH")
+                      .lastUpdatedByName(null)
+                      .build()));
 
-    // Assert
-    assertThat(managementData).isEqualTo(expected);
-  }
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, User.builder().build());
 
-  @Test
-  void testTransformToDomain_withOtherUserDocOffice_shouldTransformLastUpdatedByNameToNull() {
-    // Arrange
-    ManagementDataDTO managementDataDTO =
-        ManagementDataDTO.builder()
-            .lastUpdatedByUserName("Winnie Puh")
-            .lastUpdatedByDocumentationOffice(
-                DocumentationOfficeDTO.builder().id(UUID.randomUUID()).abbreviation("BGH").build())
-            .build();
-    DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
-    ManagementData expected =
-        generateManagementData(
-            Optional.of(
-                CreationParameters.builder()
-                    .lastUpdatedByDocumentationOffice("BGH")
-                    .lastUpdatedByName(null)
-                    .build()));
-    User user =
-        User.builder()
-            .documentationOffice(
-                DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
-            .build();
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
 
-    // Act
-    ManagementData managementData = ManagementDataTransformer.transformToDomain(decisionDTO, user);
+    @Test
+    void
+        testTransformToDomain_withOtherUserDocOfficeAndSystemName_shouldTransformCreatedByNameToSystemName() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .createdByUserName("Winnie Puuh")
+              .createdBySystemName("NeuRIS")
+              .createdByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .createdByName("NeuRIS")
+                      .createdByDocumentationOffice("BGH")
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
 
-    // Assert
-    assertThat(managementData).isEqualTo(expected);
-  }
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, user);
 
-  @Test
-  void
-      testTransformToDomain_withOtherUserDocOfficeAndSystemName_shouldTransformCreatedByNameToSystemName() {
-    // Arrange
-    ManagementDataDTO managementDataDTO =
-        ManagementDataDTO.builder()
-            .createdByUserName("Winnie Puh")
-            .createdBySystemName("NeuRIS")
-            .createdByDocumentationOffice(
-                DocumentationOfficeDTO.builder().id(UUID.randomUUID()).abbreviation("BGH").build())
-            .build();
-    DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
-    ManagementData expected =
-        generateManagementData(
-            Optional.of(
-                CreationParameters.builder()
-                    .createdByName("NeuRIS")
-                    .createdByDocumentationOffice("BGH")
-                    .build()));
-    User user =
-        User.builder()
-            .documentationOffice(
-                DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
-            .build();
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
 
-    // Act
-    ManagementData managementData = ManagementDataTransformer.transformToDomain(decisionDTO, user);
+    @Test
+    void testTransformToDomain_withoutUser_shouldTransformCreatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .createdByUserName("Winnie Puuh")
+              .createdByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .createdByDocumentationOffice("BGH")
+                      .createdByName(null)
+                      .build()));
 
-    // Assert
-    assertThat(managementData).isEqualTo(expected);
-  }
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, null);
 
-  @Test
-  void testTransformToDomain_withOtherUserDocOffice_shouldTransformCreatedByNameToNull() {
-    // Arrange
-    ManagementDataDTO managementDataDTO =
-        ManagementDataDTO.builder()
-            .createdByUserName("Winnie Puh")
-            .createdByDocumentationOffice(
-                DocumentationOfficeDTO.builder().id(UUID.randomUUID()).abbreviation("BGH").build())
-            .build();
-    DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
-    ManagementData expected =
-        generateManagementData(
-            Optional.of(
-                CreationParameters.builder()
-                    .createdByDocumentationOffice("BGH")
-                    .createdByName(null)
-                    .build()));
-    User user =
-        User.builder()
-            .documentationOffice(
-                DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
-            .build();
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
 
-    // Act
-    ManagementData managementData = ManagementDataTransformer.transformToDomain(decisionDTO, user);
+    @Test
+    void testTransformToDomain_withoutUserDocOffice_shouldTransformCreatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .createdByUserName("Winnie Puuh")
+              .createdByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .createdByDocumentationOffice("BGH")
+                      .createdByName(null)
+                      .build()));
 
-    // Assert
-    assertThat(managementData).isEqualTo(expected);
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, User.builder().build());
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void testTransformToDomain_withoutDocOffice_shouldTransformCreatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder().createdByUserName("Winnie Puuh").build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .createdByDocumentationOffice(null)
+                      .createdByName(null)
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, user);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void testTransformToDomain_withOtherUserDocOffice_shouldTransformCreatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .createdByUserName("Winnie Puuh")
+              .createdByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .createdByDocumentationOffice("BGH")
+                      .createdByName(null)
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(decisionDTO, user);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
   }
 
   private DecisionDTO.DecisionDTOBuilder<?, ?> generateSimpleDTOBuilder() {
