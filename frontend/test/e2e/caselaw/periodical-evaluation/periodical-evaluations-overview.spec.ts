@@ -219,7 +219,7 @@ test.describe(
             await expect(page.locator(".table > tr >> nth=0")).toBeVisible()
             const line = page.getByText(name + "WdG0" + formattedDate)
 
-            await line.locator("[aria-label='Ausgabe löschen']").click()
+            await line.getByLabel("Ausgabe löschen", { exact: true }).click()
             await expect(
               page.getByText(name + "WdG0" + formattedDate),
             ).toBeHidden()
@@ -241,7 +241,7 @@ test.describe(
             .click()
           if (await page.locator(".table > tr >> nth=0").isVisible()) {
             const line = page.getByText(name + "WdG0" + formattedDate)
-            await line.locator("[aria-label='Ausgabe löschen']").click()
+            await line.getByLabel("Ausgabe löschen", { exact: true }).click()
           }
         }
       },
@@ -269,11 +269,13 @@ test.describe(
       await line.waitFor({ state: "visible" })
       await expect(line).toBeVisible()
       // delete button should not be clickable
-      await expect(line.locator("[aria-label='Ausgabe löschen']")).toBeHidden()
+      await expect(
+        line.getByLabel("Ausgabe löschen", { exact: true }),
+      ).toBeHidden()
 
       await expect(
         line
-          .locator("[aria-label='Ausgabe kann nicht gelöscht werden']")
+          .getByLabel("Ausgabe kann nicht gelöscht werden", { exact: true })
           .first(),
       ).toBeVisible()
     })

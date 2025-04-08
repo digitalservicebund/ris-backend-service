@@ -1,9 +1,9 @@
 import fs from "fs"
 import { expect } from "@playwright/test"
 import {
+  createDataTransfer,
   navigateToAttachments,
   uploadTestfile,
-  createDataTransfer,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -113,8 +113,9 @@ test.describe("upload an original document to a doc unit", () => {
   test("upload non-docx file per file chooser", async ({ page }) => {
     await uploadTestfile(page, "sample.png")
     await expect(
-      page.locator(
-        "text=sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
+      page.getByText(
+        "sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
+        { exact: true },
       ),
     ).toBeVisible()
   })
@@ -164,8 +165,9 @@ test.describe("upload an original document to a doc unit", () => {
 
     await page.dispatchEvent("#upload-drop-area", "drop", { dataTransfer })
     await expect(
-      page.locator(
-        "text=sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
+      page.getByText(
+        "sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
+        { exact: true },
       ),
     ).toBeVisible()
   })

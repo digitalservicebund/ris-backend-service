@@ -305,7 +305,7 @@ test.describe(
           await fillInput(page, "Zitatstelle Literaturfundstelle", citation)
 
           await page
-            .locator("[aria-label='Literaturfundstelle speichern']")
+            .getByLabel("Literaturfundstelle speichern", { exact: true })
             .click()
           // check that both fields display error message
           await expect(
@@ -479,7 +479,7 @@ test.describe(
           ).toHaveValue("Anmerkung")
 
           await page
-            .locator("[aria-label='Literaturfundstelle speichern']")
+            .getByLabel("Literaturfundstelle speichern", { exact: true })
             .click()
           await expect(
             page.getByText("AllMBl " + citation1 + ", Bilen, Ulviye (Ean)"),
@@ -489,9 +489,7 @@ test.describe(
         await test.step("Verify rendering in preview", async () => {
           await page.keyboard.press("v")
 
-          const preview = page.locator(
-            '[data-testid="literature-references-preview"]',
-          )
+          const preview = page.getByTestId("literature-references-preview")
 
           await expect(preview.getByText("Literaturfundstellen")).toBeVisible()
           await expect(
@@ -525,7 +523,7 @@ test.describe(
           ).toHaveValue("Entscheidungsbesprechung")
 
           await page
-            .locator("[aria-label='Literaturfundstelle speichern']")
+            .getByLabel("Literaturfundstelle speichern", { exact: true })
             .click()
         })
 
@@ -539,8 +537,8 @@ test.describe(
         })
 
         await test.step("Verify second literature citation it is added at the bottom of preview", async () => {
-          const literatureReferencesPreview = page.locator(
-            '[data-testid="literature-references-preview"]',
+          const literatureReferencesPreview = page.getByTestId(
+            "literature-references-preview",
           )
           const texts = await literatureReferencesPreview.textContent()
 
@@ -584,7 +582,7 @@ test.describe(
           ).toHaveCount(7)
 
           await expect(
-            page.locator('[data-testid="caselaw-reference-input"]'),
+            page.getByTestId("caselaw-reference-input"),
           ).toBeInViewport()
         })
       },
@@ -617,7 +615,7 @@ test.describe(
           ).toHaveCount(7)
 
           await expect(
-            page.locator('[data-testid="literature-reference-input"]'),
+            page.getByTestId("literature-reference-input"),
           ).toBeInViewport()
         })
       },

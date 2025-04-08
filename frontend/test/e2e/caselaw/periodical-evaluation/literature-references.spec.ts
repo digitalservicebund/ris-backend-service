@@ -51,7 +51,7 @@ test.describe("Literature references", () => {
 
       await test.step("Literature document types can be chosen from lookup table values", async () => {
         await page
-          .locator("[aria-label='Dokumenttyp Literaturfundstelle']")
+          .getByLabel("Dokumenttyp Literaturfundstelle", { exact: true })
           .focus()
         // we expect a list of at least 15 values
         await expect(
@@ -239,8 +239,8 @@ test.describe("Literature references", () => {
           prefilledDocumentUnitWithReferences.documentNumber || "",
         )
 
-        const referencesPreview = page.locator(
-          '[data-testid="secondary-references-preview"]',
+        const referencesPreview = page.getByTestId(
+          "secondary-references-preview",
         )
 
         // Make sure the caselaw citations are in the correct order
@@ -250,8 +250,8 @@ test.describe("Literature references", () => {
             "MMG 2024, 300, Heft 1 (ST)",
         )
 
-        const literatureReferencesPreview = page.locator(
-          '[data-testid="literature-references-preview"]',
+        const literatureReferencesPreview = page.getByTestId(
+          "literature-references-preview",
         )
 
         // Make sure the literature citations are in the correct order

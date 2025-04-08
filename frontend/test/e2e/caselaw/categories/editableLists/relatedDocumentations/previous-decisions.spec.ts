@@ -1,9 +1,9 @@
 import { expect } from "@playwright/test"
 import {
+  fillPreviousDecisionInputs,
+  handoverDocumentationUnit,
   navigateToCategories,
   save,
-  handoverDocumentationUnit,
-  fillPreviousDecisionInputs,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -40,7 +40,7 @@ test.describe("previous decisions", () => {
     await navigateToCategories(page, documentNumber)
 
     await page
-      .locator("[aria-label='Datum Unbekannt Vorgehende Entscheidung']")
+      .getByLabel("Datum Unbekannt Vorgehende Entscheidung", { exact: true })
       .click()
 
     await expect(
@@ -50,11 +50,11 @@ test.describe("previous decisions", () => {
     ).toBeHidden()
 
     await page
-      .locator("[aria-label='Datum Unbekannt Vorgehende Entscheidung']")
+      .getByLabel("Datum Unbekannt Vorgehende Entscheidung", { exact: true })
       .click()
 
     await page
-      .locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']")
+      .getByLabel("Entscheidungsdatum Vorgehende Entscheidung", { exact: true })
       .isVisible()
   })
 
@@ -68,26 +68,27 @@ test.describe("previous decisions", () => {
     await navigateToCategories(page, documentNumber)
 
     await page
-      .locator("[aria-label='Aktenzeichen Vorgehende Entscheidung']")
+      .getByLabel("Aktenzeichen Vorgehende Entscheidung", { exact: true })
       .fill(fileNumber)
 
     await page
-      .locator(
-        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
+      .getByLabel(
+        "Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen",
+        { exact: true },
       )
       .click()
 
     const container = page
-      .locator("[aria-label='Vorgehende Entscheidung']")
+      .getByLabel("Vorgehende Entscheidung", { exact: true })
       .first()
     await expect(
       container.getByText("Abweichendes Aktenzeichen Vorinstanz").first(),
     ).toBeVisible()
 
     await page
-      .locator(
-        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
-      )
+      .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung", {
+        exact: true,
+      })
       .fill(deviatingFileNumber1)
 
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
@@ -99,15 +100,15 @@ test.describe("previous decisions", () => {
       .click()
     // If deviating data is available, it is automatically expanded
     await expect(
-      page.locator(
-        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
-      ),
+      page.getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung", {
+        exact: true,
+      }),
     ).toHaveValue(deviatingFileNumber1)
 
     await page
-      .locator(
-        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
-      )
+      .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung", {
+        exact: true,
+      })
       .fill(deviatingFileNumber2)
 
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
@@ -119,9 +120,9 @@ test.describe("previous decisions", () => {
       .click()
     // If deviating data is available, it is automatically expanded
     await expect(
-      page.locator(
-        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
-      ),
+      page.getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung", {
+        exact: true,
+      }),
     ).toHaveValue(deviatingFileNumber2)
   })
 

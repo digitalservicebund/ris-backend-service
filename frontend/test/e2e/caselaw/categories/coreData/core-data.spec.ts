@@ -72,7 +72,7 @@ test.describe("core data", () => {
     await expect(page.getByText("Abweichendes Aktenzeichen>")).toBeHidden()
 
     await page
-      .locator("[aria-label='Abweichendes Aktenzeichen anzeigen']")
+      .getByLabel("Abweichendes Aktenzeichen anzeigen", { exact: true })
       .click()
 
     await expect(
@@ -90,7 +90,7 @@ test.describe("core data", () => {
     // If deviating data is available, it is automatically expanded
     await expect(page.getByText("three").first()).toBeVisible()
     await page
-      .locator("[aria-label='Abweichendes Aktenzeichen schließen']")
+      .getByLabel("Abweichendes Aktenzeichen schließen", { exact: true })
       .click()
     await expect(
       page.getByText("Abweichendes Aktenzeichen").first(),
@@ -404,7 +404,9 @@ test.describe("core data", () => {
       })
 
       await test.step("Gericht und Fehlerhaftes Gericht sind nicht sichtbar", async () => {
-        const court = pageWithExternalUser.locator("[aria-label='Gericht']")
+        const court = pageWithExternalUser.getByLabel("Gericht", {
+          exact: true,
+        })
         const deviatingCourt = pageWithExternalUser.getByTestId(
           "chips-input-wrapper_deviatingCourt",
         )
@@ -424,8 +426,9 @@ test.describe("core data", () => {
       })
 
       await test.step("Entscheidungsdatum und abweichendes Entscheidungsdatum sind nicht sichtbar", async () => {
-        const decisionDate = pageWithExternalUser.locator(
-          "[aria-label='Entscheidungsdatum']",
+        const decisionDate = pageWithExternalUser.getByLabel(
+          "'Entscheidungsdatum",
+          { exact: true },
         )
         const deviatingDecisionDate = pageWithExternalUser.getByTestId(
           "chips-input-wrapper_deviatingDecisionDates",
@@ -435,21 +438,21 @@ test.describe("core data", () => {
       })
 
       await test.step("Spruchkörper ist nicht sichtbar", async () => {
-        const appraisalBody = pageWithExternalUser.locator(
-          "[aria-label='Spruchkörper']",
-        )
+        const appraisalBody = pageWithExternalUser.getByLabel("Spruchkörper", {
+          exact: true,
+        })
         await expect(appraisalBody).toBeHidden()
       })
 
       await test.step("Dokumenttyp ist nicht sichtbar", async () => {
-        const documentType = pageWithExternalUser.locator(
-          "[aria-label='Dokumenttyp']",
-        )
+        const documentType = pageWithExternalUser.getByLabel("Dokumenttyp", {
+          exact: true,
+        })
         await expect(documentType).toBeHidden()
       })
 
       await test.step("ECLI und abweichender ECLI sind nicht sichtbar", async () => {
-        const ecli = pageWithExternalUser.locator("[aria-label='ECLI']")
+        const ecli = pageWithExternalUser.getByLabel("ECLI", { exact: true })
         const deviatingEcli = pageWithExternalUser.getByTestId(
           "chips-input-wrapper_deviatingEclis",
         )
@@ -458,19 +461,23 @@ test.describe("core data", () => {
       })
 
       await test.step("Vorgang ist nicht sichtbar", async () => {
-        const procedure = pageWithExternalUser.locator("[aria-label='Vorgang']")
+        const procedure = pageWithExternalUser.getByLabel("Vorgang", {
+          exact: true,
+        })
         await expect(procedure).toBeHidden()
       })
 
       await test.step("Rechtskraft ist nicht sichtbar", async () => {
-        const legalEffect = pageWithExternalUser.locator(
-          "[aria-label='Rechtskraft']",
-        )
+        const legalEffect = pageWithExternalUser.getByLabel("Rechtskraft", {
+          exact: true,
+        })
         await expect(legalEffect).toBeHidden()
       })
 
       await test.step("Region ist nicht sichtbar", async () => {
-        const region = pageWithExternalUser.locator("[aria-label='Region']")
+        const region = pageWithExternalUser.getByLabel("Region", {
+          exact: true,
+        })
         await expect(region).toBeHidden()
       })
 

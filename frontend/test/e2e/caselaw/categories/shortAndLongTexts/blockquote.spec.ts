@@ -2,8 +2,8 @@ import { expect } from "@playwright/test"
 import {
   clickCategoryButton,
   navigateToCategories,
-  save,
   navigateToHandover,
+  save,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -22,7 +22,7 @@ test.describe(
       prefilledDocumentUnit,
     }) => {
       const blockquote = `<blockquote><p>Abschnitt</p></blockquote>`
-      const inputField = page.locator("[data-testid='Gründe']")
+      const inputField = page.getByTestId("Gründe")
 
       await test.step("open document categories", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -75,7 +75,7 @@ test.describe(
     }) => {
       const blockquote = `<blockquote><p>Abschnitt</p></blockquote>`
       const noBlockquote = `<p>Abschnitt</p>`
-      const inputField = page.locator("[data-testid='Gründe']")
+      const inputField = page.getByTestId("Gründe")
 
       await test.step("open document categories", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -137,7 +137,7 @@ test.describe(
       prefilledDocumentUnit,
     }) => {
       const blockquote = `<blockquote><p>Abschnitt</p></blockquote>`
-      const inputField = page.locator("[data-testid='Gründe']")
+      const inputField = page.getByTestId("Gründe")
 
       await test.step("open document categories", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -194,7 +194,7 @@ test.describe(
     }) => {
       const blockquote = `<blockquote><p>Abschnitt</p></blockquote>`
       const noBlockquote = `<p>Abschnitt</p>`
-      const inputField = page.locator("[data-testid='Gründe']")
+      const inputField = page.getByTestId("Gründe")
 
       await test.step("open document categories", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)

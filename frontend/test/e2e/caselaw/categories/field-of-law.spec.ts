@@ -297,7 +297,7 @@ test.describe("field of law", () => {
     await page.getByLabel("Sachgebietsuche auswählen").click()
 
     await page
-      .locator("[aria-label='Sachgebietsbezeichnung']")
+      .getByLabel("Sachgebietsbezeichnung", { exact: true })
       .fill("Grundstück")
 
     await page
@@ -343,7 +343,7 @@ test.describe("field of law", () => {
     await page.getByLabel("Sachgebietsuche auswählen").click()
 
     await page
-      .locator("[aria-label='Sachgebietsbezeichnung']")
+      .getByLabel("Sachgebietsbezeichnung", { exact: true })
       .fill("Grundstück")
     await page.keyboard.press("Enter")
 
@@ -363,7 +363,7 @@ test.describe("field of law", () => {
     await page.getByLabel("Sachgebietsuche auswählen").click()
 
     await page
-      .locator("[aria-label='Sachgebietsbezeichnung']")
+      .getByLabel("Sachgebietsbezeichnung", { exact: true })
       .fill("Grundstück")
     await page.keyboard.press("Enter")
 
@@ -439,7 +439,7 @@ test.describe("field of law", () => {
     await page.getByRole("button", { name: "Sachgebiete" }).click()
 
     await page
-      .locator("[aria-label='Direkteingabe-Sachgebietssuche eingeben']")
+      .getByLabel("Direkteingabe-Sachgebietssuche eingeben", { exact: true })
       .fill("AR")
 
     // if this is visible, it means that the dropdown opened with the search results
