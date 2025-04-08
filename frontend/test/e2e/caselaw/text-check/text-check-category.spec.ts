@@ -9,6 +9,26 @@ test.skip(
   ({ browserName }) => browserName !== "chromium",
   "Skipping firefox flaky test",
 )
+const textCheckUnderlinesColors = {
+  uncategorized: "#e86a69",
+  style: "#9d8eff",
+  grammar: "#eeb55c",
+  typographical: "#eeb55c",
+  ignored: "#01854a",
+  misspelling: "#e86a69",
+} as const
+
+type TextCheckType = keyof typeof textCheckUnderlinesColors
+
+function getTextCheckColorRGB(type: string | null): {
+  red: number
+  green: number
+  blue: number
+} {
+  const typeKey = (type ?? "uncategorized") as TextCheckType
+  const hex = textCheckUnderlinesColors[typeKey]
+  return convertHexToRGB(hex)
+}
 
 const textWithErrors = {
   text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist grün markiert",
@@ -29,20 +49,14 @@ const textWithErrors = {
 test.describe(
   "check text category",
   {
-    annotation: {
-      description: "https://digitalservicebund.atlassian.net/browse/RISDEV-254",
-      type: "epic",
-    },
+    tag: ["@RISDEV-254"],
   },
   () => {
-    test(
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "clicking on text check button, save document and returns matches",
       {
-        annotation: {
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-6154",
-          type: "story",
-        },
+        tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],
       },
       async ({ page, prefilledDocumentUnit }) => {
         await test.step("navigate to other headnote (Orientierungssatz) in categories", async () => {
@@ -99,18 +113,7 @@ test.describe(
               (await textCheckTags.nth(i).getAttribute("type")) ??
               "uncategorized"
 
-            const uncategorized = "#e86a69"
-            const expectedBorder =
-              // eslint-disable-next-line playwright/no-conditional-in-test
-              {
-                uncategorized: uncategorized,
-                style: "#9d8eff",
-                grammar: "#eeb55c",
-                typographical: "#eeb55c",
-                ignored: "#01854a",
-              }[type] || uncategorized
-
-            const rgbColors = convertHexToRGB(expectedBorder)
+            const rgbColors = getTextCheckColorRGB(type)
 
             await expect(textCheckTags.nth(i)).toHaveCSS(
               "border-bottom",
@@ -182,8 +185,61 @@ test.describe(
             await expect(page.getByTestId("text-check-modal")).toBeVisible()
             await expect(
               page.getByTestId("ignored-word-handler"),
-            ).toContainText("von juris ignoriert")
+            ).toContainText("Von jDV ignoriert")
           }
+        })
+
+        await test.step("ignoring a word highlights it in green after text re-check", async () => {
+          await page.locator(`text-check[id='${1}']`).click()
+          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
+          await page.getByTestId("ignored-word-add-button").click()
+          await page
+            .getByLabel("Orientierungssatz Button")
+            .getByRole("button", { name: "Rechtschreibprüfung" })
+            .click()
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
+
+          const rgbColors = convertHexToRGB(textCheckUnderlinesColors.ignored)
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toBeHidden()
+
+          await expect(page.locator(`text-check[id='${1}']`)).toHaveCSS(
+            "border-bottom",
+            "2px solid " +
+              `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
+          )
+        })
+
+        await test.step("removing ignored word highlights it in red after text re-check", async () => {
+          await page.locator(`text-check[id='${1}']`).click()
+          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
+          await page.getByTestId("ignored-word-remove-button").click()
+          await page
+            .getByLabel("Orientierungssatz Button")
+            .getByRole("button", { name: "Rechtschreibprüfung" })
+            .click()
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toHaveText("Rechtschreibprüfung läuft")
+
+          const rgbColors = convertHexToRGB(
+            textCheckUnderlinesColors.uncategorized,
+          )
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toBeHidden()
+
+          await expect(page.locator(`text-check[id='${1}']`)).toHaveCSS(
+            "border-bottom",
+            "2px solid " +
+              `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
+          )
         })
       },
     )

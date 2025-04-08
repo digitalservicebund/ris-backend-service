@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import Button from "primevue/button"
 import { computed, ref } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import { ValidationError } from "@/components/input/types"
 import IconAdd from "~icons/ic/baseline-add"
 import IconCheck from "~icons/ic/baseline-check"
@@ -31,16 +31,15 @@ function handleClick() {
 <template>
   <div class="flex flex-col gap-16">
     <div class="flex flex-row items-center gap-16">
-      <TextButton
+      <Button
         :aria-label="label + ' übernehmen'"
-        button-type="primary"
         :disabled="!hasContent || !importable"
-        :icon="IconAdd"
-        size="medium"
+        size="small"
         @click="handleClick"
-      />
+        ><template #icon> <IconAdd /> </template
+      ></Button>
       <span
-        class="ds-label-01-reg"
+        class="ris-label1-regular"
         :class="hasContent && importable ? 'text-blue-800' : 'text-gray-900'"
         >{{ label }}</span
       >

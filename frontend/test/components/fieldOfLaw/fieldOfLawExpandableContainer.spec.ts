@@ -89,7 +89,7 @@ describe("FieldsOfLawExpandableContainer", () => {
     const { emitted, user } = renderComponent([generateFieldOfLaw()])
 
     await user.click(screen.getByRole("button", { name: "Weitere Angabe" }))
-    await user.click(screen.getByLabelText("Suche"))
+    await user.click(screen.getByLabelText("Sachgebietsuche auswählen"))
 
     expect(emitted()["inputMethodSelected"]).toBeTruthy()
   })

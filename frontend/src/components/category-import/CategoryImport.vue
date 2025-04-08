@@ -1,12 +1,11 @@
 <script setup lang="ts">
+import Button from "primevue/button"
+import InputText from "primevue/inputtext"
 import { onMounted, ref, watch } from "vue"
 import { useRouter } from "vue-router"
-
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit, {
   longTextLabels,
@@ -413,40 +412,39 @@ onMounted(() => {
     class="scrollable-container relative overflow-auto"
     data-testid="category-import"
   >
-    <span class="ds-label-01-bold">Rubriken importieren</span>
+    <span class="ris-label1-bold">Rubriken importieren</span>
     <div class="mt-16 flex flex-row items-end gap-8">
       <InputField
         id="categoryImporterDocumentNumber"
         v-slot="slotProps"
         label="Dokumentnummer"
       >
-        <TextInput
+        <InputText
           id="categoryImporterDocumentNumber"
           v-model="documentNumber"
           aria-label="Dokumentnummer Eingabefeld"
-          :has-error="slotProps.hasError"
-          size="medium"
+          fluid
+          :ivalid="slotProps.hasError"
+          size="small"
           @enter-released="searchForDocumentUnit"
         />
       </InputField>
 
-      <TextButton
+      <Button
         aria-label="Dokumentationseinheit laden"
-        button-type="primary"
         :disabled="documentNumber?.length != 13"
-        :icon="IconSearch"
-        size="medium"
         @click="searchForDocumentUnit"
-      />
+        ><template #icon> <IconSearch /> </template
+      ></Button>
     </div>
 
-    <span v-if="errorMessage" class="ds-label-02-reg text-red-800">{{
+    <span v-if="errorMessage" class="ris-label2-regular text-red-800">{{
       errorMessage
     }}</span>
 
     <div
       v-if="documentUnitToImport"
-      class="ds-label-01-reg mt-24 flex flex-col gap-16 bg-blue-100 p-16"
+      class="ris-label1-regular mt-24 flex flex-col gap-16 bg-blue-100 p-16"
     >
       <DecisionSummary
         :document-number="documentUnitToImport.documentNumber"

@@ -301,9 +301,10 @@ test.describe("norm", () => {
     }) => {
       await navigateToCategories(page, documentNumber)
 
-      await page.locator("[aria-label='Gericht']").fill("aalen")
-      await page.locator("text=AG Aalen").click()
-      await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
+      await page.getByLabel("Gericht", { exact: true }).fill("aalen")
+      await page.getByText("AG Aalen", { exact: true }).click()
+      page.getByLabel("Gericht", { exact: true })
+      await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
         "AG Aalen",
       )
 
@@ -316,8 +317,8 @@ test.describe("norm", () => {
 
       await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeHidden()
 
-      await page.locator("[aria-label='Gericht']").fill("VerfG")
-      await page.locator("text=VerfG Dessau").last().click()
+      await page.getByLabel("Gericht", { exact: true }).fill("VerfG")
+      await page.getByText("VerfG Dessau", { exact: true }).last().click()
       await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeVisible()
     })
 
@@ -456,8 +457,8 @@ test.describe("norm", () => {
     await navigateToCategories(page, documentNumber)
     const normContainer = page.getByLabel("Norm")
 
-    await page.locator("[aria-label='Gericht']").fill("VerfG")
-    await page.locator("text=VerfG Dessau").last().click()
+    await page.getByLabel("Gericht", { exact: true }).fill("VerfG")
+    await page.getByText("VerfG Dessau", { exact: true }).last().click()
 
     await fillNormInputs(page, {
       normAbbreviation: "PBefG",
@@ -483,19 +484,21 @@ test.describe("norm", () => {
     saveNormButton = normContainer.getByLabel("Norm speichern")
     await saveNormButton.click()
 
-    await expect(page.locator("text=PBefG, § 123")).toBeVisible()
-    await expect(page.locator("text=BGB, § 1")).toBeVisible()
-    await expect(page.locator("text=KBErrG, § 8")).toBeVisible()
+    await expect(page.getByText("PBefG, § 123", { exact: true })).toBeVisible()
+    await expect(page.getByText("BGB, § 1", { exact: true })).toBeVisible()
+    await expect(page.getByText("KBErrG, § 8", { exact: true })).toBeVisible()
 
     await normContainer.getByTestId("list-entry-0").click()
 
-    await expect(page.locator("text=Mit Gesetzeskraft")).toBeVisible()
+    await expect(
+      page.getByText("Mit Gesetzeskraft", { exact: true }),
+    ).toBeVisible()
 
     await normContainer.getByLabel("Eintrag löschen").click()
 
-    await expect(page.locator("text=PBefG, § 123")).toBeHidden()
-    await expect(page.locator("text=BGB, § 1")).toBeVisible()
-    await expect(page.locator("text=KBErrG, § 8")).toBeVisible()
+    await expect(page.getByText("PBefG, § 123", { exact: true })).toBeHidden()
+    await expect(page.getByText("BGB, § 1", { exact: true })).toBeVisible()
+    await expect(page.getByText("KBErrG, § 8", { exact: true })).toBeVisible()
 
     await normContainer.getByTestId("list-entry-0").click()
 
@@ -508,7 +511,7 @@ test.describe("norm", () => {
       normContainer.locator("[aria-label='RIS-Abkürzung']"),
     ).toHaveValue("BGB")
 
-    await expect(page.locator("text=PBefG, § 123")).toBeHidden()
-    await expect(page.locator("text=KBErrG, § 8")).toBeVisible()
+    await expect(page.getByText("PBefG, § 123", { exact: true })).toBeHidden()
+    await expect(page.getByText("KBErrG, § 8", { exact: true })).toBeVisible()
   })
 })

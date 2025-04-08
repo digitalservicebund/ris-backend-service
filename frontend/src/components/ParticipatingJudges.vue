@@ -13,7 +13,9 @@ const store = useDocumentUnitStore()
 </script>
 
 <template>
-  <div id="participatingJudges" class="ds-label-02-reg mb-16">{{ label }}</div>
+  <div id="participatingJudges" class="ris-label2-regular mb-16">
+    {{ label }}
+  </div>
   <div
     aria-label="Mitwirkende Richter"
     class="border-b-1 border-blue-300"

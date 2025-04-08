@@ -63,7 +63,7 @@ const shouldDisplayCollectiveAgreements = computed(
 
 <template>
   <div aria-label="Weitere Rubriken">
-    <h2 class="ds-label-01-bold mb-16">Weitere Rubriken</h2>
+    <h2 class="ris-label1-bold mb-16">Weitere Rubriken</h2>
     <div class="flex flex-col gap-24">
       <CategoryWrapper
         v-if="shouldDisplayCollectiveAgreements"

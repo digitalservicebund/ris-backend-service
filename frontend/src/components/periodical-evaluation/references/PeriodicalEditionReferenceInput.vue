@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
+import InputText from "primevue/inputtext"
+import RadioButton from "primevue/radiobutton"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
@@ -6,9 +9,6 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import RadioInput from "@/components/input/RadioInput.vue"
-import TextButton from "@/components/input/TextButton.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
@@ -236,7 +236,7 @@ async function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
  * Stops propagation of scrolling event, and toggles the showModal value.
  * @param {boolean} [shouldOpen] - Optional parameter to explicitly set the modal state.
  */
-function toggleDeletionConfirmationModal(shouldOpen: boolean | undefined) {
+function toggleDeletionConfirmationModal(shouldOpen?: boolean) {
   showModal.value = shouldOpen ?? !showModal.value
 
   if (showModal.value) {
@@ -344,7 +344,7 @@ onBeforeUnmount(() => {
     id="periodical-references"
     ref="parentRef"
     v-ctrl-enter="search"
-    class="flex flex-col border-b-1"
+    class="flex flex-col border-b-1 border-b-gray-400"
   >
     <PopupModal
       v-if="showModal"
@@ -359,7 +359,7 @@ onBeforeUnmount(() => {
       @primary-action="deleteReferenceAndDocUnit"
       @secondary-action="deleteReference"
     />
-    <h2 v-if="!isSaved" id="reference-input" class="ds-label-01-bold mb-16">
+    <h2 v-if="!isSaved" id="reference-input" class="ris-label1-bold mb-16">
       Fundstelle hinzufügen
     </h2>
     <div class="flex flex-col gap-24">
@@ -380,14 +380,13 @@ onBeforeUnmount(() => {
             id="caselaw"
             class="flex items-center"
             label="Rechtsprechung"
-            label-class="ds-body-01-reg"
+            label-class="ris-body1-regular"
             :label-position="LabelPosition.RIGHT"
           >
-            <RadioInput
+            <RadioButton
               v-model="reference.referenceType"
               aria-label="Rechtsprechung Fundstelle"
               name="referenceType"
-              size="medium"
               value="caselaw"
               @click="validationStore.reset()"
             />
@@ -399,10 +398,10 @@ onBeforeUnmount(() => {
             id="literature"
             class="flex items-center"
             label="Literatur"
-            label-class="ds-body-01-reg"
+            label-class="ris-body1-regular"
             :label-position="LabelPosition.RIGHT"
           >
-            <RadioInput
+            <RadioButton
               v-model="reference.referenceType"
               aria-label="Literatur Fundstelle"
               name="referenceType"
@@ -423,33 +422,34 @@ onBeforeUnmount(() => {
             :validation-error="validationStore.getByField('citation')"
           >
             <div class="flex flex-grow flex-row gap-16">
-              <TextInput
+              <InputText
                 v-if="prefix"
                 id="citation prefix"
                 v-model="prefix"
                 aria-label="Zitatstelle Präfix"
                 placeholder="Präfix"
-                read-only
-                size="medium"
-              ></TextInput>
-              <TextInput
+                readonly
+                size="small"
+              ></InputText>
+              <InputText
                 id="citation"
                 v-model="reference.citation"
                 aria-label="Zitatstelle *"
-                :has-error="slotProps.hasError"
+                fluid
+                :invalid="slotProps.hasError"
                 placeholder="Variable"
-                size="medium"
+                size="small"
                 @focus="validationStore.remove('citation')"
-              ></TextInput>
-              <TextInput
+              ></InputText>
+              <InputText
                 v-if="suffix"
                 id="citation suffix"
                 v-model="suffix"
                 aria-label="Zitatstelle Suffix"
                 placeholder="Suffix"
-                read-only
-                size="medium"
-              ></TextInput>
+                readonly
+                size="small"
+              ></InputText>
             </div>
           </InputField>
 
@@ -461,19 +461,20 @@ onBeforeUnmount(() => {
             :validation-error="validationStore.getByField('citation')"
           >
             <div class="flex flex-grow flex-row gap-16">
-              <TextInput
+              <InputText
                 id="citation"
                 v-model="reference.citation"
                 aria-label="Zitatstelle *"
-                :has-error="slotProps.hasError"
-                size="medium"
+                fluid
+                :invalid="slotProps.hasError"
+                size="small"
                 @blur="validateRequiredInput(reference)"
                 @focus="validationStore.remove('citation')"
-              ></TextInput>
+              ></InputText>
             </div>
           </InputField>
 
-          <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
+          <div v-if="legalPeriodical" class="ris-label3-regular pt-4">
             Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
           </div>
         </div>
@@ -485,15 +486,16 @@ onBeforeUnmount(() => {
           label="Klammernzusatz *"
           :validation-error="validationStore.getByField('referenceSupplement')"
         >
-          <TextInput
+          <InputText
             id="referenceSupplement"
             v-model="reference.referenceSupplement"
             aria-label="Klammernzusatz"
-            :has-error="slotProps.hasError"
-            size="medium"
+            fluid
+            :invalid="slotProps.hasError"
+            size="small"
             @blur="validateRequiredInput(reference)"
             @focus="validationStore.remove('referenceSupplement')"
-          ></TextInput>
+          ></InputText>
         </InputField>
         <InputField
           v-if="reference.referenceType === 'literature'"
@@ -521,14 +523,15 @@ onBeforeUnmount(() => {
           label="Autor *"
           :validation-error="validationStore.getByField('author')"
         >
-          <TextInput
+          <InputText
             id="literatureReferenceAuthor"
             v-model="reference.author"
             aria-label="Autor Literaturfundstelle"
-            :has-error="slotProps.hasError"
-            size="medium"
+            fluid
+            :invalid="slotProps.hasError"
+            size="small"
             @focus="validationStore.remove('author')"
-          ></TextInput>
+          ></InputText>
         </InputField>
       </div>
 
@@ -536,7 +539,7 @@ onBeforeUnmount(() => {
         v-if="!reference?.documentationUnit?.hasForeignSource"
         id="documentationUnit"
       >
-        <h2 class="ds-label-01-bold mb-16">Entscheidung hinzufügen</h2>
+        <h2 class="ris-label1-bold mb-16">Entscheidung hinzufügen</h2>
 
         <div class="flex flex-col gap-24">
           <div class="flex justify-between gap-24">
@@ -571,7 +574,6 @@ onBeforeUnmount(() => {
                 id="decisionDate"
                 v-model="relatedDocumentationUnit.decisionDate"
                 aria-label="Entscheidungsdatum"
-                class="ds-input-medium"
                 :has-error="slotProps.hasError"
                 @focus="validationStore.remove('decisionDate')"
                 @update:validation-error="slotProps.updateValidationError"
@@ -586,14 +588,15 @@ onBeforeUnmount(() => {
               label="Aktenzeichen"
               :validation-error="validationStore.getByField('fileNumber')"
             >
-              <TextInput
+              <InputText
                 id="fileNumber"
                 v-model="relatedDocumentationUnit.fileNumber"
                 aria-label="Aktenzeichen"
-                :has-error="slotProps.hasError"
-                size="medium"
+                fluid
+                :invalid="slotProps.hasError"
+                size="small"
                 @focus="validationStore.remove('fileNumber')"
-              ></TextInput>
+              ></InputText>
             </InputField>
             <InputField id="decisionDocumentType" label="Dokumenttyp">
               <ComboboxInput
@@ -610,68 +613,67 @@ onBeforeUnmount(() => {
       <div class="flex w-full flex-row justify-between">
         <div>
           <div class="flex gap-16">
-            <TextButton
+            <Button
               v-if="!isSaved && !reference?.documentationUnit?.hasForeignSource"
               aria-label="Nach Entscheidung suchen"
-              button-type="primary"
               label="Suchen"
               size="small"
               @click="search"
-            />
-            <TextButton
+            ></Button>
+            <Button
               v-if="isSaved || reference?.documentationUnit?.hasForeignSource"
               aria-label="Fundstelle vermerken"
-              button-type="tertiary"
               data-testid="previous-decision-save-button"
               :disabled="reference.isEmpty"
               label="Übernehmen"
+              severity="secondary"
               size="small"
               @click.stop="addReference(relatedDocumentationUnit)"
-            />
-            <TextButton
+            ></Button>
+            <Button
               v-if="isSaved || reference?.documentationUnit?.hasForeignSource"
               aria-label="Abbrechen"
-              button-type="ghost"
               label="Abbrechen"
               size="small"
+              text
               @click.stop="emit('cancelEdit')"
-            />
+            ></Button>
           </div>
         </div>
         <div v-if="isSaved">
-          <TextButton
+          <Button
             v-if="
               reference?.documentationUnit?.status?.publicationStatus ===
                 PublicationState.UNPUBLISHED &&
               reference?.getIsDocumentationUnitCreatedByReference()
             "
             aria-label="Eintrag löschen"
-            button-type="destructive"
             label="Eintrag löschen"
+            severity="danger"
             size="small"
-            @click.stop="toggleDeletionConfirmationModal"
-          />
+            @click.stop="toggleDeletionConfirmationModal(true)"
+          ></Button>
 
-          <TextButton
+          <Button
             v-else-if="
               reference.documentationUnit?.status?.publicationStatus ===
                 PublicationState.EXTERNAL_HANDOVER_PENDING &&
               reference?.getIsDocumentationUnitCreatedByReference()
             "
             aria-label="Fundstelle und Dokumentationseinheit löschen"
-            button-type="destructive"
             label="Fundstelle und Dokumentationseinheit löschen"
+            severity="danger"
             size="small"
             @click.stop="deleteReferenceAndDocUnit"
-          />
-          <TextButton
+          ></Button>
+          <Button
             v-else
             aria-label="Eintrag löschen"
-            button-type="destructive"
             label="Eintrag löschen"
+            severity="danger"
             size="small"
             @click.stop="modelValue && emit('removeEntry', modelValue)"
-          />
+          ></Button>
         </div>
       </div>
       <div v-if="isLoading || searchResults" class="bg-blue-200">

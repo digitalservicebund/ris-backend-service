@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { Mask } from "maska"
-import { vMaska } from "maska/vue"
+import InputMask from "primevue/inputmask"
 import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "@/components/input/types"
 
@@ -25,10 +24,9 @@ const emit = defineEmits<{
   "update:validationError": [value?: ValidationError]
 }>()
 
-const mask = "##.##.####"
-const inputCompleted = computed(
-  () => inputValue.value && new Mask({ mask }).completed(inputValue.value),
-)
+const inputCompleted = computed(() => {
+  return !!inputValue.value && /^\d{2}\.\d{2}\.\d{4}$/.test(inputValue.value)
+})
 
 const inputValue = ref(
   props.modelValue ? dayjs(props.modelValue).format("DD.MM.YYYY") : undefined,
@@ -45,31 +43,30 @@ const isInPast = computed(() => {
   return dayjs(inputValue.value, "DD.MM.YYYY", true).isBefore(dayjs())
 })
 
-const conditionalClasses = computed(() => ({
-  "has-error": props.hasError,
-  "ds-input-medium": props.size === "medium",
-  "ds-input-small": props.size === "small",
-}))
-
 function validateInput() {
-  if (inputCompleted.value) {
-    if (isValidDate.value) {
-      // if valid date, check for future dates
-      if (!isInPast.value && !props.isFutureDate && isValidDate.value)
-        emit("update:validationError", {
-          message: "Das Datum darf nicht in der Zukunft liegen",
-          instance: props.id,
-        })
-      else emit("update:validationError", undefined)
-    } else {
-      emit("update:validationError", {
-        message: "Kein valides Datum",
-        instance: props.id,
-      })
-    }
-  } else if (inputValue.value) {
+  if (!inputValue.value) {
+    emit("update:validationError", undefined)
+    return
+  }
+  if (!inputCompleted.value) {
     emit("update:validationError", {
       message: "Unvollständiges Datum",
+      instance: props.id,
+    })
+    return
+  }
+
+  if (!isValidDate.value) {
+    emit("update:validationError", {
+      message: "Kein valides Datum",
+      instance: props.id,
+    })
+    return
+  }
+
+  if (!isInPast.value && !props.isFutureDate) {
+    emit("update:validationError", {
+      message: "Das Datum darf nicht in der Zukunft liegen",
       instance: props.id,
     })
   } else {
@@ -115,17 +112,19 @@ watch(inputValue, (is) => {
 </script>
 
 <template>
-  <input
+  <InputMask
     :id="id"
     v-model="inputValue"
-    v-maska="mask"
     :aria-label="ariaLabel"
-    class="ds-input"
-    :class="conditionalClasses"
+    :auto-clear="false"
     :disabled="disabled"
+    fluid
+    :invalid="hasError"
+    mask="99.99.9999"
     placeholder="TT.MM.JJJJ"
     :readonly="readOnly"
     @blur="onBlur"
+    @complete="validateInput"
     @focus="emit('update:validationError', undefined)"
     @keydown.delete="backspaceDelete"
   />

@@ -9,7 +9,7 @@ test.describe("info panel", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Aktenzeichen']").fill("-firstChip")
+    await page.getByLabel("Aktenzeichen", { exact: true }).fill("-firstChip")
     await page.keyboard.press("Enter")
 
     await expect(
@@ -18,7 +18,7 @@ test.describe("info panel", () => {
         .getByText("-firstChip"),
     ).toBeVisible()
 
-    await page.locator("[aria-label='Aktenzeichen']").fill("-secondChip")
+    await page.getByLabel("Aktenzeichen", { exact: true }).fill("-secondChip")
     await page.keyboard.press("Enter")
     await expect(
       page
@@ -44,9 +44,11 @@ test.describe("info panel", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Gericht']").fill("aalen")
+    await page.getByLabel("Gericht", { exact: true }).fill("aalen")
     await page.getByText("AG Aalen").click()
-    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("AG Aalen")
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      "AG Aalen",
+    )
     await expect(
       page.getByTestId("document-unit-info-panel-items").getByText("AG Aalen"),
     ).toBeVisible()
@@ -58,10 +60,12 @@ test.describe("info panel", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
-    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "03.02.2022",
-    )
+    await page
+      .getByLabel("Entscheidungsdatum", { exact: true })
+      .fill("03.02.2022")
+    await expect(
+      page.getByLabel("Entscheidungsdatum", { exact: true }),
+    ).toHaveValue("03.02.2022")
 
     //when using the .fill() method, we need 4 tabs to leave the field
     await page.keyboard.press("Tab")

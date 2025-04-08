@@ -1,16 +1,17 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.TextCheckMockService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckUnknownCategoryException;
@@ -19,10 +20,8 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
-import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.jsoup.Jsoup;
@@ -33,22 +32,17 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 class TextCheckServiceTest {
 
-  private DocumentationUnitService documentationUnitService;
-  private DocumentationOfficeService documentationOfficeService;
-  private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+  private DocumentationUnitRepository documentationUnitRepository;
   private TextCheckService textCheckService;
 
   @BeforeEach
   void setUp() {
-    documentationUnitService = mock(DocumentationUnitService.class);
-    documentationOfficeService = mock(DocumentationOfficeService.class);
-    ignoredTextCheckWordRepository = mock(IgnoredTextCheckWordRepository.class);
+    documentationUnitRepository = mock(DocumentationUnitRepository.class);
+    IgnoredTextCheckWordRepository ignoredTextCheckWordRepository =
+        mock(IgnoredTextCheckWordRepository.class);
 
     textCheckService =
-        new TextCheckMockService(
-            documentationUnitService, documentationOfficeService, ignoredTextCheckWordRepository);
-
-    when(textCheckService.getDocumentationOfficeIds(any())).thenReturn(Collections.emptyList());
+        new TextCheckMockService(documentationUnitRepository, ignoredTextCheckWordRepository);
   }
 
   @Test
@@ -56,7 +50,7 @@ class TextCheckServiceTest {
       throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
 
-    when(documentationUnitService.getByUuid(uuid))
+    when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
             DocumentationUnit.builder()
                 .longTexts(
@@ -74,7 +68,9 @@ class TextCheckServiceTest {
                         .build())
                 .build());
 
+    TestMemoryAppender memoryAppender = new TestMemoryAppender(TextCheckService.class);
     List<Match> result = textCheckService.checkWholeDocumentationUnit(uuid);
+    assertThat(memoryAppender.count(Level.ERROR)).isZero();
 
     assertNotNull(result);
   }
@@ -85,11 +81,14 @@ class TextCheckServiceTest {
     UUID uuid = UUID.randomUUID();
     Documentable documentable = mock(Documentable.class);
 
-    when(documentationUnitService.getByUuid(uuid)).thenReturn(documentable);
+    when(documentationUnitRepository.findByUuid(uuid)).thenReturn(documentable);
 
-    assertThrows(
-        UnsupportedOperationException.class,
-        () -> textCheckService.checkWholeDocumentationUnit(uuid));
+    var exception =
+        assertThrows(
+            UnsupportedOperationException.class,
+            () -> textCheckService.checkWholeDocumentationUnit(uuid));
+
+    assertTrue(exception.getMessage().contains("Check not supported for Documentable type: "));
   }
 
   @ParameterizedTest
@@ -98,7 +97,7 @@ class TextCheckServiceTest {
       throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
 
-    when(documentationUnitService.getByUuid(uuid))
+    when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
             DocumentationUnit.builder()
                 .longTexts(
@@ -125,23 +124,40 @@ class TextCheckServiceTest {
                         .build())
                 .build());
 
-    if (categoryType.equals(CategoryType.UNKNOWN)) {
-      assertThrows(
-          TextCheckUnknownCategoryException.class,
-          () -> textCheckService.checkCategory(uuid, categoryType));
-    } else {
-      TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, categoryType);
-      assertNotNull(result);
-    }
-
-    TextCheckCategoryResponse resultWithNull =
-        textCheckService.checkCategory(UUID.randomUUID(), categoryType);
-    assertNull(resultWithNull);
+    TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, categoryType);
+    assertNotNull(result);
   }
 
   @Test
-  void testCheckCategory_nullCategory() {
+  void testCheckCategory_nullCategory() throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
+
+    when(documentationUnitRepository.findByUuid(uuid))
+        .thenReturn(
+            DocumentationUnit.builder()
+                .longTexts(
+                    LongTexts.builder()
+                        .reasons("<p>Reason text</p>")
+                        .tenor("<p>Tenor text</p>")
+                        .decisionReasons("<p>Decision reasons text</p>")
+                        .caseFacts("<p>Case facts text</p>")
+                        .otherLongText("<p>OtherLongText text</p>")
+                        .dissentingOpinion("<p>DissentingOpinion text</p>")
+                        .outline("<p>Outline text</p>")
+                        .build())
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        .build())
+                .shortTexts(
+                    ShortTexts.builder()
+                        .guidingPrinciple("<p>Guiding principle text</p>")
+                        .headnote("<p>Headnote text</p>")
+                        .decisionName("<p>Decision name text</p>")
+                        .headline("<p>Headline text</p>")
+                        .build())
+                .build());
     assertThrows(
         TextCheckUnknownCategoryException.class, () -> textCheckService.checkCategory(uuid, null));
   }
@@ -149,7 +165,7 @@ class TextCheckServiceTest {
   @Test
   void testCheckCategory_unknownCategory() throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
-    when(documentationUnitService.getByUuid(uuid))
+    when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(
@@ -159,17 +175,15 @@ class TextCheckServiceTest {
                         .build())
                 .build());
 
-    when(textCheckService.getDocumentationOfficeIds(any())).thenReturn(Collections.emptyList());
     assertThrows(
-        TextCheckUnknownCategoryException.class,
-        () -> textCheckService.checkCategory(uuid, CategoryType.UNKNOWN));
+        TextCheckUnknownCategoryException.class, () -> textCheckService.checkCategory(uuid, null));
   }
 
   @Test
   void testCheckCategory_nullHTML() throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
 
-    when(documentationUnitService.getByUuid(uuid))
+    when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(
@@ -181,7 +195,7 @@ class TextCheckServiceTest {
                 .build());
 
     TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, CategoryType.REASONS);
-    assertNull(result);
+    assertEquals(TextCheckCategoryResponse.builder().matches(List.of()).build(), result);
   }
 
   @Test
@@ -407,10 +421,6 @@ class TextCheckServiceTest {
 
     final String ignoredWord = "ignored match";
 
-    when(ignoredTextCheckWordRepository.findAllByDocumentationOfficesOrUnitAndWords(
-            any(), any(), any()))
-        .thenReturn(List.of(IgnoredTextCheckWord.builder().word(ignoredWord).build()));
-
     TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
@@ -426,10 +436,6 @@ class TextCheckServiceTest {
         .thenCallRealMethod();
 
     TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
-
-    verify(ignoredTextCheckWordRepository)
-        .findAllByDocumentationOfficesOrUnitAndWords(
-            any(), any(), argThat(words -> words.contains(ignoredWord)));
 
     assertNotNull(response);
     assertEquals(

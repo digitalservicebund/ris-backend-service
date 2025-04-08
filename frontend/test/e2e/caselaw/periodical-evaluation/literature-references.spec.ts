@@ -4,7 +4,6 @@ import {
   navigateToPeriodicalReferences,
   navigateToPreview,
   searchForDocUnitWithFileNumberAndDecisionDate,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -65,16 +64,16 @@ test.describe("Literature references", () => {
         await fillInput(page, "Autor Literaturfundstelle", "Einstein, Albert")
 
         await page.getByLabel("Rechtsprechung Fundstelle").click()
-        await expect(page.locator("[aria-label='Zitatstelle *']")).toHaveValue(
-          "2",
-        )
+        await expect(
+          page.getByLabel("Zitatstelle *", { exact: true }),
+        ).toHaveValue("2")
 
         await page.getByLabel("Literatur Fundstelle").click()
-        await expect(page.locator("[aria-label='Zitatstelle *']")).toHaveValue(
-          "2",
-        )
         await expect(
-          page.locator("[aria-label='Autor Literaturfundstelle']"),
+          page.getByLabel("Zitatstelle *", { exact: true }),
+        ).toHaveValue("2")
+        await expect(
+          page.getByLabel("Autor Literaturfundstelle", { exact: true }),
         ).toHaveValue("Einstein, Albert")
       })
     },
@@ -103,14 +102,14 @@ test.describe("Literature references", () => {
         await page.getByLabel("Treffer übernehmen").click()
         // check that both fields display error message
         await expect(
-          page.locator("text=Pflichtfeld nicht befüllt"),
+          page.getByText("Pflichtfeld nicht befüllt", { exact: true }),
         ).toHaveCount(2)
 
         // Switching between radio buttons resets the validation errors
         await page.getByLabel("Rechtsprechung Fundstelle").click()
         await page.getByLabel("Literatur Fundstelle").click()
         await expect(
-          page.locator("text=Pflichtfeld nicht befüllt"),
+          page.getByText("Pflichtfeld nicht befüllt", { exact: true }),
         ).toHaveCount(0)
         await page.getByLabel("Seitenpanel schließen").click()
         await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
@@ -120,11 +119,9 @@ test.describe("Literature references", () => {
         await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
         await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
         await page.getByText("Ean", { exact: true }).click()
-        await waitForInputValue(
-          page,
-          "[aria-label='Dokumenttyp Literaturfundstelle']",
-          "Anmerkung",
-        )
+        await expect(
+          page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+        ).toHaveValue("Anmerkung")
 
         await searchForDocUnitWithFileNumberAndDecisionDate(
           page,
@@ -192,11 +189,9 @@ test.describe("Literature references", () => {
         await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
         await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
         await page.getByText("Ean", { exact: true }).click()
-        await waitForInputValue(
-          page,
-          "[aria-label='Dokumenttyp Literaturfundstelle']",
-          "Anmerkung",
-        )
+        await expect(
+          page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+        ).toHaveValue("Anmerkung")
 
         await searchForDocUnitWithFileNumberAndDecisionDate(
           page,
@@ -321,7 +316,9 @@ test.describe("Literature references", () => {
           }),
         ).toBeHidden()
 
-        await expect(page.locator("[aria-label='Klammernzusatz']")).toBeHidden()
+        await expect(
+          page.getByLabel("Klammernzusatz", { exact: true }),
+        ).toBeHidden()
       })
 
       await test.step("Change existing reference", async () => {
@@ -329,11 +326,9 @@ test.describe("Literature references", () => {
         await fillInput(page, "Autor Literaturfundstelle", "Kirk, James T.")
         await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
         await page.getByText("Ean", { exact: true }).click()
-        await waitForInputValue(
-          page,
-          "[aria-label='Dokumenttyp Literaturfundstelle']",
-          "Anmerkung",
-        )
+        await expect(
+          page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+        ).toHaveValue("Anmerkung")
         await page.getByLabel("Fundstelle vermerken", { exact: true }).click()
 
         await expect(

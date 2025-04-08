@@ -104,7 +104,9 @@ test.describe(
       await addFirstJobProfile(page)
 
       await test.step("Enter second job profile", async () => {
-        await page.locator("[aria-label='Berufsbild']").fill(secondJobProfile)
+        await page
+          .getByLabel("Berufsbild", { exact: true })
+          .fill(secondJobProfile)
         await page.keyboard.press("Enter")
       })
 
@@ -113,7 +115,9 @@ test.describe(
 
     async function addFirstJobProfile(page: Page) {
       await test.step("enter job profile", async () => {
-        await page.locator("[aria-label='Berufsbild']").fill(firstJobProfile)
+        await page
+          .getByLabel("Berufsbild", { exact: true })
+          .fill(firstJobProfile)
         await page.keyboard.press("Enter")
         await expect(page.getByText(firstJobProfile)).toBeVisible()
         await save(page)

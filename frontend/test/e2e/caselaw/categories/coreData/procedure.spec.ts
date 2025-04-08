@@ -5,7 +5,6 @@ import {
   navigateToCategories,
   navigateToProcedures,
   save,
-  waitForInputValue,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -31,20 +30,22 @@ test.describe("procedure", () => {
 
       await expect(async () => {
         newProcedure = testPrefix + generateString({ length: 10 })
-        await page.locator("[aria-label='Vorgang']").fill(newProcedure)
+        await page.getByLabel("Vorgang", { exact: true }).fill(newProcedure)
         await page.getByText(`${newProcedure} neu erstellen`).click()
       }).toPass()
 
       await save(page)
 
       await page.reload()
-      await waitForInputValue(page, "[aria-label='Vorgang']", newProcedure)
+      await expect(page.getByLabel("Vorgang", { exact: true })).toHaveValue(
+        newProcedure,
+      )
     })
 
     await test.step("fill previous procedures", async () => {
       await expect(async () => {
         const secondProcedure = testPrefix + generateString({ length: 10 })
-        await page.locator("[aria-label='Vorgang']").fill(secondProcedure)
+        await page.getByLabel("Vorgang", { exact: true }).fill(secondProcedure)
         await page.getByText(`${secondProcedure} neu erstellen`).click()
       }).toPass()
 
@@ -105,7 +106,7 @@ test.describe("procedure", () => {
     const listItems = await page.getByLabel("Vorgang Listenelement").all()
 
     for (const listItem of listItems) {
-      const spanLocator = listItem.locator("span.ds-label-01-reg")
+      const spanLocator = listItem.locator("span.ris-label1-regular")
       const title = await spanLocator.getAttribute("title")
       const response = await page.request.get(
         `/api/v1/caselaw/procedure?sz=10&pg=0&q=${title}`,

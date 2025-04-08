@@ -262,36 +262,6 @@ export async function deleteProcedure(page: Page, uuid: string) {
   expect(response.ok()).toBeTruthy()
 }
 
-export async function documentUnitExists(
-  page: Page,
-  documentNumber: string,
-): Promise<boolean> {
-  return (
-    await (
-      await page.request.get(`/api/v1/caselaw/documentunits/${documentNumber}`)
-    ).text()
-  ).includes("uuid")
-}
-
-/**
- * @deprecated
- * Use playwright's toHaveValue instead: e.g. <pre>page.getByLabel("Gericht").toHaveValue("BGH")</pre>
- */
-export async function waitForInputValue(
-  page: Page,
-  selector: string,
-  expectedValue: string,
-  timeout?: number,
-) {
-  await page.waitForFunction(
-    ({ selector, expectedValue }) => {
-      const input = document.querySelector(selector) as HTMLInputElement
-      return input && input.value === expectedValue
-    },
-    { selector, expectedValue, timeout },
-  )
-}
-
 export async function fillSearchInput(
   page: Page,
   values?: {
@@ -308,7 +278,7 @@ export async function fillSearchInput(
   const fillInput = async (ariaLabel: string, value = generateString()) => {
     const input = page.locator(`[aria-label='${ariaLabel}']`)
     await input.fill(value ?? ariaLabel)
-    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+    await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
   }
 
   //reset search first
@@ -348,8 +318,13 @@ export async function fillSearchInput(
   }
 
   if (values?.status) {
-    const select = page.locator(`select[id="status"]`)
-    await select.selectOption(values?.status)
+    await page.getByLabel("Status Suche").click()
+    await page
+      .getByRole("option", {
+        name: values?.status,
+        exact: true,
+      })
+      .click()
   }
 
   await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
@@ -375,17 +350,15 @@ export async function fillPreviousDecisionInputs(
   const fillInput = async (ariaLabel: string, value = generateString()) => {
     const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
     await input.fill(value ?? ariaLabel)
-    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+    await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
   }
 
   if (values?.court) {
     await fillInput("Gericht Vorgehende Entscheidung", values?.court)
     await page.getByText(values.court, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Gericht Vorgehende Entscheidung']",
-      values.court,
-    )
+    await expect(
+      page.getByLabel("Gericht Vorgehende Entscheidung", { exact: true }),
+    ).toHaveValue(values.court)
   }
   if (values?.decisionDate) {
     await fillInput(
@@ -399,11 +372,9 @@ export async function fillPreviousDecisionInputs(
   if (values?.documentType) {
     await fillInput("Dokumenttyp Vorgehende Entscheidung", values?.documentType)
     await page.getByText(values.documentType, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Dokumenttyp Vorgehende Entscheidung']",
-      values.documentType,
-    )
+    await expect(
+      page.getByLabel("Dokumenttyp Vorgehende Entscheidung", { exact: true }),
+    ).toHaveValue(values.documentType)
   }
 
   if (values?.dateKnown === false) {
@@ -450,17 +421,15 @@ export async function fillEnsuingDecisionInputs(
   const fillInput = async (ariaLabel: string, value = generateString()) => {
     const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
     await input.fill(value ?? ariaLabel)
-    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+    await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
   }
 
   if (values?.court) {
     await fillInput("Gericht Nachgehende Entscheidung", values?.court)
     await page.getByText(values.court, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Gericht Nachgehende Entscheidung']",
-      values.court,
-    )
+    await expect(
+      page.getByLabel("Gericht Nachgehende Entscheidung", { exact: true }),
+    ).toHaveValue(values.court)
   }
   if (values?.decisionDate) {
     await fillInput(
@@ -477,11 +446,9 @@ export async function fillEnsuingDecisionInputs(
       values?.documentType,
     )
     await page.getByText(values.documentType, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Dokumenttyp Nachgehende Entscheidung']",
-      values.documentType,
-    )
+    await expect(
+      page.getByLabel("Dokumenttyp Nachgehende Entscheidung", { exact: true }),
+    ).toHaveValue(values.documentType)
   }
   if (values?.pending) {
     const pendingCheckbox = page.getByLabel("Anhängige Entscheidung")
@@ -499,7 +466,7 @@ export async function fillInput(
 ) {
   const input = page.locator(`[aria-label='${ariaLabel}']`)
   await input.fill(value ?? ariaLabel)
-  await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+  await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
 }
 
 export async function clearInput(page: Page, ariaLabel: string) {
@@ -517,9 +484,7 @@ export async function fillNormInputs(
   if (values?.normAbbreviation) {
     await fillInput(page, "RIS-Abkürzung", values.normAbbreviation)
     await page.getByText(values.normAbbreviation, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='RIS-Abkürzung']",
+    await expect(page.getByLabel("RIS-Abkürzung", { exact: true })).toHaveValue(
       values.normAbbreviation,
     )
   }
@@ -565,21 +530,17 @@ export async function fillActiveCitationInputs(
   if (values?.citationType) {
     await fillInput(page, "Art der Zitierung", values?.citationType)
     await page.getByText(values.citationType, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Art der Zitierung']",
-      values.citationType,
-    )
+    await expect(
+      page.getByLabel("Art der Zitierung", { exact: true }),
+    ).toHaveValue(values.citationType)
   }
 
   if (values?.court) {
     await fillInput(page, "Gericht Aktivzitierung", values?.court)
     await page.getByText(values.court, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Gericht Aktivzitierung']",
-      values.court,
-    )
+    await expect(
+      page.getByLabel("Gericht Aktivzitierung", { exact: true }),
+    ).toHaveValue(values.court)
   }
   if (values?.decisionDate) {
     await fillInput(
@@ -594,11 +555,9 @@ export async function fillActiveCitationInputs(
   if (values?.documentType) {
     await fillInput(page, "Dokumenttyp Aktivzitierung", values?.documentType)
     await page.getByText(values.documentType, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Dokumenttyp Aktivzitierung']",
-      values.documentType,
-    )
+    await expect(
+      page.getByLabel("Dokumenttyp Aktivzitierung", { exact: true }),
+    ).toHaveValue(values.documentType)
   }
 }
 

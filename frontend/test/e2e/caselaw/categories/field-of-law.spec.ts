@@ -281,7 +281,7 @@ test.describe("field of law", () => {
     await page.getByRole("button", { name: "Sachgebiete" }).click()
     await page.getByLabel("Sachgebietsuche auswählen").click()
 
-    await page.locator("[aria-label='Sachgebietskürzel']").fill("xyz")
+    await page.getByLabel("Sachgebietskürzel", { exact: true }).fill("xyz")
     await page.keyboard.press("Enter")
     await expect(
       page.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
@@ -386,8 +386,10 @@ test.describe("field of law", () => {
     await page.getByRole("button", { name: "Sachgebiete" }).click()
     await page.getByLabel("Sachgebietsuche auswählen").click()
 
-    await page.locator("[aria-label='Sachgebietsbezeichnung']").fill("Gewinn")
-    await page.locator("[aria-label='Sachgebietsnorm']").fill("§ 252 BGB")
+    await page
+      .getByLabel("Sachgebietsbezeichnung", { exact: true })
+      .fill("Gewinn")
+    await page.getByLabel("Sachgebietsnorm", { exact: true }).fill("§ 252 BGB")
     await page.keyboard.press("Enter")
 
     await expect(page.getByLabel("BR-05-01-06 hinzufügen")).toBeVisible()
@@ -404,9 +406,11 @@ test.describe("field of law", () => {
     await page.getByRole("button", { name: "Sachgebiete" }).click()
     await page.getByLabel("Sachgebietsuche auswählen").click()
 
-    await page.locator("[aria-label='Sachgebietskürzel']").fill("BR")
-    await page.locator("[aria-label='Sachgebietsbezeichnung']").fill("Gewinn")
-    await page.locator("[aria-label='Sachgebietsnorm']").fill("§ 252 BGB")
+    await page.getByLabel("Sachgebietskürzel", { exact: true }).fill("BR")
+    await page
+      .getByLabel("Sachgebietsbezeichnung", { exact: true })
+      .fill("Gewinn")
+    await page.getByLabel("Sachgebietsnorm", { exact: true }).fill("§ 252 BGB")
     await page.keyboard.press("Enter")
 
     await expect(page.getByLabel("BR-05-01-06 hinzufügen")).toBeVisible()

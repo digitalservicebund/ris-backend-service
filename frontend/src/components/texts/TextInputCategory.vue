@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import InputText from "primevue/inputtext"
 import { nextTick } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
-import TextInput from "@/components/input/TextInput.vue"
 
 interface Props {
   id: string
@@ -32,13 +32,14 @@ async function focusInput() {
     @toggled="focusInput"
   >
     <div class="flex flex-col">
-      <label class="ds-label-02-reg mb-4" :for="id">{{ label }}</label>
+      <label class="ris-label2-regular mb-4" :for="id">{{ label }}</label>
 
-      <TextInput
+      <InputText
         :id="id"
         :aria-label="label"
+        fluid
         :model-value="modelValue"
-        size="medium"
+        size="small"
         @update:model-value="$emit('update:modelValue', $event)"
       />
     </div>

@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import TextButton from "./input/TextButton.vue"
+import Button from "primevue/button"
 import FlexContainer from "@/components/FlexContainer.vue"
 import IconArrowBack from "~icons/ic/baseline-arrow-back"
 import IconArrowForward from "~icons/ic/baseline-arrow-forward"
@@ -46,23 +46,23 @@ export type Page<T> = {
   <slot v-if="props.navigationPosition == 'bottom'"></slot>
   <FlexContainer
     v-if="page?.content && !page?.empty && !isLoading"
-    class="mb-24 mt-20 px-24"
+    class="mt-20 mb-24 px-24"
     flex-direction="flex-row"
     justify-content="justify-between"
   >
-    <TextButton
+    <Button
       v-if="!(page.first && page.last)"
       aria-label="vorherige Ergebnisse"
-      button-type="tertiary"
       :disabled="page?.first"
-      :icon="IconArrowBack"
-      icon-position="left"
       label="Zurück"
+      severity="secondary"
       size="small"
       @click="previousPage"
       @keydown.enter="previousPage"
-    >
-    </TextButton>
+      ><template #icon>
+        <IconArrowBack />
+      </template>
+    </Button>
     <FlexContainer
       class="w-full"
       flex-direction="flex-row"
@@ -80,19 +80,20 @@ export type Page<T> = {
         {{ page.first && page.last ? "gefunden" : "angezeigt" }}
       </FlexContainer>
     </FlexContainer>
-    <TextButton
+    <Button
       v-if="!(page.first && page.last)"
       aria-label="nächste Ergebnisse"
-      button-type="tertiary"
       :disabled="page?.last"
-      :icon="IconArrowForward"
       icon-position="right"
       label="Weiter"
+      severity="secondary"
       size="small"
       @click="nextPage"
       @keydown.enter="nextPage"
-    >
-    </TextButton>
+      ><template #icon>
+        <IconArrowForward class="order-last" />
+      </template>
+    </Button>
   </FlexContainer>
   <slot v-if="props.navigationPosition == 'top'"></slot>
 </template>

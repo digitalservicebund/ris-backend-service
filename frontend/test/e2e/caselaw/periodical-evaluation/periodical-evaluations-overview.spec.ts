@@ -1,10 +1,6 @@
 import { expect } from "@playwright/test"
 import dayjs from "dayjs"
-import {
-  fillInput,
-  navigateToPeriodicalEvaluation,
-  waitForInputValue,
-} from "../e2e-utils"
+import { fillInput, navigateToPeriodicalEvaluation } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
@@ -70,7 +66,9 @@ test.describe(
 
         await requestPromise
 
-        await waitForInputValue(page, "[aria-label='Periodikum']", "MMG")
+        await expect(
+          page.getByLabel("Periodikum", { exact: true }),
+        ).toHaveValue("MMG")
       })
 
       await test.step("An existing periodical edition appears in the results", async () => {
@@ -80,7 +78,7 @@ test.describe(
       })
 
       await test.step("The table is cleared when filter is deleted", async () => {
-        await page.locator("[aria-label='Auswahl zurücksetzen']").click()
+        await page.getByLabel("Auswahl zurücksetzen", { exact: true }).click()
         await expect(
           page.getByText(
             "Wählen Sie ein Periodikum um die Ausgaben anzuzeigen.",
@@ -99,7 +97,9 @@ test.describe(
             exact: true,
           })
           .click()
-        await waitForInputValue(page, "[aria-label='Periodikum']", "ZAU")
+        await expect(
+          page.getByLabel("Periodikum", { exact: true }),
+        ).toHaveValue("ZAU")
         await expect(
           page.getByText("Keine Suchergebnisse gefunden", { exact: true }),
         ).toBeVisible()
@@ -213,7 +213,9 @@ test.describe(
                 exact: true,
               })
               .click()
-            await waitForInputValue(page, "[aria-label='Periodikum']", "WdG")
+            await expect(
+              page.getByLabel("Periodikum", { exact: true }),
+            ).toHaveValue("WdG")
             await expect(page.locator(".table > tr >> nth=0")).toBeVisible()
             const line = page.getByText(name + "WdG0" + formattedDate)
 

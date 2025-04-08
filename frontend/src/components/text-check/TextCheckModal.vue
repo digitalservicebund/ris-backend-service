@@ -11,16 +11,21 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  "suggestion:update": [value: string]
-  "suggestion:ignore": [void]
+  "word:remove": [value: string]
+  "word:add": [word: string]
+  "word:replace": [value: string]
 }>()
 
 function acceptSuggestion(replacement: string) {
-  emit("suggestion:update", replacement)
+  emit("word:replace", replacement)
 }
 
-function ignoreSuggestion() {
-  emit("suggestion:ignore")
+function addIgnoredWord(word: string) {
+  emit("word:add", word)
+}
+
+function removeIgnoredWord(word: string) {
+  emit("word:remove", word)
 }
 
 function getValues(replacements: Replacement[]) {
@@ -38,7 +43,7 @@ const isMatchIgnored = computed(() => {
     data-testid="text-check-modal"
   >
     <div class="flex flex-row gap-8">
-      <span class="font-bold" data-testid="text-check-modal-word">
+      <span class="ris-body1-regular" data-testid="text-check-modal-word">
         {{ match.word }}
       </span>
     </div>
@@ -46,7 +51,7 @@ const isMatchIgnored = computed(() => {
     <IgnoredWordHandler
       v-if="isMatchIgnored"
       :match="match"
-      @ignore-text-check-word:add="ignoreSuggestion"
+      @ignored-word:remove="removeIgnoredWord(match.word)"
     />
 
     <p v-if="!isMatchIgnored">{{ match.shortMessage || match.message }}</p>
@@ -55,7 +60,7 @@ const isMatchIgnored = computed(() => {
       v-if="!isMatchIgnored"
       replacement-mode="single"
       :replacements="getValues(match.replacements)"
-      @suggestion:ignore="ignoreSuggestion"
+      @ignored-word:add="addIgnoredWord(match.word)"
       @suggestion:update="acceptSuggestion"
     />
   </div>

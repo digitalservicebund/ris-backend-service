@@ -204,16 +204,18 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       page.locator("li:has-text('Entscheidungsdatum')"),
     ).toBeVisible()
     await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
-    await page.locator("[aria-label='Rubriken bearbeiten']").click()
+    await page.getByLabel("Rubriken bearbeiten", { exact: true }).click()
 
-    await page.locator("[aria-label='Aktenzeichen']").fill("abc")
+    await page.getByLabel("Aktenzeichen", { exact: true }).fill("abc")
     await page.keyboard.press("Enter")
     await save(page)
 
-    await page.locator("[aria-label='Gericht']").fill("aalen")
+    await page.getByLabel("Gericht", { exact: true }).fill("aalen")
     await page.getByText("AG Aalen").click()
 
-    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("AG Aalen")
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      "AG Aalen",
+    )
 
     await navigateToHandover(page, documentNumber)
     await expect(page.locator("li:has-text('Aktenzeichen')")).toBeHidden()
@@ -246,7 +248,9 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     await page.getByText("XML Vorschau").click()
 
     await expect(
-      page.locator("text='        <entsch-datum>2019-12-31</entsch-datum>'"),
+      page.getByText("        <entsch-datum>2019-12-31</entsch-datum>", {
+        exact: true,
+      }),
     ).toBeVisible()
 
     await expect(

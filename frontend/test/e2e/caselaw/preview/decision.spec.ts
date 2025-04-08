@@ -4,7 +4,6 @@ import {
   navigateToCategories,
   navigateToPreview,
   save,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -55,11 +54,15 @@ test.describe("preview decision", () => {
         prefilledDocumentUnit.documentNumber as string,
       )
 
-      await page.locator("[aria-label='Gericht']").fill("BVerfG")
-      await waitForInputValue(page, "[aria-label='Gericht']", "BVerfG")
+      await page.getByLabel("Gericht", { exact: true }).fill("BVerfG")
+      await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+        "BVerfG",
+      )
       await expect(page.getByText("BVerfG")).toBeVisible()
       await page.getByText("BVerfG").click()
-      await waitForInputValue(page, "[aria-label='Gericht']", "BVerfG")
+      await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+        "BVerfG",
+      )
 
       await fillInput(page, "Entscheidungsdatum", "01.01.2021")
 
@@ -104,15 +107,18 @@ test.describe("preview decision", () => {
         prefilledDocumentUnit.documentNumber as string,
       )
 
-      await fillInput(page, "Entscheidungsdatum", "")
+      await page.getByLabel("Entscheidungsdatum", { exact: true }).fill("")
 
-      await page.locator("[aria-label='Aktenzeichen']").click()
+      await page.getByLabel("Aktenzeichen", { exact: true }).click()
       // Navigate back and delete on enter
       await page.keyboard.press("ArrowLeft")
       await page.keyboard.press("Enter")
 
       // Delete court entry
-      await page.locator("[aria-label='Auswahl zurücksetzen']").first().click()
+      await page
+        .getByLabel("Auswahl zurücksetzen", { exact: true })
+        .first()
+        .click()
 
       await save(page)
     })

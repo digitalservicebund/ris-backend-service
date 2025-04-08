@@ -4,10 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.util.UUID;
@@ -30,14 +27,8 @@ public class IgnoredTextCheckWordDTO {
 
   @Id @GeneratedValue private UUID id;
 
-  @ManyToOne
-  @NotNull
-  @JoinColumn(name = "documentation_office_id")
-  private DocumentationOfficeDTO documentationOffice;
-
-  @ManyToOne
-  @JoinColumn(name = "documentation_unit_id")
-  private DocumentationUnitDTO documentationUnit;
+  @Column(name = "documentation_unit_id")
+  private UUID documentationUnitId;
 
   @Column
   @Size(max = 255)

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
+import Checkbox from "primevue/checkbox"
 import { computed, ref } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
-import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import {
   DuplicateRelation,
@@ -91,7 +91,7 @@ const coreDataText = computed(() =>
       </span>
 
       <DecisionSummary
-        class="ds-label-01-reg"
+        class="ris-label1-regular"
         :document-number="duplicateRelation.documentNumber"
         :status="{
           publicationStatus: duplicateRelation.publicationStatus,
@@ -105,15 +105,15 @@ const coreDataText = computed(() =>
       v-slot="{ id }"
       class="whitespace-nowrap"
       :label="ignoreWarningCheckboxLabel"
-      label-class="ds-label-01-reg"
+      label-class="ris-label1-regular"
       :label-position="LabelPosition.RIGHT"
     >
-      <CheckboxInput
-        :id="id"
+      <Checkbox
         v-model="isIgnored"
         aria-label="Warnung ignorieren"
-        class="ds-checkbox-mini"
-        :readonly="isAutomaticallyIgnored"
+        binary
+        :disabled="isAutomaticallyIgnored"
+        :input-id="id"
       />
     </InputField>
 

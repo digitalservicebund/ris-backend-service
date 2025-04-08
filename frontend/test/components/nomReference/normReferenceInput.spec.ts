@@ -1,7 +1,9 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { config } from "@vue/test-utils"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
+import InputText from "primevue/inputtext"
 import { beforeEach, vi } from "vitest"
 import { ref } from "vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
@@ -46,8 +48,23 @@ describe("NormReferenceEntry", () => {
       Promise.resolve({ status: 200, data: "Ok" }),
     )
   })
-  beforeAll(() => server.listen())
-  afterAll(() => server.close())
+  beforeAll(() => {
+    // InputMask evaluates cursor position on every keystroke, however, our browser vitest setup does not
+    // implement any layout-related functionality, meaning the required functions for cursor offset
+    // calculation are missing. When we deal with typing in date/ year / time inputs, we can mock it with
+    // TextInput, as we only need the string and do not need to test the actual mask behaviour.
+    config.global.stubs = {
+      InputMask: InputText,
+    }
+    server.listen()
+  })
+  afterAll(() => {
+    // Mock needs to be reset (and can not be mocked globally) because InputMask has interdependencies
+    // with the PrimeVue select component. When testing the select components with InputMask
+    // mocked globally, they fail due to these dependencies.
+    config.global.stubs = {}
+    server.close()
+  })
 
   it("render empty norm input group on initial load", async () => {
     renderComponent()
@@ -293,19 +310,17 @@ describe("NormReferenceEntry", () => {
   })
 
   it("does not add norm with invalid year input", async () => {
-    renderComponent({
+    const { user } = renderComponent({
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
-        singleNorms: [
-          {
-            dateOfRelevance: "0000",
-          },
-        ],
       } as NormReference,
     })
 
     const yearInput = await screen.findByLabelText("Jahr der Norm")
-    expect(yearInput).toHaveValue("0000")
+    expect(yearInput).toHaveValue("")
+
+    await user.type(yearInput, "0000")
+    await user.tab()
 
     await screen.findByText(/Kein valides Jahr/)
     screen.getByLabelText("Norm speichern").click()
@@ -488,8 +503,8 @@ describe("NormReferenceEntry", () => {
       expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
       await user.click(dropdownItems[0])
 
-      const legalForceField = screen.getByLabelText("Mit Gesetzeskraft")
-      expect(legalForceField).toBeVisible()
+      const legalForceField = screen.getByLabelText("Gesetzeskraft der Norm")
+      expect(legalForceField).toBeInTheDocument()
       expect(legalForceField).not.toBeChecked()
       expect(
         screen.queryByLabelText("Gesetzeskraft Typ"),
@@ -512,7 +527,7 @@ describe("NormReferenceEntry", () => {
         } as NormReference,
       })
 
-      const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
+      const checkbox = await screen.findByLabelText("Gesetzeskraft der Norm")
 
       await user.click(checkbox)
       const legalForceType = screen.getByLabelText("Gesetzeskraft Typ")
@@ -558,7 +573,7 @@ describe("NormReferenceEntry", () => {
         } as NormReference,
       })
 
-      const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
+      const checkbox = await screen.findByLabelText("Gesetzeskraft der Norm")
 
       await user.click(checkbox)
       const regionInput = screen.getByLabelText("Gesetzeskraft Geltungsbereich")
@@ -615,7 +630,7 @@ describe("NormReferenceEntry", () => {
         } as NormReference,
       })
 
-      const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
+      const checkbox = await screen.findByLabelText("Gesetzeskraft der Norm")
       expect(checkbox).toBeChecked()
     })
   })

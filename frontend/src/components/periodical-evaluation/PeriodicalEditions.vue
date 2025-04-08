@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed, ref, watch, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import DateUtil from "../../utils/dateUtil"
@@ -9,7 +10,6 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
@@ -148,7 +148,10 @@ onMounted(async () => {
   <div class="flex flex-col gap-24 p-24">
     <div>
       <FlexContainer class="pb-16" justify-content="justify-between">
-        <h1 class="ds-heading-02-reg" data-testid="periodical-evaluation-title">
+        <h1
+          class="ris-heading2-regular"
+          data-testid="periodical-evaluation-title"
+        >
           Periodika
         </h1>
       </FlexContainer>
@@ -169,13 +172,14 @@ onMounted(async () => {
               placeholder="Nach Periodikum suchen"
             ></ComboboxInput>
           </InputField>
-          <TextButton
-            v-if="legalPeriodical && isInternalUser"
-            aria-label="Neue Periodikumsauswertung"
-            class="ds-button-02-reg"
-            label="Neue Periodikumsauswertung"
-            @click="addEdition"
-          ></TextButton>
+          <div>
+            <Button
+              v-if="legalPeriodical && isInternalUser"
+              aria-label="Neue Periodikumsauswertung"
+              label="Neue Periodikumsauswertung"
+              @click="addEdition"
+            ></Button>
+          </div>
           <div v-if="saveResponseError">
             <InfoModal
               :description="saveResponseError.description"
@@ -269,7 +273,7 @@ onMounted(async () => {
       </TableView>
       <div
         v-if="isLoading"
-        class="grid justify-items-center bg-white bg-opacity-60 py-112"
+        class="bg-opacity-60 grid justify-items-center bg-white py-112"
       >
         <LoadingSpinner />
       </div>

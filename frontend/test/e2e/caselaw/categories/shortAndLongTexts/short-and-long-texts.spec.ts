@@ -5,7 +5,6 @@ import {
   navigateToHandover,
   navigateToPreview,
   save,
-  waitForInputValue,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
@@ -28,11 +27,16 @@ test.describe("short and long texts", () => {
       })
       await clickCategoryButton("Entscheidungsname", page)
       const inputText = "Family-Karte"
-      const selector = "[aria-label='Entscheidungsname']"
-      await page.locator(selector).fill(inputText)
-      await waitForInputValue(page, selector, inputText)
+      await page
+        .getByLabel("Entscheidungsname", { exact: true })
+        .fill(inputText)
+      await expect(
+        page.getByLabel("Entscheidungsname", { exact: true }),
+      ).toHaveValue(inputText)
       await save(page)
-      await expect(page.locator(selector)).toHaveValue(inputText)
+      await expect(
+        page.getByLabel("Entscheidungsname", { exact: true }),
+      ).toHaveValue(inputText)
     },
   )
 
@@ -622,6 +626,7 @@ test.describe("short and long texts", () => {
       expect(innerText).toContain(value)
     })
   }
+
   async function checkVisibleInPreview(
     testId: string,
     value: string,

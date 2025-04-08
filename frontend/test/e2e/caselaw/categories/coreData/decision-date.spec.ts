@@ -9,7 +9,9 @@ test.describe("decision date", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2099")
+    await page
+      .getByLabel("Entscheidungsdatum", { exact: true })
+      .fill("03.02.2099")
 
     await expect(
       page.getByText("Das Datum darf nicht in der Zukunft liegen"),
@@ -22,22 +24,24 @@ test.describe("decision date", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
-    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "03.02.2022",
-    )
+    await page
+      .getByLabel("Entscheidungsdatum", { exact: true })
+      .fill("03.02.2022")
+    await expect(
+      page.getByLabel("Entscheidungsdatum", { exact: true }),
+    ).toHaveValue("03.02.2022")
 
     const infoPanel = page.getByText(
       new RegExp(`${documentNumber}.*Entscheidungsdatum.*`),
     )
     await expect(infoPanel.getByText("03.02.2022")).toBeVisible()
 
-    await page.locator("[aria-label='Entscheidungsdatum']").click()
+    await page.getByLabel("Entscheidungsdatum", { exact: true }).click()
     await page.keyboard.press("Backspace")
 
-    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "03.02.202",
-    )
+    await expect(
+      page.getByLabel("Entscheidungsdatum", { exact: true }),
+    ).toHaveValue("03.02.202_")
   })
 
   // eslint-disable-next-line playwright/no-skipped-test
@@ -55,15 +59,15 @@ test.describe("decision date", () => {
       .locator("[aria-label='Abweichendes Entscheidungsdatum']")
       .fill("03.02.2022")
     await expect(
-      page.locator("[aria-label='Abweichendes Entscheidungsdatum']"),
+      page.getByLabel("Abweichendes Entscheidungsdatum", { exact: true }),
     ).toHaveValue("03.02.2022")
 
     await page.keyboard.press("Backspace")
     await page.reload()
 
-    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "",
-    )
+    await expect(
+      page.getByLabel("Entscheidungsdatum", { exact: true }),
+    ).toHaveValue("")
   })
 
   test("incomplete input shows error onblur", async ({
@@ -72,21 +76,21 @@ test.describe("decision date", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Entscheidungsdatum']").fill("03")
+    await page.getByLabel("Entscheidungsdatum", { exact: true }).fill("03")
 
     await page.keyboard.press("Tab")
 
-    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "03",
-    )
+    await expect(
+      page.getByLabel("Entscheidungsdatum", { exact: true }),
+    ).toHaveValue("03.__.____")
 
     await expect(page.getByText("Unvollständiges Datum")).toBeVisible()
 
     await page.reload()
 
-    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "",
-    )
+    await expect(
+      page.getByLabel("Entscheidungsdatum", { exact: true }),
+    ).toHaveValue("")
   })
 
   // eslint-disable-next-line playwright/no-skipped-test
@@ -96,10 +100,12 @@ test.describe("decision date", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
-    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "03.02.2022",
-    )
+    await page
+      .getByLabel("Entscheidungsdatum", { exact: true })
+      .fill("03.02.2022")
+    await expect(
+      page.getByLabel("Entscheidungsdatum", { exact: true }),
+    ).toHaveValue("03.02.2022")
 
     await expect(
       page.getByText("Abweichendes Entscheidungsdatum>"),

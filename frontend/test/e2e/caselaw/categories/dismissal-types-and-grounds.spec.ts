@@ -4,7 +4,6 @@ import {
   navigateToHandover,
   navigateToPreview,
   save,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -32,13 +31,17 @@ test.describe(
       })
 
       await test.step("Select BAG (labor court)", async () => {
-        await page.locator("[aria-label='Gericht']").fill("BAG")
-        await waitForInputValue(page, "[aria-label='Gericht']", "BAG")
+        await page.getByLabel("Gericht", { exact: true }).fill("BAG")
+        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+          "BAG",
+        )
         await expect(
           page.locator("button").filter({ hasText: /^BAG$/ }),
         ).toBeVisible()
         await page.locator("button").filter({ hasText: /^BAG$/ }).click()
-        await waitForInputValue(page, "[aria-label='Gericht']", "BAG")
+        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+          "BAG",
+        )
 
         await save(page)
       })

@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import Button from "primevue/button"
 import { watch } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import FlexContainer from "@/components/FlexContainer.vue"
 import IconBadge from "@/components/IconBadge.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import { useScroll } from "@/composables/useScroll"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -61,22 +61,22 @@ export type SearchResults<Type extends RelatedDocumentation> = {
       data-testid="search-results"
       flex-direction="flex-col"
     >
-      <p class="ds-label-01-bold">Passende Suchergebnisse:</p>
+      <p class="ris-label1-bold">Passende Suchergebnisse:</p>
       <FlexContainer
         v-for="searchResult in searchResults"
         :key="searchResult.decision.uuid"
         class="mt-16"
       >
         <FlexContainer align-items="items-center">
-          <TextButton
+          <Button
             aria-label="Treffer übernehmen"
             class="mr-16"
             data-testid="add-decision-button"
             :disabled="!allowMultipleLinks && searchResult.isLinked"
-            :icon="IconAdd"
             size="small"
             @click.stop="emits('linkDecision', searchResult.decision)"
-          />
+            ><template #icon> <IconAdd /> </template
+          ></Button>
           <span class="flex w-full flex-row flex-wrap items-center">
             <DecisionSummary
               :display-mode="displayMode"

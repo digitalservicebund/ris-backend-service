@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import InputSelect from "primevue/select"
 import { ref } from "vue"
-import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import type { DropdownItem } from "@/components/input/types"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
@@ -20,11 +20,13 @@ const dropdownItems: DropdownItem[] = [
   <KitchensinkPage name="Dropdown">
     <KitchensinkStory name="Empty">
       <InputField id="emptyDropdown" v-slot="{ id }" label="Dropdown">
-        <DropdownInput
+        <InputSelect
           :id="id"
           v-model="emptyDropdown"
           aria-label="dropdown input"
-          :items="dropdownItems"
+          option-label="label"
+          option-value="value"
+          :options="dropdownItems"
           placeholder="Bitte auswählen"
         />
       </InputField>
@@ -32,11 +34,13 @@ const dropdownItems: DropdownItem[] = [
 
     <KitchensinkStory name="Pre-selected">
       <InputField id="preselectedDropdown" v-slot="{ id }" label="Dropdown">
-        <DropdownInput
+        <InputSelect
           :id="id"
           v-model="preselectedDropdown"
           aria-label="dropdown input"
-          :items="dropdownItems"
+          option-label="label"
+          option-value="value"
+          :options="dropdownItems"
           placeholder="Bitte auswählen"
         />
       </InputField>

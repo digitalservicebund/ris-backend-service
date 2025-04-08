@@ -19,7 +19,7 @@ const props = defineProps<{
         class="flex flex-row items-center"
       >
         <component :is="IconBook" class="mr-8" />
-        <div class="ds-label-01-reg mr-8">
+        <div class="ris-label1-regular mr-8">
           {{ data.renderSummary + ", " + data.singleNorms[0].renderSummary }}
         </div>
         <div
@@ -49,7 +49,7 @@ const props = defineProps<{
       <div v-else class="flex flex-col gap-24">
         <div class="flex flex-row items-center">
           <component :is="IconBook" class="mr-8" />
-          <div class="ds-label-01-reg mr-8">
+          <div class="ris-label1-regular mr-8">
             {{ data.renderSummary }}
           </div>
           <IconBadge

@@ -282,10 +282,15 @@ test.describe("search", () => {
 
     await expect
       .poll(async () => page.getByText("Unveröffentlicht").count())
-      .toBe(8)
+      .toBe(7)
 
-    const select = page.locator(`select[id="status"]`)
-    await select.selectOption("Veröffentlicht")
+    await page.getByLabel("Status Suche").click()
+    await page
+      .getByRole("option", {
+        name: "Veröffentlicht",
+        exact: true,
+      })
+      .click()
 
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
@@ -294,11 +299,6 @@ test.describe("search", () => {
         page.getByText("Veröffentlicht", { exact: true }).count(),
       )
       .toBe(7)
-
-    // only the unpublished in select should be counted.
-    await expect
-      .poll(async () => page.getByText("Unveröffentlicht").count())
-      .toBe(1)
   })
 
   test(
@@ -322,9 +322,13 @@ test.describe("search", () => {
       })
 
       await test.step("only published pending proceedings appear when filtered by published", async () => {
-        const select = page.locator(`select[id="status"]`)
-        await select.selectOption("Veröffentlicht")
-
+        await page.getByLabel("Status Suche").click()
+        await page
+          .getByRole("option", {
+            name: "Veröffentlicht",
+            exact: true,
+          })
+          .click()
         await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
         await expect(page.getByText("YYTestDoc0017")).toBeVisible() // show published pending proceeding
@@ -332,8 +336,12 @@ test.describe("search", () => {
       })
 
       await test.step("only unpublished pending proceedings appear when filtered by published", async () => {
-        const select = page.locator(`select[id="status"]`)
-        await select.selectOption("Unveröffentlicht")
+        await page.getByLabel("Status Suche").click()
+        await page
+          .getByRole("option", {
+            name: "Unveröffentlicht",
+          })
+          .click()
 
         await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
@@ -800,7 +808,7 @@ test.describe("search", () => {
 
     const infoPanel = page.getByText(new RegExp(`${documentNumber}|.*`))
 
-    await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
       `${courtType} ${courtLocation}`,
     )
     await expect(
