@@ -8,6 +8,8 @@ import { useResizeObserverMock } from "./test-helper/useResizeObserverMock"
 // Enable PrimeVue plugin because we need that in many tests
 config.global.plugins = [PrimeVue]
 
+process.env.TZ = "Europe/Berlin"
+
 // window.matchMedia API not available in vitest but needed by PrimeVue Components (select)
 window.matchMedia =
   window.matchMedia ||
