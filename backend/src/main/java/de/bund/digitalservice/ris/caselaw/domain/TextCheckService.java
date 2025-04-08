@@ -145,7 +145,7 @@ public class TextCheckService {
   protected TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType, UUID documentationUnitId) {
     if (htmlText == null) {
-      return TextCheckCategoryResponse.builder().matches(List.of()).build();
+      return null;
     }
 
     // normalize HTML to assure correct positioning
