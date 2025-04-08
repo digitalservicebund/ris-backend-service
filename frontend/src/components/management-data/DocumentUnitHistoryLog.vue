@@ -2,23 +2,18 @@
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
-
-type LogItem = {
-  timestamp: string
-  name: string
-  subject: string
-}
+import { DocumentationUnitHistoryLog } from "@/domain/documentationUnitHistoryLog"
 
 defineProps<{
-  data?: LogItem[]
+  data?: DocumentationUnitHistoryLog[]
   loading: boolean
 }>()
 
 // Dynamically generate the columns based on the keys in the data
 const columns = [
-  { field: "timestamp", header: "Änderung am" },
-  { field: "name", header: "Von" },
-  { field: "subject", header: "Was" },
+  { field: "createdAt", header: "Änderung am" },
+  { field: "userName", header: "Von" },
+  { field: "description", header: "Was" },
 ]
 const rowClass = () => {
   return "bg-blue-100"

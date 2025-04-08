@@ -1,81 +1,37 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed } from "vue"
+import { ref, watch } from "vue"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
 import DocumentUnitHistoryLog from "@/components/management-data/DocumentUnitHistoryLog.vue"
 import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
 import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
-const data = [
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "NeuRIS",
-    subject: "Status verändert auf „Veröffentlicht“",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "BGH (Anna Agensburg)",
-    subject: "Dokument an JDV-Portal übergeben",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "NeuRIS",
-    subject: "Status verändert auf „Veröffentlicht“",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "BGH (Anna Agensburg)",
-    subject: "Dokument an JDV-Portal übergeben",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "NeuRIS",
-    subject: "Status verändert auf „Veröffentlicht“",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "BGH (Anna Agensburg)",
-    subject: "Dokument an JDV-Portal übergeben",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "NeuRIS",
-    subject: "Status verändert auf „Veröffentlicht“",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "BGH (Anna Agensburg)",
-    subject: "Dokument an JDV-Portal übergeben",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "NeuRIS",
-    subject: "Status verändert auf „Veröffentlicht“",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "BGH (Anna Agensburg)",
-    subject: "Dokument an JDV-Portal übergeben",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "NeuRIS",
-    subject: "Status verändert auf „Veröffentlicht“",
-  },
-  {
-    timestamp: "31.03.2025 15:36",
-    name: "BGH (Anna Agensburg)",
-    subject: "Dokument an JDV-Portal übergeben",
-  },
-]
+const data = ref()
+const error = ref()
+const isLoading = ref()
 
-// Todo: set, when fetching history
-const isLoading = computed(() => false)
+watch(
+  () => documentUnit.value?.uuid,
+  async (uuid) => {
+    if (uuid) {
+      isLoading.value = true
+      const response = await DocumentUnitHistoryLogService.get(uuid)
+      if (response.error) {
+        error.value = response.error
+      } else if (response.data) {
+        data.value = response.data
+      }
+      isLoading.value = false
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
