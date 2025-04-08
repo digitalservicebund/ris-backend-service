@@ -442,7 +442,7 @@ public class DocumentationUnitService {
       }
     }
 
-    return (DocumentationUnit) repository.findByUuid(documentationUnit.uuid());
+    return (DocumentationUnit) repository.findByUuid(documentationUnit.uuid(), user);
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
