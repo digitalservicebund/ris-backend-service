@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import { computed } from "vue"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
 import DocumentUnitHistoryLog from "@/components/management-data/DocumentUnitHistoryLog.vue"
 import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
@@ -10,6 +11,71 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
+const data = [
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "NeuRIS",
+    subject: "Status verändert auf „Veröffentlicht“",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "BGH (Anna Agensburg)",
+    subject: "Dokument an JDV-Portal übergeben",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "NeuRIS",
+    subject: "Status verändert auf „Veröffentlicht“",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "BGH (Anna Agensburg)",
+    subject: "Dokument an JDV-Portal übergeben",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "NeuRIS",
+    subject: "Status verändert auf „Veröffentlicht“",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "BGH (Anna Agensburg)",
+    subject: "Dokument an JDV-Portal übergeben",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "NeuRIS",
+    subject: "Status verändert auf „Veröffentlicht“",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "BGH (Anna Agensburg)",
+    subject: "Dokument an JDV-Portal übergeben",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "NeuRIS",
+    subject: "Status verändert auf „Veröffentlicht“",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "BGH (Anna Agensburg)",
+    subject: "Dokument an JDV-Portal übergeben",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "NeuRIS",
+    subject: "Status verändert auf „Veröffentlicht“",
+  },
+  {
+    timestamp: "31.03.2025 15:36",
+    name: "BGH (Anna Agensburg)",
+    subject: "Dokument an JDV-Portal übergeben",
+  },
+]
+
+// Todo: set, when fetching history
+const isLoading = computed(() => false)
 </script>
 
 <template>
@@ -20,7 +86,7 @@ const { documentUnit } = storeToRefs(useDocumentUnitStore())
         v-if="documentUnit"
         :document-unit="documentUnit as DocumentUnit"
       />
-      <DocumentUnitHistoryLog />
+      <DocumentUnitHistoryLog :data="data" :loading="isLoading" />
       <dl>
         <div class="flex gap-24 px-0">
           <dt class="ris-body1-bold shrink-0 grow-0 basis-160">
