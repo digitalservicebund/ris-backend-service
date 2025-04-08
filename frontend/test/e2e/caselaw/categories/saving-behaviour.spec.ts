@@ -80,7 +80,7 @@ test.describe("saving behaviour", () => {
 
     for (const label of labels) {
       await page.getByLabel(`${label} anzeigen`).click()
-      await page.getByLabel(`${label} anzeigen`).type("22.11.2023")
+      await page.getByLabel(label, { exact: true }).type("22.11.2023")
       await page.keyboard.press("Enter")
     }
 
