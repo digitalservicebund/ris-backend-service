@@ -37,6 +37,7 @@ public class AuthUtils {
                       claims.put("roles", Collections.singletonList(role));
                       claims.put("name", "testUser");
                       claims.put("email", "test@test.com");
+                      claims.put("sub", UUID.randomUUID().toString());
                     }));
   }
 

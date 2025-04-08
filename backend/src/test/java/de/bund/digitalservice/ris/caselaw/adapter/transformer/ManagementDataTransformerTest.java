@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -312,13 +313,13 @@ class ManagementDataTransformerTest {
     @Test
     void testTransformToDomain_withAllMetaDataAndUser_shouldTransformAll() {
       // Arrange
-      LocalDateTime lastUpdatedAtDateTime = LocalDateTime.now();
+      Instant lastUpdatedAtDateTime = Instant.now();
       DocumentationOfficeDTO creatingAndUpdatingDocOffice =
           DocumentationOfficeDTO.builder().id(UUID.randomUUID()).abbreviation("BGH").build();
       String lastUpdatedByName = "Winnie Puuh";
-      LocalDateTime createdAtDateTime = LocalDateTime.now();
+      Instant createdAtDateTime = Instant.now();
       String createdByName = "I Aah";
-      LocalDateTime firstPublishedAtDateTime = LocalDateTime.now();
+      Instant firstPublishedAtDateTime = Instant.now();
 
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder()
@@ -717,13 +718,13 @@ class ManagementDataTransformerTest {
       List<String> borderNumbers,
       String createdByDocumentationOffice,
       UUID createdByUserId,
-      LocalDateTime createdAtDateTime,
+      Instant createdAtDateTime,
       String createdByName,
       String lastUpdatedByDocumentationOffice,
       UUID lastUpdatedByUserId,
-      LocalDateTime lastUpdatedAtDateTime,
+      Instant lastUpdatedAtDateTime,
       String lastUpdatedByName,
-      LocalDateTime firstPublishedAtDateTime) {}
+      Instant firstPublishedAtDateTime) {}
 
   private ManagementData generateManagementData(Optional<CreationParameters> parameters) {
     return ManagementData.builder()
