@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { it } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentUnitManagementData from "@/components/DocumentUnitManagementData.vue"
+import DocumentUnitManagementData from "@/components/management-data/DocumentUnitManagementData.vue"
 import DocumentUnit, {
   DuplicateRelation,
   DuplicateRelationStatus,
@@ -16,6 +16,16 @@ describe("DocumentUnitManagementData", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
     vi.resetAllMocks()
+  })
+
+  it("should show doc unit metadata", () => {
+    const managementData: ManagementData = {
+      borderNumbers: [],
+      duplicateRelations: [],
+    }
+    renderManagementData(managementData)
+
+    expect(screen.getByText(`Zuletzt bearbeitet am`)).toBeVisible()
   })
 
   describe("Duplicate relations", () => {

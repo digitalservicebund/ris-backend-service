@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -331,7 +332,8 @@ public class DocumentationUnitController {
       if (documentationUnit != null) {
         documentNumber = documentationUnit.documentNumber();
       }
-      var newPatch = service.updateDocumentationUnit(uuid, patch);
+      User user = this.userService.getUser(oidcUser);
+      var newPatch = service.updateDocumentationUnit(uuid, patch, user);
 
       return ResponseEntity.ok().body(newPatch);
     } catch (DocumentationUnitNotExistsException e) {

@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -63,8 +64,11 @@ public class KeycloakUserService implements UserService {
   }
 
   private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
+    UUID id = Optional.ofNullable(oidcUser.getSubject()).map(UUID::fromString).orElse(null);
+
     return User.builder()
         .name(oidcUser.getAttribute("name"))
+        .id(id)
         .email(oidcUser.getEmail())
         .documentationOffice(documentationOffice)
         .roles(oidcUser.getClaimAsStringList("roles"))

@@ -203,4 +203,8 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   @Builder.Default
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
+
+  // TODO: Should this be in docUnitDTO?
+  @OneToOne(mappedBy = "documentationUnitId", cascade = CascadeType.ALL, orphanRemoval = true)
+  private ManagementDataDTO managementData;
 }

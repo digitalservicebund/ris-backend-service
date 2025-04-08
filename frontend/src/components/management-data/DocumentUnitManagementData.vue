@@ -3,8 +3,10 @@ import { storeToRefs } from "pinia"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
-import DuplicateRelationListItem from "@/components/DuplicateRelationListItem.vue"
+import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
+import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import DocumentUnit from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 
@@ -88,6 +90,10 @@ const rowClass = () => {
   <div class="w-full grow p-24">
     <div class="flex flex-col gap-24 bg-white p-24">
       <TitleElement>Verwaltungsdaten</TitleElement>
+      <ManagementDataMetadata
+        v-if="documentUnit"
+        :document-unit="documentUnit as DocumentUnit"
+      />
       <div class="py-24">
         <h2 class="ris-body1-bold pb-16">Historie:</h2>
         <DataTable
