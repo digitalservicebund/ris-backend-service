@@ -26,7 +26,7 @@ public class ManagementDataDTO {
   @Id
   @OneToOne()
   @JoinColumn(name = "documentation_unit_id", referencedColumnName = "id")
-  private DecisionDTO documentationUnitId;
+  private DocumentationUnitDTO documentationUnit;
 
   @OneToOne()
   @JoinColumn(name = "created_by_documentation_office", referencedColumnName = "id")

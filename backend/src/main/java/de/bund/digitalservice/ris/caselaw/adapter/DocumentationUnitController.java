@@ -107,9 +107,9 @@ public class DocumentationUnitController {
   public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody(required = false) Optional<DocumentationUnitCreationParameters> parameters) {
-    var userDocOffice = userService.getDocumentationOffice(oidcUser);
     try {
-      var documentationUnit = service.generateNewDocumentationUnit(userDocOffice, parameters);
+      var documentationUnit =
+          service.generateNewDocumentationUnit(userService.getUser(oidcUser), parameters);
       return ResponseEntity.status(HttpStatus.CREATED).body(documentationUnit);
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);

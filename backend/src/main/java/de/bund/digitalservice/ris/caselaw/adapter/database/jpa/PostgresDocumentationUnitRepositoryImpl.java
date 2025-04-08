@@ -175,8 +175,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit docUnit, Status status, Reference createdFromReference) {
-
+      DocumentationUnit docUnit, Status status, Reference createdFromReference, User user) {
     var documentationUnitDTO =
         repository.save(
             DecisionTransformer.transformToDTO(
@@ -214,11 +213,31 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                     .createdAt(Instant.now())
                     .build());
 
+    buildManagementData(user, documentationUnitDTO, builder);
+
     // saving a second time is necessary because status and reference need a reference to a
     // persisted documentation unit
     DecisionDTO savedDocUnit = repository.save(builder.build());
 
     return DecisionTransformer.transformToDomain(savedDocUnit);
+  }
+
+  private void buildManagementData(
+      @Nullable User user,
+      DocumentationUnitDTO documentationUnitDTO,
+      DecisionDTO.DecisionDTOBuilder<?, ?> builder) {
+    ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
+        ManagementDataDTO.builder()
+            .documentationUnit(documentationUnitDTO)
+            .createdAtDateTime(Instant.now());
+    if (user != null) {
+      managementDataBuilder
+          .createdByDocumentationOffice(
+              DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
+          .createdByUserId(user.id())
+          .createdByUserName(user.name());
+    }
+    builder.managementData(managementDataBuilder.build());
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -272,7 +291,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       if (currentUser != null) {
         if (decisionDTO.getManagementData() == null) {
           decisionDTO.setManagementData(new ManagementDataDTO());
-          decisionDTO.getManagementData().setDocumentationUnitId(decisionDTO);
+          decisionDTO.getManagementData().setDocumentationUnit(decisionDTO);
         }
 
         UUID userId = Optional.of(currentUser).map(User::id).orElse(null);
