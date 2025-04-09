@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import java.util.Collections;
@@ -71,6 +72,10 @@ public class AuthUtils {
         .abbreviation("DS")
         .uuid(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
         .build();
+  }
+
+  public static User buildDSuser() {
+    return User.builder().documentationOffice(buildDSDocOffice()).build();
   }
 
   public static DocumentationOffice buildCCRisDocOffice() {

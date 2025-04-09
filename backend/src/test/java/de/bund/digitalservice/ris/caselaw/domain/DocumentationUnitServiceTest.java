@@ -82,16 +82,18 @@ class DocumentationUnitServiceTest {
           DocumentNumberFormatterException {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
+    User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any())).thenReturn(documentationUnit);
+    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
+        .thenReturn(documentationUnit);
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
     // Can we use a captor to check if the document number was correctly created?
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    assertNotNull(service.generateNewDocumentationUnit(documentationOffice, Optional.empty()));
+    assertNotNull(service.generateNewDocumentationUnit(user, Optional.empty()));
 
     verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
     verify(duplicateCheckService, times(1)).checkDuplicates("nextDocumentNumber");
@@ -110,7 +112,8 @@ class DocumentationUnitServiceTest {
                 .publicationStatus(PublicationStatus.UNPUBLISHED)
                 .withError(false)
                 .build(),
-            null);
+            null,
+            user);
   }
 
   @Test
@@ -120,6 +123,7 @@ class DocumentationUnitServiceTest {
           DocumentNumberFormatterException {
     DocumentationOffice userDocumentationOffice =
         DocumentationOffice.builder().abbreviation("BAG").uuid(UUID.randomUUID()).build();
+    User user = User.builder().documentationOffice(userDocumentationOffice).build();
     DocumentationOffice designatedDocumentationOffice =
         DocumentationOffice.builder().abbreviation("BGH").uuid(UUID.randomUUID()).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
@@ -137,7 +141,8 @@ class DocumentationUnitServiceTest {
                     .build())
             .build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any())).thenReturn(documentationUnit);
+    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
+        .thenReturn(documentationUnit);
 
     when(documentNumberService.generateDocumentNumber(designatedDocumentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
@@ -145,8 +150,7 @@ class DocumentationUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    assertNotNull(
-        service.generateNewDocumentationUnit(userDocumentationOffice, Optional.of(parameters)));
+    assertNotNull(service.generateNewDocumentationUnit(user, Optional.of(parameters)));
 
     verify(documentNumberService)
         .generateDocumentNumber(designatedDocumentationOffice.abbreviation());
@@ -170,7 +174,8 @@ class DocumentationUnitServiceTest {
                 .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
                 .withError(false)
                 .build(),
-            parameters.reference());
+            parameters.reference(),
+            user);
   }
 
   @Test
