@@ -427,7 +427,7 @@ test.describe("core data", () => {
 
       await test.step("Entscheidungsdatum und abweichendes Entscheidungsdatum sind nicht sichtbar", async () => {
         const decisionDate = pageWithExternalUser.getByLabel(
-          "'Entscheidungsdatum",
+          "Entscheidungsdatum",
           { exact: true },
         )
         const deviatingDecisionDate = pageWithExternalUser.getByTestId(
