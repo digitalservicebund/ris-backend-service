@@ -108,7 +108,7 @@ class InternalPortalPublicationServiceTest {
     UUID documentationUnitId = UUID.randomUUID();
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
 
-    internalPortalPublicationService.publishDocumentationUnit(documentationUnitId);
+    internalPortalPublicationService.publishDocumentationUnitWithChangelog(documentationUnitId);
 
     verify(caseLawBucket, times(2)).save(anyString(), anyString());
   }
@@ -124,7 +124,9 @@ class InternalPortalPublicationServiceTest {
 
     assertThatExceptionOfType(LdmlTransformationException.class)
         .isThrownBy(
-            () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
+            () ->
+                internalPortalPublicationService.publishDocumentationUnitWithChangelog(
+                    documentationUnitId))
         .withMessageContaining("LDML validation failed.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
@@ -140,7 +142,9 @@ class InternalPortalPublicationServiceTest {
 
     assertThatExceptionOfType(LdmlTransformationException.class)
         .isThrownBy(
-            () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
+            () ->
+                internalPortalPublicationService.publishDocumentationUnitWithChangelog(
+                    documentationUnitId))
         .withMessageContaining("Missing judgment body.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
@@ -155,7 +159,9 @@ class InternalPortalPublicationServiceTest {
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(
-            () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
+            () ->
+                internalPortalPublicationService.publishDocumentationUnitWithChangelog(
+                    documentationUnitId))
         .withMessageContaining(
             "Could not publish documentation unit to portal, because changelog file could not be created.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
@@ -171,7 +177,9 @@ class InternalPortalPublicationServiceTest {
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(
-            () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
+            () ->
+                internalPortalPublicationService.publishDocumentationUnitWithChangelog(
+                    documentationUnitId))
         .withMessageContaining("Could not save changelog to bucket");
   }
 
@@ -184,7 +192,9 @@ class InternalPortalPublicationServiceTest {
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(
-            () -> internalPortalPublicationService.publishDocumentationUnit(documentationUnitId))
+            () ->
+                internalPortalPublicationService.publishDocumentationUnitWithChangelog(
+                    documentationUnitId))
         .withMessageContaining("Could not save LDML to bucket");
   }
 }

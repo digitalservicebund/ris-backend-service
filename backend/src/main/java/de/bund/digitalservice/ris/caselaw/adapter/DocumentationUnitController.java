@@ -467,7 +467,7 @@ public class DocumentationUnitController {
   public ResponseEntity<Void> publishDocumentationUnit(@PathVariable UUID uuid) {
 
     try {
-      internalPortalPublicationService.publishDocumentationUnit(uuid);
+      internalPortalPublicationService.publishDocumentationUnitWithChangelog(uuid);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Error handing over documentation unit '{}' to portal", uuid, e);

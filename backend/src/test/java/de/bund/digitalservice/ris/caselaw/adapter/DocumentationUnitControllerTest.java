@@ -741,7 +741,7 @@ class DocumentationUnitControllerTest {
 
     doThrow(DocumentationUnitNotExistsException.class)
         .when(internalPortalPublicationService)
-        .publishDocumentationUnit(TEST_UUID);
+        .publishDocumentationUnitWithChangelog(TEST_UUID);
 
     risWebClient
         .withDefaultLogin()
@@ -751,7 +751,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(internalPortalPublicationService).publishDocumentationUnit(TEST_UUID);
+    verify(internalPortalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
   }
 
   @Test
@@ -760,7 +760,7 @@ class DocumentationUnitControllerTest {
 
     doThrow(LdmlTransformationException.class)
         .when(internalPortalPublicationService)
-        .publishDocumentationUnit(TEST_UUID);
+        .publishDocumentationUnitWithChangelog(TEST_UUID);
 
     risWebClient
         .withDefaultLogin()
@@ -770,7 +770,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .isBadRequest();
 
-    verify(internalPortalPublicationService).publishDocumentationUnit(TEST_UUID);
+    verify(internalPortalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
   }
 
   @Test
@@ -778,7 +778,7 @@ class DocumentationUnitControllerTest {
 
     doThrow(PublishException.class)
         .when(internalPortalPublicationService)
-        .publishDocumentationUnit(TEST_UUID);
+        .publishDocumentationUnitWithChangelog(TEST_UUID);
 
     risWebClient
         .withDefaultLogin()
@@ -788,7 +788,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(internalPortalPublicationService).publishDocumentationUnit(TEST_UUID);
+    verify(internalPortalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
   }
 
   @Test
