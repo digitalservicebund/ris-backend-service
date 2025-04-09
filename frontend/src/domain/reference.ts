@@ -1,4 +1,4 @@
-import { DocumentType } from "./documentUnit"
+import { DocumentType } from "./documentType"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"

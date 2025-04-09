@@ -9,6 +9,7 @@ import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
 import SingleNorm from "./singleNorm"
 import Attachment from "@/domain/attachment"
+import { DocumentType } from "@/domain/documentType"
 import LegalForce from "@/domain/legalForce"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { PublicationState, PublicationStatus } from "@/domain/publicationStatus"
@@ -59,12 +60,6 @@ export type ContentRelatedIndexing = {
   fieldsOfLaw?: FieldOfLaw[]
   jobProfiles?: string[]
   hasLegislativeMandate?: boolean
-}
-
-export type DocumentType = {
-  uuid?: string
-  jurisShortcut: string
-  label: string
 }
 
 export type Court = {
