@@ -225,6 +225,23 @@ const removeIgnoredWord = async (word: string) => {
   editor.commands.setSelectedMatch()
 }
 
+/**
+ * Adds word to global ignore and closes the modal
+ */
+async function addGloballyIgnoredWord(word: string) {
+  await textCheckService.ignoreWordGlobally(word)
+  editor.commands.setSelectedMatch()
+}
+
+/**
+ * Remove ignored word globally
+ * @param word
+ */
+const removeGloballyIgnoredWord = async (word: string) => {
+  await textCheckService.removeGloballyIgnoredWord(word)
+  editor.commands.setSelectedMatch()
+}
+
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
 /**
@@ -333,6 +350,8 @@ defineExpose({ jumpToMatch })
         <TextCheckModal
           v-if="selectedMatch"
           :match="selectedMatch"
+          @global-word:add="addGloballyIgnoredWord"
+          @global-word:remove="removeGloballyIgnoredWord"
           @word:add="addIgnoredWord"
           @word:remove="removeIgnoredWord"
           @word:replace="acceptSuggestion"
