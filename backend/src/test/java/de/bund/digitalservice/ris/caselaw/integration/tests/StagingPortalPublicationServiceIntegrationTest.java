@@ -18,8 +18,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
@@ -76,7 +76,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
       StagingPortalPublicationService.class,
       XmlUtilService.class,
       ConverterConfig.class,
-      InternalPortalBucket.class,
+      PortalBucket.class,
       DocumentationUnitService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
@@ -112,11 +112,8 @@ class StagingPortalPublicationServiceIntegrationTest {
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
 
-  @MockitoBean(name = "internalPortalS3Client")
+  @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
-
-  @MockitoBean(name = "publicPortalS3Client")
-  private S3Client portalPrototypeS3Client;
 
   @MockitoBean private UserService userService;
   @MockitoBean private DocxConverterService docxConverterService;

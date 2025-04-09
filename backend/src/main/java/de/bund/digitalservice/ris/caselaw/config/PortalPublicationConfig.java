@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.NoOpPortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalPublicationService;
@@ -42,13 +42,13 @@ public class PortalPublicationConfig {
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,
-      InternalPortalBucket internalPortalBucket,
+      PortalBucket portalBucket,
       ObjectMapper objectMapper) {
     return new StagingPortalPublicationService(
         documentationUnitRepository,
         xmlUtilService,
         documentBuilderFactory,
-        internalPortalBucket,
+        portalBucket,
         objectMapper);
   }
 

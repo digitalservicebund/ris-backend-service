@@ -128,7 +128,7 @@ class PrototypePortalPublicationJobIntegrationTest {
   @Autowired private PortalPublicationJobRepository publicationJobRepository;
   @Autowired private PortalPublicationJobService portalPublicationJobService;
 
-  @MockitoBean(name = "publicPortalS3Client")
+  @MockitoBean(name = "prototypePortalS3Client")
   private S3Client s3Client;
 
   @MockitoBean private UserService userService;

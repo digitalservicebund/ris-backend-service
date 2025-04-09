@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.S3Client;
 
 @Component
-public class InternalPortalBucket extends S3Bucket {
+public class PortalBucket extends S3Bucket {
 
-  public InternalPortalBucket(
-      @Qualifier("internalPortalS3Client") S3Client s3Client,
+  public PortalBucket(
+      @Qualifier("portalS3Client") S3Client s3Client,
       @Value("${s3.file-storage.case-law.bucket-name:no-bucket}") String bucketName) {
     super(s3Client, bucketName);
   }

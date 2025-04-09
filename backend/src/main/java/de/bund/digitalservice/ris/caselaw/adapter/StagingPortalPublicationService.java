@@ -12,14 +12,14 @@ public class StagingPortalPublicationService extends CommonPortalPublicationServ
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,
-      InternalPortalBucket internalPortalBucket,
+      PortalBucket portalBucket,
       ObjectMapper objectMapper) {
 
     super(
         documentationUnitRepository,
         xmlUtilService,
         documentBuilderFactory,
-        internalPortalBucket,
+        portalBucket,
         objectMapper);
   }
 

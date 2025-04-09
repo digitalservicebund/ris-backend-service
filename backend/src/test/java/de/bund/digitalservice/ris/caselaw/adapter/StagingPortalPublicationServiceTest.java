@@ -41,7 +41,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class StagingPortalPublicationServiceTest {
 
   static DocumentationUnitRepository documentationUnitRepository;
-  static InternalPortalBucket caseLawBucket;
+  static PortalBucket caseLawBucket;
   static DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
   static StagingPortalPublicationService stagingPortalPublicationService;
@@ -52,7 +52,7 @@ class StagingPortalPublicationServiceTest {
   @BeforeAll
   static void setUpBeforeClass() {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
-    caseLawBucket = mock(InternalPortalBucket.class);
+    caseLawBucket = mock(PortalBucket.class);
     objectMapper = mock(ObjectMapper.class);
     stagingPortalPublicationService =
         new StagingPortalPublicationService(

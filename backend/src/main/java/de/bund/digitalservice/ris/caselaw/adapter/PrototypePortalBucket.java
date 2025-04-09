@@ -9,7 +9,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 public class PrototypePortalBucket extends S3Bucket {
 
   public PrototypePortalBucket(
-      @Qualifier("publicPortalS3Client") S3Client s3Client,
+      @Qualifier("prototypePortalS3Client") S3Client s3Client,
       @Value("${s3.file-storage.case-law-prototype.bucket-name:no-bucket}") String bucketName) {
     super(s3Client, bucketName);
   }

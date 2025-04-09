@@ -19,8 +19,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationJobService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
@@ -87,7 +87,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
       StagingPortalPublicationService.class,
       XmlUtilService.class,
       ConverterConfig.class,
-      InternalPortalBucket.class,
+      PortalBucket.class,
       DocumentationUnitService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
@@ -128,7 +128,7 @@ class StagingPortalPublicationJobIntegrationTest {
   @Autowired private PortalPublicationJobRepository publicationJobRepository;
   @Autowired private PortalPublicationJobService portalPublicationJobService;
 
-  @MockitoBean(name = "internalPortalS3Client")
+  @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
 
   @MockitoBean private UserService userService;

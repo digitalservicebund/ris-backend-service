@@ -27,16 +27,16 @@ public class OtcObsConfig {
   private String docxSecretAccessKey;
 
   @Value("${s3.file-storage.case-law.access-key-id:test}")
-  private String internalPortalAccessKeyId;
+  private String portalAccessKeyId;
 
   @Value("${s3.file-storage.case-law.secret-access-key:test}")
-  private String internalPortalSecretAccessKey;
+  private String portalSecretAccessKey;
 
   @Value("${s3.file-storage.case-law-prototype.access-key-id:test}")
-  private String publicPortalAccessKeyId;
+  private String prototypePortalAccessKeyId;
 
   @Value("${s3.file-storage.case-law-prototype.access-key:test}")
-  private String publicPortalAccessKey;
+  private String prototypePortalAccessKey;
 
   @Bean(name = "docxS3Client")
   @Profile({"staging", "production", "uat"})
@@ -50,40 +50,39 @@ public class OtcObsConfig {
         .build();
   }
 
-  @Bean(name = "internalPortalS3Client")
+  @Bean(name = "portalS3Client")
   @Profile({"staging"})
-  public S3Client internalPortalS3Client() throws URISyntaxException {
+  public S3Client portalS3Client() throws URISyntaxException {
     return S3Client.builder()
         .credentialsProvider(
             StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(
-                    internalPortalAccessKeyId, internalPortalSecretAccessKey)))
+                AwsBasicCredentials.create(portalAccessKeyId, portalSecretAccessKey)))
         .endpointOverride(new URI(endpoint))
         .region(Region.of(EU_DE))
         .build();
   }
 
-  @Bean(name = "internalPortalS3Client")
+  @Bean(name = "portalS3Client")
   @Profile({"production", "uat"})
-  public S3Client internalPortalS3NoopClient() {
+  public S3Client portalS3NoopClient() {
     return new S3NoOpClient();
   }
 
-  @Bean(name = "publicPortalS3Client")
+  @Bean(name = "prototypePortalS3Client")
   @Profile({"staging", "production"})
-  public S3Client publicPortalS3Client() throws URISyntaxException {
+  public S3Client prototypePortalS3Client() throws URISyntaxException {
     return S3Client.builder()
         .credentialsProvider(
             StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(publicPortalAccessKeyId, publicPortalAccessKey)))
+                AwsBasicCredentials.create(prototypePortalAccessKeyId, prototypePortalAccessKey)))
         .endpointOverride(new URI(endpoint))
         .region(Region.of(EU_DE))
         .build();
   }
 
-  @Bean(name = "publicPortalS3Client")
+  @Bean(name = "prototypePortalS3Client")
   @Profile({"uat"})
-  public S3Client publicPortalS3NoopClient() {
+  public S3Client prototypePortalS3NoopClient() {
     return new S3NoOpClient();
   }
 
@@ -93,15 +92,15 @@ public class OtcObsConfig {
     return new S3MockClient();
   }
 
-  @Bean(name = "internalPortalS3Client")
+  @Bean(name = "portalS3Client")
   @Profile({"!production & !staging & !uat"})
-  public S3Client internalPortalS3MockClient() {
+  public S3Client portalS3MockClient() {
     return new S3MockClient();
   }
 
-  @Bean(name = "publicPortalS3Client")
+  @Bean(name = "prototypePortalS3Client")
   @Profile({"!production & !staging & !uat"})
-  public S3Client publicPortalS3MockClient() {
+  public S3Client prototypePortalS3MockClient() {
     return new S3MockClient();
   }
 }
