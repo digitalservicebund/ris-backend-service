@@ -4,62 +4,48 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
-@Service
 @Slf4j
-public class PublicPortalPublicationService {
+public class PrototypePortalPublicationService extends CommonPortalPublicationService {
 
-  private final PortalPublicationService portalPublicationService;
   private final RiiService riiService;
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final PublicPortalBucket publicPortalBucket;
+  private final PrototypePortalBucket prototypePortalBucket;
 
-  @Autowired
-  public PublicPortalPublicationService(
+  public PrototypePortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,
-      PublicPortalBucket publicPortalBucket,
+      PrototypePortalBucket prototypePortalBucket,
       ObjectMapper objectMapper,
       RiiService riiService) {
-    this.portalPublicationService =
-        new PortalPublicationService(
-            documentationUnitRepository,
-            xmlUtilService,
-            documentBuilderFactory,
-            publicPortalBucket,
-            objectMapper);
+    super(
+        documentationUnitRepository,
+        xmlUtilService,
+        documentBuilderFactory,
+        prototypePortalBucket,
+        objectMapper);
     this.riiService = riiService;
     this.documentationUnitRepository = documentationUnitRepository;
-    this.publicPortalBucket = publicPortalBucket;
+    this.prototypePortalBucket = prototypePortalBucket;
   }
 
-  public void publishDocumentationUnit(String documentNumber)
-      throws DocumentationUnitNotExistsException {
-    portalPublicationService.publishDocumentationUnit(documentNumber);
+  @Override
+  public void publishDocumentationUnitWithChangelog(UUID documentationUnitId) {
+    // no-op in prototype
   }
 
-  public void deleteDocumentationUnit(String documentNumber) {
-    portalPublicationService.deleteDocumentationUnit(documentNumber);
-  }
-
+  @Override
   public void uploadChangelog(
-      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
-      throws JsonProcessingException {
-    portalPublicationService.uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers);
-  }
-
-  public void uploadFullReindexChangelog() throws JsonProcessingException {
-    portalPublicationService.uploadFullReindexChangelog();
+      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers) {
+    // no-op in prototype - delta changelog uploads currently disabled
   }
 
   //                        ↓ day of month (1-31)
@@ -71,7 +57,7 @@ public class PublicPortalPublicationService {
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logPortalPublicationSanityCheck() {
     List<String> portalBucketDocumentNumbers =
-        publicPortalBucket.getAllFilenames().stream()
+        prototypePortalBucket.getAllFilenames().stream()
             .filter(fileName -> fileName.contains(".xml"))
             .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
             .toList();
@@ -116,8 +102,7 @@ public class PublicPortalPublicationService {
         log.info("Deleting documents not in Rechtsprechung im Internet...");
         try {
           inPortalNotInRii.forEach(this::deleteDocumentationUnit);
-          uploadChangelog(
-              null,
+          uploadDeletionChangelog(
               inPortalNotInRii.stream().map(documentNumber -> documentNumber + ".xml").toList());
 
         } catch (JsonProcessingException | PublishException e) {

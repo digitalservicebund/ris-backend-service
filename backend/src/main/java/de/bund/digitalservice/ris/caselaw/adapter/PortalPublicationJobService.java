@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service;
 public class PortalPublicationJobService {
 
   private final PortalPublicationJobRepository publicationJobRepository;
-  private final PublicPortalPublicationService publicPortalPublicationService;
+  private final PortalPublicationService portalPublicationService;
 
   public PortalPublicationJobService(
       PortalPublicationJobRepository publicationJobRepository,
-      PublicPortalPublicationService publicPortalPublicationService) {
+      PortalPublicationService portalPublicationService) {
     this.publicationJobRepository = publicationJobRepository;
-    this.publicPortalPublicationService = publicPortalPublicationService;
+    this.portalPublicationService = portalPublicationService;
   }
 
   //                        ↓ day of month (1-31)
@@ -34,7 +34,7 @@ public class PortalPublicationJobService {
   @SchedulerLock(name = "nightly-changelog-publish")
   public void publishNightlyChangelog() {
     try {
-      publicPortalPublicationService.uploadFullReindexChangelog();
+      portalPublicationService.uploadFullReindexChangelog();
     } catch (Exception e) {
       log.error("Could not upload nightly changelog file.", e);
     }
@@ -70,7 +70,7 @@ public class PortalPublicationJobService {
   private void executeJob(PortalPublicationJobDTO job) {
     if (job.getPublicationType() == PortalPublicationTaskType.PUBLISH) {
       try {
-        this.publicPortalPublicationService.publishDocumentationUnit(job.getDocumentNumber());
+        this.portalPublicationService.publishDocumentationUnit(job.getDocumentNumber());
         job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
       } catch (Exception e) {
         log.error("Could not publish documentation unit {}", job.getDocumentNumber(), e);
@@ -80,7 +80,7 @@ public class PortalPublicationJobService {
 
     if (job.getPublicationType() == PortalPublicationTaskType.DELETE) {
       try {
-        this.publicPortalPublicationService.deleteDocumentationUnit(job.getDocumentNumber());
+        this.portalPublicationService.deleteDocumentationUnit(job.getDocumentNumber());
         job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
       } catch (Exception e) {
         log.error("Could not unpublish documentation unit {}", job.getDocumentNumber(), e);
@@ -116,15 +116,13 @@ public class PortalPublicationJobService {
             .map(job -> job.getDocumentNumber() + ".xml")
             .toList();
 
-    // disabled until portal team tells us to write individual batch changelogs again
-    //    if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {
-    //      try {
-    //        this.internalPortalPublicationService.uploadChangelog(publishDocNumbers,
-    // deletedDocNumbers);
-    //      } catch (Exception e) {
-    //        log.error("Could not upload changelog file.", e);
-    //      }
-    //    }
+    if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {
+      try {
+        this.portalPublicationService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
+      } catch (Exception e) {
+        log.error("Could not upload changelog file.", e);
+      }
+    }
 
     return new PublicationResult(publishDocNumbers.size(), deletedDocNumbers.size());
   }

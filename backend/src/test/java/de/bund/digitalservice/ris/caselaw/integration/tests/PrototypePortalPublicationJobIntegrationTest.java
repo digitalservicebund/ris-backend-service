@@ -18,12 +18,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalBucket;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationJobService;
-import de.bund.digitalservice.ris.caselaw.adapter.PublicPortalBucket;
-import de.bund.digitalservice.ris.caselaw.adapter.PublicPortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalBucket;
+import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
@@ -85,12 +83,10 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @RISIntegrationTest(
     imports = {
-      PublicPortalPublicationService.class,
-      InternalPortalPublicationService.class,
+      PrototypePortalPublicationService.class,
       XmlUtilService.class,
       ConverterConfig.class,
-      InternalPortalBucket.class,
-      PublicPortalBucket.class,
+      PrototypePortalBucket.class,
       DocumentationUnitService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
@@ -108,7 +104,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
       RiiService.class
     },
     controllers = {DocumentationUnitController.class})
-class PortalPublicationJobIntegrationTest {
+class PrototypePortalPublicationJobIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -134,9 +130,6 @@ class PortalPublicationJobIntegrationTest {
 
   @MockitoBean(name = "publicPortalS3Client")
   private S3Client s3Client;
-
-  @MockitoBean(name = "internalPortalS3Client")
-  private S3Client ldmlS3Client;
 
   @MockitoBean private UserService userService;
   @MockitoBean private DocxConverterService docxConverterService;
@@ -175,59 +168,6 @@ class PortalPublicationJobIntegrationTest {
   void cleanUp() {
     repository.deleteAll();
   }
-
-  // currently disabled since we are not writing sequential changelogs
-  //  @Test
-  //  void shouldOnlyAddDocumentNumberToChangelogForLatestKindOfJob() throws IOException {
-  //    DocumentationUnitDTO dto1 =
-  //        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-  //            repository, buildValidDocumentationUnit("1"));
-  //    DocumentationUnitDTO dto2 =
-  //        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-  //            repository, buildValidDocumentationUnit("2"));
-  //
-  //    portalPublicationJobRepository.saveAll(
-  //        List.of(
-  //            createPublicationJob(dto1, PortalPublicationTaskType.PUBLISH),
-  //            createPublicationJob(dto2, PortalPublicationTaskType.DELETE),
-  //            createPublicationJob(dto1, PortalPublicationTaskType.PUBLISH),
-  //            createPublicationJob(dto2, PortalPublicationTaskType.PUBLISH),
-  //            createPublicationJob(dto1, PortalPublicationTaskType.DELETE),
-  //            createPublicationJob(dto2, PortalPublicationTaskType.PUBLISH)));
-  //
-  //    portalPublicationJobService.executePendingJobs();
-  //
-  //    ArgumentCaptor<PutObjectRequest> putCaptor =
-  // ArgumentCaptor.forClass(PutObjectRequest.class);
-  //    ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
-  //    ArgumentCaptor<Consumer<DeleteObjectRequest.Builder>> deleteCaptor =
-  //        ArgumentCaptor.forClass(Consumer.class);
-  //
-  //    // TWO DELETE JOBS
-  //    verify(s3Client, times(2)).deleteObject(deleteCaptor.capture());
-  //    // PUT 4 PUBLISH JOBS (( + PUT changelog)) //currently disabled
-  //    verify(s3Client, times(4)).putObject(putCaptor.capture(), bodyCaptor.capture());
-  //
-  //    var capturedPutRequests = putCaptor.getAllValues();
-  //    var changelogContent =
-  //        new String(
-  //            bodyCaptor.getAllValues().get(4).contentStreamProvider().newStream().readAllBytes(),
-  //            StandardCharsets.UTF_8);
-  //
-  //    assertThat(capturedPutRequests.get(0).key()).isEqualTo("1.xml");
-  //    assertThat(capturedPutRequests.get(1).key()).isEqualTo("1.xml");
-  //    assertThat(capturedPutRequests.get(2).key()).isEqualTo("2.xml");
-  //    assertThat(capturedPutRequests.get(3).key()).isEqualTo("2.xml");
-  //    assertThat(capturedPutRequests.get(4).key()).contains("changelogs/");
-  //    // ensure that each document number only appears either in changed or deleted section
-  //    assertThat(changelogContent)
-  //        .isEqualTo(
-  //            """
-  //                {"changed":["2.xml"],"deleted":["1.xml"]}""");
-  //
-  //    assertThat(portalPublicationJobRepository.findAll())
-  //        .allMatch(job -> job.getPublicationStatus() == SUCCESS);
-  //  }
 
   @Test
   void shouldContinueExecutionOnError() {

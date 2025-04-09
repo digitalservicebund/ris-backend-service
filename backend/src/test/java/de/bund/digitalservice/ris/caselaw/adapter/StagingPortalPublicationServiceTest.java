@@ -38,13 +38,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class InternalPortalPublicationServiceTest {
+class StagingPortalPublicationServiceTest {
 
   static DocumentationUnitRepository documentationUnitRepository;
   static InternalPortalBucket caseLawBucket;
   static DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
-  static InternalPortalPublicationService internalPortalPublicationService;
+  static StagingPortalPublicationService stagingPortalPublicationService;
   static DocumentationUnit testDocumentUnit;
   static UUID testUUID;
   static ObjectMapper objectMapper;
@@ -54,8 +54,8 @@ class InternalPortalPublicationServiceTest {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
     caseLawBucket = mock(InternalPortalBucket.class);
     objectMapper = mock(ObjectMapper.class);
-    internalPortalPublicationService =
-        new InternalPortalPublicationService(
+    stagingPortalPublicationService =
+        new StagingPortalPublicationService(
             documentationUnitRepository,
             xmlUtilService,
             documentBuilderFactory,
@@ -108,7 +108,7 @@ class InternalPortalPublicationServiceTest {
     UUID documentationUnitId = UUID.randomUUID();
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
 
-    internalPortalPublicationService.publishDocumentationUnitWithChangelog(documentationUnitId);
+    stagingPortalPublicationService.publishDocumentationUnitWithChangelog(documentationUnitId);
 
     verify(caseLawBucket, times(2)).save(anyString(), anyString());
   }
@@ -125,7 +125,7 @@ class InternalPortalPublicationServiceTest {
     assertThatExceptionOfType(LdmlTransformationException.class)
         .isThrownBy(
             () ->
-                internalPortalPublicationService.publishDocumentationUnitWithChangelog(
+                stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
                     documentationUnitId))
         .withMessageContaining("LDML validation failed.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
@@ -143,7 +143,7 @@ class InternalPortalPublicationServiceTest {
     assertThatExceptionOfType(LdmlTransformationException.class)
         .isThrownBy(
             () ->
-                internalPortalPublicationService.publishDocumentationUnitWithChangelog(
+                stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
                     documentationUnitId))
         .withMessageContaining("Missing judgment body.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
@@ -160,7 +160,7 @@ class InternalPortalPublicationServiceTest {
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(
             () ->
-                internalPortalPublicationService.publishDocumentationUnitWithChangelog(
+                stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
                     documentationUnitId))
         .withMessageContaining(
             "Could not publish documentation unit to portal, because changelog file could not be created.");
@@ -178,7 +178,7 @@ class InternalPortalPublicationServiceTest {
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(
             () ->
-                internalPortalPublicationService.publishDocumentationUnitWithChangelog(
+                stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
                     documentationUnitId))
         .withMessageContaining("Could not save changelog to bucket");
   }
@@ -193,7 +193,7 @@ class InternalPortalPublicationServiceTest {
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(
             () ->
-                internalPortalPublicationService.publishDocumentationUnitWithChangelog(
+                stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
                     documentationUnitId))
         .withMessageContaining("Could not save LDML to bucket");
   }

@@ -13,8 +13,8 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.DocumentationUnitControllerTestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
@@ -68,7 +68,7 @@ class DocumentationUnitControllerAuthTest {
   @MockitoBean private KeycloakUserService userService;
   @MockitoBean private DocxConverterService docxConverterService;
   @MockitoBean private AttachmentService attachmentService;
-  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
+  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean DatabaseApiKeyRepository apiKeyRepository;
   @MockitoBean DatabaseDocumentationOfficeRepository officeRepository;
