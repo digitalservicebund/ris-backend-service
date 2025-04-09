@@ -90,7 +90,7 @@ class DocumentationUnitControllerTest {
   @MockitoBean private DocumentationUnitService service;
   @MockitoBean private DocumentationUnitDocxMetadataInitializationService docUnitAttachmentService;
   @MockitoBean private HandoverService handoverService;
-  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
+  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private UserService userService;
   @MockitoBean private DocxConverterService docxConverterService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
@@ -740,8 +740,8 @@ class DocumentationUnitControllerTest {
       throws DocumentationUnitNotExistsException {
 
     doThrow(DocumentationUnitNotExistsException.class)
-        .when(internalPortalPublicationService)
-        .publishDocumentationUnit(TEST_UUID);
+        .when(stagingPortalPublicationService)
+        .publishDocumentationUnitWithChangelog(TEST_UUID);
 
     risWebClient
         .withDefaultLogin()
@@ -751,7 +751,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(internalPortalPublicationService).publishDocumentationUnit(TEST_UUID);
+    verify(stagingPortalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
   }
 
   @Test
@@ -759,8 +759,8 @@ class DocumentationUnitControllerTest {
       throws DocumentationUnitNotExistsException {
 
     doThrow(LdmlTransformationException.class)
-        .when(internalPortalPublicationService)
-        .publishDocumentationUnit(TEST_UUID);
+        .when(stagingPortalPublicationService)
+        .publishDocumentationUnitWithChangelog(TEST_UUID);
 
     risWebClient
         .withDefaultLogin()
@@ -770,15 +770,15 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .isBadRequest();
 
-    verify(internalPortalPublicationService).publishDocumentationUnit(TEST_UUID);
+    verify(stagingPortalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
   }
 
   @Test
   void testPublish_withServiceThrowsPublishException() throws DocumentationUnitNotExistsException {
 
     doThrow(PublishException.class)
-        .when(internalPortalPublicationService)
-        .publishDocumentationUnit(TEST_UUID);
+        .when(stagingPortalPublicationService)
+        .publishDocumentationUnitWithChangelog(TEST_UUID);
 
     risWebClient
         .withDefaultLogin()
@@ -788,7 +788,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(internalPortalPublicationService).publishDocumentationUnit(TEST_UUID);
+    verify(stagingPortalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
   }
 
   @Test

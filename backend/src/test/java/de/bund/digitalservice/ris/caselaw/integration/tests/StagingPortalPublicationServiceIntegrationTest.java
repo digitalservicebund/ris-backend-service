@@ -18,10 +18,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalBucket;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.PublicPortalBucket;
+import de.bund.digitalservice.ris.caselaw.adapter.PortalBucket;
+import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
@@ -74,11 +73,10 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @RISIntegrationTest(
     imports = {
-      InternalPortalPublicationService.class,
+      StagingPortalPublicationService.class,
       XmlUtilService.class,
       ConverterConfig.class,
-      InternalPortalBucket.class,
-      PublicPortalBucket.class,
+      PortalBucket.class,
       DocumentationUnitService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
@@ -94,7 +92,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
       DocumentNumberPatternConfig.class
     },
     controllers = {DocumentationUnitController.class})
-class InternalPortalPublicationServiceIntegrationTest {
+class StagingPortalPublicationServiceIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -114,11 +112,8 @@ class InternalPortalPublicationServiceIntegrationTest {
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
 
-  @MockitoBean(name = "internalPortalS3Client")
+  @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
-
-  @MockitoBean(name = "publicPortalS3Client")
-  private S3Client portalPrototypeS3Client;
 
   @MockitoBean private UserService userService;
   @MockitoBean private DocxConverterService docxConverterService;
@@ -176,8 +171,8 @@ class InternalPortalPublicationServiceIntegrationTest {
     verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
 
     var capturedRequests = captor.getAllValues();
-    assertThat(capturedRequests.get(0).key()).contains("changelogs/");
-    assertThat(capturedRequests.get(1).key()).isEqualTo("1234567890123.xml");
+    assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123.xml");
+    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
   }
 
   @Test
@@ -240,7 +235,7 @@ class InternalPortalPublicationServiceIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().message())
-                    .contains("Could not save changelog to bucket."));
+                    .contains("Could not save LDML to bucket."));
   }
 
   private DecisionDTO.DecisionDTOBuilder<?, ?> buildValidDocumentationUnit() {

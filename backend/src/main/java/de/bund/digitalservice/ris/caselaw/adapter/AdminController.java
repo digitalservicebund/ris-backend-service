@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +19,12 @@ public class AdminController {
 
   private final MailTrackingService mailTrackingService;
   private final EnvironmentService environmentService;
-  private final InternalPortalPublicationService internalPortalPublicationService;
 
   @Autowired
   public AdminController(
-      MailTrackingService mailTrackingService,
-      EnvironmentService environmentService,
-      InternalPortalPublicationService internalPortalPublicationService) {
+      MailTrackingService mailTrackingService, EnvironmentService environmentService) {
     this.mailTrackingService = mailTrackingService;
     this.environmentService = environmentService;
-    this.internalPortalPublicationService = internalPortalPublicationService;
   }
 
   @PostMapping("/webhook")
@@ -45,19 +40,6 @@ public class AdminController {
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<String> getEnvironment() {
     return ResponseEntity.ok(environmentService.getEnvironment());
-  }
-
-  @GetMapping("/ldml/samples")
-  @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<Void> createSampleLdmls() {
-    try {
-      internalPortalPublicationService.exportSampleLdmls();
-    } catch (IOException ex) {
-      log.error("Couldn't generate zip file for sample documentation units.", ex);
-      return ResponseEntity.internalServerError().build();
-    }
-
-    return ResponseEntity.ok().build();
   }
 
   @GetMapping("/accountManagementUrl")

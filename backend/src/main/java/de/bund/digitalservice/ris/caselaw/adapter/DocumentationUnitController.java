@@ -67,7 +67,7 @@ public class DocumentationUnitController {
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
   private final HandoverService handoverService;
-  private final InternalPortalPublicationService internalPortalPublicationService;
+  private final PortalPublicationService portalPublicationService;
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
   private final DuplicateCheckService duplicateCheckService;
@@ -78,7 +78,7 @@ public class DocumentationUnitController {
       AttachmentService attachmentService,
       ConverterService converterService,
       HandoverService handoverService,
-      InternalPortalPublicationService internalPortalPublicationService,
+      PortalPublicationService portalPublicationService,
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService,
       DuplicateCheckService duplicateCheckService) {
@@ -87,7 +87,7 @@ public class DocumentationUnitController {
     this.attachmentService = attachmentService;
     this.converterService = converterService;
     this.handoverService = handoverService;
-    this.internalPortalPublicationService = internalPortalPublicationService;
+    this.portalPublicationService = portalPublicationService;
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
     this.duplicateCheckService = duplicateCheckService;
@@ -467,7 +467,7 @@ public class DocumentationUnitController {
   public ResponseEntity<Void> publishDocumentationUnit(@PathVariable UUID uuid) {
 
     try {
-      internalPortalPublicationService.publishDocumentationUnit(uuid);
+      portalPublicationService.publishDocumentationUnitWithChangelog(uuid);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Error handing over documentation unit '{}' to portal", uuid, e);
