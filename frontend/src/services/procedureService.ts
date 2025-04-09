@@ -2,8 +2,8 @@ import { useFetch, UseFetchReturn } from "@vueuse/core"
 import { computed, Ref } from "vue"
 import httpClient, { API_PREFIX, ServiceResponse } from "./httpClient"
 import { Page } from "@/components/Pagination.vue"
-import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { Procedure } from "@/domain/procedure"
 import errorMessages from "@/i18n/errors.json"
 
 interface ProcedureService {
@@ -12,13 +12,16 @@ interface ProcedureService {
     page: Ref<number>,
     filter: Ref<string>,
   ): UseFetchReturn<Page<Procedure>>
+
   getDocumentUnits(
     procedureId: string | undefined,
   ): Promise<ServiceResponse<DocumentUnitListEntry[]>>
+
   assignUserGroup(
     procedureId: string,
     userGroupId: string,
   ): Promise<ServiceResponse<unknown>>
+
   unassignUserGroup(procedureId: string): Promise<ServiceResponse<unknown>>
 }
 

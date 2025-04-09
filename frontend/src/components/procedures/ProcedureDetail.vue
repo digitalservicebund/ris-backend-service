@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
-import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { Procedure } from "@/domain/procedure"
 import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{
