@@ -33,6 +33,13 @@ public class PostgresIgnoredTextCheckWordRepositoryImpl implements IgnoredTextCh
   }
 
   @Override
+  public List<IgnoredTextCheckWord> findAllByDocumentationUnitId(UUID documentationUnitId) {
+    return this.repository.findAllByDocumentationUnitId(documentationUnitId).stream()
+        .map(IgnoredTextCheckWordTransformer::transformToDomain)
+        .toList();
+  }
+
+  @Override
   public List<IgnoredTextCheckWord> findByDocumentationUnitIdOrByGlobalWords(
       List<String> words, UUID documentationUnitId) {
     return repository.findByDocumentationUnitIdOrByGlobalWords(documentationUnitId, words).stream()

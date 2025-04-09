@@ -17,10 +17,14 @@ public interface DatabaseIgnoredTextCheckWordRepository
 
   void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId);
 
+  List<IgnoredTextCheckWordDTO> findAllByDocumentationUnitId(UUID documentationUnitId);
+
   @Query(
       "SELECT i FROM IgnoredTextCheckWordDTO i "
           + "WHERE i.documentationUnitId = :documentationUnitId "
           + "OR (i.jurisId IS NOT NULL AND i.word IN :words)")
   List<IgnoredTextCheckWordDTO> findByDocumentationUnitIdOrByGlobalWords(
       @Param("documentationUnitId") UUID documentationUnitId, @Param("words") List<String> words);
+
+  List<IgnoredTextCheckWordDTO> findByDocumentationUnitId(UUID documentationUnitId);
 }

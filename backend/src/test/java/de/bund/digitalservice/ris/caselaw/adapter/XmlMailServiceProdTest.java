@@ -9,14 +9,17 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -38,7 +41,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({HandoverMailService.class})
+@Import({HandoverMailService.class, TextCheckService.class})
 @TestPropertySource(
     properties = {
       "mail.exporter.senderAddress=export@neuris",
@@ -96,7 +99,11 @@ class XmlMailServiceProdTest {
 
   @MockitoBean private HandoverRepository repository;
 
-  @MockitoBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean private DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
+
+  @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
+
+  @MockitoBean private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
 
   @MockitoBean private HttpMailSender mailSender;
 

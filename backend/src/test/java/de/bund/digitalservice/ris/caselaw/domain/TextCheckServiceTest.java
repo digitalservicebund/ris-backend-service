@@ -443,4 +443,19 @@ class TextCheckServiceTest {
         response.htmlText());
     assertEquals(1, response.matches().size());
   }
+
+  @Test
+  void testAddNoIndexTags_shouldNotReplaceTags() {
+
+    var html = "<body><p>body should be wrapped with no index</p></body>";
+    var result = TextCheckService.addNoIndexTags(html, List.of("body"));
+
+    var expected =
+"""
+<body>
+  <p><noindex>body</noindex> should be wrapped with no index</p>
+</body>
+""";
+    assertEquals(expected, result);
+  }
 }
