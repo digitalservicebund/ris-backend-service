@@ -65,7 +65,7 @@ public class S3AttachmentService implements AttachmentService {
 
     DocumentationUnitDTO documentationUnit =
         documentationUnitRepository.findById(documentationUnitId).orElseThrow();
-    setLastUpdatedInManagementData(user, documentationUnit);
+    setLastUpdated(user, documentationUnit);
     documentationUnitRepository.save(documentationUnit);
 
     AttachmentDTO attachmentDTO =
@@ -92,7 +92,7 @@ public class S3AttachmentService implements AttachmentService {
     deleteObjectFromBucket(s3Path);
     documentationUnitRepository
         .findById(documentationUnitId)
-        .ifPresent(documentationUnit -> setLastUpdatedInManagementData(user, documentationUnit));
+        .ifPresent(documentationUnit -> setLastUpdated(user, documentationUnit));
     repository.deleteByS3ObjectPath(s3Path);
   }
 
@@ -164,7 +164,7 @@ public class S3AttachmentService implements AttachmentService {
     s3Client.deleteObject(deleteObjectRequest);
   }
 
-  private void setLastUpdatedInManagementData(User user, DocumentationUnitDTO documentationUnit) {
+  private void setLastUpdated(User user, DocumentationUnitDTO documentationUnit) {
     ManagementDataDTO managementData = documentationUnit.getManagementData();
     if (managementData == null) {
       managementData =
