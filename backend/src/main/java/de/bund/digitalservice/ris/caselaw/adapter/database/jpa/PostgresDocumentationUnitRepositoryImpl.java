@@ -221,7 +221,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // persisted documentation unit
     DecisionDTO savedDocUnit = repository.save(documentationUnitDTO);
 
-    return DecisionTransformer.transformToDomain(savedDocUnit);
+    return DecisionTransformer.transformToDomain(savedDocUnit, user);
   }
 
   private ManagementDataDTO getCreatedBy(User user, DecisionDTO documentationUnitDTO) {
