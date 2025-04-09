@@ -17,6 +17,8 @@ public interface DatabaseIgnoredTextCheckWordRepository
 
   void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId);
 
+  List<IgnoredTextCheckWordDTO> findAllByDocumentationUnitId(UUID documentationUnitId);
+
   @Query(
       "SELECT i FROM IgnoredTextCheckWordDTO i "
           + "WHERE i.documentationUnitId = :documentationUnitId "

@@ -137,6 +137,183 @@ public class TextCheckService {
     return builder.toString();
   }
 
+  public DocumentationUnit addNoIndexTags(DocumentationUnit documentationUnit) {
+
+    List<String> ignoredTextCheckWords =
+        this.ignoredTextCheckWordRepository
+            .findAllByDocumentationUnitId(documentationUnit.uuid())
+            .stream()
+            .map(IgnoredTextCheckWord::word)
+            .toList();
+
+    for (CategoryType categoryType : CategoryType.values()) {
+
+      switch (categoryType) {
+        case REASONS:
+          {
+            if (documentationUnit.longTexts() == null) {
+              break;
+            }
+            var textWithNoIndex =
+                addNoIndexTags(documentationUnit.longTexts().reasons(), ignoredTextCheckWords);
+            LongTexts longTexts =
+                documentationUnit.longTexts().toBuilder().reasons(textWithNoIndex).build();
+            documentationUnit = documentationUnit.toBuilder().longTexts(longTexts).build();
+            break;
+          }
+
+        case CASE_FACTS:
+          {
+            if (documentationUnit.longTexts() == null) {
+              break;
+            }
+
+            var textWithNoIndex =
+                addNoIndexTags(documentationUnit.longTexts().caseFacts(), ignoredTextCheckWords);
+            LongTexts longTexts =
+                documentationUnit.longTexts().toBuilder().caseFacts(textWithNoIndex).build();
+            documentationUnit = documentationUnit.toBuilder().longTexts(longTexts).build();
+            break;
+          }
+
+        case DECISION_REASONS:
+          {
+            if (documentationUnit.longTexts() == null) {
+              break;
+            }
+
+            var textWithNoIndex =
+                addNoIndexTags(
+                    documentationUnit.longTexts().decisionReasons(), ignoredTextCheckWords);
+            LongTexts longTexts =
+                documentationUnit.longTexts().toBuilder().decisionReasons(textWithNoIndex).build();
+            documentationUnit = documentationUnit.toBuilder().longTexts(longTexts).build();
+            break;
+          }
+
+        case HEADNOTE:
+          {
+            if (documentationUnit.shortTexts() == null) {
+              break;
+            }
+
+            var textWithNoIndex =
+                addNoIndexTags(documentationUnit.shortTexts().headnote(), ignoredTextCheckWords);
+            ShortTexts shortTexts =
+                documentationUnit.shortTexts().toBuilder().headnote(textWithNoIndex).build();
+            documentationUnit = documentationUnit.toBuilder().shortTexts(shortTexts).build();
+            break;
+          }
+        case HEADLINE:
+          {
+            if (documentationUnit.shortTexts() == null) {
+              break;
+            }
+
+            var textWithNoIndex =
+                addNoIndexTags(documentationUnit.shortTexts().headline(), ignoredTextCheckWords);
+            ShortTexts shortTexts =
+                documentationUnit.shortTexts().toBuilder().headline(textWithNoIndex).build();
+            documentationUnit = documentationUnit.toBuilder().shortTexts(shortTexts).build();
+
+            break;
+          }
+        case GUIDING_PRINCIPLE:
+          {
+            if (documentationUnit.shortTexts() == null) {
+              break;
+            }
+
+            var textWithNoIndex =
+                addNoIndexTags(
+                    documentationUnit.shortTexts().guidingPrinciple(), ignoredTextCheckWords);
+            ShortTexts shortTexts =
+                documentationUnit.shortTexts().toBuilder()
+                    .guidingPrinciple(textWithNoIndex)
+                    .build();
+            documentationUnit = documentationUnit.toBuilder().shortTexts(shortTexts).build();
+            break;
+          }
+        case TENOR:
+          {
+            if (documentationUnit.longTexts() == null) {
+              break;
+            }
+
+            var textWithNoIndex =
+                addNoIndexTags(documentationUnit.longTexts().tenor(), ignoredTextCheckWords);
+            LongTexts newLongTexts =
+                documentationUnit.longTexts().toBuilder().tenor(textWithNoIndex).build();
+            documentationUnit = documentationUnit.toBuilder().longTexts(newLongTexts).build();
+            break;
+          }
+        case OTHER_LONG_TEXT:
+          {
+            if (documentationUnit.longTexts() == null) {
+              break;
+            }
+            var textWithNoIndex =
+                addNoIndexTags(
+                    documentationUnit.longTexts().otherLongText(), ignoredTextCheckWords);
+            LongTexts newLongTexts =
+                documentationUnit.longTexts().toBuilder().otherLongText(textWithNoIndex).build();
+            documentationUnit = documentationUnit.toBuilder().longTexts(newLongTexts).build();
+            break;
+          }
+        case DISSENTING_OPINION:
+          {
+            if (documentationUnit.longTexts() == null) {
+              break;
+            }
+
+            var textWithNoIndex =
+                addNoIndexTags(
+                    documentationUnit.longTexts().dissentingOpinion(), ignoredTextCheckWords);
+            LongTexts newLongTexts =
+                documentationUnit.longTexts().toBuilder()
+                    .dissentingOpinion(textWithNoIndex)
+                    .build();
+            documentationUnit = documentationUnit.toBuilder().longTexts(newLongTexts).build();
+            break;
+          }
+        case OUTLINE:
+          {
+            if (documentationUnit.longTexts() == null) {
+              break;
+            }
+
+            var textWithNoIndex =
+                addNoIndexTags(documentationUnit.longTexts().outline(), ignoredTextCheckWords);
+            LongTexts newLongTexts =
+                documentationUnit.longTexts().toBuilder().outline(textWithNoIndex).build();
+            documentationUnit = documentationUnit.toBuilder().longTexts(newLongTexts).build();
+            break;
+          }
+      }
+    }
+    return documentationUnit;
+  }
+
+  /**
+   * Wraps ignored words with <noindex></noindex> for handover service
+   *
+   * @param htmlText
+   * @param ignoredWords
+   * @return
+   */
+  public static String addNoIndexTags(String htmlText, List<String> ignoredWords) {
+    if (htmlText == null || ignoredWords == null || ignoredWords.isEmpty()) {
+      return htmlText;
+    }
+
+    Document document = Jsoup.parse(htmlText);
+    for (String ignoredWord : ignoredWords) {
+      NodeTraversor.traverse(new NoIndexNodeVisitor(htmlText, ignoredWord), document.body());
+    }
+
+    return document.body().html();
+  }
+
   protected TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType) {
     return checkCategoryByHTML(htmlText, categoryType, null);
@@ -236,6 +413,20 @@ public class TextCheckService {
               return match.toBuilder().ignoredTextCheckWords(ignoredWords).build();
             })
         .toList();
+  }
+
+  @SuppressWarnings("java:S3776")
+  protected record NoIndexNodeVisitor(String html, String ignoredWord) implements NodeVisitor {
+
+    @Override
+    public void head(@NotNull Node node, int i) {
+      if (node instanceof TextNode textNode) {
+        String processedText = textNode.getWholeText();
+        processedText =
+            processedText.replace(ignoredWord, "<noindex>" + ignoredWord + "</noindex>");
+        textNode.text(processedText);
+      }
+    }
   }
 
   @SuppressWarnings("java:S3776")
