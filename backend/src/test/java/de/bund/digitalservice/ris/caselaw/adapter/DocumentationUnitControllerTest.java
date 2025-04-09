@@ -162,7 +162,7 @@ class DocumentationUnitControllerTest {
     when(docxConverterService.getConvertedObject(any())).thenThrow(DocxConverterException.class);
 
     when(attachmentService.attachFileToDocumentationUnit(
-            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
+            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
 
     when(service.getByUuid(TEST_UUID))
@@ -184,7 +184,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is4xxClientError();
 
-    verify(attachmentService).deleteByS3Path(any());
+    verify(attachmentService).deleteByS3Path(any(), any(), any());
   }
 
   @Test
@@ -193,7 +193,7 @@ class DocumentationUnitControllerTest {
     var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
 
     when(attachmentService.attachFileToDocumentationUnit(
-            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
+            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
 
     DocumentationUnit docUnit =
@@ -219,7 +219,7 @@ class DocumentationUnitControllerTest {
     verify(duplicateCheckService, times(1)).checkDuplicates(docUnit.documentNumber());
     verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any());
 
-    verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any());
+    verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any(), any());
   }
 
   @Test

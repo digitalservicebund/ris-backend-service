@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -94,7 +95,8 @@ class S3AttachmentServiceTest {
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
 
-    service.attachFileToDocumentationUnit(documentationUnitDTO.getId(), byteBuffer, httpHeaders);
+    service.attachFileToDocumentationUnit(
+        documentationUnitDTO.getId(), byteBuffer, httpHeaders, User.builder().build());
 
     // s3 interaction
     var putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
@@ -123,7 +125,8 @@ class S3AttachmentServiceTest {
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
 
-    service.attachFileToDocumentationUnit(documentationUnitDTO.getId(), byteBuffer, httpHeaders);
+    service.attachFileToDocumentationUnit(
+        documentationUnitDTO.getId(), byteBuffer, httpHeaders, User.builder().build());
 
     var attachmentDtoCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);
     verify(repository, times(2)).save(attachmentDtoCaptor.capture());
@@ -133,7 +136,7 @@ class S3AttachmentServiceTest {
   @Test
   void testDeleteByS3Path() {
     var testS3Path = UUID.randomUUID().toString();
-    service.deleteByS3Path(testS3Path);
+    service.deleteByS3Path(testS3Path, UUID.randomUUID(), User.builder().build());
 
     // bucket interaction
     var deleteObjectRequestCaptor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
@@ -149,7 +152,9 @@ class S3AttachmentServiceTest {
   @ValueSource(strings = {"", " "})
   @NullSource
   void testDeleteByS3Path_withoutS3Path(String s3Path) {
-    assertThrows(AttachmentException.class, () -> service.deleteByS3Path(s3Path));
+    assertThrows(
+        AttachmentException.class,
+        () -> service.deleteByS3Path(s3Path, UUID.randomUUID(), User.builder().build()));
 
     verifyNoInteractions(s3Client);
     verifyNoInteractions(repository);
@@ -219,7 +224,7 @@ class S3AttachmentServiceTest {
         SdkException.class,
         () ->
             service.attachFileToDocumentationUnit(
-                documentationUnitDTOId, byteBuffer, HttpHeaders.EMPTY));
+                documentationUnitDTOId, byteBuffer, HttpHeaders.EMPTY, User.builder().build()));
 
     verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
   }

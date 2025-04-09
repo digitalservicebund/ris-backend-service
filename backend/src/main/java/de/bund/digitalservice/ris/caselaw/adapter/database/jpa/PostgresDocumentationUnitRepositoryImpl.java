@@ -240,25 +240,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     return managementDataBuilder.build();
   }
 
-  private void buildManagementData(
-      @Nullable User user,
-      DocumentationUnitDTO documentationUnitDTO,
-      DecisionDTO.DecisionDTOBuilder<?, ?> builder) {
-    ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
-        ManagementDataDTO.builder()
-            .id(documentationUnitDTO.getId())
-            .documentationUnit(documentationUnitDTO)
-            .createdAtDateTime(Instant.now());
-    if (user != null) {
-      managementDataBuilder
-          .createdByDocumentationOffice(
-              DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
-          .createdByUserId(user.id())
-          .createdByUserName(user.name());
-    }
-    builder.managementData(managementDataBuilder.build());
-  }
-
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(Documentable documentable) {

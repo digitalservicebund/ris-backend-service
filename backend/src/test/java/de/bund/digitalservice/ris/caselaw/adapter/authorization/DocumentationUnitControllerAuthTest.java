@@ -115,7 +115,7 @@ class DocumentationUnitControllerAuthTest {
   @Test
   void testAttachFileToDocumentationUnit() throws DocumentationUnitNotExistsException {
     when(attachmentService.attachFileToDocumentationUnit(
-            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
+            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
     when(docxConverterService.getConvertedObject(anyString())).thenReturn(Docx2Html.EMPTY);
     mockDocumentationUnit(docOffice1, null, null);

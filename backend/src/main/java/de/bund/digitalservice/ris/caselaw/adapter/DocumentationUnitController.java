@@ -155,7 +155,8 @@ public class DocumentationUnitController {
 
     var attachmentPath =
         attachmentService
-            .attachFileToDocumentationUnit(uuid, ByteBuffer.wrap(bytes), httpHeaders)
+            .attachFileToDocumentationUnit(
+                uuid, ByteBuffer.wrap(bytes), httpHeaders, userService.getUser(oidcUser))
             .s3path();
     try {
       var docx2html = converterService.getConvertedObject(attachmentPath);
@@ -163,7 +164,7 @@ public class DocumentationUnitController {
       return ResponseEntity.status(HttpStatus.OK).body(docx2html);
 
     } catch (Exception e) {
-      attachmentService.deleteByS3Path(attachmentPath);
+      attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
       return ResponseEntity.unprocessableEntity().build();
     }
   }
@@ -200,7 +201,7 @@ public class DocumentationUnitController {
       @PathVariable String s3Path) {
 
     try {
-      attachmentService.deleteByS3Path(s3Path);
+      attachmentService.deleteByS3Path(s3Path, uuid, userService.getUser(oidcUser));
       return ResponseEntity.noContent().build();
     } catch (Exception e) {
       log.error("Error by deleting attachment '{}' for documentation unit {}", s3Path, uuid, e);

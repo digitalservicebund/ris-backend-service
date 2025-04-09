@@ -3,11 +3,15 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -51,7 +55,7 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   public Attachment attachFileToDocumentationUnit(
-      UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
+      UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders, User user) {
     String fileName =
         httpHeaders.containsKey("X-Filename")
             ? httpHeaders.getFirst("X-Filename")
@@ -59,11 +63,15 @@ public class S3AttachmentService implements AttachmentService {
 
     checkDocx(byteBuffer);
 
+    DocumentationUnitDTO documentationUnit =
+        documentationUnitRepository.findById(documentationUnitId).orElseThrow();
+    setManagementData(user, documentationUnit);
+    documentationUnitRepository.save(documentationUnit);
+
     AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()
             .s3ObjectPath("unknown yet")
-            .documentationUnit(
-                documentationUnitRepository.findById(documentationUnitId).orElseThrow())
+            .documentationUnit(documentationUnit)
             .filename(fileName)
             .format("docx")
             .uploadTimestamp(Instant.now())
@@ -80,8 +88,11 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void deleteByS3Path(String s3Path) {
+  public void deleteByS3Path(String s3Path, UUID documentationUnitId, User user) {
     deleteObjectFromBucket(s3Path);
+    documentationUnitRepository
+        .findById(documentationUnitId)
+        .ifPresent(documentationUnit -> setManagementData(user, documentationUnit));
     repository.deleteByS3ObjectPath(s3Path);
   }
 
@@ -151,5 +162,27 @@ public class S3AttachmentService implements AttachmentService {
 
     var deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(s3Path).build();
     s3Client.deleteObject(deleteObjectRequest);
+  }
+
+  private void setManagementData(User user, DocumentationUnitDTO documentationUnit) {
+    ManagementDataDTO managementData = documentationUnit.getManagementData();
+    if (managementData == null) {
+      managementData =
+          ManagementDataDTO.builder()
+              .documentationUnit(documentationUnit)
+              .lastUpdatedAtDateTime(Instant.now())
+              .lastUpdatedByUserId(user.id())
+              .lastUpdatedByUserName(user.name())
+              .lastUpdatedByDocumentationOffice(
+                  DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
+              .build();
+      documentationUnit.setManagementData(managementData);
+    } else {
+      managementData.setLastUpdatedAtDateTime(Instant.now());
+      managementData.setLastUpdatedByUserId(user.id());
+      managementData.setLastUpdatedByUserName(user.name());
+      managementData.setLastUpdatedByDocumentationOffice(
+          DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()));
+    }
   }
 }
