@@ -27,7 +27,7 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
   private final XmlUtilService xmlUtilService;
   private final InternalPortalTransformer ldmlTransformer;
 
-  public CommonPortalPublicationService(
+  protected CommonPortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,

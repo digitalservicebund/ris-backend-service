@@ -10,7 +10,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
@@ -81,8 +80,7 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldHandleErrorWhenPublishingASingleDocUnit()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
+  void shouldHandleErrorWhenPublishingASingleDocUnit() throws DocumentationUnitNotExistsException {
     var jobs = List.of(createPublicationJob("789", PortalPublicationTaskType.PUBLISH));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
     doThrow(RuntimeException.class)
@@ -99,8 +97,7 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldHandleErrorWhenDeletingASingleDocUnit()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
+  void shouldHandleErrorWhenDeletingASingleDocUnit() throws DocumentationUnitNotExistsException {
     var jobs = List.of(createPublicationJob("312", PortalPublicationTaskType.DELETE));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
     doThrow(RuntimeException.class)
@@ -117,8 +114,7 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldCatchErrorWhenUploadingChangelogFails()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
+  void shouldCatchErrorWhenUploadingChangelogFails() throws DocumentationUnitNotExistsException {
     var jobs = List.of(createPublicationJob("312", PortalPublicationTaskType.DELETE));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
     doThrow(RuntimeException.class)

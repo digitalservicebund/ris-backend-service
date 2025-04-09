@@ -201,7 +201,7 @@ class PrototypePortalPublicationServiceTest {
   }
 
   @Test
-  void uploadChangelog_shouldDoNothing() throws JsonProcessingException {
+  void uploadChangelog_shouldDoNothing() {
     subject.uploadChangelog(List.of(), List.of());
 
     verify(prototypePortalBucket, never()).save(contains("changelogs/"), anyString());
