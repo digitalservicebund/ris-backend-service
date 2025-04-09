@@ -24,11 +24,14 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.Ignored
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class TextCheckServiceTest {
 
@@ -445,17 +448,43 @@ class TextCheckServiceTest {
   }
 
   @Test
-  void testAddNoIndexTags_shouldNotReplaceTags() {
-
-    var html = "<body><p>body should be wrapped with no index</p></body>";
-    var result = TextCheckService.addNoIndexTags(html, List.of("body"));
+  void testAddNoIndexTags_shouldReplaceTags() {
+    var html = "<p>this and this be wrapped with no index</p>";
+    var result = TextCheckService.addNoIndexTags(html, List.of("this"));
 
     var expected =
-"""
-<body>
-  <p><noindex>body</noindex> should be wrapped with no index</p>
-</body>
-""";
+        "<p><noindex>this</noindex> and <noindex>this</noindex> be wrapped with no index</p>";
     assertEquals(expected, result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("noIndexChecks")
+  void testAddNoIndexTags_variousCases(String html, List<String> ignoredWords, String expected) {
+    String result = TextCheckService.addNoIndexTags(html, ignoredWords);
+    assertEquals(expected, result);
+  }
+
+  private static Stream<Arguments> noIndexChecks() {
+    return Stream.of(
+        Arguments.of(
+            "<p>CASE sensitive should not replace</p>",
+            List.of("case"),
+            "<p>CASE sensitive should not replace</p>"),
+        Arguments.of(
+            "<p>partsofwords should no be replace</p>",
+            List.of("parts"),
+            "<p>partsofwords should no be replace</p>"),
+        Arguments.of(
+            "<p>p with no index but no html tag</p>",
+            List.of("p"),
+            "<p><noindex>p</noindex> with no index but no html tag</p>"),
+        Arguments.of(
+            "<p>WORD-WITH-UNDERSCORE should be also replaced</p>",
+            List.of("WORD-WITH-UNDERSCORE"),
+            "<p><noindex>WORD-WITH-UNDERSCORE</noindex> should be also replaced</p>"),
+        Arguments.of(
+            "<p>WORD. should be also replaced</p>",
+            List.of("WORD"),
+            "<p><noindex>WORD</noindex>. should be also replaced</p>"));
   }
 }

@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
@@ -311,7 +313,11 @@ public class TextCheckService {
       NodeTraversor.traverse(new NoIndexNodeVisitor(htmlText, ignoredWord), document.body());
     }
 
-    return document.body().html();
+    var html = document.body().html();
+    html = html.replaceAll("&lt;noindex&gt;", "<noindex>");
+    html = html.replaceAll("&lt;/noindex&gt;", "</noindex>");
+
+    return html;
   }
 
   protected TextCheckCategoryResponse checkCategoryByHTML(
@@ -421,10 +427,18 @@ public class TextCheckService {
     @Override
     public void head(@NotNull Node node, int i) {
       if (node instanceof TextNode textNode) {
-        String processedText = textNode.getWholeText();
-        processedText =
-            processedText.replace(ignoredWord, "<noindex>" + ignoredWord + "</noindex>");
-        textNode.text(processedText);
+        String text = textNode.getWholeText();
+        Pattern exactWordsMatchPattern =
+            Pattern.compile("\\b" + Pattern.quote(ignoredWord) + "\\b");
+        Matcher matcher = exactWordsMatchPattern.matcher(text);
+
+        StringBuilder newTextBuffer = new StringBuilder();
+        while (matcher.find()) {
+          matcher.appendReplacement(newTextBuffer, "<noindex>" + matcher.group() + "</noindex>");
+        }
+        matcher.appendTail(newTextBuffer);
+
+        textNode.text(newTextBuffer.toString());
       }
     }
   }
