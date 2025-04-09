@@ -91,6 +91,62 @@ test.describe("active citations", () => {
 
     await expect(page.getByText("Fehlende Daten")).toBeHidden()
   })
+
+  test("already linked docunit has tag in search results, but can be linked again", async ({
+    page,
+    documentNumber,
+    prefilledDocumentUnit,
+  }) => {
+    await handoverDocumentationUnit(
+      page,
+      prefilledDocumentUnit.documentNumber || "",
+    )
+    await navigateToCategories(page, documentNumber)
+
+    await fillActiveCitationInputs(page, {
+      citationType: "Änderung",
+      court: prefilledDocumentUnit.coreData.court?.label,
+      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
+      decisionDate: "31.12.2019",
+    })
+    const activeCitationContainer = page.getByLabel("Aktivzitierung")
+    await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
+
+    await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
+
+    await expect(
+      page.getByText(
+        `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
+      ),
+    ).toBeVisible()
+
+    await expect(
+      page.getByTestId(
+        `decision-summary-${prefilledDocumentUnit.documentNumber}`,
+      ),
+    ).toBeVisible()
+
+    await page.getByLabel("Treffer übernehmen").click()
+
+    await expect(
+      page.getByText(
+        `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
+      ),
+    ).toBeVisible()
+
+    await fillActiveCitationInputs(page, {
+      court: prefilledDocumentUnit.coreData.court?.label,
+      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
+      decisionDate: "31.12.2019",
+    })
+    await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
+    await expect(
+      activeCitationContainer.getByText("Bereits hinzugefügt"),
+    ).toBeVisible()
+    await expect(page.getByLabel("Treffer übernehmen")).toBeEnabled()
+  })
   ;[
     {
       type: "Parallelentscheidung",
