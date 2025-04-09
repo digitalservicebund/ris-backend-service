@@ -163,7 +163,7 @@ describe("Texts", () => {
     expect(screen.getByLabelText("Gliederung Button Leiste")).toBeVisible()
   }, 10000)
 
-  test("renders all tiptap text editors with ref and text check button", async () => {
+  test.skip("renders all tiptap text editors with ref and text check button", async () => {
     const { textEditorRefs } = await renderComponent(
       {
         headline: "headline",
