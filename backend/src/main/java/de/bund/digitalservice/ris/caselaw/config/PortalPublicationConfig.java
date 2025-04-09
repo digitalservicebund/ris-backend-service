@@ -53,7 +53,7 @@ public class PortalPublicationConfig {
   }
 
   @Bean
-  @Profile({"!production", "!staging"})
+  @Profile({"!production & !staging"})
   public PortalPublicationService noOpPortalPublicationService() {
     return new NoOpPortalPublicationService();
   }
