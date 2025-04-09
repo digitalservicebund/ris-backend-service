@@ -204,22 +204,40 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       sources.add(SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
     }
 
-    DecisionDTO.DecisionDTOBuilder<?, ?> builder =
-        documentationUnitDTO.toBuilder()
-            .source(sources)
-            .status(
-                StatusTransformer.transformToDTO(status).toBuilder()
-                    .documentationUnit(documentationUnitDTO)
-                    .createdAt(Instant.now())
-                    .build());
+    ManagementDataDTO managementData = getManagementData(user, documentationUnitDTO);
+    documentationUnitDTO.setManagementData(managementData);
 
-    buildManagementData(user, documentationUnitDTO, builder);
+    StatusDTO statusDTO =
+        StatusTransformer.transformToDTO(status).toBuilder()
+            .documentationUnit(documentationUnitDTO)
+            .createdAt(Instant.now())
+            .build();
 
-    // saving a second time is necessary because status and reference need a reference to a
+    documentationUnitDTO.setStatus(statusDTO);
+    documentationUnitDTO.setSource(sources);
+
+    // saving a second time is necessary because status, managementData and reference need a
+    // reference to a
     // persisted documentation unit
-    DecisionDTO savedDocUnit = repository.save(builder.build());
+    DecisionDTO savedDocUnit = repository.save(documentationUnitDTO);
 
     return DecisionTransformer.transformToDomain(savedDocUnit);
+  }
+
+  private ManagementDataDTO getManagementData(User user, DecisionDTO documentationUnitDTO) {
+    ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
+        ManagementDataDTO.builder()
+            .documentationUnit(documentationUnitDTO)
+            .createdAtDateTime(Instant.now());
+
+    if (user != null) {
+      managementDataBuilder
+          .createdByDocumentationOffice(
+              DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
+          .createdByUserId(user.id())
+          .createdByUserName(user.name());
+    }
+    return managementDataBuilder.build();
   }
 
   private void buildManagementData(
@@ -228,6 +246,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DecisionDTO.DecisionDTOBuilder<?, ?> builder) {
     ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
         ManagementDataDTO.builder()
+            .id(documentationUnitDTO.getId())
             .documentationUnit(documentationUnitDTO)
             .createdAtDateTime(Instant.now());
     if (user != null) {
