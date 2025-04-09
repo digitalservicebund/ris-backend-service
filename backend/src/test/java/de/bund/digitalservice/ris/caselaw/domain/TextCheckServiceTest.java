@@ -471,13 +471,13 @@ class TextCheckServiceTest {
             List.of("case"),
             "<p>CASE sensitive should not replace</p>"),
         Arguments.of(
-            "<p>partsofwords should no be replace</p>",
+            "<p>partsofwords should not be replace</p>",
             List.of("parts"),
-            "<p>partsofwords should no be replace</p>"),
+            "<p>partsofwords should not be replace</p>"),
         Arguments.of(
-            "<p>p with no index but no html tag</p>",
+            "<p>p with no index but not html tag</p>",
             List.of("p"),
-            "<p><noindex>p</noindex> with no index but no html tag</p>"),
+            "<p><noindex>p</noindex> with no index but not html tag</p>"),
         Arguments.of(
             "<p>WORD-WITH-UNDERSCORE should be also replaced</p>",
             List.of("WORD-WITH-UNDERSCORE"),
