@@ -78,6 +78,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final UserService userService;
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
+  private final DatabaseManagementDataRepository databaseManagementDataRepository;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -89,7 +90,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       UserService userService,
       EntityManager entityManager,
-      DatabaseReferenceRepository referenceRepository) {
+      DatabaseReferenceRepository referenceRepository,
+      DatabaseManagementDataRepository databaseManagementDataRepository) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -101,6 +103,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.referenceRepository = referenceRepository;
     this.userService = userService;
     this.entityManager = entityManager;
+    this.databaseManagementDataRepository = databaseManagementDataRepository;
   }
 
   @Override
@@ -205,6 +208,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
 
     ManagementDataDTO managementData = getCreatedBy(user, documentationUnitDTO);
+    databaseManagementDataRepository.save(managementData);
     documentationUnitDTO.setManagementData(managementData);
 
     StatusDTO statusDTO =
@@ -312,6 +316,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         .setLastUpdatedByDocumentationOffice(
             DocumentationOfficeTransformer.transformToDTO(currentUser.documentationOffice()));
     decisionDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
+    databaseManagementDataRepository.save(decisionDTO.getManagementData());
   }
 
   @Override

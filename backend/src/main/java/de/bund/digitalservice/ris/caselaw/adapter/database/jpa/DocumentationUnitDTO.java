@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -234,6 +235,7 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @Valid
   private List<DocumentalistDTO> documentalists = new ArrayList<>();
 
-  @OneToOne(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne(mappedBy = "documentationUnit", cascade = CascadeType.REMOVE)
+  @PrimaryKeyJoinColumn
   private ManagementDataDTO managementData;
 }
