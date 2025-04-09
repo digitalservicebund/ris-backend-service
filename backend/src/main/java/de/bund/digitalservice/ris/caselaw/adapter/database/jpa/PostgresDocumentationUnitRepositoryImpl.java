@@ -204,7 +204,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       sources.add(SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
     }
 
-    ManagementDataDTO managementData = getManagementData(user, documentationUnitDTO);
+    ManagementDataDTO managementData = getCreatedBy(user, documentationUnitDTO);
     documentationUnitDTO.setManagementData(managementData);
 
     StatusDTO statusDTO =
@@ -224,7 +224,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     return DecisionTransformer.transformToDomain(savedDocUnit);
   }
 
-  private ManagementDataDTO getManagementData(User user, DecisionDTO documentationUnitDTO) {
+  private ManagementDataDTO getCreatedBy(User user, DecisionDTO documentationUnitDTO) {
     ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
         ManagementDataDTO.builder()
             .documentationUnit(documentationUnitDTO)
@@ -289,21 +289,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       if (currentUser != null) {
-        if (decisionDTO.getManagementData() == null) {
-          decisionDTO.setManagementData(new ManagementDataDTO());
-          decisionDTO.getManagementData().setDocumentationUnit(decisionDTO);
-        }
-
-        UUID userId = Optional.of(currentUser).map(User::id).orElse(null);
-        DocumentationOfficeDTO userDocOffice =
-            Optional.of(currentUser)
-                .map(User::documentationOffice)
-                .map(DocumentationOfficeTransformer::transformToDTO)
-                .orElse(null);
-        decisionDTO.getManagementData().setLastUpdatedByUserId(userId);
-        decisionDTO.getManagementData().setLastUpdatedByUserName(currentUser.name());
-        decisionDTO.getManagementData().setLastUpdatedByDocumentationOffice(userDocOffice);
-        decisionDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
+        setLastUpdated(currentUser, decisionDTO);
       }
 
       documentationUnitDTO =
@@ -311,6 +297,21 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       repository.save(documentationUnitDTO);
     }
     // TODO pending proceeding
+  }
+
+  private void setLastUpdated(User currentUser, DecisionDTO decisionDTO) {
+    if (decisionDTO.getManagementData() == null) {
+      decisionDTO.setManagementData(new ManagementDataDTO());
+      decisionDTO.getManagementData().setDocumentationUnit(decisionDTO);
+    }
+
+    decisionDTO.getManagementData().setLastUpdatedByUserId(currentUser.id());
+    decisionDTO.getManagementData().setLastUpdatedByUserName(currentUser.name());
+    decisionDTO
+        .getManagementData()
+        .setLastUpdatedByDocumentationOffice(
+            DocumentationOfficeTransformer.transformToDTO(currentUser.documentationOffice()));
+    decisionDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
   }
 
   @Override
