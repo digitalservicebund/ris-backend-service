@@ -52,11 +52,11 @@ test.describe("decision date", () => {
     await navigateToCategories(page, documentNumber)
 
     await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
+      .getByLabel("Abweichendes Entscheidungsdatum anzeigen", { exact: true })
       .click()
 
     await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+      .getByLabel("Abweichendes Entscheidungsdatum", { exact: true })
       .fill("03.02.2022")
     await expect(
       page.getByLabel("Abweichendes Entscheidungsdatum", { exact: true }),
@@ -112,7 +112,7 @@ test.describe("decision date", () => {
     ).toBeHidden()
 
     await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
+      .getByLabel("Abweichendes Entscheidungsdatum anzeigen", { exact: true })
       .click()
 
     await expect(
@@ -120,11 +120,11 @@ test.describe("decision date", () => {
     ).toBeVisible()
 
     await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+      .getByLabel("Abweichendes Entscheidungsdatum", { exact: true })
       .fill("02.02.2022")
     await page.keyboard.press("Enter")
     await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+      .getByLabel("Abweichendes Entscheidungsdatum", { exact: true })
       .fill("01.02.2022")
     await page.keyboard.press("Enter")
     await save(page)
@@ -132,7 +132,7 @@ test.describe("decision date", () => {
     await page.reload()
 
     await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
+      .getByLabel("Abweichendes Entscheidungsdatum anzeigen", { exact: true })
       .click()
 
     await expect(page.locator(".label-wrapper").nth(0)).toHaveText("02.02.2022")
@@ -140,7 +140,7 @@ test.describe("decision date", () => {
     await expect(page.locator(".label-wrapper").nth(1)).toHaveText("01.02.2022")
 
     await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum schließen']")
+      .getByLabel("Abweichendes Entscheidungsdatum schließen", { exact: true })
       .click()
 
     await expect(

@@ -54,11 +54,11 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page.keyboard.press("Enter")
 
     await page
-      .locator("[aria-label='Abweichendes Aktenzeichen anzeigen']")
+      .getByLabel("Abweichendes Aktenzeichen anzeigen", { exact: true })
       .click()
 
     await page
-      .locator("[aria-label='Abweichendes Aktenzeichen']")
+      .getByLabel("Abweichendes Aktenzeichen", { exact: true })
       .type("testthree")
 
     await page.keyboard.press("Enter")

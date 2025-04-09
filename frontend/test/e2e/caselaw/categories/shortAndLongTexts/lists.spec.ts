@@ -2,8 +2,8 @@ import { expect } from "@playwright/test"
 import {
   clickCategoryButton,
   navigateToCategories,
-  save,
   navigateToHandover,
+  save,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -27,7 +27,7 @@ test.describe(
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
       await clickCategoryButton("Gründe", page)
-      const inputField = page.locator("[data-testid='Gründe']")
+      const inputField = page.getByTestId("Gründe")
       await inputField.click()
       await page.keyboard.type("This is a bullet list")
       await page
@@ -63,7 +63,7 @@ test.describe(
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
       await clickCategoryButton("Gründe", page)
-      const inputField = page.locator("[data-testid='Gründe']")
+      const inputField = page.getByTestId("Gründe")
       await inputField.click()
       await page.keyboard.type("This is an ordered list")
       await page
@@ -101,7 +101,7 @@ test.describe(
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
       await clickCategoryButton("Gründe", page)
-      const inputField = page.locator("[data-testid='Gründe']")
+      const inputField = page.getByTestId("Gründe")
       await inputField.click()
       // hide invisible characters
       await page
@@ -141,7 +141,7 @@ test.describe(
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
       await clickCategoryButton("Gründe", page)
-      const inputField = page.locator("[data-testid='Gründe']")
+      const inputField = page.getByTestId("Gründe")
       await inputField.click()
       // hide invisible characters
       await page

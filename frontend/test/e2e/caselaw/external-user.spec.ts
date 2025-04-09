@@ -192,7 +192,7 @@ test.describe(
             .getByLabel("Entscheidungsname")
             .fill("ein anderer Name")
           await pageWithExternalUser
-            .locator("[aria-label='Speichern Button']")
+            .getByLabel("Speichern Button", { exact: true })
             .click()
           await expect(
             pageWithExternalUser
@@ -249,7 +249,7 @@ test.describe(
             "some other text",
           )
           await pageWithExternalUser
-            .locator("[aria-label='Speichern Button']")
+            .getByLabel("Speichern Button", { exact: true })
             .click()
           await expect(
             pageWithExternalUser

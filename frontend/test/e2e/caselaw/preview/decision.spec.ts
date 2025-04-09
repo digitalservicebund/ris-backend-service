@@ -66,7 +66,7 @@ test.describe("preview decision", () => {
 
       await fillInput(page, "Entscheidungsdatum", "01.01.2021")
 
-      const inputField = page.locator("[data-testid='Leitsatz']")
+      const inputField = page.getByTestId("Leitsatz")
       await inputField.click()
       await page.keyboard.type("some more text")
 

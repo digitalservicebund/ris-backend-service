@@ -1,10 +1,10 @@
 import { expect, Locator, Page } from "@playwright/test"
 import {
-  navigateToCategories,
-  navigateToAttachments,
-  uploadTestfile,
-  copyPasteTextFromAttachmentIntoEditor,
   clickCategoryButton,
+  copyPasteTextFromAttachmentIntoEditor,
+  navigateToAttachments,
+  navigateToCategories,
+  uploadTestfile,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -44,15 +44,15 @@ test.describe(
   },
   () => {
     /*
-      1. Upload document with border numbers
-      2. Copy border Numbers into reasons
-      3. Select all and delete border Numbers via button
-      4. Select first border number text and delete via button
-      5. Delete border number via backspace in content
-      6. delete border number via backspace in number
-      7. Insert cursor into first border number text and delete via button
-      8. Select first paragraph (without border number) and click button (only recalculates the following border numbers)
-    */
+                  1. Upload document with border numbers
+                  2. Copy border Numbers into reasons
+                  3. Select all and delete border Numbers via button
+                  4. Select first border number text and delete via button
+                  5. Delete border number via backspace in content
+                  6. delete border number via backspace in number
+                  7. Insert cursor into first border number text and delete via button
+                  8. Select first paragraph (without border number) and click button (only recalculates the following border numbers)
+                */
     test("delete border Numbers (Randnummern) via button and backspace in 'Gründe'", async ({
       page,
       documentNumber,
@@ -214,7 +214,7 @@ test.describe(
         .locator("..")
 
       await clickCategoryButton("Leitsatz", page)
-      const editor = page.locator("[data-testid='Leitsatz']")
+      const editor = page.getByTestId("Leitsatz")
 
       await test.step("Copy border numbers from side panel into 'Leitsatz' to have reference data", async () => {
         await copyPasteTextFromAttachmentIntoEditor(
@@ -262,7 +262,7 @@ test.describe(
       await navigateToCategories(page, documentNumber)
 
       await clickCategoryButton("Gründe", page)
-      const editor = page.locator("[data-testid='Gründe']")
+      const editor = page.getByTestId("Gründe")
 
       await test.step("Add three paragraphs into Gründe", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -305,7 +305,7 @@ test.describe(
 
       // Gründe
       await clickCategoryButton("Gründe", page)
-      const reasons = page.locator("[data-testid='Gründe']")
+      const reasons = page.getByTestId("Gründe")
 
       await test.step("Add three paragraphs into 'Gründe'", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -328,9 +328,7 @@ test.describe(
 
       // Abweichende Meinung
       await clickCategoryButton("Abweichende Meinung", page)
-      const dissentingOpinion = page.locator(
-        "[data-testid='Abweichende Meinung']",
-      )
+      const dissentingOpinion = page.getByTestId("Abweichende Meinung")
 
       await test.step("Add three paragraphs into 'Abweichende Meinung'", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -363,7 +361,7 @@ test.describe(
 
       // Sonstiger Langtext
       await clickCategoryButton("Sonstiger Langtext", page)
-      const otherLongText = page.locator("[data-testid='Sonstiger Langtext']")
+      const otherLongText = page.getByTestId("Sonstiger Langtext")
 
       await test.step("Add three paragraphs into 'Sonstiger Langtext'", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -403,7 +401,7 @@ test.describe(
 
       // Tatbestand
       await clickCategoryButton("Tatbestand", page)
-      const casefacts = page.locator("[data-testid='Tatbestand']")
+      const casefacts = page.getByTestId("Tatbestand")
 
       await test.step("Add three paragraphs into 'Tatbestand'", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -426,9 +424,7 @@ test.describe(
 
       // Entscheidungsgründe
       await clickCategoryButton("Entscheidungsgründe", page)
-      const decisionReasons = page.locator(
-        "[data-testid='Entscheidungsgründe']",
-      )
+      const decisionReasons = page.getByTestId("Entscheidungsgründe")
 
       await test.step("Add three paragraphs into 'Entscheidungsgründe'", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -461,9 +457,7 @@ test.describe(
 
       // Abweichende Meinung
       await clickCategoryButton("Abweichende Meinung", page)
-      const dissentingOpinion = page.locator(
-        "[data-testid='Abweichende Meinung']",
-      )
+      const dissentingOpinion = page.getByTestId("Abweichende Meinung")
 
       await test.step("Add three paragraphs into 'Abweichende Meinung'", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -496,7 +490,7 @@ test.describe(
 
       // Sonstiger Langtext
       await clickCategoryButton("Sonstiger Langtext", page)
-      const otherLongText = page.locator("[data-testid='Sonstiger Langtext']")
+      const otherLongText = page.getByTestId("Sonstiger Langtext")
 
       await test.step("Add three paragraphs into 'Sonstiger Langtext'", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -550,7 +544,7 @@ test.describe(
       await navigateToCategories(page, documentNumber)
 
       await clickCategoryButton("Tatbestand", page)
-      const editor = page.locator("[data-testid='Tatbestand']")
+      const editor = page.getByTestId("Tatbestand")
 
       await test.step("Add one paragraph into Tatbestand", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -591,7 +585,7 @@ test.describe(
       await navigateToCategories(page, documentNumber)
 
       await clickCategoryButton("Entscheidungsgründe", page)
-      const editor = page.locator("[data-testid='Entscheidungsgründe']")
+      const editor = page.getByTestId("Entscheidungsgründe")
 
       await test.step("Add two paragraphs into Entscheidungsgründe", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -635,7 +629,7 @@ test.describe(
       await navigateToCategories(page, documentNumber)
 
       await clickCategoryButton("Entscheidungsgründe", page)
-      const editor = page.locator("[data-testid='Entscheidungsgründe']")
+      const editor = page.getByTestId("Entscheidungsgründe")
 
       await test.step("Add two paragraphs into Entscheidungsgründe", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -696,7 +690,7 @@ test.describe(
       await navigateToCategories(page, documentNumber)
 
       await clickCategoryButton("Gründe", page)
-      const editor = page.locator("[data-testid='Gründe']")
+      const editor = page.getByTestId("Gründe")
 
       await test.step("Add three paragraphs into Gründe", async () => {
         await page.keyboard.insertText(firstParagraph)

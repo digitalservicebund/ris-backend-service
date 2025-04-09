@@ -79,8 +79,8 @@ test.describe("saving behaviour", () => {
     ]
 
     for (const label of labels) {
-      await page.locator(`[aria-label='${label} anzeigen']`).click()
-      await page.locator(`[aria-label='${label}']`).type("22.11.2023")
+      await page.getByLabel(`${label} anzeigen`).click()
+      await page.getByLabel(label, { exact: true }).type("22.11.2023")
       await page.keyboard.press("Enter")
     }
 
@@ -91,7 +91,7 @@ test.describe("saving behaviour", () => {
     }
 
     await save(page)
-    await expect(page.locator("[data-testid='chip']")).toHaveCount(0)
+    await expect(page.getByTestId("chip")).toHaveCount(0)
   })
 
   test("change Spruchkörper two times, saving after each change", async ({

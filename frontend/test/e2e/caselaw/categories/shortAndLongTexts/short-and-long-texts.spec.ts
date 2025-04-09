@@ -48,7 +48,7 @@ test.describe("short and long texts", () => {
 
     // small
     await clickCategoryButton("Titelzeile", page)
-    const smallEditor = page.locator("[data-testid='Titelzeile']")
+    const smallEditor = page.getByTestId("Titelzeile")
     const smallEditorHeight = await smallEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height"),
     )
@@ -56,7 +56,7 @@ test.describe("short and long texts", () => {
 
     //medium
     await clickCategoryButton("Leitsatz", page)
-    const mediumEditor = page.locator("[data-testid='Leitsatz']")
+    const mediumEditor = page.getByTestId("Leitsatz")
     const mediumEditorHeight = await mediumEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height"),
     )
@@ -64,7 +64,7 @@ test.describe("short and long texts", () => {
 
     //large
     await clickCategoryButton("Gründe", page)
-    const largeEditor = page.locator("[data-testid='Gründe']")
+    const largeEditor = page.getByTestId("Gründe")
     const largeEditorHeight = await largeEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height"),
     )
@@ -75,7 +75,7 @@ test.describe("short and long texts", () => {
     await navigateToCategories(page, documentNumber)
 
     await clickCategoryButton("Leitsatz", page)
-    const guidingPrincipleInput = page.locator("[data-testid='Leitsatz']")
+    const guidingPrincipleInput = page.getByTestId("Leitsatz")
     await guidingPrincipleInput.click()
     await page.keyboard.type(`this is a test paragraph`)
 
@@ -351,15 +351,8 @@ test.describe("short and long texts", () => {
   }) => {
     const testId = "Titelzeile"
     const value = "Titelzeile Test Text"
-    const selector = `[data-testid='${testId}']`
 
-    await runTextCategoryTest(
-      page,
-      prefilledDocumentUnit,
-      testId,
-      value,
-      selector,
-    )
+    await runTextCategoryTest(page, prefilledDocumentUnit, testId, value)
   })
 
   // eslint-disable-next-line playwright/expect-expect
@@ -369,15 +362,8 @@ test.describe("short and long texts", () => {
   }) => {
     const testId = "Leitsatz"
     const value = "Leitsatz Test Text"
-    const selector = `[data-testid='${testId}']`
 
-    await runTextCategoryTest(
-      page,
-      secondPrefilledDocumentUnit,
-      testId,
-      value,
-      selector,
-    )
+    await runTextCategoryTest(page, secondPrefilledDocumentUnit, testId, value)
   })
 
   // eslint-disable-next-line playwright/expect-expect
@@ -387,15 +373,8 @@ test.describe("short and long texts", () => {
   }) => {
     const testId = "Orientierungssatz"
     const value = "Orientierungssatz Test Text"
-    const selector = `[data-testid='${testId}']`
 
-    await runTextCategoryTest(
-      page,
-      secondPrefilledDocumentUnit,
-      testId,
-      value,
-      selector,
-    )
+    await runTextCategoryTest(page, secondPrefilledDocumentUnit, testId, value)
   })
 
   // eslint-disable-next-line playwright/expect-expect
@@ -407,15 +386,8 @@ test.describe("short and long texts", () => {
     async ({ page, prefilledDocumentUnit }) => {
       const testId = "Sonstiger Orientierungssatz"
       const value = "Sonstiger Orientierungssatz Test Text"
-      const selector = `[data-testid='${testId}']`
 
-      await runTextCategoryTest(
-        page,
-        prefilledDocumentUnit,
-        testId,
-        value,
-        selector,
-      )
+      await runTextCategoryTest(page, prefilledDocumentUnit, testId, value)
     },
   )
 
@@ -426,15 +398,8 @@ test.describe("short and long texts", () => {
   }) => {
     const testId = "Tenor"
     const value = "Tenor Test Text"
-    const selector = `[data-testid='${testId}']`
 
-    await runTextCategoryTest(
-      page,
-      prefilledDocumentUnit,
-      testId,
-      value,
-      selector,
-    )
+    await runTextCategoryTest(page, prefilledDocumentUnit, testId, value)
   })
 
   // eslint-disable-next-line playwright/expect-expect
@@ -444,15 +409,8 @@ test.describe("short and long texts", () => {
   }) => {
     const testId = "Gründe"
     const value = "Gründe Test Text"
-    const selector = `[data-testid='${testId}']`
 
-    await runTextCategoryTest(
-      page,
-      prefilledDocumentUnit,
-      testId,
-      value,
-      selector,
-    )
+    await runTextCategoryTest(page, prefilledDocumentUnit, testId, value)
   })
 
   // eslint-disable-next-line playwright/expect-expect
@@ -462,26 +420,20 @@ test.describe("short and long texts", () => {
   }) => {
     const testId = "Tatbestand"
     const value = "Tatbestand Test Text"
-    const selector = `[data-testid='${testId}']`
 
     await navigateToCategories(
       page,
       secondPrefilledDocumentUnit.documentNumber!,
     )
     await clickCategoryButton(testId, page)
-    await fillTextField(testId, value, page, selector)
+    await fillTextField(testId, value, page)
 
     //required for xml preview
     await clickCategoryButton("Entscheidungsgründe", page)
-    await fillTextField(
-      "Entscheidungsgründe",
-      "Test",
-      page,
-      "[data-testid='Entscheidungsgründe']",
-    )
+    await fillTextField("Entscheidungsgründe", "Test", page)
 
     await save(page)
-    await checkWasSaved(value, page, selector)
+    await checkWasSaved(value, page, testId)
     await checkVisibleInPreview(
       testId,
       value,
@@ -503,23 +455,17 @@ test.describe("short and long texts", () => {
   }) => {
     const testId = "Entscheidungsgründe"
     const value = "Entscheidungsgründe Test Text"
-    const selector = `[data-testid='${testId}']`
 
     await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
     await clickCategoryButton(testId, page)
-    await fillTextField(testId, value, page, selector)
+    await fillTextField(testId, value, page)
 
     //required for xml preview
     await clickCategoryButton("Tatbestand", page)
-    await fillTextField(
-      "Tatbestand",
-      "Test",
-      page,
-      "[data-testid='Tatbestand']",
-    )
+    await fillTextField("Tatbestand", "Test", page)
 
     await save(page)
-    await checkWasSaved(value, page, selector)
+    await checkWasSaved(value, page, testId)
     await checkVisibleInPreview(testId, value, page, prefilledDocumentUnit)
     await checkVisibleInXMLPreview(testId, value, page, prefilledDocumentUnit)
   })
@@ -533,14 +479,12 @@ test.describe("short and long texts", () => {
     async ({ page, secondPrefilledDocumentUnit }) => {
       const testId = "Abweichende Meinung"
       const value = "Abweichende Meinung Test Text"
-      const selector = `[data-testid='${testId}']`
 
       await runTextCategoryTest(
         page,
         secondPrefilledDocumentUnit,
         testId,
         value,
-        selector,
       )
     },
   )
@@ -554,15 +498,8 @@ test.describe("short and long texts", () => {
     async ({ page, prefilledDocumentUnit }) => {
       const testId = "Sonstiger Langtext"
       const value = "Sonstiger Langtext Test Text"
-      const selector = `[data-testid='${testId}']`
 
-      await runTextCategoryTest(
-        page,
-        prefilledDocumentUnit,
-        testId,
-        value,
-        selector,
-      )
+      await runTextCategoryTest(page, prefilledDocumentUnit, testId, value)
     },
   )
 
@@ -575,15 +512,8 @@ test.describe("short and long texts", () => {
     async ({ page, prefilledDocumentUnit }) => {
       const testId = "Gliederung"
       const value = "Gliederung Test Text"
-      const selector = `[data-testid='${testId}']`
 
-      await runTextCategoryTest(
-        page,
-        prefilledDocumentUnit,
-        testId,
-        value,
-        selector,
-      )
+      await runTextCategoryTest(page, prefilledDocumentUnit, testId, value)
     },
   )
 
@@ -592,25 +522,19 @@ test.describe("short and long texts", () => {
     prefilledDocumentUnit: DocumentUnit,
     testId: string,
     value: string,
-    selector: string,
   ) {
     await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
     await clickCategoryButton(testId, page)
-    await fillTextField(testId, value, page, selector)
+    await fillTextField(testId, value, page)
     await save(page)
-    await checkWasSaved(value, page, selector)
+    await checkWasSaved(value, page, testId)
     await checkVisibleInPreview(testId, value, page, prefilledDocumentUnit)
     await checkVisibleInXMLPreview(testId, value, page, prefilledDocumentUnit)
   }
 
-  async function fillTextField(
-    testId: string,
-    value: string,
-    page: Page,
-    selector: string,
-  ) {
+  async function fillTextField(testId: string, value: string, page: Page) {
     await test.step(`text field '${testId}' should be filled with value '${value}'`, async () => {
-      const textField = page.locator(selector)
+      const textField = page.getByTestId(testId)
       await textField.click()
       await page.keyboard.type(value)
       const innerText = await textField.innerText()
@@ -618,10 +542,10 @@ test.describe("short and long texts", () => {
     })
   }
 
-  async function checkWasSaved(value: string, page: Page, selector: string) {
+  async function checkWasSaved(value: string, page: Page, testId: string) {
     await test.step(`value '${value}' should be saved (be present after reload)`, async () => {
       await page.reload()
-      const textField = page.locator(selector)
+      const textField = page.getByTestId(testId)
       const innerText = await textField.innerText()
       expect(innerText).toContain(value)
     })

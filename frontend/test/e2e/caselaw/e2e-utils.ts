@@ -229,7 +229,7 @@ export async function save(page: Page) {
   const saveRequest = page.waitForRequest("**/api/v1/caselaw/documentunits/*", {
     timeout: 5_000,
   })
-  await page.locator("[aria-label='Speichern Button']").click()
+  await page.getByLabel("Speichern Button", { exact: true }).click()
   await saveRequest
   await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
 }
@@ -276,7 +276,7 @@ export async function fillSearchInput(
   },
 ) {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
-    const input = page.locator(`[aria-label='${ariaLabel}']`)
+    const input = page.getByLabel(ariaLabel, { exact: true })
     await input.fill(value ?? ariaLabel)
     await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
   }
@@ -348,7 +348,7 @@ export async function fillPreviousDecisionInputs(
   decisionIndex = 0,
 ): Promise<void> {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
-    const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
+    const input = page.getByLabel(ariaLabel, { exact: true }).nth(decisionIndex)
     await input.fill(value ?? ariaLabel)
     await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
   }
@@ -394,8 +394,9 @@ export async function fillPreviousDecisionInputs(
         .isVisible())
     ) {
       await page
-        .locator(
-          "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
+        .getByLabel(
+          "Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen",
+          { exact: true },
         )
         .click()
     }
@@ -419,7 +420,7 @@ export async function fillEnsuingDecisionInputs(
   decisionIndex = 0,
 ): Promise<void> {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
-    const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
+    const input = page.getByLabel(ariaLabel, { exact: true }).nth(decisionIndex)
     await input.fill(value ?? ariaLabel)
     await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
   }
@@ -464,13 +465,13 @@ export async function fillInput(
   ariaLabel: string,
   value = generateString(),
 ) {
-  const input = page.locator(`[aria-label='${ariaLabel}']`)
+  const input = page.getByLabel(ariaLabel, { exact: true })
   await input.fill(value ?? ariaLabel)
   await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
 }
 
 export async function clearInput(page: Page, ariaLabel: string) {
-  const input = page.locator(`[aria-label='${ariaLabel}']`)
+  const input = page.getByLabel(ariaLabel, { exact: true })
   await input.clear()
 }
 
@@ -495,7 +496,7 @@ export async function fillNormInputs(
         const input = page.getByLabel("Einzelnorm der Norm").nth(index)
         await input.fill(entry.singleNorm)
         await expect(
-          page.locator("[aria-label='Einzelnorm der Norm'] >> nth=" + index),
+          page.getByLabel("Einzelnorm der Norm", { exact: true }).nth(index),
         ).toHaveValue(entry.singleNorm.trim())
       }
 
@@ -503,14 +504,14 @@ export async function fillNormInputs(
         const input = page.getByLabel("Fassungsdatum der Norm").nth(index)
         await input.fill(entry.dateOfVersion)
         await expect(
-          page.locator("[aria-label='Fassungsdatum der Norm'] >> nth=" + index),
+          page.getByLabel("Fassungsdatum der Norm", { exact: true }).nth(index),
         ).toHaveValue(entry.dateOfVersion)
       }
       if (entry.dateOfRelevance) {
         const input = page.getByLabel("Jahr der Norm").nth(index)
         await input.fill(entry.dateOfRelevance)
         await expect(
-          page.locator("[aria-label='Jahr der Norm'] >> nth=" + index),
+          page.getByLabel("Jahr der Norm", { exact: true }).nth(index),
         ).toHaveValue(entry.dateOfRelevance)
       }
     }
@@ -610,7 +611,7 @@ export async function assignProcedureToDocUnit(
   await test.step("Internal user assigns new procedure to doc unit", async () => {
     await navigateToCategories(page, documentNumber)
     procedureName = generateString({ length: 10, prefix: prefix })
-    await page.locator("[aria-label='Vorgang']").fill(procedureName)
+    await page.getByLabel("Vorgang", { exact: true }).fill(procedureName)
     await page
       .getByText(`${procedureName} neu erstellen`)
       .click({ timeout: 5_000 })

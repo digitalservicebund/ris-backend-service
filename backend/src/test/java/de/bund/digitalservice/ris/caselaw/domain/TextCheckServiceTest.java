@@ -195,7 +195,7 @@ class TextCheckServiceTest {
                 .build());
 
     TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, CategoryType.REASONS);
-    assertEquals(TextCheckCategoryResponse.builder().matches(List.of()).build(), result);
+    assertEquals(null, result);
   }
 
   @Test

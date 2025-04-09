@@ -65,19 +65,21 @@ test.describe(
           await page.getByText("XML Vorschau").click()
 
           await expect(
-            page.locator(
-              "text='            <zitstelle>2024, 1-11, Heft 1</zitstelle>'",
+            page.getByText(
+              "            <zitstelle>2024, 1-11, Heft 1</zitstelle>",
             ),
           ).toBeVisible()
 
           await expect(
-            page.locator(
-              "text='            <zitstelle>2024, 12-22, Heft 1 (L)</zitstelle>'",
+            page.getByText(
+              "            <zitstelle>2024, 12-22, Heft 1 (L)</zitstelle>",
             ),
           ).toBeVisible()
 
           await page
-            .locator("[aria-label='Fundstellen der Ausgabe an jDV übergeben']")
+            .getByLabel("Fundstellen der Ausgabe an jDV übergeben", {
+              exact: true,
+            })
             .click()
 
           await expect(page.getByText("Email wurde versendet")).toBeVisible()

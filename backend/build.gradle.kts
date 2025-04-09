@@ -13,14 +13,14 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "7.0.2"
+    id("com.diffplug.spotless") version "7.0.3"
     id("org.sonarqube") version "6.1.0.5360"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.4.0"
+    id("org.flywaydb.flyway") version "11.6.0"
     id("io.sentry.jvm.gradle") version "5.3.0"
 }
 
@@ -51,7 +51,7 @@ sourceSets {
 }
 
 jacoco {
-    toolVersion = "0.8.12"
+    toolVersion = "0.8.13"
 }
 
 lombok {
@@ -171,7 +171,7 @@ dependencies {
     implementation("net.minidev:json-smart:2.5.2")
 
     // CVE-2025-24970
-    implementation("io.netty:netty-handler:4.1.119.Final")
+    implementation("io.netty:netty-handler:4.2.0.Final")
 
     implementation("org.postgresql:postgresql:42.7.5")
 
@@ -228,15 +228,15 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.10.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.5.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.6.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.5.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.6.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.16.1")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.17.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.4")

@@ -264,7 +264,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     ).toBeVisible()
 
     await page
-      .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
+      .getByLabel("Dokumentationseinheit an jDV übergeben", { exact: true })
       .click()
 
     await expect(page.getByText("Email wurde versendet")).toBeVisible()
@@ -292,7 +292,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       ).toBeVisible()
 
       await page
-        .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
+        .getByLabel("Dokumentationseinheit an jDV übergeben", { exact: true })
         .click()
 
       await expect(page.getByText("Email wurde versendet")).toBeVisible()
@@ -368,7 +368,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
 
       await test.step("Übergabe ist möglich nachdem Randnummernwarnung bestätigt wurde", async () => {
         await page
-          .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
+          .getByLabel("Dokumentationseinheit an jDV übergeben", { exact: true })
           .click()
 
         await expect(
