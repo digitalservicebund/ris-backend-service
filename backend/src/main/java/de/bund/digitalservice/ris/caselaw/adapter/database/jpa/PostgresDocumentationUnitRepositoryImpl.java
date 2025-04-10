@@ -206,7 +206,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     ManagementDataDTO managementData = getCreatedBy(user, documentationUnitDTO);
     documentationUnitDTO.setManagementData(managementData);
-    repository.save(documentationUnitDTO);
 
     StatusDTO statusDTO =
         StatusTransformer.transformToDTO(status).toBuilder()
