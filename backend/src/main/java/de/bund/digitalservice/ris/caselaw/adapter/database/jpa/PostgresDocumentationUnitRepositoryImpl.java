@@ -107,16 +107,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Transactional(transactionManager = "jpaTransactionManager")
   public Documentable findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException {
-    var documentationUnit =
-        repository
-            .findByDocumentNumber(documentNumber)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-    return getDocumentationUnit(documentationUnit);
+    return findByDocumentNumberNonTransactional(documentNumber, null);
   }
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public Documentable findByDocumentNumber(String documentNumber, User user)
+      throws DocumentationUnitNotExistsException {
+    return findByDocumentNumberNonTransactional(documentNumber, user);
+  }
+
+  private Documentable findByDocumentNumberNonTransactional(String documentNumber, User user)
       throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository
@@ -135,11 +136,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
     }
     return null;
-  }
-
-  @Nullable
-  private static Documentable getDocumentationUnit(DocumentationUnitDTO documentationUnit) {
-    return getDocumentationUnit(documentationUnit, null);
   }
 
   @Override

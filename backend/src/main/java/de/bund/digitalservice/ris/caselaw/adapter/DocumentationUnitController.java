@@ -333,7 +333,7 @@ public class DocumentationUnitController {
       if (documentationUnit != null) {
         documentNumber = documentationUnit.documentNumber();
       }
-      User user = this.userService.getUser(oidcUser);
+      User user = userService.getUser(oidcUser);
       var newPatch = service.updateDocumentationUnit(uuid, patch, user);
 
       return ResponseEntity.ok().body(newPatch);
