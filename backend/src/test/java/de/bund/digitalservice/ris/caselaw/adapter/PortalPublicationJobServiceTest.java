@@ -10,7 +10,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
@@ -24,15 +23,15 @@ class PortalPublicationJobServiceTest {
 
   private PortalPublicationJobService service;
   private PortalPublicationJobRepository publicationJobRepository;
-  private PublicPortalPublicationService publicPortalPublicationService;
+  private PrototypePortalPublicationService prototypePortalPublicationService;
 
   @BeforeEach
   void beforeEach() {
     this.publicationJobRepository = mock(PortalPublicationJobRepository.class);
-    this.publicPortalPublicationService = mock(PublicPortalPublicationService.class);
+    this.prototypePortalPublicationService = mock(PrototypePortalPublicationService.class);
     this.service =
         new PortalPublicationJobService(
-            this.publicationJobRepository, this.publicPortalPublicationService);
+            this.publicationJobRepository, this.prototypePortalPublicationService);
   }
 
   @Test
@@ -41,8 +40,8 @@ class PortalPublicationJobServiceTest {
 
     this.service.executePendingJobs();
 
-    verify(publicPortalPublicationService, never()).publishDocumentationUnit(anyString());
-    verify(publicPortalPublicationService, never()).deleteDocumentationUnit(anyString());
+    verify(prototypePortalPublicationService, never()).publishDocumentationUnit(anyString());
+    verify(prototypePortalPublicationService, never()).deleteDocumentationUnit(anyString());
     verify(publicationJobRepository, never()).saveAll(any());
   }
 
@@ -53,8 +52,8 @@ class PortalPublicationJobServiceTest {
 
     this.service.executePendingJobs();
 
-    verify(publicPortalPublicationService, times(1)).publishDocumentationUnit("123");
-    verify(publicPortalPublicationService, never()).deleteDocumentationUnit(anyString());
+    verify(prototypePortalPublicationService, times(1)).publishDocumentationUnit("123");
+    verify(prototypePortalPublicationService, never()).deleteDocumentationUnit(anyString());
     // currently disabled
     //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of("123.xml"),
     // List.of());
@@ -70,8 +69,8 @@ class PortalPublicationJobServiceTest {
 
     this.service.executePendingJobs();
 
-    verify(publicPortalPublicationService, never()).publishDocumentationUnit(anyString());
-    verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("456");
+    verify(prototypePortalPublicationService, never()).publishDocumentationUnit(anyString());
+    verify(prototypePortalPublicationService, times(1)).deleteDocumentationUnit("456");
     // currently disabled
     //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(),
     // List.of("456.xml"));
@@ -81,54 +80,51 @@ class PortalPublicationJobServiceTest {
   }
 
   @Test
-  void shouldHandleErrorWhenPublishingASingleDocUnit()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
+  void shouldHandleErrorWhenPublishingASingleDocUnit() throws DocumentationUnitNotExistsException {
     var jobs = List.of(createPublicationJob("789", PortalPublicationTaskType.PUBLISH));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
     doThrow(RuntimeException.class)
-        .when(publicPortalPublicationService)
+        .when(prototypePortalPublicationService)
         .publishDocumentationUnit("789");
 
     this.service.executePendingJobs();
 
-    verify(publicPortalPublicationService, times(1)).publishDocumentationUnit("789");
-    verify(publicPortalPublicationService, never()).deleteDocumentationUnit(anyString());
-    verify(publicPortalPublicationService, never()).uploadChangelog(any(), any());
+    verify(prototypePortalPublicationService, times(1)).publishDocumentationUnit("789");
+    verify(prototypePortalPublicationService, never()).deleteDocumentationUnit(anyString());
+    verify(prototypePortalPublicationService, never()).uploadChangelog(any(), any());
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationStatus()).isEqualTo(PortalPublicationTaskStatus.ERROR);
   }
 
   @Test
-  void shouldHandleErrorWhenDeletingASingleDocUnit()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
+  void shouldHandleErrorWhenDeletingASingleDocUnit() throws DocumentationUnitNotExistsException {
     var jobs = List.of(createPublicationJob("312", PortalPublicationTaskType.DELETE));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
     doThrow(RuntimeException.class)
-        .when(publicPortalPublicationService)
+        .when(prototypePortalPublicationService)
         .deleteDocumentationUnit("312");
 
     this.service.executePendingJobs();
 
-    verify(publicPortalPublicationService, never()).publishDocumentationUnit(anyString());
-    verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("312");
-    verify(publicPortalPublicationService, never()).uploadChangelog(any(), any());
+    verify(prototypePortalPublicationService, never()).publishDocumentationUnit(anyString());
+    verify(prototypePortalPublicationService, times(1)).deleteDocumentationUnit("312");
+    verify(prototypePortalPublicationService, never()).uploadChangelog(any(), any());
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationStatus()).isEqualTo(PortalPublicationTaskStatus.ERROR);
   }
 
   @Test
-  void shouldCatchErrorWhenUploadingChangelogFails()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
+  void shouldCatchErrorWhenUploadingChangelogFails() throws DocumentationUnitNotExistsException {
     var jobs = List.of(createPublicationJob("312", PortalPublicationTaskType.DELETE));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
     doThrow(RuntimeException.class)
-        .when(publicPortalPublicationService)
+        .when(prototypePortalPublicationService)
         .uploadChangelog(any(), any());
 
     this.service.executePendingJobs();
 
-    verify(publicPortalPublicationService, never()).publishDocumentationUnit(anyString());
-    verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("312");
+    verify(prototypePortalPublicationService, never()).publishDocumentationUnit(anyString());
+    verify(prototypePortalPublicationService, times(1)).deleteDocumentationUnit("312");
     // currently disabled
     //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(),
     // List.of("312.xml"));
@@ -148,19 +144,19 @@ class PortalPublicationJobServiceTest {
             createPublicationJob("5", PortalPublicationTaskType.PUBLISH));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
     doThrow(RuntimeException.class)
-        .when(publicPortalPublicationService)
+        .when(prototypePortalPublicationService)
         .publishDocumentationUnit("1");
     doThrow(RuntimeException.class)
-        .when(publicPortalPublicationService)
+        .when(prototypePortalPublicationService)
         .deleteDocumentationUnit("2");
 
     this.service.executePendingJobs();
 
-    verify(publicPortalPublicationService, times(1)).publishDocumentationUnit("1");
-    verify(publicPortalPublicationService, times(1)).publishDocumentationUnit("3");
-    verify(publicPortalPublicationService, times(1)).publishDocumentationUnit("5");
-    verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("2");
-    verify(publicPortalPublicationService, times(1)).deleteDocumentationUnit("4");
+    verify(prototypePortalPublicationService, times(1)).publishDocumentationUnit("1");
+    verify(prototypePortalPublicationService, times(1)).publishDocumentationUnit("3");
+    verify(prototypePortalPublicationService, times(1)).publishDocumentationUnit("5");
+    verify(prototypePortalPublicationService, times(1)).deleteDocumentationUnit("2");
+    verify(prototypePortalPublicationService, times(1)).deleteDocumentationUnit("4");
     // currently disabled
     //    verify(publicPortalPublicationService, times(1))
     //        .uploadChangelog(List.of("3.xml", "5.xml"), List.of("4.xml"));

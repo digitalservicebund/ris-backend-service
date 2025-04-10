@@ -1,7 +1,6 @@
 import dayjs from "dayjs"
 import ActiveCitation from "./activeCitation"
 import DocumentationOffice from "./documentationOffice"
-import DocumentUnitListEntry from "./documentUnitListEntry"
 import EnsuingDecision from "./ensuingDecision"
 import { FieldOfLaw } from "./fieldOfLaw"
 import NormReference from "./normReference"
@@ -9,8 +8,10 @@ import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
 import SingleNorm from "./singleNorm"
 import Attachment from "@/domain/attachment"
+import { DocumentType } from "@/domain/documentType"
 import LegalForce from "@/domain/legalForce"
 import ParticipatingJudge from "@/domain/participatingJudge"
+import { Procedure } from "@/domain/procedure"
 import { PublicationState, PublicationStatus } from "@/domain/publicationStatus"
 
 export type CoreData = {
@@ -62,12 +63,6 @@ export type ContentRelatedIndexing = {
   hasLegislativeMandate?: boolean
 }
 
-export type DocumentType = {
-  uuid?: string
-  jurisShortcut: string
-  label: string
-}
-
 export type Court = {
   type?: string
   location?: string
@@ -76,15 +71,6 @@ export type Court = {
   jurisdictionType?: string
   region?: string
   responsibleDocOffice?: DocumentationOffice
-}
-
-export type Procedure = {
-  id?: string
-  label: string
-  documentationUnitCount: number
-  createdAt: string
-  documentUnits?: DocumentUnitListEntry[]
-  userGroupId?: string
 }
 
 export type ShortTexts = {

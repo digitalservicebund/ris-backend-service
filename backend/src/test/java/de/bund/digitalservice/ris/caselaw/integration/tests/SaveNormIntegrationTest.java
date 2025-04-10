@@ -13,8 +13,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
@@ -110,7 +110,7 @@ class SaveNormIntegrationTest {
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
+  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
 
   @MockitoBean
