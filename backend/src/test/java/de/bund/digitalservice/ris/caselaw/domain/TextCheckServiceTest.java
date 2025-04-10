@@ -482,6 +482,28 @@ class TextCheckServiceTest {
             "<p>WORD-WITH-UNDERSCORE should be also replaced</p>",
             List.of("WORD-WITH-UNDERSCORE"),
             "<p><noindex>WORD-WITH-UNDERSCORE</noindex> should be also replaced</p>"),
+        // don't know, if it is necessary, but in german the hyphen is allowed
+        // for combined word to make it more readable
+        //        Arguments.of(
+        //            "<p>word-list - first part shouldn't be replaced</p>",
+        //            List.of("word"),
+        //            "<p>word-list - first part shouldn't be replaced</p>"),
+        Arguments.of(
+            "<p>\"word\" - words in double quotes should be replaced</p>",
+            List.of("word"),
+            "<p>\"<noindex>word</noindex>\" - words in double quotes should be replaced</p>"),
+        Arguments.of(
+            "<p>word, other word - both words should be replaced</p>",
+            List.of("word"),
+            "<p><noindex>word</noindex>, other <noindex>word</noindex> - both words should be replaced</p>"),
+        Arguments.of(
+            "<p>word; other word - both words should be replaced</p>",
+            List.of("word"),
+            "<p><noindex>word</noindex>; other <noindex>word</noindex> - both words should be replaced</p>"),
+        Arguments.of(
+            "<p>word;other word - both words should be replaced</p>",
+            List.of("word"),
+            "<p><noindex>word</noindex>;other <noindex>word</noindex> - both words should be replaced</p>"),
         Arguments.of(
             "<p>WORD. should be also replaced</p>",
             List.of("WORD"),
