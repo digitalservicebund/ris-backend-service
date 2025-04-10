@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
@@ -24,8 +25,12 @@ import lombok.Setter;
 public class ManagementDataDTO {
 
   @Id
-  @OneToOne()
-  @JoinColumn(name = "documentation_unit_id", referencedColumnName = "id")
+  @Column(name = "documentation_unit_id")
+  private UUID id;
+
+  @OneToOne
+  @MapsId
+  @JoinColumn(name = "documentation_unit_id")
   private DocumentationUnitDTO documentationUnit;
 
   @OneToOne()

@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -64,6 +66,7 @@ import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
@@ -370,7 +373,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -527,7 +530,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -571,7 +574,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
@@ -646,7 +649,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -753,7 +756,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -917,7 +920,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1027,7 +1030,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1130,7 +1133,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1290,7 +1293,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1335,7 +1338,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
@@ -1411,7 +1414,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1511,7 +1514,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1663,7 +1666,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1705,7 +1708,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
@@ -1783,7 +1786,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1913,7 +1916,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -2109,7 +2112,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -2165,7 +2168,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
@@ -2250,7 +2253,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -2361,7 +2364,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -2521,7 +2524,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -2561,7 +2564,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 // next iteration: handle add operation with null values
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
@@ -2633,7 +2636,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -2757,7 +2760,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
@@ -2938,7 +2941,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
@@ -3218,7 +3221,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
@@ -3391,7 +3394,8 @@ class PatchUpdateIntegrationTest {
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1RemovePreviousDecisionAndUser2DoNothing_shouldSendPatchWithRemovePreviousDecisionToUser2() {
+        testPartialUpdateByUuid_withUser1RemovePreviousDecisionAndUser2DoNothing_shouldSendPatchWithRemovePreviousDecisionToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -3428,7 +3432,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -3451,10 +3455,36 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/previousDecisions/0\"}]"));
+      assertThat(patches).hasSize(1);
+      assertThat(patches.getFirst().getDocumentationUnitVersion()).isZero();
+      List<Map<String, String>> parsedPatches =
+          objectMapper.readValue(patches.getFirst().getPatch(), new TypeReference<>() {});
+      assertThat(parsedPatches).hasSize(4);
+      assertThat(parsedPatches.getFirst())
+          .containsExactlyInAnyOrderEntriesOf(
+              Map.of("op", "remove", "path", "/previousDecisions/0"));
+      assertThat(parsedPatches.get(1))
+          .containsExactlyInAnyOrderEntriesOf(
+              Map.of(
+                  "op",
+                  "replace",
+                  "path",
+                  "/managementData/lastUpdatedByDocOffice",
+                  "value",
+                  "DS"));
+      assertThat(parsedPatches.get(2))
+          .containsAllEntriesOf(
+              Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
+      assertThat(parsedPatches.get(3))
+          .containsExactlyInAnyOrderEntriesOf(
+              Map.of(
+                  "op",
+                  "replace",
+                  "path",
+                  "/managementData/lastUpdatedByName",
+                  "value",
+                  "testUser"));
+
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -3474,7 +3504,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(4);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
@@ -3501,10 +3531,35 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/previousDecisions/0\"}]"));
+      assertThat(patches).hasSize(1);
+      assertThat(patches.getFirst().getDocumentationUnitVersion()).isZero();
+      parsedPatches =
+          objectMapper.readValue(patches.getFirst().getPatch(), new TypeReference<>() {});
+      assertThat(parsedPatches).hasSize(4);
+      assertThat(parsedPatches.getFirst())
+          .containsExactlyInAnyOrderEntriesOf(
+              Map.of("op", "remove", "path", "/previousDecisions/0"));
+      assertThat(parsedPatches.get(1))
+          .containsExactlyInAnyOrderEntriesOf(
+              Map.of(
+                  "op",
+                  "replace",
+                  "path",
+                  "/managementData/lastUpdatedByDocOffice",
+                  "value",
+                  "DS"));
+      assertThat(parsedPatches.get(2))
+          .containsAllEntriesOf(
+              Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
+      assertThat(parsedPatches.get(3))
+          .containsExactlyInAnyOrderEntriesOf(
+              Map.of(
+                  "op",
+                  "replace",
+                  "path",
+                  "/managementData/lastUpdatedByName",
+                  "value",
+                  "testUser"));
       TestTransaction.end();
     }
 
@@ -3548,7 +3603,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -3728,7 +3783,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -3776,7 +3831,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
@@ -3857,7 +3912,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -3916,7 +3971,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);

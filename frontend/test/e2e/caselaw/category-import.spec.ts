@@ -406,7 +406,9 @@ test.describe("category import", () => {
         // add a field of law manually
         await page.getByRole("button", { name: "Sachgebiete" }).click()
         await page
-          .locator("[aria-label='Direkteingabe-Sachgebietssuche eingeben']")
+          .getByLabel("Direkteingabe-Sachgebietssuche eingeben", {
+            exact: true,
+          })
           .fill("VR-01-02")
         await expect(page.getByText("Völkergewohnheitsrecht")).toBeVisible()
         await page.getByText("Völkergewohnheitsrecht").click()
@@ -437,7 +439,9 @@ test.describe("category import", () => {
 
       await test.step("do not import duplicates and keep first field of law", async () => {
         await page
-          .locator("[aria-label='Direkteingabe-Sachgebietssuche eingeben']")
+          .getByLabel("Direkteingabe-Sachgebietssuche eingeben", {
+            exact: true,
+          })
           .fill("EU-01-01")
         await expect(page.getByText("Aufgaben und Ziele")).toBeVisible()
         await page.getByText("Aufgaben und Ziele").click()

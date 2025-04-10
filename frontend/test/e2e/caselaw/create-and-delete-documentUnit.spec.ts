@@ -34,7 +34,7 @@ test.describe("create a doc unit and delete it again", () => {
       .locator(".table-row", {
         hasText: documentNumber,
       })
-      .locator("[aria-label='Dokumentationseinheit löschen']")
+      .getByLabel("Dokumentationseinheit löschen", { exact: true })
       .click()
     await page.locator('button:has-text("Abbrechen")').click()
     await expect(

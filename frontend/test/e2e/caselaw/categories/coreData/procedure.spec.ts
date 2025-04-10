@@ -67,7 +67,7 @@ test.describe("procedure", () => {
       await page.getByText("Rubriken").click()
 
       await page
-        .locator("[aria-label='Vorgang']")
+        .getByLabel("Vorgang", { exact: true })
         .fill(newProcedure.substring(0, 7))
       await expect(page.getByText(newProcedure)).toBeVisible()
 
@@ -88,7 +88,7 @@ test.describe("procedure", () => {
       await pageWithBghUser.getByText("Rubriken").click()
 
       await pageWithBghUser
-        .locator("[aria-label='Vorgang']")
+        .getByLabel("Vorgang", { exact: true })
         .fill(newProcedure.substring(0, 7))
       await expect(pageWithBghUser.getByText(newProcedure)).toBeHidden()
 

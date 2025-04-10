@@ -149,16 +149,6 @@ public class DecisionTransformer extends DocumentableTransformer {
           .headline(null);
     }
 
-    //      if (updatedDomainObject.shortTexts() != null) {
-    //        if (updatedDomainObject.shortTexts().otherHeadnote() != null) {
-    //          pendingProceedingDTOBuilder.resolutionNote(
-    //              updatedDomainObject.shortTexts().otherHeadnote());
-    //        }
-    //      } else {
-    //        pendingProceedingDTOBuilder.resolutionNote(null).headline(null);
-    //      }
-    //    }
-
     if (updatedDomainObject.managementData() != null) {
       var managementData = updatedDomainObject.managementData();
 
@@ -170,7 +160,12 @@ public class DecisionTransformer extends DocumentableTransformer {
     addCaselawReferences(updatedDomainObject, builder, currentDto);
     addLiteratureReferences(updatedDomainObject, builder, currentDto);
 
-    return builder.build();
+    DecisionDTO result = builder.build();
+    if (currentDto.getManagementData() != null) {
+      currentDto.getManagementData().setDocumentationUnit(result);
+      result.setManagementData(currentDto.getManagementData());
+    }
+    return result;
   }
 
   // No need to check for null, when accessing max of a non-empty list.
