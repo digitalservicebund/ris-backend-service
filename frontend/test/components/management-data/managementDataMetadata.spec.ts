@@ -3,10 +3,10 @@ import ManagementDataMetadata from "@/components/management-data/ManagementDataM
 import DocumentationOffice from "@/domain/documentationOffice"
 import DocumentUnit, {
   ManagementData,
-  Procedure,
   Source,
   SourceValue,
 } from "@/domain/documentUnit"
+import { Procedure } from "@/domain/procedure"
 import Reference from "@/domain/reference"
 
 function mockDocUnit({
