@@ -152,9 +152,9 @@ class S3AttachmentServiceTest {
   @ValueSource(strings = {"", " "})
   @NullSource
   void testDeleteByS3Path_withoutS3Path(String s3Path) {
-    assertThrows(
-        AttachmentException.class,
-        () -> service.deleteByS3Path(s3Path, UUID.randomUUID(), User.builder().build()));
+    var user = User.builder().build();
+    var docUnitId = UUID.randomUUID();
+    assertThrows(AttachmentException.class, () -> service.deleteByS3Path(s3Path, docUnitId, user));
 
     verifyNoInteractions(s3Client);
     verifyNoInteractions(repository);
@@ -220,11 +220,12 @@ class S3AttachmentServiceTest {
         .thenThrow(SdkException.create("exception", null));
     var documentationUnitDTOId = documentationUnitDTO.getId();
 
+    var user = User.builder().build();
     assertThrows(
         SdkException.class,
         () ->
             service.attachFileToDocumentationUnit(
-                documentationUnitDTOId, byteBuffer, HttpHeaders.EMPTY, User.builder().build()));
+                documentationUnitDTOId, byteBuffer, HttpHeaders.EMPTY, user));
 
     verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
   }

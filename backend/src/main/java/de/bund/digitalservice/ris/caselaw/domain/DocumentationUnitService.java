@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@SuppressWarnings("java:S6539") // Too many dependencies warning
 public class DocumentationUnitService {
 
   private final DocumentationUnitRepository repository;
