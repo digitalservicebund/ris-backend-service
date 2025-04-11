@@ -162,9 +162,8 @@ class StagingPortalPublicationServiceTest {
             () ->
                 stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
                     documentationUnitId))
-        .withMessageContaining(
-            "Could not publish documentation unit to portal, because changelog file could not be created.");
-    verify(caseLawBucket, times(0)).save(anyString(), anyString());
+        .withMessageContaining("Could not save changelog to bucket");
+    verify(caseLawBucket).delete(testDocumentUnit.documentNumber() + ".xml");
   }
 
   @Test
@@ -181,6 +180,7 @@ class StagingPortalPublicationServiceTest {
                 stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
                     documentationUnitId))
         .withMessageContaining("Could not save changelog to bucket");
+    verify(caseLawBucket).delete(testDocumentUnit.documentNumber() + ".xml");
   }
 
   @Test

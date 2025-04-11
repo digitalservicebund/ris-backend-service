@@ -223,7 +223,7 @@ class PrototypePortalPublicationServiceTest {
         .thenReturn(List.of("123.xml", "456.xml", "789.xml"));
     ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> fileContentCaptor = ArgumentCaptor.forClass(String.class);
-    when(objectMapper.writeValueAsString(new Changelog(null, List.of("789.xml"), null)))
+    when(objectMapper.writeValueAsString(new ChangelogUpdateDelete(null, List.of("789.xml"))))
         .thenReturn(
             """
                 {"deleted":["789.xml"]}""");
