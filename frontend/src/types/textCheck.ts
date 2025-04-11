@@ -111,6 +111,10 @@ export interface TextCheckService {
   ignoreWord(word: string): Promise<void>
 
   removeIgnoredWord(word: string): Promise<void>
+
+  ignoreWordGlobally(word: string): Promise<void>
+
+  removeGloballyIgnoredWord(word: string): Promise<void>
 }
 
 export const TextCheckTagName = "textCheck"

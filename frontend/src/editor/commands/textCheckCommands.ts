@@ -187,6 +187,24 @@ class NeurisTextCheckService implements TextCheckService {
       }
     }
   }
+
+  ignoreWordGlobally = async (word: string) => {
+    const response: ServiceResponse<IgnoredTextCheckWord> =
+      await languageToolService.addGlobalIgnore(word)
+
+    if (response.status >= 300) {
+      this.responseError.value = response.error
+    }
+  }
+
+  removeGloballyIgnoredWord = async (word: string): Promise<void> => {
+    const response: ServiceResponse<IgnoredTextCheckWord> =
+      await languageToolService.removeGlobalIgnore(word)
+
+    if (response.status >= 300) {
+      this.responseError.value = response.error
+    }
+  }
 }
 
 export { NeurisTextCheckService }
