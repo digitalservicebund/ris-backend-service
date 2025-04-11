@@ -43,11 +43,13 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
@@ -200,6 +202,89 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     var savedAttachment = attachmentRepository.findAllByDocumentationUnitId(dto.getId()).get(0);
     assertThat(savedAttachment.getUploadTimestamp()).isInstanceOf(Instant.class);
     assertThat(savedAttachment.getId()).isInstanceOf(UUID.class);
+  }
+
+  // TODO: Test for setting lastUpdate on delete attachment
+
+  @Test
+  void testAttachDocxToDocumentationUnit_shouldSetManagementData() throws IOException {
+    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+    mockS3ClientToReturnFile(attachment);
+
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyAsByteArray(attachment)
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    var docUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData managementData = docUnit.managementData();
+    assertThat(managementData.lastUpdatedByName()).isEqualTo("testUser");
+    assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
+    assertThat(managementData.lastUpdatedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+  }
+
+  @Test
+  void testAttachDocxToDocumentationUnit_shouldSetManagementDataForOtherDocOffice()
+      throws IOException {
+    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+    mockS3ClientToReturnFile(attachment);
+
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyAsByteArray(attachment)
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    var docUnit =
+        risWebTestClient
+            .withLogin("/BGH")
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData managementData = docUnit.managementData();
+    assertThat(managementData.lastUpdatedByName()).isNull();
+    assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
+    assertThat(managementData.lastUpdatedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
   }
 
   @Test
