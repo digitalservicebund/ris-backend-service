@@ -203,7 +203,7 @@ public class TextCheckService {
 
     Document document = Jsoup.parse(htmlText);
     for (String ignoredWord : ignoredWords) {
-      NodeTraversor.traverse(new NoIndexNodeVisitor(htmlText, ignoredWord), document.body());
+      NodeTraversor.traverse(new NoIndexNodeWrapperVisitor(htmlText, ignoredWord), document.body());
     }
 
     var htmlWithNoIndexTags = document.body().html();
@@ -314,15 +314,24 @@ public class TextCheckService {
         .toList();
   }
 
+  /**
+   * See test method for covered cases {@code
+   * TextCheckServiceTest#testAddNoIndexTags_variousCases()}
+   */
   @SuppressWarnings("java:S3776")
-  protected record NoIndexNodeVisitor(String html, String ignoredWord) implements NodeVisitor {
+  protected record NoIndexNodeWrapperVisitor(String html, String ignoredWord)
+      implements NodeVisitor {
 
     @Override
     public void head(@NotNull Node node, int i) {
       if (node instanceof TextNode textNode) {
         String text = textNode.getWholeText();
+
         Pattern exactWordsMatchPattern =
-            Pattern.compile("\\b" + Pattern.quote(ignoredWord) + "\\b");
+            Pattern.compile(
+                "(?<![\\p{L}\\p{N}-])" + Pattern.quote(ignoredWord) + "(?![\\p{L}\\p{N}-])",
+                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
+
         Matcher matcher = exactWordsMatchPattern.matcher(text);
 
         StringBuilder newTextBuffer = new StringBuilder();

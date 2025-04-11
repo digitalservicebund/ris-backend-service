@@ -458,36 +458,39 @@ class TextCheckServiceTest {
   }
 
   @ParameterizedTest
-  @MethodSource("noIndexChecks")
-  void testAddNoIndexTags_variousCases(String html, List<String> ignoredWords, String expected) {
+  @MethodSource("noIndexReplacementCases")
+  void testAddNoIndexTags_withMultipleCases(
+      String html, List<String> ignoredWords, String expected) {
     String result = TextCheckService.addNoIndexTags(html, ignoredWords);
     assertEquals(expected, result);
   }
 
-  private static Stream<Arguments> noIndexChecks() {
+  private static Stream<Arguments> noIndexReplacementCases() {
     return Stream.of(
         Arguments.of(
-            "<p>CASE sensitive should not replace</p>",
+            "<p>CASE insensitive should be replaced</p>",
             List.of("case"),
-            "<p>CASE sensitive should not replace</p>"),
+            "<p><noindex>CASE</noindex> insensitive should be replaced</p>"),
         Arguments.of(
-            "<p>partsofwords should not be replace</p>",
+            "<p>partsofwords should not replace</p>",
             List.of("parts"),
-            "<p>partsofwords should not be replace</p>"),
+            "<p>partsofwords should not replace</p>"),
         Arguments.of(
-            "<p>p with no index but not html tag</p>",
+            "<p>p with no index but not html tag should be replaced</p>",
             List.of("p"),
-            "<p><noindex>p</noindex> with no index but not html tag</p>"),
+            "<p><noindex>p</noindex> with no index but not html tag should be replaced</p>"),
         Arguments.of(
-            "<p>WORD-WITH-UNDERSCORE should be also replaced</p>",
-            List.of("WORD-WITH-UNDERSCORE"),
-            "<p><noindex>WORD-WITH-UNDERSCORE</noindex> should be also replaced</p>"),
-        // don't know, if it is necessary, but in german the hyphen is allowed
-        // for combined word to make it more readable
-        //        Arguments.of(
-        //            "<p>word-list - first part shouldn't be replaced</p>",
-        //            List.of("word"),
-        //            "<p>word-list - first part shouldn't be replaced</p>"),
+            "<p>saved-words-with-hyphen should be replaced</p>",
+            List.of("saved-words-with-hyphen"),
+            "<p><noindex>saved-words-with-hyphen</noindex> should be replaced</p>"),
+        Arguments.of(
+            "<p>hyphenated-word - first part should not replace</p>",
+            List.of("word"),
+            "<p>hyphenated-word - first part should not replace</p>"),
+        Arguments.of(
+            "<p>\"Selbständig[entätigkeit]\" - words in double quotes should be replaced</p>",
+            List.of("Selbständig[entätigkeit]"),
+            "<p>\"<noindex>Selbständig[entätigkeit]</noindex>\" - words in double quotes should be replaced</p>"),
         Arguments.of(
             "<p>\"word\" - words in double quotes should be replaced</p>",
             List.of("word"),
@@ -505,8 +508,12 @@ class TextCheckServiceTest {
             List.of("word"),
             "<p><noindex>word</noindex>;other <noindex>word</noindex> - both words should be replaced</p>"),
         Arguments.of(
-            "<p>WORD. should be also replaced</p>",
+            "<p>WORD. should replace</p>",
             List.of("WORD"),
-            "<p><noindex>WORD</noindex>. should be also replaced</p>"));
+            "<p><noindex>WORD</noindex>. should replace</p>"),
+        Arguments.of(
+            "<p>Abc§116A should replace</p>",
+            List.of("Abc§116A"),
+            "<p><noindex>Abc§116A</noindex> should replace</p>"));
   }
 }
