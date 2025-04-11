@@ -23,9 +23,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
-import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +35,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -148,16 +149,6 @@ public class DecisionTransformer extends DocumentableTransformer {
           .headline(null);
     }
 
-    //      if (updatedDomainObject.shortTexts() != null) {
-    //        if (updatedDomainObject.shortTexts().otherHeadnote() != null) {
-    //          pendingProceedingDTOBuilder.resolutionNote(
-    //              updatedDomainObject.shortTexts().otherHeadnote());
-    //        }
-    //      } else {
-    //        pendingProceedingDTOBuilder.resolutionNote(null).headline(null);
-    //      }
-    //    }
-
     if (updatedDomainObject.managementData() != null) {
       var managementData = updatedDomainObject.managementData();
 
@@ -169,7 +160,12 @@ public class DecisionTransformer extends DocumentableTransformer {
     addCaselawReferences(updatedDomainObject, builder, currentDto);
     addLiteratureReferences(updatedDomainObject, builder, currentDto);
 
-    return builder.build();
+    DecisionDTO result = builder.build();
+    if (currentDto.getManagementData() != null) {
+      currentDto.getManagementData().setDocumentationUnit(result);
+      result.setManagementData(currentDto.getManagementData());
+    }
+    return result;
   }
 
   // No need to check for null, when accessing max of a non-empty list.
@@ -479,14 +475,19 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.inputTypes(inputTypeDTOs);
   }
 
+  public static DocumentationUnit transformToDomain(DecisionDTO decisionDTO) {
+    return transformToDomain(decisionDTO, null);
+  }
+
   /**
    * Transforms a documentation unit object from its database representation into a domain object
    * that is suitable to be consumed by clients of the REST service.
    *
    * @param decisionDTO the database documentation unit
+   * @param user the {@link User}, may be null
    * @return a transformed domain object, or an empty domain object if the input is null
    */
-  public static DocumentationUnit transformToDomain(DecisionDTO decisionDTO) {
+  public static DocumentationUnit transformToDomain(DecisionDTO decisionDTO, @Nullable User user) {
     if (decisionDTO == null) {
       throw new DocumentationUnitTransformerException("Document unit is null and won't transform");
     }
@@ -502,7 +503,7 @@ public class DecisionTransformer extends DocumentableTransformer {
         .shortTexts(buildShortTexts(decisionDTO))
         .longTexts(buildLongTexts(decisionDTO))
         .contentRelatedIndexing(buildContentRelatedIndexing(decisionDTO))
-        .managementData(buildManagementData(decisionDTO))
+        .managementData(ManagementDataTransformer.transformToDomain(decisionDTO, user))
         .caselawReferences(
             decisionDTO.getCaselawReferences() == null
                 ? new ArrayList<>()
@@ -540,25 +541,6 @@ public class DecisionTransformer extends DocumentableTransformer {
         .guidingPrinciple(decisionDTO.getGuidingPrinciple())
         .headnote(decisionDTO.getHeadnote())
         .otherHeadnote(decisionDTO.getOtherHeadnote())
-        .build();
-  }
-
-  private static ManagementData buildManagementData(DecisionDTO decisionDTO) {
-    List<String> borderNumbers =
-        extractBorderNumbers(
-            decisionDTO.getTenor(),
-            decisionDTO.getGrounds(),
-            decisionDTO.getCaseFacts(),
-            decisionDTO.getDecisionGrounds(),
-            decisionDTO.getOtherLongText(),
-            decisionDTO.getDissentingOpinion());
-
-    return ManagementData.builder()
-        .lastPublicationDateTime(decisionDTO.getLastPublicationDateTime())
-        .scheduledPublicationDateTime(decisionDTO.getScheduledPublicationDateTime())
-        .scheduledByEmail(decisionDTO.getScheduledByEmail())
-        .borderNumbers(borderNumbers)
-        .duplicateRelations(transformDuplicateRelations(decisionDTO))
         .build();
   }
 

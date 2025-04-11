@@ -22,8 +22,26 @@ public interface DocumentationUnitRepository {
   Documentable findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
 
+  /**
+   * Find a documentation unit by its document number
+   *
+   * @param documentNumber the document number
+   * @param user is optional and can be null
+   * @return the documentation unit found (decision or pending proceeding)
+   */
+  Documentable findByDocumentNumber(String documentNumber, User user)
+      throws DocumentationUnitNotExistsException;
+
   DocumentationUnitListItem findDocumentationUnitListItemByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
+
+  /**
+   * Find a documentation unit by its UUID
+   *
+   * @param uuid the UUID to search for
+   * @return the documentation unit found
+   */
+  Documentable findByUuid(UUID uuid, User user) throws DocumentationUnitNotExistsException;
 
   /**
    * Find a documentation unit by its UUID
@@ -39,10 +57,14 @@ public interface DocumentationUnitRepository {
    * @param documentationUnit the documentation unit to create
    * @param status the status of the new documentation unit
    * @param createdFromReference the reference the documentation unit is created from
+   * @param user the {@link User}
    * @return the new documentation unit
    */
   DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit documentationUnit, Status status, Reference createdFromReference);
+      DocumentationUnit documentationUnit,
+      Status status,
+      Reference createdFromReference,
+      User user);
 
   /**
    * Save a documentation unit
@@ -50,6 +72,8 @@ public interface DocumentationUnitRepository {
    * @param documentationUnit the documentation unit to save
    */
   void save(Documentable documentationUnit);
+
+  void save(Documentable documentable, User currentUser);
 
   /**
    * Save the keywords of a documentation unit
