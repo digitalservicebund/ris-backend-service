@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
-import DuplicateRelationListItem from "@/components/DuplicateRelationListItem.vue"
+import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
+import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import DocumentUnit from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 
@@ -13,6 +15,10 @@ const { documentUnit } = storeToRefs(useDocumentUnitStore())
   <div class="w-full grow p-24">
     <div class="flex flex-col gap-24 bg-white p-24">
       <TitleElement>Verwaltungsdaten</TitleElement>
+      <ManagementDataMetadata
+        v-if="documentUnit"
+        :document-unit="documentUnit as DocumentUnit"
+      />
       <dl class="my-16">
         <div class="flex gap-24 px-0">
           <dt class="ris-label2-bold shrink-0 grow-0 basis-160">

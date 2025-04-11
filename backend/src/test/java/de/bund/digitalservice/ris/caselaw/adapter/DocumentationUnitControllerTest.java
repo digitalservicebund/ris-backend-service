@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSuser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -48,6 +49,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
@@ -106,6 +108,7 @@ class DocumentationUnitControllerTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
   private final DocumentationOffice docOffice = buildDSDocOffice();
+  private final User user = buildDSuser();
   private final ObjectMapper mapper = new ObjectMapper();
 
   @BeforeEach
@@ -132,7 +135,8 @@ class DocumentationUnitControllerTest {
   @Test
   void testGenerateNewDocumentationUnit_withInternalUser_shouldSucceed() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(service.generateNewDocumentationUnit(docOffice, null))
+    when(userService.getUser(any())).thenReturn(user);
+    when(service.generateNewDocumentationUnit(null, null))
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
@@ -147,8 +151,8 @@ class DocumentationUnitControllerTest {
         .isCreated()
         .expectBody(DocumentationUnit.class);
 
-    verify(service, times(1)).generateNewDocumentationUnit(docOffice, Optional.empty());
-    verify(userService, times(1)).getDocumentationOffice(any(OidcUser.class));
+    verify(service, times(1)).generateNewDocumentationUnit(user, Optional.empty());
+    verify(userService, times(1)).getUser(any(OidcUser.class));
   }
 
   @Test
@@ -158,7 +162,7 @@ class DocumentationUnitControllerTest {
     when(docxConverterService.getConvertedObject(any())).thenThrow(DocxConverterException.class);
 
     when(attachmentService.attachFileToDocumentationUnit(
-            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
+            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
 
     when(service.getByUuid(TEST_UUID))
@@ -180,7 +184,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is4xxClientError();
 
-    verify(attachmentService).deleteByS3Path(any());
+    verify(attachmentService).deleteByS3Path(any(), any(), any());
   }
 
   @Test
@@ -189,7 +193,7 @@ class DocumentationUnitControllerTest {
     var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
 
     when(attachmentService.attachFileToDocumentationUnit(
-            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
+            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
 
     DocumentationUnit docUnit =
@@ -215,7 +219,7 @@ class DocumentationUnitControllerTest {
     verify(duplicateCheckService, times(1)).checkDuplicates(docUnit.documentNumber());
     verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any());
 
-    verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any());
+    verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any(), any());
   }
 
   @Test
@@ -231,7 +235,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .isForbidden();
 
-    verify(service, times(0)).generateNewDocumentationUnit(docOffice, null);
+    verify(service, times(0)).generateNewDocumentationUnit(user, null);
     verify(userService, times(0)).getDocumentationOffice(any(OidcUser.class));
   }
 

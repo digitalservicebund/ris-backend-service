@@ -47,6 +47,7 @@ export enum SourceValue {
 
 export type Source = {
   value?: SourceValue
+  reference?: Reference
   sourceRawValue?: string
 }
 
@@ -134,6 +135,13 @@ export type ManagementData = {
   scheduledByEmail?: string
   duplicateRelations: DuplicateRelation[]
   borderNumbers: string[]
+  lastUpdatedAtDateTime?: string
+  lastUpdatedByName?: string
+  lastUpdatedByDocOffice?: string
+  createdAtDateTime?: string
+  createdByName?: string
+  createdByDocOffice?: string
+  firstPublishedAtDateTime?: string
 }
 
 export type DocumentationUnitParameters = {

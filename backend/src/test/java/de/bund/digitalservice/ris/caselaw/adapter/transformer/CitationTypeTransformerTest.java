@@ -1,9 +1,8 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.CitationTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

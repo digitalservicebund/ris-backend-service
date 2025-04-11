@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
@@ -106,17 +107,30 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Transactional(transactionManager = "jpaTransactionManager")
   public Documentable findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException {
+    return findByDocumentNumberNonTransactional(documentNumber, null);
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public Documentable findByDocumentNumber(String documentNumber, User user)
+      throws DocumentationUnitNotExistsException {
+    return findByDocumentNumberNonTransactional(documentNumber, user);
+  }
+
+  private Documentable findByDocumentNumberNonTransactional(String documentNumber, User user)
+      throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository
             .findByDocumentNumber(documentNumber)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-    return getDocumentationUnit(documentationUnit);
+    return getDocumentationUnit(documentationUnit, user);
   }
 
   @Nullable
-  private static Documentable getDocumentationUnit(DocumentationUnitDTO documentationUnit) {
+  private static Documentable getDocumentationUnit(
+      DocumentationUnitDTO documentationUnit, @Nullable User user) {
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
-      return DecisionTransformer.transformToDomain(decisionDTO);
+      return DecisionTransformer.transformToDomain(decisionDTO, user);
     }
     if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
       return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
@@ -137,17 +151,27 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
+  public Documentable findByUuid(UUID uuid, User user) throws DocumentationUnitNotExistsException {
+    return this.findByUuidNonTransactional(uuid, user);
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Documentable findByUuid(UUID uuid) throws DocumentationUnitNotExistsException {
+    return this.findByUuidNonTransactional(uuid, null);
+  }
+
+  private Documentable findByUuidNonTransactional(UUID uuid, User user)
+      throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
-    return getDocumentationUnit(documentationUnit);
+    return getDocumentationUnit(documentationUnit, user);
   }
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit docUnit, Status status, Reference createdFromReference) {
-
+      DocumentationUnit docUnit, Status status, Reference createdFromReference, User user) {
     var documentationUnitDTO =
         repository.save(
             DecisionTransformer.transformToDTO(
@@ -176,26 +200,55 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       sources.add(SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
     }
 
-    DecisionDTO.DecisionDTOBuilder<?, ?> builder =
-        documentationUnitDTO.toBuilder()
-            .source(sources)
-            .status(
-                StatusTransformer.transformToDTO(status).toBuilder()
-                    .documentationUnit(documentationUnitDTO)
-                    .createdAt(Instant.now())
-                    .build());
+    ManagementDataDTO managementData = getCreatedBy(user, documentationUnitDTO);
+    documentationUnitDTO.setManagementData(managementData);
 
-    // saving a second time is necessary because status and reference need a reference to a
+    StatusDTO statusDTO =
+        StatusTransformer.transformToDTO(status).toBuilder()
+            .documentationUnit(documentationUnitDTO)
+            .createdAt(Instant.now())
+            .build();
+
+    documentationUnitDTO.setStatus(statusDTO);
+    documentationUnitDTO.setSource(sources);
+
+    // saving a second time is necessary because status, managementData and reference need a
+    // reference to a
     // persisted documentation unit
-    DecisionDTO savedDocUnit = repository.save(builder.build());
+    DecisionDTO savedDocUnit = repository.save(documentationUnitDTO);
 
-    return DecisionTransformer.transformToDomain(savedDocUnit);
+    return DecisionTransformer.transformToDomain(savedDocUnit, user);
+  }
+
+  private ManagementDataDTO getCreatedBy(User user, DecisionDTO documentationUnitDTO) {
+    ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
+        ManagementDataDTO.builder()
+            .documentationUnit(documentationUnitDTO)
+            .createdAtDateTime(Instant.now());
+
+    if (user != null) {
+      managementDataBuilder
+          .createdByDocumentationOffice(
+              DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
+          .createdByUserId(user.id())
+          .createdByUserName(user.name());
+    }
+    return managementDataBuilder.build();
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(Documentable documentable) {
+    saveNonTransactional(documentable, null);
+  }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
+  @Override
+  public void save(Documentable documentable, @Nullable User currentUser) {
+    saveNonTransactional(documentable, currentUser);
+  }
+
+  private void saveNonTransactional(Documentable documentable, @Nullable User currentUser) {
     DocumentationUnitDTO documentationUnitDTO =
         repository.findById(documentable.uuid()).orElse(null);
     if (documentationUnitDTO == null) {
@@ -231,11 +284,30 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
+      if (currentUser != null) {
+        setLastUpdated(currentUser, decisionDTO);
+      }
+
       documentationUnitDTO =
           DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);
       repository.save(documentationUnitDTO);
     }
     // TODO pending proceeding
+  }
+
+  private void setLastUpdated(User currentUser, DecisionDTO decisionDTO) {
+    if (decisionDTO.getManagementData() == null) {
+      decisionDTO.setManagementData(new ManagementDataDTO());
+      decisionDTO.getManagementData().setDocumentationUnit(decisionDTO);
+    }
+
+    decisionDTO.getManagementData().setLastUpdatedByUserId(currentUser.id());
+    decisionDTO.getManagementData().setLastUpdatedByUserName(currentUser.name());
+    decisionDTO
+        .getManagementData()
+        .setLastUpdatedByDocumentationOffice(
+            DocumentationOfficeTransformer.transformToDTO(currentUser.documentationOffice()));
+    decisionDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
   }
 
   @Override
