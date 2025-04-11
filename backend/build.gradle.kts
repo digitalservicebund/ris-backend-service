@@ -20,7 +20,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.6.0"
+    id("org.flywaydb.flyway") version "11.7.0"
     id("io.sentry.jvm.gradle") version "5.3.0"
 }
 
@@ -187,7 +187,7 @@ dependencies {
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
-    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.5")
+    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.6")
     implementation("net.sf.saxon:Saxon-HE:12.5")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
@@ -226,12 +226,12 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.3.1")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.10.2")
+    implementation("com.squareup.okio:okio-jvm:3.11.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.6.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.7.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.6.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.7.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")

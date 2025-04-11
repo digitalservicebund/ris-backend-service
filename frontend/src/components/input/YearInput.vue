@@ -33,8 +33,11 @@ const isValidYear = computed(() => {
 })
 
 function validateInput() {
+  if (!inputValue.value) {
+    emit("update:validationError", undefined)
+    return
+  }
   if (!inputCompleted.value) {
-    console.log(inputValue.value)
     emit("update:validationError", {
       message: "Unvollständiges Jahr",
       instance: props.id,
@@ -89,6 +92,7 @@ watch(inputValue, () => {
     :id="id"
     v-model="inputValue"
     :aria-label="($attrs.ariaLabel as string) ?? ''"
+    :auto-clear="false"
     fluid
     :invalid="hasError"
     mask="9999"

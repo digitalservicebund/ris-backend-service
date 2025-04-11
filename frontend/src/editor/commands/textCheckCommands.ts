@@ -1,43 +1,16 @@
 import { Editor } from "@tiptap/core"
 import { EditorState } from "prosemirror-state"
-import { Ref, ref } from "vue"
-import { ResponseError, ServiceResponse } from "@/services/httpClient"
+import { ref } from "vue"
+import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-
 import {
   IgnoredTextCheckWord,
   Match,
   TextCheckCategoryResponse,
+  TextCheckService,
   TextCheckTagName,
 } from "@/types/textCheck"
-
-interface TextCheckService {
-  loading: Ref<boolean>
-  matches: Match[]
-  selectedMatch: Ref<Match | undefined>
-  responseError: Ref<ResponseError | undefined>
-
-  checkCategory(editor: Editor, category?: string): Promise<void>
-
-  handleSelection(state: EditorState): boolean
-
-  selectMatch(matchId?: number): void
-
-  replaceMatch(
-    matchId: number,
-    text: string,
-    state: EditorState,
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    dispatch: ((args?: any) => any) | undefined,
-  ): void
-
-  clearSelectedMatch(): void
-
-  ignoreWord(word: string): Promise<void>
-
-  removeIgnoredWord(word: string): Promise<void>
-}
 
 class NeurisTextCheckService implements TextCheckService {
   loading = ref(false)
@@ -216,4 +189,4 @@ class NeurisTextCheckService implements TextCheckService {
   }
 }
 
-export { NeurisTextCheckService, TextCheckService }
+export { NeurisTextCheckService }

@@ -30,7 +30,7 @@ class AdminControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockitoBean private MailTrackingService mailTrackingService;
   @MockitoBean private EnvironmentService environmentService;
-  @MockitoBean InternalPortalPublicationService internalPortalPublicationService;
+  @MockitoBean StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");

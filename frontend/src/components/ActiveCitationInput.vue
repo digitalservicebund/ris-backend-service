@@ -336,6 +336,7 @@ onMounted(() => {
         @update-page="updatePage"
       >
         <SearchResultList
+          allow-multiple-links
           :is-loading="isLoading"
           :search-results="searchResults"
           @link-decision="addActiveCitationFromSearch"

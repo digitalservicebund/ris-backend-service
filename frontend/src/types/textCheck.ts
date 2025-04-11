@@ -1,4 +1,7 @@
-import { TextCheckService } from "@/editor/commands/textCheckCommands"
+import { Editor } from "@tiptap/core"
+import { EditorState } from "prosemirror-state"
+import { Ref } from "vue"
+import { ResponseError } from "@/services/httpClient"
 
 export interface Replacement {
   value: string
@@ -81,6 +84,33 @@ export type DocumentationType = "global" | "documentation_unit"
 export type TextCheckExtensionOptions = {
   category?: string
   service?: TextCheckService
+}
+
+export interface TextCheckService {
+  loading: Ref<boolean>
+  matches: Match[]
+  selectedMatch: Ref<Match | undefined>
+  responseError: Ref<ResponseError | undefined>
+
+  checkCategory(editor: Editor, category?: string): Promise<void>
+
+  handleSelection(state: EditorState): boolean
+
+  selectMatch(matchId?: number): void
+
+  replaceMatch(
+    matchId: number,
+    text: string,
+    state: EditorState,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    dispatch: ((args?: any) => any) | undefined,
+  ): void
+
+  clearSelectedMatch(): void
+
+  ignoreWord(word: string): Promise<void>
+
+  removeIgnoredWord(word: string): Promise<void>
 }
 
 export const TextCheckTagName = "textCheck"

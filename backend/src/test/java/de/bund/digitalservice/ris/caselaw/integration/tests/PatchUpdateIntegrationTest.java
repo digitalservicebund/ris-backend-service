@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -22,10 +23,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
+import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -145,7 +146,7 @@ class PatchUpdateIntegrationTest {
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private DocumentationUnitDocxMetadataInitializationService initializationService;
   @MockitoBean private UserGroupService userGroupService;
-  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
+  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
 
   private UUID court1Id;
@@ -201,6 +202,8 @@ class PatchUpdateIntegrationTest {
     regionRepository.deleteAll();
     userGroupRepository.deleteAll();
     procedureRepository.deleteAll();
+    patchRepository.deleteAll();
+    relatedDocumentationRepository.deleteAll();
   }
 
   @Test
@@ -248,8 +251,8 @@ class PatchUpdateIntegrationTest {
   class SingleValueAdd {
     @Test
     @Transactional
-    void
-        testPartialUpdateByUuid_withUser1AddEcliAndUser2DoNothing_shouldSendPatchWithEcliToUser2() {
+    void testPartialUpdateByUuid_withUser1AddEcliAndUser2DoNothing_shouldSendPatchWithEcliToUser2()
+        throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -274,7 +277,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).isEmpty();
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -291,11 +294,13 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"));
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -315,7 +320,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(4);
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
@@ -337,18 +342,21 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"));
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1AddEcliAndUser2AddFileNumber_shouldSendPatchWithEcliToUser2AndPatchWithFileNumberToUser1() {
+        testPartialUpdateByUuid_withUser1AddEcliAndUser2AddFileNumber_shouldSendPatchWithEcliToUser2AndPatchWithFileNumberToUser1()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -389,11 +397,15 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
 
@@ -416,8 +428,8 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/ecli");
@@ -440,14 +452,20 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"),
-              Tuple.tuple(
-                  1L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser2\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
+
       TestTransaction.end();
 
       RisJsonPatch emptyPatchUser1 =
@@ -467,7 +485,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(2);
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
@@ -491,21 +509,26 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"),
-              Tuple.tuple(
-                  1L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser2\"}]"));
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1AddEcliAndUser2ChangeEcliToo_shouldSendPatchWithEcliAndErrorPathToUser2() {
+        testPartialUpdateByUuid_withUser1AddEcliAndUser2ChangeEcliToo_shouldSendPatchWithEcliAndErrorPathToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -547,11 +570,15 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
 
@@ -574,14 +601,14 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(3);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/ecli");
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/ecli");
@@ -603,11 +630,14 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
     }
@@ -618,7 +648,8 @@ class PatchUpdateIntegrationTest {
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1ChangeEcliAndUser2DoNothing_shouldSendPatchWithEcliToUser2() {
+        testPartialUpdateByUuid_withUser1ChangeEcliAndUser2DoNothing_shouldSendPatchWithEcliToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -666,12 +697,13 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"replace\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"));
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -691,7 +723,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(4);
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation addOperation = (ReplaceOperation) operation;
@@ -713,19 +745,21 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"replace\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"));
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1ChangeEcliAndUser2AddFileNumber_shouldSendPatchWithEcliToUser2AndPatchWithFileNumberToUser1() {
+        testPartialUpdateByUuid_withUser1ChangeEcliAndUser2AddFileNumber_shouldSendPatchWithEcliToUser2AndPatchWithFileNumberToUser1()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -772,12 +806,15 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"replace\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
 
@@ -800,8 +837,8 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation addOperation = (ReplaceOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/ecli");
@@ -824,14 +861,19 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L, "[{\"op\":\"replace\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"),
-              Tuple.tuple(
-                  1L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser2\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
       TestTransaction.end();
 
       RisJsonPatch emptyPatchUser1 =
@@ -851,12 +893,20 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/fileNumbers/0");
                 assertThat(addOperation.getValue().textValue()).isEqualTo("fileNumberUser2");
+
+                operation = responsePatch.patch().getOperations().get(1);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -875,21 +925,26 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L, "[{\"op\":\"replace\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"),
-              Tuple.tuple(
-                  1L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser2\"}]"));
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1ChangeEcliAndUser2ChangeEcliToo_shouldSendPatchWithEcliAndErrorPathToUser2() {
+        testPartialUpdateByUuid_withUser1ChangeEcliAndUser2ChangeEcliToo_shouldSendPatchWithEcliAndErrorPathToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -937,12 +992,13 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"replace\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"));
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
 
@@ -965,11 +1021,32 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(4);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByName");
+                assertThat(replaceOperation.getValue().textValue()).isEqualTo("testUser");
+
+                operation = responsePatch.patch().getOperations().get(1);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
+
+                operation = responsePatch.patch().getOperations().get(2);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByDocOffice");
+                assertThat(replaceOperation.getValue().textValue()).isEqualTo("DS");
+
+                operation = responsePatch.patch().getOperations().get(3);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/coreData/ecli");
                 assertThat(replaceOperation.getValue().textValue()).isEqualTo("ecliUser1");
 
@@ -989,12 +1066,14 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"replace\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser1\"}]"));
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
     }
@@ -1005,7 +1084,8 @@ class PatchUpdateIntegrationTest {
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1AddFileNumberAndUser2DoNothing_shouldSendPatchWithFileNumberToUser2() {
+        testPartialUpdateByUuid_withUser1AddFileNumberAndUser2DoNothing_shouldSendPatchWithFileNumberToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -1048,12 +1128,15 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser1\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -1073,7 +1156,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(4);
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
@@ -1096,19 +1179,21 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser1\"}]"));
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1AddFileNumberAndUser2AddEcli_shouldSendPatchWithFileNumberToUser2AndPatchWithEcliToUser1() {
+        testPartialUpdateByUuid_withUser1AddFileNumberAndUser2AddEcli_shouldSendPatchWithFileNumberToUser2AndPatchWithEcliToUser1()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -1151,12 +1236,15 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser1\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -1178,9 +1266,9 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/fileNumbers/0");
@@ -1203,14 +1291,20 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser1\"}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
+
       TestTransaction.end();
 
       RisJsonPatch emptyPatchUser1 =
@@ -1230,12 +1324,21 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(2);
+
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/ecli");
                 assertThat(addOperation.getValue().textValue()).isEqualTo("ecliUser2");
+
+                operation = responsePatch.patch().getOperations().get(1);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
+
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1254,21 +1357,27 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser1\"}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1AddFileNumberAndUser2AddFileNumberToo_shouldSendPatchWithFileNumberAndErrorPathToUser2() {
+        testPartialUpdateByUuid_withUser1AddFileNumberAndUser2AddFileNumberToo_shouldSendPatchWithFileNumberAndErrorPathToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -1311,12 +1420,15 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser1\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -1338,14 +1450,14 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(1);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/fileNumbers/0");
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/fileNumbers/0");
@@ -1368,12 +1480,15 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/fileNumbers/0\",\"value\":\"fileNumberUser1\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser1"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
     }
   }
@@ -1383,7 +1498,8 @@ class PatchUpdateIntegrationTest {
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1RemoveFileNumnerAndUser2DoNothing_shouldSendPatchWithRemoveFileNumberToUser2() {
+        testPartialUpdateByUuid_withUser1RemoveFileNumberAndUser2DoNothing_shouldSendPatchWithRemoveFileNumberToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -1430,10 +1546,15 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/fileNumbers/0\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/fileNumbers/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -1453,11 +1574,35 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(4);
+
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/fileNumbers/0");
+
+                operation = responsePatch.patch().getOperations().get(1);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByDocOffice");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+                assertThat(responsePatch.errorPaths()).isEmpty();
+
+                operation = responsePatch.patch().getOperations().get(2);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(3);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByName");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -1473,17 +1618,22 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/fileNumbers/0\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/fileNumbers/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1RemoveFileNumberAndUser2AddEcli_shouldSendPatchWithRemoveFileNumberToUser2AndPatchWithEcliToUser1() {
+        testPartialUpdateByUuid_withUser1RemoveFileNumberAndUser2AddEcli_shouldSendPatchWithRemoveFileNumberToUser2AndPatchWithEcliToUser1()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -1530,10 +1680,14 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/fileNumbers/0\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/fileNumbers/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -1555,8 +1709,8 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/fileNumbers/0");
@@ -1576,12 +1730,20 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/fileNumbers/0\"}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/fileNumbers/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
+
       TestTransaction.end();
 
       RisJsonPatch emptyPatchUser1 =
@@ -1601,7 +1763,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(2);
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
@@ -1623,19 +1785,27 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/fileNumbers/0\"}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/fileNumbers/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1RemoveFileNumberAndUser2RemoveFileNumberToo_shouldSendPatchWithRemoveFileNumberAndErrorPathToUser2() {
+        testPartialUpdateByUuid_withUser1RemoveFileNumberAndUser2RemoveFileNumberToo_shouldSendPatchWithRemoveFileNumberAndErrorPathToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -1682,11 +1852,18 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
+
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/fileNumbers/0\"}]"));
-      assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L);
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/coreData/fileNumbers/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -1708,15 +1885,15 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(1);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/fileNumbers/0");
                 assertThat(addOperation.getValue().isNull()).isTrue();
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/fileNumbers/0");
@@ -1736,10 +1913,14 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/fileNumbers/0\"}]"));
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/coreData/fileNumbers/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
     }
@@ -1750,7 +1931,8 @@ class PatchUpdateIntegrationTest {
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1SelectCourtAndUser2DoNothing_shouldSendPatchWithCourtAndRegionToUser2() {
+        testPartialUpdateByUuid_withUser1SelectCourtAndUser2DoNothing_shouldSendPatchWithCourtAndRegionToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -1808,15 +1990,10 @@ class PatchUpdateIntegrationTest {
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
-                      + "{\"id\":\""
-                      + court1Id
-                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
-                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L);
+      assertCourt(patches);
+
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -1836,7 +2013,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(4);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
@@ -1844,7 +2021,27 @@ class PatchUpdateIntegrationTest {
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
                 assertThat(addOperation.getValue()).isEqualTo(courtAsNode);
 
+                operation = responsePatch.patch().getOperations().get(1);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByDocOffice");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
                 assertThat(responsePatch.errorPaths()).isEmpty();
+
+                operation = responsePatch.patch().getOperations().get(2);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(3);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByName");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
               });
 
       TestTransaction.start();
@@ -1864,23 +2061,17 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
-                      + "{\"id\":\""
-                      + court1Id
-                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
-                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"));
+
+      assertCourt(patches);
+
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1AddCourtAndUser2AddEcli_shouldSendPatchWithCourtAndRegionToUser2AndPatchWithEcliToUser1() {
+        testPartialUpdateByUuid_withUser1AddCourtAndUser2AddEcli_shouldSendPatchWithCourtAndRegionToUser2AndPatchWithEcliToUser1()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -1938,16 +2129,7 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
-                      + "{\"id\":\""
-                      + court1Id
-                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
-                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"));
+      assertCourt(patches);
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -1969,13 +2151,41 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
+
+                operation = responsePatch.patch().getOperations().get(1);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByName");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
+
+                operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
                 assertThat(addOperation.getValue()).isEqualTo(courtAsNode);
+
+                operation = responsePatch.patch().getOperations().get(3);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
+
+                operation = responsePatch.patch().getOperations().get(4);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByDocOffice");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -1998,18 +2208,14 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
-                      + "{\"id\":\""
-                      + court1Id
-                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
-                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+
+      assertCourt(patches);
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
+
       TestTransaction.end();
 
       RisJsonPatch emptyPatchUser1 =
@@ -2029,13 +2235,20 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(2);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/ecli");
                 assertThat(addOperation.getValue().textValue()).isEqualTo("ecliUser2");
+
+                operation = responsePatch.patch().getOperations().get(1);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -2058,25 +2271,22 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
-                      + "{\"id\":\""
-                      + court1Id
-                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
-                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+
+      assertCourt(patches);
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
+
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1AddCourtAndUser2AddCourtToo_shouldSendPatchWithCourtAndRegionAndErrorPathToUser2() {
+        testPartialUpdateByUuid_withUser1AddCourtAndUser2AddCourtToo_shouldSendPatchWithCourtAndRegionAndErrorPathToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -2133,16 +2343,11 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
+
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
-                      + "{\"id\":\""
-                      + court1Id
-                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
-                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L);
+      assertCourt(patches);
       TestTransaction.end();
 
       JsonNode court2AsNode =
@@ -2168,18 +2373,38 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
-
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByName");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
+
+                operation = responsePatch.patch().getOperations().get(1);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/court");
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
                 assertThat(addOperation.getValue()).isEqualTo(court1AsNode);
+
+                operation = responsePatch.patch().getOperations().get(3);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
+
+                operation = responsePatch.patch().getOperations().get(4);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByDocOffice");
+                assertThat(replaceOperation.getValue().textValue()).isNotNull();
 
                 assertThat(responsePatch.errorPaths()).containsExactly("/coreData/court");
               });
@@ -2202,15 +2427,9 @@ class PatchUpdateIntegrationTest {
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/coreData/court\",\"value\":"
-                      + "{\"id\":\""
-                      + court1Id
-                      + "\",\"type\":\"LG\",\"location\":\"Detmold\",\"label\":\"LG Detmold\","
-                      + "\"revoked\":null,\"jurisdictionType\":\"\",\"region\":\"NW\",\"responsibleDocOffice\":null}}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L);
+      assertCourt(patches);
       TestTransaction.end();
     }
   }
@@ -2220,7 +2439,8 @@ class PatchUpdateIntegrationTest {
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1SelectCourtAndUser2DoNothing_shouldSendPatchWithCourtAndRegionToUser2() {
+        testPartialUpdateByUuid_withUser1SelectCourtAndUser2DoNothing_shouldSendPatchWithCourtAndRegionToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -2271,8 +2491,16 @@ class PatchUpdateIntegrationTest {
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L);
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/coreData/court"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -2292,7 +2520,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(4);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
@@ -2322,16 +2550,23 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/court"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1RemoveCourtAndUser2AddEcli_shouldSendPatchWithRemoveCourtAndRegionToUser2AndPatchWithEcliToUser1() {
+        testPartialUpdateByUuid_withUser1RemoveCourtAndUser2AddEcli_shouldSendPatchWithRemoveCourtAndRegionToUser2AndPatchWithEcliToUser1()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -2381,9 +2616,14 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/court"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -2405,9 +2645,9 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation addOperation = (RemoveOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
@@ -2429,12 +2669,19 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/court"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
       TestTransaction.end();
 
       RisJsonPatch emptyPatchUser1 =
@@ -2454,7 +2701,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(2);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
@@ -2479,19 +2726,27 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/court"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1RemoveCourtAndUser2RemoveCourtToo_shouldSendPatchWithRemoveCourtAndRegionAndErrorPathToUser2() {
+        testPartialUpdateByUuid_withUser1RemoveCourtAndUser2RemoveCourtToo_shouldSendPatchWithRemoveCourtAndRegionAndErrorPathToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -2541,9 +2796,15 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/court"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 = List.of(new RemoveOperation("/coreData/court"));
@@ -2564,16 +2825,16 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
                 // next iteration: handle add operation with null values
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(1);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
                 assertThat(addOperation.getValue().textValue()).isNull();
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/court");
@@ -2594,16 +2855,22 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/court"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1RemoveCourtAndUser2ReplaceCourt_shouldSendPatchWithRemoveCourtAndRegionAndErrorPathToUser2() {
+        testPartialUpdateByUuid_withUser1RemoveCourtAndUser2ReplaceCourt_shouldSendPatchWithRemoveCourtAndRegionAndErrorPathToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -2654,8 +2921,15 @@ class PatchUpdateIntegrationTest {
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L);
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/coreData/court"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
 
       JsonNode court2AsNode = objectMapper.convertValue(Court.builder().build(), JsonNode.class);
@@ -2680,21 +2954,21 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(6);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(1);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/court");
                 assertThat(addOperation.getValue().textValue()).isNull();
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/court");
 
                 // next iteration: handle two same operation (unique)
-                operation = responsePatch.patch().getOperations().get(2);
+                operation = responsePatch.patch().getOperations().get(3);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/coreData/court");
@@ -2715,9 +2989,14 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/coreData/court\"}]"));
+
+      assertOnSavedPatchEntry(
+          patches.get(0).getPatch(),
+          Map.of("op", "remove", "path", "/coreData/court"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
   }
@@ -2727,7 +3006,8 @@ class PatchUpdateIntegrationTest {
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1AddPreviousDecisionAndUser2DoNothing_shouldSendPatchWithPreviousDecisionToUser2() {
+        testPartialUpdateByUuid_withUser1AddPreviousDecisionAndUser2DoNothing_shouldSendPatchWithPreviousDecisionToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -2762,13 +3042,13 @@ class PatchUpdateIntegrationTest {
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
                 assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(3);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/status");
@@ -2799,26 +3079,8 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
-                      + relatedDocument.getDocumentNumber()
-                      + "\","
-                      + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
-                      + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
-                      + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
-                      + "\"value\":\""
-                      + relatedDocument.getId()
-                      + "\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/status\","
-                      + "\"value\":null}]"));
+      assertPreviousDecision(patches, relatedDocument);
+
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -2838,7 +3100,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(6);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
@@ -2849,10 +3111,31 @@ class PatchUpdateIntegrationTest {
                 operation = responsePatch.patch().getOperations().get(1);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByDocOffice");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 operation = responsePatch.patch().getOperations().get(2);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(3);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByName");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(4);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(5);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/status");
@@ -2882,33 +3165,17 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
-                      + relatedDocument.getDocumentNumber()
-                      + "\","
-                      + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
-                      + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
-                      + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
-                      + "\"value\":\""
-                      + relatedDocument.getId()
-                      + "\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/status\","
-                      + "\"value\":null}]"));
+
+      assertPreviousDecision(patches, relatedDocument);
+
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1AddPreviousDecisionAndUser2AddEcli_shouldSendPatchWithPreviousDecisionToUser2AndPatchWithEcliToUser1() {
+        testPartialUpdateByUuid_withUser1AddPreviousDecisionAndUser2AddEcli_shouldSendPatchWithPreviousDecisionToUser2AndPatchWithEcliToUser1()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -2941,15 +3208,15 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(3);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/status");
@@ -2981,26 +3248,9 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
-                      + relatedDocument.getDocumentNumber()
-                      + "\","
-                      + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
-                      + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
-                      + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
-                      + "\"value\":\""
-                      + relatedDocument.getId()
-                      + "\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/status\","
-                      + "\"value\":null}]"));
+
+      assertPreviousDecision(patches, relatedDocument);
+
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -3022,24 +3272,52 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(7);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(1);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/status");
                 assertThat(replaceOperation.getValue().textValue()).isNull();
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(2);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByName");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(3);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/previousDecisions/0");
                 assertThat(addOperation.getValue()).isEqualTo(previousDecisionAsNode);
 
-                operation = responsePatch.patch().getOperations().get(2);
+                operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(5);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(6);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByDocOffice");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
@@ -3067,28 +3345,7 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
-                      + relatedDocument.getDocumentNumber()
-                      + "\","
-                      + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
-                      + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
-                      + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
-                      + "\"value\":\""
-                      + relatedDocument.getId()
-                      + "\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/status\","
-                      + "\"value\":null}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+      assertPreviousDecision(patches, relatedDocument);
       TestTransaction.end();
 
       RisJsonPatch emptyPatchUser1 =
@@ -3108,7 +3365,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(4);
+                assertThat(responsePatch.patch().getOperations()).hasSize(8);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
@@ -3119,20 +3376,48 @@ class PatchUpdateIntegrationTest {
                 operation = responsePatch.patch().getOperations().get(1);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByDocOffice");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(3);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByName");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(4);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(5);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/status");
                 assertThat(replaceOperation.getValue().textValue()).isNull();
 
-                operation = responsePatch.patch().getOperations().get(3);
+                operation = responsePatch.patch().getOperations().get(6);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/coreData/ecli");
                 assertThat(addOperation.getValue().textValue()).isEqualTo("ecliUser2");
+
+                operation = responsePatch.patch().getOperations().get(7);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
@@ -3159,35 +3444,15 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
-                      + relatedDocument.getDocumentNumber()
-                      + "\","
-                      + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
-                      + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
-                      + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
-                      + "\"value\":\""
-                      + relatedDocument.getId()
-                      + "\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/status\","
-                      + "\"value\":null}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+      assertPreviousDecision(patches, relatedDocument);
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1AddPreviosDecisionAndUser2AddPreviousDecisionToo_shouldSendPatchWithPreviousDecisionAndErrorPathToUser2() {
+        testPartialUpdateByUuid_withUser1AddPreviousDecisionAndUser2AddPreviousDecisionToo_shouldSendPatchWithPreviousDecisionAndErrorPathToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -3221,15 +3486,15 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(3);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/status");
@@ -3264,26 +3529,9 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
-                      + relatedDocument.getDocumentNumber()
-                      + "\","
-                      + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
-                      + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
-                      + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
-                      + "\"value\":\""
-                      + relatedDocument.getId()
-                      + "\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/status\","
-                      + "\"value\":null}]"));
+
+      assertPreviousDecision(patches, relatedDocument);
+
       TestTransaction.end();
 
       JsonNode previousDecision2AsNode =
@@ -3312,8 +3560,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(4);
-
+                assertThat(responsePatch.patch().getOperations()).hasSize(7);
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
@@ -3321,20 +3568,41 @@ class PatchUpdateIntegrationTest {
                 assertThat(replaceOperation.getValue().textValue()).isNull();
 
                 operation = responsePatch.patch().getOperations().get(1);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByName");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/previousDecisions/0");
 
-                operation = responsePatch.patch().getOperations().get(2);
+                operation = responsePatch.patch().getOperations().get(3);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/previousDecisions/0");
                 assertThat(addOperation.getValue()).isEqualTo(previousDecision1AsNode);
 
-                operation = responsePatch.patch().getOperations().get(3);
+                operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(5);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedAtDateTime");
+                assertThat(replaceOperation.getValue().textValue()).isNotBlank();
+
+                operation = responsePatch.patch().getOperations().get(6);
+                assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                replaceOperation = (ReplaceOperation) operation;
+                assertThat(replaceOperation.getPath())
+                    .isEqualTo("/managementData/lastUpdatedByDocOffice");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 assertThat(responsePatch.errorPaths()).containsExactly("/previousDecisions/0");
@@ -3365,26 +3633,9 @@ class PatchUpdateIntegrationTest {
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(
-                  0L,
-                  "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
-                      + relatedDocument.getDocumentNumber()
-                      + "\","
-                      + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
-                      + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
-                      + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
-                      + "\"value\":\""
-                      + relatedDocument.getId()
-                      + "\"},"
-                      + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/status\","
-                      + "\"value\":null}]"));
+
+      assertPreviousDecision(patches, relatedDocument);
+
       TestTransaction.end();
     }
   }
@@ -3457,33 +3708,13 @@ class PatchUpdateIntegrationTest {
               documentationUnit.uuid(), 0L);
       assertThat(patches).hasSize(1);
       assertThat(patches.getFirst().getDocumentationUnitVersion()).isZero();
-      List<Map<String, String>> parsedPatches =
-          objectMapper.readValue(patches.getFirst().getPatch(), new TypeReference<>() {});
-      assertThat(parsedPatches).hasSize(4);
-      assertThat(parsedPatches.getFirst())
-          .containsExactlyInAnyOrderEntriesOf(
-              Map.of("op", "remove", "path", "/previousDecisions/0"));
-      assertThat(parsedPatches.get(1))
-          .containsExactlyInAnyOrderEntriesOf(
-              Map.of(
-                  "op",
-                  "replace",
-                  "path",
-                  "/managementData/lastUpdatedByDocOffice",
-                  "value",
-                  "DS"));
-      assertThat(parsedPatches.get(2))
-          .containsAllEntriesOf(
-              Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
-      assertThat(parsedPatches.get(3))
-          .containsExactlyInAnyOrderEntriesOf(
-              Map.of(
-                  "op",
-                  "replace",
-                  "path",
-                  "/managementData/lastUpdatedByName",
-                  "value",
-                  "testUser"));
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/previousDecisions/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -3533,40 +3764,22 @@ class PatchUpdateIntegrationTest {
               documentationUnit.uuid(), 0L);
       assertThat(patches).hasSize(1);
       assertThat(patches.getFirst().getDocumentationUnitVersion()).isZero();
-      parsedPatches =
-          objectMapper.readValue(patches.getFirst().getPatch(), new TypeReference<>() {});
-      assertThat(parsedPatches).hasSize(4);
-      assertThat(parsedPatches.getFirst())
-          .containsExactlyInAnyOrderEntriesOf(
-              Map.of("op", "remove", "path", "/previousDecisions/0"));
-      assertThat(parsedPatches.get(1))
-          .containsExactlyInAnyOrderEntriesOf(
-              Map.of(
-                  "op",
-                  "replace",
-                  "path",
-                  "/managementData/lastUpdatedByDocOffice",
-                  "value",
-                  "DS"));
-      assertThat(parsedPatches.get(2))
-          .containsAllEntriesOf(
-              Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
-      assertThat(parsedPatches.get(3))
-          .containsExactlyInAnyOrderEntriesOf(
-              Map.of(
-                  "op",
-                  "replace",
-                  "path",
-                  "/managementData/lastUpdatedByName",
-                  "value",
-                  "testUser"));
+      String savedPatchJson = patches.getFirst().getPatch();
+      assertOnSavedPatchEntry(
+          savedPatchJson,
+          Map.of("op", "remove", "path", "/previousDecisions/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1RemovePreviousDecisionAndUser2AddEcli_shouldSendPatchWithRemovePreviousDecisionToUser2AndPatchWithEcliToUser1() {
+        testPartialUpdateByUuid_withUser1RemovePreviousDecisionAndUser2AddEcli_shouldSendPatchWithRemovePreviousDecisionToUser2AndPatchWithEcliToUser1()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -3627,10 +3840,14 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
-      assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/previousDecisions/0\"}]"));
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/previousDecisions/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -3652,9 +3869,9 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/previousDecisions/0");
@@ -3681,11 +3898,20 @@ class PatchUpdateIntegrationTest {
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/previousDecisions/0\"}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L, 1L);
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/previousDecisions/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
+
       TestTransaction.end();
 
       RisJsonPatch emptyPatchUser1 =
@@ -3705,7 +3931,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(2L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(1);
+                assertThat(responsePatch.patch().getOperations()).hasSize(2);
 
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
                 assertThat(operation).isInstanceOf(AddOperation.class);
@@ -3735,18 +3961,28 @@ class PatchUpdateIntegrationTest {
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/previousDecisions/0\"}]"),
-              Tuple.tuple(
-                  1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L, 1L);
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/previousDecisions/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+      assertOnSavedPatchEntry(
+          patches.get(1).getPatch(),
+          Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"));
+
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1RemovePreviousDecisionAndUser2RemovePreviousDecisionToo_shouldSendPatchWithRemovePreviousDecisionAndErrorPathToUser2() {
+        testPartialUpdateByUuid_withUser1RemovePreviousDecisionAndUser2RemovePreviousDecisionToo_shouldSendPatchWithRemovePreviousDecisionAndErrorPathToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -3806,10 +4042,18 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
+
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/previousDecisions/0\"}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L);
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/previousDecisions/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -3831,15 +4075,15 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(1);
                 assertThat(operation).isInstanceOf(AddOperation.class);
                 AddOperation addOperation = (AddOperation) operation;
                 assertThat(addOperation.getPath()).isEqualTo("/previousDecisions/0");
                 assertThat(addOperation.getValue().textValue()).isNull();
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/previousDecisions/0");
@@ -3865,16 +4109,25 @@ class PatchUpdateIntegrationTest {
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/previousDecisions/0\"}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L);
+
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/previousDecisions/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
     }
 
     @Test
     @Transactional
     void
-        testPartialUpdateByUuid_withUser1RemovePreviousDecisionAndUser2AddOtherPreviousDecision_shouldSendPatchWithRemovePreviousDecisionAndErrorPathToUser2() {
+        testPartialUpdateByUuid_withUser1RemovePreviousDecisionAndUser2AddOtherPreviousDecision_shouldSendPatchWithRemovePreviousDecisionAndErrorPathToUser2()
+            throws JsonProcessingException {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
@@ -3939,10 +4192,18 @@ class PatchUpdateIntegrationTest {
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
+
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/previousDecisions/0\"}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L);
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/previousDecisions/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
+
       TestTransaction.end();
 
       JsonNode previousDecision2AsNode =
@@ -3971,14 +4232,14 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(3);
+                assertThat(responsePatch.patch().getOperations()).hasSize(5);
 
-                JsonPatchOperation operation = responsePatch.patch().getOperations().get(0);
+                JsonPatchOperation operation = responsePatch.patch().getOperations().get(1);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 RemoveOperation removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/previousDecisions/0");
 
-                operation = responsePatch.patch().getOperations().get(1);
+                operation = responsePatch.patch().getOperations().get(2);
                 assertThat(operation).isInstanceOf(RemoveOperation.class);
                 removeOperation = (RemoveOperation) operation;
                 assertThat(removeOperation.getPath()).isEqualTo("/previousDecisions/0");
@@ -4008,11 +4269,150 @@ class PatchUpdateIntegrationTest {
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
               documentationUnit.uuid(), 0L);
       assertThat(patches)
-          .extracting("documentationUnitVersion", "patch")
-          .containsExactly(
-              Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/previousDecisions/0\"}]"));
+          .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
+          .containsExactly(0L);
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "remove", "path", "/previousDecisions/0"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
+  }
+
+  /** The patches will always include entries for lastUpdated fields of managementData. */
+  @SafeVarargs
+  private void assertOnSavedPatchEntry(
+      String savedPatchJson, Map<String, String>... expectedPatchEntries)
+      throws JsonProcessingException {
+    List<Map<String, String>> parsedPatches;
+    parsedPatches = objectMapper.readValue(savedPatchJson, new TypeReference<>() {});
+    assertThat(parsedPatches).hasSize(expectedPatchEntries.length);
+    for (int i = 0; i < expectedPatchEntries.length; i++) {
+      assertThat(parsedPatches.get(i)).containsAllEntriesOf(expectedPatchEntries[i]);
+    }
+  }
+
+  private void assertPatchJsonContains(String patchJson, String... expectedFragments)
+      throws JsonProcessingException {
+    JsonNode actualArray = objectMapper.readTree(patchJson);
+
+    for (String expected : expectedFragments) {
+      JsonNode expectedNode = objectMapper.readTree(expected);
+      boolean matchFound = false;
+
+      for (JsonNode actualNode : actualArray) {
+        if (actualNode.equals(expectedNode)) {
+          matchFound = true;
+          break;
+        }
+      }
+
+      if (!matchFound) {
+        fail("Expected patch fragment not found:\n" + expectedNode.toPrettyString());
+      }
+    }
+  }
+
+  private void assertPreviousDecision(
+      List<DocumentationUnitPatchDTO> patches, RelatedDocumentationDTO relatedDocument)
+      throws JsonProcessingException {
+    assertPatchJsonContains(
+        patches.get(0).getPatch(),
+        """
+        {
+          "op": "add",
+          "path": "/previousDecisions/0",
+          "value": {
+            "uuid": null,
+            "newEntry": false,
+            "documentNumber": "%s",
+            "status": {
+              "publicationStatus": "UNPUBLISHED",
+              "withError": false,
+              "createdAt": null
+            },
+            "court": null,
+            "decisionDate": null,
+            "fileNumber": null,
+            "documentType": null,
+            "createdByReference": null,
+            "documentationOffice": null,
+            "creatingDocOffice": null,
+            "hasPreviewAccess": false,
+            "dateKnown": true,
+            "deviatingFileNumber": null
+          }
+        }
+        """
+            .formatted(relatedDocument.getDocumentNumber()),
+        """
+        {
+          "op": "replace",
+          "path": "/managementData/lastUpdatedByDocOffice",
+          "value": "DS"
+        }
+        """,
+        """
+        {
+          "op": "replace",
+          "path": "/managementData/lastUpdatedByName",
+          "value": "testUser"
+        }
+        """,
+        """
+        {
+          "op": "replace",
+          "path": "/previousDecisions/0/uuid",
+          "value": "%s"
+        }
+        """
+            .formatted(relatedDocument.getId()),
+        """
+        {
+          "op": "replace",
+          "path": "/previousDecisions/0/status",
+          "value": null
+        }
+        """);
+  }
+
+  private void assertCourt(List<DocumentationUnitPatchDTO> patches) throws JsonProcessingException {
+    assertPatchJsonContains(
+        patches.get(0).getPatch(),
+        """
+        {
+          "op": "add",
+          "path": "/coreData/court",
+          "value": {
+            "id": "%s",
+            "type": "LG",
+            "location": "Detmold",
+            "label": "LG Detmold",
+            "revoked": null,
+            "jurisdictionType": "",
+            "region": "NW",
+            "responsibleDocOffice": null
+          }
+        }
+        """
+            .formatted(court1Id),
+        """
+        {
+          "op": "replace",
+          "path": "/managementData/lastUpdatedByDocOffice",
+          "value": "DS"
+        }
+        """,
+        """
+        {
+          "op": "replace",
+          "path": "/managementData/lastUpdatedByName",
+          "value": "testUser"
+        }
+        """);
   }
 
   @Nested
