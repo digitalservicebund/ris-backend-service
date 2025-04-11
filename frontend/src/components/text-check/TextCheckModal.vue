@@ -32,8 +32,8 @@ function removeIgnoredWord(word: string) {
   emit("word:remove", word)
 }
 
-function addIgnoredWordGlobally(word: string) {
-  emit("globalWord:add", word)
+function addIgnoredWordGlobally() {
+  emit("globalWord:add", props.match.word)
 }
 
 function removeGloballyIgnoredWord(word: string) {
@@ -68,10 +68,9 @@ const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
         !isMatchIgnored &&
         match.type.typeName == 'UnknownWord'
       "
-      disabled
       size="small"
       text
-      @click="addIgnoredWordGlobally(match.word)"
+      @click="addIgnoredWordGlobally"
       >Zum globalen Wörterbuch hinzufügen</Button
     >
 

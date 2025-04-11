@@ -5,7 +5,6 @@ import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   match: Match
-  addingToDictionaryEnabled?: boolean
 }>()
 
 const emit = defineEmits<{
