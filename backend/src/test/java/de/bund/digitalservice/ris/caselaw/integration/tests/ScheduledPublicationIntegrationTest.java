@@ -48,8 +48,10 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.ScheduledPublicationService;
+import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -89,6 +91,7 @@ import org.testcontainers.junit.jupiter.Container;
       SecurityConfig.class,
       OAuthService.class,
       TestConfig.class,
+      TextCheckService.class,
       DocumentNumberPatternConfig.class
     },
     controllers = {DocumentationUnitController.class})
@@ -120,6 +123,7 @@ class ScheduledPublicationIntegrationTest {
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService

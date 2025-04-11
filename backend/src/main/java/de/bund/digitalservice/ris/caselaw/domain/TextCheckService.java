@@ -153,6 +153,10 @@ public class TextCheckService {
             .map(IgnoredTextCheckWord::word)
             .toList();
 
+    if (ignoredTextCheckWords.isEmpty()) {
+      return documentationUnit;
+    }
+
     if (documentationUnit.longTexts() != null) {
       documentationUnit =
           documentationUnit.toBuilder()
