@@ -8,10 +8,7 @@ import lombok.Builder;
 public record HistoryLog(
     UUID id,
     Instant createdAt,
-    UUID documentationUnitId,
-    UUID documentationOffice,
-    UUID userId,
-    String userName,
-    String systemName,
+    String createdBy,
+    String documentationOffice,
     String description,
     String eventType) {}

@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
@@ -22,8 +24,9 @@ public class HistoryLogDTO {
   @Column(name = "documentation_unit_id", nullable = false)
   private UUID documentationUnitId;
 
-  @Column(name = "documentation_office", nullable = false)
-  private UUID documentationOffice;
+  @OneToOne()
+  @JoinColumn(name = "documentation_office", referencedColumnName = "id")
+  private DocumentationOfficeDTO documentationOffice;
 
   @Column(name = "user_id")
   private UUID userId;

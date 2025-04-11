@@ -1,9 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.HistoryLogTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -18,22 +21,10 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
   }
 
   @Override
-  public List<HistoryLog> findByDocumentationUnitId(UUID documentationUnitId) {
+  @Nullable
+  public List<HistoryLog> findByDocumentationUnitId(UUID documentationUnitId, @Nullable User user) {
     return databaseRepository.findByDocumentationUnitId(documentationUnitId).stream()
-        .map(this::toDomain)
+        .map(historyLogDTO -> HistoryLogTransformer.transformToDomain(historyLogDTO, user))
         .toList();
-  }
-
-  private HistoryLog toDomain(HistoryLogDTO dto) {
-    return new HistoryLog(
-        dto.getId(),
-        dto.getCreatedAt(),
-        dto.getDocumentationUnitId(),
-        dto.getDocumentationOffice(),
-        dto.getUserId(),
-        dto.getUserName(),
-        dto.getSystemName(),
-        dto.getDescription(),
-        dto.getEventType());
   }
 }
