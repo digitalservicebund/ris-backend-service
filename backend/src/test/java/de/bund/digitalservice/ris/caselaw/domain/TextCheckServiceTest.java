@@ -488,9 +488,13 @@ class TextCheckServiceTest {
             List.of("word"),
             "<p>hyphenated-word - first part should not replace</p>"),
         Arguments.of(
-            "<p>\"Selbständig[entätigkeit]\" - words in double quotes should be replaced</p>",
-            List.of("Selbständig[entätigkeit]"),
-            "<p>\"<noindex>Selbständig[entätigkeit]</noindex>\" - words in double quotes should be replaced</p>"),
+            "<p>\"[word]\" - words in square brackets should be replaced</p>",
+            List.of("word"),
+            "<p>\"[<noindex>word</noindex>]\" - words in square brackets should be replaced</p>"),
+        Arguments.of(
+            "<p>\"(word)\" - words in round brackets should be replaced</p>",
+            List.of("word"),
+            "<p>\"(<noindex>word</noindex>)\" - words in round brackets should be replaced</p>"),
         Arguments.of(
             "<p>\"word\" - words in double quotes should be replaced</p>",
             List.of("word"),
