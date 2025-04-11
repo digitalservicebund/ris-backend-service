@@ -284,9 +284,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
-      if (currentUser != null) {
-        setLastUpdated(currentUser, decisionDTO);
-      }
+      setLastUpdated(currentUser, decisionDTO);
 
       documentationUnitDTO =
           DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);
@@ -296,6 +294,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   private void setLastUpdated(User currentUser, DecisionDTO decisionDTO) {
+    if (currentUser == null) {
+      return;
+    }
+
     if (decisionDTO.getManagementData() == null) {
       decisionDTO.setManagementData(new ManagementDataDTO());
       decisionDTO.getManagementData().setDocumentationUnit(decisionDTO);

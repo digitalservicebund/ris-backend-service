@@ -117,8 +117,8 @@ class DocumentationUnitControllerTest {
         .when(userService)
         .getDocumentationOffice(
             argThat(
-                (OidcUser user) -> {
-                  List<String> groups = user.getAttribute("groups");
+                (OidcUser currentUser) -> {
+                  List<String> groups = currentUser.getAttribute("groups");
                   return Objects.requireNonNull(groups).get(0).equals("/DS");
                 }));
 
