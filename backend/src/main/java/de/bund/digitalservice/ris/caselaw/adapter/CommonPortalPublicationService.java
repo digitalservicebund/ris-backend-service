@@ -11,7 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
-import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,45 +56,13 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
    */
   public void publishDocumentationUnitWithChangelog(UUID documentationUnitId)
       throws DocumentationUnitNotExistsException {
-
     Documentable documentable = documentationUnitRepository.findByUuid(documentationUnitId);
-
-    if (!(documentable instanceof DocumentationUnit documentationUnit)) {
-      throw new UnsupportedOperationException(
-          "Publish not supported for Documentable type: " + documentable.getClass());
-    }
-
-    CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
-
-    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    if (fileContent.isEmpty()) {
-      throw new LdmlTransformationException(
-          "Could not transform documentation unit to valid LDML.", null);
-    }
-
-    Changelog changelog = new Changelog(List.of(ldml.getFileName()), null, null);
-    String changelogJson;
+    publishToBucket(documentable);
     try {
-      changelogJson = objectMapper.writeValueAsString(changelog);
-    } catch (IOException e) {
-      log.error("Could not write changelog file. {}", e.getMessage());
-      throw new PublishException(
-          "Could not publish documentation unit to portal, because changelog file could not be created.",
-          null);
-    }
-
-    try {
-      portalBucket.save(ldml.getFileName(), fileContent.get());
-      log.info("LDML for documentation unit {} successfully published.", ldml.getUniqueId());
-    } catch (BucketException e) {
-      log.error("Could not save LDML to bucket", e);
-      throw new PublishException("Could not save LDML to bucket.", e);
-    }
-
-    try {
-      portalBucket.save(changelog.createFileName(), changelogJson);
-    } catch (BucketException e) {
-      log.error("Could not save changelog to bucket", e);
+      uploadChangelog(List.of(documentable.documentNumber() + ".xml"), null);
+    } catch (Exception e) {
+      log.error("Could not upload changelog file.");
+      deleteDocumentationUnit(documentable.documentNumber());
       throw new PublishException("Could not save changelog to bucket.", e);
     }
   }
@@ -113,12 +81,15 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
   public void publishDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
     Documentable documentable = documentationUnitRepository.findByDocumentNumber(documentNumber);
+    publishToBucket(documentable);
+  }
+
+  private void publishToBucket(Documentable documentable) {
     if (!(documentable instanceof DocumentationUnit documentationUnit)) {
       // for now pending proceedings can not be transformed to LDML, so they are ignored.
       return;
     }
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
-
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
@@ -165,7 +136,7 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
   public void uploadChangelog(
       List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
       throws JsonProcessingException {
-    uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers, null);
+    uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers, false);
   }
 
   /**
@@ -177,16 +148,24 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
    */
   protected void uploadDeletionChangelog(List<String> deletedDocumentNumbers)
       throws JsonProcessingException {
-    uploadChangelog(null, deletedDocumentNumbers, null);
+    uploadChangelog(null, deletedDocumentNumbers, false);
   }
 
   private void uploadChangelog(
-      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers, Boolean changeAll)
+      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers, boolean changeAll)
       throws JsonProcessingException {
-    Changelog changelog =
-        new Changelog(publishedDocumentNumbers, deletedDocumentNumbers, changeAll);
+    Changelog changelog;
+    if (changeAll) {
+      changelog = new ChangelogChangeAll(true);
+    } else {
+      changelog = new ChangelogUpdateDelete(publishedDocumentNumbers, deletedDocumentNumbers);
+    }
 
     String changelogString = objectMapper.writeValueAsString(changelog);
-    portalBucket.save(changelog.createFileName(), changelogString);
+    portalBucket.save(createChangelogFileName(), changelogString);
+  }
+
+  private String createChangelogFileName() {
+    return "changelogs/" + Instant.now().toString() + "-caselaw.json";
   }
 }
