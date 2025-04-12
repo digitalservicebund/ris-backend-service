@@ -7,9 +7,13 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface IgnoredTextCheckWordRepository {
 
-  IgnoredTextCheckWord addIgnoredTextCheckWord(String word, UUID documentationOfficeId);
+  IgnoredTextCheckWord addWord(String word, UUID documentationOfficeId);
 
-  void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId);
+  void deleteWordIgnoredInDocumentationUnitWithId(String word, UUID documentationUnitId);
+
+  IgnoredTextCheckWord addWord(String word);
+
+  void deleteWordGlobally(String word);
 
   /**
    * Returns all ignored word by documentation unit and search in global words by the list of words

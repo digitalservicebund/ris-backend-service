@@ -17,8 +17,7 @@ public class PostgresIgnoredTextCheckWordRepositoryImpl implements IgnoredTextCh
   }
 
   @Override
-  public IgnoredTextCheckWord addIgnoredTextCheckWord(String word, UUID documentationUnitId) {
-
+  public IgnoredTextCheckWord addWord(String word, UUID documentationUnitId) {
     return IgnoredTextCheckWordTransformer.transformToDomain(
         repository.save(
             IgnoredTextCheckWordDTO.builder()
@@ -28,8 +27,19 @@ public class PostgresIgnoredTextCheckWordRepositoryImpl implements IgnoredTextCh
   }
 
   @Override
-  public void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId) {
+  public void deleteWordIgnoredInDocumentationUnitWithId(String word, UUID documentationUnitId) {
     this.repository.deleteAllByWordAndDocumentationUnitId(word, documentationUnitId);
+  }
+
+  @Override
+  public IgnoredTextCheckWord addWord(String word) {
+    return IgnoredTextCheckWordTransformer.transformToDomain(
+        repository.save(IgnoredTextCheckWordDTO.builder().word(word).build()));
+  }
+
+  @Override
+  public void deleteWordGlobally(String word) {
+    this.repository.deleteByWordAndDocumentationUnitIdIsNull(word);
   }
 
   @Override

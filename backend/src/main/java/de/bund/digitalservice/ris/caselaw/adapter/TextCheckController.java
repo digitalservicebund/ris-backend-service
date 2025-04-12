@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/caselaw/documentunits")
+@RequestMapping("api/v1/caselaw")
 @Slf4j
 public class TextCheckController {
 
@@ -35,7 +35,7 @@ public class TextCheckController {
     this.textCheckService = textCheckService;
   }
 
-  @GetMapping("{id}/text-check/all")
+  @GetMapping("documentunits/{id}/text-check/all")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<TextCheckAllResponse> checkWholeDocumentationUnit(
       @PathVariable("id") UUID id) {
@@ -50,7 +50,7 @@ public class TextCheckController {
     return ResponseEntity.ok(TextCheckResponseTransformer.transformToAllDomain(allMatches));
   }
 
-  @GetMapping("{id}/text-check")
+  @GetMapping("documentunits/{id}/text-check")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<TextCheckCategoryResponse> checkCategory(
       @PathVariable("id") UUID id, @Param("category") String category) {
@@ -62,7 +62,7 @@ public class TextCheckController {
   }
 
   @PostMapping(
-      value = "{id}/text-check/ignored-words/add",
+      value = "documentunits/{id}/text-check/ignored-words/add",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
@@ -79,7 +79,7 @@ public class TextCheckController {
   }
 
   @PostMapping(
-      value = "{id}/text-check/ignored-words/remove",
+      value = "documentunits/{id}/text-check/ignored-words/remove",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
@@ -88,6 +88,41 @@ public class TextCheckController {
       @PathVariable("id") UUID id, @RequestBody IgnoredTextCheckWordRequest request) {
     try {
       textCheckService.removeIgnoredWord(id, request.word());
+      return ResponseEntity.ok().build();
+    } catch (Exception e) {
+      log.error("Removing word failed", e);
+    }
+
+    return ResponseEntity.internalServerError().build();
+  }
+
+  @PostMapping(
+      value = "text-check/ignored-words/add",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<IgnoredTextCheckWord> addIgnoredWordGlobally(
+      @RequestBody IgnoredTextCheckWordRequest request) {
+    try {
+      return ResponseEntity.ok(textCheckService.addIgnoreWord(request.word()));
+
+    } catch (Exception e) {
+      log.error("Adding word failed", e);
+    }
+
+    return ResponseEntity.internalServerError().build();
+  }
+
+  @PostMapping(
+      value = "text-check/ignored-words/remove",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  @Transactional
+  public ResponseEntity<IgnoredTextCheckWord> removeIgnoredWordGlobally(
+      @RequestBody IgnoredTextCheckWordRequest request) {
+    try {
+      textCheckService.removeIgnoredWord(request.word());
       return ResponseEntity.ok().build();
     } catch (Exception e) {
       log.error("Removing word failed", e);

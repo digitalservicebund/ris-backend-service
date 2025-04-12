@@ -196,11 +196,20 @@ public class TextCheckService {
   }
 
   public void removeIgnoredWord(UUID documentationUnitId, String word) {
-    ignoredTextCheckWordRepository.deleteAllByWordAndDocumentationUnitId(word, documentationUnitId);
+    ignoredTextCheckWordRepository.deleteWordIgnoredInDocumentationUnitWithId(
+        word, documentationUnitId);
   }
 
   public IgnoredTextCheckWord addIgnoreWord(UUID documentationUnitId, String word) {
-    return ignoredTextCheckWordRepository.addIgnoredTextCheckWord(word, documentationUnitId);
+    return ignoredTextCheckWordRepository.addWord(word, documentationUnitId);
+  }
+
+  public void removeIgnoredWord(String word) {
+    ignoredTextCheckWordRepository.deleteWordGlobally(word);
+  }
+
+  public IgnoredTextCheckWord addIgnoreWord(String word) {
+    return ignoredTextCheckWordRepository.addWord(word);
   }
 
   public List<Match> addIgnoredTextChecksIndividually(
