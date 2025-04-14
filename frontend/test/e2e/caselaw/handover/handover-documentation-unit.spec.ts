@@ -9,7 +9,10 @@ import {
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import DocumentUnit from "@/domain/documentUnit"
-import { updateDocumentationUnit } from "~/e2e/caselaw/documentaiton-unit-controller-util"
+import {
+  addIgnoreWordToDocumentationUnit,
+  updateDocumentationUnit,
+} from "~/e2e/caselaw/utils/documentaiton-unit-controller-util"
 
 test.describe("ensuring the handover of documentunits works as expected", () => {
   test("handover page shows all possible missing required fields when no fields filled", async ({
@@ -416,6 +419,81 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
 
         // The first border number link was changed from 5 -> 2, the second one left as is.
         await expect(page.getByTestId("Tenor")).toHaveText("2 1")
+      })
+    },
+  )
+
+  test(
+    "handover wraps <noindex> on  ignored words in preview and handover",
+    {
+      tag: ["@RISDEV-7394"],
+    },
+    async ({ page, prefilledDocumentUnit, request }) => {
+      const expectedNoindexCount = 8
+      await test.step("Befülle Langtexte und Kurztexte mit texts", async () => {
+        await addIgnoreWordToDocumentationUnit(
+          page,
+          prefilledDocumentUnit.uuid,
+          "text",
+        )
+
+        const text =
+          "<p>das wort text soll mit noindex umgeschlossen werden</p>"
+
+        const documentationUnit = {
+          ...prefilledDocumentUnit,
+          shortTexts: {
+            headline: text,
+            guidingPrinciple: text,
+            headnote: text,
+            otherHeadnote: text,
+          },
+          longTexts: {
+            tenor: text,
+            caseFacts: text,
+            decisionReasons: text,
+            otherLongText: text,
+            dissentingOpinion: text,
+          },
+        } as DocumentUnit
+        await updateDocumentationUnit(page, documentationUnit, request)
+      })
+
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+
+      await test.step("XML Vorschau zeigt die noindex tags", async () => {
+        await expect(page.getByText("XML Vorschau")).toBeVisible()
+
+        await page.getByText("XML Vorschau").click()
+
+        await expect(
+          page.getByText(
+            "<p>das wort <noindex>text</noindex> soll mit noindex umgeschlossen werden</p>",
+            {
+              exact: true,
+            },
+          ),
+        ).toHaveCount(expectedNoindexCount)
+      })
+
+      await test.step("Übergabe an der jDV behinhaltet noindex", async () => {
+        await page
+          .getByLabel("Dokumentationseinheit an jDV übergeben", { exact: true })
+          .click()
+
+        await expect(page.getByText("Email wurde versendet")).toBeVisible()
+        await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
+
+        await expect(
+          page
+            .getByTestId("xml-handover-code-snippet-preview")
+            .getByText(
+              "<p>das wort <noindex>text</noindex> soll mit noindex umgeschlossen werden</p>",
+              {
+                exact: true,
+              },
+            ),
+        ).toHaveCount(expectedNoindexCount)
       })
     },
   )
