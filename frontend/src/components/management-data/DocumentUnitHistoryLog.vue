@@ -12,7 +12,7 @@ defineProps<{
 // Dynamically generate the columns based on the keys in the data
 const columns = [
   { field: "createdAt", header: "Änderung am" },
-  { field: "userName", header: "Von" },
+  { field: "createdBy", header: "Von" },
   { field: "description", header: "Was" },
 ]
 const rowClass = () => {

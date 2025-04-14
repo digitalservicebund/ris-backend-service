@@ -1,11 +1,8 @@
 export type DocumentationUnitHistoryLog = {
   id: string
   createdAt?: string
-  documentationUnitId?: string
+  createdBy?: string
   documentationOffice?: string
-  userId?: string
-  userName?: string
-  systemName?: string
   description?: string
   eventType?: string
 }
