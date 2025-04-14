@@ -3,7 +3,6 @@ import dayjs from "dayjs"
 import errorMessages from "@/i18n/errors.json" with { type: "json" }
 
 import {
-  deleteDocumentUnit,
   fillInput,
   fillSearchInput,
   navigateToCategories,
@@ -11,6 +10,7 @@ import {
   save,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { noteContent } from "~/e2e/testdata"
 import { generateString } from "~/test-helper/dataGenerators"
 

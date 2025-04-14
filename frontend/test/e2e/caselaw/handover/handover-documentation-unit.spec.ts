@@ -12,7 +12,7 @@ import DocumentUnit from "@/domain/documentUnit"
 import {
   addIgnoreWordToDocumentationUnit,
   updateDocumentationUnit,
-} from "~/e2e/caselaw/utils/documentaiton-unit-controller-util"
+} from "~/e2e/caselaw/utils/documentation-unit-api-util"
 
 test.describe("ensuring the handover of documentunits works as expected", () => {
   test("handover page shows all possible missing required fields when no fields filled", async ({

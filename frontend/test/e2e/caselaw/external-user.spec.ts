@@ -2,7 +2,6 @@ import { expect, Page } from "@playwright/test"
 import {
   assignProcedureToDocUnit,
   clickCategoryButton,
-  deleteAllProcedures,
   fillInput,
   navigateToCategories,
   navigateToProcedures,
@@ -10,6 +9,7 @@ import {
   save,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { deleteAllProcedures } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe(

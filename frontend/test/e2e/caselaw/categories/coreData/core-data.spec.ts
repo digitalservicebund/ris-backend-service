@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
-import { deleteDocumentUnit, navigateToCategories, save } from "../../e2e-utils"
+import { navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
+import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 
 test.describe("core data", () => {
   test("core data change", async ({ page, documentNumber }) => {
