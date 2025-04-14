@@ -8,6 +8,8 @@ import {
   save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
+import DocumentUnit from "@/domain/documentUnit"
+import { updateDocumentationUnit } from "~/e2e/caselaw/documentaiton-unit-controller-util"
 
 test.describe("ensuring the handover of documentunits works as expected", () => {
   test("handover page shows all possible missing required fields when no fields filled", async ({
@@ -315,29 +317,22 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     },
     async ({ page, prefilledDocumentUnit, request }) => {
       await test.step("Befülle Langtexte mit invaliden Randnummern und Verlinkungen", async () => {
-        const cookies = await page.context().cookies()
-        const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-        await request.put(
-          `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-          {
-            data: {
-              ...prefilledDocumentUnit,
-              longTexts: {
-                tenor: `<border-number-link nr='5'>5</border-number-link>
+        const documentationUnit = {
+          ...prefilledDocumentUnit,
+          longTexts: {
+            tenor: `<border-number-link nr='5'>5</border-number-link>
  <border-number-link nr='1'>1</border-number-link>`,
-                caseFacts:
-                  "<border-number><number>3</number><content>Text</content></border-number>",
-                decisionReasons:
-                  "<border-number><number>5</number><content>Text</content></border-number>",
-                otherLongText:
-                  "<border-number><number>6</number><content>Text</content></border-number>",
-                dissentingOpinion:
-                  "<border-number><number>7</number><content>Text</content></border-number>",
-              },
-            },
-            headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+            caseFacts:
+              "<border-number><number>3</number><content>Text</content></border-number>",
+            decisionReasons:
+              "<border-number><number>5</number><content>Text</content></border-number>",
+            otherLongText:
+              "<border-number><number>6</number><content>Text</content></border-number>",
+            dissentingOpinion:
+              "<border-number><number>7</number><content>Text</content></border-number>",
           },
-        )
+        } as DocumentUnit
+        await updateDocumentationUnit(page, documentationUnit, request)
       })
 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
