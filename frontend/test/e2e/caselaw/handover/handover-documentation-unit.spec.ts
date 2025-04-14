@@ -426,7 +426,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   test(
     "handover wraps <noindex> on ignored words in preview and publication",
     {
-      tag: ["@RISDEV-7394"],
+      tag: ["@RISDEV-254", "@RISDEV-6205", "@RISDEV-7394"],
     },
     async ({ page, prefilledDocumentUnit, request }) => {
       const expectedNoindexCount = 8
