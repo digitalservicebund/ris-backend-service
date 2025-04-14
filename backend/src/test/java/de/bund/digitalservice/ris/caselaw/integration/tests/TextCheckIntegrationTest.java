@@ -161,7 +161,6 @@ class TextCheckIntegrationTest {
               assertThat(response.getResponseBody().word()).isEqualTo("abc");
               assertThat(response.getResponseBody().type())
                   .isEqualTo(IgnoredTextCheckType.DOCUMENTATION_UNIT);
-              assertThat(response.getResponseBody().isEditable()).isTrue();
             });
 
     risWebTestClient
@@ -208,7 +207,6 @@ class TextCheckIntegrationTest {
               assertThat(response.getResponseBody().id()).isNotNull();
               assertThat(response.getResponseBody().word()).isEqualTo("def");
               assertThat(response.getResponseBody().type()).isEqualTo(IgnoredTextCheckType.GLOBAL);
-              assertThat(response.getResponseBody().isEditable()).isTrue();
             });
 
     risWebTestClient

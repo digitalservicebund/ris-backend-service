@@ -28,8 +28,7 @@ const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
     <div
       v-if="
         match.ignoredTextCheckWords?.some(
-          (ignoredWord) =>
-            ignoredWord.type === 'global' && !ignoredWord.isEditable,
+          (ignoredWord) => ignoredWord.type === 'global_jdv',
         )
       "
     >
@@ -40,8 +39,7 @@ const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
       v-else-if="
         textCheckGlobal &&
         match.ignoredTextCheckWords?.some(
-          (ignoredWord) =>
-            ignoredWord.type === 'global' && ignoredWord.isEditable,
+          (ignoredWord) => ignoredWord.type === 'global',
         )
       "
       aria-label="Wort aus globalem Wörterbuch entfernen"
@@ -56,9 +54,12 @@ const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
     </Button>
 
     <Button
-      v-else-if="
+      v-if="
         match.ignoredTextCheckWords?.some(
           (ignoredWord) => ignoredWord.type === 'documentation_unit',
+        ) &&
+        !match.ignoredTextCheckWords?.some(
+          (ignoredWord) => ignoredWord.type === 'global_jdv',
         )
       "
       aria-label="Wort nicht ignorieren"

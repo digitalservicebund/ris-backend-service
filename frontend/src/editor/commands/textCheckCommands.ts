@@ -152,13 +152,6 @@ class NeurisTextCheckService implements TextCheckService {
     this.selectedMatch.value = undefined
   }
 
-  static isMatchIgnored(match: Match): boolean {
-    return (
-      Array.isArray(match.ignoredTextCheckWords) &&
-      match.ignoredTextCheckWords.length > 0
-    )
-  }
-
   ignoreWord = async (word: string) => {
     const store = useDocumentUnitStore()
 

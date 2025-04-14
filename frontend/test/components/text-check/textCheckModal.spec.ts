@@ -88,7 +88,6 @@ describe("TextCheckModal", () => {
         {
           type: "documentation_unit",
           word: "testword",
-          isEditable: true,
           id: "1",
         },
       ],
@@ -116,9 +115,7 @@ describe("TextCheckModal", () => {
   test.skip("emits 'globalWord:remove' event when remove global ignore button is clicked", async () => {
     const { emitted, user } = renderComponent({
       ...baseMatch,
-      ignoredTextCheckWords: [
-        { type: "global", word: "testword", isEditable: true, id: "1" },
-      ],
+      ignoredTextCheckWords: [{ type: "global", word: "testword", id: "1" }],
     })
 
     // don't render the other options

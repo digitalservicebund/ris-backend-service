@@ -5,7 +5,6 @@ import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
 
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
-import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { Match, Replacement } from "@/types/textCheck"
 
 const props = defineProps<{
@@ -44,8 +43,18 @@ function getValues(replacements: Replacement[]) {
   return replacements.flatMap((replacement) => replacement.value)
 }
 
+const matchIsIgnoredGlobally = computed(() => {
+  return props.match.ignoredTextCheckWords?.some(
+    (ignoredWord) =>
+      ignoredWord.type === "global" || ignoredWord.type === "global_jdv",
+  )
+})
+
 const isMatchIgnored = computed(() => {
-  return NeurisTextCheckService.isMatchIgnored(props.match)
+  return (
+    Array.isArray(props.match.ignoredTextCheckWords) &&
+    props.match.ignoredTextCheckWords.length > 0
+  )
 })
 
 const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
@@ -63,11 +72,7 @@ const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
     </div>
 
     <Button
-      v-if="
-        textCheckGlobal &&
-        !isMatchIgnored &&
-        match.type.typeName == 'UnknownWord'
-      "
+      v-if="textCheckGlobal && !matchIsIgnoredGlobally"
       size="small"
       text
       @click="addIgnoredWordGlobally"

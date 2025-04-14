@@ -2,6 +2,9 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import { Match } from "@/types/textCheck"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
+
+useFeatureToggleServiceMock()
 
 function renderComponent(match: Match) {
   const user = userEvent.setup()
@@ -68,9 +71,7 @@ describe("IgnoredWordHandler", () => {
   it("renders 'Von jDV ignoriert' when word is globally ignored by jDV", () => {
     renderComponent({
       ...baseMatch,
-      ignoredTextCheckWords: [
-        { type: "global", isEditable: false, word: "testword" },
-      ],
+      ignoredTextCheckWords: [{ type: "global_jdv", word: "testword" }],
     })
     expect(screen.getByText("Von jDV ignoriert")).toBeInTheDocument()
     expect(
@@ -83,9 +84,7 @@ describe("IgnoredWordHandler", () => {
   test.skip("emits remove global ignore word event when 'Aus globalem Wörterbuch entfernen' button is clicked", async () => {
     const { emitted, user } = renderComponent({
       ...baseMatch,
-      ignoredTextCheckWords: [
-        { type: "global", isEditable: true, word: "testword" },
-      ],
+      ignoredTextCheckWords: [{ type: "global", word: "testword" }],
     })
     // other options should not be rendered
     expect(
