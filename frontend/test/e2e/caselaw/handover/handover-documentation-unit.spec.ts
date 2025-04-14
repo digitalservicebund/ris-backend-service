@@ -424,7 +424,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   )
 
   test(
-    "handover wraps <noindex> on  ignored words in preview and handover",
+    "handover wraps <noindex> on ignored words in preview and publication",
     {
       tag: ["@RISDEV-7394"],
     },
@@ -476,7 +476,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         ).toHaveCount(expectedNoindexCount)
       })
 
-      await test.step("Übergabe an der jDV behinhaltet noindex", async () => {
+      await test.step("Übergabe an der jDV beinhaltet noindex", async () => {
         await page
           .getByLabel("Dokumentationseinheit an jDV übergeben", { exact: true })
           .click()
