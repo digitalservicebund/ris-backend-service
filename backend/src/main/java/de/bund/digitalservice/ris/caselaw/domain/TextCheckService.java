@@ -204,8 +204,8 @@ public class TextCheckService {
     return ignoredTextCheckWordRepository.addWord(word, documentationUnitId);
   }
 
-  public void removeIgnoredWord(String word) {
-    ignoredTextCheckWordRepository.deleteWordGlobally(word);
+  public boolean removeIgnoredWord(String word) {
+    return ignoredTextCheckWordRepository.deleteWordGlobally(word);
   }
 
   public IgnoredTextCheckWord addIgnoreWord(String word) {

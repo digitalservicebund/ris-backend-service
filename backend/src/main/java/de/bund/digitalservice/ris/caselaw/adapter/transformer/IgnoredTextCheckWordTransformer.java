@@ -9,18 +9,21 @@ import lombok.experimental.UtilityClass;
 public class IgnoredTextCheckWordTransformer {
   public static IgnoredTextCheckWord transformToDomain(
       IgnoredTextCheckWordDTO ignoredTextCheckWordDTO) {
+    IgnoredTextCheckType ignoredTextCheckType = getIgnoredTextCheckType(ignoredTextCheckWordDTO);
     return new IgnoredTextCheckWord(
         ignoredTextCheckWordDTO.getId(),
-        getIgnoredTextCheckType(ignoredTextCheckWordDTO),
-        ignoredTextCheckWordDTO.getDocumentationUnitId() != null, // TODO
+        ignoredTextCheckType,
+        !ignoredTextCheckType.equals(IgnoredTextCheckType.GLOBAL_JDV),
         ignoredTextCheckWordDTO.getWord());
   }
 
   private static IgnoredTextCheckType getIgnoredTextCheckType(
       IgnoredTextCheckWordDTO ignoredTextCheckWordDTO) {
     if (ignoredTextCheckWordDTO.getJurisId() != null) {
-      return IgnoredTextCheckType.GLOBAL;
+      return IgnoredTextCheckType.GLOBAL_JDV;
+    } else if (ignoredTextCheckWordDTO.getDocumentationUnitId() != null) {
+      return IgnoredTextCheckType.DOCUMENTATION_UNIT;
     }
-    return IgnoredTextCheckType.DOCUMENTATION_UNIT;
+    return IgnoredTextCheckType.GLOBAL;
   }
 }

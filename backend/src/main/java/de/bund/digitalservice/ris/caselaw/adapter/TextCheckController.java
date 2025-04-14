@@ -17,6 +17,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -84,7 +85,7 @@ public class TextCheckController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   @Transactional
-  public ResponseEntity<IgnoredTextCheckWord> removeIgnoredWord(
+  public ResponseEntity<Void> removeIgnoredWord(
       @PathVariable("id") UUID id, @RequestBody IgnoredTextCheckWordRequest request) {
     try {
       textCheckService.removeIgnoredWord(id, request.word());
@@ -113,17 +114,20 @@ public class TextCheckController {
     return ResponseEntity.internalServerError().build();
   }
 
-  @PostMapping(
+  @DeleteMapping(
       value = "text-check/ignored-words/remove",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   @Transactional
-  public ResponseEntity<IgnoredTextCheckWord> removeIgnoredWordGlobally(
+  public ResponseEntity<Void> removeIgnoredWordGlobally(
       @RequestBody IgnoredTextCheckWordRequest request) {
     try {
-      textCheckService.removeIgnoredWord(request.word());
-      return ResponseEntity.ok().build();
+      var success = textCheckService.removeIgnoredWord(request.word());
+      if (success) {
+        return ResponseEntity.ok().build();
+      }
+      return ResponseEntity.notFound().build();
     } catch (Exception e) {
       log.error("Removing word failed", e);
     }

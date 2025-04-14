@@ -38,8 +38,8 @@ public class PostgresIgnoredTextCheckWordRepositoryImpl implements IgnoredTextCh
   }
 
   @Override
-  public void deleteWordGlobally(String word) {
-    this.repository.deleteByWordAndDocumentationUnitIdIsNull(word);
+  public boolean deleteWordGlobally(String word) {
+    return repository.deleteByWordAndDocumentationUnitIdIsNullAndJurisIdIsNull(word) == 1;
   }
 
   @Override

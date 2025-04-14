@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
@@ -45,12 +46,14 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.Ignored
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -75,6 +78,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentNumberPatternConfig.class
     },
     controllers = {TextCheckController.class})
+@Sql(scripts = {"classpath:text_check_init.sql"})
+@Sql(
+    scripts = {"classpath:text_check_cleanup.sql"},
+    executionPhase = AFTER_TEST_METHOD)
 class TextCheckIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -112,7 +119,6 @@ class TextCheckIntegrationTest {
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
-  private static final String DEFAULT_DOCUMENT_NUMBER = "1234567890126";
 
   @BeforeEach
   void setUp() {
@@ -129,14 +135,16 @@ class TextCheckIntegrationTest {
 
   @Test
   void testAddLocalIgnore() {
-    DocumentationUnitDTO dto =
+    DocumentationUnitDTO documentationUnitDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             documentationUnitRepository, documentationOffice);
-
     risWebTestClient
         .withDefaultLogin()
         .post()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/text-check/ignored-words/add")
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentationUnitDTO.getId()
+                + "/text-check/ignored-words/add")
         .bodyValue(new IgnoredTextCheckWordRequest("abc"))
         .exchange()
         .expectStatus()
@@ -151,5 +159,78 @@ class TextCheckIntegrationTest {
                   .isEqualTo(IgnoredTextCheckType.DOCUMENTATION_UNIT);
               assertThat(response.getResponseBody().isEditable()).isTrue();
             });
+
+    risWebTestClient
+        .withDefaultLogin()
+        .post()
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentationUnitDTO.getId()
+                + "/text-check/ignored-words/remove")
+        .bodyValue(new IgnoredTextCheckWordRequest("abc"))
+        .exchange()
+        .expectStatus()
+        .isOk();
+  }
+
+  @Disabled
+  @Test
+  void testAddLocalIgnore_cantAddGloballyIgnoredWordsLocally() {
+    DocumentationUnitDTO documentationUnitDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository, documentationOffice);
+    risWebTestClient
+        .withDefaultLogin()
+        .post()
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentationUnitDTO.getId()
+                + "/text-check/ignored-words/add")
+        .bodyValue(new IgnoredTextCheckWordRequest("xyz"))
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
+  }
+
+  @Test
+  void testAddGlobalIgnore() {
+    risWebTestClient
+        .withDefaultLogin()
+        .post()
+        .uri("/api/v1/caselaw/text-check/ignored-words/add")
+        .bodyValue(new IgnoredTextCheckWordRequest("def"))
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(IgnoredTextCheckWord.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().id()).isNotNull();
+              assertThat(response.getResponseBody().word()).isEqualTo("def");
+              assertThat(response.getResponseBody().type()).isEqualTo(IgnoredTextCheckType.GLOBAL);
+              assertThat(response.getResponseBody().isEditable()).isTrue();
+            });
+
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/text-check/ignored-words/remove")
+        .bodyValue(new IgnoredTextCheckWordRequest("def"))
+        .exchange()
+        .expectStatus()
+        .isOk();
+  }
+
+  @Test
+  void testGlobalJdvIgnore_cantBeDeleted() {
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/text-check/ignored-words/remove")
+        .bodyValue(new IgnoredTextCheckWordRequest("uvw"))
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
   }
 }

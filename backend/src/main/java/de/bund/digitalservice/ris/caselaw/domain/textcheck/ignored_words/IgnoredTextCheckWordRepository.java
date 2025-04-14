@@ -13,7 +13,7 @@ public interface IgnoredTextCheckWordRepository {
 
   IgnoredTextCheckWord addWord(String word);
 
-  void deleteWordGlobally(String word);
+  boolean deleteWordGlobally(String word);
 
   /**
    * Returns all ignored word by documentation unit and search in global words by the list of words
