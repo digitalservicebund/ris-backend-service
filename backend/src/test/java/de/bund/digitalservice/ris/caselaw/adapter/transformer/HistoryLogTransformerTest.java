@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.time.Instant;
 import java.util.UUID;
@@ -21,7 +22,7 @@ class HistoryLogTransformerTest {
     String userName = "testUser";
     String systemName = "testSystemName";
     String description = "Unit changed";
-    String eventType = "UPDATE";
+    HistoryLogEventType eventType = HistoryLogEventType.PUBLISH;
     UUID docOfficeId = UUID.randomUUID();
     String officeAbbreviation = "BGH";
     DocumentationOfficeDTO documentationOfficeDTO =
@@ -55,7 +56,7 @@ class HistoryLogTransformerTest {
             .createdBy(userName)
             .documentationOffice(officeAbbreviation)
             .description(description)
-            .eventType(eventType)
+            .eventType(String.valueOf(eventType))
             .build();
 
     // Act
@@ -73,7 +74,7 @@ class HistoryLogTransformerTest {
     String userName = "testUser";
     String systemName = "testSystemName";
     String description = "Unit changed";
-    String eventType = "UPDATE";
+    HistoryLogEventType eventType = HistoryLogEventType.UPDATE;
     UUID docOfficeId = UUID.randomUUID();
     String officeAbbreviation = "BGH";
     DocumentationOfficeDTO documentationOfficeDTO =
@@ -104,7 +105,7 @@ class HistoryLogTransformerTest {
             .createdBy(systemName)
             .documentationOffice(officeAbbreviation)
             .description(description)
-            .eventType(eventType)
+            .eventType(String.valueOf(eventType))
             .build();
 
     // Act
@@ -122,7 +123,7 @@ class HistoryLogTransformerTest {
     Instant now = Instant.now();
     String userName = "testUser";
     String description = "Unit changed";
-    String eventType = "UPDATE";
+    HistoryLogEventType eventType = HistoryLogEventType.UPDATE;
     UUID docOfficeId = UUID.randomUUID();
     String officeAbbreviation = "BGH";
     DocumentationOfficeDTO documentationOfficeDTO =
@@ -152,7 +153,7 @@ class HistoryLogTransformerTest {
             .createdBy(null)
             .documentationOffice(officeAbbreviation)
             .description(description)
-            .eventType(eventType)
+            .eventType(String.valueOf(eventType))
             .build();
 
     // Act
