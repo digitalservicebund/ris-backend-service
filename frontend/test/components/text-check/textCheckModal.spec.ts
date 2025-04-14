@@ -2,6 +2,9 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import TextCheckModal from "@/components/text-check/TextCheckModal.vue"
 import { Match } from "@/types/textCheck"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
+
+useFeatureToggleServiceMock()
 
 function renderComponent(match: Match) {
   const user = userEvent.setup()
