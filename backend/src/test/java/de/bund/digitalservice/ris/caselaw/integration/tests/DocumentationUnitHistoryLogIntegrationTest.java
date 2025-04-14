@@ -20,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -62,6 +63,7 @@ import org.testcontainers.junit.jupiter.Container;
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
+      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
       DatabaseDocumentationUnitStatusService.class,
       PostgresJPAConfig.class,
       FlywayConfig.class,
@@ -90,10 +92,10 @@ class DocumentationUnitHistoryLogIntegrationTest {
   @Autowired private DatabaseDocumentationUnitHistoryLogRepository databaseHistoryLogRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private AuthService authService;
+  @Autowired private DocumentationUnitRepository documentationUnitRepository;
+  @Autowired private DocumentationUnitHistoryLogRepository historyLogRepository;
 
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private DocumentationUnitHistoryLogRepository historyLogRepository;
-  @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private DocumentNumberService documentNumberService;
   @MockitoBean private DocumentationUnitStatusService documentationUnitStatusService;
@@ -162,7 +164,8 @@ class DocumentationUnitHistoryLogIntegrationTest {
     HistoryLog log = historyLogs.getFirst();
 
     assertThat(log.createdAt()).isEqualTo(historyLogDTO.getCreatedAt());
-    assertThat(log.documentationOffice()).isEqualTo(historyLogDTO.getDocumentationOffice());
+    assertThat(log.documentationOffice())
+        .isEqualTo(historyLogDTO.getDocumentationOffice().getAbbreviation());
     assertThat(log.eventType()).isEqualTo(historyLogDTO.getEventType());
     assertThat(log.description()).isEqualTo(historyLogDTO.getDescription());
     assertThat(log.createdBy()).isEqualTo(historyLogDTO.getUserName());
