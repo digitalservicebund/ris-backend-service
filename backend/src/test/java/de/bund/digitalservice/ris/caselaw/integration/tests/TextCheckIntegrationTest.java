@@ -46,7 +46,6 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.Ignored
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -119,6 +118,8 @@ class TextCheckIntegrationTest {
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
+  DocumentationUnitDTO documentationUnitDTO;
+  private static final String DEFAULT_DOCUMENT_NUMBER = "1234567890";
 
   @BeforeEach
   void setUp() {
@@ -126,6 +127,12 @@ class TextCheckIntegrationTest {
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
     when(userService.getDocumentationOffice(any())).thenReturn(docOffice);
+
+    documentationUnitDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository,
+            documentationOffice,
+            DEFAULT_DOCUMENT_NUMBER + Math.random() * 1000);
   }
 
   @AfterEach
@@ -135,16 +142,13 @@ class TextCheckIntegrationTest {
 
   @Test
   void testAddLocalIgnore() {
-    DocumentationUnitDTO documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            documentationUnitRepository, documentationOffice);
     risWebTestClient
         .withDefaultLogin()
         .post()
         .uri(
             "/api/v1/caselaw/documentunits/"
                 + documentationUnitDTO.getId()
-                + "/text-check/ignored-words/add")
+                + "/text-check/ignored-word")
         .bodyValue(new IgnoredTextCheckWordRequest("abc"))
         .exchange()
         .expectStatus()
@@ -162,34 +166,29 @@ class TextCheckIntegrationTest {
 
     risWebTestClient
         .withDefaultLogin()
-        .post()
+        .delete()
         .uri(
             "/api/v1/caselaw/documentunits/"
                 + documentationUnitDTO.getId()
-                + "/text-check/ignored-words/remove")
-        .bodyValue(new IgnoredTextCheckWordRequest("abc"))
+                + "/text-check/ignored-word/abc")
         .exchange()
         .expectStatus()
         .isOk();
   }
 
-  @Disabled
   @Test
-  void testAddLocalIgnore_cantAddGloballyIgnoredWordsLocally() {
-    DocumentationUnitDTO documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            documentationUnitRepository, documentationOffice);
+  void testAddLocalIgnore_canAddGloballyIgnoredWordsLocally() {
     risWebTestClient
         .withDefaultLogin()
         .post()
         .uri(
             "/api/v1/caselaw/documentunits/"
                 + documentationUnitDTO.getId()
-                + "/text-check/ignored-words/add")
+                + "/text-check/ignored-word")
         .bodyValue(new IgnoredTextCheckWordRequest("xyz"))
         .exchange()
         .expectStatus()
-        .is4xxClientError();
+        .isOk();
   }
 
   @Test
@@ -197,7 +196,7 @@ class TextCheckIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .post()
-        .uri("/api/v1/caselaw/text-check/ignored-words/add")
+        .uri("/api/v1/caselaw/text-check/ignored-word")
         .bodyValue(new IgnoredTextCheckWordRequest("def"))
         .exchange()
         .expectStatus()
@@ -215,8 +214,7 @@ class TextCheckIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .delete()
-        .uri("/api/v1/caselaw/text-check/ignored-words/remove")
-        .bodyValue(new IgnoredTextCheckWordRequest("def"))
+        .uri("/api/v1/caselaw/text-check/ignored-word/def")
         .exchange()
         .expectStatus()
         .isOk();
@@ -227,8 +225,7 @@ class TextCheckIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .delete()
-        .uri("/api/v1/caselaw/text-check/ignored-words/remove")
-        .bodyValue(new IgnoredTextCheckWordRequest("uvw"))
+        .uri("/api/v1/caselaw/text-check/ignored-word/uvw")
         .exchange()
         .expectStatus()
         .is4xxClientError();

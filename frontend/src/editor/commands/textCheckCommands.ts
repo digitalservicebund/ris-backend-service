@@ -176,7 +176,7 @@ class NeurisTextCheckService implements TextCheckService {
     const store = useDocumentUnitStore()
 
     if (store.documentUnit?.uuid) {
-      const response: ServiceResponse<IgnoredTextCheckWord> =
+      const response: ServiceResponse<void> =
         await languageToolService.removeLocalIgnore(
           store.documentUnit?.uuid,
           word,
@@ -198,7 +198,7 @@ class NeurisTextCheckService implements TextCheckService {
   }
 
   removeGloballyIgnoredWord = async (word: string): Promise<void> => {
-    const response: ServiceResponse<IgnoredTextCheckWord> =
+    const response: ServiceResponse<void> =
       await languageToolService.removeGlobalIgnore(word)
 
     if (response.status >= 300) {

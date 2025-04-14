@@ -63,7 +63,7 @@ public class TextCheckController {
   }
 
   @PostMapping(
-      value = "documentunits/{id}/text-check/ignored-words/add",
+      value = "documentunits/{id}/text-check/ignored-word",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
@@ -79,16 +79,15 @@ public class TextCheckController {
     return ResponseEntity.internalServerError().build();
   }
 
-  @PostMapping(
-      value = "documentunits/{id}/text-check/ignored-words/remove",
-      consumes = MediaType.APPLICATION_JSON_VALUE,
+  @DeleteMapping(
+      value = "documentunits/{id}/text-check/ignored-word/{word}",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   @Transactional
   public ResponseEntity<Void> removeIgnoredWord(
-      @PathVariable("id") UUID id, @RequestBody IgnoredTextCheckWordRequest request) {
+      @PathVariable("id") UUID id, @PathVariable("word") String word) {
     try {
-      textCheckService.removeIgnoredWord(id, request.word());
+      textCheckService.removeIgnoredWord(id, word);
       return ResponseEntity.ok().build();
     } catch (Exception e) {
       log.error("Removing word failed", e);
@@ -98,7 +97,7 @@ public class TextCheckController {
   }
 
   @PostMapping(
-      value = "text-check/ignored-words/add",
+      value = "text-check/ignored-word",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
@@ -115,15 +114,13 @@ public class TextCheckController {
   }
 
   @DeleteMapping(
-      value = "text-check/ignored-words/remove",
-      consumes = MediaType.APPLICATION_JSON_VALUE,
+      value = "text-check/ignored-word/{word}",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   @Transactional
-  public ResponseEntity<Void> removeIgnoredWordGlobally(
-      @RequestBody IgnoredTextCheckWordRequest request) {
+  public ResponseEntity<Void> removeIgnoredWordGlobally(@PathVariable("word") String word) {
     try {
-      var success = textCheckService.removeIgnoredWord(request.word());
+      var success = textCheckService.removeIgnoredWord(word);
       if (success) {
         return ResponseEntity.ok().build();
       }
