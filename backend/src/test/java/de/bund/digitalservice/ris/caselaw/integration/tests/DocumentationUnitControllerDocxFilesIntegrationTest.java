@@ -204,8 +204,6 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     assertThat(savedAttachment.getId()).isInstanceOf(UUID.class);
   }
 
-  // TODO: Test for setting lastUpdate on delete attachment
-
   @Test
   void testAttachDocxToDocumentationUnit_shouldSetManagementData() throws IOException {
     var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
@@ -477,7 +475,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   }
 
   @Test
-  void testRemoveFileFromDocumentationUnit() {
+  void testRemoveFileFromDocumentationUnit_shouldReturnLastUpdatedByWithName() {
+    // Arrange
     when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(DeleteObjectResponse.builder().build());
 
@@ -496,6 +495,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
 
     assertThat(attachmentRepository.findAll()).hasSize(1);
 
+    // Act
     risWebTestClient
         .withDefaultLogin()
         .delete()
@@ -504,7 +504,74 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
         .expectStatus()
         .isNoContent();
 
-    assertThat(attachmentRepository.findAll()).isEmpty();
+    var docUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    // Assert
+    ManagementData managementData = docUnit.managementData();
+    assertThat(managementData.lastUpdatedByName()).isEqualTo("testUser");
+    assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
+    assertThat(managementData.lastUpdatedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+  }
+
+  @Test
+  void testRemoveFileFromDocumentationUnit_shouldReturnLastUpdatedByWithoutName() {
+    // Arrange
+    when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
+        .thenReturn(DeleteObjectResponse.builder().build());
+
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
+
+    attachmentRepository.save(
+        AttachmentDTO.builder()
+            .s3ObjectPath("fooPath")
+            .documentationUnit(dto)
+            .uploadTimestamp(Instant.now())
+            .filename("fooFile")
+            .format("docx")
+            .build());
+
+    assertThat(attachmentRepository.findAll()).hasSize(1);
+
+    // Act
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/fooPath")
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+
+    var docUnit =
+        risWebTestClient
+            .withLogin("/BGH")
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    // Assert
+    ManagementData managementData = docUnit.managementData();
+    assertThat(managementData.lastUpdatedByName()).isNull();
+    assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
+    assertThat(managementData.lastUpdatedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
   }
 
   @Test
