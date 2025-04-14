@@ -12,7 +12,7 @@ interface DocumentationUnitHistoryLogService {
 const service: DocumentationUnitHistoryLogService = {
   async get(documentUnitUuid: string) {
     const response = await httpClient.get<DocumentationUnitHistoryLog[]>(
-      `caselaw/history/${documentUnitUuid}`,
+      `caselaw/documentunits/${documentUnitUuid}/historylogs`,
     )
     if (response.status >= 300) {
       response.error = {

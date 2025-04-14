@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DatabaseDocumentationUnitHistoryLogRepository
     extends JpaRepository<HistoryLogDTO, UUID> {
-  List<HistoryLogDTO> findByDocumentationUnitId(UUID documentationUnitId);
+  List<HistoryLogDTO> findByDocumentationUnitIdOrderByCreatedAtDesc(UUID documentationUnitId);
 }

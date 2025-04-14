@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/caselaw/history")
+@RequestMapping("api/v1/caselaw/documentunits/{documentationUnitId}/historylogs")
 @Slf4j
 public class DocumentationUnitHistoryLogController {
   private final DocumentationUnitHistoryLogService service;
@@ -27,14 +27,15 @@ public class DocumentationUnitHistoryLogController {
   /**
    * Get all history logs of a documentation unit
    *
-   * @param uuid UUID of the documentation unit
+   * @param documentationUnitId UUID of the documentation unit
    * @return ordered list of history records (newest first) or an empty response with status code
    *     400 if the user is not authorized
    */
-  @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize(
+      "@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#documentationUnitId)")
   public List<HistoryLog> getHistoryLog(
-      @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID uuid) {
-    return service.getHistoryLogs(uuid, oidcUser);
+      @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID documentationUnitId) {
+    return service.getHistoryLogs(documentationUnitId, oidcUser);
   }
 }

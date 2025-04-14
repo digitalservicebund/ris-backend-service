@@ -37,6 +37,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -107,6 +108,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
+  private static final String HISTORY_LOG_ENDPOINT = "/api/v1/caselaw/documentunits/";
 
   @BeforeEach
   void setUp() {
@@ -138,7 +140,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
             .createdAt(Instant.now())
             .documentationUnitId(entityId)
             .documentationOffice(documentationOffice)
-            .eventType("UPDATE")
+            .eventType(HistoryLogEventType.UPDATE)
             .description("something updated")
             .systemName(null)
             .userName("testUser")
@@ -146,13 +148,14 @@ class DocumentationUnitHistoryLogIntegrationTest {
             .build();
     databaseHistoryLogRepository.save(historyLogDTO);
     assertThat(databaseHistoryLogRepository.findAll()).hasSize(1);
-    assertThat(databaseHistoryLogRepository.findByDocumentationUnitId(entityId)).hasSize(1);
+    assertThat(databaseHistoryLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(entityId))
+        .hasSize(1);
 
     List<HistoryLog> historyLogs =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/history/" + entityId)
+            .uri(HISTORY_LOG_ENDPOINT + entityId + "/historylogs")
             .exchange()
             .expectStatus()
             .isOk()

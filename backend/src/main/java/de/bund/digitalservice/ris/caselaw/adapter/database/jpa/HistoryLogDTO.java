@@ -1,7 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -49,5 +52,6 @@ public class HistoryLogDTO {
   private String description;
 
   @Column(name = "event_type")
-  private String eventType;
+  @Enumerated(EnumType.STRING)
+  private HistoryLogEventType eventType;
 }

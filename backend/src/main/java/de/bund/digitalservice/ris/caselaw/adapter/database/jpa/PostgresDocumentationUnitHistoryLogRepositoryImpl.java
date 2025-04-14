@@ -21,9 +21,10 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
   }
 
   @Override
-  @Nullable
   public List<HistoryLog> findByDocumentationUnitId(UUID documentationUnitId, @Nullable User user) {
-    return databaseRepository.findByDocumentationUnitId(documentationUnitId).stream()
+    return databaseRepository
+        .findByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId)
+        .stream()
         .map(historyLogDTO -> HistoryLogTransformer.transformToDomain(historyLogDTO, user))
         .toList();
   }

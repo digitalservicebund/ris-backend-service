@@ -2,17 +2,15 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
-import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
- * Utility class responsible for transforming {@link ManagementDataDTO} entities into their
- * corresponding domain model {@link ManagementData}.
+ * Utility class responsible for transforming {@link HistoryLogDTO} entities into their
+ * corresponding domain model {@link HistoryLog}.
  *
  * <p>This class is not meant to be instantiated and provides only static transformation logic.
  */
@@ -44,7 +42,7 @@ public class HistoryLogTransformer {
         .createdBy(transformCreatedBy(historyLogDTO, userDocumentationOffice))
         .documentationOffice(historyLogDTO.getDocumentationOffice().getAbbreviation())
         .description(historyLogDTO.getDescription())
-        .eventType(historyLogDTO.getEventType())
+        .eventType(String.valueOf(historyLogDTO.getEventType()))
         .build();
   }
 

@@ -6,15 +6,17 @@ import DocumentUnitHistoryLog from "@/components/management-data/DocumentUnitHis
 import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
 import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import { DocumentationUnitHistoryLog } from "@/domain/documentationUnitHistoryLog"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
+import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
-const data = ref()
-const error = ref()
-const isLoading = ref()
+const historyLogs = ref<DocumentationUnitHistoryLog[]>()
+const error = ref<ResponseError>()
+const isLoading = ref(false)
 
 watch(
   () => documentUnit.value?.uuid,
@@ -25,7 +27,7 @@ watch(
       if (response.error) {
         error.value = response.error
       } else if (response.data) {
-        data.value = response.data
+        historyLogs.value = response.data
       }
       isLoading.value = false
     }
@@ -42,7 +44,7 @@ watch(
         v-if="documentUnit"
         :document-unit="documentUnit as DocumentUnit"
       />
-      <DocumentUnitHistoryLog :data="data" :loading="isLoading" />
+      <DocumentUnitHistoryLog :data="historyLogs" :loading="isLoading" />
       <dl>
         <div class="flex gap-24 px-0">
           <dt class="ris-body1-bold shrink-0 grow-0 basis-160">

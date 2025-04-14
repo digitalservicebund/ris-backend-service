@@ -12,6 +12,7 @@ public interface DocumentationUnitHistoryLogRepository {
    * Find all history logs for a documentation unit by its uuid
    *
    * @param uuid the uuid of the documentation unit
+   * @param user logged-in user for checking view permissions
    * @return a list of history logs for this documentation unit
    */
   List<HistoryLog> findByDocumentationUnitId(UUID uuid, User user);

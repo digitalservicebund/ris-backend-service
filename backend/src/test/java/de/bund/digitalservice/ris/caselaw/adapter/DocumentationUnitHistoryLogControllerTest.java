@@ -60,7 +60,7 @@ class DocumentationUnitHistoryLogControllerTest {
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private UserService userService;
 
-  private static final String HISTORY_LOG_ENDPOINT = "/api/v1/caselaw/history/";
+  private static final String HISTORY_LOG_ENDPOINT = "/api/v1/caselaw/documentunits/";
   private static final UUID TEST_UUID = UUID.randomUUID();
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private final User user = buildDSuser();
@@ -110,7 +110,7 @@ class DocumentationUnitHistoryLogControllerTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri(HISTORY_LOG_ENDPOINT + TEST_UUID)
+        .uri(HISTORY_LOG_ENDPOINT + TEST_UUID + "/historylogs")
         .exchange()
         .expectStatus()
         .isOk()
