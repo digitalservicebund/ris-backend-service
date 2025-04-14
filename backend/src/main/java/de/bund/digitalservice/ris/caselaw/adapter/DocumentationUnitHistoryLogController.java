@@ -32,7 +32,7 @@ public class DocumentationUnitHistoryLogController {
    *     400 if the user is not authorized
    */
   @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public List<HistoryLog> getHistoryLog(
       @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID uuid) {
     return service.getHistoryLogs(uuid, oidcUser);
