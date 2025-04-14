@@ -152,13 +152,6 @@ class NeurisTextCheckService implements TextCheckService {
     this.selectedMatch.value = undefined
   }
 
-  static isMatchIgnored(match: Match): boolean {
-    return (
-      Array.isArray(match.ignoredTextCheckWords) &&
-      match.ignoredTextCheckWords.length > 0
-    )
-  }
-
   ignoreWord = async (word: string) => {
     const store = useDocumentUnitStore()
 
@@ -176,7 +169,7 @@ class NeurisTextCheckService implements TextCheckService {
     const store = useDocumentUnitStore()
 
     if (store.documentUnit?.uuid) {
-      const response: ServiceResponse<IgnoredTextCheckWord> =
+      const response: ServiceResponse<void> =
         await languageToolService.removeLocalIgnore(
           store.documentUnit?.uuid,
           word,
@@ -185,6 +178,24 @@ class NeurisTextCheckService implements TextCheckService {
       if (response.status >= 300) {
         this.responseError.value = response.error
       }
+    }
+  }
+
+  ignoreWordGlobally = async (word: string) => {
+    const response: ServiceResponse<IgnoredTextCheckWord> =
+      await languageToolService.addGlobalIgnore(word)
+
+    if (response.status >= 300) {
+      this.responseError.value = response.error
+    }
+  }
+
+  removeGloballyIgnoredWord = async (word: string): Promise<void> => {
+    const response: ServiceResponse<void> =
+      await languageToolService.removeGlobalIgnore(word)
+
+    if (response.status >= 300) {
+      this.responseError.value = response.error
     }
   }
 }

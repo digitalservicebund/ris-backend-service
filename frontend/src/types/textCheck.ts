@@ -76,10 +76,9 @@ export interface IgnoredTextCheckWord {
   id?: string
   word: string
   type: DocumentationType
-  isEditable?: boolean
 }
 
-export type DocumentationType = "global" | "documentation_unit"
+export type DocumentationType = "global" | "global_jdv" | "documentation_unit"
 
 export type TextCheckExtensionOptions = {
   category?: string
@@ -111,6 +110,10 @@ export interface TextCheckService {
   ignoreWord(word: string): Promise<void>
 
   removeIgnoredWord(word: string): Promise<void>
+
+  ignoreWordGlobally(word: string): Promise<void>
+
+  removeGloballyIgnoredWord(word: string): Promise<void>
 }
 
 export const TextCheckTagName = "textCheck"
