@@ -169,7 +169,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
     assertThat(log.createdAt()).isEqualTo(historyLogDTO.getCreatedAt());
     assertThat(log.documentationOffice())
         .isEqualTo(historyLogDTO.getDocumentationOffice().getAbbreviation());
-    assertThat(log.eventType()).isEqualTo(historyLogDTO.getEventType());
+    assertThat(log.eventType()).isEqualTo(String.valueOf(historyLogDTO.getEventType()));
     assertThat(log.description()).isEqualTo(historyLogDTO.getDescription());
     assertThat(log.createdBy()).isEqualTo(historyLogDTO.getUserName());
   }
