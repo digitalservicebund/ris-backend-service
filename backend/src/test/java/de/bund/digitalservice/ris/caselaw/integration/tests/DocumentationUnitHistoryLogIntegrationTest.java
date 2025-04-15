@@ -108,12 +108,14 @@ class DocumentationUnitHistoryLogIntegrationTest {
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
+  private DocumentationOfficeDTO otherDocumentationOffice;
   private static final String HISTORY_LOG_ENDPOINT = "/api/v1/caselaw/documentunits/";
 
   @BeforeEach
   void setUp() {
     documentationOffice =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
+    otherDocumentationOffice = documentationOfficeRepository.findByAbbreviation("BGH");
     mockUserGroups(userGroupService);
   }
 
@@ -123,7 +125,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
   }
 
   @Test
-  void testGetHistoryLogs_fromExistingDocumentationUnit_withSameDocOffice() {
+  void testGetHistoryLogs_fromExistingDocumentationUnit() {
     UUID entityId =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
                 repository,
@@ -134,22 +136,14 @@ class DocumentationUnitHistoryLogIntegrationTest {
 
     assertThat(repository.findById(entityId)).isPresent();
 
-    HistoryLogDTO historyLogDTO =
-        HistoryLogDTO.builder()
-            .id(UUID.randomUUID())
-            .createdAt(Instant.now())
-            .documentationUnitId(entityId)
-            .documentationOffice(documentationOffice)
-            .eventType(HistoryLogEventType.UPDATE)
-            .description("something updated")
-            .systemName(null)
-            .userName("testUser")
-            .userId(UUID.randomUUID())
-            .build();
-    databaseHistoryLogRepository.save(historyLogDTO);
-    assertThat(databaseHistoryLogRepository.findAll()).hasSize(1);
+    HistoryLogDTO historyLog1 = saveHistoryLog(entityId, documentationOffice, "testUser1", null);
+    HistoryLogDTO historyLog2 =
+        saveHistoryLog(entityId, otherDocumentationOffice, "testUser2", null);
+    HistoryLogDTO historyLog3 =
+        saveHistoryLog(entityId, otherDocumentationOffice, null, "migration");
+
     assertThat(databaseHistoryLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(entityId))
-        .hasSize(1);
+        .hasSize(3);
 
     List<HistoryLog> historyLogs =
         risWebTestClient
@@ -164,18 +158,83 @@ class DocumentationUnitHistoryLogIntegrationTest {
             .getResponseBody();
 
     assertThat(historyLogs).isNotEmpty();
-    HistoryLog log = historyLogs.getFirst();
+    HistoryLog log1 = historyLogs.getFirst();
+    HistoryLog log2 = historyLogs.get(1);
+    HistoryLog log3 = historyLogs.get(2);
 
-    assertThat(log.createdAt()).isEqualTo(historyLogDTO.getCreatedAt());
-    assertThat(log.documentationOffice())
-        .isEqualTo(historyLogDTO.getDocumentationOffice().getAbbreviation());
-    assertThat(log.eventType()).isEqualTo(String.valueOf(historyLogDTO.getEventType()));
-    assertThat(log.description()).isEqualTo(historyLogDTO.getDescription());
-    assertThat(log.createdBy()).isEqualTo(historyLogDTO.getUserName());
+    // Order is now descending, by created at
+    // log 1 is historyLog3
+    // log 2 is historyLog2
+    // log 3 is historyLog1
+    assertThat(log1.createdAt()).isEqualTo(historyLog3.getCreatedAt());
+    assertThat(log1.documentationOffice())
+        .isEqualTo(historyLog3.getDocumentationOffice().getAbbreviation());
+    assertThat(log1.eventType()).isEqualTo(String.valueOf(historyLog3.getEventType()));
+    assertThat(log1.description()).isEqualTo(historyLog3.getDescription());
+    // user from other doc office is allowed to see system name
+    assertThat(log1.createdBy()).isEqualTo(historyLog3.getSystemName());
+    // usernames from other docoffices are not visible in logs
+    assertThat(log2.createdBy()).isEqualTo(null);
+    // user from same doc office is allowed to see user name
+    assertThat(log3.createdBy()).isEqualTo(historyLog1.getUserName());
+  }
+
+  private HistoryLogDTO saveHistoryLog(
+      UUID docUnitId, DocumentationOfficeDTO office, String userName, String systemName) {
+    HistoryLogDTO dto =
+        HistoryLogDTO.builder()
+            .id(UUID.randomUUID())
+            .createdAt(Instant.now())
+            .documentationUnitId(docUnitId)
+            .documentationOffice(office)
+            .eventType(HistoryLogEventType.UPDATE)
+            .description("something updated")
+            .systemName(systemName)
+            .userName(userName)
+            .userId(UUID.randomUUID())
+            .build();
+
+    return databaseHistoryLogRepository.save(dto);
   }
 
   @Test
-  void testGetHistoryLogs_fromExistingDocumentationUnit_withOtherDocOffice() {
-    // Todo
+  void testGetHistoryLogs_returnsEmptyList_whenNoLogsExist() {
+    UUID entityId =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+                repository,
+                DecisionDTO.builder()
+                    .documentationOffice(documentationOffice)
+                    .documentNumber("docnr_empty"))
+            .getId();
+
+    assertThat(repository.findById(entityId)).isPresent();
+
+    List<HistoryLog> historyLogs =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(HISTORY_LOG_ENDPOINT + entityId + "/historylogs")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<List<HistoryLog>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(historyLogs).isNotNull();
+    assertThat(historyLogs).isEmpty();
+  }
+
+  @Test
+  void testGetHistoryLogs_returnsNotFound_whenDocUnitDoesNotExist() {
+    UUID nonExistentId = UUID.randomUUID();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(HISTORY_LOG_ENDPOINT + nonExistentId + "/historylogs")
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
   }
 }
