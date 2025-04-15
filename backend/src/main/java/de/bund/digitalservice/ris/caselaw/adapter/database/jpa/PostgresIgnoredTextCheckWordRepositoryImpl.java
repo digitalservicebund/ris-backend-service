@@ -57,4 +57,10 @@ public class PostgresIgnoredTextCheckWordRepositoryImpl implements IgnoredTextCh
         .distinct()
         .toList();
   }
+
+  @Override
+  public IgnoredTextCheckWord getGloballyIgnoreWord(String word) {
+    return IgnoredTextCheckWordTransformer.transformToDomain(
+        repository.findByDocumentationUnitIdIsNullAndWord(word));
+  }
 }

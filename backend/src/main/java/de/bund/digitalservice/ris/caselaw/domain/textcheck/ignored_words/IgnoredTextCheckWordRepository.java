@@ -26,4 +26,6 @@ public interface IgnoredTextCheckWordRepository {
    */
   List<IgnoredTextCheckWord> findByDocumentationUnitIdOrByGlobalWords(
       List<String> words, UUID documentationUnitId);
+
+  IgnoredTextCheckWord getGloballyIgnoreWord(String word);
 }

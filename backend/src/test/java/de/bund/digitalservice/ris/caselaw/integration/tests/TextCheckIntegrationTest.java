@@ -44,6 +44,7 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.Ignored
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRequest;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -117,13 +118,12 @@ class TextCheckIntegrationTest {
       documentationUnitDocxMetadataInitializationService;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
-  private DocumentationOfficeDTO documentationOffice;
   DocumentationUnitDTO documentationUnitDTO;
   private static final String DEFAULT_DOCUMENT_NUMBER = "1234567890";
 
   @BeforeEach
   void setUp() {
-    documentationOffice =
+    DocumentationOfficeDTO documentationOffice =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
     when(userService.getDocumentationOffice(any())).thenReturn(docOffice);
@@ -141,7 +141,7 @@ class TextCheckIntegrationTest {
   }
 
   @Test
-  void testAddLocalIgnore() {
+  void testAddAndRemoveLocalIgnore() {
     risWebTestClient
         .withDefaultLogin()
         .post()
@@ -191,7 +191,7 @@ class TextCheckIntegrationTest {
   }
 
   @Test
-  void testAddGlobalIgnore() {
+  void testAddAndRemoveGlobalIgnore() {
     risWebTestClient
         .withDefaultLogin()
         .post()
@@ -216,6 +216,23 @@ class TextCheckIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk();
+  }
+
+  @Test
+  void testAddGlobalIgnore_shouldNotBeAbleToAddTwice() {
+    for (int i = 0; i < 2; i++) {
+      risWebTestClient
+          .withDefaultLogin()
+          .post()
+          .uri("/api/v1/caselaw/text-check/ignored-word")
+          .bodyValue(new IgnoredTextCheckWordRequest("hij"))
+          .exchange()
+          .expectStatus()
+          .isOk();
+    }
+
+    assertThat(repository.findByDocumentationUnitIdOrByGlobalWords(null, List.of("hij")))
+        .hasSize(1);
   }
 
   @Test

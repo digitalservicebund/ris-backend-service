@@ -289,6 +289,11 @@ public class TextCheckService {
   }
 
   public IgnoredTextCheckWord addIgnoreWord(String word) {
+    IgnoredTextCheckWord globallyIgnoreWord =
+        ignoredTextCheckWordRepository.getGloballyIgnoreWord(word);
+    if (globallyIgnoreWord != null) {
+      return globallyIgnoreWord;
+    }
     return ignoredTextCheckWordRepository.addWord(word);
   }
 

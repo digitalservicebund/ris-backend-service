@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface DatabaseIgnoredTextCheckWordRepository
-    extends JpaRepository<IgnoredTextCheckWordDTO, Long> {
+    extends JpaRepository<IgnoredTextCheckWordDTO, UUID> {
 
   void deleteAllByWordAndDocumentationUnitId(String word, UUID documentationUnitId);
 
@@ -21,10 +21,13 @@ public interface DatabaseIgnoredTextCheckWordRepository
 
   @Query(
       "SELECT i FROM IgnoredTextCheckWordDTO i "
-          + "WHERE i.documentationUnitId = :documentationUnitId "
-          + "OR (i.jurisId IS NOT NULL AND i.word IN :words)")
+          + "WHERE (i.documentationUnitId = :documentationUnitId "
+          + "OR i.documentationUnitId IS NULL) "
+          + "AND i.word IN :words")
   List<IgnoredTextCheckWordDTO> findByDocumentationUnitIdOrByGlobalWords(
       @Param("documentationUnitId") UUID documentationUnitId, @Param("words") List<String> words);
 
   int deleteByWordAndDocumentationUnitIdIsNullAndJurisIdIsNull(String word);
+
+  IgnoredTextCheckWordDTO findByDocumentationUnitIdIsNullAndWord(String word);
 }

@@ -43,11 +43,10 @@ const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
         )
       "
       aria-label="Wort aus globalem Wörterbuch entfernen"
-      button-type="ghost"
       data-testid="ignored-word-global-remove-button"
       label="Aus globalem Wörterbuch entfernen"
-      severity="secondary"
       size="small"
+      text
       @click="removeWordGlobally"
     >
       Aus globalem Wörterbuch entfernen

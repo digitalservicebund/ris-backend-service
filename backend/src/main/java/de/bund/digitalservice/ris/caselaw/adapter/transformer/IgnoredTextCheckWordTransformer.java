@@ -9,6 +9,9 @@ import lombok.experimental.UtilityClass;
 public class IgnoredTextCheckWordTransformer {
   public static IgnoredTextCheckWord transformToDomain(
       IgnoredTextCheckWordDTO ignoredTextCheckWordDTO) {
+    if (ignoredTextCheckWordDTO == null) {
+      return null;
+    }
     IgnoredTextCheckType ignoredTextCheckType = getIgnoredTextCheckType(ignoredTextCheckWordDTO);
     return new IgnoredTextCheckWord(
         ignoredTextCheckWordDTO.getId(), ignoredTextCheckType, ignoredTextCheckWordDTO.getWord());
