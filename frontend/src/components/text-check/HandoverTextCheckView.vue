@@ -106,6 +106,7 @@ onBeforeMount(async () => {
                           v-for="category in textCategories"
                           :key="category"
                           class="ris-link2-regular"
+                          :data-testid="`text-check-handover-link-${category}`"
                           :to="textCategoriesRouter(category)"
                         >
                           {{ getCategoryLabel(category) }}
