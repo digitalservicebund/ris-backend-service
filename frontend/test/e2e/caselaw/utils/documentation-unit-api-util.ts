@@ -28,7 +28,7 @@ export async function addIgnoreWordToDocumentationUnit(
   const cookies = await page.context().cookies()
   const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
   const response = await page.request.post(
-    `/api/v1/caselaw/documentunits/${uuid}/text-check/ignored-words/add`,
+    `/api/v1/caselaw/documentunits/${uuid}/text-check/ignored-word`,
     {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
       data: {
