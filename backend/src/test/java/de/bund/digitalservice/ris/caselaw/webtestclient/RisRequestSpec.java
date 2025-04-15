@@ -117,7 +117,8 @@ public class RisRequestSpec {
     }
 
     if (csrfCookie != null) {
-      request.header("X-XSRF-TOKEN", csrfCookie.getValue()).cookie(csrfCookie);
+      request.cookie(csrfCookie);
+      request.header("X-XSRF-TOKEN", csrfCookie.getValue());
     } else {
       request.with(csrf());
     }

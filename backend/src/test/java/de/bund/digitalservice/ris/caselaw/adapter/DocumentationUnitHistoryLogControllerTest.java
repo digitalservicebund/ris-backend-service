@@ -128,7 +128,7 @@ class DocumentationUnitHistoryLogControllerTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri(HISTORY_LOG_ENDPOINT + TEST_UUID)
+        .uri(HISTORY_LOG_ENDPOINT + TEST_UUID + "/historylogs")
         .exchange()
         .expectStatus()
         .isForbidden();
@@ -142,7 +142,7 @@ class DocumentationUnitHistoryLogControllerTest {
     risWebTestClient
         .withExternalLogin()
         .get()
-        .uri(HISTORY_LOG_ENDPOINT + TEST_UUID)
+        .uri(HISTORY_LOG_ENDPOINT + TEST_UUID + "/historylogs")
         .exchange()
         .expectStatus()
         .isForbidden();
