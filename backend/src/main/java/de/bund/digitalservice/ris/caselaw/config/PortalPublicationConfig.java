@@ -40,13 +40,6 @@ public class PortalPublicationConfig {
   }
 
   @Bean
-  @Profile({"production"})
-  public PortalTransformer prototypePortalTransformer(
-      DocumentBuilderFactory documentBuilderFactory) {
-    return new PublicPortalTransformer(documentBuilderFactory);
-  }
-
-  @Bean
   @Profile({"staging", "local"})
   public PortalPublicationService stagingPortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
@@ -59,20 +52,27 @@ public class PortalPublicationConfig {
   }
 
   @Bean
-  @Profile({"staging"})
-  public PortalTransformer stagingPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
-    return new InternalPortalTransformer(documentBuilderFactory);
-  }
-
-  @Bean
   @Profile({"!production & !staging & !local"})
   public PortalPublicationService noOpPortalPublicationService() {
     return new NoOpPortalPublicationService();
   }
 
   @Bean
-  @Profile({"!staging & !production"})
-  public PortalTransformer localPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  @Profile({"production"})
+  public PortalTransformer prototypePortalTransformer(
+      DocumentBuilderFactory documentBuilderFactory) {
+    return new PublicPortalTransformer(documentBuilderFactory);
+  }
+
+  @Bean
+  @Profile({"staging", "local"})
+  public PortalTransformer stagingPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+    return new InternalPortalTransformer(documentBuilderFactory);
+  }
+
+  @Bean
+  @Profile({"!staging & !production & !local"})
+  public PortalTransformer defaultPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
     return new PublicPortalTransformer(documentBuilderFactory);
   }
 }
