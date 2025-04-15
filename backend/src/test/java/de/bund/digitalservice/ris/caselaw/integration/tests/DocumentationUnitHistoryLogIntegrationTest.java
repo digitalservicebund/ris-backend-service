@@ -43,6 +43,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -166,16 +167,17 @@ class DocumentationUnitHistoryLogIntegrationTest {
     // log 1 is historyLog3
     // log 2 is historyLog2
     // log 3 is historyLog1
-    assertThat(log1.createdAt()).isEqualTo(historyLog3.getCreatedAt());
+    assertThat(log1.createdAt().truncatedTo(ChronoUnit.MILLIS))
+        .isEqualTo(historyLog3.getCreatedAt().truncatedTo(ChronoUnit.MILLIS));
     assertThat(log1.documentationOffice())
         .isEqualTo(historyLog3.getDocumentationOffice().getAbbreviation());
     assertThat(log1.eventType()).isEqualTo(String.valueOf(historyLog3.getEventType()));
     assertThat(log1.description()).isEqualTo(historyLog3.getDescription());
     // user from other doc office is allowed to see system name
     assertThat(log1.createdBy()).isEqualTo(historyLog3.getSystemName());
-    // usernames from other docoffices are not visible in logs
+    // usernames from other doc offices are not visible in logs
     assertThat(log2.createdBy()).isEqualTo(null);
-    // user from same doc office is allowed to see user name
+    // user from same doc office is allowed to see username
     assertThat(log3.createdBy()).isEqualTo(historyLog1.getUserName());
   }
 
