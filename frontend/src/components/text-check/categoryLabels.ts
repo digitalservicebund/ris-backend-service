@@ -12,17 +12,4 @@ function getCategoryLabel(category: string | undefined): string | undefined {
   return undefined
 }
 
-function getCategoryLabels(categories: string[]): string[] {
-  const textCategories: string[] = []
-
-  categories.forEach((category) => {
-    const label = getCategoryLabel(category)
-    if (label) {
-      textCategories.push(label)
-    }
-  })
-
-  return textCategories
-}
-
 export { getCategoryLabel, getCategoryLabels }

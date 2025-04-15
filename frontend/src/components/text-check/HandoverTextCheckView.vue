@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Button from "primevue/button"
 import { onBeforeMount, ref } from "vue"
+import { getCategoryLabel } from "./categoryLabels"
 import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
-import { getCategoryLabels } from "@/components/text-check/categoryLabels"
 import router from "@/router"
 import { ResponseError } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
@@ -49,10 +49,18 @@ const checkAll = async (documentUnitId: string) => {
   } else if (response.data && response.data.suggestions) {
     responseError.value = undefined
     totalTextCheckErrors.value = response.data.totalTextCheckErrors
-    textCategories.value = getCategoryLabels(response.data.categoryTypes)
+    textCategories.value = response.data.categoryTypes
   }
   loading.value = false
 }
+
+const textCategoriesRouter = (category: string) => ({
+  name: "caselaw-documentUnit-documentNumber-categories",
+  hash: `#${category}`,
+  params: {
+    documentNumber: props.documentNumber,
+  },
+})
 
 onBeforeMount(async () => {
   await checkAll(props.documentId)
@@ -93,7 +101,16 @@ onBeforeMount(async () => {
                     </dd>
                     <dt class="ris-label2-bold self-center">Rubrik</dt>
                     <dd class="ris-body2-regular">
-                      {{ textCategories?.join(", ") }}
+                      <div class="flex flex-row gap-8">
+                        <RouterLink
+                          v-for="category in textCategories"
+                          :key="category"
+                          class="ris-link2-regular"
+                          :to="textCategoriesRouter(category)"
+                        >
+                          {{ getCategoryLabel(category) }}
+                        </RouterLink>
+                      </div>
                     </dd>
                   </div>
                 </dl>
