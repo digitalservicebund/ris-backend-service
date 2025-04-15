@@ -5,11 +5,11 @@ const germanLabels: Record<string, string | undefined> = {
   ...shortTextLabels,
 }
 
-function getCategoryLabel(category: string | undefined): string | undefined {
+export function getCategoryLabel(
+  category: string | undefined,
+): string | undefined {
   if (category) {
     return germanLabels[category]
   }
   return undefined
 }
-
-export { getCategoryLabel, getCategoryLabels }
