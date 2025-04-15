@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
@@ -137,6 +139,84 @@ public class TextCheckService {
     return builder.toString();
   }
 
+  /**
+   * Method to retrieve no index words and exports the ignore list for jDV publication
+   *
+   * @param documentationUnit without noindex tags
+   * @return object with noindex tags on long and short texts
+   */
+  public DocumentationUnit addNoIndexTagsForPublication(DocumentationUnit documentationUnit) {
+    List<String> ignoredTextCheckWords =
+        ignoredTextCheckWordRepository
+            .findAllByDocumentationUnitId(documentationUnit.uuid())
+            .stream()
+            .map(IgnoredTextCheckWord::word)
+            .toList();
+
+    if (ignoredTextCheckWords.isEmpty()) {
+      return documentationUnit;
+    }
+
+    if (documentationUnit.longTexts() != null) {
+      documentationUnit =
+          documentationUnit.toBuilder()
+              .longTexts(updateLongTexts(documentationUnit.longTexts(), ignoredTextCheckWords))
+              .build();
+    }
+
+    if (documentationUnit.shortTexts() != null) {
+      documentationUnit =
+          documentationUnit.toBuilder()
+              .shortTexts(updateShortTexts(documentationUnit.shortTexts(), ignoredTextCheckWords))
+              .build();
+    }
+
+    return documentationUnit;
+  }
+
+  private LongTexts updateLongTexts(LongTexts texts, List<String> ignoredWords) {
+    return texts.toBuilder()
+        .reasons(addNoIndexTags(texts.reasons(), ignoredWords))
+        .caseFacts(addNoIndexTags(texts.caseFacts(), ignoredWords))
+        .decisionReasons(addNoIndexTags(texts.decisionReasons(), ignoredWords))
+        .tenor(addNoIndexTags(texts.tenor(), ignoredWords))
+        .otherLongText(addNoIndexTags(texts.otherLongText(), ignoredWords))
+        .dissentingOpinion(addNoIndexTags(texts.dissentingOpinion(), ignoredWords))
+        .outline(addNoIndexTags(texts.outline(), ignoredWords))
+        .build();
+  }
+
+  private ShortTexts updateShortTexts(ShortTexts texts, List<String> ignoredWords) {
+    return texts.toBuilder()
+        .headnote(addNoIndexTags(texts.headnote(), ignoredWords))
+        .headline(addNoIndexTags(texts.headline(), ignoredWords))
+        .guidingPrinciple(addNoIndexTags(texts.guidingPrinciple(), ignoredWords))
+        .build();
+  }
+
+  /**
+   * Wraps ignored words with <noindex></noindex> for handover service
+   *
+   * @param htmlText to add no index tags to
+   * @param ignoredWords on Documentation Level or global level
+   */
+  public static String addNoIndexTags(String htmlText, List<String> ignoredWords) {
+    if (htmlText == null || ignoredWords == null || ignoredWords.isEmpty()) {
+      return htmlText;
+    }
+
+    Document document = Jsoup.parse(htmlText);
+    for (String ignoredWord : ignoredWords) {
+      NodeTraversor.traverse(new NoIndexNodeWrapperVisitor(htmlText, ignoredWord), document.body());
+    }
+
+    var htmlWithNoIndexTags = document.body().html();
+    htmlWithNoIndexTags = htmlWithNoIndexTags.replace("&lt;noindex&gt;", "<noindex>");
+    htmlWithNoIndexTags = htmlWithNoIndexTags.replace("&lt;/noindex&gt;", "</noindex>");
+
+    return htmlWithNoIndexTags;
+  }
+
   protected TextCheckCategoryResponse checkCategoryByHTML(
       String htmlText, CategoryType categoryType) {
     return checkCategoryByHTML(htmlText, categoryType, null);
@@ -236,6 +316,37 @@ public class TextCheckService {
               return match.toBuilder().ignoredTextCheckWords(ignoredWords).build();
             })
         .toList();
+  }
+
+  /**
+   * See test method for covered cases {@code
+   * TextCheckServiceTest#testAddNoIndexTags_variousCases()}
+   */
+  @SuppressWarnings("java:S3776")
+  protected record NoIndexNodeWrapperVisitor(String html, String ignoredWord)
+      implements NodeVisitor {
+
+    @Override
+    public void head(@NotNull Node node, int i) {
+      if (node instanceof TextNode textNode) {
+        String text = textNode.getWholeText();
+
+        Pattern exactWordsMatchPattern =
+            Pattern.compile(
+                "(?<![\\p{L}\\p{N}-])" + Pattern.quote(ignoredWord) + "(?![\\p{L}\\p{N}-])",
+                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
+
+        Matcher matcher = exactWordsMatchPattern.matcher(text);
+
+        StringBuilder newTextBuffer = new StringBuilder();
+        while (matcher.find()) {
+          matcher.appendReplacement(newTextBuffer, "<noindex>" + matcher.group() + "</noindex>");
+        }
+        matcher.appendTail(newTextBuffer);
+
+        textNode.text(newTextBuffer.toString());
+      }
+    }
   }
 
   @SuppressWarnings("java:S3776")

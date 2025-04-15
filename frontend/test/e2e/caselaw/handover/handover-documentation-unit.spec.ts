@@ -8,6 +8,11 @@ import {
   save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
+import DocumentUnit from "@/domain/documentUnit"
+import {
+  addIgnoreWordToDocumentationUnit,
+  updateDocumentationUnit,
+} from "~/e2e/caselaw/utils/documentation-unit-api-util"
 
 test.describe("ensuring the handover of documentunits works as expected", () => {
   test("handover page shows all possible missing required fields when no fields filled", async ({
@@ -315,29 +320,22 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     },
     async ({ page, prefilledDocumentUnit, request }) => {
       await test.step("Befülle Langtexte mit invaliden Randnummern und Verlinkungen", async () => {
-        const cookies = await page.context().cookies()
-        const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-        await request.put(
-          `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-          {
-            data: {
-              ...prefilledDocumentUnit,
-              longTexts: {
-                tenor: `<border-number-link nr='5'>5</border-number-link>
+        const documentationUnit = {
+          ...prefilledDocumentUnit,
+          longTexts: {
+            tenor: `<border-number-link nr='5'>5</border-number-link>
  <border-number-link nr='1'>1</border-number-link>`,
-                caseFacts:
-                  "<border-number><number>3</number><content>Text</content></border-number>",
-                decisionReasons:
-                  "<border-number><number>5</number><content>Text</content></border-number>",
-                otherLongText:
-                  "<border-number><number>6</number><content>Text</content></border-number>",
-                dissentingOpinion:
-                  "<border-number><number>7</number><content>Text</content></border-number>",
-              },
-            },
-            headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+            caseFacts:
+              "<border-number><number>3</number><content>Text</content></border-number>",
+            decisionReasons:
+              "<border-number><number>5</number><content>Text</content></border-number>",
+            otherLongText:
+              "<border-number><number>6</number><content>Text</content></border-number>",
+            dissentingOpinion:
+              "<border-number><number>7</number><content>Text</content></border-number>",
           },
-        )
+        } as DocumentUnit
+        await updateDocumentationUnit(page, documentationUnit, request)
       })
 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
@@ -421,6 +419,81 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
 
         // The first border number link was changed from 5 -> 2, the second one left as is.
         await expect(page.getByTestId("Tenor")).toHaveText("2 1")
+      })
+    },
+  )
+
+  test(
+    "handover wraps <noindex> on ignored words in preview and publication",
+    {
+      tag: ["@RISDEV-254", "@RISDEV-6205", "@RISDEV-7394"],
+    },
+    async ({ page, prefilledDocumentUnit, request }) => {
+      const expectedNoindexCount = 8
+      await test.step("Befülle Langtexte und Kurztexte mit texts", async () => {
+        await addIgnoreWordToDocumentationUnit(
+          page,
+          prefilledDocumentUnit.uuid,
+          "text",
+        )
+
+        const text =
+          "<p>das wort text soll mit noindex umgeschlossen werden</p>"
+
+        const documentationUnit = {
+          ...prefilledDocumentUnit,
+          shortTexts: {
+            headline: text,
+            guidingPrinciple: text,
+            headnote: text,
+            otherHeadnote: text,
+          },
+          longTexts: {
+            tenor: text,
+            caseFacts: text,
+            decisionReasons: text,
+            otherLongText: text,
+            dissentingOpinion: text,
+          },
+        } as DocumentUnit
+        await updateDocumentationUnit(page, documentationUnit, request)
+      })
+
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+
+      await test.step("XML Vorschau zeigt die noindex tags", async () => {
+        await expect(page.getByText("XML Vorschau")).toBeVisible()
+
+        await page.getByText("XML Vorschau").click()
+
+        await expect(
+          page.getByText(
+            "<p>das wort <noindex>text</noindex> soll mit noindex umgeschlossen werden</p>",
+            {
+              exact: true,
+            },
+          ),
+        ).toHaveCount(expectedNoindexCount)
+      })
+
+      await test.step("Übergabe an der jDV beinhaltet noindex", async () => {
+        await page
+          .getByLabel("Dokumentationseinheit an jDV übergeben", { exact: true })
+          .click()
+
+        await expect(page.getByText("Email wurde versendet")).toBeVisible()
+        await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
+
+        await expect(
+          page
+            .getByTestId("xml-handover-code-snippet-preview")
+            .getByText(
+              "<p>das wort <noindex>text</noindex> soll mit noindex umgeschlossen werden</p>",
+              {
+                exact: true,
+              },
+            ),
+        ).toHaveCount(expectedNoindexCount)
       })
     },
   )

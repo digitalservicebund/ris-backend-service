@@ -678,8 +678,11 @@ const isPublishable = computed<boolean>(
         label="Dokumentationseinheit an jDV übergeben"
         size="small"
         @click="handoverDocumentUnit"
-        ><template #icon> <IconCheck /> </template
-      ></Button>
+      >
+        <template #icon>
+          <IconCheck />
+        </template>
+      </Button>
 
       <ScheduledPublishingDateTime :is-publishable="isPublishable" />
 
@@ -729,6 +732,7 @@ const isPublishable = computed<boolean>(
 
                   <CodeSnippet
                     v-if="(item as HandoverMail).attachments?.[0]"
+                    data-testid="xml-handover-code-snippet-preview"
                     title="XML"
                     :xml="(item as HandoverMail).attachments?.[0].fileContent!"
                   />

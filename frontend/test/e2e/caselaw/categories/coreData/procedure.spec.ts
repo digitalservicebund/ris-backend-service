@@ -1,12 +1,14 @@
 import { expect } from "@playwright/test"
 import {
-  deleteDocumentUnit,
-  deleteProcedure,
   navigateToCategories,
   navigateToProcedures,
   save,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import {
+  deleteDocumentUnit,
+  deleteProcedure,
+} from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("procedure", () => {
