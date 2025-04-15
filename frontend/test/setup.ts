@@ -4,6 +4,8 @@ import failOnConsole from "jest-fail-on-console"
 import PrimeVue from "primevue/config"
 import { vi } from "vitest"
 import { useResizeObserverMock } from "./test-helper/useResizeObserverMock"
+import { useBubbleMenuMock } from "~/test-helper/useBubbleMenuMock"
+import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 // Enable PrimeVue plugin because we need that in many tests
 config.global.plugins = [PrimeVue]
@@ -28,5 +30,6 @@ failOnConsole({
   shouldFailOnLog: true,
   shouldFailOnWarn: true,
 })
-
+useFeatureToggleServiceMock()
+useBubbleMenuMock()
 useResizeObserverMock()

@@ -64,7 +64,7 @@ const isFirstTimeHandover = computed(() => {
   return !props.eventLog || props.eventLog.length === 0
 })
 
-const textCheckAllToggle = useFeatureToggle("neuris.text-check-all")
+const textCheckAllToggle = useFeatureToggle("neuris.text-check-handover")
 
 const preview = ref<Preview>()
 const frontendError = ref()
