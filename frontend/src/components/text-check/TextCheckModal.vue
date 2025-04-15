@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import { computed } from "vue"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
 
-import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Match, Replacement } from "@/types/textCheck"
 
 const props = defineProps<{
@@ -13,6 +14,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   "word:remove": [value: string]
   "word:add": [word: string]
+  "globalWord:remove": [value: string]
+  "globalWord:add": [word: string]
   "word:replace": [value: string]
 }>()
 
@@ -28,13 +31,33 @@ function removeIgnoredWord(word: string) {
   emit("word:remove", word)
 }
 
+function addIgnoredWordGlobally() {
+  emit("globalWord:add", props.match.word)
+}
+
+function removeGloballyIgnoredWord(word: string) {
+  emit("globalWord:remove", word)
+}
+
 function getValues(replacements: Replacement[]) {
   return replacements.flatMap((replacement) => replacement.value)
 }
 
-const isMatchIgnored = computed(() => {
-  return NeurisTextCheckService.isMatchIgnored(props.match)
+const matchIsIgnoredGlobally = computed(() => {
+  return props.match.ignoredTextCheckWords?.some(
+    (ignoredWord) =>
+      ignoredWord.type === "global" || ignoredWord.type === "global_jdv",
+  )
 })
+
+const isMatchIgnored = computed(() => {
+  return (
+    Array.isArray(props.match.ignoredTextCheckWords) &&
+    props.match.ignoredTextCheckWords.length > 0
+  )
+})
+
+const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
 </script>
 
 <template>
@@ -43,14 +66,23 @@ const isMatchIgnored = computed(() => {
     data-testid="text-check-modal"
   >
     <div class="flex flex-row gap-8">
-      <span class="ris-body1-regular" data-testid="text-check-modal-word">
+      <span class="ris-body1-bold" data-testid="text-check-modal-word">
         {{ match.word }}
       </span>
     </div>
 
+    <Button
+      v-if="textCheckGlobal && !matchIsIgnoredGlobally"
+      size="small"
+      text
+      @click="addIgnoredWordGlobally"
+      >Zum globalen Wörterbuch hinzufügen</Button
+    >
+
     <IgnoredWordHandler
       v-if="isMatchIgnored"
       :match="match"
+      @globally-ignored-word:remove="removeGloballyIgnoredWord(match.word)"
       @ignored-word:remove="removeIgnoredWord(match.word)"
     />
 

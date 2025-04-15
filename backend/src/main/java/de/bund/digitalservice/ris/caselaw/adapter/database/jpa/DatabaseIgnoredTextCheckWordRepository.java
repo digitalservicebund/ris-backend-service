@@ -23,4 +23,6 @@ public interface DatabaseIgnoredTextCheckWordRepository
           + "OR (i.jurisId IS NOT NULL AND i.word IN :words)")
   List<IgnoredTextCheckWordDTO> findByDocumentationUnitIdOrByGlobalWords(
       @Param("documentationUnitId") UUID documentationUnitId, @Param("words") List<String> words);
+
+  int deleteByWordAndDocumentationUnitIdIsNullAndJurisIdIsNull(String word);
 }

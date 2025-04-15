@@ -17,6 +17,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/caselaw/documentunits")
+@RequestMapping("api/v1/caselaw")
 @Slf4j
 public class TextCheckController {
 
@@ -35,7 +36,7 @@ public class TextCheckController {
     this.textCheckService = textCheckService;
   }
 
-  @GetMapping("{id}/text-check/all")
+  @GetMapping("documentunits/{id}/text-check/all")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<TextCheckAllResponse> checkWholeDocumentationUnit(
       @PathVariable("id") UUID id) {
@@ -50,7 +51,7 @@ public class TextCheckController {
     return ResponseEntity.ok(TextCheckResponseTransformer.transformToAllDomain(allMatches));
   }
 
-  @GetMapping("{id}/text-check")
+  @GetMapping("documentunits/{id}/text-check")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<TextCheckCategoryResponse> checkCategory(
       @PathVariable("id") UUID id, @Param("category") String category) {
@@ -62,7 +63,7 @@ public class TextCheckController {
   }
 
   @PostMapping(
-      value = "{id}/text-check/ignored-words/add",
+      value = "documentunits/{id}/text-check/ignored-word",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
@@ -78,17 +79,52 @@ public class TextCheckController {
     return ResponseEntity.internalServerError().build();
   }
 
-  @PostMapping(
-      value = "{id}/text-check/ignored-words/remove",
-      consumes = MediaType.APPLICATION_JSON_VALUE,
+  @DeleteMapping(
+      value = "documentunits/{id}/text-check/ignored-word/{word}",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   @Transactional
-  public ResponseEntity<IgnoredTextCheckWord> removeIgnoredWord(
-      @PathVariable("id") UUID id, @RequestBody IgnoredTextCheckWordRequest request) {
+  public ResponseEntity<Void> removeIgnoredWord(
+      @PathVariable("id") UUID id, @PathVariable("word") String word) {
     try {
-      textCheckService.removeIgnoredWord(id, request.word());
+      textCheckService.removeIgnoredWord(id, word);
       return ResponseEntity.ok().build();
+    } catch (Exception e) {
+      log.error("Removing word failed", e);
+    }
+
+    return ResponseEntity.internalServerError().build();
+  }
+
+  @PostMapping(
+      value = "text-check/ignored-word",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<IgnoredTextCheckWord> addIgnoredWordGlobally(
+      @RequestBody IgnoredTextCheckWordRequest request) {
+    try {
+      return ResponseEntity.ok(textCheckService.addIgnoreWord(request.word()));
+
+    } catch (Exception e) {
+      log.error("Adding word failed", e);
+    }
+
+    return ResponseEntity.internalServerError().build();
+  }
+
+  @DeleteMapping(
+      value = "text-check/ignored-word/{word}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  @Transactional
+  public ResponseEntity<Void> removeIgnoredWordGlobally(@PathVariable("word") String word) {
+    try {
+      var success = textCheckService.removeIgnoredWord(word);
+      if (success) {
+        return ResponseEntity.ok().build();
+      }
+      return ResponseEntity.notFound().build();
     } catch (Exception e) {
       log.error("Removing word failed", e);
     }

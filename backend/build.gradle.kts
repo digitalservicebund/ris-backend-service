@@ -20,7 +20,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.7.0"
+    id("org.flywaydb.flyway") version "11.7.1"
     id("io.sentry.jvm.gradle") version "5.3.0"
 }
 
@@ -213,13 +213,13 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.14.5")
-    implementation("io.micrometer:micrometer-core:1.14.5")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.6")
+    implementation("io.micrometer:micrometer-core:1.14.6")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
     implementation("io.getunleash:unleash-client-java:9.3.2")
-    implementation("org.apache.commons:commons-text:1.13.0")
+    implementation("org.apache.commons:commons-text:1.13.1")
     implementation("org.jsoup:jsoup:1.19.1")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.3.1")
@@ -228,10 +228,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.11.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.7.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.7.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.7.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.7.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
