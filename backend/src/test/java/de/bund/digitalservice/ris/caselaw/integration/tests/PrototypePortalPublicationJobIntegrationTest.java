@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -40,6 +41,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublication
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.PublicPortalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -84,6 +86,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @RISIntegrationTest(
     imports = {
       PrototypePortalPublicationService.class,
+      PublicPortalTransformer.class,
       XmlUtilService.class,
       ConverterConfig.class,
       PrototypePortalBucket.class,
@@ -167,6 +170,34 @@ class PrototypePortalPublicationJobIntegrationTest {
   @AfterEach
   void cleanUp() {
     repository.deleteAll();
+  }
+
+  @Test
+  void shouldPublishWithOnlyAllowedPrototypeData() throws IOException {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, buildValidDocumentationUnit("1"));
+    ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+    ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
+
+    portalPublicationJobRepository.saveAll(
+        List.of(createPublicationJob(dto, PortalPublicationTaskType.PUBLISH)));
+
+    portalPublicationJobService.executePendingJobs();
+
+    verify(s3Client, times(1)).putObject(putCaptor.capture(), bodyCaptor.capture());
+
+    var putRequest = putCaptor.getValue();
+    var ldmlContent =
+        new String(
+            bodyCaptor.getValue().contentStreamProvider().newStream().readAllBytes(),
+            StandardCharsets.UTF_8);
+
+    assertThat(putRequest.key()).contains(dto.getDocumentNumber());
+    assertThat(ldmlContent)
+        .contains("gruende test")
+        .doesNotContain("entscheidungsname test")
+        .doesNotContain("orientierungssatz test");
   }
 
   @Test
@@ -280,6 +311,8 @@ class PrototypePortalPublicationJobIntegrationTest {
         .date(LocalDate.now())
         .legalEffect(LegalEffectDTO.JA)
         .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
-        .grounds("lorem ipsum dolor sit amet");
+        .grounds("gruende test")
+        .headnote("orientierungssatz test")
+        .decisionNames(List.of(DecisionNameDTO.builder().value("entscheidungsname test").build()));
   }
 }

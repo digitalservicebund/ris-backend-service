@@ -734,7 +734,9 @@ describe("HandoverDocumentationUnitView:", () => {
       `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefüllt.RandnummernprüfungDie Reihenfolge der Randnummern ist korrekt.DublettenprüfungEs besteht kein Dublettenverdacht.RechtschreibprüfungEs wurden keine Rechtschreibfehler identifiziert.XML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
-    const codeSnippet = screen.queryByTestId("code-snippet")
+    const codeSnippet = screen.queryByTestId(
+      "xml-handover-code-snippet-preview",
+    )
 
     expect(codeSnippet).toBeInTheDocument()
     expect(codeSnippet?.title).toBe("XML")

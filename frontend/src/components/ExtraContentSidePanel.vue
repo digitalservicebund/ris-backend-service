@@ -35,7 +35,7 @@ const { panelMode, currentAttachmentIndex, importDocumentNumber } =
 
 const route = useRoute()
 
-const textCheckAll = useFeatureToggle("neuris.text-check-all")
+const textCheckAll = useFeatureToggle("neuris.text-side-panel")
 
 const hasNote = computed(() => {
   return !!props.documentUnit!.note && props.documentUnit!.note.length > 0

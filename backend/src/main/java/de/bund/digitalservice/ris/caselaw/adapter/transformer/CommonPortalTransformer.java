@@ -6,6 +6,7 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validate;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
+import de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
@@ -56,7 +57,7 @@ import org.xml.sax.SAXException;
  * common transformation logic and helper methods.
  */
 @Slf4j
-public abstract class CommonPortalTransformer {
+public abstract class CommonPortalTransformer implements PortalTransformer {
 
   private final DocumentBuilderFactory documentBuilderFactory;
 

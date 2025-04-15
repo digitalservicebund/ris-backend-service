@@ -1,5 +1,4 @@
 import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
-import { Browser } from "playwright"
 import { caselawTest as test } from "./fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import SingleNorm from "@/domain/singleNorm"
@@ -232,34 +231,6 @@ export async function save(page: Page) {
   await page.getByLabel("Speichern Button", { exact: true }).click()
   await saveRequest
   await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
-}
-
-export async function deleteDocumentUnit(page: Page, documentNumber: string) {
-  const cookies = await page.context().cookies()
-  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-  const getResponse = await page.request.get(
-    `/api/v1/caselaw/documentunits/${documentNumber}`,
-    { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
-  )
-  expect(getResponse.ok()).toBeTruthy()
-
-  const { uuid } = await getResponse.json()
-
-  const deleteResponse = await page.request.delete(
-    `/api/v1/caselaw/documentunits/${uuid}`,
-    { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
-  )
-  expect(deleteResponse.ok()).toBeTruthy()
-}
-
-export async function deleteProcedure(page: Page, uuid: string) {
-  const cookies = await page.context().cookies()
-  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-  const response = await page.request.delete(
-    `/api/v1/caselaw/procedure/${uuid}`,
-    { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
-  )
-  expect(response.ok()).toBeTruthy()
 }
 
 export async function fillSearchInput(
@@ -618,21 +589,6 @@ export async function assignProcedureToDocUnit(
     await save(page)
   })
   return procedureName
-}
-
-export async function deleteAllProcedures(
-  browser: Browser,
-  procedurePrefix: string,
-) {
-  const page = await browser.newPage()
-  const response = await page.request.get(
-    `/api/v1/caselaw/procedure?sz=50&pg=0&q=${procedurePrefix}&withDocUnits=false`,
-  )
-  const responseBody = await response.json()
-  for (const procedure of responseBody.content) {
-    const uuid = procedure.id
-    await deleteProcedure(page, uuid)
-  }
 }
 
 export async function searchForDocUnitWithFileNumberAndDecisionDate(

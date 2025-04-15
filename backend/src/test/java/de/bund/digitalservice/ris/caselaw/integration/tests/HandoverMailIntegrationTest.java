@@ -65,9 +65,11 @@ import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
+import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Clock;
 import java.time.Instant;
@@ -114,6 +116,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class,
       OAuthService.class,
       TestConfig.class,
+      TextCheckService.class,
       DocumentNumberPatternConfig.class
     },
     controllers = {DocumentationUnitController.class, LegalPeriodicalEditionController.class})
@@ -165,6 +168,7 @@ class HandoverMailIntegrationTest {
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService

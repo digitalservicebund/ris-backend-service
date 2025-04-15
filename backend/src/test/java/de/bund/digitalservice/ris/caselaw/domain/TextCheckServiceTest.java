@@ -24,11 +24,14 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.Ignored
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class TextCheckServiceTest {
 
@@ -442,5 +445,79 @@ class TextCheckServiceTest {
         "<p>text text with <text-check id=\"1\" type=\"ignored\">ignored match</text-check></p>",
         response.htmlText());
     assertEquals(1, response.matches().size());
+  }
+
+  @Test
+  void testAddNoIndexTags_shouldReplaceTags() {
+    var html = "<p>this and this be wrapped with no index</p>";
+    var result = TextCheckService.addNoIndexTags(html, List.of("this"));
+
+    var expected =
+        "<p><noindex>this</noindex> and <noindex>this</noindex> be wrapped with no index</p>";
+    assertEquals(expected, result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("noIndexReplacementCases")
+  void testAddNoIndexTags_withMultipleCases(
+      String html, List<String> ignoredWords, String expected) {
+    String result = TextCheckService.addNoIndexTags(html, ignoredWords);
+    assertEquals(expected, result);
+  }
+
+  private static Stream<Arguments> noIndexReplacementCases() {
+    return Stream.of(
+        Arguments.of(
+            "<p>CASE insensitive should be replaced</p>",
+            List.of("case"),
+            "<p><noindex>CASE</noindex> insensitive should be replaced</p>"),
+        Arguments.of(
+            "<p>partsofwords should not replace</p>",
+            List.of("parts"),
+            "<p>partsofwords should not replace</p>"),
+        Arguments.of(
+            "<p>p with no index but not html tag should be replaced</p>",
+            List.of("p"),
+            "<p><noindex>p</noindex> with no index but not html tag should be replaced</p>"),
+        Arguments.of(
+            "<p>saved-words-with-hyphen should be replaced</p>",
+            List.of("saved-words-with-hyphen"),
+            "<p><noindex>saved-words-with-hyphen</noindex> should be replaced</p>"),
+        Arguments.of(
+            "<p>hyphenated-word - first part should not replace</p>",
+            List.of("word"),
+            "<p>hyphenated-word - first part should not replace</p>"),
+        Arguments.of(
+            "<p>\"[word]\" - words in square brackets should be replaced</p>",
+            List.of("word"),
+            "<p>\"[<noindex>word</noindex>]\" - words in square brackets should be replaced</p>"),
+        Arguments.of(
+            "<p>\"(word)\" - words in round brackets should be replaced</p>",
+            List.of("word"),
+            "<p>\"(<noindex>word</noindex>)\" - words in round brackets should be replaced</p>"),
+        Arguments.of(
+            "<p>\"word\" - words in double quotes should be replaced</p>",
+            List.of("word"),
+            "<p>\"<noindex>word</noindex>\" - words in double quotes should be replaced</p>"),
+        Arguments.of(
+            "<p>word, other word - both words should be replaced</p>",
+            List.of("word"),
+            "<p><noindex>word</noindex>, other <noindex>word</noindex> - both words should be replaced</p>"),
+        Arguments.of(
+            "<p>word; other word - both words should be replaced</p>",
+            List.of("word"),
+            "<p><noindex>word</noindex>; other <noindex>word</noindex> - both words should be replaced</p>"),
+        Arguments.of(
+            "<p>word;other word - both words should be replaced</p>",
+            List.of("word"),
+            "<p><noindex>word</noindex>;other <noindex>word</noindex> - both words should be replaced</p>"),
+        Arguments.of(
+            "<p>WORD. should replace</p>",
+            List.of("WORD"),
+            "<p><noindex>WORD</noindex>. should replace</p>"),
+        Arguments.of(
+            "<p>Abc§116A should replace</p>",
+            List.of("Abc§116A"),
+            "<p><noindex>Abc§116A</noindex> should replace</p>"));
   }
 }

@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,16 +21,16 @@ public class PrototypePortalPublicationService extends CommonPortalPublicationSe
   public PrototypePortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
-      DocumentBuilderFactory documentBuilderFactory,
       PrototypePortalBucket prototypePortalBucket,
       ObjectMapper objectMapper,
+      PortalTransformer portalTransformer,
       RiiService riiService) {
     super(
         documentationUnitRepository,
         xmlUtilService,
-        documentBuilderFactory,
         prototypePortalBucket,
-        objectMapper);
+        objectMapper,
+        portalTransformer);
     this.riiService = riiService;
     this.documentationUnitRepository = documentationUnitRepository;
     this.prototypePortalBucket = prototypePortalBucket;

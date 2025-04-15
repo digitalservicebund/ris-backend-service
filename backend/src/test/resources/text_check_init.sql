@@ -15,9 +15,9 @@ VALUES
       current_timestamp
   ),
   (
-      gen_random_uuid (),
+      gen_random_uuid(),
     null,
     'xyz',
-    401,
+    null,
       current_timestamp
   );

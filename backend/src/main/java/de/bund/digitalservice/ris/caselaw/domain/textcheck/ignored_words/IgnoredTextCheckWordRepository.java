@@ -15,6 +15,8 @@ public interface IgnoredTextCheckWordRepository {
 
   boolean deleteWordGlobally(String word);
 
+  List<IgnoredTextCheckWord> findAllByDocumentationUnitId(UUID documentationUnitId);
+
   /**
    * Returns all ignored word by documentation unit and search in global words by the list of words
    *
@@ -24,4 +26,6 @@ public interface IgnoredTextCheckWordRepository {
    */
   List<IgnoredTextCheckWord> findByDocumentationUnitIdOrByGlobalWords(
       List<String> words, UUID documentationUnitId);
+
+  IgnoredTextCheckWord getGloballyIgnoreWord(String word);
 }

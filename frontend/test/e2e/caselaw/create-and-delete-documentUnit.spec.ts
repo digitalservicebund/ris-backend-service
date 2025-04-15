@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
-import { deleteDocumentUnit } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
+import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 
 test.describe("create a doc unit and delete it again", () => {
   test("create and delete new doc unit", async ({ page }) => {
