@@ -26,7 +26,7 @@ const emit = defineEmits<{
   "attachmentIndex:update": [value: number]
 }>()
 
-const textCheckAll = useFeatureToggle("neuris.text-check-all")
+const textCheckAll = useFeatureToggle("neuris.text-check-side-panel")
 
 function emitSidePanelMode(value: SelectablePanelContent) {
   emit("panelMode:update", value)
@@ -50,8 +50,10 @@ function emitAttachmentIndex(value: number) {
           size="small"
           @click="() => emitSidePanelMode('note')"
         >
-          <template #icon> <IconStickyNote /> </template
-        ></Button>
+          <template #icon>
+            <IconStickyNote />
+          </template>
+        </Button>
       </Tooltip>
       <Tooltip shortcut="d" text="Datei">
         <Button
@@ -63,8 +65,10 @@ function emitAttachmentIndex(value: number) {
           size="small"
           @click="() => emitSidePanelMode('attachments')"
         >
-          <template #icon> <IconAttachFile /> </template
-        ></Button>
+          <template #icon>
+            <IconAttachFile />
+          </template>
+        </Button>
       </Tooltip>
 
       <Tooltip shortcut="v" text="Vorschau">
@@ -77,8 +81,10 @@ function emitAttachmentIndex(value: number) {
           size="small"
           @click="() => emitSidePanelMode('preview')"
         >
-          <template #icon> <IconPreview /> </template
-        ></Button>
+          <template #icon>
+            <IconPreview />
+          </template>
+        </Button>
       </Tooltip>
 
       <Tooltip shortcut="r" text="Rubriken-Import">
@@ -90,8 +96,11 @@ function emitAttachmentIndex(value: number) {
           severity="secondary"
           size="small"
           @click="() => emitSidePanelMode('category-import')"
-          ><template #icon> <IconImportCategories /> </template
-        ></Button>
+        >
+          <template #icon>
+            <IconImportCategories />
+          </template>
+        </Button>
       </Tooltip>
       <Tooltip v-if="textCheckAll" shortcut="t" text="Rechtschreibprüfung">
         <Button
@@ -102,8 +111,11 @@ function emitAttachmentIndex(value: number) {
           severity="secondary"
           size="small"
           @click="() => emitSidePanelMode('text-check')"
-          ><template #icon> <IconSpellCheck /> </template
-        ></Button>
+        >
+          <template #icon>
+            <IconSpellCheck />
+          </template>
+        </Button>
       </Tooltip>
     </div>
 
@@ -129,9 +141,11 @@ function emitAttachmentIndex(value: number) {
             },
           }"
         >
-          <Button text
-            ><template #icon> <IconEdit /> </template
-          ></Button>
+          <Button text>
+            <template #icon>
+              <IconEdit />
+            </template>
+          </Button>
         </router-link>
       </Tooltip>
       <Tooltip text="In neuem Tab öffnen">
@@ -145,9 +159,11 @@ function emitAttachmentIndex(value: number) {
             },
           }"
         >
-          <Button text
-            ><template #icon> <IconOpenInNewTab /> </template
-          ></Button>
+          <Button text>
+            <template #icon>
+              <IconOpenInNewTab />
+            </template>
+          </Button>
         </router-link>
       </Tooltip>
     </div>
