@@ -5,13 +5,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrElement;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrThis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
@@ -26,42 +31,32 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotE
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import javax.xml.parsers.DocumentBuilderFactory;
-import net.sf.saxon.TransformerFactoryImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 class StagingPortalPublicationServiceTest {
 
-  static DocumentationUnitRepository documentationUnitRepository;
-  static PortalBucket caseLawBucket;
-  static DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-  static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
-  static StagingPortalPublicationService stagingPortalPublicationService;
-  static DocumentationUnit testDocumentUnit;
-  static UUID testUUID;
-  static ObjectMapper objectMapper;
+  @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean private PortalBucket caseLawBucket;
+  @MockitoBean private XmlUtilService xmlUtilService;
+  @MockitoBean private ObjectMapper objectMapper;
+  @MockitoBean private PortalTransformer portalTransformer;
+
+  private static DocumentationUnit testDocumentUnit;
+  private static CaseLawLdml testLdml;
+
+  private StagingPortalPublicationService subject;
 
   @BeforeAll
   static void setUpBeforeClass() {
-    documentationUnitRepository = mock(DocumentationUnitRepository.class);
-    caseLawBucket = mock(PortalBucket.class);
-    objectMapper = mock(ObjectMapper.class);
-    stagingPortalPublicationService =
-        new StagingPortalPublicationService(
-            documentationUnitRepository,
-            xmlUtilService,
-            documentBuilderFactory,
-            caseLawBucket,
-            objectMapper);
-
     PreviousDecision related1 =
         PreviousDecision.builder()
             .decisionDate(LocalDate.of(2020, 1, 1))
@@ -73,7 +68,7 @@ class StagingPortalPublicationServiceTest {
     PreviousDecision related2 =
         related1.toBuilder().documentNumber("Test document number 2").build();
 
-    testUUID = UUID.randomUUID();
+    UUID testUUID = UUID.randomUUID();
     testDocumentUnit =
         DocumentationUnit.builder()
             .uuid(testUUID)
@@ -93,22 +88,46 @@ class StagingPortalPublicationServiceTest {
             .shortTexts(ShortTexts.builder().build())
             .previousDecisions(List.of(related1, related2))
             .build();
+
+    testLdml =
+        CaseLawLdml.builder()
+            .judgment(
+                Judgment.builder()
+                    .meta(
+                        Meta.builder()
+                            .identification(
+                                Identification.builder()
+                                    .frbrWork(
+                                        FrbrElement.builder()
+                                            .frbrThis(new FrbrThis("XXRE123456789"))
+                                            .build())
+                                    .build())
+                            .build())
+                    .build())
+            .build();
   }
 
   @BeforeEach
   void mockReset() throws JsonProcessingException {
-    Mockito.reset(caseLawBucket);
-    Mockito.reset(objectMapper);
+    subject =
+        new StagingPortalPublicationService(
+            documentationUnitRepository,
+            xmlUtilService,
+            caseLawBucket,
+            objectMapper,
+            portalTransformer);
     when(objectMapper.writeValueAsString(any())).thenReturn("");
   }
 
   @Test
-  @DisplayName("Should publish single documentation unit succesfully")
+  @DisplayName("Should publish single documentation unit successfully")
   void publishSuccessfully() throws DocumentationUnitNotExistsException {
     UUID documentationUnitId = UUID.randomUUID();
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
+    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
 
-    stagingPortalPublicationService.publishDocumentationUnitWithChangelog(documentationUnitId);
+    subject.publishDocumentationUnitWithChangelog(documentationUnitId);
 
     verify(caseLawBucket, times(2)).save(anyString(), anyString());
   }
@@ -116,17 +135,13 @@ class StagingPortalPublicationServiceTest {
   @Test
   @DisplayName("Publish fails with empty core data")
   void failLdmlTransformation() throws DocumentationUnitNotExistsException {
-    DocumentationUnit invalidTestDocumentUnit =
-        testDocumentUnit.toBuilder().coreData(CoreData.builder().build()).build();
     UUID documentationUnitId = UUID.randomUUID();
-    when(documentationUnitRepository.findByUuid(documentationUnitId))
-        .thenReturn(invalidTestDocumentUnit);
+    when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
+    when(portalTransformer.transformToLdml(testDocumentUnit))
+        .thenThrow(new LdmlTransformationException("LDML validation failed.", new Exception()));
 
     assertThatExceptionOfType(LdmlTransformationException.class)
-        .isThrownBy(
-            () ->
-                stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
-                    documentationUnitId))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
         .withMessageContaining("LDML validation failed.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
@@ -134,17 +149,13 @@ class StagingPortalPublicationServiceTest {
   @Test
   @DisplayName("Publish fails with missing judgement body")
   void failMissingJudgementBody() throws DocumentationUnitNotExistsException {
-    DocumentationUnit invalidTestDocumentUnit =
-        testDocumentUnit.toBuilder().longTexts(null).build();
     UUID documentationUnitId = UUID.randomUUID();
-    when(documentationUnitRepository.findByUuid(documentationUnitId))
-        .thenReturn(invalidTestDocumentUnit);
+    when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
+    when(portalTransformer.transformToLdml(testDocumentUnit))
+        .thenThrow(new LdmlTransformationException("Missing judgment body.", new Exception()));
 
     assertThatExceptionOfType(LdmlTransformationException.class)
-        .isThrownBy(
-            () ->
-                stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
-                    documentationUnitId))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
         .withMessageContaining("Missing judgment body.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
@@ -156,12 +167,11 @@ class StagingPortalPublicationServiceTest {
     UUID documentationUnitId = UUID.randomUUID();
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(
-            () ->
-                stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
-                    documentationUnitId))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
         .withMessageContaining("Could not save changelog to bucket");
     verify(caseLawBucket).delete(testDocumentUnit.documentNumber() + ".xml");
   }
@@ -171,14 +181,13 @@ class StagingPortalPublicationServiceTest {
   void failWithBucketException() throws DocumentationUnitNotExistsException {
     UUID documentationUnitId = UUID.randomUUID();
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
+    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
 
     doThrow(BucketException.class).when(caseLawBucket).save(contains("changelogs/"), anyString());
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(
-            () ->
-                stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
-                    documentationUnitId))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
         .withMessageContaining("Could not save changelog to bucket");
     verify(caseLawBucket).delete(testDocumentUnit.documentNumber() + ".xml");
   }
@@ -189,12 +198,11 @@ class StagingPortalPublicationServiceTest {
     UUID documentationUnitId = UUID.randomUUID();
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     doThrow(BucketException.class).when(caseLawBucket).save(contains(".xml"), anyString());
+    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(
-            () ->
-                stagingPortalPublicationService.publishDocumentationUnitWithChangelog(
-                    documentationUnitId))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
         .withMessageContaining("Could not save LDML to bucket");
   }
 }

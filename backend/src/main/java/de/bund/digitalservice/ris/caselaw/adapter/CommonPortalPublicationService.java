@@ -6,7 +6,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.InternalPortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -15,7 +14,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,20 +23,20 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
   private final S3Bucket portalBucket;
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
-  private final InternalPortalTransformer ldmlTransformer;
+  private final PortalTransformer ldmlTransformer;
 
   protected CommonPortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
-      DocumentBuilderFactory documentBuilderFactory,
       S3Bucket portalBucket,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      PortalTransformer portalTransformer) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.portalBucket = portalBucket;
     this.objectMapper = objectMapper;
     this.xmlUtilService = xmlUtilService;
-    this.ldmlTransformer = new InternalPortalTransformer(documentBuilderFactory);
+    this.ldmlTransformer = portalTransformer;
   }
 
   /**

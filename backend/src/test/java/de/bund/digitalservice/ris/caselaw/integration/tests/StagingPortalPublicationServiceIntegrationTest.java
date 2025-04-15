@@ -36,6 +36,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.InternalPortalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -74,6 +75,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @RISIntegrationTest(
     imports = {
       StagingPortalPublicationService.class,
+      InternalPortalTransformer.class,
       XmlUtilService.class,
       ConverterConfig.class,
       PortalBucket.class,

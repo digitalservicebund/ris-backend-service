@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,6 +14,12 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrElement;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrThis;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
@@ -32,44 +37,32 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 class PrototypePortalPublicationServiceTest {
 
-  static DocumentationUnitRepository documentationUnitRepository;
-  static PrototypePortalBucket prototypePortalBucket;
-  static DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-  static XmlUtilService xmlUtilService;
-  static PrototypePortalPublicationService subject;
-  static DocumentationUnit testDocumentUnit;
-  static String testDocumentNumber;
-  static ObjectMapper objectMapper;
-  static RiiService riiService;
+  @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean private PrototypePortalBucket prototypePortalBucket;
+  @MockitoBean private XmlUtilService xmlUtilService;
+  @MockitoBean private ObjectMapper objectMapper;
+  @MockitoBean private PortalTransformer portalTransformer;
+  @MockitoBean private RiiService riiService;
+
+  private static DocumentationUnit testDocumentUnit;
+  private static String testDocumentNumber;
+  private static CaseLawLdml testLdml;
+
+  private PrototypePortalPublicationService subject;
 
   @BeforeAll
   static void setUpBeforeClass() {
-    documentationUnitRepository = mock(DocumentationUnitRepository.class);
-    prototypePortalBucket = mock(PrototypePortalBucket.class);
-    objectMapper = mock(ObjectMapper.class);
-    xmlUtilService = mock(XmlUtilService.class);
-    riiService = mock(RiiService.class);
-    subject =
-        new PrototypePortalPublicationService(
-            documentationUnitRepository,
-            xmlUtilService,
-            documentBuilderFactory,
-            prototypePortalBucket,
-            objectMapper,
-            riiService);
-
     PreviousDecision related1 =
         PreviousDecision.builder()
             .decisionDate(LocalDate.of(2020, 1, 1))
@@ -101,12 +94,35 @@ class PrototypePortalPublicationServiceTest {
             .shortTexts(ShortTexts.builder().build())
             .previousDecisions(List.of(related1, related2))
             .build();
+
+    testLdml =
+        CaseLawLdml.builder()
+            .judgment(
+                Judgment.builder()
+                    .meta(
+                        Meta.builder()
+                            .identification(
+                                Identification.builder()
+                                    .frbrWork(
+                                        FrbrElement.builder()
+                                            .frbrThis(new FrbrThis(testDocumentNumber))
+                                            .build())
+                                    .build())
+                            .build())
+                    .build())
+            .build();
   }
 
   @BeforeEach
   void mockReset() throws JsonProcessingException {
-    Mockito.reset(prototypePortalBucket);
-    Mockito.reset(objectMapper);
+    subject =
+        new PrototypePortalPublicationService(
+            documentationUnitRepository,
+            xmlUtilService,
+            prototypePortalBucket,
+            objectMapper,
+            portalTransformer,
+            riiService);
     when(objectMapper.writeValueAsString(any())).thenReturn("");
   }
 
@@ -125,14 +141,13 @@ class PrototypePortalPublicationServiceTest {
   @Test
   void publish_withMissingCoreDataLdml_shouldThrowLdmlTransformationException()
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit invalidTestDocumentUnit =
-        testDocumentUnit.toBuilder().coreData(CoreData.builder().build()).build();
     when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
-        .thenReturn(invalidTestDocumentUnit);
+        .thenReturn(testDocumentUnit);
+    when(portalTransformer.transformToLdml(testDocumentUnit))
+        .thenThrow(new LdmlTransformationException("LDML validation failed.", new Exception()));
 
-    var documentNumber = invalidTestDocumentUnit.documentNumber();
     assertThatExceptionOfType(LdmlTransformationException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnit(documentNumber))
+        .isThrownBy(() -> subject.publishDocumentationUnit(testDocumentNumber))
         .withMessageContaining("LDML validation failed.");
   }
 
@@ -153,6 +168,7 @@ class PrototypePortalPublicationServiceTest {
     String transformed = "ldml";
     when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
         .thenReturn(testDocumentUnit);
+    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
 
     subject.publishDocumentationUnit(testDocumentNumber);
@@ -166,6 +182,7 @@ class PrototypePortalPublicationServiceTest {
     String transformed = "ldml";
     when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
         .thenReturn(testDocumentUnit);
+    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
     doThrow(BucketException.class).when(prototypePortalBucket).save(anyString(), anyString());
 

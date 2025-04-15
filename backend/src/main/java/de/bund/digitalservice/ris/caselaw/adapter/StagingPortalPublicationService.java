@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
-import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -11,16 +10,12 @@ public class StagingPortalPublicationService extends CommonPortalPublicationServ
   public StagingPortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
-      DocumentBuilderFactory documentBuilderFactory,
       PortalBucket portalBucket,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      PortalTransformer portalTransformer) {
 
     super(
-        documentationUnitRepository,
-        xmlUtilService,
-        documentBuilderFactory,
-        portalBucket,
-        objectMapper);
+        documentationUnitRepository, xmlUtilService, portalBucket, objectMapper, portalTransformer);
   }
 
   @Override
