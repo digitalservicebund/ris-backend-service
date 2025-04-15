@@ -8,20 +8,6 @@ import TextEditor from "@/components/input/TextEditor.vue"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
-vi.mock("@tiptap/vue-3", async () => {
-  const actual =
-    await vi.importActual<typeof import("@tiptap/vue-3")>("@tiptap/vue-3")
-
-  return {
-    ...actual,
-    BubbleMenu: {
-      name: "BubbleMenu",
-      template: "<div><slot /></div>",
-      props: ["editor", "tippyOptions", "shouldShow"],
-    },
-  }
-})
-
 beforeAll(() => {
   mockDocumentForProsemirror()
   useFeatureToggleServiceMock()
