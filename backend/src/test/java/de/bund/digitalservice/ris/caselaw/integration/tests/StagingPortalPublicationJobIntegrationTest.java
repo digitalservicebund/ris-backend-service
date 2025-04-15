@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -172,6 +173,44 @@ class StagingPortalPublicationJobIntegrationTest {
   }
 
   @Test
+  void shouldPublishWithOnlyAllowedPrototypeData() throws IOException {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, buildValidDocumentationUnit("1"));
+    ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+    ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
+
+    portalPublicationJobRepository.saveAll(
+        List.of(createPublicationJob(dto, PortalPublicationTaskType.PUBLISH)));
+
+    portalPublicationJobService.executePendingJobs();
+
+    verify(s3Client, times(2)).putObject(putCaptor.capture(), bodyCaptor.capture());
+
+    var fileNameRequests = putCaptor.getAllValues();
+    var bodyRequests = bodyCaptor.getAllValues();
+    var ldmlContent =
+        new String(
+            bodyRequests.getFirst().contentStreamProvider().newStream().readAllBytes(),
+            StandardCharsets.UTF_8);
+    var changelogContent =
+        new String(
+            bodyRequests.get(1).contentStreamProvider().newStream().readAllBytes(),
+            StandardCharsets.UTF_8);
+
+    assertThat(fileNameRequests.getFirst().key()).contains(dto.getDocumentNumber());
+    assertThat(ldmlContent)
+        .contains("gruende test")
+        .contains("entscheidungsname test")
+        .contains("orientierungssatz test");
+    assertThat(fileNameRequests.get(1).key()).contains("changelog");
+    assertThat(changelogContent)
+        .isEqualTo(
+            """
+            {"changed":["1.xml"],"deleted":[]}""");
+  }
+
+  @Test
   void shouldOnlyAddDocumentNumberToChangelogForLatestKindOfJob() throws IOException {
     DocumentationUnitDTO dto1 =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
@@ -311,6 +350,8 @@ class StagingPortalPublicationJobIntegrationTest {
         .date(LocalDate.now())
         .legalEffect(LegalEffectDTO.JA)
         .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
-        .grounds("lorem ipsum dolor sit amet");
+        .grounds("gruende test")
+        .headnote("orientierungssatz test")
+        .decisionNames(List.of(DecisionNameDTO.builder().value("entscheidungsname test").build()));
   }
 }
