@@ -184,18 +184,9 @@ test.describe(
             await expect(page.getByTestId("text-check-modal")).toBeVisible()
 
             const locator = page.getByTestId("ignored-word-handler")
-            const expectedTexts = [
-              "Von jDV ignoriert",
-              "Aus globalem Wörterbuch entfernen",
-              "Nicht Ignorieren",
-            ]
-
-            const elementText = await locator.textContent()
-            const containsOneOfTheTexts = expectedTexts.some((text) =>
-              elementText?.includes(text),
+            await expect(locator).toHaveText(
+              /.*(Von jDV ignoriert|Aus globalem Wörterbuch entfernen|Nicht ignorieren).*/i,
             )
-
-            expect(containsOneOfTheTexts).toBe(true)
           }
         })
 
