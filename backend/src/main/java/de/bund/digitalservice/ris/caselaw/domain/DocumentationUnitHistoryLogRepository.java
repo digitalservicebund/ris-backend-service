@@ -41,5 +41,10 @@ public interface DocumentationUnitHistoryLogRepository {
    * @param user logged-in user for checking view permissions
    * @return a domain representation of the saved history log
    */
-  HistoryLog saveUpdateLog(UUID id, UUID documentationUnitId, User user);
+  HistoryLog saveHistoryLog(
+      UUID id,
+      UUID documentationUnitId,
+      User user,
+      HistoryLogEventType eventType,
+      String description);
 }

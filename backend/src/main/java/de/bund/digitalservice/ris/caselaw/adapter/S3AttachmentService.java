@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.io.ByteArrayInputStream;
@@ -71,7 +72,8 @@ public class S3AttachmentService implements AttachmentService {
         documentationUnitRepository.findById(documentationUnitId).orElseThrow();
     setLastUpdated(user, documentationUnit);
     documentationUnitRepository.save(documentationUnit);
-    documentationUnitHistoryLogService.saveUpdateHistoryLog(documentationUnitId, user);
+    documentationUnitHistoryLogService.saveHistoryLog(
+        documentationUnitId, user, HistoryLogEventType.FILES, "Dokument wurde hochgeladen");
 
     AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()
@@ -100,7 +102,8 @@ public class S3AttachmentService implements AttachmentService {
         .ifPresent(
             documentationUnit -> {
               setLastUpdated(user, documentationUnit);
-              documentationUnitHistoryLogService.saveUpdateHistoryLog(documentationUnitId, user);
+              documentationUnitHistoryLogService.saveHistoryLog(
+                  documentationUnitId, user, HistoryLogEventType.FILES, "Dokument wurde gelöscht");
             });
     repository.deleteByS3ObjectPath(s3Path);
   }

@@ -43,7 +43,12 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
   }
 
   @Override
-  public HistoryLog saveUpdateLog(UUID existingId, UUID documentationUnitId, User user) {
+  public HistoryLog saveHistoryLog(
+      UUID existingId,
+      UUID documentationUnitId,
+      User user,
+      HistoryLogEventType eventType,
+      String description) {
     UUID historyLogId = UUID.randomUUID();
     if (existingId != null) {
       historyLogId = existingId;
@@ -57,8 +62,8 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
                 DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
             .userId(user.id())
             .userName(user.name())
-            .description("Dokumentationseinheit wurde aktualisiert")
-            .eventType(HistoryLogEventType.UPDATE)
+            .description(description)
+            .eventType(eventType)
             .build();
     return HistoryLogTransformer.transformToDomain(databaseRepository.save(dto), user);
   }

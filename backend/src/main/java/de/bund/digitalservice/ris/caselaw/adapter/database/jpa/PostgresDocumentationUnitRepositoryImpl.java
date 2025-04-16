@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogServ
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -289,7 +290,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       setLastUpdated(currentUser, decisionDTO);
-      historyLogService.saveUpdateHistoryLog(decisionDTO.getId(), currentUser);
+      historyLogService.saveHistoryLog(
+          decisionDTO.getId(),
+          currentUser,
+          HistoryLogEventType.UPDATE,
+          "Dokumentationseinheit wurde bearbeitet.");
 
       documentationUnitDTO =
           DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);
