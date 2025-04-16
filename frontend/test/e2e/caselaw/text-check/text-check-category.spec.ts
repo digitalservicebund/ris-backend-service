@@ -186,7 +186,7 @@ test.describe(
             const locator = page.getByTestId("ignored-word-handler")
             const expectedTexts = [
               "Von jDV ignoriert",
-              "Aus globalem Wörterbuch entfernenn",
+              "Aus globalem Wörterbuch entfernen",
               "Nicht Ignorieren",
             ]
 
