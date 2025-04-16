@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
@@ -78,6 +79,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final UserService userService;
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
+  private final DocumentationUnitHistoryLogService historyLogService;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -89,7 +91,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       UserService userService,
       EntityManager entityManager,
-      DatabaseReferenceRepository referenceRepository) {
+      DatabaseReferenceRepository referenceRepository,
+      DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -101,6 +104,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.referenceRepository = referenceRepository;
     this.userService = userService;
     this.entityManager = entityManager;
+    this.historyLogService = historyLogService;
   }
 
   @Override
@@ -285,6 +289,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       setLastUpdated(currentUser, decisionDTO);
+      historyLogService.saveUpdateHistoryLog(decisionDTO.getId(), currentUser);
 
       documentationUnitDTO =
           DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);

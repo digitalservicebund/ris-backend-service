@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
+import { computed } from "vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import { DocumentationUnitHistoryLog } from "@/domain/documentationUnitHistoryLog"
+import DateUtil from "@/utils/dateUtil"
 
-defineProps<{
+const props = defineProps<{
   data?: DocumentationUnitHistoryLog[]
   loading: boolean
 }>()
@@ -18,6 +20,18 @@ const columns = [
 const rowClass = () => {
   return "bg-blue-100"
 }
+
+const formattedData = computed(
+  () =>
+    props.data?.map((item) => ({
+      ...item,
+      createdAt: formatTimestamp(item.createdAt),
+      createdBy: `${item.documentationOffice} (${item.createdBy})`,
+    })) ?? [],
+)
+
+const formatTimestamp = (date?: string) =>
+  date ? DateUtil.formatDateTime(date) : "–"
 </script>
 
 <template>
@@ -28,7 +42,7 @@ const rowClass = () => {
       :row-class="rowClass"
       scroll-height="250px"
       scrollable
-      :value="data"
+      :value="formattedData"
     >
       <template #empty> Keine Daten. </template>
       <template #loading>
