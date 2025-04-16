@@ -4,8 +4,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class TextCheckMockService extends TextCheckService {
 
@@ -17,6 +17,16 @@ public class TextCheckMockService extends TextCheckService {
 
   @Override
   public List<Match> requestTool(String text) {
-    return Collections.emptyList();
+    if (text == null) {
+      return List.of();
+    }
+    return Stream.of(
+            "ignoredWordOnDocUnitLevel",
+            "ignoredWordOnGlobalLevel",
+            "ignoredWordOnGlobalJDVLevel",
+            "notIgnoredWord")
+        .filter(text::contains)
+        .map(word -> Match.builder().word(word).build())
+        .toList();
   }
 }

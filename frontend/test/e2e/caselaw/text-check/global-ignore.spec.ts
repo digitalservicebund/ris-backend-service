@@ -1,6 +1,9 @@
 import { expect, Page } from "@playwright/test"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
-import { navigateToCategories } from "~/e2e/caselaw/e2e-utils"
+import {
+  navigateToCategories,
+  navigateToHandover,
+} from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
@@ -84,6 +87,16 @@ test.describe(
           await page.getByText("Zum globalen Wörterbuch hinzufügen").click()
         })
 
+        await test.step("make sure the globally ignored word is exported with <noindex> tags", async () => {
+          await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
+          await expect(page.getByText("XML Vorschau")).toBeVisible()
+          await page.getByText("XML Vorschau").click()
+
+          await expect(
+            page.getByText("<noindex>" + wordWithTypo + "</noindex>"),
+          ).toBeVisible()
+        })
+
         await test.step("open doc unit B in edit mode", async () => {
           await navigateToCategories(
             pageWithBghUser,
@@ -120,6 +133,13 @@ test.describe(
         })
 
         await test.step("check text again in doc unit A and expect word not to be ignored globally", async () => {
+          await navigateToCategories(
+            page,
+            prefilledDocumentUnit.documentNumber,
+            { category: DocumentUnitCategoriesEnum.TEXTS },
+          )
+          await expect(page.getByTestId("headnote")).toBeVisible()
+          await headNoteEditor.locator("div").click()
           await checkTextOfHeadnote(page)
           await headNoteEditor
             .locator("text-check")
@@ -146,6 +166,3 @@ async function checkTextOfHeadnote(page: Page) {
     timeout: 15000,
   })
 }
-
-// # export
-// export should show word is wrapped in <noindex>
