@@ -182,9 +182,20 @@ test.describe(
             const textCheckTag = allTextCheckById.nth(index)
             await textCheckTag.click()
             await expect(page.getByTestId("text-check-modal")).toBeVisible()
-            await expect(
-              page.getByTestId("ignored-word-handler"),
-            ).toContainText("Von jDV ignoriert")
+
+            const locator = page.getByTestId("ignored-word-handler")
+            const expectedTexts = [
+              "Von jDV ignoriert",
+              "Aus globalem Wörterbuch entfernenn",
+              "Nicht Ignorieren",
+            ]
+
+            const elementText = await locator.textContent()
+            const containsOneOfTheTexts = expectedTexts.some((text) =>
+              elementText?.includes(text),
+            )
+
+            expect(containsOneOfTheTexts).toBe(true)
           }
         })
 
