@@ -1,14 +1,16 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { flushPromises } from "@vue/test-utils"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import { Match } from "@/types/textCheck"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 useFeatureToggleServiceMock()
 
-function renderComponent(match: Match) {
+async function renderComponent(match: Match) {
   const user = userEvent.setup()
 
+  await flushPromises()
   return {
     user,
     ...render(IgnoredWordHandler, {
@@ -42,8 +44,8 @@ describe("IgnoredWordHandler", () => {
     contextForSureMatch: 1,
   }
 
-  it("does not render any button when ignoredTextCheckWords is undefined", () => {
-    renderComponent({ ...baseMatch, ignoredTextCheckWords: undefined })
+  it("does not render any button when ignoredTextCheckWords is undefined", async () => {
+    await renderComponent({ ...baseMatch, ignoredTextCheckWords: undefined })
     expect(
       screen.queryByText("Aus globalem Wörterbuch entfernen"),
     ).not.toBeInTheDocument()
@@ -52,7 +54,7 @@ describe("IgnoredWordHandler", () => {
   })
 
   it("emits remove local ignore word event when 'Nicht ignorieren' button is clicked", async () => {
-    const { emitted, user } = renderComponent({
+    const { emitted, user } = await renderComponent({
       ...baseMatch,
       ignoredTextCheckWords: [{ type: "documentation_unit", word: "testword" }],
     })
@@ -68,8 +70,8 @@ describe("IgnoredWordHandler", () => {
     expect(emitted()["globally-ignored-word:remove"]).toBeUndefined()
   })
 
-  it("renders 'Von jDV ignoriert' when word is globally ignored by jDV", () => {
-    renderComponent({
+  it("renders 'Von jDV ignoriert' when word is globally ignored by jDV", async () => {
+    await renderComponent({
       ...baseMatch,
       ignoredTextCheckWords: [{ type: "global_jdv", word: "testword" }],
     })
@@ -80,9 +82,8 @@ describe("IgnoredWordHandler", () => {
     expect(screen.queryByText("Nicht Ignorieren")).not.toBeInTheDocument()
   })
 
-  // unable to mock feature toggle
-  test.skip("emits remove global ignore word event when 'Aus globalem Wörterbuch entfernen' button is clicked", async () => {
-    const { emitted, user } = renderComponent({
+  test("emits remove global ignore word event when 'Aus globalem Wörterbuch entfernen' button is clicked", async () => {
+    const { emitted, user } = await renderComponent({
       ...baseMatch,
       ignoredTextCheckWords: [{ type: "global", word: "testword" }],
     })
