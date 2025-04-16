@@ -175,6 +175,8 @@ class TextCheckIntegrationTest {
         .isOk();
   }
 
+  // 'xyz' is added as a globally ignored word via SQL script
+  // this test verifies that it can be added locally at doc unit level, too
   @Test
   void testAddLocalIgnore_canAddGloballyIgnoredWordsLocally() {
     risWebTestClient

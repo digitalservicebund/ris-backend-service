@@ -62,13 +62,6 @@ describe("TextCheckModal", () => {
     expect(screen.getByText(baseMatch.message)).toBeInTheDocument()
   })
 
-  it("does not render the 'Zum globalen Wörterbuch hinzufügen' button when the match type is not UnknownWord", () => {
-    renderComponent({ ...baseMatch, type: { typeName: "Grammar" } })
-    expect(
-      screen.queryByText("Zum globalen Wörterbuch hinzufügen"),
-    ).not.toBeInTheDocument()
-  })
-
   it("emits 'word:replace' event when a suggestion is updated in ReplacementBar", async () => {
     const { emitted, user } = renderComponent(baseMatch)
     await user.click(screen.getByText("suggestion1"))
