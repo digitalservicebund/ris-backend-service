@@ -211,6 +211,15 @@ class TextCheckIntegrationTest {
               assertThat(response.getResponseBody().type()).isEqualTo(IgnoredTextCheckType.GLOBAL);
             });
 
+    // assert the global word has been saved and the documentation office is set correctly
+    assertThat(
+            repository
+                .findByDocumentationUnitIdOrByGlobalWords(null, List.of("def"))
+                .getFirst()
+                .getDocumentationOffice()
+                .getId())
+        .isEqualTo(docOffice.uuid());
+
     risWebTestClient
         .withDefaultLogin()
         .delete()
@@ -218,6 +227,8 @@ class TextCheckIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk();
+
+    assertThat(repository.findByDocumentationUnitIdOrByGlobalWords(null, List.of("def"))).isEmpty();
   }
 
   @Test

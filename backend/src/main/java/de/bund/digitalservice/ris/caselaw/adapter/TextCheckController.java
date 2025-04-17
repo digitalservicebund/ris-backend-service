@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.TextCheckResponseTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.CategoryType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
@@ -17,6 +18,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class TextCheckController {
 
   private final TextCheckService textCheckService;
+  private final UserService userService;
 
-  public TextCheckController(TextCheckService textCheckService) {
+  public TextCheckController(TextCheckService textCheckService, UserService userService) {
     this.textCheckService = textCheckService;
+    this.userService = userService;
   }
 
   @GetMapping("documentunits/{id}/text-check/all")
@@ -102,9 +107,12 @@ public class TextCheckController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<IgnoredTextCheckWord> addIgnoredWordGlobally(
-      @RequestBody IgnoredTextCheckWordRequest request) {
+      @RequestBody IgnoredTextCheckWordRequest request,
+      @AuthenticationPrincipal OidcUser oidcUser) {
+
+    var documentationOffice = userService.getDocumentationOffice(oidcUser);
     try {
-      return ResponseEntity.ok(textCheckService.addIgnoreWord(request.word()));
+      return ResponseEntity.ok(textCheckService.addIgnoreWord(request.word(), documentationOffice));
 
     } catch (Exception e) {
       log.error("Adding word failed", e);

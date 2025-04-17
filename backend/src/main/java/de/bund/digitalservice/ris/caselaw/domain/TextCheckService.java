@@ -288,13 +288,13 @@ public class TextCheckService {
     return ignoredTextCheckWordRepository.deleteWordGlobally(word);
   }
 
-  public IgnoredTextCheckWord addIgnoreWord(String word) {
+  public IgnoredTextCheckWord addIgnoreWord(String word, DocumentationOffice documentationOffice) {
     IgnoredTextCheckWord globallyIgnoreWord =
         ignoredTextCheckWordRepository.getGloballyIgnoreWord(word);
     if (globallyIgnoreWord != null) {
       return globallyIgnoreWord;
     }
-    return ignoredTextCheckWordRepository.addWord(word);
+    return ignoredTextCheckWordRepository.addWord(word, documentationOffice);
   }
 
   public List<Match> addIgnoredTextChecksIndividually(

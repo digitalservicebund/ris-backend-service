@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.IgnoredTextCheckWordTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.List;
@@ -32,9 +34,14 @@ public class PostgresIgnoredTextCheckWordRepositoryImpl implements IgnoredTextCh
   }
 
   @Override
-  public IgnoredTextCheckWord addWord(String word) {
+  public IgnoredTextCheckWord addWord(String word, DocumentationOffice documentationOffice) {
     return IgnoredTextCheckWordTransformer.transformToDomain(
-        repository.save(IgnoredTextCheckWordDTO.builder().word(word).build()));
+        repository.save(
+            IgnoredTextCheckWordDTO.builder()
+                .word(word)
+                .documentationOffice(
+                    DocumentationOfficeTransformer.transformToDTO(documentationOffice))
+                .build()));
   }
 
   @Override
