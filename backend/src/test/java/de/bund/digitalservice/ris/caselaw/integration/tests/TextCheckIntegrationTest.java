@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -75,7 +76,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class,
       OAuthService.class,
       TestConfig.class,
-      DocumentNumberPatternConfig.class
+      DocumentNumberPatternConfig.class,
     },
     controllers = {TextCheckController.class})
 @Sql(scripts = {"classpath:text_check_init.sql"})
@@ -112,6 +113,7 @@ class TextCheckIntegrationTest {
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
