@@ -3,7 +3,9 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import io.getunleash.Unleash;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UnleashService implements FeatureToggleService {
   private final Unleash unleash;
   private final String environment;

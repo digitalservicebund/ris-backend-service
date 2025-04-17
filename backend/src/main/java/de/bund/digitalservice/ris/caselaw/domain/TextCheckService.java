@@ -33,13 +33,16 @@ import org.jsoup.select.NodeVisitor;
 public class TextCheckService {
   private final DocumentationUnitRepository documentationUnitRepository;
   private final IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+  private final FeatureToggleService featureToggleService;
 
   public TextCheckService(
       DocumentationUnitRepository documentationUnitRepository,
-      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
+      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository,
+      FeatureToggleService featureToggleService) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.ignoredTextCheckWordRepository = ignoredTextCheckWordRepository;
+    this.featureToggleService = featureToggleService;
   }
 
   public List<Match> check(String text) {
@@ -146,6 +149,10 @@ public class TextCheckService {
    * @return object with noindex tags on long and short texts
    */
   public DocumentationUnit addNoIndexTagsForHandOver(DocumentationUnit documentationUnit) {
+    if (!featureToggleService.isEnabled("neuris.text-check-noindex-handover")) {
+      return documentationUnit;
+    }
+
     List<String> ignoredTextCheckWords =
         ignoredTextCheckWordRepository
             .findAllByDocumentationUnitId(documentationUnit.uuid())

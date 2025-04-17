@@ -44,8 +44,11 @@ class TextCheckServiceTest {
     IgnoredTextCheckWordRepository ignoredTextCheckWordRepository =
         mock(IgnoredTextCheckWordRepository.class);
 
+    FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+
     textCheckService =
-        new TextCheckMockService(documentationUnitRepository, ignoredTextCheckWordRepository);
+        new TextCheckMockService(
+            documentationUnitRepository, ignoredTextCheckWordRepository, featureToggleService);
   }
 
   @Test
