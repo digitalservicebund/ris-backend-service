@@ -431,7 +431,7 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException {
     repository.saveKeywords(documentationUnit);
     repository.saveFieldsOfLaw(documentationUnit);
-    repository.saveProcedures(documentationUnit);
+    repository.saveProcedures(documentationUnit, user);
 
     repository.save(documentationUnit, user);
 

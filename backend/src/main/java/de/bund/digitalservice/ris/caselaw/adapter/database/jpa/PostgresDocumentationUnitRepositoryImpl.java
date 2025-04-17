@@ -294,7 +294,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           decisionDTO.getId(),
           currentUser,
           HistoryLogEventType.UPDATE,
-          "Dokumentationseinheit wurde bearbeitet.");
+          "Dokumentationseinheit wurde bearbeitet");
 
       documentationUnitDTO =
           DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);
@@ -423,7 +423,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void saveProcedures(Documentable documentationUnit) {
+  public void saveProcedures(Documentable documentationUnit, @Nullable User user) {
     if (documentationUnit == null
         || documentationUnit.coreData() == null
         || documentationUnit.coreData().procedure() == null
@@ -451,6 +451,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
     // set new procedure
     decisionDTO.setProcedure(procedureDTO);
+    historyLogService.saveHistoryLog(
+        decisionDTO.getId(),
+        user,
+        HistoryLogEventType.PROCEDURE,
+        "Dokumentationseinheit wurde zu Vorgang " + procedureDTO.getLabel() + " hinzugefügt");
 
     repository.save(decisionDTO);
   }

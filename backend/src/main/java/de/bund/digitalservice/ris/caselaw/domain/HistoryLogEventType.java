@@ -3,5 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 public enum HistoryLogEventType {
   UPDATE,
   FILES,
-  PUBLISH
+  PROCEDURE,
+  STATUS,
+  HANDOVER
 }

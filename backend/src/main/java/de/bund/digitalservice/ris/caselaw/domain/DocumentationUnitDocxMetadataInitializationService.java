@@ -37,12 +37,12 @@ public class DocumentationUnitDocxMetadataInitializationService {
     initializeFieldsFromProperties(docx2html.properties(), documentationUnit, builder);
 
     if (docx2html.ecliList().size() == 1) {
-      handleEcli(documentationUnit, builder, docx2html.ecliList().get(0));
+      handleEcli(documentationUnit, builder, docx2html.ecliList().getFirst());
     }
 
     DocumentationUnit updatedDocumentationUnit =
         documentationUnit.toBuilder().coreData(builder.build()).build();
-    repository.saveProcedures(updatedDocumentationUnit);
+    repository.saveProcedures(updatedDocumentationUnit, user);
     // save new court first to avoid override of legal effect
     repository.save(
         documentationUnit.toBuilder()
