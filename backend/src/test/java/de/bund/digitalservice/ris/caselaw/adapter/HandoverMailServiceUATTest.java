@@ -207,8 +207,8 @@ class HandoverMailServiceUATTest {
             "neuris",
             Collections.singletonList(
                 MailAttachment.builder()
-                    .fileName(DOC_UNIT_SAVED_MAIL.attachments().getFirst().fileName())
-                    .fileContent(DOC_UNIT_SAVED_MAIL.attachments().getFirst().fileContent())
+                    .fileName(DOC_UNIT_SAVED_MAIL.attachments().get(0).fileName())
+                    .fileContent(DOC_UNIT_SAVED_MAIL.attachments().get(0).fileContent())
                     .build()),
             DOC_UNIT_SAVED_MAIL.entityId().toString());
   }
