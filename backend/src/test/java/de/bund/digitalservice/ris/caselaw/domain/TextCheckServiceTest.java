@@ -522,6 +522,10 @@ class TextCheckServiceTest {
         Arguments.of(
             "<p>Abc§116A should replace</p>",
             List.of("Abc§116A"),
-            "<p><noindex>Abc§116A</noindex> should replace</p>"));
+            "<p><noindex>Abc§116A</noindex> should replace</p>"),
+        Arguments.of(
+            "<border-number><number>7</number><content><p><noindex>should-keep-text</noindex></p></content></border-number>",
+            List.of("Abc§116A"),
+            "<border-number><number>7</number><content><p><noindex>should-keep-text</noindex></p></content></border-number>"));
   }
 }

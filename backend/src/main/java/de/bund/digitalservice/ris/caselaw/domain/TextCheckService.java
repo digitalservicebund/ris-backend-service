@@ -216,6 +216,8 @@ public class TextCheckService {
     }
 
     Document document = Jsoup.parse(htmlText);
+    document.outputSettings().prettyPrint(false);
+
     for (String ignoredWord : ignoredWords) {
       NodeTraversor.traverse(new NoIndexNodeWrapperVisitor(htmlText, ignoredWord), document.body());
     }
