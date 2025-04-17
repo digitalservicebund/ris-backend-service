@@ -10,6 +10,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOffic
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.io.ByteArrayInputStream;
@@ -41,6 +43,7 @@ public class S3AttachmentService implements AttachmentService {
   private final AttachmentRepository repository;
   private final S3Client s3Client;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
+  private final DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -48,10 +51,12 @@ public class S3AttachmentService implements AttachmentService {
   public S3AttachmentService(
       AttachmentRepository repository,
       @Qualifier("docxS3Client") S3Client s3Client,
-      DatabaseDocumentationUnitRepository documentationUnitRepository) {
+      DatabaseDocumentationUnitRepository documentationUnitRepository,
+      DocumentationUnitHistoryLogService documentationUnitHistoryLogService) {
     this.repository = repository;
     this.s3Client = s3Client;
     this.documentationUnitRepository = documentationUnitRepository;
+    this.documentationUnitHistoryLogService = documentationUnitHistoryLogService;
   }
 
   public Attachment attachFileToDocumentationUnit(
@@ -67,6 +72,8 @@ public class S3AttachmentService implements AttachmentService {
         documentationUnitRepository.findById(documentationUnitId).orElseThrow();
     setLastUpdated(user, documentationUnit);
     documentationUnitRepository.save(documentationUnit);
+    documentationUnitHistoryLogService.saveHistoryLog(
+        documentationUnitId, user, HistoryLogEventType.FILES, "Dokument wurde hochgeladen");
 
     AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()
@@ -92,7 +99,12 @@ public class S3AttachmentService implements AttachmentService {
     deleteObjectFromBucket(s3Path);
     documentationUnitRepository
         .findById(documentationUnitId)
-        .ifPresent(documentationUnit -> setLastUpdated(user, documentationUnit));
+        .ifPresent(
+            documentationUnit -> {
+              setLastUpdated(user, documentationUnit);
+              documentationUnitHistoryLogService.saveHistoryLog(
+                  documentationUnitId, user, HistoryLogEventType.FILES, "Dokument wurde gelöscht");
+            });
     repository.deleteByS3ObjectPath(s3Path);
   }
 

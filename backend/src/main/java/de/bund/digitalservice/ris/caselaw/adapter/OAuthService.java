@@ -202,9 +202,8 @@ public class OAuthService implements AuthService {
   public Function<UUID, Boolean> userHasWriteAccess() {
     return uuid -> {
       try {
-        return Optional.ofNullable(documentationUnitService.getByUuid(uuid))
-            .map(this::userHasWriteAccess)
-            .orElse(false);
+        var docUnit = documentationUnitService.getByUuid(uuid);
+        return Optional.ofNullable(docUnit).map(this::userHasWriteAccess).orElse(false);
       } catch (DocumentationUnitNotExistsException e) {
         return false;
       }

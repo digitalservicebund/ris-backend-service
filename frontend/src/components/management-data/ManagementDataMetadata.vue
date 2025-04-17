@@ -57,33 +57,33 @@ const formatSource = (source?: Source) => {
 <template>
   <dl class="my-16 grid w-fit auto-rows-auto grid-cols-[repeat(4,auto)] gap-48">
     <div data-testid="management-data-created-at">
-      <dt class="ds-label-02-bold">Angelegt am</dt>
-      <dd class="ds-label-02-reg">{{ createdAt }}</dd>
+      <dt class="ris-label2-bold">Angelegt am</dt>
+      <dd class="ris-label2-regular">{{ createdAt }}</dd>
     </div>
     <div data-testid="management-data-created-by">
-      <dt class="ds-label-02-bold">Von</dt>
-      <dd class="ds-label-02-reg">{{ createdBy }}</dd>
+      <dt class="ris-label2-bold">Von</dt>
+      <dd class="ris-label2-regular">{{ createdBy }}</dd>
     </div>
     <div data-testid="management-data-source">
-      <dt class="ds-label-02-bold">Quelle</dt>
-      <dd class="ds-label-02-reg">{{ source }}</dd>
+      <dt class="ris-label2-bold">Quelle</dt>
+      <dd class="ris-label2-regular">{{ source }}</dd>
     </div>
     <div />
     <div data-testid="management-data-last-updated-at">
-      <dt class="ds-label-02-bold">Zuletzt bearbeitet am</dt>
-      <dd class="ds-label-02-reg">{{ lastUpdatedAt }}</dd>
+      <dt class="ris-label2-bold">Zuletzt bearbeitet am</dt>
+      <dd class="ris-label2-regular">{{ lastUpdatedAt }}</dd>
     </div>
     <div data-testid="management-data-last-updated-by">
-      <dt class="ds-label-02-bold">Von</dt>
-      <dd class="ds-label-02-reg">{{ lastUpdatedBy }}</dd>
+      <dt class="ris-label2-bold">Von</dt>
+      <dd class="ris-label2-regular">{{ lastUpdatedBy }}</dd>
     </div>
     <div data-testid="management-data-procedure">
-      <dt class="ds-label-02-bold">Vorgang</dt>
-      <dd class="ds-label-02-reg">{{ procedure }}</dd>
+      <dt class="ris-label2-bold">Vorgang</dt>
+      <dd class="ris-label2-regular">{{ procedure }}</dd>
     </div>
     <div data-testid="management-data-first-published-at">
-      <dt class="ds-label-02-bold">Erstveröffentlichung am</dt>
-      <dd class="ds-label-02-reg">{{ firstPublishedAt }}</dd>
+      <dt class="ris-label2-bold">Erstveröffentlichung am</dt>
+      <dd class="ris-label2-regular">{{ firstPublishedAt }}</dd>
     </div>
   </dl>
 </template>

@@ -30,7 +30,8 @@ public class DocumentationUnitDocxMetadataInitializationService {
     this.documentTypeRepository = documentTypeRepository;
   }
 
-  public void initializeCoreData(DocumentationUnit documentationUnit, Docx2Html docx2html) {
+  public void initializeCoreData(
+      DocumentationUnit documentationUnit, Docx2Html docx2html, User user) {
     CoreData.CoreDataBuilder builder = documentationUnit.coreData().toBuilder();
 
     initializeFieldsFromProperties(docx2html.properties(), documentationUnit, builder);
