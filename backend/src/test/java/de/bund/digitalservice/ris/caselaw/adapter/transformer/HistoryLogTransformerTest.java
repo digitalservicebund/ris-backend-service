@@ -22,7 +22,7 @@ class HistoryLogTransformerTest {
     String userName = "testUser";
     String systemName = "testSystemName";
     String description = "Unit changed";
-    HistoryLogEventType eventType = HistoryLogEventType.PUBLISH;
+    HistoryLogEventType eventType = HistoryLogEventType.HANDOVER;
     UUID docOfficeId = UUID.randomUUID();
     String officeAbbreviation = "BGH";
     DocumentationOfficeDTO documentationOfficeDTO =

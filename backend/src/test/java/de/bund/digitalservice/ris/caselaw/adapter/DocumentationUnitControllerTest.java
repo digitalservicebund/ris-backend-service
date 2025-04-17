@@ -217,7 +217,7 @@ class DocumentationUnitControllerTest {
         .isOk();
 
     verify(duplicateCheckService, times(1)).checkDuplicates(docUnit.documentNumber());
-    verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any());
+    verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any(), any());
 
     verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any(), any());
   }
