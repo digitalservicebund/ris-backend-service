@@ -43,6 +43,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
@@ -124,6 +125,7 @@ class ScheduledPublicationIntegrationTest {
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
