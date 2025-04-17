@@ -27,11 +27,11 @@ import org.xml.sax.SAXException;
 public class HandoverService {
 
   private final DocumentationUnitRepository repository;
-
   private final LegalPeriodicalEditionRepository editionRepository;
   private final HandoverReportRepository handoverReportRepository;
   private final MailService mailService;
   private final DeltaMigrationRepository deltaMigrationRepository;
+  private final DocumentationUnitHistoryLogService historyLogService;
 
   @Value("${mail.exporter.recipientAddress:neuris@example.com}")
   private String recipientAddress;
@@ -41,13 +41,15 @@ public class HandoverService {
       MailService mailService,
       DeltaMigrationRepository migrationService,
       HandoverReportRepository handoverReportRepository,
-      LegalPeriodicalEditionRepository editionRepository) {
+      LegalPeriodicalEditionRepository editionRepository,
+      DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
     this.mailService = mailService;
     this.deltaMigrationRepository = migrationService;
     this.handoverReportRepository = handoverReportRepository;
     this.editionRepository = editionRepository;
+    this.historyLogService = historyLogService;
   }
 
   /**
@@ -59,12 +61,20 @@ public class HandoverService {
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
    */
   public HandoverMail handoverDocumentationUnitAsMail(
-      UUID documentationUnitId, String issuerAddress) throws DocumentationUnitNotExistsException {
+      UUID documentationUnitId, String issuerAddress, User user)
+      throws DocumentationUnitNotExistsException {
 
     Documentable documentable = repository.findByUuid(documentationUnitId);
 
     if (documentable instanceof DocumentationUnit documentationUnit) {
-      return mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
+      HandoverMail handoverMail =
+          mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
+      historyLogService.saveHistoryLog(
+          documentationUnit.uuid(),
+          user,
+          HistoryLogEventType.HANDOVER,
+          "Dokumentationseinheit wurde an die jdv übergeben");
+      return handoverMail;
     } else {
       log.info("Documentable type not supported: {}", documentable.getClass().getName());
       return null;
