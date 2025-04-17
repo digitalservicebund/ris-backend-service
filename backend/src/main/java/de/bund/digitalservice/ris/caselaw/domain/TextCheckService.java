@@ -145,7 +145,7 @@ public class TextCheckService {
    * @param documentationUnit without noindex tags
    * @return object with noindex tags on long and short texts
    */
-  public DocumentationUnit addNoIndexTagsForPublication(DocumentationUnit documentationUnit) {
+  public DocumentationUnit addNoIndexTagsForHandOver(DocumentationUnit documentationUnit) {
     List<String> ignoredTextCheckWords =
         ignoredTextCheckWordRepository
             .findAllByDocumentationUnitId(documentationUnit.uuid())
