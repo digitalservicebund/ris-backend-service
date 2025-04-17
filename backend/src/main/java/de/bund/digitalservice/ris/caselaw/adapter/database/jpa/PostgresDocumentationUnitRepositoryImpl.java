@@ -448,15 +448,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // add the previous procedure to the history
     if (procedureDTO != null && !sameAsLast) {
       decisionDTO.getProcedureHistory().add(procedureDTO);
+      historyLogService.saveHistoryLog(
+          decisionDTO.getId(),
+          user,
+          HistoryLogEventType.PROCEDURE,
+          "Dokumentationseinheit wurde zu Vorgang " + procedureDTO.getLabel() + " hinzugefügt");
     }
     // set new procedure
     decisionDTO.setProcedure(procedureDTO);
-    historyLogService.saveHistoryLog(
-        decisionDTO.getId(),
-        user,
-        HistoryLogEventType.PROCEDURE,
-        "Dokumentationseinheit wurde zu Vorgang " + procedureDTO.getLabel() + " hinzugefügt");
-
     repository.save(decisionDTO);
   }
 
