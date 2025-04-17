@@ -5,11 +5,13 @@ import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
 import java.util.Map;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /** Config to import and validate doc number patterns to generate doc numbers by doc office */
+@Slf4j
 @Configuration
 @ConfigurationProperties(prefix = "neuris")
 @Data
@@ -64,6 +66,7 @@ public class DocumentNumberPatternConfig implements InitializingBean {
       }
       return true;
     } catch (Exception e) {
+      log.info("Pattern is invalid cause: {}", e.getMessage());
       return false;
     }
   }

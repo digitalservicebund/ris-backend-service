@@ -18,7 +18,7 @@ neuris:
   document-number-patterns:
     BGH: KORE7****YYYY # results in e.g. KORE 7 0001 2024
     BVerfG: KVRE*****YY42 # results in e.g. KVRE 00001 24 42
-    BVerwG: WBREYYYY7****
+    BVerwG: WBRE7****YYYY
     BSG: BSGRE0*****YY
     DS: XXRE0******YY
     CC-RIS: XXRE1******YY
