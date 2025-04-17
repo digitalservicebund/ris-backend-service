@@ -27,16 +27,16 @@ public class DocumentationUnitHistoryLogService {
     return repository.findByDocumentationUnitId(documentationUnitId, userService.getUser(oidcUser));
   }
 
-  public HistoryLog saveHistoryLog(
+  public void saveHistoryLog(
       UUID documentationUnitId, User user, HistoryLogEventType eventType, String description) {
     UUID existingLogId = null;
     // accumulate UPDATE logs per day
-    if (eventType == HistoryLogEventType.UPDATE)
+    if (eventType == HistoryLogEventType.UPDATE) {
       existingLogId =
           findUpdateHistoryLogForToday(documentationUnitId, user).map(HistoryLog::id).orElse(null);
+    }
 
-    return repository.saveHistoryLog(
-        existingLogId, documentationUnitId, user, eventType, description);
+    repository.saveHistoryLog(existingLogId, documentationUnitId, user, eventType, description);
   }
 
   private Optional<HistoryLog> findUpdateHistoryLogForToday(UUID uuid, User user) {

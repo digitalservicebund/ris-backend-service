@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HistoryLogTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
@@ -43,12 +44,24 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
   }
 
   @Override
-  public HistoryLog saveHistoryLog(
+  public void saveHistoryLog(
       UUID existingId,
       UUID documentationUnitId,
       User user,
       HistoryLogEventType eventType,
       String description) {
+    String userName = null;
+    String systemName = null;
+    DocumentationOffice office = null;
+    UUID userId = null;
+
+    if (user != null) {
+      userName = user.name();
+      office = user.documentationOffice();
+      userId = user.id();
+    } else {
+      systemName = "NeuRIS";
+    }
     UUID historyLogId = UUID.randomUUID();
     if (existingId != null) {
       historyLogId = existingId;
@@ -58,13 +71,13 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
             .id(historyLogId)
             .createdAt(Instant.now())
             .documentationUnitId(documentationUnitId)
-            .documentationOffice(
-                DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
-            .userId(user.id())
-            .userName(user.name())
+            .documentationOffice(DocumentationOfficeTransformer.transformToDTO(office))
+            .userId(userId)
+            .userName(userName)
+            .systemName(systemName)
             .description(description)
             .eventType(eventType)
             .build();
-    return HistoryLogTransformer.transformToDomain(databaseRepository.save(dto), user);
+    databaseRepository.save(dto);
   }
 }

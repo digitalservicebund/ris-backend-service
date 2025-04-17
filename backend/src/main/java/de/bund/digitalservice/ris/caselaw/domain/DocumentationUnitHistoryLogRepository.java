@@ -39,9 +39,8 @@ public interface DocumentationUnitHistoryLogRepository {
    *     of the day, for the user
    * @param documentationUnitId the uuid of the documentation unit
    * @param user logged-in user for checking view permissions
-   * @return a domain representation of the saved history log
    */
-  HistoryLog saveHistoryLog(
+  void saveHistoryLog(
       UUID id,
       UUID documentationUnitId,
       User user,

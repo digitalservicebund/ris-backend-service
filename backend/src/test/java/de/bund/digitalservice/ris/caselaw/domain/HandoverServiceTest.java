@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -68,7 +69,7 @@ class HandoverServiceTest {
             .build();
     when(mailService.handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString()))
         .thenReturn(handoverMail);
-    var mailResponse = service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS);
+    var mailResponse = service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, any());
     assertThat(mailResponse).usingRecursiveComparison().isEqualTo(handoverMail);
     verify(repository).findByUuid(TEST_UUID);
     verify(mailService).handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString());
@@ -110,7 +111,7 @@ class HandoverServiceTest {
 
     Assertions.assertThrows(
         DocumentationUnitNotExistsException.class,
-        () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS));
+        () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, any()));
     verify(repository).findByUuid(TEST_UUID);
     verify(mailService, never())
         .handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString());
