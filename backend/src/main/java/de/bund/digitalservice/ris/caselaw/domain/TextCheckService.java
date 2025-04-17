@@ -110,6 +110,9 @@ public class TextCheckService {
       case HEADNOTE ->
           checkCategoryByHTML(
               documentationUnit.shortTexts().headnote(), category, documentationUnit.uuid());
+      case OTHER_HEADNOTE ->
+          checkCategoryByHTML(
+              documentationUnit.shortTexts().otherHeadnote(), category, documentationUnit.uuid());
       case HEADLINE ->
           checkCategoryByHTML(
               documentationUnit.shortTexts().headline(), category, documentationUnit.uuid());

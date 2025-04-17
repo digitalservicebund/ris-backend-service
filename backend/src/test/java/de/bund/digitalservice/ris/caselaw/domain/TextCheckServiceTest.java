@@ -125,6 +125,7 @@ class TextCheckServiceTest {
                     ShortTexts.builder()
                         .guidingPrinciple("<p>Guiding principle text</p>")
                         .headnote("<p>Headnote text</p>")
+                        .otherHeadnote("<p>Other headnote text</p>")
                         .decisionName("<p>Decision name text</p>")
                         .headline("<p>Headline text</p>")
                         .build())
