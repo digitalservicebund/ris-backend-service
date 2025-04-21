@@ -160,7 +160,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.4")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.5")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.1")
 
@@ -240,7 +240,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.5")
-    testImplementation("org.springframework.security:spring-security-test:6.4.4")
+    testImplementation("org.springframework.security:spring-security-test:6.4.5")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
