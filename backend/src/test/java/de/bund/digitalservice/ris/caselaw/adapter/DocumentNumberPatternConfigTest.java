@@ -26,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 })
 class DocumentNumberPatternConfigTest {
 
-  @Autowired DocumentNumberPatternConfig documentNumberPatternConfig;
+  @Autowired protected DocumentNumberPatternConfig documentNumberPatternConfig;
 
   @Test
   void validateMaxCharacters() throws DocumentNumberPatternException {
