@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeri
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -130,6 +131,8 @@ class HandoverMailServiceUATTest {
   @Autowired private HandoverMailService service;
 
   @MockitoBean private XmlExporter xmlExporter;
+
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @MockitoBean private HandoverRepository repository;
 

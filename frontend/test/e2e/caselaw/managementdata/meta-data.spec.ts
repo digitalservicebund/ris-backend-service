@@ -151,7 +151,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
   }
 
   async function expectCreatedBy(page: Page, createdBy: string) {
-    await test.step("Angelegt von ist " + createdBy, async () => {
+    await test.step(`Angelegt von ist '${createdBy}'`, async () => {
       const label = page.locator(
         '[data-testid="management-data-created-by"] dt',
       )
@@ -165,7 +165,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
 
   async function expectSource(page: Page, source: string | RegExp) {
     // eslint-disable-next-line playwright/no-conditional-in-test
-    await test.step(`Zuletzt bearbeitet am ist ${source instanceof RegExp ? "Z aus MMG 2024, 12, Heft e2e-[...]+ (L) (DS)" : source}`, async () => {
+    await test.step(`Quelle ist '${source instanceof RegExp ? "Z aus MMG 2024, 12, Heft e2e-[...] (L) (DS)" : source}'`, async () => {
       const label = page.locator('[data-testid="management-data-source"] dt')
       await expect(label).toHaveText("Quelle")
       const sourceElement = page.locator(
@@ -180,7 +180,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
     lastUpdatedAt: string | RegExp,
   ) {
     // eslint-disable-next-line playwright/no-conditional-in-test
-    await test.step(`Zuletzt bearbeitet am ist ${lastUpdatedAt instanceof RegExp ? "befüllt" : lastUpdatedAt}`, async () => {
+    await test.step(`Zuletzt bearbeitet am ist ${lastUpdatedAt instanceof RegExp ? "befüllt" : "'" + lastUpdatedAt + "'"}`, async () => {
       const label = page.locator(
         '[data-testid="management-data-last-updated-at"] dt',
       )
@@ -193,7 +193,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
   }
 
   async function expectLastUpdatedBy(page: Page, lastUpdatedBy: string) {
-    await test.step("Zuletzt bearbeitet von ist leer", async () => {
+    await test.step(`Zuletzt bearbeitet von ist '${lastUpdatedBy}'`, async () => {
       const label = page.locator(
         '[data-testid="management-data-last-updated-by"] dt',
       )
@@ -206,7 +206,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
   }
 
   async function expectProcedure(page: Page, procedure: string) {
-    await test.step("Vorgang ist leer", async () => {
+    await test.step(`Vorgang ist '${procedure}'`, async () => {
       const label = page.locator('[data-testid="management-data-procedure"] dt')
       await expect(label).toHaveText("Vorgang")
       const procedureElement = page.locator(
@@ -217,7 +217,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
   }
 
   async function expectFirstPublishedAt(page: Page, firstPublishedAt: string) {
-    await test.step("Erstveröffentlichung am ist leer", async () => {
+    await test.step(`Erstveröffentlichung am ist '${firstPublishedAt}'`, async () => {
       const label = page.locator(
         '[data-testid="management-data-first-published-at"] dt',
       )

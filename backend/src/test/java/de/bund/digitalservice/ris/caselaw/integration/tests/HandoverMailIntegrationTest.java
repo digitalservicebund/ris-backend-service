@@ -52,6 +52,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.EventType;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
@@ -169,6 +170,7 @@ class HandoverMailIntegrationTest {
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService

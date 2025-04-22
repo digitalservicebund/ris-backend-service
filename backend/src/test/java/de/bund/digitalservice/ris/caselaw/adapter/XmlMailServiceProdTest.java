@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
@@ -106,6 +107,8 @@ class XmlMailServiceProdTest {
   @MockitoBean private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
 
   @MockitoBean private HttpMailSender mailSender;
+
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {

@@ -82,3 +82,6 @@ where name LIKE '%e2e\-%';
 delete
 from incremental_migration.ignored_text_check_word
 where juris_id < 0;
+delete
+from incremental_migration.ignored_text_check_word
+where word LIKE 'etoe%';

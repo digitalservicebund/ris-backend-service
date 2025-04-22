@@ -33,13 +33,16 @@ import org.jsoup.select.NodeVisitor;
 public class TextCheckService {
   private final DocumentationUnitRepository documentationUnitRepository;
   private final IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+  private final FeatureToggleService featureToggleService;
 
   public TextCheckService(
       DocumentationUnitRepository documentationUnitRepository,
-      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
+      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository,
+      FeatureToggleService featureToggleService) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.ignoredTextCheckWordRepository = ignoredTextCheckWordRepository;
+    this.featureToggleService = featureToggleService;
   }
 
   public List<Match> check(String text) {
@@ -107,6 +110,9 @@ public class TextCheckService {
       case HEADNOTE ->
           checkCategoryByHTML(
               documentationUnit.shortTexts().headnote(), category, documentationUnit.uuid());
+      case OTHER_HEADNOTE ->
+          checkCategoryByHTML(
+              documentationUnit.shortTexts().otherHeadnote(), category, documentationUnit.uuid());
       case HEADLINE ->
           checkCategoryByHTML(
               documentationUnit.shortTexts().headline(), category, documentationUnit.uuid());
@@ -145,7 +151,11 @@ public class TextCheckService {
    * @param documentationUnit without noindex tags
    * @return object with noindex tags on long and short texts
    */
-  public DocumentationUnit addNoIndexTagsForPublication(DocumentationUnit documentationUnit) {
+  public DocumentationUnit addNoIndexTagsForHandOver(DocumentationUnit documentationUnit) {
+    if (!featureToggleService.isEnabled("neuris.text-check-noindex-handover")) {
+      return documentationUnit;
+    }
+
     List<String> ignoredTextCheckWords =
         ignoredTextCheckWordRepository
             .findAllByDocumentationUnitId(documentationUnit.uuid())
@@ -206,6 +216,8 @@ public class TextCheckService {
     }
 
     Document document = Jsoup.parse(htmlText);
+    document.outputSettings().prettyPrint(false);
+
     for (String ignoredWord : ignoredWords) {
       NodeTraversor.traverse(new NoIndexNodeWrapperVisitor(htmlText, ignoredWord), document.body());
     }
@@ -288,13 +300,13 @@ public class TextCheckService {
     return ignoredTextCheckWordRepository.deleteWordGlobally(word);
   }
 
-  public IgnoredTextCheckWord addIgnoreWord(String word) {
+  public IgnoredTextCheckWord addIgnoreWord(String word, DocumentationOffice documentationOffice) {
     IgnoredTextCheckWord globallyIgnoreWord =
         ignoredTextCheckWordRepository.getGloballyIgnoreWord(word);
     if (globallyIgnoreWord != null) {
       return globallyIgnoreWord;
     }
-    return ignoredTextCheckWordRepository.addWord(word);
+    return ignoredTextCheckWordRepository.addWord(word, documentationOffice);
   }
 
   public List<Match> addIgnoredTextChecksIndividually(

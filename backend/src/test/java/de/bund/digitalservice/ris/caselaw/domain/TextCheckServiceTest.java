@@ -44,8 +44,11 @@ class TextCheckServiceTest {
     IgnoredTextCheckWordRepository ignoredTextCheckWordRepository =
         mock(IgnoredTextCheckWordRepository.class);
 
+    FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+
     textCheckService =
-        new TextCheckMockService(documentationUnitRepository, ignoredTextCheckWordRepository);
+        new TextCheckMockService(
+            documentationUnitRepository, ignoredTextCheckWordRepository, featureToggleService);
   }
 
   @Test
@@ -122,6 +125,7 @@ class TextCheckServiceTest {
                     ShortTexts.builder()
                         .guidingPrinciple("<p>Guiding principle text</p>")
                         .headnote("<p>Headnote text</p>")
+                        .otherHeadnote("<p>Other headnote text</p>")
                         .decisionName("<p>Decision name text</p>")
                         .headline("<p>Headline text</p>")
                         .build())
@@ -518,6 +522,10 @@ class TextCheckServiceTest {
         Arguments.of(
             "<p>Abc§116A should replace</p>",
             List.of("Abc§116A"),
-            "<p><noindex>Abc§116A</noindex> should replace</p>"));
+            "<p><noindex>Abc§116A</noindex> should replace</p>"),
+        Arguments.of(
+            "<border-number><number>7</number><content><p><noindex>should-keep-text</noindex></p></content></border-number>",
+            List.of("Abc§116A"),
+            "<border-number><number>7</number><content><p><noindex>should-keep-text</noindex></p></content></border-number>"));
   }
 }

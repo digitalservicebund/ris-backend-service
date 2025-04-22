@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -75,7 +76,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class,
       OAuthService.class,
       TestConfig.class,
-      DocumentNumberPatternConfig.class
+      DocumentNumberPatternConfig.class,
     },
     controllers = {TextCheckController.class})
 @Sql(scripts = {"classpath:text_check_init.sql"})
@@ -112,6 +113,7 @@ class TextCheckIntegrationTest {
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -175,6 +177,8 @@ class TextCheckIntegrationTest {
         .isOk();
   }
 
+  // 'xyz' is added as a globally ignored word via SQL script
+  // this test verifies that it can be added locally at doc unit level, too
   @Test
   void testAddLocalIgnore_canAddGloballyIgnoredWordsLocally() {
     risWebTestClient
@@ -209,6 +213,15 @@ class TextCheckIntegrationTest {
               assertThat(response.getResponseBody().type()).isEqualTo(IgnoredTextCheckType.GLOBAL);
             });
 
+    // assert the global word has been saved and the documentation office is set correctly
+    assertThat(
+            repository
+                .findByDocumentationUnitIdOrByGlobalWords(null, List.of("def"))
+                .getFirst()
+                .getDocumentationOffice()
+                .getId())
+        .isEqualTo(docOffice.uuid());
+
     risWebTestClient
         .withDefaultLogin()
         .delete()
@@ -216,6 +229,8 @@ class TextCheckIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk();
+
+    assertThat(repository.findByDocumentationUnitIdOrByGlobalWords(null, List.of("def"))).isEmpty();
   }
 
   @Test

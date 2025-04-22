@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -11,7 +12,7 @@ public interface IgnoredTextCheckWordRepository {
 
   void deleteWordIgnoredInDocumentationUnitWithId(String word, UUID documentationUnitId);
 
-  IgnoredTextCheckWord addWord(String word);
+  IgnoredTextCheckWord addWord(String word, DocumentationOffice documentationOffice);
 
   boolean deleteWordGlobally(String word);
 

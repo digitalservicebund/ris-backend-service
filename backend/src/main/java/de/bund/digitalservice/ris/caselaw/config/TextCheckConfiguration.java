@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.config;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import org.springframework.context.annotation.Bean;
@@ -14,8 +15,9 @@ public class TextCheckConfiguration {
   public TextCheckService textCheckService(
       LanguageToolConfig config,
       DocumentationUnitRepository documentationUnitRepository,
-      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository) {
+      IgnoredTextCheckWordRepository ignoredTextCheckWordRepository,
+      FeatureToggleService featureToggleService) {
     return new LanguageToolService(
-        config, documentationUnitRepository, ignoredTextCheckWordRepository);
+        config, documentationUnitRepository, ignoredTextCheckWordRepository, featureToggleService);
   }
 }

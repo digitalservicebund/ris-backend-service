@@ -9,6 +9,7 @@ public enum CategoryType {
   CASE_FACTS("caseFacts"),
   DECISION_REASONS("decisionReasons"),
   HEADNOTE("headnote"),
+  OTHER_HEADNOTE("otherHeadnote"),
   GUIDING_PRINCIPLE("guidingPrinciple"),
   TENOR("tenor"),
   HEADLINE("headline"),
