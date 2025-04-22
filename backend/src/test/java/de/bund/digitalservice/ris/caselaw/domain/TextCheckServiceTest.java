@@ -20,6 +20,8 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckType;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +40,15 @@ class TextCheckServiceTest {
   private DocumentationUnitRepository documentationUnitRepository;
   private TextCheckService textCheckService;
 
+  private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+
   @BeforeEach
   void setUp() {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
-    IgnoredTextCheckWordRepository ignoredTextCheckWordRepository =
-        mock(IgnoredTextCheckWordRepository.class);
+    ignoredTextCheckWordRepository = mock(IgnoredTextCheckWordRepository.class);
 
     FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
-
+    when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
     textCheckService =
         new TextCheckMockService(
             documentationUnitRepository, ignoredTextCheckWordRepository, featureToggleService);
@@ -461,6 +464,59 @@ class TextCheckServiceTest {
     assertEquals(expected, result);
   }
 
+  @Test
+  void testAddNoIndexForPublication_shouldUpdateAllSupportedFields() {
+    var uuid = UUID.randomUUID();
+    var ignoredWord =
+        new IgnoredTextCheckWord(UUID.randomUUID(), IgnoredTextCheckType.GLOBAL, "text");
+    var docUnit =
+        DocumentationUnit.builder()
+            .uuid(uuid)
+            .longTexts(
+                LongTexts.builder()
+                    .reasons("<p>Reason text</p>")
+                    .tenor("<p>Tenor text</p>")
+                    .decisionReasons("<p>Decision reasons text</p>")
+                    .caseFacts("<p>Case facts text</p>")
+                    .otherLongText("<p>OtherLongText text</p>")
+                    .dissentingOpinion("<p>DissentingOpinion text</p>")
+                    .outline("<p>Outline text</p>")
+                    .build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(
+                        DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                    .build())
+            .shortTexts(
+                ShortTexts.builder()
+                    .guidingPrinciple("<p>Guiding principle text</p>")
+                    .headnote("<p>Headnote text</p>")
+                    .otherHeadnote("<p>Other headnote text</p>")
+                    .headline("<p>Headline text</p>")
+                    .build())
+            .build();
+
+    when(ignoredTextCheckWordRepository.findAllByDocumentationUnitId(uuid))
+        .thenReturn(List.of(ignoredWord));
+
+    var result = textCheckService.addNoIndexTagsForHandOver(docUnit);
+
+    // Long texts
+    assertTrue(result.longTexts().reasons().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().tenor().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().decisionReasons().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().caseFacts().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().otherLongText().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().dissentingOpinion().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().outline().contains("<noindex>text</noindex>"));
+
+    // Short text
+    assertTrue(result.shortTexts().guidingPrinciple().contains("<noindex>text</noindex>"));
+    assertTrue(result.shortTexts().headnote().contains("<noindex>text</noindex>"));
+    assertTrue(result.shortTexts().otherHeadnote().contains("<noindex>text</noindex>"));
+    assertTrue(result.shortTexts().headline().contains("<noindex>text</noindex>"));
+  }
+
   @ParameterizedTest
   @MethodSource("noIndexReplacementCases")
   void testAddNoIndexTags_withMultipleCases(
@@ -472,9 +528,9 @@ class TextCheckServiceTest {
   private static Stream<Arguments> noIndexReplacementCases() {
     return Stream.of(
         Arguments.of(
-            "<p>CASE insensitive should be replaced</p>",
+            "<p>CASE insensitive should not be replaced</p>",
             List.of("case"),
-            "<p><noindex>CASE</noindex> insensitive should be replaced</p>"),
+            "<p>CASE insensitive should not be replaced</p>"),
         Arguments.of(
             "<p>partsofwords should not replace</p>",
             List.of("parts"),
@@ -490,7 +546,7 @@ class TextCheckServiceTest {
         Arguments.of(
             "<p>hyphenated-word - first part should not replace</p>",
             List.of("word"),
-            "<p>hyphenated-word - first part should not replace</p>"),
+            "<p>hyphenated-<noindex>word</noindex> - first part should not replace</p>"),
         Arguments.of(
             "<p>\"[word]\" - words in square brackets should be replaced</p>",
             List.of("word"),

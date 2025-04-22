@@ -199,6 +199,7 @@ public class TextCheckService {
   private ShortTexts updateShortTexts(ShortTexts texts, List<String> ignoredWords) {
     return texts.toBuilder()
         .headnote(addNoIndexTags(texts.headnote(), ignoredWords))
+        .otherHeadnote(addNoIndexTags(texts.otherHeadnote(), ignoredWords))
         .headline(addNoIndexTags(texts.headline(), ignoredWords))
         .guidingPrinciple(addNoIndexTags(texts.guidingPrinciple(), ignoredWords))
         .build();
@@ -337,7 +338,7 @@ public class TextCheckService {
 
   /**
    * See test method for covered cases {@code
-   * TextCheckServiceTest#testAddNoIndexTags_variousCases()}
+   * TextCheckServiceTest#testAddNoIndexTags_withMultipleCases()}
    */
   @SuppressWarnings("java:S3776")
   protected record NoIndexNodeWrapperVisitor(String html, String ignoredWord)
@@ -350,8 +351,8 @@ public class TextCheckService {
 
         Pattern exactWordsMatchPattern =
             Pattern.compile(
-                "(?<![\\p{L}\\p{N}-])" + Pattern.quote(ignoredWord) + "(?![\\p{L}\\p{N}-])",
-                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
+                "(?<![\\p{L}\\p{N}])" + Pattern.quote(ignoredWord) + "(?![\\p{L}\\p{N}])",
+                Pattern.UNICODE_CHARACTER_CLASS);
 
         Matcher matcher = exactWordsMatchPattern.matcher(text);
 
