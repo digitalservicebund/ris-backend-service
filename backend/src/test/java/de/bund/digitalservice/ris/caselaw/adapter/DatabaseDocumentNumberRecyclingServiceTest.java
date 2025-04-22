@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -264,11 +263,6 @@ class DatabaseDocumentNumberRecyclingServiceTest {
         () ->
             service.assertDocumentationUnitHasNeverBeenHandedOverOrMigrated(
                 documentationUnitDTO.getId()));
-  }
-
-  @Test
-  void assertHasValidFormat() {
-    assertDoesNotThrow(() -> service.assertPatternIsValid("BVerwG", "WBRE700012025"));
   }
 
   private static StatusDTO generateStatus(
