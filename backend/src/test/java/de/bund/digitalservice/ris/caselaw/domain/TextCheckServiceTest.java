@@ -546,7 +546,7 @@ class TextCheckServiceTest {
         Arguments.of(
             "<p>hyphenated-word - first part should not replace</p>",
             List.of("word"),
-            "<p>hyphenated-word - first part should not replace</p>"),
+            "<p>hyphenated-<noindex>word</noindex> - first part should not replace</p>"),
         Arguments.of(
             "<p>\"[word]\" - words in square brackets should be replaced</p>",
             List.of("word"),
