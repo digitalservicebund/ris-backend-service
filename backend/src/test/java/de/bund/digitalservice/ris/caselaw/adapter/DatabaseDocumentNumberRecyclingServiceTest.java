@@ -60,10 +60,14 @@ class DatabaseDocumentNumberRecyclingServiceTest {
   @Test
   void addForRecycling_shouldNotSave_ifPrefixIsInvalid() {
 
+    var documentationUnitId = UUID.randomUUID();
+    var currentYear = Year.now();
+    var documentationUnitNumber = "KORE2" + currentYear + "00037";
+
     var documentationUnitDTO =
         DecisionDTO.builder()
-            .id(UUID.randomUUID())
-            .documentNumber("KORE2" + Year.now() + "00037")
+            .id(documentationUnitId)
+            .documentNumber(documentationUnitNumber)
             .build();
 
     var unpublished = generateStatus(documentationUnitDTO, PublicationStatus.UNPUBLISHED);
@@ -71,7 +75,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
     var outdatedDeletedId =
         DeletedDocumentationUnitDTO.builder()
             .documentNumber(documentationUnitDTO.getDocumentNumber())
-            .year(Year.now())
+            .year(currentYear)
             .abbreviation(DEFAULT_DOCUMENTATION_OFFICE)
             .build();
 
@@ -85,9 +89,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
         DocumentNumberPatternException.class,
         () ->
             service.addForRecycling(
-                documentationUnitDTO.getId(),
-                documentationUnitDTO.getDocumentNumber(),
-                DEFAULT_DOCUMENTATION_OFFICE));
+                documentationUnitId, documentationUnitNumber, DEFAULT_DOCUMENTATION_OFFICE));
   }
 
   @Test
