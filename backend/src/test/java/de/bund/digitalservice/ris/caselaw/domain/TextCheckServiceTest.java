@@ -528,9 +528,9 @@ class TextCheckServiceTest {
   private static Stream<Arguments> noIndexReplacementCases() {
     return Stream.of(
         Arguments.of(
-            "<p>CASE insensitive should be replaced</p>",
+            "<p>CASE insensitive should not be replaced</p>",
             List.of("case"),
-            "<p><noindex>CASE</noindex> insensitive should be replaced</p>"),
+            "<p>CASE insensitive should not be replaced</p>"),
         Arguments.of(
             "<p>partsofwords should not replace</p>",
             List.of("parts"),

@@ -352,7 +352,7 @@ public class TextCheckService {
         Pattern exactWordsMatchPattern =
             Pattern.compile(
                 "(?<![\\p{L}\\p{N}])" + Pattern.quote(ignoredWord) + "(?![\\p{L}\\p{N}])",
-                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
+                Pattern.UNICODE_CHARACTER_CLASS);
 
         Matcher matcher = exactWordsMatchPattern.matcher(text);
 
