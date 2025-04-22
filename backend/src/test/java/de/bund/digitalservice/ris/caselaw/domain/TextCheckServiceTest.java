@@ -520,6 +520,10 @@ class TextCheckServiceTest {
             List.of("WORD"),
             "<p><noindex>WORD</noindex>. should replace</p>"),
         Arguments.of(
+            "<article>add-no-index should not reformat text</article>",
+            List.of("add-no-index"),
+            "<article><noindex>add-no-index</noindex> should not reformat text</article>"),
+        Arguments.of(
             "<p>Abc§116A should replace</p>",
             List.of("Abc§116A"),
             "<p><noindex>Abc§116A</noindex> should replace</p>"),
