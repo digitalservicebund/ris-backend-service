@@ -151,6 +151,8 @@ class HandoverMailServiceUATTest {
     documentationUnit =
         DocumentationUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
 
+    when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
+
     edition =
         LegalPeriodicalEdition.builder()
             .legalPeriodical(legalPeriodical)
@@ -210,8 +212,8 @@ class HandoverMailServiceUATTest {
             "neuris",
             Collections.singletonList(
                 MailAttachment.builder()
-                    .fileName(DOC_UNIT_SAVED_MAIL.attachments().get(0).fileName())
-                    .fileContent(DOC_UNIT_SAVED_MAIL.attachments().get(0).fileContent())
+                    .fileName(DOC_UNIT_SAVED_MAIL.attachments().getFirst().fileName())
+                    .fileContent(DOC_UNIT_SAVED_MAIL.attachments().getFirst().fileContent())
                     .build()),
             DOC_UNIT_SAVED_MAIL.entityId().toString());
   }
