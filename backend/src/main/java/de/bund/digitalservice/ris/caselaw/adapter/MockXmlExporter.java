@@ -22,7 +22,10 @@ public class MockXmlExporter implements XmlExporter {
   @Override
   public XmlTransformationResult transformToXml(DocumentationUnit documentationUnit) {
     return new XmlTransformationResult(
-        "xml",
+        (documentationUnit.shortTexts() != null
+                && documentationUnit.shortTexts().headnote() != null)
+            ? documentationUnit.shortTexts().headnote()
+            : "xml",
         documentationUnit.coreData().decisionDate() != null,
         List.of("message 1", "message 2"),
         "test.xml",
