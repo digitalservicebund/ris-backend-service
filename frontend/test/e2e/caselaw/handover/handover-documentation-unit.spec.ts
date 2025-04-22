@@ -429,7 +429,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       tag: ["@RISDEV-254", "@RISDEV-6205", "@RISDEV-7394"],
     },
     async ({ page, prefilledDocumentUnit, request }) => {
-      const expectedNoindexCount = 8
+      const expectedNoindexCount = 11
       await test.step("Befülle Langtexte und Kurztexte mit texts", async () => {
         await addIgnoreWordToDocumentationUnit(
           page,
@@ -450,10 +450,12 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
           },
           longTexts: {
             tenor: text,
+            reasons: text,
             caseFacts: text,
             decisionReasons: text,
             otherLongText: text,
             dissentingOpinion: text,
+            outline: text,
           },
         } as DocumentUnit
         await updateDocumentationUnit(page, documentationUnit, request)
