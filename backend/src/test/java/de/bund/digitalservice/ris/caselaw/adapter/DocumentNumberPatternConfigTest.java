@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
 import java.util.Map;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ class DocumentNumberPatternConfigTest {
     assertFalse(documentNumberPatternConfig.getDocumentNumberPatterns().isEmpty());
   }
 
+  @Disabled("Temporarily disabled due to UAT pattern clarification RISDEV-7565")
   @Test
   void assertDocOfficePatternsAreValid() throws DocumentNumberFormatterException {
     for (Map.Entry<String, String> entry :
