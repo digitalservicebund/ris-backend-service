@@ -291,10 +291,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       setLastUpdated(currentUser, decisionDTO);
       historyLogService.saveHistoryLog(
-          decisionDTO.getId(),
-          currentUser,
-          HistoryLogEventType.UPDATE,
-          "Dokumentationseinheit wurde bearbeitet");
+          decisionDTO.getId(), currentUser, HistoryLogEventType.UPDATE, "Dokeinheit bearbeitet");
 
       documentationUnitDTO =
           DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);
@@ -445,15 +442,21 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     boolean sameAsLast =
         decisionDTO.getProcedure() != null && decisionDTO.getProcedure().equals(procedureDTO);
 
-    // add the previous procedure to the history
     if (procedureDTO != null && !sameAsLast) {
       decisionDTO.getProcedureHistory().add(procedureDTO);
+      String description;
+      if (decisionDTO.getProcedure() != null) {
+        String oldProcedureLabel = decisionDTO.getProcedure().getLabel();
+        description =
+            "Vorgang geändert: %s → %s".formatted(oldProcedureLabel, procedureDTO.getLabel());
+
+      } else {
+        description = "Vorgang gesetzt: %s".formatted(procedureDTO.getLabel());
+      }
       historyLogService.saveHistoryLog(
-          decisionDTO.getId(),
-          user,
-          HistoryLogEventType.PROCEDURE,
-          "Dokumentationseinheit wurde zu Vorgang " + procedureDTO.getLabel() + " hinzugefügt");
+          decisionDTO.getId(), user, HistoryLogEventType.PROCEDURE, description);
     }
+
     // set new procedure
     decisionDTO.setProcedure(procedureDTO);
     repository.save(decisionDTO);

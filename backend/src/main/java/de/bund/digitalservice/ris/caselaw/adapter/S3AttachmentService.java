@@ -73,7 +73,7 @@ public class S3AttachmentService implements AttachmentService {
     setLastUpdated(user, documentationUnit);
     documentationUnitRepository.save(documentationUnit);
     documentationUnitHistoryLogService.saveHistoryLog(
-        documentationUnitId, user, HistoryLogEventType.FILES, "Dokument wurde hochgeladen");
+        documentationUnitId, user, HistoryLogEventType.FILES, "Word-Dokument hinzugefügt");
 
     AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()
@@ -103,7 +103,7 @@ public class S3AttachmentService implements AttachmentService {
             documentationUnit -> {
               setLastUpdated(user, documentationUnit);
               documentationUnitHistoryLogService.saveHistoryLog(
-                  documentationUnitId, user, HistoryLogEventType.FILES, "Dokument wurde gelöscht");
+                  documentationUnitId, user, HistoryLogEventType.FILES, "Word-Dokument gelöscht");
             });
     repository.deleteByS3ObjectPath(s3Path);
   }

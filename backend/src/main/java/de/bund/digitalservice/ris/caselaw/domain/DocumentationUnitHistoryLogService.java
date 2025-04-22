@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -40,8 +38,7 @@ public class DocumentationUnitHistoryLogService {
   }
 
   private Optional<HistoryLog> findUpdateHistoryLogForToday(UUID uuid, User user) {
-    ZoneOffset zone = ZoneOffset.UTC;
-    Instant startOfDay = LocalDate.now(zone).atStartOfDay().toInstant(zone);
+    Instant startOfDay = Instant.now().truncatedTo(ChronoUnit.DAYS);
     Instant endOfDay = startOfDay.plus(1, ChronoUnit.DAYS);
 
     return repository.findUpdateLogForToday(uuid, user, startOfDay, endOfDay);

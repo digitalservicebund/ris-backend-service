@@ -67,10 +67,7 @@ public class HandoverService {
     Documentable documentable = repository.findByUuid(documentationUnitId);
 
     if (documentable instanceof DocumentationUnit documentationUnit) {
-      String description = "Dokumentationseinheit wurde an die jdv übergeben";
-      if (user == null) {
-        description = "Terminierte Abgabe an die jdv";
-      }
+      String description = "Dokeinheit an jDV übergeben";
       historyLogService.saveHistoryLog(
           documentationUnit.uuid(), user, HistoryLogEventType.HANDOVER, description);
       return mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
