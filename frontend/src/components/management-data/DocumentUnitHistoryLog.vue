@@ -26,7 +26,9 @@ const formattedData = computed(
     props.data?.map((item) => ({
       ...item,
       createdAt: formatTimestamp(item.createdAt),
-      createdBy: `${item.documentationOffice} (${item.createdBy})`,
+      createdBy: item.documentationOffice
+        ? `${item.documentationOffice} (${item.createdBy})`
+        : item.createdBy,
     })) ?? [],
 )
 
@@ -38,13 +40,13 @@ const formatTimestamp = (date?: string) =>
   <div class="py-24">
     <h2 class="ris-body1-bold pb-16">Historie:</h2>
     <DataTable
+      v-if="formattedData.length > 0"
       :loading="loading"
       :row-class="rowClass"
       scroll-height="250px"
       scrollable
       :value="formattedData"
     >
-      <template #empty> Keine Daten. </template>
       <template #loading>
         <LoadingSpinner size="small" />
       </template>
@@ -53,9 +55,10 @@ const formatTimestamp = (date?: string) =>
         :key="col.field"
         :field="col.field"
         :header="col.header"
-        header-class="ris-label2-bold text-gray-900"
-      >
-      </Column>
+        header-class="ris-label2-bold text-gray-900 w-64 sticky top-0 bg-white z-10"
+      />
     </DataTable>
+    <!-- Empty state -->
+    <div v-else class="bg-blue-100 p-8">Keine Daten</div>
   </div>
 </template>

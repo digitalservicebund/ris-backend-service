@@ -35,12 +35,16 @@ public class HistoryLogTransformer {
   public static HistoryLog transformToDomain(HistoryLogDTO historyLogDTO, @Nullable User user) {
     DocumentationOffice userDocumentationOffice =
         Optional.ofNullable(user).map(User::documentationOffice).orElse(null);
+    String documentationOffice =
+        Optional.ofNullable(historyLogDTO.getDocumentationOffice())
+            .map(DocumentationOfficeDTO::getAbbreviation)
+            .orElse(null);
 
     return HistoryLog.builder()
         .id(historyLogDTO.getId())
         .createdAt(historyLogDTO.getCreatedAt())
         .createdBy(transformCreatedBy(historyLogDTO, userDocumentationOffice))
-        .documentationOffice(historyLogDTO.getDocumentationOffice().getAbbreviation())
+        .documentationOffice(documentationOffice)
         .description(historyLogDTO.getDescription())
         .eventType(String.valueOf(historyLogDTO.getEventType()))
         .build();
