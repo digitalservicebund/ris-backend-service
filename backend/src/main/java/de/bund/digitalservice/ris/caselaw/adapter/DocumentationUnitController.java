@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
@@ -73,7 +72,6 @@ public class DocumentationUnitController {
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
   private final DuplicateCheckService duplicateCheckService;
-  private final DocumentationUnitHistoryLogService historyLogService;
 
   public DocumentationUnitController(
       DocumentationUnitService service,
@@ -84,8 +82,7 @@ public class DocumentationUnitController {
       PortalPublicationService portalPublicationService,
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService,
-      DuplicateCheckService duplicateCheckService,
-      DocumentationUnitHistoryLogService historyLogService) {
+      DuplicateCheckService duplicateCheckService) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
@@ -95,7 +92,6 @@ public class DocumentationUnitController {
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
     this.duplicateCheckService = duplicateCheckService;
-    this.historyLogService = historyLogService;
   }
 
   /**
