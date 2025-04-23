@@ -91,6 +91,19 @@
       "labels": [
         "no-automerge"
       ]
+    },
+    {
+      "groupName": "neuris-languagetool-docker-image",
+      "automerge": true,
+      "labels": [
+        "no-automerge"
+      ],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "ghcr.io/digitalservicebund/neuris-languagetool"
+      ],
     }
   ]
 }
