@@ -60,7 +60,6 @@ const isMatchIgnored = computed(() => {
     </div>
 
     <IgnoredWordHandler
-      v-if="isMatchIgnored"
       :match="match"
       @globally-ignored-word:add="addIgnoredWordGlobally"
       @globally-ignored-word:remove="removeGloballyIgnoredWord(match.word)"

@@ -37,10 +37,7 @@ const matchIsIgnoredGlobally = computed(() => {
 </script>
 
 <template>
-  <div
-    class="flex flex-grow flex-col gap-16"
-    data-testid="ignored-word-handler"
-  >
+  <div class="flex flex-grow flex-col" data-testid="ignored-word-handler">
     <div
       v-if="
         match.ignoredTextCheckWords?.some(
