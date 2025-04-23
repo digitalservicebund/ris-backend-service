@@ -5,5 +5,7 @@ public enum HistoryLogEventType {
   FILES,
   PROCEDURE,
   STATUS,
-  HANDOVER
+  HANDOVER,
+  LEGACY_DOKEDIT,
+  LEGACY_DOKABGABE
 }
