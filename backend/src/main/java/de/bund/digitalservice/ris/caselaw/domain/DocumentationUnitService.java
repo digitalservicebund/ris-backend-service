@@ -196,7 +196,8 @@ public class DocumentationUnitService {
 
     statusService.update(
         documentNumber,
-        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build());
+        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build(),
+        userService.getUser(oidcUser));
 
     return addPermissions(
         oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));

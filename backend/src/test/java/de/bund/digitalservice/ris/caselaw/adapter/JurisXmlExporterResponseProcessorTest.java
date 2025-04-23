@@ -344,7 +344,8 @@ class JurisXmlExporterResponseProcessorTest {
                 Status.builder()
                     .publicationStatus(PublicationStatus.UNPUBLISHED)
                     .withError(true)
-                    .build()));
+                    .build()),
+            eq(null));
   }
 
   @ParameterizedTest
@@ -367,7 +368,8 @@ class JurisXmlExporterResponseProcessorTest {
                 Status.builder()
                     .publicationStatus(PublicationStatus.UNPUBLISHED)
                     .withError(hasResultingError)
-                    .build()));
+                    .build()),
+            eq(null));
   }
 
   @Test
@@ -395,7 +397,8 @@ class JurisXmlExporterResponseProcessorTest {
                 Status.builder()
                     .publicationStatus(PublicationStatus.UNPUBLISHED)
                     .withError(true)
-                    .build()));
+                    .build()),
+            eq(null));
 
     inOrder.verify(statusService, times(1)).getLatestStatus(DOCUMENT_NUMBER);
 
@@ -407,7 +410,8 @@ class JurisXmlExporterResponseProcessorTest {
                 Status.builder()
                     .publicationStatus(PublicationStatus.UNPUBLISHED)
                     .withError(false)
-                    .build()));
+                    .build()),
+            eq(null));
 
     inOrder.verifyNoMoreInteractions();
   }

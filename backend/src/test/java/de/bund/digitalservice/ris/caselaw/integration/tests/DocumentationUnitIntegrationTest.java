@@ -1392,7 +1392,7 @@ class DocumentationUnitIntegrationTest {
             .publicationStatus(PublicationStatus.PUBLISHED)
             .createdAt(Instant.now())
             .build();
-    documentationUnitStatusService.update(createdDocUnit.documentNumber(), status);
+    documentationUnitStatusService.update(createdDocUnit.documentNumber(), status, null);
 
     var docUnitForDifferentDocOffice =
         risWebTestClient

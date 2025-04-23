@@ -255,7 +255,8 @@ public class JurisXmlExporterResponseProcessor {
           Status.builder()
               .publicationStatus(lastStatus)
               .withError(messageWrapper.hasErrors() || !messageWrapper.isPublished().orElse(true))
-              .build());
+              .build(),
+          null);
     } catch (Exception e) {
       throw new StatusImporterException("Could not update publicationStatus", e);
     }
