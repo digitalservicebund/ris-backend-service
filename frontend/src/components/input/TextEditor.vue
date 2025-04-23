@@ -224,7 +224,7 @@ const removeIgnoredWord = async (word: string) => {
 }
 
 /**
- * Adds word to global ignore and closes the modal
+ * Adds word to globally ignore and closes the modal
  */
 async function addGloballyIgnoredWord(word: string) {
   await textCheckService.ignoreWordGlobally(word)
