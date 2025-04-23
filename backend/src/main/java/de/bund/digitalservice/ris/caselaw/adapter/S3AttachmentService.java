@@ -192,6 +192,7 @@ public class S3AttachmentService implements AttachmentService {
     } else {
       managementData.setLastUpdatedAtDateTime(Instant.now());
       managementData.setLastUpdatedByUserId(user.id());
+      managementData.setLastUpdatedBySystemName(null);
       managementData.setLastUpdatedByUserName(user.name());
       managementData.setLastUpdatedByDocumentationOffice(
           DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()));

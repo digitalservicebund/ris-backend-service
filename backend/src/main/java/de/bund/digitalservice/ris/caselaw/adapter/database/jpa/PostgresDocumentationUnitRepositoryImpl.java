@@ -310,12 +310,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       decisionDTO.getManagementData().setDocumentationUnit(decisionDTO);
     }
 
+    DocumentationOfficeDTO docOffice =
+        DocumentationOfficeTransformer.transformToDTO(currentUser.documentationOffice());
+
     decisionDTO.getManagementData().setLastUpdatedByUserId(currentUser.id());
     decisionDTO.getManagementData().setLastUpdatedByUserName(currentUser.name());
-    decisionDTO
-        .getManagementData()
-        .setLastUpdatedByDocumentationOffice(
-            DocumentationOfficeTransformer.transformToDTO(currentUser.documentationOffice()));
+    decisionDTO.getManagementData().setLastUpdatedBySystemName(null);
+    decisionDTO.getManagementData().setLastUpdatedByDocumentationOffice(docOffice);
     decisionDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
   }
 
