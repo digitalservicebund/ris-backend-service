@@ -37,19 +37,15 @@ const formatTimestamp = (date?: string) =>
 </script>
 
 <template>
-  <div class="py-24">
+  <div class="flex flex-col py-24">
     <h2 class="ris-body1-bold pb-16">Historie:</h2>
     <DataTable
-      v-if="formattedData.length > 0"
-      :loading="loading"
+      v-if="formattedData.length > 0 && !loading"
       :row-class="rowClass"
       scroll-height="250px"
       scrollable
       :value="formattedData"
     >
-      <template #loading>
-        <LoadingSpinner size="small" />
-      </template>
       <Column
         v-for="col in columns"
         :key="col.field"
@@ -59,6 +55,7 @@ const formatTimestamp = (date?: string) =>
       />
     </DataTable>
     <!-- Empty state -->
+    <LoadingSpinner v-else-if="loading" class="self-center" size="small" />
     <div v-else class="bg-blue-100 p-8">Keine Daten</div>
   </div>
 </template>
