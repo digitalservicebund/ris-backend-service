@@ -101,7 +101,6 @@
       "matchDatasources": [
         "docker"
       ],
-      "versioning": "loose",
       "matchPackageNames": [
         "ghcr.io/digitalservicebund/neuris-languagetool"
       ],
