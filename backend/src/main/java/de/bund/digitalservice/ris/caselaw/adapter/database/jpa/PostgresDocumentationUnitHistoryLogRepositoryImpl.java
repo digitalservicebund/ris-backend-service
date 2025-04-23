@@ -47,7 +47,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
   public void saveHistoryLog(
       UUID existingId,
       UUID documentationUnitId,
-      User user,
+      @Nullable User user,
       HistoryLogEventType eventType,
       String description) {
     String userName = null;

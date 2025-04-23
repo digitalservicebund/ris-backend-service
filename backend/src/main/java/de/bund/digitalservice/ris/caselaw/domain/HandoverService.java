@@ -17,6 +17,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
@@ -61,7 +62,7 @@ public class HandoverService {
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
    */
   public HandoverMail handoverDocumentationUnitAsMail(
-      UUID documentationUnitId, String issuerAddress, User user)
+      UUID documentationUnitId, String issuerAddress, @Nullable User user)
       throws DocumentationUnitNotExistsException {
 
     Documentable documentable = repository.findByUuid(documentationUnitId);

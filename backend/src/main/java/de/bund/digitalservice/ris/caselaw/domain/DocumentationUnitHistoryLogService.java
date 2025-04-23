@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,10 @@ public class DocumentationUnitHistoryLogService {
   }
 
   public void saveHistoryLog(
-      UUID documentationUnitId, User user, HistoryLogEventType eventType, String description) {
+      UUID documentationUnitId,
+      @Nullable User user,
+      HistoryLogEventType eventType,
+      String description) {
     UUID existingLogId = null;
     // accumulate UPDATE logs per day
     if (eventType == HistoryLogEventType.UPDATE) {
