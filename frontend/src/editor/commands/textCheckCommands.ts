@@ -161,6 +161,9 @@ class NeurisTextCheckService implements TextCheckService {
 
       if (response.status >= 300) {
         this.responseError.value = response.error
+      } else {
+        this.selectedMatch.value.ignoredTextCheckWords ??= []
+        this.selectedMatch.value.ignoredTextCheckWords.push(response.data)
       }
     }
   }
@@ -177,6 +180,11 @@ class NeurisTextCheckService implements TextCheckService {
 
       if (response.status >= 300) {
         this.responseError.value = response.error
+      } else {
+        this.selectedMatch.value.ignoredTextCheckWords = (
+          this.selectedMatch.value
+            .ignoredTextCheckWords as IgnoredTextCheckWord[]
+        ).filter(({ type }) => type !== "documentation_unit")
       }
     }
   }
@@ -187,6 +195,9 @@ class NeurisTextCheckService implements TextCheckService {
 
     if (response.status >= 300) {
       this.responseError.value = response.error
+    } else {
+      this.selectedMatch.value.ignoredTextCheckWords ??= []
+      this.selectedMatch.value.ignoredTextCheckWords.push(response.data)
     }
   }
 
@@ -196,6 +207,10 @@ class NeurisTextCheckService implements TextCheckService {
 
     if (response.status >= 300) {
       this.responseError.value = response.error
+    } else {
+      this.selectedMatch.value.ignoredTextCheckWords = (
+        this.selectedMatch.value.ignoredTextCheckWords as IgnoredTextCheckWord[]
+      ).filter(({ type }) => type !== "global")
     }
   }
 }

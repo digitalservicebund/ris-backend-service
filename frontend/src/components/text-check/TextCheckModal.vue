@@ -1,10 +1,7 @@
 <script lang="ts" setup>
-import Button from "primevue/button"
 import { computed } from "vue"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
-
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Match, Replacement } from "@/types/textCheck"
 
 const props = defineProps<{
@@ -43,21 +40,12 @@ function getValues(replacements: Replacement[]) {
   return replacements.flatMap((replacement) => replacement.value)
 }
 
-const matchIsIgnoredGlobally = computed(() => {
-  return props.match.ignoredTextCheckWords?.some(
-    (ignoredWord) =>
-      ignoredWord.type === "global" || ignoredWord.type === "global_jdv",
-  )
-})
-
 const isMatchIgnored = computed(() => {
   return (
     Array.isArray(props.match.ignoredTextCheckWords) &&
     props.match.ignoredTextCheckWords.length > 0
   )
 })
-
-const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
 </script>
 
 <template>
@@ -71,17 +59,9 @@ const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
       </span>
     </div>
 
-    <Button
-      v-if="textCheckGlobal && !matchIsIgnoredGlobally"
-      size="small"
-      text
-      @click="addIgnoredWordGlobally"
-      >Zum globalen Wörterbuch hinzufügen</Button
-    >
-
     <IgnoredWordHandler
-      v-if="isMatchIgnored"
       :match="match"
+      @globally-ignored-word:add="addIgnoredWordGlobally"
       @globally-ignored-word:remove="removeGloballyIgnoredWord(match.word)"
       @ignored-word:remove="removeIgnoredWord(match.word)"
     />
