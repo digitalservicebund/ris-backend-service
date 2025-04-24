@@ -287,12 +287,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       }
     }
 
+    setLastUpdated(currentUser, documentationUnitDTO);
+    historyLogService.saveHistoryLog(
+        documentationUnitDTO.getId(),
+        currentUser,
+        HistoryLogEventType.UPDATE,
+        "Dokeinheit bearbeitet");
+
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
-      setLastUpdated(currentUser, decisionDTO);
-      historyLogService.saveHistoryLog(
-          decisionDTO.getId(), currentUser, HistoryLogEventType.UPDATE, "Dokeinheit bearbeitet");
-
       documentationUnitDTO =
           DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);
       repository.save(documentationUnitDTO);
@@ -300,24 +303,24 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // TODO pending proceeding
   }
 
-  private void setLastUpdated(User currentUser, DecisionDTO decisionDTO) {
+  private void setLastUpdated(User currentUser, DocumentationUnitDTO docUnitDTO) {
     if (currentUser == null) {
       return;
     }
 
-    if (decisionDTO.getManagementData() == null) {
-      decisionDTO.setManagementData(new ManagementDataDTO());
-      decisionDTO.getManagementData().setDocumentationUnit(decisionDTO);
+    if (docUnitDTO.getManagementData() == null) {
+      docUnitDTO.setManagementData(new ManagementDataDTO());
+      docUnitDTO.getManagementData().setDocumentationUnit(docUnitDTO);
     }
 
     DocumentationOfficeDTO docOffice =
         DocumentationOfficeTransformer.transformToDTO(currentUser.documentationOffice());
 
-    decisionDTO.getManagementData().setLastUpdatedByUserId(currentUser.id());
-    decisionDTO.getManagementData().setLastUpdatedByUserName(currentUser.name());
-    decisionDTO.getManagementData().setLastUpdatedBySystemName(null);
-    decisionDTO.getManagementData().setLastUpdatedByDocumentationOffice(docOffice);
-    decisionDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
+    docUnitDTO.getManagementData().setLastUpdatedByUserId(currentUser.id());
+    docUnitDTO.getManagementData().setLastUpdatedByUserName(currentUser.name());
+    docUnitDTO.getManagementData().setLastUpdatedBySystemName(null);
+    docUnitDTO.getManagementData().setLastUpdatedByDocumentationOffice(docOffice);
+    docUnitDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
   }
 
   @Override
