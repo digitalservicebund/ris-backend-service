@@ -6,6 +6,11 @@ import DocumentUnit from "@/domain/documentUnit"
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { DocumentationType, IgnoredTextCheckWord } from "@/types/textCheck"
+import {
+  generateIgnoredWord,
+  generateMatch,
+} from "~/test-helper/text-check-service-mock"
 
 describe("check category service", () => {
   let store: ReturnType<typeof useDocumentUnitStore>
@@ -58,4 +63,91 @@ describe("check category service", () => {
     expect(store.updateDocumentUnit).toHaveBeenCalledTimes(1)
     expect(store.updateDocumentUnit).toHaveBeenCalledWith()
   })
+
+  it.each(["global", "documentation_unit"] as const)(
+    "removing a %s ignored word updates the selected match ignored words list accordingly",
+    async (type: DocumentationType) => {
+      const textCheckService = new NeurisTextCheckService()
+      if (type === "global") {
+        vi.spyOn(languageToolService, "removeGlobalIgnore").mockResolvedValue({
+          status: 200,
+          data: undefined,
+        })
+      } else if (type === "documentation_unit") {
+        vi.spyOn(languageToolService, "removeLocalIgnore").mockResolvedValue({
+          status: 200,
+          data: undefined,
+        })
+      }
+
+      const match = generateMatch()
+      const ignoredWord = generateIgnoredWord(type) as IgnoredTextCheckWord
+      match.ignoredTextCheckWords = [ignoredWord]
+      textCheckService.selectedMatch.value = match
+
+      expect(
+        textCheckService.selectedMatch.value.ignoredTextCheckWords,
+      ).toEqual([ignoredWord])
+
+      if (type === "global") {
+        await textCheckService.removeGloballyIgnoredWord(ignoredWord.word)
+      } else if (type === "documentation_unit") {
+        await textCheckService.removeIgnoredWord(ignoredWord.word)
+      }
+
+      expect(
+        textCheckService.selectedMatch.value.ignoredTextCheckWords,
+      ).toEqual([])
+    },
+  )
+
+  it.each(["global", "documentation_unit"] as const)(
+    "adding a %s ignored word updates the selected match ignored words list accordingly",
+    async (type: DocumentationType) => {
+      const textCheckService = new NeurisTextCheckService()
+
+      if (type == "documentation_unit") {
+        vi.spyOn(languageToolService, "removeLocalIgnore").mockResolvedValue({
+          status: 200,
+          data: undefined,
+        })
+      } else {
+        vi.spyOn(languageToolService, "removeGlobalIgnore").mockResolvedValue({
+          status: 200,
+          data: undefined,
+        })
+      }
+
+      const match = generateMatch()
+      const ignoredWord = generateIgnoredWord(type) as IgnoredTextCheckWord
+      match.ignoredTextCheckWords = []
+      textCheckService.selectedMatch.value = match
+
+      if (type == "global") {
+        vi.spyOn(languageToolService, "addGlobalIgnore").mockResolvedValue({
+          status: 200,
+          data: ignoredWord,
+        })
+      } else {
+        vi.spyOn(languageToolService, "addLocalIgnore").mockResolvedValue({
+          status: 200,
+          data: ignoredWord,
+        })
+      }
+
+      expect(
+        textCheckService.selectedMatch.value.ignoredTextCheckWords,
+      ).toEqual([])
+
+      if (type === "global") {
+        await textCheckService.ignoreWordGlobally(ignoredWord.word)
+      } else if (type === "documentation_unit") {
+        await textCheckService.ignoreWord(ignoredWord.word)
+      }
+
+      expect(
+        textCheckService.selectedMatch.value.ignoredTextCheckWords,
+      ).toEqual([ignoredWord])
+    },
+  )
 })
