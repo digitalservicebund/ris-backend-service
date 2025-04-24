@@ -44,7 +44,11 @@ watch(
         v-if="documentUnit"
         :document-unit="documentUnit as DocumentUnit"
       />
-      <DocumentUnitHistoryLog :data="historyLogs" :loading="isLoading" />
+      <DocumentUnitHistoryLog
+        :data="historyLogs"
+        :error="error"
+        :loading="isLoading"
+      />
       <dl>
         <div class="flex gap-24 px-0">
           <dt class="ris-body1-bold shrink-0 grow-0 basis-160">
