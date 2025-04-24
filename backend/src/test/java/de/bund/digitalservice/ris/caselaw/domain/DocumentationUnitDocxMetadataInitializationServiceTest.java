@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -89,7 +91,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("ECLI:ABCD", savedCoreData.ecli());
@@ -113,7 +115,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.ecli());
@@ -130,10 +132,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
-    assertEquals("ECLI:ABCD", savedCoreData.ecli());
+    assertThat(savedCoreData.ecli()).isEqualTo("ECLI:ABCD");
   }
 
   @Test
@@ -156,7 +158,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
 
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
     assertEquals(LegalEffect.NO.getLabel(), savedCoreData.legalEffect());
@@ -173,7 +175,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
@@ -191,7 +193,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("BFH", savedCoreData.court().label());
@@ -208,7 +210,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
@@ -227,7 +229,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
@@ -245,7 +247,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bern", savedCoreData.court().label());
@@ -276,7 +278,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bern", savedCoreData.court().label());
@@ -305,7 +307,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bernau", savedCoreData.court().label());

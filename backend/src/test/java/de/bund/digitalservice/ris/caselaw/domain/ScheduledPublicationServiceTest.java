@@ -159,7 +159,7 @@ class ScheduledPublicationServiceTest {
       throws DocumentationUnitNotExistsException {
     verify(handoverService, times(1))
         .handoverDocumentationUnitAsMail(
-            docUnit.uuid(), docUnit.managementData().scheduledByEmail(), any());
+            docUnit.uuid(), docUnit.managementData().scheduledByEmail(), null);
     verify(docUnitRepository, times(1))
         .save(
             argThat(
