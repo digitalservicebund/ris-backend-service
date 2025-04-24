@@ -194,10 +194,9 @@ public class DocumentationUnitService {
   public DocumentationUnitListItem takeOverDocumentationUnit(
       String documentNumber, OidcUser oidcUser) throws DocumentationUnitNotExistsException {
 
-    statusService.update(
-        documentNumber,
-        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build(),
-        userService.getUser(oidcUser));
+    Status status =
+        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build();
+    statusService.update(documentNumber, status, userService.getUser(oidcUser));
 
     return addPermissions(
         oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));

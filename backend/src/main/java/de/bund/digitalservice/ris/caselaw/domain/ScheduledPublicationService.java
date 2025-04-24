@@ -16,7 +16,6 @@ public class ScheduledPublicationService {
   private final DocumentationUnitRepository docUnitRepository;
 
   private final HandoverService handoverService;
-  private final DocumentationUnitHistoryLogService historyLogService;
 
   private final HttpMailSender mailSender;
 
@@ -31,12 +30,10 @@ public class ScheduledPublicationService {
   public ScheduledPublicationService(
       DocumentationUnitRepository docUnitRepository,
       HandoverService handoverService,
-      DocumentationUnitHistoryLogService historyLogService,
       HttpMailSender mailSender) {
 
     this.docUnitRepository = docUnitRepository;
     this.handoverService = handoverService;
-    this.historyLogService = historyLogService;
     this.mailSender = mailSender;
   }
 
@@ -58,10 +55,6 @@ public class ScheduledPublicationService {
   private void handoverDocument(DocumentationUnit docUnit) {
     try {
       String email = docUnit.managementData().scheduledByEmail();
-      DocumentationOffice docOffice = null;
-      if (docUnit.coreData() != null) {
-        docOffice = docUnit.coreData().documentationOffice();
-      }
       var result =
           this.handoverService.handoverDocumentationUnitAsMail(docUnit.uuid(), email, null);
       if (!result.isSuccess()) {

@@ -48,8 +48,9 @@ public class DocumentationUnitDocxMetadataInitializationService {
         documentationUnit.toBuilder()
             .coreData(
                 documentationUnit.coreData().toBuilder().court(builder.build().court()).build())
-            .build());
-    repository.save(updatedDocumentationUnit);
+            .build(),
+        user);
+    repository.save(updatedDocumentationUnit, user);
   }
 
   private void initializeFieldsFromProperties(

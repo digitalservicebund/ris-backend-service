@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -39,10 +40,13 @@ import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -95,6 +99,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private AuthService authService;
   @Autowired private DocumentationUnitRepository documentationUnitRepository;
+  @Autowired private DocumentationUnitService documentationUnitService;
   @Autowired private DocumentationUnitHistoryLogRepository historyLogRepository;
 
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
@@ -102,7 +107,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
   @MockitoBean private DocumentNumberService documentNumberService;
   @MockitoBean private DocumentationUnitStatusService documentationUnitStatusService;
   @MockitoBean private DocumentNumberRecyclingService documentNumberRecyclingService;
-  @MockitoBean private AttachmentService AttachmentService;
+  @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private ProcedureService procedureService;
@@ -126,7 +131,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
   }
 
   @Test
-  void testGetHistoryLogs_fromExistingDocumentationUnit() {
+  void getHistoryLogs_fromExistingDocumentationUnit() {
     UUID entityId =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
                 repository,
@@ -138,8 +143,8 @@ class DocumentationUnitHistoryLogIntegrationTest {
     assertThat(repository.findById(entityId)).isPresent();
 
     HistoryLogDTO historyLog1 = saveHistoryLog(entityId, documentationOffice, "testUser1", null);
-    HistoryLogDTO historyLog2 =
-        saveHistoryLog(entityId, otherDocumentationOffice, "testUser2", null);
+
+    saveHistoryLog(entityId, otherDocumentationOffice, "testUser2", null);
     HistoryLogDTO historyLog3 =
         saveHistoryLog(entityId, otherDocumentationOffice, null, "migration");
 
@@ -176,16 +181,63 @@ class DocumentationUnitHistoryLogIntegrationTest {
     // user from other doc office is allowed to see system name
     assertThat(log1.createdBy()).isEqualTo(historyLog3.getSystemName());
     // usernames from other doc offices are not visible in logs
-    assertThat(log2.createdBy()).isEqualTo(null);
+    assertThat(log2.createdBy()).isNull();
     // user from same doc office is allowed to see username
     assertThat(log3.createdBy()).isEqualTo(historyLog1.getUserName());
+  }
+
+  @Test
+  void saveHistoryLogs_multipleUpdatEventsAreMerged() throws DocumentationUnitNotExistsException {
+    var docUnit =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DecisionDTO.builder()
+                .documentationOffice(documentationOffice)
+                .documentNumber("docnr12345678"));
+
+    docUnit.setScheduledPublicationDateTime(LocalDateTime.now());
+    var user =
+        User.builder().id(UUID.randomUUID()).name("Al Nam").documentationOffice(docOffice).build();
+    documentationUnitService.updateDocumentationUnit(
+        DecisionTransformer.transformToDomain((DecisionDTO) docUnit),
+        DocumentationUnitService.DuplicateCheckStatus.DISABLED,
+        user);
+
+    var logsAfterFirstUpdate =
+        databaseHistoryLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(docUnit.getId());
+    assertThat(logsAfterFirstUpdate).hasSize(1);
+
+    docUnit.setScheduledPublicationDateTime(LocalDateTime.now());
+    documentationUnitService.updateDocumentationUnit(
+        DecisionTransformer.transformToDomain((DecisionDTO) docUnit),
+        DocumentationUnitService.DuplicateCheckStatus.DISABLED,
+        user);
+
+    var logsAfterSecondUpdate =
+        databaseHistoryLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(docUnit.getId());
+    assertThat(logsAfterSecondUpdate).hasSize(1);
+
+    var firstLog = logsAfterFirstUpdate.getFirst();
+    var secondLog = logsAfterSecondUpdate.getFirst();
+
+    // Only date is different
+    assertThat(firstLog.getCreatedAt()).isBefore(secondLog.getCreatedAt());
+
+    // All other attributes are the same
+    assertThat(firstLog.getEventType()).isEqualTo(secondLog.getEventType());
+    assertThat(firstLog.getDocumentationUnitId()).isEqualTo(secondLog.getDocumentationUnitId());
+    assertThat(firstLog.getDocumentationOffice()).isEqualTo(secondLog.getDocumentationOffice());
+    assertThat(firstLog.getDescription()).isEqualTo(secondLog.getDescription());
+    assertThat(firstLog.getUserName()).isEqualTo(secondLog.getUserName());
+    assertThat(firstLog.getSystemName()).isEqualTo(secondLog.getSystemName());
+    assertThat(firstLog.getUserId()).isEqualTo(secondLog.getUserId());
+    assertThat(firstLog.getId()).isEqualTo(secondLog.getId());
   }
 
   private HistoryLogDTO saveHistoryLog(
       UUID docUnitId, DocumentationOfficeDTO office, String userName, String systemName) {
     HistoryLogDTO dto =
         HistoryLogDTO.builder()
-            .id(UUID.randomUUID())
             .createdAt(Instant.now())
             .documentationUnitId(docUnitId)
             .documentationOffice(office)
@@ -200,7 +252,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
   }
 
   @Test
-  void testGetHistoryLogs_returnsEmptyList_whenNoLogsExist() {
+  void getHistoryLogs_returnsEmptyList_whenNoLogsExist() {
     UUID entityId =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
                 repository,
@@ -223,12 +275,11 @@ class DocumentationUnitHistoryLogIntegrationTest {
             .returnResult()
             .getResponseBody();
 
-    assertThat(historyLogs).isNotNull();
     assertThat(historyLogs).isEmpty();
   }
 
   @Test
-  void testGetHistoryLogs_returnsNotFound_whenDocUnitDoesNotExist() {
+  void getHistoryLogs_returnsNotFound_whenDocUnitDoesNotExist() {
     UUID nonExistentId = UUID.randomUUID();
 
     risWebTestClient

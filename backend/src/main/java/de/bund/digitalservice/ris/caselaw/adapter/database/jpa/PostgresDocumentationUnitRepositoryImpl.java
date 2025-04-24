@@ -458,7 +458,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           decisionDTO.getId(), user, HistoryLogEventType.PROCEDURE, description);
     }
 
-    // set new procedure
     decisionDTO.setProcedure(procedureDTO);
     repository.save(decisionDTO);
   }

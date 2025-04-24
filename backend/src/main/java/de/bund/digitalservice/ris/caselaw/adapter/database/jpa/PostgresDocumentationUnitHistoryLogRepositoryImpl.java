@@ -36,10 +36,11 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
 
   @Override
   public Optional<HistoryLog> findUpdateLogForToday(
-      UUID documentationUnitId, User user, Instant start, Instant end) {
+      UUID documentationUnitId, @Nullable User user, Instant start, Instant end) {
+    String userName = Optional.ofNullable(user).map(User::name).orElse(null);
     return databaseRepository
         .findFirstByDocumentationUnitIdAndUserNameAndEventTypeAndCreatedAtBetween(
-            documentationUnitId, user.name(), HistoryLogEventType.UPDATE, start, end)
+            documentationUnitId, userName, HistoryLogEventType.UPDATE, start, end)
         .map(dto -> HistoryLogTransformer.transformToDomain(dto, user));
   }
 
@@ -62,7 +63,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     } else {
       systemName = "NeuRIS";
     }
-    UUID historyLogId = UUID.randomUUID();
+    UUID historyLogId = null;
     if (existingId != null) {
       historyLogId = existingId;
     }

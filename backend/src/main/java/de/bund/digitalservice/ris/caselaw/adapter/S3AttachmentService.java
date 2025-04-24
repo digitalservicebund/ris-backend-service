@@ -70,10 +70,6 @@ public class S3AttachmentService implements AttachmentService {
 
     DocumentationUnitDTO documentationUnit =
         documentationUnitRepository.findById(documentationUnitId).orElseThrow();
-    setLastUpdated(user, documentationUnit);
-    documentationUnitRepository.save(documentationUnit);
-    documentationUnitHistoryLogService.saveHistoryLog(
-        documentationUnitId, user, HistoryLogEventType.FILES, "Word-Dokument hinzugefügt");
 
     AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()
@@ -91,7 +87,13 @@ public class S3AttachmentService implements AttachmentService {
 
     attachmentDTO.setS3ObjectPath(fileUuid.toString());
 
-    return AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
+    Attachment attachment = AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
+
+    setLastUpdated(user, documentationUnit);
+    documentationUnitHistoryLogService.saveHistoryLog(
+        documentationUnitId, user, HistoryLogEventType.FILES, "Word-Dokument hinzugefügt");
+
+    return attachment;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
