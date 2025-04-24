@@ -164,5 +164,86 @@ class HistoryLogTransformerTest {
   }
 
   @Test
-  void testTransformToDomain_withNullUser_shouldShowSystemName() {}
+  void testTransformToDomain_withNullUser_shouldShowSystemName() {
+    // Arrange
+    UUID id = UUID.randomUUID();
+    Instant now = Instant.now();
+    String userName = "testUser";
+    String systemName = "testSystemName";
+    String description = "Unit changed";
+    HistoryLogEventType eventType = HistoryLogEventType.UPDATE;
+    UUID docOfficeId = UUID.randomUUID();
+    String officeAbbreviation = "BGH";
+    DocumentationOfficeDTO documentationOfficeDTO =
+        DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation(officeAbbreviation).build();
+
+    HistoryLogDTO dto =
+        HistoryLogDTO.builder()
+            .id(id)
+            .createdAt(now)
+            .userName(userName)
+            .systemName(systemName)
+            .description(description)
+            .eventType(eventType)
+            .documentationOffice(documentationOfficeDTO)
+            .documentationUnitId(UUID.randomUUID())
+            .build();
+
+    HistoryLog expectedLog =
+        HistoryLog.builder()
+            .id(id)
+            .createdAt(now)
+            .createdBy(systemName)
+            .documentationOffice(officeAbbreviation)
+            .description(description)
+            .eventType(eventType)
+            .build();
+
+    // Act
+    HistoryLog actualLog = HistoryLogTransformer.transformToDomain(dto, null);
+
+    // Assert
+    assertThat(actualLog).isEqualTo(expectedLog);
+  }
+
+  @Test
+  void testTransformToDomain_withNullUser_withoutSystemName_shouldReturnNoCreatedBy() {
+    // Arrange
+    UUID id = UUID.randomUUID();
+    Instant now = Instant.now();
+    String userName = "testUser";
+    String description = "Unit changed";
+    HistoryLogEventType eventType = HistoryLogEventType.UPDATE;
+    UUID docOfficeId = UUID.randomUUID();
+    String officeAbbreviation = "BGH";
+    DocumentationOfficeDTO documentationOfficeDTO =
+        DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation(officeAbbreviation).build();
+
+    HistoryLogDTO dto =
+        HistoryLogDTO.builder()
+            .id(id)
+            .createdAt(now)
+            .userName(userName)
+            .description(description)
+            .eventType(eventType)
+            .documentationOffice(documentationOfficeDTO)
+            .documentationUnitId(UUID.randomUUID())
+            .build();
+
+    HistoryLog expectedLog =
+        HistoryLog.builder()
+            .id(id)
+            .createdAt(now)
+            .createdBy(null)
+            .documentationOffice(officeAbbreviation)
+            .description(description)
+            .eventType(eventType)
+            .build();
+
+    // Act
+    HistoryLog actualLog = HistoryLogTransformer.transformToDomain(dto, null);
+
+    // Assert
+    assertThat(actualLog).isEqualTo(expectedLog);
+  }
 }
