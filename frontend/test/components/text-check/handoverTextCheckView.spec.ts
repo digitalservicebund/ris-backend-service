@@ -44,7 +44,7 @@ describe("text check handover", () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
-  it("successful response list text categories and error count", async () => {
+  it("displays links to categories when text mistakes are found", async () => {
     const expectedError = 494
     const enabledTextCheckCategories: Record<string, string> = {
       tenor: "Tenor",
@@ -87,5 +87,28 @@ describe("text check handover", () => {
     expect(
       screen.queryByText(errorMessages.TEXT_CHECK_FAILED.title),
     ).not.toBeInTheDocument()
+  })
+
+  it("displays success message when no text mistakes are found", async () => {
+    const expectedError = 0
+
+    vi.spyOn(languageToolService, "checkAll").mockResolvedValue({
+      status: 200,
+      data: {
+        suggestions: [],
+        totalTextCheckErrors: expectedError,
+        categoryTypes: [],
+      },
+    } as ServiceResponse<TextCheckAllResponse>)
+
+    await renderComponent()
+
+    expect(
+      screen.queryByText(errorMessages.TEXT_CHECK_FAILED.title),
+    ).not.toBeInTheDocument()
+
+    expect(
+      screen.getByText("Es wurden keine Rechtschreibfehler identifiziert."),
+    ).toBeInTheDocument()
   })
 })
