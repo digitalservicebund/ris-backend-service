@@ -21,7 +21,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "11.7.2"
-    id("io.sentry.jvm.gradle") version "5.3.0"
+    id("io.sentry.jvm.gradle") version "5.4.0"
 }
 
 group = "de.bund.digitalservice"
@@ -147,7 +147,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.20.6"
+    val testContainersVersion = "1.21.0"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
