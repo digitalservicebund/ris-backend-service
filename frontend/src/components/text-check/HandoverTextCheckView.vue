@@ -7,7 +7,6 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import router from "@/router"
 import { ResponseError } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
-import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
@@ -20,7 +19,6 @@ const responseError = ref<ResponseError | undefined>()
 
 const loading = ref()
 const totalTextCheckErrors = ref(0)
-const sidePanelStore = useExtraContentSidePanelStore()
 const textCategories = ref<string[] | undefined>()
 
 async function navigateToTextCheckSummaryInCategories() {
@@ -30,8 +28,6 @@ async function navigateToTextCheckSummaryInCategories() {
       documentNumber: props.documentNumber,
     },
   })
-  sidePanelStore.setSidePanelMode("text-check")
-  sidePanelStore.togglePanel(true)
 }
 
 function resetResults() {

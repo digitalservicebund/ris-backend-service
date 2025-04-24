@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView.vue"
 import errorMessages from "@/i18n/errors.json"
@@ -11,12 +12,13 @@ import { TextCheckAllResponse } from "@/types/textCheck"
 import routes from "~/test-helper/routes"
 import { suggestions } from "~/test-helper/text-check-service-mock"
 
-function renderComponent() {
+async function renderComponent() {
   const user = userEvent.setup()
   const router = createRouter({
     history: createWebHistory(),
     routes: routes,
   })
+  await flushPromises()
   return {
     user,
     ...render(HandoverTextCheckView, {
@@ -37,42 +39,50 @@ describe("text check handover", () => {
       status: 200,
       data: true,
     })
-
-    vi.spyOn(languageToolService, "checkAll").mockResolvedValue({
-      status: 200,
-      data: {
-        suggestions: suggestions,
-        totalTextCheckErrors: 2,
-        categoryTypes: ["tenor", "reasons"],
-      },
-    } as ServiceResponse<TextCheckAllResponse>)
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
-  it("failed response display an error", async () => {
+  it("successful response list text categories and error count", async () => {
+    const expectedError = 494
+    const enabledTextCheckCategories: Record<string, string> = {
+      tenor: "Tenor",
+      reasons: "Gründe",
+      caseFacts: "Tatbestand",
+      decisionReasons: "Entscheidungsgründe",
+      headnote: "Orientierungssatz",
+      otherHeadnote: "Sonstiger Orientierungssatz",
+      guidingPrinciple: "Leitsatz",
+      headline: "Titelzeile",
+      otherLongText: "Sonstiger Langtext",
+      dissentingOpinion: "Abweichende Meinung",
+      outline: "Gliederung",
+    }
+
     vi.spyOn(languageToolService, "checkAll").mockResolvedValue({
-      status: 400,
-      error: {
-        title: errorMessages.TEXT_CHECK_FAILED.title,
+      status: 200,
+      data: {
+        suggestions: suggestions,
+        totalTextCheckErrors: expectedError,
+        categoryTypes: Object.keys(enabledTextCheckCategories),
       },
-      data: undefined,
     } as ServiceResponse<TextCheckAllResponse>)
 
-    renderComponent()
+    await renderComponent()
 
-    expect(
-      await screen.findByText(errorMessages.TEXT_CHECK_FAILED.title),
-    ).toBeInTheDocument()
-  })
+    Object.entries(enabledTextCheckCategories).forEach(([key, value]) => {
+      const element = screen.getByTestId(`text-check-handover-link-${key}`)
+      expect(element).toHaveTextContent(value)
 
-  it("successful response list text categories and error count", async () => {
-    renderComponent()
+      expect(element).toHaveAttribute(
+        "href",
+        `/caselaw/documentUnit/TEST000011225/categories#${key}`,
+      )
+    })
 
-    expect(await screen.findByText("Tenor, Gründe")).toBeInTheDocument()
     expect(screen.queryByTestId("total-text-check-errors")).toHaveTextContent(
-      "2",
+      expectedError.toString(),
     )
     expect(
       screen.queryByText(errorMessages.TEXT_CHECK_FAILED.title),
