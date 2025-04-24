@@ -45,7 +45,7 @@ public class HistoryLogTransformer {
                 .map(DocumentationOfficeDTO::getAbbreviation)
                 .orElse(null))
         .description(historyLogDTO.getDescription())
-        .eventType(String.valueOf(historyLogDTO.getEventType()))
+        .eventType(historyLogDTO.getEventType())
         .build();
   }
 

@@ -11,4 +11,4 @@ public record HistoryLog(
     String createdBy,
     String documentationOffice,
     String description,
-    String eventType) {}
+    HistoryLogEventType eventType) {}

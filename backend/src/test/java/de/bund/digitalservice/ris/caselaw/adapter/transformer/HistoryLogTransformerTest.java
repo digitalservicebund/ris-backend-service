@@ -56,7 +56,7 @@ class HistoryLogTransformerTest {
             .createdBy(userName)
             .documentationOffice(officeAbbreviation)
             .description(description)
-            .eventType(String.valueOf(eventType))
+            .eventType(eventType)
             .build();
 
     // Act
@@ -105,7 +105,7 @@ class HistoryLogTransformerTest {
             .createdBy(systemName)
             .documentationOffice(officeAbbreviation)
             .description(description)
-            .eventType(String.valueOf(eventType))
+            .eventType(eventType)
             .build();
 
     // Act
@@ -153,7 +153,7 @@ class HistoryLogTransformerTest {
             .createdBy(null)
             .documentationOffice(officeAbbreviation)
             .description(description)
-            .eventType(String.valueOf(eventType))
+            .eventType(eventType)
             .build();
 
     // Act

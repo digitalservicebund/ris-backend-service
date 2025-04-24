@@ -31,7 +31,7 @@ class DocumentationUnitHistoryLogServiceTest {
     HistoryLog log1 =
         HistoryLog.builder()
             .documentationOffice("BSG")
-            .eventType("UPDATE")
+            .eventType(HistoryLogEventType.UPDATE)
             .description("Updated field")
             .createdBy("mock-user")
             .build();

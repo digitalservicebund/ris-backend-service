@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogServ
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
@@ -71,8 +72,8 @@ class DocumentationUnitHistoryLogControllerTest {
         .when(userService)
         .getDocumentationOffice(
             argThat(
-                (OidcUser user) -> {
-                  List<String> groups = user.getAttribute("groups");
+                (OidcUser oidcUser) -> {
+                  List<String> groups = oidcUser.getAttribute("groups");
                   return Objects.requireNonNull(groups).getFirst().equals("/DS");
                 }));
 
@@ -90,7 +91,7 @@ class DocumentationUnitHistoryLogControllerTest {
     HistoryLog log1 =
         HistoryLog.builder()
             .id(UUID.randomUUID())
-            .eventType("UPDATE")
+            .eventType(HistoryLogEventType.UPDATE)
             .description("something was updated")
             .createdAt(Instant.now())
             .createdBy("test user")
@@ -98,7 +99,7 @@ class DocumentationUnitHistoryLogControllerTest {
     HistoryLog log2 =
         HistoryLog.builder()
             .id(UUID.randomUUID())
-            .eventType("UPDATE")
+            .eventType(HistoryLogEventType.UPDATE)
             .description("something was again updated")
             .createdAt(Instant.now())
             .createdBy("system")
