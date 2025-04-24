@@ -39,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IgnoredTextCheckW
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverRepositoryImpl;
@@ -52,6 +53,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
@@ -124,7 +126,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       OAuthService.class,
       TestConfig.class,
       TextCheckService.class,
-      DocumentNumberPatternConfig.class
+      DocumentNumberPatternConfig.class,
+      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
+      DocumentationUnitHistoryLogService.class
     },
     controllers = {DocumentationUnitController.class, LegalPeriodicalEditionController.class})
 @TestPropertySource(

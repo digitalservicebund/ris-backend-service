@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 class ScheduledPublicationServiceTest {
 
   private ScheduledPublicationService service;
-  private DocumentationUnitHistoryLogService historyLogService;
   private DocumentationUnitRepository docUnitRepository;
   private HandoverService handoverService;
   private HttpMailSender httpMailSender;
@@ -36,14 +35,10 @@ class ScheduledPublicationServiceTest {
   void beforeEach() {
     this.docUnitRepository = mock(DocumentationUnitRepository.class);
     this.handoverService = mock(HandoverService.class);
-    this.historyLogService = mock(DocumentationUnitHistoryLogService.class);
     this.httpMailSender = mock(HttpMailSender.class);
     this.service =
         new ScheduledPublicationService(
-            this.docUnitRepository,
-            this.handoverService,
-            this.historyLogService,
-            this.httpMailSender);
+            this.docUnitRepository, this.handoverService, this.httpMailSender);
   }
 
   @AfterEach
@@ -53,10 +48,7 @@ class ScheduledPublicationServiceTest {
     reset(this.httpMailSender);
     this.service =
         new ScheduledPublicationService(
-            this.docUnitRepository,
-            this.handoverService,
-            this.historyLogService,
-            this.httpMailSender);
+            this.docUnitRepository, this.handoverService, this.httpMailSender);
   }
 
   @Test
