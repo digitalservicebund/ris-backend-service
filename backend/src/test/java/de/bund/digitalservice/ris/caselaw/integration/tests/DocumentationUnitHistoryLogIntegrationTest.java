@@ -176,7 +176,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
         .isEqualTo(historyLog3.getCreatedAt().truncatedTo(ChronoUnit.MILLIS));
     assertThat(log1.documentationOffice())
         .isEqualTo(historyLog3.getDocumentationOffice().getAbbreviation());
-    assertThat(log1.eventType()).isEqualTo(String.valueOf(historyLog3.getEventType()));
+    assertThat(log1.eventType()).isEqualTo(historyLog3.getEventType());
     assertThat(log1.description()).isEqualTo(historyLog3.getDescription());
     // user from other doc office is allowed to see system name
     assertThat(log1.createdBy()).isEqualTo(historyLog3.getSystemName());
