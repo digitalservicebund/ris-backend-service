@@ -105,8 +105,7 @@ class DocumentationUnitHistoryLogControllerTest {
             .createdBy("system")
             .build();
 
-    when(service.getHistoryLogs(eq(TEST_UUID), any(OidcUser.class)))
-        .thenReturn(List.of(log1, log2));
+    when(service.getHistoryLogs(eq(TEST_UUID), any(User.class))).thenReturn(List.of(log1, log2));
 
     risWebTestClient
         .withDefaultLogin()

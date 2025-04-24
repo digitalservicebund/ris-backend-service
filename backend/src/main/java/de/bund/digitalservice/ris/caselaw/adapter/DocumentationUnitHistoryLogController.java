@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class DocumentationUnitHistoryLogController {
   private final DocumentationUnitHistoryLogService service;
+  private final UserService userService;
 
-  public DocumentationUnitHistoryLogController(DocumentationUnitHistoryLogService service) {
+  public DocumentationUnitHistoryLogController(
+      DocumentationUnitHistoryLogService service, UserService userService) {
     this.service = service;
+    this.userService = userService;
   }
 
   /**
@@ -36,6 +40,6 @@ public class DocumentationUnitHistoryLogController {
       "@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#documentationUnitId)")
   public List<HistoryLog> getHistoryLog(
       @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID documentationUnitId) {
-    return service.getHistoryLogs(documentationUnitId, oidcUser);
+    return service.getHistoryLogs(documentationUnitId, userService.getUser(oidcUser));
   }
 }

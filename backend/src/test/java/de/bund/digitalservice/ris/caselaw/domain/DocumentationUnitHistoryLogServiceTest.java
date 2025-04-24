@@ -36,11 +36,10 @@ class DocumentationUnitHistoryLogServiceTest {
             .createdBy("mock-user")
             .build();
 
-    when(userService.getUser(oidcUser)).thenReturn(user);
     when(repository.findByDocumentationUnitId(documentationUnit.uuid(), user))
         .thenReturn(List.of(log1));
 
-    List<HistoryLog> result = service.getHistoryLogs(documentationUnit.uuid(), oidcUser);
+    List<HistoryLog> result = service.getHistoryLogs(documentationUnit.uuid(), user);
 
     assertThat(result).hasSize(1).containsExactly(log1);
 
