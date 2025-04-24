@@ -150,7 +150,7 @@ describe("useSaveToRemote", () => {
     )
     await triggerSave()
 
-    expect(formattedLastSavedOn.value).toBe("00:01")
+    expect(formattedLastSavedOn.value).toBe("01:01")
 
     vi.setSystemTime(120_000)
     mockDocumentUnitStore(
@@ -158,7 +158,7 @@ describe("useSaveToRemote", () => {
     )
     await triggerSave()
 
-    expect(formattedLastSavedOn.value).toBe("00:01")
+    expect(formattedLastSavedOn.value).toBe("01:01")
 
     vi.setSystemTime(180_000)
     mockDocumentUnitStore(
@@ -166,7 +166,7 @@ describe("useSaveToRemote", () => {
     )
     await triggerSave()
 
-    expect(formattedLastSavedOn.value).toBe("00:03")
+    expect(formattedLastSavedOn.value).toBe("01:03")
   })
 
   it("automatically triggers the callback once per set interval", async () => {

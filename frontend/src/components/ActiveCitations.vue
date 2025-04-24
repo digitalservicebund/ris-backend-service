@@ -21,7 +21,7 @@ const activeCitations = computed({
   <div aria-label="Aktivzitierung">
     <h2
       :id="DocumentUnitCategoriesEnum.ACTIVE_CITATIONS"
-      class="ds-label-01-bold mb-16"
+      class="ris-label1-bold mb-16"
     >
       Aktivzitierung
     </h2>

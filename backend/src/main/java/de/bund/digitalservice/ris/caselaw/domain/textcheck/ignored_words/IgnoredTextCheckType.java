@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 public enum IgnoredTextCheckType {
-  DOCUMENTATION_OFFICE("documentation_office"),
-  DOCUMENTATION_UNIT("documentation_unit"),
-  ;
+  GLOBAL("global"),
+  GLOBAL_JDV("global_jdv"),
+  DOCUMENTATION_UNIT("documentation_unit");
   @JsonValue private final String name;
 
   IgnoredTextCheckType(String name) {

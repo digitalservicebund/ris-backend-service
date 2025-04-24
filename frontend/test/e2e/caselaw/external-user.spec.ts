@@ -2,7 +2,6 @@ import { expect, Page } from "@playwright/test"
 import {
   assignProcedureToDocUnit,
   clickCategoryButton,
-  deleteAllProcedures,
   fillInput,
   navigateToCategories,
   navigateToProcedures,
@@ -10,6 +9,7 @@ import {
   save,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { deleteAllProcedures } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe(
@@ -192,7 +192,7 @@ test.describe(
             .getByLabel("Entscheidungsname")
             .fill("ein anderer Name")
           await pageWithExternalUser
-            .locator("[aria-label='Speichern Button']")
+            .getByLabel("Speichern Button", { exact: true })
             .click()
           await expect(
             pageWithExternalUser
@@ -249,7 +249,7 @@ test.describe(
             "some other text",
           )
           await pageWithExternalUser
-            .locator("[aria-label='Speichern Button']")
+            .getByLabel("Speichern Button", { exact: true })
             .click()
           await expect(
             pageWithExternalUser
@@ -335,15 +335,20 @@ test.describe(
         await page
           .getByLabel("Vorgang Listenelement")
           .getByLabel("dropdown input")
-          .selectOption("Extern", { timeout: 5_000 })
-
+          .click()
+        await page
+          .getByRole("option", {
+            name: "Extern",
+            exact: true,
+          })
+          .click()
         await assignRequest
         await page.reload()
 
         await expect(
           page.getByLabel("Vorgang Listenelement").getByLabel("dropdown input"),
           // The id of the user group "Extern"
-        ).toHaveValue(/.+/, { timeout: 5_000 })
+        ).toHaveText(/.+/, { timeout: 5_000 })
       })
     }
 
@@ -362,7 +367,14 @@ test.describe(
         await page
           .getByLabel("Vorgang Listenelement")
           .getByLabel("dropdown input")
-          .selectOption("Nicht zugewiesen", { timeout: 5_000 })
+          .click()
+
+        await page
+          .getByRole("option", {
+            name: "Nicht zugewiesen",
+            exact: true,
+          })
+          .click({ timeout: 5000 })
 
         await unassignRequest
         await page.reload()
@@ -370,7 +382,7 @@ test.describe(
         await expect(
           page.getByLabel("Vorgang Listenelement").getByLabel("dropdown input"),
           // The unassigned option has an empty value
-        ).toHaveValue(/^$/, { timeout: 5_000 })
+        ).toHaveText("Nicht zugewiesen", { timeout: 5_000 })
       })
     }
   },

@@ -71,7 +71,7 @@ const decisionReasons = computed({
 
 <template>
   <div aria-label="Langtexte">
-    <h2 class="ds-label-01-bold mb-16">Langtexte</h2>
+    <h2 class="ris-label1-bold mb-16">Langtexte</h2>
     <div class="flex flex-col gap-24">
       <TextEditorCategory
         id="tenor"

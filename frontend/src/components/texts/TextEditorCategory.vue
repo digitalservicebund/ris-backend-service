@@ -3,7 +3,6 @@ import { Component, nextTick } from "vue"
 import TextEditor from "../input/TextEditor.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 
 interface Props {
   id: string
@@ -23,8 +22,6 @@ defineEmits<{
   "update:modelValue": [value: string]
 }>()
 
-const textCheck = useFeatureToggle("neuris.text-check")
-
 async function focusEditor() {
   await nextTick()
   const editorElement = document.getElementById(props.id)
@@ -40,7 +37,7 @@ async function focusEditor() {
     @toggled="focusEditor"
   >
     <div class="flex flex-col">
-      <label class="ds-label-02-reg mb-4" :for="id">{{ label }}</label>
+      <label class="ris-label2-regular mb-4" :for="id">{{ label }}</label>
 
       <TextEditor
         :id="id"
@@ -50,7 +47,6 @@ async function focusEditor() {
         class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
         editable
         :field-size="fieldSize"
-        :text-check="textCheck"
         :value="modelValue"
         @update-value="$emit('update:modelValue', $event)"
       />

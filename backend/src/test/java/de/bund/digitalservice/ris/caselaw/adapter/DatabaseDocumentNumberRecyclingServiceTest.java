@@ -60,10 +60,14 @@ class DatabaseDocumentNumberRecyclingServiceTest {
   @Test
   void addForRecycling_shouldNotSave_ifPrefixIsInvalid() {
 
+    var documentationUnitId = UUID.randomUUID();
+    var currentYear = Year.now();
+    var documentationUnitNumber = "KORE2" + currentYear + "00037";
+
     var documentationUnitDTO =
         DecisionDTO.builder()
-            .id(UUID.randomUUID())
-            .documentNumber("KORE2" + Year.now() + "00037")
+            .id(documentationUnitId)
+            .documentNumber(documentationUnitNumber)
             .build();
 
     var unpublished = generateStatus(documentationUnitDTO, PublicationStatus.UNPUBLISHED);
@@ -71,11 +75,11 @@ class DatabaseDocumentNumberRecyclingServiceTest {
     var outdatedDeletedId =
         DeletedDocumentationUnitDTO.builder()
             .documentNumber(documentationUnitDTO.getDocumentNumber())
-            .year(Year.now())
+            .year(currentYear)
             .abbreviation(DEFAULT_DOCUMENTATION_OFFICE)
             .build();
 
-    when(repository.findFirstByAbbreviationAndYear(DEFAULT_DOCUMENTATION_OFFICE, Year.now()))
+    when(repository.findFirstByAbbreviationAndYear(DEFAULT_DOCUMENTATION_OFFICE, currentYear))
         .thenReturn(Optional.of(outdatedDeletedId));
     when(documentationUnitRepository.findById(documentationUnitDTO.getId()))
         .thenReturn(Optional.of(DecisionDTO.builder().statusHistory(List.of(unpublished)).build()));
@@ -85,39 +89,39 @@ class DatabaseDocumentNumberRecyclingServiceTest {
         DocumentNumberPatternException.class,
         () ->
             service.addForRecycling(
-                documentationUnitDTO.getId(),
-                documentationUnitDTO.getDocumentNumber(),
-                DEFAULT_DOCUMENTATION_OFFICE));
+                documentationUnitId, documentationUnitNumber, DEFAULT_DOCUMENTATION_OFFICE));
   }
 
   @Test
   void recycleFromDeletedDocumentationUnit_shouldNotOfferInvalidPrefix() {
+    var currentYear = Year.now();
     var outdatedDeletedId =
         DeletedDocumentationUnitDTO.builder()
             .documentNumber("KORE2" + Year.now() + "0037")
-            .year(Year.now())
+            .year(currentYear)
             .abbreviation(DEFAULT_DOCUMENTATION_OFFICE)
             .build();
 
-    when(repository.findFirstByAbbreviationAndYear(DEFAULT_DOCUMENTATION_OFFICE, Year.now()))
+    when(repository.findFirstByAbbreviationAndYear(DEFAULT_DOCUMENTATION_OFFICE, currentYear))
         .thenReturn(Optional.of(outdatedDeletedId));
 
     assertThrows(
         DocumentNumberPatternException.class,
         () ->
-            service.recycleFromDeletedDocumentationUnit(DEFAULT_DOCUMENTATION_OFFICE, Year.now()));
+            service.recycleFromDeletedDocumentationUnit(DEFAULT_DOCUMENTATION_OFFICE, currentYear));
   }
 
   @Test
   void recycleFromDeletedDocumentationUnit_shouldNotOfferUsedDocumentationUnit() {
+    var currentYear = Year.now();
     var usedDocumentationUnit =
         DeletedDocumentationUnitDTO.builder()
             .documentNumber(generateDefaultDocumentNumber())
-            .year(Year.now())
+            .year(currentYear)
             .abbreviation(DEFAULT_DOCUMENTATION_OFFICE)
             .build();
 
-    when(repository.findFirstByAbbreviationAndYear(DEFAULT_DOCUMENTATION_OFFICE, Year.now()))
+    when(repository.findFirstByAbbreviationAndYear(DEFAULT_DOCUMENTATION_OFFICE, currentYear))
         .thenReturn(Optional.of(usedDocumentationUnit));
 
     when(documentationUnitRepository.findByDocumentNumber(
@@ -129,7 +133,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
             DocumentNumberRecyclingException.class,
             () ->
                 service.recycleFromDeletedDocumentationUnit(
-                    DEFAULT_DOCUMENTATION_OFFICE, Year.now()));
+                    DEFAULT_DOCUMENTATION_OFFICE, currentYear));
 
     Assertions.assertEquals(
         "Saved documentation number is currently in use", exception.getMessage());

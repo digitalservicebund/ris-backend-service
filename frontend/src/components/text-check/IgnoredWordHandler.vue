@@ -1,60 +1,96 @@
 <script setup lang="ts">
-import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
-import languageToolService from "@/services/textCheckService"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { IgnoredTextCheckWord, Match } from "@/types/textCheck"
+import Button from "primevue/button"
+import { computed } from "vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
+import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   match: Match
-  addingToDictionaryEnabled?: boolean
 }>()
 
 const emit = defineEmits<{
-  "ignoreTextCheckWord:add": [void]
+  "ignored-word:remove": [string]
+  "globally-ignored-word:remove": [string]
+  "globally-ignored-word:add": [string]
 }>()
 
-const store = useDocumentUnitStore()
-
-async function addWordToDocOffice() {
-  if (!store.documentUnit?.uuid) {
-    console.error("Documentation unit does not exist")
-    return
-  }
-
-  const newIgnoredTextCheckWord: IgnoredTextCheckWord = {
-    word: props.match.word,
-    type: "documentation_office",
-  }
-
-  try {
-    await languageToolService.addIgnoredWordForDocumentationOffice(
-      store.documentUnit.uuid,
-      newIgnoredTextCheckWord,
-    )
-    emit("ignoreTextCheckWord:add")
-  } catch (error) {
-    console.error("Error adding ignored word:", error)
-  }
+async function removeWord() {
+  emit("ignored-word:remove", props.match.word)
 }
+
+function addIgnoredWordGlobally() {
+  emit("globally-ignored-word:add", props.match.word)
+}
+
+async function removeWordGlobally() {
+  emit("globally-ignored-word:remove", props.match.word)
+}
+
+const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
+
+const matchIsIgnoredGlobally = computed(() => {
+  return props.match.ignoredTextCheckWords?.some(
+    (ignoredWord) =>
+      ignoredWord.type === "global" || ignoredWord.type === "global_jdv",
+  )
+})
 </script>
 
 <template>
-  <div data-testid="ignored-word-handler">
-    <div v-if="!NeurisTextCheckService.isMatchEditable(match)">
-      von juris ignoriert
+  <div class="flex flex-grow flex-col" data-testid="ignored-word-handler">
+    <div
+      v-if="
+        match.ignoredTextCheckWords?.some(
+          (ignoredWord) => ignoredWord.type === 'global_jdv',
+        )
+      "
+    >
+      Von jDV ignoriert
     </div>
 
-    <div v-else-if="addingToDictionaryEnabled">
-      <div
+    <Button
+      v-else-if="
+        textCheckGlobal &&
+        match.ignoredTextCheckWords?.some(
+          (ignoredWord) => ignoredWord.type === 'global',
+        )
+      "
+      aria-label="Wort aus globalem Wörterbuch entfernen"
+      data-testid="ignored-word-global-remove-button"
+      label="Aus globalem Wörterbuch entfernen"
+      size="small"
+      text
+      @click="removeWordGlobally"
+    >
+      Aus globalem Wörterbuch entfernen
+    </Button>
+
+    <Button
+      v-if="textCheckGlobal && !matchIsIgnoredGlobally"
+      size="small"
+      text
+      @click="addIgnoredWordGlobally"
+      >Zum globalen Wörterbuch hinzufügen
+    </Button>
+
+    <div>
+      <Button
         v-if="
-          match.rule.issueType == 'misspelling' &&
-          !match.ignoredTextCheckWords?.length
+          match.ignoredTextCheckWords?.some(
+            (ignoredWord) => ignoredWord.type === 'documentation_unit',
+          ) &&
+          !match.ignoredTextCheckWords?.some(
+            (ignoredWord) => ignoredWord.type === 'global_jdv',
+          )
         "
-      >
-        <button class="ds-link-01-bold" @click="addWordToDocOffice">
-          Zum globalen Wörterbuch hinzufügen
-        </button>
-      </div>
+        aria-label="Wort nicht ignorieren"
+        button-type="tertiary"
+        data-testid="ignored-word-remove-button"
+        label="Nicht ignorieren"
+        severity="secondary"
+        size="small"
+        @click="removeWord"
+      />
     </div>
   </div>
 </template>

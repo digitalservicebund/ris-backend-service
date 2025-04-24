@@ -1,27 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@Builder(toBuilder = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class IgnoredTextCheckWord {
-
-  private UUID id;
-
-  @Size(max = 255)
-  @NotBlank
-  private String word;
-
-  @NotNull private IgnoredTextCheckType type;
-
-  Boolean isEditable;
-}
+/**
+ * Represents a word that is ignored during text checks.
+ *
+ * @param id the id
+ * @param type if the word is ignored on a global or documentation_unit level
+ * @param word the word to be ignored
+ */
+public record IgnoredTextCheckWord(UUID id, IgnoredTextCheckType type, String word) {}

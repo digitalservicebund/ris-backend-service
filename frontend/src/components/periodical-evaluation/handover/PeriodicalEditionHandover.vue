@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import Button from "primevue/button"
 import { watch, ref, computed } from "vue"
 import PeriodicalEditionHandoverEventLog from "./PeriodicalEditionHandoverEventLog.vue"
 import PeriodicalEditionHandoverPreview from "./PeriodicalEditionHandoverPreview.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import EventRecord, { HandoverMail, Preview } from "@/domain/eventRecord"
@@ -102,13 +102,13 @@ watch(
           class="flex flex-row items-center gap-8"
         >
           <IconErrorOutline class="text-red-800" />
-          <p class="flexds-body-01-reg">
+          <p class="flexris-body1-regular">
             Es wurden noch keine Fundstellen hinzugefügt
           </p>
         </div>
         <div v-else class="flex flex-row items-center gap-8">
           <IconCheck class="text-green-700" />
-          <p class="ds-body-01-reg">
+          <p class="ris-body1-regular">
             Die Ausgabe enthält {{ numberOfReferences }} Fundstellen
           </p>
         </div>
@@ -135,16 +135,16 @@ watch(
         v-bind="handoverSucceedMessage"
         :status="InfoStatus.SUCCEED"
       />
-      <TextButton
+      <Button
         v-if="featureToggle"
         aria-label="Fundstellen der Ausgabe an jDV übergeben"
-        button-type="secondary"
         class="w-fit"
         :disabled="!numberOfReferences"
-        :icon="IconHandover"
         label="Fundstellen der Ausgabe an jDV übergeben"
+        size="small"
         @click="handoverEdition"
-      />
+        ><template #icon> <IconHandover /> </template
+      ></Button>
 
       <!-- Event Log -->
       <PeriodicalEditionHandoverEventLog
@@ -153,7 +153,7 @@ watch(
       />
     </div>
 
-    <div v-else class="my-112 grid justify-items-center bg-white bg-opacity-60">
+    <div v-else class="bg-opacity-60 my-112 grid justify-items-center bg-white">
       <h2>Ausgabe wird geladen ...</h2>
       <LoadingSpinner />
     </div>

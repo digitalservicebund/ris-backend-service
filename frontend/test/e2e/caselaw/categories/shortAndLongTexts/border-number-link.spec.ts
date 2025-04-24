@@ -1,11 +1,11 @@
 import { expect } from "@playwright/test"
 import {
-  navigateToCategories,
+  clickCategoryButton,
+  copyPasteTextFromAttachmentIntoEditor,
   navigateToAttachments,
+  navigateToCategories,
   save,
   uploadTestfile,
-  copyPasteTextFromAttachmentIntoEditor,
-  clickCategoryButton,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -59,7 +59,7 @@ test("create and validate border number links", async ({
     .locator("..")
     .locator("..")
     .locator("..")
-  const inputField = page.locator("[data-testid='Gründe']")
+  const inputField = page.getByTestId("Gründe")
   await clickCategoryButton("Gründe", page)
   await copyPasteTextFromAttachmentIntoEditor(
     page,
@@ -80,7 +80,7 @@ test("create and validate border number links", async ({
 
   // Create valid and invalid border number links in Leitsatz
   await clickCategoryButton("Leitsatz", page)
-  const guidingPrincipleInput = page.locator("[data-testid='Leitsatz']")
+  const guidingPrincipleInput = page.getByTestId("Leitsatz")
   await guidingPrincipleInput.click()
   await page.keyboard.type(`#1# #4# #99999# #1000000# #not a border number#`)
 
@@ -88,9 +88,7 @@ test("create and validate border number links", async ({
   await save(page)
 
   // check valid border number link
-  const locators = page
-    .locator("[data-testid='Leitsatz']")
-    .locator("border-number-link")
+  const locators = page.getByTestId("Leitsatz").locator("border-number-link")
 
   const borderNumberLinks = await locators.all()
 
@@ -103,21 +101,21 @@ test("create and validate border number links", async ({
 
   await expect(validLink).toHaveAttribute("valid", "true")
   await expect(validLink).toHaveClass(
-    'font-bold text-white bg-blue-700 before:content-["Rd_"] ml-1 pr-1',
+    'ris-body1-bold text-white bg-blue-700 before:content-["Rd_"] ml-1 pr-1',
   )
 
   // check invalid border number links
   await expect(invalidLink).toHaveAttribute("valid", "false")
   await expect(invalidLink).toHaveClass(
-    'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
+    'ris-body1-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
   await expect(invalidHighestNumberLink).toHaveAttribute("valid", "false")
   await expect(invalidHighestNumberLink).toHaveClass(
-    'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
+    'ris-body1-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
 
   // Delete border numbers in reasons
-  const reasons = page.locator("[data-testid='Gründe']")
+  const reasons = page.getByTestId("Gründe")
   await reasons.click()
   await page.keyboard.press(`ControlOrMeta+A`)
   await page.keyboard.press(`ControlOrMeta+Backspace`)
@@ -128,6 +126,6 @@ test("create and validate border number links", async ({
   // check first border number link: should be invalid now
   await expect(validLink).toHaveAttribute("valid", "false")
   await expect(validLink).toHaveClass(
-    'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
+    'ris-body1-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
 })

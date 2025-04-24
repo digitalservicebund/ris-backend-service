@@ -7,7 +7,7 @@ import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { Page } from "@/components/Pagination.vue"
 import ProcedureList from "@/components/procedures/ProcedureList.vue"
-import { Procedure } from "@/domain/documentUnit"
+import { Procedure } from "@/domain/procedure"
 import featureToggleService from "@/services/featureToggleService"
 import service from "@/services/procedureService"
 import userGroupsService from "@/services/userGroupsService"
@@ -260,11 +260,11 @@ describe("ProcedureList", () => {
 
   it("should list all user groups and default option in dropdown", async () => {
     isInternalUser = true
-    const { mockedGetProcedures } = await renderComponent()
+    const { mockedGetProcedures, user } = await renderComponent()
     expect(mockedGetProcedures).toHaveBeenCalledOnce()
 
     const dropdown = await screen.findByLabelText("dropdown input")
-    expect(dropdown).toBeEnabled()
+    await user.click(dropdown)
 
     const options = screen.getAllByRole("option")
     expect(options.length).toBe(3)

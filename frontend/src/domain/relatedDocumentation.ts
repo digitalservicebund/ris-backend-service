@@ -1,6 +1,8 @@
 import dayjs from "dayjs"
 import DocumentationOffice from "./documentationOffice"
-import { Court, DocumentType } from "./documentUnit"
+import { Court } from "./documentUnit"
+import { DocumentType } from "@/domain/documentType"
+
 import {
   Label,
   PublicationState,

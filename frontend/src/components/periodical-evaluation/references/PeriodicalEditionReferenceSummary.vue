@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
-import TextButton from "@/components/input/TextButton.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import Reference from "@/domain/reference"
 import AddIcon from "~icons/ic/outline-library-add"
@@ -29,7 +29,7 @@ async function generateNewEntryFromExisting() {
 <template>
   <div class="flex w-full justify-between" data-testid="reference-list-summary">
     <div v-if="props.data.documentationUnit?.documentNumber">
-      <div class="ds-label-01-bold" data-testid="citation-summary">
+      <div class="ris-label1-bold" data-testid="citation-summary">
         {{ props.data.renderSummary }}
       </div>
       <DecisionSummary
@@ -41,14 +41,14 @@ async function generateNewEntryFromExisting() {
       ></DecisionSummary>
     </div>
     <Tooltip text="Weitere Fundstelle zu dieser Entscheidung">
-      <TextButton
+      <Button
         aria-label="Weitere Fundstelle zu dieser Entscheidung"
-        button-type="ghost"
         data-testid="import-categories"
-        :icon="AddIcon"
         size="small"
+        text
         @click="generateNewEntryFromExisting"
-      />
+        ><template #icon> <AddIcon /> </template
+      ></Button>
     </Tooltip>
   </div>
 </template>

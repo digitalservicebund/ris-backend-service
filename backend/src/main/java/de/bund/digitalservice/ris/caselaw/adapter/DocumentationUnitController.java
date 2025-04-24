@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -67,7 +68,7 @@ public class DocumentationUnitController {
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
   private final HandoverService handoverService;
-  private final InternalPortalPublicationService internalPortalPublicationService;
+  private final PortalPublicationService portalPublicationService;
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
   private final DuplicateCheckService duplicateCheckService;
@@ -78,7 +79,7 @@ public class DocumentationUnitController {
       AttachmentService attachmentService,
       ConverterService converterService,
       HandoverService handoverService,
-      InternalPortalPublicationService internalPortalPublicationService,
+      PortalPublicationService portalPublicationService,
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService,
       DuplicateCheckService duplicateCheckService) {
@@ -87,7 +88,7 @@ public class DocumentationUnitController {
     this.attachmentService = attachmentService;
     this.converterService = converterService;
     this.handoverService = handoverService;
-    this.internalPortalPublicationService = internalPortalPublicationService;
+    this.portalPublicationService = portalPublicationService;
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
     this.duplicateCheckService = duplicateCheckService;
@@ -106,9 +107,9 @@ public class DocumentationUnitController {
   public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody(required = false) Optional<DocumentationUnitCreationParameters> parameters) {
-    var userDocOffice = userService.getDocumentationOffice(oidcUser);
     try {
-      var documentationUnit = service.generateNewDocumentationUnit(userDocOffice, parameters);
+      var documentationUnit =
+          service.generateNewDocumentationUnit(userService.getUser(oidcUser), parameters);
       return ResponseEntity.status(HttpStatus.CREATED).body(documentationUnit);
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
@@ -154,7 +155,8 @@ public class DocumentationUnitController {
 
     var attachmentPath =
         attachmentService
-            .attachFileToDocumentationUnit(uuid, ByteBuffer.wrap(bytes), httpHeaders)
+            .attachFileToDocumentationUnit(
+                uuid, ByteBuffer.wrap(bytes), httpHeaders, userService.getUser(oidcUser))
             .s3path();
     try {
       var docx2html = converterService.getConvertedObject(attachmentPath);
@@ -162,7 +164,7 @@ public class DocumentationUnitController {
       return ResponseEntity.status(HttpStatus.OK).body(docx2html);
 
     } catch (Exception e) {
-      attachmentService.deleteByS3Path(attachmentPath);
+      attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
       return ResponseEntity.unprocessableEntity().build();
     }
   }
@@ -199,7 +201,7 @@ public class DocumentationUnitController {
       @PathVariable String s3Path) {
 
     try {
-      attachmentService.deleteByS3Path(s3Path);
+      attachmentService.deleteByS3Path(s3Path, uuid, userService.getUser(oidcUser));
       return ResponseEntity.noContent().build();
     } catch (Exception e) {
       log.error("Error by deleting attachment '{}' for documentation unit {}", s3Path, uuid, e);
@@ -331,7 +333,8 @@ public class DocumentationUnitController {
       if (documentationUnit != null) {
         documentNumber = documentationUnit.documentNumber();
       }
-      var newPatch = service.updateDocumentationUnit(uuid, patch);
+      User user = userService.getUser(oidcUser);
+      var newPatch = service.updateDocumentationUnit(uuid, patch, user);
 
       return ResponseEntity.ok().body(newPatch);
     } catch (DocumentationUnitNotExistsException e) {
@@ -467,7 +470,7 @@ public class DocumentationUnitController {
   public ResponseEntity<Void> publishDocumentationUnit(@PathVariable UUID uuid) {
 
     try {
-      internalPortalPublicationService.publishDocumentationUnit(uuid);
+      portalPublicationService.publishDocumentationUnitWithChangelog(uuid);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Error handing over documentation unit '{}' to portal", uuid, e);

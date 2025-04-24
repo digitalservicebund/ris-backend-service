@@ -1,4 +1,4 @@
-import { DocumentType } from "./documentUnit"
+import { DocumentType } from "./documentType"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
@@ -51,9 +51,7 @@ export default class Reference implements EditableListItem {
         ...data.documentationUnit,
       })
     }
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
-    }
+    this.id ??= crypto.randomUUID()
   }
 
   /**

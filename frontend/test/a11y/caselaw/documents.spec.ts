@@ -41,7 +41,7 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     await navigateToAttachments(page, documentNumber)
     await uploadTestfile(page, "sample.docx")
     await page.getByLabel("Datei löschen").click()
-    await page.locator("[aria-label='Anhang löschen']").click()
+    await page.getByLabel("Anhang löschen", { exact: true }).click()
 
     const accessibilityScanResults = await useAxeBuilder(page).analyze()
     expect(accessibilityScanResults.violations).toEqual([])

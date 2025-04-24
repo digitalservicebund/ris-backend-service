@@ -21,9 +21,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
@@ -69,11 +69,13 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataIn
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -86,6 +88,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisBodySpec;
@@ -168,6 +171,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
   @Autowired private AuthService authService;
   @Autowired private HandoverService handoverService;
+  @Autowired private DocumentationUnitStatusService documentationUnitStatusService;
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
   @MockitoBean private DocxConverterService docxConverterService;
@@ -176,7 +180,7 @@ class DocumentationUnitIntegrationTest {
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private HandoverReportRepository handoverReportRepository;
-  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
+  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
 
@@ -1315,6 +1319,98 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated();
+  }
+
+  @Test
+  void testGenerateNewDocumentationUnit_ManagementData_shouldSetCreatedBy() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "ZZREYYYY*****"));
+    var createdDocUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/new")
+            .exchange()
+            .expectStatus()
+            .isCreated()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData createdManagementData = createdDocUnit.managementData();
+    assertThat(createdManagementData.createdByDocOffice()).isEqualTo("DS");
+    assertThat(createdManagementData.createdAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(createdManagementData.createdByName()).isEqualTo("testUser");
+
+    var docUnitGetSameDocOffice =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + createdDocUnit.documentNumber())
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData managementDataSameDocOffice = docUnitGetSameDocOffice.managementData();
+    assertThat(managementDataSameDocOffice.createdByDocOffice()).isEqualTo("DS");
+    assertThat(managementDataSameDocOffice.createdAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(managementDataSameDocOffice.createdByName()).isEqualTo("testUser");
+  }
+
+  @Test
+  void
+      testGenerateNewDocumentationUnit_ManagementData_shouldSetCreatedByAndHideNameForOtherDocOffice()
+          throws DocumentationUnitNotExistsException {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "ZZREYYYY*****"));
+    var createdDocUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/new")
+            .exchange()
+            .expectStatus()
+            .isCreated()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData createdManagementData = createdDocUnit.managementData();
+    assertThat(createdManagementData.createdByDocOffice()).isEqualTo("DS");
+    assertThat(createdManagementData.createdAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(createdManagementData.createdByName()).isEqualTo("testUser");
+
+    // Publish the doc unit so that other doc office can access it
+    var status =
+        Status.builder()
+            .publicationStatus(PublicationStatus.PUBLISHED)
+            .createdAt(Instant.now())
+            .build();
+    documentationUnitStatusService.update(createdDocUnit.documentNumber(), status);
+
+    var docUnitForDifferentDocOffice =
+        risWebTestClient
+            .withLogin("/BGH")
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + createdDocUnit.documentNumber())
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData managementDataForOtherDocOffice = docUnitForDifferentDocOffice.managementData();
+    assertThat(managementDataForOtherDocOffice.createdByDocOffice()).isEqualTo("DS");
+    assertThat(managementDataForOtherDocOffice.createdAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(managementDataForOtherDocOffice.createdByName()).isNull();
   }
 
   @Test

@@ -9,14 +9,13 @@ public enum CategoryType {
   CASE_FACTS("caseFacts"),
   DECISION_REASONS("decisionReasons"),
   HEADNOTE("headnote"),
+  OTHER_HEADNOTE("otherHeadnote"),
   GUIDING_PRINCIPLE("guidingPrinciple"),
   TENOR("tenor"),
   HEADLINE("headline"),
   OTHER_LONG_TEXT("otherLongText"),
   DISSENTING_OPINION("dissentingOpinion"),
-  OUTLINE("outline"),
-  UNKNOWN("unbekannt");
-
+  OUTLINE("outline");
   @JsonValue private final String name;
 
   CategoryType(String name) {
@@ -30,6 +29,6 @@ public enum CategoryType {
       }
     }
 
-    return UNKNOWN;
+    return null;
   }
 }

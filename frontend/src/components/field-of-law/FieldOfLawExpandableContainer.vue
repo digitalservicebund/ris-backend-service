@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
+import RadioButton from "primevue/radiobutton"
 import { computed, nextTick, ref, watch } from "vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import FieldOfLawSummary from "@/components/field-of-law/FieldOfLawSummary.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import RadioInput from "@/components/input/RadioInput.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconAdd from "~icons/ic/baseline-add"
 
@@ -71,7 +71,7 @@ export enum InputMethod {
           <h2
             :id="DocumentUnitCategoriesEnum.FIELDS_OF_LAW"
             ref="titleRef"
-            class="ds-label-01-bold mb-16"
+            class="ris-label1-bold mb-16"
           >
             Sachgebiete
           </h2>
@@ -91,15 +91,14 @@ export enum InputMethod {
           <InputField
             id="direct"
             label="Direkteingabe"
-            label-class="ds-label-01-reg"
+            label-class="ris-label1-regular"
             :label-position="LabelPosition.RIGHT"
             @click="() => (inputMethod = InputMethod.DIRECT)"
           >
-            <RadioInput
+            <RadioButton
               id="direct"
               v-model="inputMethod"
               aria-label="Direkteingabe auswählen"
-              size="small"
               value="direct"
             />
           </InputField>
@@ -107,46 +106,40 @@ export enum InputMethod {
           <InputField
             id="search"
             label="Suche"
-            label-class="ds-label-01-reg"
+            label-class="ris-label1-regular"
             :label-position="LabelPosition.RIGHT"
             @click="inputMethod = InputMethod.SEARCH"
           >
-            <RadioInput
+            <RadioButton
               id="search"
               v-model="inputMethod"
               aria-label="Sachgebietsuche auswählen"
-              size="small"
               value="search"
             />
           </InputField>
         </div>
 
         <div class="flex flex-row gap-8">
-          <TextButton
+          <Button
             v-if="isResetButtonVisible && inputMethod === InputMethod.SEARCH"
-            button-type="tertiary"
             label="Suche zurücksetzen"
+            severity="secondary"
             size="small"
             @click="emit('resetSearch')"
-          />
-          <TextButton
-            button-type="primary"
-            label="Fertig"
-            size="small"
-            @click="exitEditMode"
-          />
+          ></Button>
+          <Button label="Fertig" size="small" @click="exitEditMode"></Button>
         </div>
       </div>
       <slot />
     </div>
 
-    <TextButton
+    <Button
       v-else
-      button-type="tertiary"
-      :icon="IconAdd"
       :label="expandButtonLabel"
+      severity="secondary"
       size="small"
       @click="enterEditMode"
-    />
+      ><template #icon> <IconAdd /> </template
+    ></Button>
   </div>
 </template>

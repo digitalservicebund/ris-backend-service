@@ -13,6 +13,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -22,10 +24,12 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -53,7 +57,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({HandoverMailService.class})
+@Import({HandoverMailService.class, TextCheckService.class})
 @TestPropertySource(
     properties = {
       "mail.exporter.jurisUsername=test-user",
@@ -128,18 +132,26 @@ class HandoverMailServiceUATTest {
 
   @MockitoBean private XmlExporter xmlExporter;
 
+  @MockitoBean private FeatureToggleService featureToggleService;
+
   @MockitoBean private HandoverRepository repository;
 
-  @MockitoBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean private DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
+
+  @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
 
   @MockitoBean private DatabaseLegalPeriodicalEditionRepository editionRepository;
 
   @MockitoBean private HttpMailSender mailSender;
 
+  @MockitoBean private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
     documentationUnit =
         DocumentationUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
+
+    when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
 
     edition =
         LegalPeriodicalEdition.builder()
@@ -200,8 +212,8 @@ class HandoverMailServiceUATTest {
             "neuris",
             Collections.singletonList(
                 MailAttachment.builder()
-                    .fileName(DOC_UNIT_SAVED_MAIL.attachments().get(0).fileName())
-                    .fileContent(DOC_UNIT_SAVED_MAIL.attachments().get(0).fileContent())
+                    .fileName(DOC_UNIT_SAVED_MAIL.attachments().getFirst().fileName())
+                    .fileContent(DOC_UNIT_SAVED_MAIL.attachments().getFirst().fileContent())
                     .build()),
             DOC_UNIT_SAVED_MAIL.entityId().toString());
   }

@@ -6,7 +6,6 @@ import {
   navigateToPeriodicalReferences,
   navigateToPreview,
   searchForDocUnitWithFileNumberAndDecisionDate,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -36,13 +35,15 @@ test.describe(
       })
 
       await test.step("Prefix, suffix, Name and Legal Periodical can't be edited", async () => {
-        await expect(page.locator("[aria-label='Periodikum']")).toBeHidden()
+        await expect(
+          page.getByLabel("Periodikum", { exact: true }),
+        ).toBeHidden()
 
         await expect(
-          page.locator("[aria-label='Zitatstelle Präfix']"),
+          page.getByLabel("Zitatstelle Präfix", { exact: true }),
         ).not.toBeEditable()
         await expect(
-          page.locator("[aria-label='Zitatstelle Suffix']"),
+          page.getByLabel("Zitatstelle Suffix", { exact: true }),
         ).not.toBeEditable()
       })
     })
@@ -81,7 +82,7 @@ test.describe(
           // wait for panel to open
           await expect(page).toHaveURL(/showAttachmentPanel=true/)
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(1)
 
           await fillInput(page, "Zitatstelle *", "5")
@@ -103,7 +104,7 @@ test.describe(
           ).toHaveCount(1)
 
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(2)
 
           await expect(page).toHaveURL(/showAttachmentPanel=false/)
@@ -148,7 +149,7 @@ test.describe(
           ).toBeVisible()
 
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(3)
 
           await expect(page).toHaveURL(/showAttachmentPanel=false/)
@@ -192,7 +193,7 @@ test.describe(
           ).toBeVisible()
 
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(4)
         })
 
@@ -260,9 +261,9 @@ test.describe(
           page.getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
         ).toHaveCount(1)
 
-        await expect(page.locator("[aria-label='Listen Eintrag']")).toHaveCount(
-          2,
-        )
+        await expect(
+          page.getByLabel("Listen Eintrag", { exact: true }),
+        ).toHaveCount(2)
       })
 
       await test.step("An added citation is visible in the documentation unit's preview", async () => {
@@ -318,9 +319,9 @@ test.describe(
           page.getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
         ).toHaveCount(1)
 
-        await expect(page.locator("[aria-label='Listen Eintrag']")).toHaveCount(
-          2,
-        )
+        await expect(
+          page.getByLabel("Listen Eintrag", { exact: true }),
+        ).toHaveCount(2)
       })
 
       await test.step("Expect changed to be visible after 10 seconds", async () => {
@@ -381,7 +382,9 @@ test.describe(
           }),
         ).toBeHidden()
 
-        await expect(page.locator("[aria-label='Dokumenttyp']")).toBeHidden()
+        await expect(
+          page.getByLabel("Dokumenttyp", { exact: true }),
+        ).toBeHidden()
       })
 
       await test.step("Change existing reference", async () => {
@@ -504,10 +507,10 @@ test.describe(
           await page.getByText("Eintrag löschen").click()
 
           await expect(
-            page.locator("[aria-label='Eintrag löschen']"),
+            page.getByLabel("Eintrag löschen", { exact: true }),
           ).toBeHidden()
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(3)
           await expect(
             page.getByText(`MMG 2024, 12-22, Heft 1 (L)`, { exact: true }),
@@ -520,7 +523,7 @@ test.describe(
             page.getByText(`MMG 2024, 12-22, Heft 1 (L)`, { exact: true }),
           ).toBeHidden()
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(3)
         })
 
@@ -538,10 +541,10 @@ test.describe(
           await page.getByText("Eintrag löschen").click()
 
           await expect(
-            page.locator("[aria-label='Eintrag löschen']"),
+            page.getByLabel("Eintrag löschen", { exact: true }),
           ).toBeHidden()
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(2)
           await expect(
             page.getByText(`MMG 2024, 23-25, Heft 1, Picard, Jean-Luc (Ean)`, {
@@ -558,7 +561,7 @@ test.describe(
             }),
           ).toBeHidden()
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(2)
         })
 
@@ -619,13 +622,13 @@ test.describe(
       })
 
       await test.step("An added reference is visible in the other docoffice's documentation unit's preview", async () => {
-        await expect(page.locator("[aria-label='Listen Eintrag']")).toHaveCount(
-          1,
-        )
+        await expect(
+          page.getByLabel("Listen Eintrag", { exact: true }),
+        ).toHaveCount(1)
         await page.getByLabel("Treffer übernehmen").click()
-        await expect(page.locator("[aria-label='Listen Eintrag']")).toHaveCount(
-          2,
-        )
+        await expect(
+          page.getByLabel("Listen Eintrag", { exact: true }),
+        ).toHaveCount(2)
 
         const previewTab = await context.newPage()
         await navigateToPreview(
@@ -656,11 +659,9 @@ test.describe(
           )
           await expect(periodical).toBeVisible()
           await periodical.click()
-          await waitForInputValue(
-            pageWithExternalUser,
-            "[aria-label='Periodikum']",
-            "MMG",
-          )
+          await expect(
+            pageWithExternalUser.getByLabel("Periodikum", { exact: true }),
+          ).toHaveValue("MMG")
         })
 
         await test.step("User can view but not edit or delete the editions", async () => {

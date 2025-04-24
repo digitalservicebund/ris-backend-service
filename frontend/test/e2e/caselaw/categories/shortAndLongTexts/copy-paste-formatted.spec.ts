@@ -1,10 +1,10 @@
 import { expect } from "@playwright/test"
 import {
-  navigateToAttachments,
-  uploadTestfile,
-  navigateToCategories,
-  copyPasteTextFromAttachmentIntoEditor,
   clickCategoryButton,
+  copyPasteTextFromAttachmentIntoEditor,
+  navigateToAttachments,
+  navigateToCategories,
+  uploadTestfile,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -49,7 +49,7 @@ test("copy-paste text with different styles and alignments from side panel", asy
   await test.step("copy and paste document text into text editor field, check that the style is applied", async () => {
     const attachmentLocator = page.getByText("centered").locator("..")
     await clickCategoryButton("Leitsatz", page)
-    const inputField = page.locator("[data-testid='Leitsatz']")
+    const inputField = page.getByTestId("Leitsatz")
     await copyPasteTextFromAttachmentIntoEditor(
       page,
       attachmentLocator,
@@ -114,7 +114,7 @@ test(
         .getByText("Text", { exact: true })
         .locator("..")
       await clickCategoryButton("Leitsatz", page)
-      const inputField = page.locator("[data-testid='Leitsatz']")
+      const inputField = page.getByTestId("Leitsatz")
       await copyPasteTextFromAttachmentIntoEditor(
         page,
         attachmentLocator,
@@ -175,7 +175,7 @@ test(
         .getByText("Text", { exact: true })
         .locator("..")
       await clickCategoryButton("Leitsatz", page)
-      const inputField = page.locator("[data-testid='Leitsatz']")
+      const inputField = page.getByTestId("Leitsatz")
       await copyPasteTextFromAttachmentIntoEditor(
         page,
         attachmentLocator,

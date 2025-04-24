@@ -215,7 +215,7 @@ describe("Edition Handover", () => {
     await user.click(handoverButton)
 
     expect(screen.getByLabelText("Letzte Ereignisse")).toHaveTextContent(
-      `Letzte EreignisseXml Email Abgabe - 11.10.2024 um 07:19 UhrÜBERE-Mail an: receiver address Betreff: mail subjectALSfile.xml1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>Juris Protokoll - 11.10.2024 um 07:19 Uhr`,
+      `Letzte EreignisseXml Email Abgabe - 11.10.2024 um 09:19 UhrE-Mail an: receiver address Betreff: mail subjectfile.xml1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>Juris Protokoll - 11.10.2024 um 09:19 Uhr`,
     )
   })
 

@@ -1,38 +1,16 @@
 import { Editor } from "@tiptap/core"
 import { EditorState } from "prosemirror-state"
-import { Ref, ref } from "vue"
-import { ResponseError, ServiceResponse } from "@/services/httpClient"
+import { ref } from "vue"
+import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-
 import {
+  IgnoredTextCheckWord,
   Match,
   TextCheckCategoryResponse,
+  TextCheckService,
   TextCheckTagName,
 } from "@/types/textCheck"
-
-interface TextCheckService {
-  loading: Ref<boolean>
-  matches: Match[]
-  selectedMatch: Ref<Match | undefined>
-  responseError: Ref<ResponseError | undefined>
-
-  checkCategory(editor: Editor, category?: string): Promise<void>
-
-  handleSelection(state: EditorState): boolean
-
-  selectMatch(matchId?: number): void
-
-  replaceMatch(
-    matchId: number,
-    text: string,
-    state: EditorState,
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    dispatch: ((args?: any) => any) | undefined,
-  ): void
-
-  clearSelectedMatch(): void
-}
 
 class NeurisTextCheckService implements TextCheckService {
   loading = ref(false)
@@ -174,24 +152,67 @@ class NeurisTextCheckService implements TextCheckService {
     this.selectedMatch.value = undefined
   }
 
-  static isMatchIgnored(match: Match): boolean {
-    return (
-      Array.isArray(match.ignoredTextCheckWords) &&
-      match.ignoredTextCheckWords.length > 0
-    )
+  ignoreWord = async (word: string) => {
+    const store = useDocumentUnitStore()
+
+    if (store.documentUnit?.uuid) {
+      const response: ServiceResponse<IgnoredTextCheckWord> =
+        await languageToolService.addLocalIgnore(store.documentUnit?.uuid, word)
+
+      if (response.status >= 300) {
+        this.responseError.value = response.error
+      } else {
+        this.selectedMatch.value.ignoredTextCheckWords ??= []
+        this.selectedMatch.value.ignoredTextCheckWords.push(response.data)
+      }
+    }
   }
 
-  /**
-   * Returns true if all ignored words are editable, otherwise false
-   * @param match
-   */
-  static isMatchEditable(match: Match): boolean {
-    return (
-      match.ignoredTextCheckWords?.every(
-        (ignoredWord) => ignoredWord.isEditable === true,
-      ) ?? false
-    )
+  removeIgnoredWord = async (word: string): Promise<void> => {
+    const store = useDocumentUnitStore()
+
+    if (store.documentUnit?.uuid) {
+      const response: ServiceResponse<void> =
+        await languageToolService.removeLocalIgnore(
+          store.documentUnit?.uuid,
+          word,
+        )
+
+      if (response.status >= 300) {
+        this.responseError.value = response.error
+      } else {
+        this.selectedMatch.value.ignoredTextCheckWords = (
+          this.selectedMatch.value
+            .ignoredTextCheckWords as IgnoredTextCheckWord[]
+        ).filter(({ type }) => type !== "documentation_unit")
+      }
+    }
+  }
+
+  ignoreWordGlobally = async (word: string) => {
+    const response: ServiceResponse<IgnoredTextCheckWord> =
+      await languageToolService.addGlobalIgnore(word)
+
+    if (response.status >= 300) {
+      this.responseError.value = response.error
+    } else {
+      this.selectedMatch.value.ignoredTextCheckWords ??= []
+      this.selectedMatch.value.ignoredTextCheckWords.push(response.data)
+    }
+  }
+
+  removeGloballyIgnoredWord = async (word: string): Promise<void> => {
+    const response: ServiceResponse<void> =
+      await languageToolService.removeGlobalIgnore(word)
+
+    if (response.status >= 300) {
+      this.responseError.value = response.error
+    } else {
+      this.selectedMatch.value.ignoredTextCheckWords = (
+        this.selectedMatch.value.ignoredTextCheckWords as IgnoredTextCheckWord[]
+      ).filter(({ type }) => type !== "global")
+    }
   }
 }
 
-export { NeurisTextCheckService, TextCheckService }
+export { NeurisTextCheckService }

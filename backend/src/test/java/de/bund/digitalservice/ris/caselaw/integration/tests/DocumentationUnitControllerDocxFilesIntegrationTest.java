@@ -14,10 +14,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.S3AttachmentService;
+import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
@@ -43,11 +43,13 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
@@ -156,7 +158,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private UserGroupService userGroupService;
-  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
+  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
 
   private DocumentationOfficeDTO dsDocOffice = null;
@@ -200,6 +202,87 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     var savedAttachment = attachmentRepository.findAllByDocumentationUnitId(dto.getId()).get(0);
     assertThat(savedAttachment.getUploadTimestamp()).isInstanceOf(Instant.class);
     assertThat(savedAttachment.getId()).isInstanceOf(UUID.class);
+  }
+
+  @Test
+  void testAttachDocxToDocumentationUnit_shouldSetManagementData() throws IOException {
+    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+    mockS3ClientToReturnFile(attachment);
+
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyAsByteArray(attachment)
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    var docUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData managementData = docUnit.managementData();
+    assertThat(managementData.lastUpdatedByName()).isEqualTo("testUser");
+    assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
+    assertThat(managementData.lastUpdatedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+  }
+
+  @Test
+  void testAttachDocxToDocumentationUnit_shouldSetManagementDataForOtherDocOffice()
+      throws IOException {
+    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+    mockS3ClientToReturnFile(attachment);
+
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyAsByteArray(attachment)
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    var docUnit =
+        risWebTestClient
+            .withLogin("/BGH")
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData managementData = docUnit.managementData();
+    assertThat(managementData.lastUpdatedByName()).isNull();
+    assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
+    assertThat(managementData.lastUpdatedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
   }
 
   @Test
@@ -392,7 +475,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   }
 
   @Test
-  void testRemoveFileFromDocumentationUnit() {
+  void testRemoveFileFromDocumentationUnit_shouldReturnLastUpdatedByWithName() {
+    // Arrange
     when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(DeleteObjectResponse.builder().build());
 
@@ -411,6 +495,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
 
     assertThat(attachmentRepository.findAll()).hasSize(1);
 
+    // Act
     risWebTestClient
         .withDefaultLogin()
         .delete()
@@ -419,7 +504,74 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
         .expectStatus()
         .isNoContent();
 
-    assertThat(attachmentRepository.findAll()).isEmpty();
+    var docUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    // Assert
+    ManagementData managementData = docUnit.managementData();
+    assertThat(managementData.lastUpdatedByName()).isEqualTo("testUser");
+    assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
+    assertThat(managementData.lastUpdatedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+  }
+
+  @Test
+  void testRemoveFileFromDocumentationUnit_shouldReturnLastUpdatedByWithoutName() {
+    // Arrange
+    when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
+        .thenReturn(DeleteObjectResponse.builder().build());
+
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
+
+    attachmentRepository.save(
+        AttachmentDTO.builder()
+            .s3ObjectPath("fooPath")
+            .documentationUnit(dto)
+            .uploadTimestamp(Instant.now())
+            .filename("fooFile")
+            .format("docx")
+            .build());
+
+    assertThat(attachmentRepository.findAll()).hasSize(1);
+
+    // Act
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/fooPath")
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+
+    var docUnit =
+        risWebTestClient
+            .withLogin("/BGH")
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    // Assert
+    ManagementData managementData = docUnit.managementData();
+    assertThat(managementData.lastUpdatedByName()).isNull();
+    assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
+    assertThat(managementData.lastUpdatedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
   }
 
   @Test

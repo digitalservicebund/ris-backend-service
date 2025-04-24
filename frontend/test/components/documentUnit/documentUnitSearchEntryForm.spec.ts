@@ -1,5 +1,7 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { config } from "@vue/test-utils"
+import InputText from "primevue/inputtext"
 import { expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
@@ -37,6 +39,22 @@ async function renderComponent(options?: { isLoading: boolean }) {
 }
 
 describe("Documentunit search form", () => {
+  beforeEach(() => {
+    // InputMask evaluates cursor position on every keystroke, however, our browser vitest setup does not
+    // implement any layout-related functionality, meaning the required functions for cursor offset
+    // calculation are missing. When we deal with typing in date/ year / time inputs, we can mock it with
+    // TextInput, as we only need the string and do not need to test the actual mask behaviour.
+    config.global.stubs = {
+      InputMask: InputText,
+    }
+  })
+
+  afterEach(() => {
+    // Mock needs to be reset (and can not be mocked globally) because InputMask has interdependencies
+    // with the PrimeVue select component. When testing the select components with InputMask
+    // mocked globally, they fail due to these dependencies.
+    config.global.stubs = {}
+  })
   test("renders correctly", async () => {
     await renderComponent()
     ;[
@@ -46,8 +64,11 @@ describe("Documentunit search form", () => {
       "Entscheidungsdatum Suche",
       "Dokumentnummer Suche",
       "Status Suche",
-      "Nur meine Dokstelle Filter",
     ].forEach((label) => expect(screen.getByLabelText(label)).toBeVisible())
+
+    expect(
+      screen.getByLabelText("Nur meine Dokstelle Filter"),
+    ).toBeInTheDocument()
   })
 
   test("click on 'Suche zurücksetzen' emits 'resetSearchResults'", async () => {
@@ -98,11 +119,13 @@ describe("Documentunit search form", () => {
     expect(
       screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
     ).not.toBeInTheDocument()
-    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
+    expect(
+      screen.getByLabelText("Nur meine Dokstelle Filter"),
+    ).toBeInTheDocument()
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
     expect(
       screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
-    ).toBeVisible()
+    ).toBeInTheDocument()
   })
 
   test("click on 'Nur meine Dokstelle' renders scheduled publication fields", async () => {
@@ -115,16 +138,20 @@ describe("Documentunit search form", () => {
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
 
     expect(screen.getByLabelText("jDV Übergabedatum Suche")).toBeVisible()
-    expect(screen.getByLabelText("Terminiert Filter")).toBeVisible()
+    expect(screen.getByLabelText("Terminiert Filter")).toBeInTheDocument()
   })
 
   test("click on 'Nur meine Dokstelle' renders 'Dublettenverdacht' checkbox", async () => {
     const { user } = await renderComponent()
-    expect(screen.queryByLabelText("Dublettenverdacht")).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
+    ).not.toBeInTheDocument()
 
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
 
-    expect(screen.getByLabelText("Dublettenverdacht")).toBeVisible()
+    expect(
+      screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
+    ).toBeInTheDocument()
   })
 
   test("unchecking 'Nur meine Dokstelle' removes scheduled publication input", async () => {

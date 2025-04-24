@@ -34,7 +34,7 @@ test.describe("a11y of start page (/caselaw)", () => {
       .locator(".table-row", {
         hasText: documentNumber,
       })
-      .locator("[aria-label='Dokumentationseinheit löschen']")
+      .getByLabel("Dokumentationseinheit löschen", { exact: true })
       .click()
     const accessibilityScanResults = await useAxeBuilder(page).analyze()
     expect(accessibilityScanResults.violations).toEqual([])

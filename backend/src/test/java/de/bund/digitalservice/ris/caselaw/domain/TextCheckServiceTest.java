@@ -1,16 +1,17 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.TextCheckMockService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.TextCheckUnknownCategoryException;
@@ -19,36 +20,38 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Replacement;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.Rule;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResponse;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckType;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class TextCheckServiceTest {
 
-  private DocumentationUnitService documentationUnitService;
-  private DocumentationOfficeService documentationOfficeService;
-  private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+  private DocumentationUnitRepository documentationUnitRepository;
   private TextCheckService textCheckService;
+
+  private IgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
 
   @BeforeEach
   void setUp() {
-    documentationUnitService = mock(DocumentationUnitService.class);
-    documentationOfficeService = mock(DocumentationOfficeService.class);
+    documentationUnitRepository = mock(DocumentationUnitRepository.class);
     ignoredTextCheckWordRepository = mock(IgnoredTextCheckWordRepository.class);
 
+    FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+    when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
     textCheckService =
         new TextCheckMockService(
-            documentationUnitService, documentationOfficeService, ignoredTextCheckWordRepository);
-
-    when(textCheckService.getDocumentationOfficeIds(any())).thenReturn(Collections.emptyList());
+            documentationUnitRepository, ignoredTextCheckWordRepository, featureToggleService);
   }
 
   @Test
@@ -56,7 +59,7 @@ class TextCheckServiceTest {
       throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
 
-    when(documentationUnitService.getByUuid(uuid))
+    when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
             DocumentationUnit.builder()
                 .longTexts(
@@ -74,7 +77,9 @@ class TextCheckServiceTest {
                         .build())
                 .build());
 
+    TestMemoryAppender memoryAppender = new TestMemoryAppender(TextCheckService.class);
     List<Match> result = textCheckService.checkWholeDocumentationUnit(uuid);
+    assertThat(memoryAppender.count(Level.ERROR)).isZero();
 
     assertNotNull(result);
   }
@@ -85,11 +90,14 @@ class TextCheckServiceTest {
     UUID uuid = UUID.randomUUID();
     Documentable documentable = mock(Documentable.class);
 
-    when(documentationUnitService.getByUuid(uuid)).thenReturn(documentable);
+    when(documentationUnitRepository.findByUuid(uuid)).thenReturn(documentable);
 
-    assertThrows(
-        UnsupportedOperationException.class,
-        () -> textCheckService.checkWholeDocumentationUnit(uuid));
+    var exception =
+        assertThrows(
+            UnsupportedOperationException.class,
+            () -> textCheckService.checkWholeDocumentationUnit(uuid));
+
+    assertTrue(exception.getMessage().contains("Check not supported for Documentable type: "));
   }
 
   @ParameterizedTest
@@ -98,7 +106,43 @@ class TextCheckServiceTest {
       throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
 
-    when(documentationUnitService.getByUuid(uuid))
+    when(documentationUnitRepository.findByUuid(uuid))
+        .thenReturn(
+            DocumentationUnit.builder()
+                .longTexts(
+                    LongTexts.builder()
+                        .reasons("<p>Reason text</p>")
+                        .tenor("<p>Tenor text</p>")
+                        .decisionReasons("<p>Decision reasons text</p>")
+                        .caseFacts("<p>Case facts text</p>")
+                        .otherLongText("<p>OtherLongText text</p>")
+                        .dissentingOpinion("<p>DissentingOpinion text</p>")
+                        .outline("<p>Outline text</p>")
+                        .build())
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        .build())
+                .shortTexts(
+                    ShortTexts.builder()
+                        .guidingPrinciple("<p>Guiding principle text</p>")
+                        .headnote("<p>Headnote text</p>")
+                        .otherHeadnote("<p>Other headnote text</p>")
+                        .decisionName("<p>Decision name text</p>")
+                        .headline("<p>Headline text</p>")
+                        .build())
+                .build());
+
+    TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, categoryType);
+    assertNotNull(result);
+  }
+
+  @Test
+  void testCheckCategory_nullCategory() throws DocumentationUnitNotExistsException {
+    UUID uuid = UUID.randomUUID();
+
+    when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
             DocumentationUnit.builder()
                 .longTexts(
@@ -124,24 +168,6 @@ class TextCheckServiceTest {
                         .headline("<p>Headline text</p>")
                         .build())
                 .build());
-
-    if (categoryType.equals(CategoryType.UNKNOWN)) {
-      assertThrows(
-          TextCheckUnknownCategoryException.class,
-          () -> textCheckService.checkCategory(uuid, categoryType));
-    } else {
-      TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, categoryType);
-      assertNotNull(result);
-    }
-
-    TextCheckCategoryResponse resultWithNull =
-        textCheckService.checkCategory(UUID.randomUUID(), categoryType);
-    assertNull(resultWithNull);
-  }
-
-  @Test
-  void testCheckCategory_nullCategory() {
-    UUID uuid = UUID.randomUUID();
     assertThrows(
         TextCheckUnknownCategoryException.class, () -> textCheckService.checkCategory(uuid, null));
   }
@@ -149,7 +175,7 @@ class TextCheckServiceTest {
   @Test
   void testCheckCategory_unknownCategory() throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
-    when(documentationUnitService.getByUuid(uuid))
+    when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(
@@ -159,17 +185,15 @@ class TextCheckServiceTest {
                         .build())
                 .build());
 
-    when(textCheckService.getDocumentationOfficeIds(any())).thenReturn(Collections.emptyList());
     assertThrows(
-        TextCheckUnknownCategoryException.class,
-        () -> textCheckService.checkCategory(uuid, CategoryType.UNKNOWN));
+        TextCheckUnknownCategoryException.class, () -> textCheckService.checkCategory(uuid, null));
   }
 
   @Test
   void testCheckCategory_nullHTML() throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
 
-    when(documentationUnitService.getByUuid(uuid))
+    when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(
@@ -181,7 +205,7 @@ class TextCheckServiceTest {
                 .build());
 
     TextCheckCategoryResponse result = textCheckService.checkCategory(uuid, CategoryType.REASONS);
-    assertNull(result);
+    assertEquals(null, result);
   }
 
   @Test
@@ -407,10 +431,6 @@ class TextCheckServiceTest {
 
     final String ignoredWord = "ignored match";
 
-    when(ignoredTextCheckWordRepository.findAllByDocumentationOfficesOrUnitAndWords(
-            any(), any(), any()))
-        .thenReturn(List.of(IgnoredTextCheckWord.builder().word(ignoredWord).build()));
-
     TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
@@ -427,14 +447,145 @@ class TextCheckServiceTest {
 
     TextCheckCategoryResponse response = mockService.checkCategoryByHTML(htmlText, categoryType);
 
-    verify(ignoredTextCheckWordRepository)
-        .findAllByDocumentationOfficesOrUnitAndWords(
-            any(), any(), argThat(words -> words.contains(ignoredWord)));
-
     assertNotNull(response);
     assertEquals(
         "<p>text text with <text-check id=\"1\" type=\"ignored\">ignored match</text-check></p>",
         response.htmlText());
     assertEquals(1, response.matches().size());
+  }
+
+  @Test
+  void testAddNoIndexTags_shouldReplaceTags() {
+    var html = "<p>this and this be wrapped with no index</p>";
+    var result = TextCheckService.addNoIndexTags(html, List.of("this"));
+
+    var expected =
+        "<p><noindex>this</noindex> and <noindex>this</noindex> be wrapped with no index</p>";
+    assertEquals(expected, result);
+  }
+
+  @Test
+  void testAddNoIndexForPublication_shouldUpdateAllSupportedFields() {
+    var uuid = UUID.randomUUID();
+    var ignoredWord =
+        new IgnoredTextCheckWord(UUID.randomUUID(), IgnoredTextCheckType.GLOBAL, "text");
+    var docUnit =
+        DocumentationUnit.builder()
+            .uuid(uuid)
+            .longTexts(
+                LongTexts.builder()
+                    .reasons("<p>Reason text</p>")
+                    .tenor("<p>Tenor text</p>")
+                    .decisionReasons("<p>Decision reasons text</p>")
+                    .caseFacts("<p>Case facts text</p>")
+                    .otherLongText("<p>OtherLongText text</p>")
+                    .dissentingOpinion("<p>DissentingOpinion text</p>")
+                    .outline("<p>Outline text</p>")
+                    .build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(
+                        DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                    .build())
+            .shortTexts(
+                ShortTexts.builder()
+                    .guidingPrinciple("<p>Guiding principle text</p>")
+                    .headnote("<p>Headnote text</p>")
+                    .otherHeadnote("<p>Other headnote text</p>")
+                    .headline("<p>Headline text</p>")
+                    .build())
+            .build();
+
+    when(ignoredTextCheckWordRepository.findAllByDocumentationUnitId(uuid))
+        .thenReturn(List.of(ignoredWord));
+
+    var result = textCheckService.addNoIndexTagsForHandOver(docUnit);
+
+    // Long texts
+    assertTrue(result.longTexts().reasons().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().tenor().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().decisionReasons().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().caseFacts().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().otherLongText().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().dissentingOpinion().contains("<noindex>text</noindex>"));
+    assertTrue(result.longTexts().outline().contains("<noindex>text</noindex>"));
+
+    // Short text
+    assertTrue(result.shortTexts().guidingPrinciple().contains("<noindex>text</noindex>"));
+    assertTrue(result.shortTexts().headnote().contains("<noindex>text</noindex>"));
+    assertTrue(result.shortTexts().otherHeadnote().contains("<noindex>text</noindex>"));
+    assertTrue(result.shortTexts().headline().contains("<noindex>text</noindex>"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("noIndexReplacementCases")
+  void testAddNoIndexTags_withMultipleCases(
+      String html, List<String> ignoredWords, String expected) {
+    String result = TextCheckService.addNoIndexTags(html, ignoredWords);
+    assertEquals(expected, result);
+  }
+
+  private static Stream<Arguments> noIndexReplacementCases() {
+    return Stream.of(
+        Arguments.of(
+            "<p>CASE insensitive should not be replaced</p>",
+            List.of("case"),
+            "<p>CASE insensitive should not be replaced</p>"),
+        Arguments.of(
+            "<p>partsofwords should not replace</p>",
+            List.of("parts"),
+            "<p>partsofwords should not replace</p>"),
+        Arguments.of(
+            "<p>p with no index but not html tag should be replaced</p>",
+            List.of("p"),
+            "<p><noindex>p</noindex> with no index but not html tag should be replaced</p>"),
+        Arguments.of(
+            "<p>saved-words-with-hyphen should be replaced</p>",
+            List.of("saved-words-with-hyphen"),
+            "<p><noindex>saved-words-with-hyphen</noindex> should be replaced</p>"),
+        Arguments.of(
+            "<p>hyphenated-word - first part should not replace</p>",
+            List.of("word"),
+            "<p>hyphenated-<noindex>word</noindex> - first part should not replace</p>"),
+        Arguments.of(
+            "<p>\"[word]\" - words in square brackets should be replaced</p>",
+            List.of("word"),
+            "<p>\"[<noindex>word</noindex>]\" - words in square brackets should be replaced</p>"),
+        Arguments.of(
+            "<p>\"(word)\" - words in round brackets should be replaced</p>",
+            List.of("word"),
+            "<p>\"(<noindex>word</noindex>)\" - words in round brackets should be replaced</p>"),
+        Arguments.of(
+            "<p>\"word\" - words in double quotes should be replaced</p>",
+            List.of("word"),
+            "<p>\"<noindex>word</noindex>\" - words in double quotes should be replaced</p>"),
+        Arguments.of(
+            "<p>word, other word - both words should be replaced</p>",
+            List.of("word"),
+            "<p><noindex>word</noindex>, other <noindex>word</noindex> - both words should be replaced</p>"),
+        Arguments.of(
+            "<p>word; other word - both words should be replaced</p>",
+            List.of("word"),
+            "<p><noindex>word</noindex>; other <noindex>word</noindex> - both words should be replaced</p>"),
+        Arguments.of(
+            "<p>word;other word - both words should be replaced</p>",
+            List.of("word"),
+            "<p><noindex>word</noindex>;other <noindex>word</noindex> - both words should be replaced</p>"),
+        Arguments.of(
+            "<p>WORD. should replace</p>",
+            List.of("WORD"),
+            "<p><noindex>WORD</noindex>. should replace</p>"),
+        Arguments.of(
+            "<article>add-no-index should not reformat text</article>",
+            List.of("add-no-index"),
+            "<article><noindex>add-no-index</noindex> should not reformat text</article>"),
+        Arguments.of(
+            "<p>Abc§116A should replace</p>",
+            List.of("Abc§116A"),
+            "<p><noindex>Abc§116A</noindex> should replace</p>"),
+        Arguments.of(
+            "<border-number><number>7</number><content><p><noindex>should-keep-text</noindex></p></content></border-number>",
+            List.of("Abc§116A"),
+            "<border-number><number>7</number><content><p><noindex>should-keep-text</noindex></p></content></border-number>"));
   }
 }

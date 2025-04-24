@@ -1,5 +1,4 @@
 import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
-import { Browser } from "playwright"
 import { caselawTest as test } from "./fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import SingleNorm from "@/domain/singleNorm"
@@ -229,67 +228,9 @@ export async function save(page: Page) {
   const saveRequest = page.waitForRequest("**/api/v1/caselaw/documentunits/*", {
     timeout: 5_000,
   })
-  await page.locator("[aria-label='Speichern Button']").click()
+  await page.getByLabel("Speichern Button", { exact: true }).click()
   await saveRequest
   await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
-}
-
-export async function deleteDocumentUnit(page: Page, documentNumber: string) {
-  const cookies = await page.context().cookies()
-  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-  const getResponse = await page.request.get(
-    `/api/v1/caselaw/documentunits/${documentNumber}`,
-    { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
-  )
-  expect(getResponse.ok()).toBeTruthy()
-
-  const { uuid } = await getResponse.json()
-
-  const deleteResponse = await page.request.delete(
-    `/api/v1/caselaw/documentunits/${uuid}`,
-    { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
-  )
-  expect(deleteResponse.ok()).toBeTruthy()
-}
-
-export async function deleteProcedure(page: Page, uuid: string) {
-  const cookies = await page.context().cookies()
-  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-  const response = await page.request.delete(
-    `/api/v1/caselaw/procedure/${uuid}`,
-    { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
-  )
-  expect(response.ok()).toBeTruthy()
-}
-
-export async function documentUnitExists(
-  page: Page,
-  documentNumber: string,
-): Promise<boolean> {
-  return (
-    await (
-      await page.request.get(`/api/v1/caselaw/documentunits/${documentNumber}`)
-    ).text()
-  ).includes("uuid")
-}
-
-/**
- * @deprecated
- * Use playwright's toHaveValue instead: e.g. <pre>page.getByLabel("Gericht").toHaveValue("BGH")</pre>
- */
-export async function waitForInputValue(
-  page: Page,
-  selector: string,
-  expectedValue: string,
-  timeout?: number,
-) {
-  await page.waitForFunction(
-    ({ selector, expectedValue }) => {
-      const input = document.querySelector(selector) as HTMLInputElement
-      return input && input.value === expectedValue
-    },
-    { selector, expectedValue, timeout },
-  )
 }
 
 export async function fillSearchInput(
@@ -306,9 +247,9 @@ export async function fillSearchInput(
   },
 ) {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
-    const input = page.locator(`[aria-label='${ariaLabel}']`)
+    const input = page.getByLabel(ariaLabel, { exact: true })
     await input.fill(value ?? ariaLabel)
-    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+    await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
   }
 
   //reset search first
@@ -348,8 +289,13 @@ export async function fillSearchInput(
   }
 
   if (values?.status) {
-    const select = page.locator(`select[id="status"]`)
-    await select.selectOption(values?.status)
+    await page.getByLabel("Status Suche").click()
+    await page
+      .getByRole("option", {
+        name: values?.status,
+        exact: true,
+      })
+      .click()
   }
 
   await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
@@ -373,19 +319,17 @@ export async function fillPreviousDecisionInputs(
   decisionIndex = 0,
 ): Promise<void> {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
-    const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
+    const input = page.getByLabel(ariaLabel, { exact: true }).nth(decisionIndex)
     await input.fill(value ?? ariaLabel)
-    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+    await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
   }
 
   if (values?.court) {
     await fillInput("Gericht Vorgehende Entscheidung", values?.court)
     await page.getByText(values.court, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Gericht Vorgehende Entscheidung']",
-      values.court,
-    )
+    await expect(
+      page.getByLabel("Gericht Vorgehende Entscheidung", { exact: true }),
+    ).toHaveValue(values.court)
   }
   if (values?.decisionDate) {
     await fillInput(
@@ -399,11 +343,9 @@ export async function fillPreviousDecisionInputs(
   if (values?.documentType) {
     await fillInput("Dokumenttyp Vorgehende Entscheidung", values?.documentType)
     await page.getByText(values.documentType, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Dokumenttyp Vorgehende Entscheidung']",
-      values.documentType,
-    )
+    await expect(
+      page.getByLabel("Dokumenttyp Vorgehende Entscheidung", { exact: true }),
+    ).toHaveValue(values.documentType)
   }
 
   if (values?.dateKnown === false) {
@@ -423,8 +365,9 @@ export async function fillPreviousDecisionInputs(
         .isVisible())
     ) {
       await page
-        .locator(
-          "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
+        .getByLabel(
+          "Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen",
+          { exact: true },
         )
         .click()
     }
@@ -448,19 +391,17 @@ export async function fillEnsuingDecisionInputs(
   decisionIndex = 0,
 ): Promise<void> {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
-    const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
+    const input = page.getByLabel(ariaLabel, { exact: true }).nth(decisionIndex)
     await input.fill(value ?? ariaLabel)
-    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+    await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
   }
 
   if (values?.court) {
     await fillInput("Gericht Nachgehende Entscheidung", values?.court)
     await page.getByText(values.court, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Gericht Nachgehende Entscheidung']",
-      values.court,
-    )
+    await expect(
+      page.getByLabel("Gericht Nachgehende Entscheidung", { exact: true }),
+    ).toHaveValue(values.court)
   }
   if (values?.decisionDate) {
     await fillInput(
@@ -477,11 +418,9 @@ export async function fillEnsuingDecisionInputs(
       values?.documentType,
     )
     await page.getByText(values.documentType, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Dokumenttyp Nachgehende Entscheidung']",
-      values.documentType,
-    )
+    await expect(
+      page.getByLabel("Dokumenttyp Nachgehende Entscheidung", { exact: true }),
+    ).toHaveValue(values.documentType)
   }
   if (values?.pending) {
     const pendingCheckbox = page.getByLabel("Anhängige Entscheidung")
@@ -497,13 +436,13 @@ export async function fillInput(
   ariaLabel: string,
   value = generateString(),
 ) {
-  const input = page.locator(`[aria-label='${ariaLabel}']`)
+  const input = page.getByLabel(ariaLabel, { exact: true })
   await input.fill(value ?? ariaLabel)
-  await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+  await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
 }
 
 export async function clearInput(page: Page, ariaLabel: string) {
-  const input = page.locator(`[aria-label='${ariaLabel}']`)
+  const input = page.getByLabel(ariaLabel, { exact: true })
   await input.clear()
 }
 
@@ -517,9 +456,7 @@ export async function fillNormInputs(
   if (values?.normAbbreviation) {
     await fillInput(page, "RIS-Abkürzung", values.normAbbreviation)
     await page.getByText(values.normAbbreviation, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='RIS-Abkürzung']",
+    await expect(page.getByLabel("RIS-Abkürzung", { exact: true })).toHaveValue(
       values.normAbbreviation,
     )
   }
@@ -530,7 +467,7 @@ export async function fillNormInputs(
         const input = page.getByLabel("Einzelnorm der Norm").nth(index)
         await input.fill(entry.singleNorm)
         await expect(
-          page.locator("[aria-label='Einzelnorm der Norm'] >> nth=" + index),
+          page.getByLabel("Einzelnorm der Norm", { exact: true }).nth(index),
         ).toHaveValue(entry.singleNorm.trim())
       }
 
@@ -538,14 +475,14 @@ export async function fillNormInputs(
         const input = page.getByLabel("Fassungsdatum der Norm").nth(index)
         await input.fill(entry.dateOfVersion)
         await expect(
-          page.locator("[aria-label='Fassungsdatum der Norm'] >> nth=" + index),
+          page.getByLabel("Fassungsdatum der Norm", { exact: true }).nth(index),
         ).toHaveValue(entry.dateOfVersion)
       }
       if (entry.dateOfRelevance) {
         const input = page.getByLabel("Jahr der Norm").nth(index)
         await input.fill(entry.dateOfRelevance)
         await expect(
-          page.locator("[aria-label='Jahr der Norm'] >> nth=" + index),
+          page.getByLabel("Jahr der Norm", { exact: true }).nth(index),
         ).toHaveValue(entry.dateOfRelevance)
       }
     }
@@ -565,21 +502,17 @@ export async function fillActiveCitationInputs(
   if (values?.citationType) {
     await fillInput(page, "Art der Zitierung", values?.citationType)
     await page.getByText(values.citationType, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Art der Zitierung']",
-      values.citationType,
-    )
+    await expect(
+      page.getByLabel("Art der Zitierung", { exact: true }),
+    ).toHaveValue(values.citationType)
   }
 
   if (values?.court) {
     await fillInput(page, "Gericht Aktivzitierung", values?.court)
     await page.getByText(values.court, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Gericht Aktivzitierung']",
-      values.court,
-    )
+    await expect(
+      page.getByLabel("Gericht Aktivzitierung", { exact: true }),
+    ).toHaveValue(values.court)
   }
   if (values?.decisionDate) {
     await fillInput(
@@ -594,11 +527,9 @@ export async function fillActiveCitationInputs(
   if (values?.documentType) {
     await fillInput(page, "Dokumenttyp Aktivzitierung", values?.documentType)
     await page.getByText(values.documentType, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Dokumenttyp Aktivzitierung']",
-      values.documentType,
-    )
+    await expect(
+      page.getByLabel("Dokumenttyp Aktivzitierung", { exact: true }),
+    ).toHaveValue(values.documentType)
   }
 }
 
@@ -651,28 +582,13 @@ export async function assignProcedureToDocUnit(
   await test.step("Internal user assigns new procedure to doc unit", async () => {
     await navigateToCategories(page, documentNumber)
     procedureName = generateString({ length: 10, prefix: prefix })
-    await page.locator("[aria-label='Vorgang']").fill(procedureName)
+    await page.getByLabel("Vorgang", { exact: true }).fill(procedureName)
     await page
       .getByText(`${procedureName} neu erstellen`)
       .click({ timeout: 5_000 })
     await save(page)
   })
   return procedureName
-}
-
-export async function deleteAllProcedures(
-  browser: Browser,
-  procedurePrefix: string,
-) {
-  const page = await browser.newPage()
-  const response = await page.request.get(
-    `/api/v1/caselaw/procedure?sz=50&pg=0&q=${procedurePrefix}&withDocUnits=false`,
-  )
-  const responseBody = await response.json()
-  for (const procedure of responseBody.content) {
-    const uuid = procedure.id
-    await deleteProcedure(page, uuid)
-  }
 }
 
 export async function searchForDocUnitWithFileNumberAndDecisionDate(

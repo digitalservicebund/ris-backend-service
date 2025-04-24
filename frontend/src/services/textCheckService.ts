@@ -5,6 +5,7 @@ import httpClient, {
 } from "@/services/httpClient"
 import {
   IgnoredTextCheckWord,
+  IgnoredTextCheckWordRequest,
   TextCheckAllResponse,
   TextCheckCategoryResponse,
   TextCheckResponse,
@@ -20,10 +21,16 @@ interface TextCheckService {
     category?: string,
   ): Promise<ServiceResponse<TextCheckCategoryResponse>>
 
-  addIgnoredWordForDocumentationOffice(
+  addLocalIgnore(
     id: string,
-    ignoredTextCheckWord: IgnoredTextCheckWord,
+    word: string,
   ): Promise<ServiceResponse<IgnoredTextCheckWord>>
+
+  removeLocalIgnore(id: string, word: string): Promise<ServiceResponse<void>>
+
+  addGlobalIgnore(word: string): Promise<ServiceResponse<IgnoredTextCheckWord>>
+
+  removeGlobalIgnore(word: string): Promise<ServiceResponse<void>>
 }
 
 const service: TextCheckService = {
@@ -64,27 +71,82 @@ const service: TextCheckService = {
     }
     return response
   },
-
-  async addIgnoredWordForDocumentationOffice(
-    id: string,
-    ignoredTextCheckWord: IgnoredTextCheckWord,
-  ) {
+  async addLocalIgnore(id: string, word: string) {
     const response = await httpClient.post<
-      IgnoredTextCheckWord,
+      IgnoredTextCheckWordRequest,
       IgnoredTextCheckWord
     >(
-      `caselaw/documentunits/${id}/text-check/ignored-words/add`,
+      `caselaw/documentunits/${id}/text-check/ignored-word`,
       {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
       },
-      ignoredTextCheckWord,
+      { word },
     )
     if (response.status >= 300) {
       response.error = {
         title: errorMessages.IGNORED_TEXT_CHECK_WORD_COULD_NOT_BE_SAVED.title,
+      } as ResponseError
+    }
+    return response
+  },
+
+  async removeLocalIgnore(id: string, word: string) {
+    const response = await httpClient.delete<void>(
+      `caselaw/documentunits/${id}/text-check/ignored-word/${word}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.IGNORED_TEXT_CHECK_WORD_COULD_NOT_BE_DELETED.title,
+      } as ResponseError
+    }
+    return response
+  },
+
+  async addGlobalIgnore(word: string) {
+    const response = await httpClient.post<
+      IgnoredTextCheckWordRequest,
+      IgnoredTextCheckWord
+    >(
+      `caselaw/text-check/ignored-word`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      { word },
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title:
+          errorMessages.IGNORED_TEXT_CHECK_WORD_GLOBAL_COULD_NOT_BE_SAVED.title,
+      } as ResponseError
+    }
+    return response
+  },
+
+  async removeGlobalIgnore(word: string) {
+    const response = await httpClient.delete<void>(
+      `caselaw/text-check/ignored-word/${word}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title:
+          errorMessages.IGNORED_TEXT_CHECK_WORD_GLOBAL_COULD_NOT_BE_DELETED
+            .title,
       } as ResponseError
     }
     return response

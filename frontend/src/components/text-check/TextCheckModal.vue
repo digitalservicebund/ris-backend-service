@@ -2,8 +2,6 @@
 import { computed } from "vue"
 import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
-
-import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import { Match, Replacement } from "@/types/textCheck"
 
 const props = defineProps<{
@@ -11,16 +9,31 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  "suggestion:update": [value: string]
-  "suggestion:ignore": [void]
+  "word:remove": [value: string]
+  "word:add": [word: string]
+  "globalWord:remove": [value: string]
+  "globalWord:add": [word: string]
+  "word:replace": [value: string]
 }>()
 
 function acceptSuggestion(replacement: string) {
-  emit("suggestion:update", replacement)
+  emit("word:replace", replacement)
 }
 
-function ignoreSuggestion() {
-  emit("suggestion:ignore")
+function addIgnoredWord(word: string) {
+  emit("word:add", word)
+}
+
+function removeIgnoredWord(word: string) {
+  emit("word:remove", word)
+}
+
+function addIgnoredWordGlobally() {
+  emit("globalWord:add", props.match.word)
+}
+
+function removeGloballyIgnoredWord(word: string) {
+  emit("globalWord:remove", word)
 }
 
 function getValues(replacements: Replacement[]) {
@@ -28,7 +41,10 @@ function getValues(replacements: Replacement[]) {
 }
 
 const isMatchIgnored = computed(() => {
-  return NeurisTextCheckService.isMatchIgnored(props.match)
+  return (
+    Array.isArray(props.match.ignoredTextCheckWords) &&
+    props.match.ignoredTextCheckWords.length > 0
+  )
 })
 </script>
 
@@ -38,15 +54,16 @@ const isMatchIgnored = computed(() => {
     data-testid="text-check-modal"
   >
     <div class="flex flex-row gap-8">
-      <span class="font-bold" data-testid="text-check-modal-word">
+      <span class="ris-body1-bold" data-testid="text-check-modal-word">
         {{ match.word }}
       </span>
     </div>
 
     <IgnoredWordHandler
-      v-if="isMatchIgnored"
       :match="match"
-      @ignore-text-check-word:add="ignoreSuggestion"
+      @globally-ignored-word:add="addIgnoredWordGlobally"
+      @globally-ignored-word:remove="removeGloballyIgnoredWord(match.word)"
+      @ignored-word:remove="removeIgnoredWord(match.word)"
     />
 
     <p v-if="!isMatchIgnored">{{ match.shortMessage || match.message }}</p>
@@ -55,7 +72,7 @@ const isMatchIgnored = computed(() => {
       v-if="!isMatchIgnored"
       replacement-mode="single"
       :replacements="getValues(match.replacements)"
-      @suggestion:ignore="ignoreSuggestion"
+      @ignored-word:add="addIgnoredWord(match.word)"
       @suggestion:update="acceptSuggestion"
     />
   </div>

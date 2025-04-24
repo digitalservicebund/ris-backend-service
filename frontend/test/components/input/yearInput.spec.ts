@@ -1,225 +1,125 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import TextInput from "@/components/input/TextInput.vue"
+import { config } from "@vue/test-utils"
+import InputText from "primevue/inputtext"
+import { nextTick } from "vue"
+import { ValidationError } from "@/components/input/types"
 import YearInput from "@/components/input/YearInput.vue"
 
-type YearInputProps = InstanceType<typeof YearInput>["$props"]
-type TextInputProps = InstanceType<typeof TextInput>["$props"]
-
-function renderComponent(
-  props?: Partial<YearInputProps>,
-  attrs?: Partial<TextInputProps>,
-) {
-  let modelValue: string | undefined = ""
-
-  const effectiveProps: YearInputProps = {
+function renderComponent(options?: {
+  id?: string
+  ariaLabel?: string
+  modelValue?: string
+  hasError?: boolean
+}) {
+  const user = userEvent.setup()
+  const props = {
     id: "identifier",
-    modelValue: modelValue,
-    "onUpdate:modelValue": (value) => (modelValue = value),
+    modelValue: options?.modelValue,
+    ariaLabel: options?.ariaLabel ?? "aria-label",
     hasError: false,
-    ...props,
   }
-
-  return render(YearInput, { props: effectiveProps, attrs })
+  const utils = render(YearInput, { props })
+  return { user, props, ...utils }
 }
 
-describe("Year Input", () => {
-  it("renders a year input", () => {
-    renderComponent()
-    const input = screen.getByRole("textbox")
+describe("YearInput", () => {
+  beforeEach(() => {
+    // InputMask evaluates cursor position on every keystroke, however, our browser vitest setup does not
+    // implement any layout-related functionality, meaning the required functions for cursor offset
+    // calculation are missing. When we deal with typing in date/ year / time inputs, we can mock it with
+    // TextInput, as we only need the string and do not need to test the actual mask behaviour.
+    config.global.stubs = {
+      InputMask: InputText,
+    }
+  })
+
+  afterEach(() => {
+    // Mock needs to be reset (and can not be mocked globally) because InputMask has interdependencies
+    // with the PrimeVue select component. When testing the select components with InputMask
+    // mocked globally, they fail due to these dependencies.
+    config.global.stubs = {}
+  })
+
+  it("renders year input", () => {
+    renderComponent({ modelValue: "2022" })
+    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
+
     expect(input).toBeInTheDocument()
+    expect(input).toHaveValue("2022")
   })
 
-  it("shows the value", () => {
-    renderComponent({ modelValue: "1989" })
-    const input: HTMLInputElement = screen.getByRole("textbox")
-    expect(input).toHaveValue("1989")
-  })
-
-  it("renders the ID", () => {
-    renderComponent({ id: "test-id" })
-    const input = screen.getByRole("textbox")
-    expect(input).toHaveAttribute("id", "test-id")
-  })
-
-  it("renders an aria label", () => {
-    renderComponent(undefined, { ariaLabel: "test-label" })
-    const input = screen.queryByLabelText("test-label")
-    expect(input).toBeInTheDocument()
-  })
-
-  it("emits model update when a value is inserted", async () => {
-    const { emitted } = renderComponent({ modelValue: "" })
-    const input = screen.getByRole<HTMLInputElement>("textbox")
-
-    expect(input).toHaveValue("")
-    await userEvent.type(input, "2021")
-    expect(emitted("update:modelValue")).toEqual([["2021"]])
-  })
-
-  it("emits model update when a value is cleared", async () => {
-    const { emitted } = renderComponent({ modelValue: "2021" })
-    const input = screen.getByRole<HTMLInputElement>("textbox")
-
-    expect(input).toHaveValue("2021")
+  it("emits model update event when input completed and valid", async () => {
+    const { emitted } = renderComponent({
+      modelValue: "2022",
+    })
+    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
+    expect(input).toHaveValue("2022")
     await userEvent.clear(input)
-    expect(emitted("update:modelValue")).toEqual([[undefined]])
+    await userEvent.type(input, "2023")
+    await nextTick()
+
+    expect(emitted()["update:modelValue"]).toEqual([[undefined], ["2023"]])
   })
 
-  it("does not update the model value when changing to a partial year", async () => {
-    const { emitted } = renderComponent({ modelValue: "2021" })
-    const input = screen.getByRole<HTMLInputElement>("textbox")
-
-    expect(input).toHaveValue("2021")
+  it("removes validation errors on backspace delete", async () => {
+    const { emitted } = renderComponent({
+      modelValue: "2022",
+    })
+    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
     await userEvent.type(input, "{backspace}")
-    expect(input).toHaveValue("202")
-    expect(emitted("update:modelValue")).toBeUndefined()
+
+    expect(emitted()["update:validationError"]).toBeTruthy()
+    expect(emitted()["update:validationError"]).toEqual([
+      [undefined],
+      [undefined],
+    ])
   })
 
-  it("does not update the model value when changing to an invalid year", async () => {
-    const { emitted } = renderComponent({ modelValue: "" })
-    const input = screen.getByRole<HTMLInputElement>("textbox")
-
-    expect(input).toHaveValue("")
+  it("does not allow invalid year", async () => {
+    const { emitted } = renderComponent()
+    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
     await userEvent.type(input, "0000")
+    await nextTick()
+
     expect(input).toHaveValue("0000")
-    expect(emitted("update:modelValue")).toBeUndefined()
+
+    expect(emitted()["update:modelValue"]).not.toBeTruthy()
+
+    expect(emitted()["update:validationError"]).toBeTruthy()
+
+    const array = emitted()["update:validationError"] as ValidationError[][]
+
+    expect(
+      array.filter((element) => element[0] !== undefined)[0][0].message,
+    ).toBe("Kein valides Jahr")
   })
 
-  it("updates the model when changing from an invalid year to a valid year", async () => {
-    const { emitted } = renderComponent({ modelValue: "2005" })
-    const input = screen.getByRole<HTMLInputElement>("textbox")
+  it("does not allow incomplete year", async () => {
+    const { emitted } = renderComponent()
+    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
 
-    await userEvent.type(input, "{backspace}")
-    expect(input).toHaveValue("200")
-    await userEvent.type(input, "8")
+    await userEvent.type(input, "03")
+    await userEvent.type(input, "{tab}")
+    await nextTick()
 
-    expect(emitted("update:modelValue")).toEqual([["2008"]])
+    expect(emitted()["update:modelValue"]).not.toBeTruthy()
+    const emittedEvents = emitted()["update:validationError"]
+    expect(emittedEvents[emittedEvents.length - 1]).toEqual([
+      {
+        message: "Unvollständiges Jahr",
+        instance: "identifier",
+      },
+    ])
   })
 
-  it("user can enter only digits in the year input field", async () => {
-    renderComponent()
-    const input = screen.getByRole<HTMLInputElement>("textbox")
-    await userEvent.type(input, "abcd")
-    expect(input).toHaveValue("")
-  })
+  it("tabbing through input does not trigger incomplete year validation error", async () => {
+    const { emitted } = renderComponent()
+    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
+    await userEvent.type(input, "{tab}")
+    await nextTick()
 
-  it("user can enter only 4 digits in the year input field", async () => {
-    renderComponent()
-    const input = screen.getByRole<HTMLInputElement>("textbox")
-    await userEvent.type(input, "12345")
-    expect(input).toHaveValue("1234")
-  })
-
-  it("renders a validation error via prop", async () => {
-    renderComponent({ hasError: true })
-    const input = screen.getByRole("textbox")
-    expect(input).toHaveClass("has-error")
-  })
-
-  it("does not render a validation error for an empty field", async () => {
-    renderComponent({ modelValue: "" })
-    const input = screen.getByRole("textbox")
-    expect(input).not.toHaveClass("has-error")
-  })
-
-  it("does not render a validation error for a valid year", async () => {
-    renderComponent({ modelValue: "1989" })
-    const input = screen.getByRole("textbox")
-    expect(input).not.toHaveClass("has-error")
-  })
-
-  it("renders a validation error for an invalid year", async () => {
-    renderComponent({ modelValue: "" })
-    const input = screen.getByRole("textbox")
-    await userEvent.type(input, "0000")
-    expect(input).toHaveClass("has-error")
-  })
-
-  it("renders a validation error for a partial year on blur", async () => {
-    renderComponent({ modelValue: "" })
-    const input = screen.getByRole("textbox")
-
-    await userEvent.type(input, "2020")
-    expect(input).not.toHaveClass("has-error")
-
-    await userEvent.type(input, "{backspace}")
-    await userEvent.tab()
-    expect(input).toHaveClass("has-error")
-  })
-
-  it("does not render a validation error for a partial year while editing", async () => {
-    renderComponent({ modelValue: "" })
-    const input = screen.getByRole("textbox")
-
-    await userEvent.type(input, "2020")
-    expect(input).not.toHaveClass("has-error")
-
-    await userEvent.type(input, "{backspace}")
-    expect(input).not.toHaveClass("has-error")
-  })
-
-  it("removes a validation error when a valid year is entered", async () => {
-    renderComponent({ modelValue: "" })
-    const input = screen.getByRole("textbox")
-    await userEvent.type(input, "0000")
-    expect(input).toHaveClass("has-error")
-
-    await userEvent.type(input, "{backspace}")
-    await userEvent.type(input, "{backspace}")
-    await userEvent.type(input, "{backspace}")
-    await userEvent.type(input, "{backspace}")
-    await userEvent.type(input, "2020")
-
-    expect(input).not.toHaveClass("has-error")
-  })
-
-  it("removes a validation error while editing", async () => {
-    renderComponent({ modelValue: "" })
-    const input = screen.getByRole("textbox")
-    await userEvent.type(input, "0000")
-    expect(input).toHaveClass("has-error")
-    await userEvent.type(input, "{backspace}")
-    expect(input).not.toHaveClass("has-error")
-  })
-
-  it("renders a read-only input", () => {
-    renderComponent(undefined, { readOnly: true })
-    const input = screen.getByRole("textbox")
-    expect(input).toHaveAttribute("readonly")
-  })
-
-  it("does not rennder a read-only input", () => {
-    renderComponent(undefined, { readOnly: false })
-    const input = screen.getByRole("textbox")
-    expect(input).not.toHaveAttribute("readonly")
-  })
-
-  it("renders the regular variant by default", () => {
-    renderComponent()
-    const input = screen.getByRole("textbox")
-    expect(input).not.toHaveClass("ds-input-medium")
-    expect(input).not.toHaveClass("ds-input-small")
-  })
-
-  it("renders the regular variant", () => {
-    renderComponent(undefined, { size: "regular" })
-    const input = screen.getByRole("textbox")
-    expect(input).not.toHaveClass("ds-input-medium")
-    expect(input).not.toHaveClass("ds-input-small")
-  })
-
-  it("renders the medium variant", () => {
-    renderComponent(undefined, { size: "medium" })
-    const input = screen.getByRole("textbox")
-    expect(input).toHaveClass("ds-input-medium")
-    expect(input).not.toHaveClass("ds-input-small")
-  })
-
-  it("renders the small variant", () => {
-    renderComponent(undefined, { size: "small" })
-    const input = screen.getByRole("textbox")
-    expect(input).not.toHaveClass("ds-input-medium")
-    expect(input).toHaveClass("ds-input-small")
+    expect(emitted()["update:modelValue"]).not.toBeTruthy()
+    expect(emitted()["update:validationError"]).toEqual([[undefined]])
   })
 })

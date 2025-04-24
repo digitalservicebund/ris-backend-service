@@ -12,7 +12,6 @@ function renderComponent(options?: {
     user,
     ...render(ReplacementBar, {
       props: {
-        replacementMode: options?.replacementMode ?? "single",
         replacements: options?.replacements ?? [],
       },
     }),
@@ -20,36 +19,6 @@ function renderComponent(options?: {
 }
 
 describe("Match replacement bar single and multiple test", () => {
-  test.each([
-    {
-      mode: "single" as const,
-      expectedLabel: "Ignorieren",
-      expectedAriaLabel: "Vorschlag ignorieren",
-    },
-    {
-      mode: "multiple" as const,
-      expectedLabel: "Alle ignorieren",
-      expectedAriaLabel: "Vorschläge ignorieren",
-    },
-  ])(
-    "$mode ignore button renders $expectedLabel",
-    ({
-      mode,
-      expectedLabel,
-      expectedAriaLabel,
-    }: {
-      mode: "single" | "multiple"
-      expectedLabel: string
-      expectedAriaLabel: string
-    }) => {
-      renderComponent({ replacementMode: mode })
-      expect(screen.getByTestId("suggestion-ignore-button")).toHaveTextContent(
-        expectedLabel,
-      )
-      expect(screen.getByLabelText(expectedAriaLabel)).toBeInTheDocument()
-    },
-  )
-
   it("accept replacement emits update", async () => {
     const { emitted, user } = renderComponent({
       replacements: ["Rechtschreibfehler"],
@@ -62,8 +31,8 @@ describe("Match replacement bar single and multiple test", () => {
 
   it("accept replacement emits ignore", async () => {
     const { emitted, user } = renderComponent()
-    const ignoreButton = screen.getByTestId("suggestion-ignore-button")
+    const ignoreButton = screen.getByTestId("ignored-word-add-button")
     await user.click(ignoreButton)
-    expect(emitted()["suggestion:ignore"]).toHaveLength(1)
+    expect(emitted()["ignored-word:add"]).toHaveLength(1)
   })
 })

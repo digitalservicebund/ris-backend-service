@@ -1,7 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
-import { Stubs } from "@vue/test-utils/dist/types"
 import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
@@ -28,7 +27,8 @@ function renderComponent(
   options: {
     props?: unknown
     documentUnit?: DocumentUnit
-    stubs?: Stubs
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    stubs?: any
     env?: Env
   } = {},
 ) {
@@ -734,7 +734,9 @@ describe("HandoverDocumentationUnitView:", () => {
       `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefüllt.RandnummernprüfungDie Reihenfolge der Randnummern ist korrekt.DublettenprüfungEs besteht kein Dublettenverdacht.RechtschreibprüfungEs wurden keine Rechtschreibfehler identifiziert.XML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
-    const codeSnippet = screen.queryByTestId("code-snippet")
+    const codeSnippet = screen.queryByTestId(
+      "xml-handover-code-snippet-preview",
+    )
 
     expect(codeSnippet).toBeInTheDocument()
     expect(codeSnippet?.title).toBe("XML")

@@ -43,7 +43,6 @@ import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
 import { TextCheckExtension } from "@/editor/textCheckExtension"
 import { TextCheckMark } from "@/editor/textCheckMark"
-import FeatureToggleService from "@/services/featureToggleService"
 import { Match } from "@/types/textCheck"
 
 interface Props {
@@ -54,7 +53,6 @@ interface Props {
   /* If true, the color formatting of border numbers is disabled */
   plainBorderNumbers?: boolean
   fieldSize?: TextAreaInputAttributes["fieldSize"]
-  textCheck?: boolean
   category?: string
 }
 
@@ -65,7 +63,6 @@ const props = withDefaults(defineProps<Props>(), {
   plainBorderNumbers: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
-  textCheck: false,
   category: "",
 })
 
@@ -75,7 +72,6 @@ const emit = defineEmits<{
 
 const textCheckService = new NeurisTextCheckService()
 
-const textCheckEnabled = ref<boolean>()
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
@@ -201,9 +197,10 @@ const shouldShowBubbleMenu = (): boolean => {
 }
 
 /**
- * Closing text check menu and resets selected match when ignoring word
+ * Adds word to doc level ignore and closes the modal
  */
-function ignoreSuggestion() {
+async function addIgnoredWord(word: string) {
+  await textCheckService.ignoreWord(word)
   editor.commands.setSelectedMatch()
 }
 
@@ -215,6 +212,32 @@ const acceptSuggestion = (suggestion: string) => {
   if (selectedMatch.value && selectedMatch.value?.id) {
     editor.commands.acceptMatch(selectedMatch.value.id, suggestion)
   }
+}
+
+/**
+ * Remove ignored word from doc
+ * @param word
+ */
+const removeIgnoredWord = async (word: string) => {
+  await textCheckService.removeIgnoredWord(word)
+  editor.commands.setSelectedMatch()
+}
+
+/**
+ * Adds word to globally ignore and closes the modal
+ */
+async function addGloballyIgnoredWord(word: string) {
+  await textCheckService.ignoreWordGlobally(word)
+  editor.commands.setSelectedMatch()
+}
+
+/**
+ * Remove ignored word globally
+ * @param word
+ */
+const removeGloballyIgnoredWord = async (word: string) => {
+  await textCheckService.removeGloballyIgnoredWord(word)
+  editor.commands.setSelectedMatch()
 }
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
@@ -278,12 +301,6 @@ const resizeObserver = new ResizeObserver((entries) => {
   }
 })
 
-onMounted(async () => {
-  textCheckEnabled.value = (
-    await FeatureToggleService.isEnabled("neuris.text-check")
-  ).data
-})
-
 defineExpose({ jumpToMatch })
 </script>
 
@@ -307,12 +324,11 @@ defineExpose({ jumpToMatch })
       :container-width="containerWidth"
       :editor="editor"
       :editor-expanded="editorExpanded"
-      :text-check-enabled="textCheckEnabled"
       @on-editor-expanded-changed="
         (isExpanded) => (editorExpanded = isExpanded)
       "
     />
-    <hr v-if="editable" class="ml-8 mr-8 border-blue-300" />
+    <hr v-if="editable" class="mr-8 ml-8 border-blue-300" />
     <div>
       <EditorContent
         :class="editorStyleClasses"
@@ -321,7 +337,7 @@ defineExpose({ jumpToMatch })
       />
     </div>
 
-    <div v-if="props.textCheck">
+    <div>
       <BubbleMenu
         v-if="editor"
         class="bubble-menu"
@@ -332,14 +348,16 @@ defineExpose({ jumpToMatch })
         <TextCheckModal
           v-if="selectedMatch"
           :match="selectedMatch"
-          @suggestion:ignore="ignoreSuggestion"
-          @suggestion:update="acceptSuggestion"
+          @global-word:add="addGloballyIgnoredWord"
+          @global-word:remove="removeGloballyIgnoredWord"
+          @word:add="addIgnoredWord"
+          @word:remove="removeIgnoredWord"
+          @word:replace="acceptSuggestion"
         />
       </BubbleMenu>
     </div>
-    <TextEditorFooter v-if="textCheck">
+    <TextEditorFooter>
       <TextCheckStatus
-        v-if="textCheck"
         :loading="textCheckService.loading.value"
         :response-error="textCheckService.responseError.value ?? undefined"
       />

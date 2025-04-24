@@ -1,7 +1,6 @@
 import { expect, Page } from "@playwright/test"
 import dayjs from "dayjs"
 import {
-  deleteDocumentUnit,
   fillInput,
   navigateToPeriodicalReferences,
   navigateToPreview,
@@ -11,6 +10,7 @@ import {
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { generateString } from "~/test-helper/dataGenerators"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")
@@ -53,8 +53,13 @@ async function verifyDocUnitCanBeTakenOver(
 
   await pageWithBghUser.getByLabel("Dokumentnummer Suche").fill(documentNumber)
 
-  const select = pageWithBghUser.locator(`select[id="status"]`)
-  await select.selectOption("Fremdanlage")
+  await pageWithBghUser.getByLabel("Status Suche").click()
+  await pageWithBghUser
+    .getByRole("option", {
+      name: "Fremdanlage",
+      exact: true,
+    })
+    .click()
   await pageWithBghUser
     .getByLabel("Nach Dokumentationseinheiten suchen")
     .click()
@@ -289,8 +294,8 @@ test.describe(
           ).toHaveValue("Anerkenntnisurteil")
 
           await expect(
-            newTab.locator("[aria-label='Rechtskraft']"),
-          ).toHaveValue("Keine Angabe")
+            newTab.getByLabel("Rechtskraft", { exact: true }),
+          ).toHaveText("Keine Angabe")
         })
 
         // this test has nothing to do with the other test steps
@@ -307,7 +312,7 @@ test.describe(
           ).toBeVisible()
 
           await page.getByTestId("list-entry-0").first().click()
-          await page.locator("[aria-label='Eintrag löschen']").click()
+          await page.getByLabel("Eintrag löschen", { exact: true }).click()
 
           await expect(
             page.getByText(referenceSummary, {
@@ -657,8 +662,13 @@ test.describe(
 
           await newTab.getByLabel("Dokumentnummer Suche").fill(documentNumber)
 
-          const select = newTab.locator(`select[id="status"]`)
-          await select.selectOption("Fremdanlage")
+          await newTab.getByLabel("Status Suche").click()
+          await newTab
+            .getByRole("option", {
+              name: "Fremdanlage",
+              exact: true,
+            })
+            .click()
           await newTab.getByLabel("Nach Dokumentationseinheiten suchen").click()
           const listEntry = newTab.getByRole("row")
           await expect(listEntry).toHaveCount(0)
@@ -813,8 +823,13 @@ test.describe(
             .getByLabel("Dokumentnummer Suche")
             .fill(documentNumber1)
 
-          const select = pageWithBghUser.locator(`select[id="status"]`)
-          await select.selectOption("Fremdanlage")
+          await pageWithBghUser.getByLabel("Status Suche").click()
+          await pageWithBghUser
+            .getByRole("option", {
+              name: "Fremdanlage",
+              exact: true,
+            })
+            .click()
           await pageWithBghUser
             .getByLabel("Nach Dokumentationseinheiten suchen")
             .click()
