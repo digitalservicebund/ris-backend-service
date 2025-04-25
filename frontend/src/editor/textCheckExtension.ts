@@ -8,7 +8,10 @@ declare module "@tiptap/core" {
       setSelectedMatch: (matchId?: number) => ReturnType
       handleMatchSelection: () => ReturnType
       acceptMatch: (matchId: number, text: string) => ReturnType
-      markMatchAs: (matchId: number, ignored: boolean) => ReturnType
+      toggleMatchIgnoredStatus: (
+        matchId: number,
+        ignored: boolean,
+      ) => ReturnType
     }
   }
 }
@@ -62,7 +65,7 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
           return false
         },
 
-      markMatchAs:
+      toggleMatchIgnoredStatus:
         (matchId: number, ignored: boolean) =>
         ({ state, dispatch }) => {
           if (matchId) {
