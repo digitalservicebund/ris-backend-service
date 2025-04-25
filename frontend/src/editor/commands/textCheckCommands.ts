@@ -133,9 +133,16 @@ class NeurisTextCheckService implements TextCheckService {
     })
   }
 
-  applyMarkToMatch = (
+  /**
+   * Updates the ignored status of a match by id
+   * @param matchId match id to update status to
+   * @param isIgnored the new status
+   * @param state
+   * @param dispatch
+   */
+  toggleMatchIgnoredStatus = (
     matchId: number,
-    ignored: boolean,
+    isIgnored: boolean,
     state: EditorState,
     dispatch: ((args?: any) => any) | undefined,
   ): void => {
@@ -157,13 +164,13 @@ class NeurisTextCheckService implements TextCheckService {
           ) {
             return mark.type.create({
               ...mark.attrs,
-              ignored: ignored,
+              ignored: isIgnored,
             })
           }
           return mark
         })
 
-        const updatedText = schema.text(node.text || "", updatedMarks)
+        const updatedText = schema.text(node.text ?? "", updatedMarks)
         tr.replaceWith(pos, pos + node.nodeSize, updatedText)
       }
     })

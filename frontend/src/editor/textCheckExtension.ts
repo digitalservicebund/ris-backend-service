@@ -68,7 +68,7 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
           if (matchId) {
             const service = this.options.service as TextCheckService
 
-            service.applyMarkToMatch(matchId, ignored, state, dispatch)
+            service.toggleMatchIgnoredStatus(matchId, ignored, state, dispatch)
             return true
           }
           return false
