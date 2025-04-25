@@ -187,7 +187,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
   }
 
   @Test
-  void saveHistoryLogs_multipleUpdatEventsAreMerged() throws DocumentationUnitNotExistsException {
+  void saveHistoryLogs_multipleUpdateEventsAreMerged() throws DocumentationUnitNotExistsException {
     var docUnit =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,

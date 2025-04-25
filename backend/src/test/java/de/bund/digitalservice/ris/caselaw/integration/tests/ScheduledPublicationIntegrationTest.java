@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.byLessThan;
+import static org.assertj.core.api.Assertions.within;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -47,16 +48,19 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.ScheduledPublicationService;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -118,6 +122,7 @@ class ScheduledPublicationIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository docUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DocumentationUnitHistoryLogService docUnitHistoryLogService;
 
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private HttpMailSender mailSender;
@@ -224,5 +229,20 @@ class ScheduledPublicationIntegrationTest {
     // One error notification mail to the user is sent out.
     verify(mailSender, times(1))
         .sendMail(any(), eq("invalid-docunit@example.local"), eq(subject), any(), any(), any());
+
+    var user = User.builder().documentationOffice(buildDSDocOffice()).build();
+    var logs = docUnitHistoryLogService.getHistoryLogs(docUnitDueNow.getId(), user);
+
+    assertThat(logs).hasSize(2);
+
+    // The lastPublicationDate is set -> additional update event is logged
+    assertThat(logs.get(0).eventType()).isEqualTo(HistoryLogEventType.UPDATE);
+    assertThat(logs.get(0).createdBy()).isEqualTo("NeuRIS");
+
+    assertThat(logs.get(1).description()).isEqualTo("Dokeinheit an jDV übergeben");
+    assertThat(logs.get(1).createdBy()).isEqualTo("NeuRIS");
+    assertThat(logs.get(1).eventType()).isEqualTo(HistoryLogEventType.HANDOVER);
+    assertThat(logs.get(1).createdAt()).isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
+    assertThat(logs.get(1).documentationOffice()).isNull();
   }
 }

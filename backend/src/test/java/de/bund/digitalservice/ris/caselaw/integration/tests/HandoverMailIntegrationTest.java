@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
@@ -63,6 +64,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
@@ -73,6 +75,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
@@ -169,6 +172,7 @@ class HandoverMailIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
   @Autowired private DatabaseIgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+  @Autowired private DocumentationUnitHistoryLogService docUnitHistoryLogService;
 
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private S3AsyncClient s3AsyncClient;
@@ -416,6 +420,19 @@ class HandoverMailIntegrationTest {
         .usingRecursiveComparison()
         .ignoringFields("sentDate", "id", "attachments")
         .isEqualTo(expectedHandoverMailDTO);
+
+    var user = User.builder().documentationOffice(buildDSDocOffice()).build();
+    var logs = docUnitHistoryLogService.getHistoryLogs(entityId, user);
+
+    if (entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)) {
+      assertThat(logs).hasSize(1);
+      assertThat(logs.getFirst().description()).isEqualTo("Dokeinheit an jDV übergeben");
+      assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");
+      assertThat(logs.getFirst().eventType()).isEqualTo(HistoryLogEventType.HANDOVER);
+      assertThat(logs.getFirst().createdAt())
+          .isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
+      assertThat(logs.getFirst().documentationOffice()).isEqualTo("DS");
+    }
   }
 
   @ParameterizedTest
