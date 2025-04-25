@@ -322,6 +322,10 @@ public class TextCheckService {
 
     var words = matches.stream().map(Match::word).toList();
 
+    if (words.isEmpty()) {
+      return matches;
+    }
+
     List<IgnoredTextCheckWord> globalAndDocumentationUnitIgnoredWords =
         ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(
             words, documentationUnitId);
