@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.owasp.html.HtmlPolicyBuilder;
@@ -83,6 +84,7 @@ public class JurisXmlExporterResponseProcessor {
   }
 
   @Scheduled(fixedDelay = 60000, initialDelay = 60000)
+  @SchedulerLock(name = "read-juris-xml-mails-job", lockAtMostFor = "PT5M")
   public void readEmails() {
     try (Store store = storeFactory.createStore()) {
       processInbox(store);

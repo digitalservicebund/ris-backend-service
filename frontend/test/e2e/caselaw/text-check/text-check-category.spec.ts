@@ -14,7 +14,7 @@ const textCheckUnderlinesColors = {
   style: "#9d8eff",
   grammar: "#eeb55c",
   typographical: "#eeb55c",
-  ignored: "#01854a",
+  ignored: "#26A7F2",
   misspelling: "#e86a69",
 } as const
 

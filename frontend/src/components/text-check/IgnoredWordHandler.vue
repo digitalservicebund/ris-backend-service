@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Button from "primevue/button"
+import { computed } from "vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Match } from "@/types/textCheck"
 
@@ -10,10 +11,15 @@ const props = defineProps<{
 const emit = defineEmits<{
   "ignored-word:remove": [string]
   "globally-ignored-word:remove": [string]
+  "globally-ignored-word:add": [string]
 }>()
 
 async function removeWord() {
   emit("ignored-word:remove", props.match.word)
+}
+
+function addIgnoredWordGlobally() {
+  emit("globally-ignored-word:add", props.match.word)
 }
 
 async function removeWordGlobally() {
@@ -21,10 +27,17 @@ async function removeWordGlobally() {
 }
 
 const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
+
+const matchIsIgnoredGlobally = computed(() => {
+  return props.match.ignoredTextCheckWords?.some(
+    (ignoredWord) =>
+      ignoredWord.type === "global" || ignoredWord.type === "global_jdv",
+  )
+})
 </script>
 
 <template>
-  <div data-testid="ignored-word-handler">
+  <div class="flex flex-grow flex-col" data-testid="ignored-word-handler">
     <div
       v-if="
         match.ignoredTextCheckWords?.some(
@@ -53,21 +66,31 @@ const textCheckGlobal = useFeatureToggle("neuris.text-check-global")
     </Button>
 
     <Button
-      v-if="
-        match.ignoredTextCheckWords?.some(
-          (ignoredWord) => ignoredWord.type === 'documentation_unit',
-        ) &&
-        !match.ignoredTextCheckWords?.some(
-          (ignoredWord) => ignoredWord.type === 'global_jdv',
-        )
-      "
-      aria-label="Wort nicht ignorieren"
-      button-type="tertiary"
-      data-testid="ignored-word-remove-button"
-      label="Nicht ignorieren"
-      severity="secondary"
+      v-if="textCheckGlobal && !matchIsIgnoredGlobally"
       size="small"
-      @click="removeWord"
-    />
+      text
+      @click="addIgnoredWordGlobally"
+      >Zum globalen Wörterbuch hinzufügen
+    </Button>
+
+    <div>
+      <Button
+        v-if="
+          match.ignoredTextCheckWords?.some(
+            (ignoredWord) => ignoredWord.type === 'documentation_unit',
+          ) &&
+          !match.ignoredTextCheckWords?.some(
+            (ignoredWord) => ignoredWord.type === 'global_jdv',
+          )
+        "
+        aria-label="Wort nicht ignorieren"
+        button-type="tertiary"
+        data-testid="ignored-word-remove-button"
+        label="Nicht ignorieren"
+        severity="secondary"
+        size="small"
+        @click="removeWord"
+      />
+    </div>
   </div>
 </template>

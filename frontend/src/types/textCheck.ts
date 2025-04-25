@@ -45,7 +45,7 @@ export interface Match {
   contextForSureMatch: number
   word: string
   category: string
-  ignoredTextCheckWords?: [IgnoredTextCheckWord]
+  ignoredTextCheckWords?: IgnoredTextCheckWord[]
 }
 
 export interface TextCheckResponse {

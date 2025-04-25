@@ -154,7 +154,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:16ea56ccd8a6810e033b293f6924c68b2d0f2794739c3f8c9d6c9bb64fa8994e
+    image: cgr.dev/chainguard/redis@sha256:02837a7b96ae30691b72dc9b317c1b1f714994b4d0d34249992c8fc668d3bf30
     extra_hosts:
       - localhost:host-gateway
     container_name: redis
@@ -179,13 +179,13 @@ services:
       timeout: 5s
 
   languagetool:
-    image: ghcr.io/digitalservicebund/neuris-languagetool:4b9033937141d17c470cbd078280e4799c4a1493
+    image: ghcr.io/digitalservicebund/neuris-languagetool:755d779bb5ba73cea40dced5c8e193d81d77e1e5
     extra_hosts:
-    - localhost:host-gateway
+      - localhost:host-gateway
     ports:
       - 8181:8181
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://localhost:8181/v2/languages || exit 1"]
+      test: [ "CMD-SHELL", "wget --spider -q http://localhost:8181/v2/languages || exit 1" ]
       interval: 5s
       retries: 3
       start_period: 5s
