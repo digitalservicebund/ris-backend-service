@@ -160,7 +160,7 @@ public class DocumentationUnitController {
             .s3path();
     try {
       var docx2html = converterService.getConvertedObject(attachmentPath);
-      initializeCoreDataAndCheckDuplicates(uuid, docx2html);
+      initializeCoreDataAndCheckDuplicates(uuid, docx2html, userService.getUser(oidcUser));
       return ResponseEntity.status(HttpStatus.OK).body(docx2html);
 
     } catch (Exception e) {
@@ -169,11 +169,12 @@ public class DocumentationUnitController {
     }
   }
 
-  private void initializeCoreDataAndCheckDuplicates(UUID uuid, Docx2Html docx2html) {
+  private void initializeCoreDataAndCheckDuplicates(UUID uuid, Docx2Html docx2html, User user) {
     try {
       Documentable documentable = service.getByUuid(uuid);
       if (documentable instanceof DocumentationUnit docUnit) {
-        documentationUnitDocxMetadataInitializationService.initializeCoreData(docUnit, docx2html);
+        documentationUnitDocxMetadataInitializationService.initializeCoreData(
+            docUnit, docx2html, user);
         checkDuplicates(docUnit.documentNumber());
       } else {
         log.info("Documentable type not supported: {}", documentable.getClass().getName());
@@ -360,7 +361,8 @@ public class DocumentationUnitController {
 
     try {
       HandoverMail handoverMail =
-          handoverService.handoverDocumentationUnitAsMail(uuid, userService.getEmail(oidcUser));
+          handoverService.handoverDocumentationUnitAsMail(
+              uuid, userService.getEmail(oidcUser), userService.getUser(oidcUser));
       if (handoverMail == null || !handoverMail.isSuccess()) {
         log.warn("Failed to send mail for documentation unit {}", uuid);
         return ResponseEntity.unprocessableEntity().body(handoverMail);

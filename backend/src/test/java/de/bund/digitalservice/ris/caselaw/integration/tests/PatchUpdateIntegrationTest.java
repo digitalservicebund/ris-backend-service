@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -41,6 +42,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
@@ -55,13 +57,17 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -107,7 +113,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class,
       OAuthService.class,
       TestConfig.class,
-      DocumentNumberPatternConfig.class
+      DocumentNumberPatternConfig.class,
+      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
+      DocumentationUnitHistoryLogService.class
     },
     controllers = {DocumentationUnitController.class, ProcedureController.class})
 @Slf4j
@@ -136,6 +144,7 @@ class PatchUpdateIntegrationTest {
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
   @Autowired private ObjectMapper objectMapper;
+  @Autowired private DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
 
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
@@ -245,6 +254,73 @@ class PatchUpdateIntegrationTest {
         .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber(), null);
     assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
     TestTransaction.end();
+  }
+
+  @Test
+  @Transactional
+  void testPartialUpdateByUuid_withProcedurePatch_shouldWriteHistoryLogEntries() {
+    TestTransaction.flagForCommit();
+    TestTransaction.end();
+
+    DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+
+    var procedure1AsNode =
+        objectMapper.convertValue(Procedure.builder().label("Vorgang1").build(), JsonNode.class);
+    List<JsonPatchOperation> operations1 =
+        List.of(new AddOperation("/coreData/procedure", procedure1AsNode));
+    RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .patch()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+        .bodyValue(patch1)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    var user = User.builder().documentationOffice(buildDSDocOffice()).build();
+    var logs = documentationUnitHistoryLogService.getHistoryLogs(documentationUnit.uuid(), user);
+    assertThat(logs).hasSize(2);
+    assertThat(logs)
+        .map(HistoryLog::eventType)
+        .containsExactly(HistoryLogEventType.UPDATE, HistoryLogEventType.PROCEDURE);
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser");
+    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS");
+    assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
+    assertThat(logs.get(1).description()).isEqualTo("Vorgang gesetzt: Vorgang1");
+
+    var procedure2AsNode =
+        objectMapper.convertValue(Procedure.builder().label("Vorgang2").build(), JsonNode.class);
+    List<JsonPatchOperation> operations2 =
+        List.of(new ReplaceOperation("/coreData/procedure", procedure2AsNode));
+    RisJsonPatch patch2 = new RisJsonPatch(1L, new JsonPatch(operations2), Collections.emptyList());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .patch()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+        .bodyValue(patch2)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    // Existing update event will be updated
+    var logs2 = documentationUnitHistoryLogService.getHistoryLogs(documentationUnit.uuid(), user);
+    assertThat(logs2).hasSize(3);
+    assertThat(logs2)
+        .map(HistoryLog::eventType)
+        .containsExactly(
+            HistoryLogEventType.UPDATE,
+            HistoryLogEventType.PROCEDURE,
+            HistoryLogEventType.PROCEDURE);
+    assertThat(logs2)
+        .map(HistoryLog::createdBy)
+        .containsExactly("testUser", "testUser", "testUser");
+    assertThat(logs2).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+    assertThat(logs2.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
+    assertThat(logs2.get(1).description()).isEqualTo("Vorgang geändert: Vorgang1 → Vorgang2");
+    assertThat(logs2.get(2).description()).isEqualTo("Vorgang gesetzt: Vorgang1");
   }
 
   @Nested

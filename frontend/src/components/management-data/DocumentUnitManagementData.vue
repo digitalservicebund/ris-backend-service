@@ -1,14 +1,39 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import { ref, watch } from "vue"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
+import DocumentUnitHistoryLog from "@/components/management-data/DocumentUnitHistoryLog.vue"
 import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
 import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import { DocumentationUnitHistoryLog } from "@/domain/documentationUnitHistoryLog"
 import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
+import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
+const historyLogs = ref<DocumentationUnitHistoryLog[]>()
+const error = ref<ResponseError>()
+const isLoading = ref(false)
+
+watch(
+  () => documentUnit.value?.uuid,
+  async (uuid) => {
+    if (uuid) {
+      isLoading.value = true
+      const response = await DocumentUnitHistoryLogService.get(uuid)
+      if (response.error) {
+        error.value = response.error
+      } else if (response.data) {
+        historyLogs.value = response.data
+      }
+      isLoading.value = false
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -19,9 +44,14 @@ const { documentUnit } = storeToRefs(useDocumentUnitStore())
         v-if="documentUnit"
         :document-unit="documentUnit as DocumentUnit"
       />
-      <dl class="my-16">
+      <DocumentUnitHistoryLog
+        :data="historyLogs"
+        :error="error"
+        :loading="isLoading"
+      />
+      <dl>
         <div class="flex gap-24 px-0">
-          <dt class="ris-label2-bold shrink-0 grow-0 basis-160">
+          <dt class="ris-body1-bold shrink-0 grow-0 basis-160">
             Dublettenverdacht:
           </dt>
           <dd class="ris-body2-regular flex flex-col gap-32">

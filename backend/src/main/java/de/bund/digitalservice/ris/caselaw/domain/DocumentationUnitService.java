@@ -194,9 +194,9 @@ public class DocumentationUnitService {
   public DocumentationUnitListItem takeOverDocumentationUnit(
       String documentNumber, OidcUser oidcUser) throws DocumentationUnitNotExistsException {
 
-    statusService.update(
-        documentNumber,
-        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build());
+    Status status =
+        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build();
+    statusService.update(documentNumber, status, userService.getUser(oidcUser));
 
     return addPermissions(
         oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));
@@ -431,7 +431,7 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException {
     repository.saveKeywords(documentationUnit);
     repository.saveFieldsOfLaw(documentationUnit);
-    repository.saveProcedures(documentationUnit);
+    repository.saveProcedures(documentationUnit, user);
 
     repository.save(documentationUnit, user);
 

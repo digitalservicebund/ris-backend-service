@@ -238,5 +238,8 @@
   },
   "IGNORED_TEXT_CHECK_WORD_GLOBAL_COULD_NOT_BE_DELETED": {
     "title": "Wort konnte nicht aus dem Wörterbuch gelöscht werden"
+  },
+  "DOCUMENTATION_UNIT_HISTORY_LOG_COULD_NOT_BE_LOADED": {
+    "title": "Die Historie konnte nicht geladen werden."
   }
 }

@@ -217,7 +217,7 @@ class DocumentationUnitControllerTest {
         .isOk();
 
     verify(duplicateCheckService, times(1)).checkDuplicates(docUnit.documentNumber());
-    verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any());
+    verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any(), any());
 
     verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any(), any());
   }
@@ -399,7 +399,7 @@ class DocumentationUnitControllerTest {
   @Test
   void testHandoverAsEmail() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(handoverService.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS))
+    when(handoverService.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
         .thenReturn(
             HandoverMail.builder()
                 .entityId(TEST_UUID)
@@ -441,13 +441,13 @@ class DocumentationUnitControllerTest {
                 .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
                 .build());
 
-    verify(handoverService).handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS);
+    verify(handoverService).handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null);
   }
 
   @Test
   void testHandoverAsEmail_withServiceThrowsException() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(handoverService.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS))
+    when(handoverService.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
         .thenThrow(DocumentationUnitNotExistsException.class);
 
     risWebClient
@@ -458,7 +458,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(handoverService).handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS);
+    verify(handoverService).handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null);
   }
 
   @Test
