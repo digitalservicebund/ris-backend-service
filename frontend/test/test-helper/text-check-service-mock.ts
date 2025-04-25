@@ -13,9 +13,9 @@ function generateIgnoredWord(type: DocumentationType): IgnoredTextCheckWord {
   } as IgnoredTextCheckWord
 }
 
-function generateMatch(): Match {
+function generateMatch(id?: number): Match {
   return {
-    id: 1,
+    id: id ?? 1,
     word: "Rechtshcreibfehler",
     message: "Möglicher Tippfehler gefunden.",
     shortMessage: "Rechtschreibfehler",

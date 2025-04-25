@@ -64,6 +64,33 @@ describe("check category service", () => {
     expect(store.updateDocumentUnit).toHaveBeenCalledWith()
   })
 
+  it("clear selected match sets it to undefined ", async () => {
+    const textCheckService = new NeurisTextCheckService()
+
+    textCheckService.selectedMatch.value = generateMatch()
+
+    textCheckService.clearSelectedMatch()
+    expect(textCheckService.selectedMatch.value).toBeUndefined()
+  })
+
+  it("resets selected match if not in matches, otherwise sets it", async () => {
+    const textCheckService = new NeurisTextCheckService()
+
+    const match = generateMatch()
+    textCheckService.selectedMatch.value = match
+    textCheckService.matches = [match]
+
+    textCheckService.selectMatch(match.id)
+    expect(textCheckService.selectedMatch.value).toEqual(match)
+    textCheckService.selectedMatch.value = generateMatch()
+
+    const matchWithOtherId = generateMatch(4)
+    textCheckService.matches = [matchWithOtherId]
+
+    textCheckService.selectMatch(match.id)
+    expect(textCheckService.selectedMatch.value).toBeUndefined()
+  })
+
   it.each(["global", "documentation_unit"] as const)(
     "removing a %s ignored word updates the selected match ignored words list accordingly",
     async (type: DocumentationType) => {
@@ -81,7 +108,7 @@ describe("check category service", () => {
       }
 
       const match = generateMatch()
-      const ignoredWord = generateIgnoredWord(type) as IgnoredTextCheckWord
+      const ignoredWord: IgnoredTextCheckWord = generateIgnoredWord(type)
       match.ignoredTextCheckWords = [ignoredWord]
       textCheckService.selectedMatch.value = match
 
