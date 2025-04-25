@@ -41,6 +41,6 @@ public class DocumentationUnitHistoryLogService {
     Instant startOfDay = Instant.now().truncatedTo(ChronoUnit.DAYS);
     Instant endOfDay = startOfDay.plus(1, ChronoUnit.DAYS);
 
-    return repository.findUpdateLogForToday(uuid, user, startOfDay, endOfDay);
+    return repository.findUpdateLogForDuration(uuid, user, startOfDay, endOfDay);
   }
 }

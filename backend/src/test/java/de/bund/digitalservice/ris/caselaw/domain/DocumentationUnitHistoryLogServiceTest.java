@@ -62,7 +62,7 @@ class DocumentationUnitHistoryLogServiceTest {
     service.saveHistoryLog(
         documentationUnit.uuid(), user, HistoryLogEventType.STATUS, "Status geändert");
 
-    verify(repository, never()).findUpdateLogForToday(any(), any(), any(), any());
+    verify(repository, never()).findUpdateLogForDuration(any(), any(), any(), any());
     verify(repository)
         .saveHistoryLog(
             null, documentationUnit.uuid(), user, HistoryLogEventType.STATUS, "Status geändert");
@@ -75,11 +75,12 @@ class DocumentationUnitHistoryLogServiceTest {
     User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    when(repository.findUpdateLogForToday(any(), any(), any(), any())).thenReturn(Optional.empty());
+    when(repository.findUpdateLogForDuration(any(), any(), any(), any()))
+        .thenReturn(Optional.empty());
 
     service.saveHistoryLog(documentationUnit.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
 
-    verify(repository, times(1)).findUpdateLogForToday(any(), any(), any(), any());
+    verify(repository, times(1)).findUpdateLogForDuration(any(), any(), any(), any());
     verify(repository)
         .saveHistoryLog(null, documentationUnit.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
   }
@@ -101,12 +102,12 @@ class DocumentationUnitHistoryLogServiceTest {
             .build();
     var startOfDay = Instant.now().truncatedTo(ChronoUnit.DAYS);
     var endOfDay = startOfDay.plus(1, ChronoUnit.DAYS);
-    when(repository.findUpdateLogForToday(documentationUnit.uuid(), user, startOfDay, endOfDay))
+    when(repository.findUpdateLogForDuration(documentationUnit.uuid(), user, startOfDay, endOfDay))
         .thenReturn(Optional.ofNullable(log));
 
     service.saveHistoryLog(documentationUnit.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
 
-    verify(repository, times(1)).findUpdateLogForToday(any(), any(), any(), any());
+    verify(repository, times(1)).findUpdateLogForDuration(any(), any(), any(), any());
     verify(repository)
         .saveHistoryLog(
             log.id(), documentationUnit.uuid(), user, HistoryLogEventType.UPDATE, "Edit");

@@ -118,13 +118,13 @@ public class EntityBuilderTestUtil {
         null);
   }
 
-  public static void createAndSavePendingDocumentationUnit(
+  public static DocumentationUnitDTO createAndSavePendingDocumentationUnit(
       DatabaseDocumentationUnitRepository repository,
       DocumentationOfficeDTO documentationOffice,
       DocumentationOfficeDTO creatingDocumentationOffice,
       String documentNumber) {
 
-    createAndSavePublishedDocumentationUnit(
+    return createAndSavePublishedDocumentationUnit(
         repository,
         DecisionDTO.builder()
             .documentNumber(documentNumber)

@@ -35,7 +35,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
   }
 
   @Override
-  public Optional<HistoryLog> findUpdateLogForToday(
+  public Optional<HistoryLog> findUpdateLogForDuration(
       UUID documentationUnitId, @Nullable User user, Instant start, Instant end) {
     String userName = Optional.ofNullable(user).map(User::name).orElse(null);
     return databaseRepository

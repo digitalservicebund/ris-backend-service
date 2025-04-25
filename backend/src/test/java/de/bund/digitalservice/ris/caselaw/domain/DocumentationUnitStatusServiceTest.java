@@ -106,9 +106,8 @@ class DocumentationUnitStatusServiceTest {
   }
 
   @Test
-  void
-      testUpdate_withDocumentNumberAndDocumentationUnitFoundWithExistingStatus_shouldNotWriteHistoryLogIfStatusUnchanged()
-          throws DocumentationUnitNotExistsException {
+  void testUpdate_withWithExistingStatus_shouldNotWriteHistoryLogIfStatusUnchanged()
+      throws DocumentationUnitNotExistsException {
 
     DocumentationUnitDTO documentationUnitDTO =
         DecisionDTO.builder()

@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/v1/caselaw/documentunits/{documentationUnitId}/historylogs")
-@Slf4j
 public class DocumentationUnitHistoryLogController {
   private final DocumentationUnitHistoryLogService service;
   private final UserService userService;
@@ -32,8 +30,7 @@ public class DocumentationUnitHistoryLogController {
    * Get all history logs of a documentation unit
    *
    * @param documentationUnitId UUID of the documentation unit
-   * @return ordered list of history records (newest first) or an empty response with status code
-   *     400 if the user is not authorized
+   * @return ordered list of history records (newest first)
    */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize(

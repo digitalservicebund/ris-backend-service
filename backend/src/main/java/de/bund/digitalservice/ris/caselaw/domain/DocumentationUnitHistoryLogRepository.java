@@ -20,16 +20,16 @@ public interface DocumentationUnitHistoryLogRepository {
   List<HistoryLog> findByDocumentationUnitId(UUID documentationUnitId, User user);
 
   /**
-   * Find all history logs for a documentation unit by its uuid
+   * Find all history logs for a documentation unit by its uuid for a certain duration
    *
    * @param documentationUnitId the uuid of the documentation unit
    * @param user logged-in user for checking view permissions
-   * @param start timestamp for the start of current day
-   * @param end timestamp for the end of current day
+   * @param start timestamp for the start
+   * @param end timestamp for the end
    * @return an optional history log, which is the latest history log, that was created by the same
    *     user at the same date for this documentation unit and is of type "UPDATE"
    */
-  Optional<HistoryLog> findUpdateLogForToday(
+  Optional<HistoryLog> findUpdateLogForDuration(
       UUID documentationUnitId, User user, Instant start, Instant end);
 
   /**

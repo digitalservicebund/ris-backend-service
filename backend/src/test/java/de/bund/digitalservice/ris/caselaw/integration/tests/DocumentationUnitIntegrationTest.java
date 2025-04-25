@@ -54,6 +54,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -67,6 +68,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
@@ -75,6 +77,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
@@ -88,6 +91,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -176,6 +180,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private AuthService authService;
   @Autowired private HandoverService handoverService;
   @Autowired private DocumentationUnitStatusService documentationUnitStatusService;
+  @Autowired private DocumentationUnitHistoryLogRepository historyLogRepository;
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
   @MockitoBean private DocxConverterService docxConverterService;
@@ -1470,13 +1475,16 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  void testTakeOverDocumentationUnit_setsStatusAndPermissionsCorrectly() {
+  void testTakeOverDocumentationUnit_setsStatusAndPermissionsCorrectlyAndCreatesHistoryLog() {
     DocumentationOfficeDTO creatingDocumentationOffice =
         documentationOfficeRepository.findByAbbreviation("BGH");
     String documentNumber = "1234567890123";
 
-    EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
-        repository, documentationOffice, creatingDocumentationOffice, documentNumber);
+    var ds = documentationOfficeRepository.findByAbbreviation("DS");
+
+    var pendingDocUnit =
+        EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
+            repository, documentationOffice, creatingDocumentationOffice, documentNumber);
 
     risWebTestClient
         .withDefaultLogin()
@@ -1494,5 +1502,20 @@ class DocumentationUnitIntegrationTest {
               assertThat(response.getResponseBody().isDeletable()).isTrue();
               assertThat(response.getResponseBody().isEditable()).isTrue();
             });
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitId(
+            pendingDocUnit.getId(),
+            User.builder()
+                .documentationOffice(DocumentationOfficeTransformer.transformToDomain(ds))
+                .build());
+    assertThat(historyLogs).hasSize(1);
+    assertThat(historyLogs.getFirst().createdAt())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
+    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
+    assertThat(historyLogs.getFirst().description())
+        .isEqualTo("Status geändert: Fremdanlage → Unveröffentlicht");
+    assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.STATUS);
   }
 }
