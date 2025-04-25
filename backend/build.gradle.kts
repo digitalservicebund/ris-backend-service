@@ -207,9 +207,10 @@ dependencies {
     // for local development:
     //implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.60.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.18.3")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.3")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.19.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.0")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
