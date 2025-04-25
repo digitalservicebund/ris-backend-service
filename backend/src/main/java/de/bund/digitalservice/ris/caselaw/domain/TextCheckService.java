@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.textcheck.TextCheckCategoryResp
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWord;
 import de.bund.digitalservice.ris.caselaw.domain.textcheck.ignored_words.IgnoredTextCheckWordRepository;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -59,19 +60,22 @@ public class TextCheckService {
     Documentable documentable = documentationUnitRepository.findByUuid(id);
 
     if (documentable instanceof DocumentationUnit documentationUnit) {
-      List<Match> allMatches = new ArrayList<>();
+      List<Match> allMatches = Collections.synchronizedList(new ArrayList<>());
 
-      for (CategoryType type : CategoryType.values()) {
-        try {
-          TextCheckCategoryResponse response = checkCategory(documentationUnit, type);
-          if (response == null) {
-            continue;
-          }
-          allMatches.addAll(response.matches());
-        } catch (Exception e) {
-          log.error("Could not process category", e);
-        }
-      }
+      stream(CategoryType.values())
+          .parallel()
+          .forEach(
+              type -> {
+                try {
+                  TextCheckCategoryResponse response = checkCategory(documentationUnit, type);
+                  if (response != null) {
+                    allMatches.addAll(response.matches());
+                  }
+                } catch (Exception e) {
+                  log.error("Could not process category", e);
+                }
+              });
+
       return allMatches;
 
     } else {
