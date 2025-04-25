@@ -200,7 +200,11 @@ const shouldShowBubbleMenu = (): boolean => {
  * Adds word to doc level ignore and closes the modal
  */
 async function addIgnoredWord(word: string) {
-  await textCheckService.ignoreWord(word)
+  const success = await textCheckService.ignoreWord(word)
+  if (success) {
+    editor.commands.markMatchAs(selectedMatch.value.id, true)
+  }
+
   editor.commands.setSelectedMatch()
 }
 
@@ -219,7 +223,10 @@ const acceptSuggestion = (suggestion: string) => {
  * @param word
  */
 const removeIgnoredWord = async (word: string) => {
-  await textCheckService.removeIgnoredWord(word)
+  const success = await textCheckService.removeIgnoredWord(word)
+  if (success) {
+    editor.commands.markMatchAs(selectedMatch.value.id, false)
+  }
   editor.commands.setSelectedMatch()
 }
 
@@ -227,7 +234,10 @@ const removeIgnoredWord = async (word: string) => {
  * Adds word to globally ignore and closes the modal
  */
 async function addGloballyIgnoredWord(word: string) {
-  await textCheckService.ignoreWordGlobally(word)
+  const success = await textCheckService.ignoreWordGlobally(word)
+  if (success) {
+    editor.commands.markMatchAs(selectedMatch.value.id, true)
+  }
   editor.commands.setSelectedMatch()
 }
 
@@ -236,7 +246,10 @@ async function addGloballyIgnoredWord(word: string) {
  * @param word
  */
 const removeGloballyIgnoredWord = async (word: string) => {
-  await textCheckService.removeGloballyIgnoredWord(word)
+  const success = await textCheckService.removeGloballyIgnoredWord(word)
+  if (success) {
+    editor.commands.markMatchAs(selectedMatch.value.id, false)
+  }
   editor.commands.setSelectedMatch()
 }
 
