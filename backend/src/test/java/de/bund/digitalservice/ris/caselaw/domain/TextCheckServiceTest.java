@@ -242,7 +242,7 @@ class TextCheckServiceTest {
 
     assertNotNull(response);
     assertEquals(
-        "<p><text-check id=\"1\" type=\"redundancy\">text</text-check> text <text-check id=\"2\" type=\"typo\">widt</text-check> <text-check id=\"3\" type=\"typo\">missspelling</text-check></p>",
+        "<p><text-check id=\"1\" type=\"redundancy\" ignored=\"false\">text</text-check> text <text-check id=\"2\" type=\"typo\" ignored=\"false\">widt</text-check> <text-check id=\"3\" type=\"typo\" ignored=\"false\">missspelling</text-check></p>",
         response.htmlText());
     assertEquals(3, response.matches().size());
   }
@@ -301,7 +301,7 @@ class TextCheckServiceTest {
 
     assertNotNull(response);
     assertEquals(
-        "<p>text with a <border-number number=\"2\"><text-check id=\"1\" type=\"typo\">missspelling</text-check></border-number></p>",
+        "<p>text with a <border-number number=\"2\"><text-check id=\"1\" type=\"typo\" ignored=\"false\">missspelling</text-check></border-number></p>",
         response.htmlText());
     assertEquals(1, response.matches().size());
   }
@@ -329,7 +329,7 @@ class TextCheckServiceTest {
 
     assertNotNull(response);
     assertEquals(
-        "<p>This is a test <text-check id=\"1\" type=\"typo\">&gt; 10 & &lt; 20</text-check>. Also \"quoted\". And ♥ and ♥</p>",
+        "<p>This is a test <text-check id=\"1\" type=\"typo\" ignored=\"false\">&gt; 10 & &lt; 20</text-check>. Also \"quoted\". And ♥ and ♥</p>",
         response.htmlText());
     assertEquals(1, response.matches().size());
   }
@@ -357,7 +357,7 @@ class TextCheckServiceTest {
 
     assertNotNull(response);
     assertEquals(
-        "<p>This text contains a fake &lt;<text-check id=\"1\" type=\"typo\">tag</text-check>&gt;</p>",
+        "<p>This text contains a fake &lt;<text-check id=\"1\" type=\"typo\" ignored=\"false\">tag</text-check>&gt;</p>",
         response.htmlText());
     assertEquals(1, response.matches().size());
   }
@@ -384,7 +384,7 @@ class TextCheckServiceTest {
 
     assertNotNull(response);
     assertEquals(
-        "<p>This is a<text-check id=\"1\" type=\"grammar\">,<br>with</text-check> line<br>breaks</p>",
+        "<p>This is a<text-check id=\"1\" type=\"grammar\" ignored=\"false\">,<br>with</text-check> line<br>breaks</p>",
         response.htmlText());
     assertEquals(1, response.matches().size());
   }
@@ -431,6 +431,9 @@ class TextCheckServiceTest {
 
     final String ignoredWord = "ignored match";
 
+    var ignoredTextCheckWord =
+        new IgnoredTextCheckWord(UUID.randomUUID(), IgnoredTextCheckType.GLOBAL, ignoredWord);
+
     TextCheckService mockService = spy(textCheckService);
     when(mockService.check(any(String.class)))
         .thenReturn(
@@ -440,7 +443,8 @@ class TextCheckServiceTest {
                     .word(ignoredWord)
                     .offset(18)
                     .length(ignoredWord.length())
-                    .rule(Rule.builder().issueType("ignored").build())
+                    .rule(Rule.builder().issueType("misspelling").build())
+                    .ignoredTextCheckWords(List.of(ignoredTextCheckWord))
                     .build()));
     when(mockService.checkCategoryByHTML(any(String.class), any(CategoryType.class)))
         .thenCallRealMethod();
@@ -449,7 +453,7 @@ class TextCheckServiceTest {
 
     assertNotNull(response);
     assertEquals(
-        "<p>text text with <text-check id=\"1\" type=\"ignored\">ignored match</text-check></p>",
+        "<p>text text with <text-check id=\"1\" type=\"misspelling\" ignored=\"true\">ignored match</text-check></p>",
         response.htmlText());
     assertEquals(1, response.matches().size());
   }
