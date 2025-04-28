@@ -1,12 +1,14 @@
-import { expect, Page } from "@playwright/test"
+import { expect } from "@playwright/test"
 import {
   assignProcedureToDocUnit,
+  assignUserGroupToProcedure,
   clickCategoryButton,
   fillInput,
   navigateToCategories,
   navigateToProcedures,
   navigateToSearch,
   save,
+  unassignUserGroupFromProcedure,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { deleteAllProcedures } from "~/e2e/caselaw/utils/documentation-unit-api-util"
@@ -319,71 +321,5 @@ test.describe(
     test.afterAll(async ({ browser }) => {
       await deleteAllProcedures(browser, procedurePrefix)
     })
-
-    async function assignUserGroupToProcedure(
-      page: Page,
-      procedureName: string,
-    ) {
-      await test.step("Internal user assigns a user group to the given procedure", async () => {
-        await navigateToProcedures(page, procedureName)
-
-        const assignRequest = page.waitForRequest(
-          "**/api/v1/caselaw/procedure/*/assign/*",
-          { timeout: 5_000 },
-        )
-
-        await page
-          .getByLabel("Vorgang Listenelement")
-          .getByLabel("dropdown input")
-          .click()
-        await page
-          .getByRole("option", {
-            name: "Extern",
-            exact: true,
-          })
-          .click()
-        await assignRequest
-        await page.reload()
-
-        await expect(
-          page.getByLabel("Vorgang Listenelement").getByLabel("dropdown input"),
-          // The id of the user group "Extern"
-        ).toHaveText(/.+/, { timeout: 5_000 })
-      })
-    }
-
-    async function unassignUserGroupFromProcedure(
-      page: Page,
-      procedureName: string,
-    ) {
-      await test.step("Internal user unassigns a user group from the given procedure", async () => {
-        await navigateToProcedures(page, procedureName)
-
-        const unassignRequest = page.waitForRequest(
-          "**/api/v1/caselaw/procedure/*/unassign",
-          { timeout: 5_000 },
-        )
-
-        await page
-          .getByLabel("Vorgang Listenelement")
-          .getByLabel("dropdown input")
-          .click()
-
-        await page
-          .getByRole("option", {
-            name: "Nicht zugewiesen",
-            exact: true,
-          })
-          .click({ timeout: 5000 })
-
-        await unassignRequest
-        await page.reload()
-
-        await expect(
-          page.getByLabel("Vorgang Listenelement").getByLabel("dropdown input"),
-          // The unassigned option has an empty value
-        ).toHaveText("Nicht zugewiesen", { timeout: 5_000 })
-      })
-    }
   },
 )

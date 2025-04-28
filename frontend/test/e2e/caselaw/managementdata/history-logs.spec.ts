@@ -1,6 +1,8 @@
 import { expect, Page } from "@playwright/test"
 import dayjs from "dayjs"
 import {
+  assignUserGroupToProcedure,
+  clickCategoryButton,
   fillInput,
   navigateToAttachments,
   navigateToCategories,
@@ -11,12 +13,14 @@ import {
   uploadTestfile,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
+import { deleteAllProcedures } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { generateString } from "~/test-helper/dataGenerators"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")
 
 /* eslint-disable playwright/expect-expect */
 test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
+  const testPrefix = `e2e_${generateString({ length: 10 })}`
   test("Es wird geloggt, wenn eine Userin etwas an den Rubriken geändert hat", async ({
     page,
     documentNumber,
@@ -55,13 +59,13 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
   test("Es wird jede Vorgangsänderung geloggt", async ({
     page,
+    pageWithExternalUser,
     documentNumber,
   }) => {
     let newProcedure: string
 
     await test.step("Setze den Vorgang", async () => {
       await navigateToCategories(page, documentNumber)
-      const testPrefix = generateString({ length: 10 })
       newProcedure = testPrefix + generateString({ length: 10 })
       await page.getByLabel("Vorgang", { exact: true }).fill(newProcedure)
       await page.getByText(`${newProcedure} neu erstellen`).click()
@@ -81,6 +85,30 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
         1,
         "DS (e2e_tests DigitalService)",
         `Vorgang gesetzt: ${newProcedure}`,
+      )
+    })
+
+    await test.step("Dok-Einheit externer Person zuweisen", async () => {
+      await assignUserGroupToProcedure(page, newProcedure)
+    })
+
+    await test.step("Externe Person ändert Entscheidungsname", async () => {
+      await navigateToCategories(pageWithExternalUser, documentNumber)
+      await clickCategoryButton("Entscheidungsname", pageWithExternalUser)
+      await pageWithExternalUser
+        .getByLabel("Entscheidungsname")
+        .fill("ein Name")
+      await save(pageWithExternalUser)
+    })
+
+    await test.step("Bearbeitungsevent der Externen Person ist zusätzlich sichtbar", async () => {
+      await navigateToManagementData(page, documentNumber)
+      await expectHistoryCount(page, 3)
+      await expectHistoryLogRow(
+        page,
+        0,
+        "DS (E2emila Extern)",
+        `Dokeinheit bearbeitet`,
       )
     })
   })
@@ -201,6 +229,10 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
         `Status geändert: Fremdanlage → Unveröffentlicht`,
       )
     })
+  })
+
+  test.afterAll(async ({ browser }) => {
+    await deleteAllProcedures(browser, testPrefix)
   })
 })
 
