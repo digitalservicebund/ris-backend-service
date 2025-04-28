@@ -672,17 +672,19 @@ const isPublishable = computed<boolean>(
         title="UAT Testmodus für die Übergabe an die jDV"
       />
 
-      <Button
-        aria-label="Dokumentationseinheit an jDV übergeben"
-        :disabled="!isPublishable || isScheduled"
-        label="Dokumentationseinheit an jDV übergeben"
-        size="small"
-        @click="handoverDocumentUnit"
-      >
-        <template #icon>
-          <IconCheck />
-        </template>
-      </Button>
+      <div>
+        <Button
+          aria-label="Dokumentationseinheit an jDV übergeben"
+          :disabled="!isPublishable || isScheduled"
+          label="Dokumentationseinheit an jDV übergeben"
+          size="small"
+          @click="handoverDocumentUnit"
+        >
+          <template #icon>
+            <IconCheck />
+          </template>
+        </Button>
+      </div>
 
       <ScheduledPublishingDateTime :is-publishable="isPublishable" />
 

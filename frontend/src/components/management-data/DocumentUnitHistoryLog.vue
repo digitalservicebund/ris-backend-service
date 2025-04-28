@@ -23,6 +23,15 @@ const rowClass = () => {
   return "bg-blue-100"
 }
 
+const getColumnWidth = (field: string) => {
+  if (field === "createdAt" || field === "createdBy") {
+    return { width: "25%" }
+  } else if (field === "description") {
+    return { width: "50%" }
+  }
+  return {} // default style
+}
+
 const formattedData = computed(
   () =>
     props.data?.map((item) => ({
@@ -50,7 +59,7 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
       v-if="formattedData.length > 0 && !loading"
       data-testid="document-unit-history-log"
       :row-class="rowClass"
-      scroll-height="250px"
+      scroll-height="300px"
       scrollable
       :value="formattedData"
     >
@@ -59,7 +68,8 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
         :key="col.field"
         :field="col.field"
         :header="col.header"
-        header-class="ris-label2-bold text-gray-900 w-64 sticky top-0 bg-white z-10"
+        header-class="ris-label2-bold text-gray-900 w-64 sticky top-0 bg-white z-10 border-b-2 border-blue-300 border-solid"
+        :style="getColumnWidth(col.field)"
       />
     </DataTable>
     <!-- Empty state -->
