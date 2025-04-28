@@ -33,6 +33,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     await test.step("Nach einer Bearbeitung wird ein Historien-Log erstellt", async () => {
       await navigateToCategories(page, documentNumber)
       await page.getByLabel("ECLI", { exact: true }).fill("ECLI-12345")
+      await save(page)
       await navigateToManagementData(page, documentNumber)
       await expectHistoryCount(page, 1)
       await expectHistoryLogRow(
@@ -46,6 +47,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     await test.step("Nach einer erneuten Bearbeitung durch den selben User wird der bestehende Log aktualisiert", async () => {
       await navigateToCategories(page, documentNumber)
       await page.getByLabel("ECLI", { exact: true }).fill("ECLI-anderer-Wert")
+      await save(page)
       await navigateToManagementData(page, documentNumber)
       await expectHistoryCount(page, 1)
       await expectHistoryLogRow(
@@ -69,6 +71,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       newProcedure = testPrefix + generateString({ length: 10 })
       await page.getByLabel("Vorgang", { exact: true }).fill(newProcedure)
       await page.getByText(`${newProcedure} neu erstellen`).click()
+      await save(page)
     })
 
     await test.step("In der Historie sind zwei Historien-Events", async () => {
