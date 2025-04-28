@@ -28,14 +28,19 @@ const formattedData = computed(
     props.data?.map((item) => ({
       ...item,
       createdAt: formatTimestamp(item.createdAt),
-      createdBy: item.documentationOffice
-        ? `${item.documentationOffice} (${item.createdBy})`
-        : item.createdBy,
+      createdBy: formatCreatedBy(item.documentationOffice, item.createdBy),
     })) ?? [],
 )
 
 const formatTimestamp = (date?: string) =>
   date ? DateUtil.formatDateTime(date) : "–"
+
+const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
+  if (!docOffice && !createdBy) return "–"
+  if (!createdBy) return docOffice
+  if (!docOffice) return createdBy
+  return `${docOffice} (${createdBy})`
+}
 </script>
 
 <template>
