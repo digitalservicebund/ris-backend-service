@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { ref, watch } from "vue"
+import { onBeforeMount, ref } from "vue"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
 import DocumentUnitHistoryLog from "@/components/management-data/DocumentUnitHistoryLog.vue"
 import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
@@ -14,26 +14,31 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
+const { updateDocumentUnit } = useDocumentUnitStore()
+
+onBeforeMount(async () => {
+  // Save before navigation
+  await updateDocumentUnit()
+  // Load history only after latest changes are saved
+  await loadHistory()
+})
+
 const historyLogs = ref<DocumentationUnitHistoryLog[]>()
 const error = ref<ResponseError>()
 const isLoading = ref(false)
 
-watch(
-  () => documentUnit.value?.uuid,
-  async (uuid) => {
-    if (uuid) {
-      isLoading.value = true
-      const response = await DocumentUnitHistoryLogService.get(uuid)
-      if (response.error) {
-        error.value = response.error
-      } else if (response.data) {
-        historyLogs.value = response.data
-      }
-      isLoading.value = false
-    }
-  },
-  { immediate: true },
-)
+const loadHistory = async () => {
+  isLoading.value = true
+  const response = await DocumentUnitHistoryLogService.get(
+    documentUnit.value!.uuid!,
+  )
+  if (response.error) {
+    error.value = response.error
+  } else if (response.data) {
+    historyLogs.value = response.data
+  }
+  isLoading.value = false
+}
 </script>
 
 <template>
