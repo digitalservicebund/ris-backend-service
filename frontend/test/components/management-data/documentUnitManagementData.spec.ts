@@ -41,6 +41,9 @@ describe("DocumentUnitManagementData", () => {
     })
 
     renderManagementData(managementData)
+    // Wait for saving doc unit
+    await nextTick()
+    // Wait for loading history
     await nextTick()
 
     expect(screen.getByText(`Historie:`)).toBeVisible()
@@ -58,6 +61,9 @@ describe("DocumentUnitManagementData", () => {
     })
 
     renderManagementData(managementData)
+    // Wait for saving doc unit
+    await nextTick()
+    // Wait for loading history
     await nextTick()
 
     expect(
@@ -181,6 +187,10 @@ describe("DocumentUnitManagementData", () => {
     mockedSessionStore.documentUnit = new DocumentUnit("q834", {
       documentNumber: "DS123",
       managementData,
+    })
+    vi.spyOn(mockedSessionStore, "updateDocumentUnit").mockResolvedValue({
+      status: 200,
+      data: { documentationUnitVersion: 0, patch: [], errorPaths: [] },
     })
 
     return mockedSessionStore
