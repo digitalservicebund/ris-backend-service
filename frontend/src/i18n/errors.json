@@ -238,5 +238,11 @@
   },
   "IGNORED_TEXT_CHECK_WORD_GLOBAL_COULD_NOT_BE_DELETED": {
     "title": "Wort konnte nicht aus dem Wörterbuch gelöscht werden"
+  },
+  "EURLEX_SEARCH_FAILED": {
+    "title": "Die EUR-Lex-Suche hat zu einem Fehler geführt."
+  },
+  "EURLEX_TRANSFORMATION_FAILED": {
+    "title": "Die Übernahme der EUR-Lex-Entscheidung hat zu einem Fehler geführt."
   }
 }
