@@ -54,7 +54,7 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
 
 <template>
   <div class="flex flex-col py-24">
-    <h2 class="ris-body1-bold pb-16">Historie:</h2>
+    <h2 class="ris-body1-bold pb-16">Historie</h2>
     <DataTable
       v-if="formattedData.length > 0 && !loading"
       data-testid="document-unit-history-log"
