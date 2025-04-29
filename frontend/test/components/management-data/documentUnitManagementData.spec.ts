@@ -46,7 +46,7 @@ describe("DocumentUnitManagementData", () => {
     // Wait for loading history
     await nextTick()
 
-    expect(screen.getByText(`Historie:`)).toBeVisible()
+    expect(screen.getByText(`Historie`)).toBeVisible()
     expect(screen.getByText(`Änderung am`)).toBeVisible()
   })
 
