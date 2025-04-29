@@ -24,10 +24,10 @@ const rowClass = () => {
 }
 
 const getColumnWidth = (field: string) => {
-  if (field === "createdAt" || field === "createdBy") {
-    return { width: "25%" }
-  } else if (field === "description") {
-    return { width: "50%" }
+  if (field === "createdAt") {
+    return { width: "200px" }
+  } else if (field === "createdBy" || field === "description") {
+    return { width: "fit-content" }
   }
   return {} // default style
 }
@@ -58,6 +58,12 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
     <DataTable
       v-if="formattedData.length > 0 && !loading"
       data-testid="document-unit-history-log"
+      :pt="{
+        thead: {
+          style:
+            'position: sticky; top: 0; z-index: 10; background: white; box-shadow: inset 0 -2px #DCE8EF;',
+        },
+      }"
       :row-class="rowClass"
       scroll-height="300px"
       scrollable
@@ -68,15 +74,17 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
         :key="col.field"
         :field="col.field"
         :header="col.header"
-        header-class="ris-label2-bold text-gray-900 w-64 sticky top-0 bg-white z-10 border-b-2 border-blue-300 border-solid"
+        header-class="ris-label2-bold text-gray-900 w-64"
         :style="getColumnWidth(col.field)"
       />
     </DataTable>
-    <!-- Empty state -->
     <LoadingSpinner v-else-if="loading" class="self-center" size="small" />
     <div v-else-if="error" class="bg-blue-100 p-8">
       Die Historie konnte nicht geladen werden.
     </div>
-    <div v-else class="bg-blue-100 p-8">Keine Daten</div>
+    <!-- Empty state -->
+    <div v-else-if="data?.length === 0" class="bg-blue-100 p-8">
+      Keine Daten
+    </div>
   </div>
 </template>
