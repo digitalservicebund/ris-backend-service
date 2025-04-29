@@ -16,6 +16,7 @@ interface AttachmentService {
   getAttachmentAsHtml(
     uuid: string,
     s3path: string,
+    format: string,
   ): Promise<ServiceResponse<Docx2HTML>>
 }
 
@@ -87,9 +88,19 @@ const service: AttachmentService = {
     return response
   },
 
-  async getAttachmentAsHtml(uuid: string, s3path: string) {
+  async getAttachmentAsHtml(uuid: string, s3path: string, format: string) {
     const response = await httpClient.get<Docx2HTML>(
-      `caselaw/documentunits/${uuid}/docx/${s3path}`,
+      `caselaw/documentunits/${uuid}/file`,
+      {
+        params: {
+          s3Path: s3path ?? "",
+          format: format ?? "",
+        },
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
     )
     response.error =
       response.status >= 300

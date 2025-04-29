@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -35,5 +37,14 @@ public class OriginalXmlDTO {
   @NotNull
   private Instant updatedAt;
 
+  @Column
+  @Enumerated(EnumType.STRING)
+  Type type;
+
   @Column @NotBlank private String content;
+
+  public enum Type {
+    JURIS,
+    FMX,
+  }
 }
