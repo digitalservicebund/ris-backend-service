@@ -6,6 +6,7 @@ import {
   fillInput,
   navigateToAttachments,
   navigateToCategories,
+  navigateToHandover,
   navigateToManagementData,
   navigateToPeriodicalReferences,
   navigateToSearch,
@@ -25,7 +26,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     page,
     documentNumber,
   }) => {
-    await test.step("Historie einer neu erstellten Dokeinheit ist leer", async () => {
+    await test.step("Die Historie hat ein 'Dokeinheit angelegt'-Event", async () => {
       await navigateToManagementData(page, documentNumber)
       await expectHistoryCount(page, 1)
       await expectHistoryLogRow(
@@ -71,6 +72,31 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
         0,
         "DS (e2e_tests DigitalService)",
         `Dokeinheit bearbeitet`,
+      )
+    })
+  })
+
+  test("Es wird geloggt, wenn eine Dokeinheit an die jDV übergeben wird", async ({
+    page,
+    prefilledDocumentUnit,
+  }) => {
+    const documentNumber = prefilledDocumentUnit.documentNumber
+
+    await test.step("Übergebe Dokument an die jDV", async () => {
+      await navigateToHandover(page, documentNumber)
+      await page
+        .getByRole("button", { name: "Dokumentationseinheit an jDV übergeben" })
+        .click()
+    })
+
+    await test.step("Nach einer Übergabe wird ein Historien-Log erstellt", async () => {
+      await navigateToManagementData(page, documentNumber)
+      await expectHistoryCount(page, 3)
+      await expectHistoryLogRow(
+        page,
+        0,
+        "DS (e2e_tests DigitalService)",
+        `Dokeinheit an jDV übergeben`,
       )
     })
   })
