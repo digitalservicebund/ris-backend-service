@@ -42,7 +42,7 @@ const loadHistory = async () => {
 </script>
 
 <template>
-  <div class="w-full grow p-24">
+  <div class="w-full flex-1 grow p-24">
     <div class="flex flex-col gap-24 bg-white p-24">
       <TitleElement>Verwaltungsdaten</TitleElement>
       <ManagementDataMetadata

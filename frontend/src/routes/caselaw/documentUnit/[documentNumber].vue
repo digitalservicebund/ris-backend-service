@@ -206,7 +206,6 @@ onMounted(async () => {
               documentUnit &&
               !(
                 route.path.includes('handover') ||
-                route.path.includes('managementdata') ||
                 route.path.includes('preview')
               )
             "

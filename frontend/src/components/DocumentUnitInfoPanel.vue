@@ -60,7 +60,8 @@ const isRouteWithSaveButton = computed(
   () =>
     route.path.includes("categories") ||
     route.path.includes("attachments") ||
-    route.path.includes("references"),
+    route.path.includes("references") ||
+    route.path.includes("managementdata"),
 )
 
 const managementDataRoute = computed(() => ({
