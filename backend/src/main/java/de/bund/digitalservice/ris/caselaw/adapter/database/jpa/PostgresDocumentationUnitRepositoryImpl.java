@@ -222,6 +222,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // persisted documentation unit
     DecisionDTO savedDocUnit = repository.save(documentationUnitDTO);
 
+    historyLogService.saveHistoryLog(
+        savedDocUnit.getId(), user, HistoryLogEventType.CREATE, "Dokeinheit angelegt");
+
     return DecisionTransformer.transformToDomain(savedDocUnit, user);
   }
 

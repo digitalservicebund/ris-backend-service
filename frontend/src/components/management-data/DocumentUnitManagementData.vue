@@ -25,7 +25,7 @@ onBeforeMount(async () => {
 
 const historyLogs = ref<DocumentationUnitHistoryLog[]>()
 const error = ref<ResponseError>()
-const isLoading = ref(false)
+const isLoading = ref(true)
 
 const loadHistory = async () => {
   isLoading.value = true
