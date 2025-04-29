@@ -65,7 +65,7 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
         },
       }"
       :row-class="rowClass"
-      scroll-height="300px"
+      scroll-height="315px"
       scrollable
       :value="formattedData"
     >
