@@ -208,6 +208,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     ManagementDataDTO managementData = getCreatedBy(user, documentationUnitDTO);
     documentationUnitDTO.setManagementData(managementData);
 
+    historyLogService.saveHistoryLog(
+        documentationUnitDTO.getId(), user, HistoryLogEventType.CREATE, "Dokeinheit angelegt");
+
     StatusDTO statusDTO =
         StatusTransformer.transformToDTO(status).toBuilder()
             .documentationUnit(documentationUnitDTO)
@@ -221,10 +224,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // reference to a
     // persisted documentation unit
     DecisionDTO savedDocUnit = repository.save(documentationUnitDTO);
-
-    historyLogService.saveHistoryLog(
-        savedDocUnit.getId(), user, HistoryLogEventType.CREATE, "Dokeinheit angelegt");
-
     return DecisionTransformer.transformToDomain(savedDocUnit, user);
   }
 
