@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 public enum HistoryLogEventType {
+  CREATE,
   UPDATE,
   FILES,
   PROCEDURE,

@@ -281,14 +281,16 @@ class PatchUpdateIntegrationTest {
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
     var logs = documentationUnitHistoryLogService.getHistoryLogs(documentationUnit.uuid(), user);
-    assertThat(logs).hasSize(2);
+    assertThat(logs).hasSize(3);
     assertThat(logs)
         .map(HistoryLog::eventType)
-        .containsExactly(HistoryLogEventType.UPDATE, HistoryLogEventType.PROCEDURE);
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser");
-    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS");
+        .containsExactly(
+            HistoryLogEventType.UPDATE, HistoryLogEventType.PROCEDURE, HistoryLogEventType.CREATE);
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
+    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
     assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
     assertThat(logs.get(1).description()).isEqualTo("Vorgang gesetzt: Vorgang1");
+    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
 
     var procedure2AsNode =
         objectMapper.convertValue(Procedure.builder().label("Vorgang2").build(), JsonNode.class);
@@ -307,20 +309,22 @@ class PatchUpdateIntegrationTest {
 
     // Existing update event will be updated
     var logs2 = documentationUnitHistoryLogService.getHistoryLogs(documentationUnit.uuid(), user);
-    assertThat(logs2).hasSize(3);
+    assertThat(logs2).hasSize(4);
     assertThat(logs2)
         .map(HistoryLog::eventType)
         .containsExactly(
             HistoryLogEventType.UPDATE,
             HistoryLogEventType.PROCEDURE,
-            HistoryLogEventType.PROCEDURE);
+            HistoryLogEventType.PROCEDURE,
+            HistoryLogEventType.CREATE);
     assertThat(logs2)
         .map(HistoryLog::createdBy)
-        .containsExactly("testUser", "testUser", "testUser");
-    assertThat(logs2).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+        .containsExactly("testUser", "testUser", "testUser", "testUser");
+    assertThat(logs2).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS", "DS");
     assertThat(logs2.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
     assertThat(logs2.get(1).description()).isEqualTo("Vorgang geändert: Vorgang1 → Vorgang2");
     assertThat(logs2.get(2).description()).isEqualTo("Vorgang gesetzt: Vorgang1");
+    assertThat(logs2.get(3).description()).isEqualTo("Dokeinheit angelegt");
   }
 
   @Nested

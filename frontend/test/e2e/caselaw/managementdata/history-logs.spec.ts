@@ -21,6 +21,22 @@ const formattedDate = dayjs().format("DD.MM.YYYY")
 /* eslint-disable playwright/expect-expect */
 test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
   const testPrefix = `e2e_${generateString({ length: 10 })}`
+  test("Es wird geloggt, wenn eine Dokeinheit angelegt wird", async ({
+    page,
+    documentNumber,
+  }) => {
+    await test.step("Historie einer neu erstellten Dokeinheit ist leer", async () => {
+      await navigateToManagementData(page, documentNumber)
+      await expectHistoryCount(page, 1)
+      await expectHistoryLogRow(
+        page,
+        0,
+        "DS (e2e_tests DigitalService)",
+        `Dokeinheit angelegt`,
+      )
+    })
+  })
+
   test("Es wird geloggt, wenn eine Userin etwas an den Rubriken geändert hat", async ({
     page,
     documentNumber,
@@ -35,7 +51,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await page.getByLabel("ECLI", { exact: true }).fill("ECLI-12345")
       await save(page)
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 1)
+      await expectHistoryCount(page, 2)
       await expectHistoryLogRow(
         page,
         0,
@@ -49,7 +65,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await page.getByLabel("ECLI", { exact: true }).fill("ECLI-anderer-Wert")
       await save(page)
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 1)
+      await expectHistoryCount(page, 2)
       await expectHistoryLogRow(
         page,
         0,
@@ -76,7 +92,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("In der Historie sind zwei Historien-Events", async () => {
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 2)
+      await expectHistoryCount(page, 3)
       await expectHistoryLogRow(
         page,
         0,
@@ -106,7 +122,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("Bearbeitungsevent der Externen Person ist zusätzlich sichtbar", async () => {
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 3)
+      await expectHistoryCount(page, 4)
       await expectHistoryLogRow(
         page,
         0,
@@ -127,7 +143,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("In der Historie gibt es ein Hochladen und ein Bearbeitet Historien-Event", async () => {
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 2)
+      await expectHistoryCount(page, 3)
       await expectHistoryLogRow(
         page,
         0,
@@ -151,7 +167,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("In der Historie gibt es zusätzlich ein Dokument gelöscht Historien-Event", async () => {
       await navigateToManagementData(page, documentNumber)
-      await expectHistoryCount(page, 3)
+      await expectHistoryCount(page, 4)
       await expectHistoryLogRow(
         page,
         0,
@@ -215,7 +231,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
 
     await test.step("BGH-User sieht nur BGH Namen in Verwaltungsdaten", async () => {
       await navigateToManagementData(pageWithBghUser, documentNumber)
-      await expectHistoryCount(pageWithBghUser, 2)
+      await expectHistoryCount(pageWithBghUser, 3)
       await expectHistoryLogRow(
         pageWithBghUser,
         1,

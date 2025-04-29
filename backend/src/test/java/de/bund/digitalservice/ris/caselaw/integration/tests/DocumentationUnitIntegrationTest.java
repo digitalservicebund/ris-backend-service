@@ -6,6 +6,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLIS
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -102,6 +103,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -242,6 +244,16 @@ class DocumentationUnitIntegrationTest {
 
     List<DocumentationUnitDTO> list = repository.findAll();
     assertThat(list).hasSize(1);
+
+    User user = User.builder().documentationOffice(docOffice).build();
+    var historyLogs = historyLogRepository.findByDocumentationUnitId(list.getFirst().getId(), user);
+    assertThat(historyLogs).hasSize(1);
+    assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.CREATE);
+    assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
+    assertThat(historyLogs.getFirst().description()).isEqualTo("Dokeinheit angelegt");
+    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
+    assertThat(historyLogs.getFirst().createdAt())
+        .isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
   }
 
   @Test
