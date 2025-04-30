@@ -65,14 +65,20 @@ public class TextCheckService {
       stream(CategoryType.values())
           .parallel()
           .forEach(
-              type -> {
+              categoryType -> {
                 try {
-                  TextCheckCategoryResponse response = checkCategory(documentationUnit, type);
+                  TextCheckCategoryResponse response =
+                      checkCategory(documentationUnit, categoryType);
                   if (response != null) {
                     allMatches.addAll(response.matches());
                   }
+
                 } catch (Exception e) {
-                  log.error("Could not process category", e);
+                  log.error(
+                      "Could not process text category: {} for doc unit id: {}",
+                      categoryType,
+                      id,
+                      e);
                 }
               });
 
