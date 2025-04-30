@@ -1,78 +1,154 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import Select from "primevue/select"
-import { computed, ref } from "vue"
-import { Page } from "@/components/Pagination.vue"
+import { computed, onMounted, ref } from "vue"
+import { ComboboxItem } from "@/components/input/types"
+import Pagination, { Page } from "@/components/Pagination.vue"
+import DocumentationOffice from "@/domain/documentationOffice"
 import EURLexResult from "@/domain/eurlex"
-import dayjs from "dayjs"
+import errorMessages from "@/i18n/errors.json"
+import service from "@/services/comboboxItemService"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconCallMade from "~icons/material-symbols/call-made"
-// import IconAdd from "~icons/material-symbols/add"
 
 const props = defineProps<{
   pageEntries?: Page<EURLexResult>
 }>()
 
-const emit = defineEmits<{}>()
+const emit = defineEmits<{
+  updatePage: [number]
+}>()
 
-const selectedEntries = ref<EURLexResult[]>()
+const selectedEntries = ref<EURLexResult[]>([])
+const noDecisionSelected = ref<boolean>(false)
+const selectedDocumentationOffice = ref<DocumentationOffice>()
+const noDocumentationOfficeSelected = ref<boolean>(false)
+const documentationOffices = ref<DocumentationOffice[]>()
 
 const entries = computed(() => {
   return props.pageEntries?.content || []
 })
 
-function openPreview() {}
+onMounted(async () => {
+  const comboboxItems: ComboboxItem[] | null = (
+    await service.getDocumentationOffices(ref(undefined))
+  ).data.value
 
-function handleAssignToDokOffice() {
-  if (selectedEntries.value?.length == 0) {
+  documentationOffices.value = comboboxItems?.map(
+    (item) =>
+      ({
+        id: item.value?.uuid,
+        abbreviation: item.value?.abbreviation,
+      }) as DocumentationOffice,
+  )
+})
+
+function openPreview(entry: EURLexResult) {
+  if (entry && entry.celex) {
+    window.open(entry.htmlLink, "_blank")
   }
+}
+
+function handleAssignToDocOffice() {
+  if (selectedEntries.value?.length == 0) {
+    noDecisionSelected.value = true
+  }
+
+  if (!selectedDocumentationOffice.value) {
+    noDocumentationOfficeSelected.value = true
+  }
+}
+
+function selectRow() {
+  noDecisionSelected.value = selectedEntries.value.length == 0
+}
+
+function selectDocumentationOffice() {
+  noDocumentationOfficeSelected.value =
+    selectedDocumentationOffice.value == undefined
 }
 </script>
 
 <template>
-  <div class="flex justify-end">
-    <Select
-      aria-label="Dokumentationstelle auswählen"
-      placeholder="Dokumentationsstelle auswählen"
-    ></Select>
-    <Button
-      class="ml-8"
-      label="Zuweisen"
-      severity="secondary"
-      @click="handleAssignToDokOffice"
-    ></Button>
+  <div class="flex flex-col items-start justify-self-end">
+    <div class="flex">
+      <Select
+        v-model="selectedDocumentationOffice"
+        aria-label="Dokumentationstelle auswählen"
+        class="w-2xs"
+        option-label="abbreviation"
+        :options="documentationOffices"
+        placeholder="Dokumentationsstelle auswählen"
+        @change="selectDocumentationOffice"
+      ></Select>
+      <Button
+        class="ml-8"
+        label="Zuweisen"
+        severity="secondary"
+        @click="handleAssignToDocOffice"
+      ></Button>
+    </div>
+    <span
+      v-if="noDocumentationOfficeSelected"
+      class="ris-body3-regular mt-8 flex text-red-900"
+    >
+      <IconErrorOutline class="mr-8" />
+      {{ errorMessages.EURLEX_NO_DOCUMENTATION_OFFICE_SELECTED.title }}
+    </span>
   </div>
   <div class="m-24">
-    <DataTable
-      v-model:selection="selectedEntries"
-      data-key="celex"
-      table-style="min-width: 50rem"
-      :value="entries"
+    <Pagination
+      navigation-position="bottom"
+      :page="pageEntries"
+      @update-page="emit('updatePage', $event)"
     >
-      <Column header-style="width: 3rem" selection-mode="multiple"></Column>
-      <Column field="celex" header="CELEX"></Column>
-      <Column field="courtType" header="Gerichtstyp"></Column>
-      <Column field="courtLocation" header="Ort"></Column>
-      <Column field="date" header="Datum">
-        <template #body="{ data }">
-          {{ dayjs(data.date).format("DD.MM.YYYY") }}
-        </template>
-      </Column>
-      <Column field="fileNumber" header="Aktenzeichen"></Column>
-      <Column field="publicationDate" header="Veröffentlichungsdatum">
-        <template #body="{ data }">
-          {{ dayjs(data.publicationDate).format("DD.MM.YYYY") }}
-        </template>
-      </Column>
-      <Column>
-        <template #body>
-          <Button severity="secondary" @click="openPreview">
-            <IconCallMade />
-          </Button>
-        </template>
-        ></Column
+      <span
+        v-if="noDecisionSelected"
+        class="ris-body3-regular flex text-red-900"
       >
-    </DataTable>
+        <IconErrorOutline class="mr-8 ml-16" />
+        {{ errorMessages.EURLEX_NO_DECISION_SELECTED.title }}
+      </span>
+      <DataTable
+        v-model:selection="selectedEntries"
+        data-key="celex"
+        table-style="min-width: 50rem"
+        :value="entries"
+        @row-select="selectRow"
+      >
+        <Column header-style="width: 3rem" selection-mode="multiple"></Column>
+        <Column field="celex" header="CELEX"></Column>
+        <Column field="courtType" header="Gerichtstyp"></Column>
+        <Column field="courtLocation" header="Ort"></Column>
+        <Column header="Datum">
+          <template #body="{ data }">
+            {{ dayjs(data.date).format("DD.MM.YYYY") }}
+          </template>
+        </Column>
+        <Column field="fileNumber" header="Aktenzeichen"></Column>
+        <Column header="Veröffentlichungsdatum">
+          <template #body="{ data }">
+            {{ dayjs(data.publicationDate).format("DD.MM.YYYY") }}
+          </template>
+        </Column>
+        <Column>
+          <template #body="{ data }">
+            <Button
+              class="self-start"
+              icon="pi"
+              severity="secondary"
+              size="small"
+              @click="openPreview(data)"
+            >
+              <IconCallMade />
+            </Button>
+          </template>
+          ></Column
+        >
+      </DataTable>
+    </Pagination>
   </div>
 </template>
