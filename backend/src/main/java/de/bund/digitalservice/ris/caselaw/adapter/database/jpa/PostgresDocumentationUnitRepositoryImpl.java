@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -643,6 +644,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Boolean withError,
       Boolean myDocOfficeOnly,
       Boolean withDuplicateWarning,
+      InboxStatus inboxStatus,
       DocumentationOfficeDTO documentationOfficeDTO) {
     if ((fileNumber == null || fileNumber.trim().isEmpty())) {
       return repository.searchByDocumentationUnitSearchInput(
@@ -658,6 +660,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           withError,
           myDocOfficeOnly,
           withDuplicateWarning,
+          inboxStatus,
           pageable);
     }
 
@@ -689,6 +692,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               withError,
               myDocOfficeOnly,
               withDuplicateWarning,
+              inboxStatus,
               fixedPageRequest);
 
       deviatingFileNumberResults =
@@ -706,6 +710,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               withError,
               myDocOfficeOnly,
               withDuplicateWarning,
+              inboxStatus,
               fixedPageRequest);
     }
 
@@ -769,6 +774,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             withError,
             searchInput.myDocOfficeOnly(),
             searchInput.withDuplicateWarning(),
+            searchInput.inboxStatus(),
             documentationOfficeDTO);
 
     return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);

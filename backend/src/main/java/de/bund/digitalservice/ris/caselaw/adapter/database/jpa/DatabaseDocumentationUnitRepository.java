@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.LocalDate;
 import java.util.List;
@@ -48,6 +49,7 @@ public interface DatabaseDocumentationUnitRepository
       )
     )
    AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND documentationUnit.status.withError = TRUE)
+   AND (:inboxStatus IS NULL OR documentationUnit.inboxStatus = :inboxStatus)
    AND (:withDuplicateWarning = FALSE
     OR (documentationUnit.documentationOffice.id = :documentationOfficeId
       AND (EXISTS (SELECT 1 FROM DuplicateRelationDTO duplicateRelation1
@@ -86,6 +88,7 @@ public interface DatabaseDocumentationUnitRepository
       @Param("withErrorOnly") Boolean withErrorOnly,
       @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
       @Param("withDuplicateWarning") Boolean withDuplicateWarning,
+      @Param("inboxStatus") InboxStatus inboxStatus,
       @Param("pageable") Pageable pageable);
 
   @Query(
@@ -114,6 +117,7 @@ public interface DatabaseDocumentationUnitRepository
       @Param("withErrorOnly") Boolean withErrorOnly,
       @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
       @Param("withDuplicateWarning") Boolean withDuplicateWarning,
+      @Param("inboxStatus") InboxStatus inboxStatus,
       @Param("pageable") Pageable pageable);
 
   @Query(
@@ -142,6 +146,7 @@ public interface DatabaseDocumentationUnitRepository
       Boolean withErrorOnly,
       Boolean myDocOfficeOnly,
       Boolean withDuplicateWarning,
+      InboxStatus inboxStatus,
       Pageable pageable);
 
   // temporarily needed for the ldml handover phase, can be removed once we integrate ldml
