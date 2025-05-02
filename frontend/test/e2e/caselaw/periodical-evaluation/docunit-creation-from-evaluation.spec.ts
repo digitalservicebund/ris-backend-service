@@ -80,8 +80,9 @@ async function verifyDocUnitCanBeTakenOver(
     pageWithBghUser.getByLabel("Dokumentationseinheit löschen"),
   ).toBeVisible()
 }
-
-test.describe(
+// Todo: Enable this test again, as soon as the handover inbox is ready
+// eslint-disable-next-line playwright/no-skipped-test
+test.describe.skip(
   "Creation of new documentation units from periodical evaluation",
   {
     tag: ["@RISDEV-4562"],
@@ -734,7 +735,9 @@ test.describe(
       },
     )
 
-    test(
+    // Todo: Enable this test again, as soon as the handover inbox is ready
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "Takeover and deletion of created documentation unit from foreign docoffice",
       {
         tag: ["@RISDEV-4833"],
