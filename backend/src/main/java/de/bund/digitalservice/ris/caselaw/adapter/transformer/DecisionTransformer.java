@@ -62,7 +62,8 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder
         .id(updatedDomainObject.uuid())
         .documentNumber(updatedDomainObject.documentNumber())
-        .version(updatedDomainObject.version());
+        .version(updatedDomainObject.version())
+        .inboxStatus(updatedDomainObject.inboxStatus());
 
     addPreviousDecisions(updatedDomainObject, builder);
 

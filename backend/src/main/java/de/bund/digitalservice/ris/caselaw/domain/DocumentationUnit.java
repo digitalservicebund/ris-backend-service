@@ -46,6 +46,7 @@ public record DocumentationUnit(
     List<Reference> caselawReferences,
     List<Reference> literatureReferences,
     List<String> documentalists,
+    InboxStatus inboxStatus,
     boolean isEditable,
     boolean isDeletable)
     implements Documentable {}
