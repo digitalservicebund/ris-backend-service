@@ -25,7 +25,7 @@ jobs:
 
   backend-unit-tests:
     needs: scan-backend-changes
-    if: 3 == 4
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main'  }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +58,7 @@ jobs:
 
   backend-integration-tests:
     needs: scan-backend-changes
-    if: 3 == 4
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main'  }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -92,7 +92,7 @@ jobs:
 
   backend-tests-and-code-quality:
     needs: scan-backend-changes
-    #if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref == 'refs/heads/main'  }}
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref == 'refs/heads/main'  }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -113,7 +113,7 @@ jobs:
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run tests and scan with SonarQube
-        run: ./gradlew sonar --info --parallel
+        run: ./gradlew sonar --info
         working-directory: ./backend
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
