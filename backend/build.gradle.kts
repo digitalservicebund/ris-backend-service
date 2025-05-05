@@ -278,7 +278,7 @@ tasks {
 
     test {
         useJUnitPlatform {
-            excludeTags("integration", "manual")
+            excludeTags("integration")
         }
     }
 
@@ -287,7 +287,6 @@ tasks {
         group = "verification"
         useJUnitPlatform {
             includeTags("integration")
-            excludeTags("manual")
         }
 
     }
