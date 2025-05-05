@@ -9,6 +9,7 @@ test.skip(
   ({ browserName }) => browserName !== "chromium",
   "Skipping firefox flaky test",
 )
+
 const textCheckUnderlinesColors = {
   uncategorized: "#e86a69",
   style: "#9d8eff",
@@ -19,10 +20,6 @@ const textCheckUnderlinesColors = {
 } as const
 
 type TextCheckType = keyof typeof textCheckUnderlinesColors
-
-async function isTextCheckMarkIgnored(tag: Locator): Promise<boolean> {
-  return await tag.evaluate((el) => el.getAttribute("ignored") === "true")
-}
 
 async function getMarkId(tag: Locator): Promise<string | null> {
   return await tag.evaluate((el) => el.getAttribute("id"))
@@ -107,23 +104,41 @@ test.describe(
             .getByTestId("Orientierungssatz")
             .locator("text-check")
 
-          const allIgnoredWords = page.locator(`text-check[ignored='false']`)
+          const allTextCheckTags = page.locator(`text-check`)
 
-          for (let i = 0; i < allIgnoredWords.length; i++) {
-            await expect(textCheckTags.nth(i)).not.toHaveText("")
+          for (
+            let ignoredTextCheckTag = 0;
+            ignoredTextCheckTag < (await allTextCheckTags.count());
+            ignoredTextCheckTag++
+          ) {
+            await expect(textCheckTags.nth(ignoredTextCheckTag)).not.toHaveText(
+              "",
+            )
 
-            const typeAttr = await textCheckTags.nth(i).getAttribute("type")
+            const isTextCheckIgnored = await textCheckTags
+              .nth(ignoredTextCheckTag)
+              .getAttribute("ignored")
+
+            let expectedRGBUnderlinesColor
+
             // eslint-disable-next-line playwright/no-conditional-in-test
-            const type = (await isTextCheckMarkIgnored(textCheckTags.nth(i)))
-              ? "ignored"
-              : // eslint-disable-next-line playwright/no-conditional-in-test
-                (typeAttr ?? "uncategorized")
-            const rgbColors = getTextCheckColorRGB(type)
+            if (isTextCheckIgnored == "true") {
+              expectedRGBUnderlinesColor = convertHexToRGB(
+                textCheckUnderlinesColors.ignored,
+              )
+            } else {
+              const typeAttr = await textCheckTags
+                .nth(ignoredTextCheckTag)
+                .getAttribute("type")
+              // eslint-disable-next-line playwright/no-conditional-in-test
+              const type = typeAttr ?? "uncategorized"
+              expectedRGBUnderlinesColor = getTextCheckColorRGB(type)
+            }
 
-            await expect(textCheckTags.nth(i)).toHaveCSS(
+            await expect(textCheckTags.nth(ignoredTextCheckTag)).toHaveCSS(
               "border-bottom",
               "2px solid " +
-                `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
+                `rgb(${expectedRGBUnderlinesColor.red}, ${expectedRGBUnderlinesColor.green}, ${expectedRGBUnderlinesColor.blue})`,
             )
           }
         })
