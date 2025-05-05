@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test"
+import { expect, Locator } from "@playwright/test"
 import { navigateToCategories } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
@@ -9,6 +9,7 @@ test.skip(
   ({ browserName }) => browserName !== "chromium",
   "Skipping firefox flaky test",
 )
+
 const textCheckUnderlinesColors = {
   uncategorized: "#e86a69",
   style: "#9d8eff",
@@ -19,6 +20,10 @@ const textCheckUnderlinesColors = {
 } as const
 
 type TextCheckType = keyof typeof textCheckUnderlinesColors
+
+async function getMarkId(tag: Locator): Promise<string | null> {
+  return await tag.evaluate((el) => el.getAttribute("id"))
+}
 
 function getTextCheckColorRGB(type: string | null): {
   red: number
@@ -99,25 +104,41 @@ test.describe(
             .getByTestId("Orientierungssatz")
             .locator("text-check")
 
-          const allIgnoredWords = [
-            ...textWithErrors.ignoredWords,
-            ...textWithErrors.incorrectWords,
-          ]
+          const allTextCheckTags = page.locator(`text-check`)
 
-          for (let i = 0; i < allIgnoredWords.length; i++) {
-            await expect(textCheckTags.nth(i)).not.toHaveText("")
+          for (
+            let ignoredTextCheckTag = 0;
+            ignoredTextCheckTag < (await allTextCheckTags.count());
+            ignoredTextCheckTag++
+          ) {
+            await expect(textCheckTags.nth(ignoredTextCheckTag)).not.toHaveText(
+              "",
+            )
 
-            const type =
+            const isTextCheckIgnored = await textCheckTags
+              .nth(ignoredTextCheckTag)
+              .getAttribute("ignored")
+
+            let expectedRGBUnderlinesColor
+
+            // eslint-disable-next-line playwright/no-conditional-in-test
+            if (isTextCheckIgnored == "true") {
+              expectedRGBUnderlinesColor = convertHexToRGB(
+                textCheckUnderlinesColors.ignored,
+              )
+            } else {
+              const typeAttr = await textCheckTags
+                .nth(ignoredTextCheckTag)
+                .getAttribute("type")
               // eslint-disable-next-line playwright/no-conditional-in-test
-              (await textCheckTags.nth(i).getAttribute("type")) ??
-              "uncategorized"
+              const type = typeAttr ?? "uncategorized"
+              expectedRGBUnderlinesColor = getTextCheckColorRGB(type)
+            }
 
-            const rgbColors = getTextCheckColorRGB(type)
-
-            await expect(textCheckTags.nth(i)).toHaveCSS(
+            await expect(textCheckTags.nth(ignoredTextCheckTag)).toHaveCSS(
               "border-bottom",
               "2px solid " +
-                `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
+                `rgb(${expectedRGBUnderlinesColor.red}, ${expectedRGBUnderlinesColor.green}, ${expectedRGBUnderlinesColor.blue})`,
             )
           }
         })
@@ -190,25 +211,26 @@ test.describe(
           }
         })
 
-        await test.step("ignoring a word highlights it in green after text re-check", async () => {
-          await page.locator(`text-check[id='${1}']`).click()
+        await test.step("ignoring a word highlights it in blue after text re-check", async () => {
+          const textCheckTag = page
+            .locator(`text-check[ignored='false']`)
+            .first()
+
+          const textCheckId = await getMarkId(textCheckTag)
+
+          await textCheckTag.click()
+
           await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
           await page.getByTestId("ignored-word-add-button").click()
-          await page
-            .getByLabel("Orientierungssatz Button")
-            .getByRole("button", { name: "Rechtschreibprüfung" })
-            .click()
-
-          await expect(
-            page.getByTestId("text-check-loading-status"),
-          ).toHaveText("Rechtschreibprüfung läuft")
 
           const rgbColors = convertHexToRGB(textCheckUnderlinesColors.ignored)
           await expect(
             page.getByTestId("text-check-loading-status"),
           ).toBeHidden()
 
-          await expect(page.locator(`text-check[id='${1}']`)).toHaveCSS(
+          await expect(
+            page.locator(`text-check[id='${textCheckId}']`),
+          ).toHaveCSS(
             "border-bottom",
             "2px solid " +
               `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
@@ -216,17 +238,20 @@ test.describe(
         })
 
         await test.step("removing ignored word highlights it in red after text re-check", async () => {
-          await page.locator(`text-check[id='${1}']`).click()
-          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
-          await page.getByTestId("ignored-word-remove-button").click()
-          await page
-            .getByLabel("Orientierungssatz Button")
-            .getByRole("button", { name: "Rechtschreibprüfung" })
-            .click()
+          const textCheckTag = page
+            .locator(`text-check[ignored='true']`)
+            .first()
 
-          await expect(
-            page.getByTestId("text-check-loading-status"),
-          ).toHaveText("Rechtschreibprüfung läuft")
+          const textCheckId = await getMarkId(textCheckTag)
+
+          await textCheckTag.click()
+
+          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
+
+          const removeIgnoredWordButton = page.getByTestId(
+            /^(ignored-word-remove-button|ignored-word-global-remove-button)$/,
+          )
+          await removeIgnoredWordButton.click()
 
           const rgbColors = convertHexToRGB(
             textCheckUnderlinesColors.uncategorized,
@@ -236,7 +261,9 @@ test.describe(
             page.getByTestId("text-check-loading-status"),
           ).toBeHidden()
 
-          await expect(page.locator(`text-check[id='${1}']`)).toHaveCSS(
+          await expect(
+            page.locator(`text-check[id='${textCheckId}']`),
+          ).toHaveCSS(
             "border-bottom",
             "2px solid " +
               `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
