@@ -276,7 +276,7 @@ tasks {
         maxParallelForks = Runtime.getRuntime().availableProcessors().div(2)
     }
 
-    getByName<Test>("test") {
+    test {
         useJUnitPlatform {
             excludeTags("integration", "manual")
         }
@@ -290,15 +290,10 @@ tasks {
             excludeTags("manual")
         }
 
-        // So that running integration test require running unit tests first,
-        // and we won"t even attempt running integration tests when there are
-        // failing unit tests.
-        dependsOn("test")
-        finalizedBy("jacocoTestReport")
     }
 
     check {
-        dependsOn("integrationTest")
+        dependsOn("test", "integrationTest")
     }
 
     jacocoTestReport {
