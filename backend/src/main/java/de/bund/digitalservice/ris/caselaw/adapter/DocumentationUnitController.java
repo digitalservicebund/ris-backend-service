@@ -425,9 +425,10 @@ public class DocumentationUnitController {
         PageRequest.of(page, size));
   }
 
-  @GetMapping(value = "/{uuid}/docx/{s3Path}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{uuid}/file", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
-  public ResponseEntity<Docx2Html> getHtml(@PathVariable UUID uuid, @PathVariable String s3Path) {
+  public ResponseEntity<Docx2Html> getDocxHtml(
+      @PathVariable UUID uuid, @RequestParam String s3Path, @RequestParam String format) {
 
     try {
       service.getByUuid(uuid);
@@ -436,9 +437,9 @@ public class DocumentationUnitController {
     }
 
     try {
-      var docx2Html = converterService.getConvertedObject(s3Path);
+      var docx2Html = converterService.getConvertedObject(s3Path, format, uuid);
       return ResponseEntity.ok()
-          .cacheControl(CacheControl.maxAge(Duration.ofDays(1))) // Set cache duration
+          .cacheControl(CacheControl.maxAge(Duration.ofSeconds(1))) // Set cache duration
           .body(docx2Html);
     } catch (Exception ex) {
       log.error("Error by getting docx for documentation unit {}", uuid, ex);

@@ -158,9 +158,13 @@ onMounted(() => {
             v-if="
               props.documentUnit!.uuid &&
               props.documentUnit!.attachments &&
-              props.documentUnit!.attachments[currentAttachmentIndex]?.s3path
+              props.documentUnit!.attachments[currentAttachmentIndex]?.s3path &&
+              props.documentUnit!.attachments[currentAttachmentIndex]?.format
             "
             :document-unit-uuid="props.documentUnit!.uuid"
+            :format="
+              props.documentUnit!.attachments[currentAttachmentIndex].format
+            "
             :s3-path="
               props.documentUnit!.attachments[currentAttachmentIndex].s3path
             "
