@@ -306,7 +306,7 @@ tasks {
                 },
             ),
         )
-        dependsOn("integrationTest")
+        dependsOn("test", "integrationTest")
         reports {
             xml.required.set(true)
             html.required.set(true)
