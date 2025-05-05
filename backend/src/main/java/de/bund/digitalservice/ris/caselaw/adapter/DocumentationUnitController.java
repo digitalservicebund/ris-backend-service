@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
+import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
@@ -22,7 +23,6 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
-import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -147,7 +147,7 @@ public class DocumentationUnitController {
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
   @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
-  public ResponseEntity<Docx2Html> attachFileToDocumentationUnit(
+  public ResponseEntity<Attachment2Html> attachFileToDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable UUID uuid,
       @RequestBody byte[] bytes,
@@ -159,9 +159,9 @@ public class DocumentationUnitController {
                 uuid, ByteBuffer.wrap(bytes), httpHeaders, userService.getUser(oidcUser))
             .s3path();
     try {
-      var docx2html = converterService.getConvertedObject(attachmentPath);
-      initializeCoreDataAndCheckDuplicates(uuid, docx2html);
-      return ResponseEntity.status(HttpStatus.OK).body(docx2html);
+      var attachment2Html = converterService.getConvertedObject(attachmentPath);
+      initializeCoreDataAndCheckDuplicates(uuid, attachment2Html);
+      return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
 
     } catch (Exception e) {
       attachmentService.deleteByS3Path(attachmentPath, uuid, userService.getUser(oidcUser));
@@ -169,11 +169,12 @@ public class DocumentationUnitController {
     }
   }
 
-  private void initializeCoreDataAndCheckDuplicates(UUID uuid, Docx2Html docx2html) {
+  private void initializeCoreDataAndCheckDuplicates(UUID uuid, Attachment2Html attachment2Html) {
     try {
       Documentable documentable = service.getByUuid(uuid);
       if (documentable instanceof DocumentationUnit docUnit) {
-        documentationUnitDocxMetadataInitializationService.initializeCoreData(docUnit, docx2html);
+        documentationUnitDocxMetadataInitializationService.initializeCoreData(
+            docUnit, attachment2Html);
         checkDuplicates(docUnit.documentNumber());
       } else {
         log.info("Documentable type not supported: {}", documentable.getClass().getName());
@@ -425,7 +426,7 @@ public class DocumentationUnitController {
 
   @GetMapping(value = "/{uuid}/file", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
-  public ResponseEntity<Docx2Html> getDocxHtml(
+  public ResponseEntity<Attachment2Html> getDocxHtml(
       @PathVariable UUID uuid, @RequestParam String s3Path, @RequestParam String format) {
 
     try {
@@ -435,10 +436,10 @@ public class DocumentationUnitController {
     }
 
     try {
-      var docx2Html = converterService.getConvertedObject(s3Path, format, uuid);
+      var attachment2Html = converterService.getConvertedObject(format, s3Path, uuid);
       return ResponseEntity.ok()
           .cacheControl(CacheControl.maxAge(Duration.ofSeconds(1))) // Set cache duration
-          .body(docx2Html);
+          .body(attachment2Html);
     } catch (Exception ex) {
       log.error("Error by getting docx for documentation unit {}", uuid, ex);
       return ResponseEntity.internalServerError().build();

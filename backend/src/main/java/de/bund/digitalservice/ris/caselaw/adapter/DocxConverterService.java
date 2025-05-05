@@ -4,8 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentationUn
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.FooterConverter;
-import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
-import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentationUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
@@ -19,7 +17,6 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElementType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -37,11 +33,6 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -59,7 +50,6 @@ import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
 import org.docx4j.wml.Style;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mapping.MappingException;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -73,7 +63,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @Service
 @Slf4j
-public class DocxConverterService implements ConverterService {
+public class DocxConverterService {
   private static final String PARAGRAPH = "paragraph";
   private static final List<UnhandledElement> IRRELEVANT_ELEMENTS =
       List.of(
@@ -92,10 +82,6 @@ public class DocxConverterService implements ConverterService {
   private final S3Client client;
   private final DocumentBuilderFactory documentBuilderFactory;
   private final DocxConverter converter;
-  private final FmxRepository fmxRepository;
-
-  private Transformer xsltTransformer;
-  private final Templates fmxToHtml;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -103,15 +89,10 @@ public class DocxConverterService implements ConverterService {
   public DocxConverterService(
       @Qualifier("docxS3Client") S3Client client,
       DocumentBuilderFactory documentBuilderFactory,
-      DocxConverter converter,
-      FmxRepository fmxRepository,
-      XmlUtilService xmlUtilService) {
+      DocxConverter converter) {
     this.client = client;
     this.documentBuilderFactory = documentBuilderFactory;
     this.converter = converter;
-    this.fmxRepository = fmxRepository;
-
-    fmxToHtml = xmlUtilService.getTemplates("caselawhandover/fmxToHtml.xslt");
   }
 
   public String getOriginalText(WordprocessingMLPackage mlPackage) {
@@ -158,42 +139,6 @@ public class DocxConverterService implements ConverterService {
       return null;
     }
     return getDocx(fileName);
-  }
-
-  /**
-   * Convert formex xml file to an object with the html content of the formex file
-   *
-   * @param fileName name of the file in the bucket
-   * @param documentationUnitId id of the documentation unit that the file is attached to
-   * @return the generated object with html content
-   */
-  @Override
-  public Docx2Html getConvertedObject(String fileName, String format, UUID documentationUnitId) {
-    if ("fmx".equals(format)) {
-      return getFmx(documentationUnitId);
-    } else if (fileName != null) {
-      return getConvertedObject(fileName);
-    } else {
-      return null;
-    }
-  }
-
-  private Docx2Html getFmx(UUID documentationUnitId) {
-    try {
-      xsltTransformer = fmxToHtml.newTransformer();
-      String content = fmxRepository.getFmxAsString(documentationUnitId);
-      if (content != null && !content.isEmpty()) {
-        return Docx2Html.EMPTY;
-      }
-      StringWriter xsltOutput = new StringWriter();
-      xsltTransformer.transform(
-          new StreamSource(new StringReader(content.strip())), new StreamResult(xsltOutput));
-      log.info(xsltOutput.toString());
-      return new Docx2Html(xsltOutput.toString(), null, null);
-    } catch (TransformerException e) {
-      log.error("Xslt transformation error.", e);
-      throw new MappingException(e.getMessage());
-    }
   }
 
   private Docx2Html getDocx(String fileName) {

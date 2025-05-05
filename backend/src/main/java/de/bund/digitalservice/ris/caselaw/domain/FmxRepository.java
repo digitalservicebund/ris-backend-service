@@ -8,5 +8,5 @@ public interface FmxRepository {
 
   String getFmxAsString(UUID documentationUnitUuid);
 
-  void attachFmxToDocumentationUnit(UUID documentationUnitUuid, String content);
+  void attachFmxToDocumentationUnit(UUID documentationUnitUuid, String content, String source);
 }

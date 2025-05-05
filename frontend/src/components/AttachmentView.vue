@@ -19,7 +19,7 @@ const fileAsHTML = ref<Docx2HTML>()
 
 const getAttachmentHTML = async () => {
   isLoading.value = true
-  if (props.documentUnitUuid && props.s3Path && props.format) {
+  if (props.documentUnitUuid && props.format) {
     const htmlResponse = await fileService.getAttachmentAsHtml(
       props.documentUnitUuid,
       props.s3Path,
