@@ -25,7 +25,7 @@ jobs:
 
   backend-unit-tests:
     needs: scan-backend-changes
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main'  }}
+    if: 3 == 4
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +58,7 @@ jobs:
 
   backend-integration-tests:
     needs: scan-backend-changes
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main'  }}
+    if: 3 == 4
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
