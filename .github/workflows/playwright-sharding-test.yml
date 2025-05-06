@@ -1,0 +1,16 @@
+# for test propose only.
+name: Sharding playwright test
+
+on:
+  push:
+    branches: [ e2e-sharding ]
+
+jobs:
+  e2e-tests:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: true
+    # We do not include the matrix directly, so that the concurrency group does not apply to each matrix job individually
+    uses: ./.github/workflows/e2e_matrix.yml
+    secrets: inherit
