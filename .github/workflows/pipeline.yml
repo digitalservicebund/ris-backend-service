@@ -462,15 +462,6 @@ jobs:
     uses: ./.github/workflows/e2e_matrix.yml
     secrets: inherit
 
-  a11y-test:
-    #   if: ${{ github.ref == 'refs/heads/main' }}
-    # needs: [ deploy-staging ]
-    uses: ./.github/workflows/_playwright-test.yml
-    with:
-      project: a11y
-    secrets: inherit
-
-
   query-performance-tests:
     #  if: ${{ github.ref == 'refs/heads/main' }}
     concurrency:

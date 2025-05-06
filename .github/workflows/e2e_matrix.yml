@@ -11,3 +11,9 @@ jobs:
     with:
       project: ${{ matrix.project }}
     secrets: inherit
+
+  a11y:
+    uses: ./.github/workflows/_playwright-test.yml
+    with:
+      project: a11y
+    secrets: inherit
