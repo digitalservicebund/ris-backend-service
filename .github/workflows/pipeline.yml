@@ -472,7 +472,7 @@ jobs:
 
 
   query-performance-tests:
-    if: ${{ github.ref == 'refs/heads/main' }}
+    #  if: ${{ github.ref == 'refs/heads/main' }}
     concurrency:
       group: deploy-staging
       cancel-in-progress: true
