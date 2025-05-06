@@ -3,9 +3,9 @@ name: Sharding playwright test
 
 on:
   push:
-    branches: [ e2e-sharding ]
+    branches: [ e2e-sharding-disable ]
   pull_request:
-    branches: [ e2e-sharding ]
+    branches: [ e2e-sharding-disable ]
 
 
 jobs:
