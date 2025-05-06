@@ -46,6 +46,7 @@ async function search() {
       : {}),
     ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
     ...searchQuery.value,
+    inboxStatus: "EXTERNAL_HANDOVER",
     myDocOfficeOnly: "true",
   })
   if (response.data) {

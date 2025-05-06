@@ -48,7 +48,7 @@ const entries = computed(() => {
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center space-x-8">
-              <div class="flex-grow">{{ item.documentNumber }}</div>
+              <div>{{ item.documentNumber }}</div>
 
               <Tooltip text="Tooltip Text">
                 <IconAttachedFile

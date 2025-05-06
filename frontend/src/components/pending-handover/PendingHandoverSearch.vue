@@ -158,6 +158,7 @@ export type DocumentUnitSearchParameter =
   | "withError"
   | "myDocOfficeOnly"
   | "withDuplicateWarning"
+  | "inboxStatus"
 </script>
 
 <template>
