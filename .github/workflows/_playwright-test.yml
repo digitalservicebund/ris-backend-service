@@ -110,7 +110,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: test-results-${{ inputs.project }}
+          name: test-results-${{ inputs.project }}-${{ matrix.shardIndex }}
           path: ./frontend/test-results.json
           retention-days: 1
       - name: Upload test result blobs reports
