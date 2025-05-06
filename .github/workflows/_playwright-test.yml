@@ -117,7 +117,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: test-results-blob-${{ inputs.project }}
+          name: test-results-blob-${{ inputs.project }}-${{ matrix.shardIndex }}
           path: ./frontend/blob-report/test-report.zip
           retention-days: 5
       - name: Send status to Slack
