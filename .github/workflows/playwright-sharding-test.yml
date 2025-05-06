@@ -10,7 +10,6 @@ on:
 
 jobs:
   e2e-tests:
-    if: ${{ github.ref == 'refs/heads/main' }}
     concurrency:
       group: deploy-staging
       cancel-in-progress: true
