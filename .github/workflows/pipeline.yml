@@ -464,7 +464,6 @@ jobs:
 
   a11y-test:
     #   if: ${{ github.ref == 'refs/heads/main' }}
-    name: Run a11y test
     # needs: [ deploy-staging ]
     uses: ./.github/workflows/_playwright-test.yml
     with:
