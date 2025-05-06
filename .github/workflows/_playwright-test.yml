@@ -12,6 +12,14 @@ on:
       workers:
         required: false
         type: string
+      shard_index:
+        required: false
+        type: number
+        default: 1
+      shard_total:
+        required: false
+        type: number
+        default: 1
     secrets:
       STAGING_URL:
         required: true
@@ -20,12 +28,7 @@ on:
 
 jobs:
   playwright-test:
-    name: ${{ inputs.project }} (${{ matrix.shardIndex }}, ${{ matrix.shardTotal }})
-    strategy:
-      fail-fast: false
-      matrix:
-        shardIndex: [ 1, 2, 3, 4 ]
-        shardTotal: [ 4 ]
+    name: ${{ inputs.project }} (${{ inputs.shard_index }}, ${{ inputs.shard_total }})
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -86,7 +89,7 @@ jobs:
 
           reporter_config=${{ inputs.project == 'queries' && '--reporter=./test/queries/queries_log_reporter.ts' || '' }}
 
-          npx playwright test --project ${{ inputs.project }} --repeat-each ${{ inputs.runs}} $reporter_config $workers_config --retries=3 --max-failures=5 --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+          npx playwright test --project ${{ inputs.project }} --repeat-each ${{ inputs.runs}} $reporter_config $workers_config --retries=3 --max-failures=5 --shard=${{ inputs.shard_index }}/${{ inputs.shard_total }}
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
         uses: actions/upload-artifact@v4
@@ -111,14 +114,14 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: test-results-${{ inputs.project }}-${{ matrix.shardIndex }}
+          name: test-results-${{ inputs.project }}-${{ inputs.shard_index }}
           path: ./frontend/test-results.json
           retention-days: 1
       - name: Upload test result blobs reports
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: test-results-blob-${{ inputs.project }}-${{ matrix.shardIndex }}
+          name: test-results-blob-${{ inputs.project }}-${{ inputs.shard_index }}
           path: ./frontend/blob-report/test-report.zip
           retention-days: 5
       - name: Send status to Slack

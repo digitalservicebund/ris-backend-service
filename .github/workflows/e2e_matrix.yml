@@ -3,11 +3,17 @@ on:
 
 jobs:
   e2e-matrix:
-    if: ${{ github.ref == 'refs/heads/main' }}
+    #  if: ${{ github.ref == 'refs/heads/main' }}
     strategy:
       fail-fast: false
       matrix:
-        project: [ chromium, firefox, a11y ]
+        project: [ chromium, firefox ]
+    uses: ./.github/workflows/e2e-sharding-matrix.yml
+    with:
+      project: ${{ matrix.project }}
+    secrets: inherit
+
+  a11y:
     uses: ./.github/workflows/_playwright-test.yml
     with:
       project: ${{ matrix.project }}
