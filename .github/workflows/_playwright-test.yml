@@ -20,7 +20,6 @@ on:
 
 jobs:
   playwright-test:
-    name: ${{ inputs.project }} (${{ matrix.shardIndex }}, ${{ matrix.shardTotal }})
     strategy:
       fail-fast: false
       matrix:
@@ -111,14 +110,14 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: test-results-${{ inputs.project }}-${{ matrix.shardIndex }}
+          name: test-results-${{ inputs.project }}
           path: ./frontend/test-results.json
           retention-days: 1
       - name: Upload test result blobs reports
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: test-results-blob-${{ inputs.project }}-${{ matrix.shardIndex }}
+          name: test-results-blob-${{ inputs.project }}
           path: ./frontend/blob-report/test-report.zip
           retention-days: 5
       - name: Send status to Slack
