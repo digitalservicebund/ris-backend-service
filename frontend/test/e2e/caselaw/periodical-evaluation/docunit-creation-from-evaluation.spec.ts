@@ -6,6 +6,7 @@ import {
   navigateToPreview,
   navigateToReferences,
   navigateToSearch,
+  navigateToInbox,
   save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -49,24 +50,20 @@ async function verifyDocUnitCanBeTakenOver(
   documentNumber: string,
   edition: LegalPeriodicalEdition,
 ) {
-  await navigateToSearch(pageWithBghUser)
+  await navigateToInbox(pageWithBghUser)
+  await pageWithBghUser.getByTestId("external-handover-tab").click()
 
-  await pageWithBghUser.getByLabel("Dokumentnummer Suche").fill(documentNumber)
-
-  await pageWithBghUser.getByLabel("Status Suche").click()
-  await pageWithBghUser
-    .getByRole("option", {
-      name: "Fremdanlage",
-      exact: true,
-    })
-    .click()
   await pageWithBghUser
     .getByLabel("Nach Dokumentationseinheiten suchen")
     .click()
-  const listEntry = pageWithBghUser.getByRole("row")
-  await expect(listEntry).toHaveCount(1)
+
+  const listEntry = pageWithBghUser.locator(
+    `tr[data-p-index="0"] >> text=${documentNumber}`,
+  )
+  await expect(listEntry).toBeVisible()
+  await expect(listEntry).toContainText("Fremdanlage")
   await expect(listEntry).toContainText(
-    `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
+    ` MMG ${edition.prefix}12${edition.suffix} (DS)`,
   )
   await expect(
     pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
@@ -80,9 +77,8 @@ async function verifyDocUnitCanBeTakenOver(
     pageWithBghUser.getByLabel("Dokumentationseinheit löschen"),
   ).toBeVisible()
 }
-// Todo: Enable this test again, as soon as the handover inbox is ready
-// eslint-disable-next-line playwright/no-skipped-test
-test.describe.skip(
+
+test.describe(
   "Creation of new documentation units from periodical evaluation",
   {
     tag: ["@RISDEV-4562"],
@@ -735,9 +731,7 @@ test.describe.skip(
       },
     )
 
-    // Todo: Enable this test again, as soon as the handover inbox is ready
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
+    test(
       "Takeover and deletion of created documentation unit from foreign docoffice",
       {
         tag: ["@RISDEV-4833"],
@@ -887,6 +881,10 @@ test.describe.skip(
           await pageWithBghUser.locator('button:has-text("Löschen")').click()
 
           await expect(pageWithBghUser.getByRole("row")).toHaveCount(0)
+          const listEntry = pageWithBghUser.locator(
+            `tr[data-p-index="0"] >> text=${documentNumber2}`,
+          )
+          await expect(listEntry).toBeHidden()
 
           await page.reload()
           await expect(page.getByText(documentNumber2)).toBeHidden()

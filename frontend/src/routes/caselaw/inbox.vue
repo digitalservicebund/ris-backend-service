@@ -11,7 +11,7 @@ import PendingHandover from "@/components/pending-handover/PendingHandover.vue"
 <template>
   <Tabs class="m-32" value="2">
     <TabList>
-      <Tab value="0">Fremdanlagen</Tab>
+      <Tab data-testId="external-handover-tab" value="0">Fremdanlagen</Tab>
       <Tab value="1">EU-Rechtsprechung</Tab>
       <Tab value="2">EUR-Lex</Tab>
     </TabList>

@@ -34,6 +34,24 @@ export const navigateToSearch = async (
   })
 }
 
+export const navigateToInbox = async (
+  page: Page,
+  { navigationBy }: { navigationBy: "click" | "url" } = { navigationBy: "url" },
+) => {
+  await test.step("Navigate to 'Eingang'", async () => {
+    if (navigationBy === "url") {
+      await page.goto(`/caselaw/inbox`, { waitUntil: "domcontentloaded" })
+    } else {
+      await page.getByTestId("inbox-navbar-button").click()
+    }
+    await page.waitForURL("/caselaw/inbox")
+
+    await expect(page.getByText("Fremdanlagen")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
+  })
+}
+
 export const navigateToProcedures = async (
   page: Page,
   searchParam?: string,
