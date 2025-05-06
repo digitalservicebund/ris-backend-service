@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
@@ -228,6 +229,7 @@ public class DocumentationUnitController {
       @RequestParam(value = "withError") Optional<Boolean> withError,
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
       @RequestParam(value = "withDuplicateWarning") Optional<Boolean> withDuplicateWarning,
+      @RequestParam(value = "inboxStatus") Optional<InboxStatus> inboxStatus,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     return service.searchByDocumentationUnitSearchInput(
@@ -244,7 +246,8 @@ public class DocumentationUnitController {
         publicationStatus,
         withError,
         myDocOfficeOnly,
-        withDuplicateWarning);
+        withDuplicateWarning,
+        inboxStatus);
   }
 
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)

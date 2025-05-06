@@ -1,9 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -28,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -241,4 +245,9 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @OneToOne(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
   @PrimaryKeyJoinColumn
   private ManagementDataDTO managementData;
+
+  @Column(name = "inbox_status")
+  @Nullable
+  @Enumerated(EnumType.STRING)
+  private InboxStatus inboxStatus;
 }

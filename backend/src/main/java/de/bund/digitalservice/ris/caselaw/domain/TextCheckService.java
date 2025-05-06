@@ -323,15 +323,11 @@ public class TextCheckService {
 
   public List<Match> addIgnoredTextChecksIndividually(
       UUID documentationUnitId, List<Match> matches) {
-    if (documentationUnitId == null) {
+    if (documentationUnitId == null || matches == null || matches.isEmpty()) {
       return matches;
     }
 
     var words = matches.stream().map(Match::word).toList();
-
-    if (words.isEmpty()) {
-      return matches;
-    }
 
     List<IgnoredTextCheckWord> globalAndDocumentationUnitIgnoredWords =
         ignoredTextCheckWordRepository.findByDocumentationUnitIdOrByGlobalWords(

@@ -97,6 +97,11 @@ public class DocumentationUnitService {
       params = params.toBuilder().documentationOffice(userDocOffice).build();
     }
 
+    boolean isExternalHandover =
+        params.documentationOffice() != null
+            && userDocOffice != null
+            && !userDocOffice.uuid().equals(params.documentationOffice().uuid());
+
     DocumentationUnit docUnit =
         DocumentationUnit.builder()
             .version(0L)
@@ -108,28 +113,21 @@ public class DocumentationUnitService {
                     .documentType(params.documentType())
                     .decisionDate(params.decisionDate())
                     .court(params.court())
-                    .creatingDocOffice(
-                        params.documentationOffice() == null
-                                || userDocOffice == null
-                                || userDocOffice.uuid().equals(params.documentationOffice().uuid())
-                            ? null
-                            : userDocOffice)
+                    .creatingDocOffice(isExternalHandover ? userDocOffice : null)
                     .legalEffect(
                         LegalEffect.deriveFrom(params.court(), true)
                             .orElse(LegalEffect.NOT_SPECIFIED)
                             .getLabel())
                     .build())
+            .inboxStatus(isExternalHandover ? InboxStatus.EXTERNAL_HANDOVER : null)
             .build();
 
     Status status =
         Status.builder()
             .publicationStatus(
-                userDocOffice == null
-                        || userDocOffice
-                            .uuid()
-                            .equals(docUnit.coreData().documentationOffice().uuid())
-                    ? PublicationStatus.UNPUBLISHED
-                    : PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                isExternalHandover
+                    ? PublicationStatus.EXTERNAL_HANDOVER_PENDING
+                    : PublicationStatus.UNPUBLISHED)
             .withError(false)
             .build();
 
@@ -165,7 +163,8 @@ public class DocumentationUnitService {
       Optional<String> publicationStatus,
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly,
-      Optional<Boolean> withDuplicateWarning) {
+      Optional<Boolean> withDuplicateWarning,
+      Optional<InboxStatus> inboxStatus) {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
@@ -187,6 +186,7 @@ public class DocumentationUnitService {
                     : null)
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .withDuplicateWarning(withDuplicateWarning.orElse(false))
+            .inboxStatus(inboxStatus.orElse(null))
             .build();
 
     Slice<DocumentationUnitListItem> documentationUnitListItems =

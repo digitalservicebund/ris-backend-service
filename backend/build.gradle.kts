@@ -203,9 +203,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.61")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.63")
     // for local development:
-    //implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.60.jar"))
+//    implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.63.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.19.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
@@ -276,9 +276,9 @@ tasks {
         maxParallelForks = Runtime.getRuntime().availableProcessors().div(2)
     }
 
-    getByName<Test>("test") {
+    test {
         useJUnitPlatform {
-            excludeTags("integration", "manual")
+            excludeTags("integration")
         }
     }
 
@@ -287,18 +287,12 @@ tasks {
         group = "verification"
         useJUnitPlatform {
             includeTags("integration")
-            excludeTags("manual")
         }
 
-        // So that running integration test require running unit tests first,
-        // and we won"t even attempt running integration tests when there are
-        // failing unit tests.
-        dependsOn("test")
-        finalizedBy("jacocoTestReport")
     }
 
     check {
-        dependsOn("integrationTest")
+        dependsOn("test", "integrationTest")
     }
 
     jacocoTestReport {
@@ -312,7 +306,7 @@ tasks {
                 },
             ),
         )
-        dependsOn("integrationTest")
+        dependsOn("test", "integrationTest")
         reports {
             xml.required.set(true)
             html.required.set(true)
