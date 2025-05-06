@@ -453,7 +453,7 @@ jobs:
 
 
   e2e-tests:
-    if: ${{ github.ref == 'refs/heads/main' }}
+    #   if: ${{ github.ref == 'refs/heads/main' }}
     concurrency:
       group: deploy-staging
       cancel-in-progress: true
@@ -461,6 +461,16 @@ jobs:
     # We do not include the matrix directly, so that the concurrency group does not apply to each matrix job individually
     uses: ./.github/workflows/e2e_matrix.yml
     secrets: inherit
+
+  a11y-test:
+    #   if: ${{ github.ref == 'refs/heads/main' }}
+    name: Run a11y test
+    needs: [ deploy-staging ]
+    uses: ./.github/workflows/_playwright-test.yml
+    with:
+      project: a11y
+    secrets: inherit
+
 
   query-performance-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
