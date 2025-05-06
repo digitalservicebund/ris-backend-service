@@ -40,7 +40,6 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   deleteDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
-  takeOverDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
 
 dayjs.extend(dayjsUtc)

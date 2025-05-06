@@ -80,52 +80,52 @@ async function search() {
   isLoading.value = false
 }
 
-// /**
-//  * Deletes a documentation unit
-//  * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be removed
-//  */
-// async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
-//   if (currentPage.value?.content) {
-//     const response = await service.delete(documentUnitListEntry.uuid as string)
-//     if (response.status === 200) {
-//       if (currentPage.value.content.length === 1) {
-//         await search()
-//         return
-//       }
-//       const newEntries = currentPage.value.content.filter(
-//         (item) => item != documentUnitListEntry,
-//       )
-//       currentPage.value.content = newEntries
-//       currentPage.value.numberOfElements = newEntries.length
-//       currentPage.value.empty = newEntries.length == 0
-//     } else {
-//       alert("Fehler beim Löschen der Dokumentationseinheit: " + response.data)
-//     }
-//   }
-// }
+/**
+ * Deletes a documentation unit
+ * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be removed
+ */
+async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
+  if (currentPage.value?.content) {
+    const response = await service.delete(documentUnitListEntry.uuid as string)
+    if (response.status === 200) {
+      if (currentPage.value.content.length === 1) {
+        await search()
+        return
+      }
+      const newEntries = currentPage.value.content.filter(
+        (item) => item != documentUnitListEntry,
+      )
+      currentPage.value.content = newEntries
+      currentPage.value.numberOfElements = newEntries.length
+      currentPage.value.empty = newEntries.length == 0
+    } else {
+      alert("Fehler beim Löschen der Dokumentationseinheit: " + response.data)
+    }
+  }
+}
 
-// /**
-//  * Updates the status from 'Fremdanlage' to 'Unveröffentlicht'
-//  * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be updated
-//  */
-// async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
-//   const response = await service.takeOver(
-//     documentUnitListEntry.documentNumber as string,
-//   )
+/**
+ * Updates the status from 'Fremdanlage' to 'Unveröffentlicht'
+ * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be updated
+ */
+async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
+  const response = await service.takeOver(
+    documentUnitListEntry.documentNumber as string,
+  )
 
-//   if (response.error) {
-//     alert(response.error.title)
-//   } else if (currentPage.value?.content) {
-//     const index = currentPage.value.content.findIndex(
-//       (entry) => entry.uuid === documentUnitListEntry.uuid,
-//     )
+  if (response.error) {
+    alert(response.error.title)
+  } else if (currentPage.value?.content) {
+    const index = currentPage.value.content.findIndex(
+      (entry) => entry.uuid === documentUnitListEntry.uuid,
+    )
 
-//     if (index !== -1) {
-//       // Replace the old entry with the updated one
-//       currentPage.value.content[index] = response.data as DocumentUnitListEntry
-//     }
-//   }
-// }
+    if (index !== -1) {
+      // Replace the old entry with the updated one
+      currentPage.value.content[index] = response.data as DocumentUnitListEntry
+    }
+  }
+}
 
 /**
  * When using the navigation a new page number is set, the search is triggered,
@@ -171,6 +171,8 @@ onMounted(async () => {
     />
     <PendingHandoverList
       :page-entries="currentPage"
+      @delete-documentation-unit="handleDelete"
+      @take-over-documentation-unit="handleTakeOver"
       @update-page="updatePage"
     />
   </div>
