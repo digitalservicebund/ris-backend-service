@@ -1,0 +1,176 @@
+<script lang="ts" setup>
+import { computed, onMounted, ref } from "vue"
+import PendingHandoverList from "./PendingHandoverList.vue"
+import PendingHandoverSearch, {
+  DocumentUnitSearchParameter,
+} from "./PendingHandoverSearch.vue"
+import { Page } from "@/components/Pagination.vue"
+import { Query } from "@/composables/useQueryFromRoute"
+import { Court } from "@/domain/documentUnit"
+import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import comboboxItemService from "@/services/comboboxItemService"
+import service from "@/services/documentUnitService"
+
+const isLoading = ref(false)
+const pageNumber = ref<number>(0)
+const itemsPerPage = 100
+const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
+const currentPage = ref<Page<DocumentUnitListEntry>>()
+const searchResponseError = ref()
+const courtFilter = ref("")
+
+const courtFromQuery = ref<Court | undefined>()
+
+const isSearchCompletedWithNoResults = computed(
+  () =>
+    currentPage.value?.content != undefined &&
+    currentPage.value?.content.length === 0,
+)
+
+const { data: courts, execute: fetchCourts } =
+  comboboxItemService.getCourts(courtFilter)
+
+/**
+ * Searches all documentation units by given input and updates the local
+ * documentunit list entries, the currentPage for pagination and catches errors
+ * if they happen. When no results found, but a court was given, the court input
+ * is validated against the court table, in order to be able to create a new
+ * documentation unit from search the given search input, if the user wants to.
+ */
+async function search() {
+  isLoading.value = true
+
+  const response = await service.searchByDocumentUnitSearchInput({
+    ...(pageNumber.value != undefined
+      ? { pg: pageNumber.value.toString() }
+      : {}),
+    ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
+    ...searchQuery.value,
+    myDocOfficeOnly: "true",
+  })
+  if (response.data) {
+    currentPage.value = response.data
+    searchResponseError.value = undefined
+  }
+  if (response.error) {
+    searchResponseError.value = response.error
+  }
+
+  if (isSearchCompletedWithNoResults.value && searchQuery.value?.courtType) {
+    courtFilter.value =
+      searchQuery.value.courtType +
+      (searchQuery.value.courtLocation
+        ? ` ${searchQuery.value.courtLocation}`
+        : "")
+
+    await fetchCourts()
+
+    const courtResponse = courts.value
+
+    //filter for exact matches
+    const matches = courtResponse
+      ? courtResponse.filter((item) => item.label === courtFilter.value)
+      : []
+
+    // add as court query only if 1 exact match
+    courtFromQuery.value =
+      matches.length === 1 ? (matches[0].value as Court) : undefined
+  } else courtFromQuery.value = undefined
+  isLoading.value = false
+}
+
+// /**
+//  * Deletes a documentation unit
+//  * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be removed
+//  */
+// async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
+//   if (currentPage.value?.content) {
+//     const response = await service.delete(documentUnitListEntry.uuid as string)
+//     if (response.status === 200) {
+//       if (currentPage.value.content.length === 1) {
+//         await search()
+//         return
+//       }
+//       const newEntries = currentPage.value.content.filter(
+//         (item) => item != documentUnitListEntry,
+//       )
+//       currentPage.value.content = newEntries
+//       currentPage.value.numberOfElements = newEntries.length
+//       currentPage.value.empty = newEntries.length == 0
+//     } else {
+//       alert("Fehler beim Löschen der Dokumentationseinheit: " + response.data)
+//     }
+//   }
+// }
+
+// /**
+//  * Updates the status from 'Fremdanlage' to 'Unveröffentlicht'
+//  * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be updated
+//  */
+// async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
+//   const response = await service.takeOver(
+//     documentUnitListEntry.documentNumber as string,
+//   )
+
+//   if (response.error) {
+//     alert(response.error.title)
+//   } else if (currentPage.value?.content) {
+//     const index = currentPage.value.content.findIndex(
+//       (entry) => entry.uuid === documentUnitListEntry.uuid,
+//     )
+
+//     if (index !== -1) {
+//       // Replace the old entry with the updated one
+//       currentPage.value.content[index] = response.data as DocumentUnitListEntry
+//     }
+//   }
+// }
+
+/**
+ * When using the navigation a new page number is set, the search is triggered,
+ * with the given page number.
+ * @param {number} page - The page to be updated
+ */
+async function updatePage(page: number) {
+  pageNumber.value = page
+  await search()
+}
+
+/**
+ * The search form emits an event, when clicking the search button and is
+ * triggering the search with the updated query here.
+ * It will always reset the pagination to the first page.
+ * @param {Query<DocumentUnitSearchParameter>} value - The page to be updated
+ */
+async function updateQuery(value: Query<DocumentUnitSearchParameter>) {
+  searchQuery.value = value
+  pageNumber.value = 0
+  await search()
+}
+
+/**
+ * The search form emits an event, when resetting the search,
+ * which empties the document unit list and resets the pagination.
+ */
+async function handleReset() {
+  currentPage.value = undefined
+}
+
+onMounted(async () => {
+  await search()
+})
+</script>
+
+<template>
+  <div class="flex flex-col gap-24">
+    <PendingHandoverSearch
+      :is-loading="isLoading"
+      @reset-search-results="handleReset"
+      @search="updateQuery"
+    />
+    <PendingHandoverList
+      :page-entries="currentPage"
+      @update-page="updatePage"
+    />
+  </div>
+</template>
