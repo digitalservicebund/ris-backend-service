@@ -20,7 +20,7 @@ on:
 
 jobs:
   playwright-test:
-    name: ${{ inputs.project }}-playwright-test
+    name: ${{ inputs.project }} (${{ matrix.shardIndex }}-${{ matrix.shardTotal }})
     strategy:
       fail-fast: false
       matrix:
