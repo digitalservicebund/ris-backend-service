@@ -36,7 +36,10 @@ test.describe(
 
         await test.step("add jDV globally ignored word in headnote (Orientierungssatz)", async () => {
           await headNoteEditor.locator("div").fill("")
+          await expect(headNoteEditor.locator("div")).not.toBeEmpty()
+
           await headNoteEditor.locator("div").fill("VDberbglStPr") // this is ignored by jDV
+          await expect(headNoteEditor.locator("div")).toHaveText("VDberbglStPr")
         })
 
         await test.step("check text of headnote (Orientierungssatz)", async () => {
