@@ -163,7 +163,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-24">
+  <div class="flex flex-col gap-24" data-testId="pending-handover-inbox">
     <PendingHandoverSearch
       :is-loading="isLoading"
       @reset-search-results="handleReset"

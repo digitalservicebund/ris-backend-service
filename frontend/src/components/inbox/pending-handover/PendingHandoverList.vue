@@ -80,7 +80,7 @@ function toggleModal() {
 </script>
 
 <template>
-  <div>
+  <div data-testId="pending-handover-list">
     <PopupModal
       v-if="showModal"
       aria-label="Dokumentationseinheit löschen"
