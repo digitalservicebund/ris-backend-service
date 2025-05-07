@@ -1,11 +1,23 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.NoRepositoryBean;
 
-@Repository
-public interface EurLexResultRepository extends JpaRepository<EurLexResultDTO, UUID> {
+@NoRepositoryBean
+public interface EurLexResultRepository {
   Optional<EurLexResultDTO> findTopByOrderByCreatedAtDesc();
+
+  Page<EurLexResultDTO> findAllBySearchParameters(
+      Pageable pageable,
+      Optional<String> fileNumber,
+      Optional<String> celex,
+      Optional<String> court,
+      Optional<LocalDate> startDate,
+      Optional<LocalDate> endDate);
+
+  void saveAll(List<EurLexResultDTO> transformedList);
 }

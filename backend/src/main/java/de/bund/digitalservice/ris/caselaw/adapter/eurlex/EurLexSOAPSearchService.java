@@ -16,6 +16,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
@@ -60,31 +61,53 @@ public class EurLexSOAPSearchService implements SearchService {
    *
    * @param page - page number to filter the decisions. The entries per page are always 100. If the
    *     page parameter is null, the first page is requested.
+   * @param fileNumber
+   * @param celex
+   * @param court
+   * @param startDate
+   * @param endDate
    * @return a page object with the 100 entries of the page
    */
   @Override
-  public Page<SearchResult> getSearchResults(String page) {
-    int pageNumber = 1;
+  public Page<SearchResult> getSearchResults(
+      String page,
+      Optional<String> fileNumber,
+      Optional<String> celex,
+      Optional<String> court,
+      Optional<LocalDate> startDate,
+      Optional<LocalDate> endDate) {
+    int pageNumber = 0;
     if (page != null) {
       try {
-        pageNumber = Integer.parseInt(page) + 1;
+        pageNumber = Integer.parseInt(page);
       } catch (NumberFormatException ignored) {
       }
     }
 
     Optional<EurLexResultDTO> lastResult = repository.findTopByOrderByCreatedAtDesc();
 
+    LocalDate lastUpdate;
     if (lastResult.isEmpty()
         || lastResult.get().getCreatedAt().plus(1, ChronoUnit.DAYS).isBefore(Instant.now())) {
-      requestNewestDecisions(pageNumber);
+      if (lastResult.isPresent()) {
+        lastUpdate = lastResult.get().getPublicationDate();
+      } else {
+        lastUpdate = LocalDate.now().withDayOfMonth(1);
+        if (ChronoUnit.DAYS.between(lastUpdate, LocalDate.now()) < 5) {
+          lastUpdate = lastUpdate.minusMonths(1);
+        }
+      }
+
+      requestNewestDecisions(1, lastUpdate);
     }
 
     return repository
-        .findAll(PageRequest.of(pageNumber, PAGE_SIZE))
+        .findAllBySearchParameters(
+            PageRequest.of(pageNumber, PAGE_SIZE), fileNumber, celex, court, startDate, endDate)
         .map(EurLexSearchResultTransformer::transformDTOToDomain);
   }
 
-  private void requestNewestDecisions(int pageNumber) {
+  private void requestNewestDecisions(int pageNumber, LocalDate lastUpdate) {
     Element searchResults;
 
     try {
@@ -93,7 +116,7 @@ public class EurLexSOAPSearchService implements SearchService {
       HttpRequest request =
           HttpRequest.newBuilder()
               .uri(new URI("https://eur-lex.europa.eu/EURLexWebService?WSDL"))
-              .POST(BodyPublishers.ofString(generatePayload(pageNumber)))
+              .POST(BodyPublishers.ofString(generatePayload(pageNumber, lastUpdate)))
               .header("Content-Type", "application/soap+xml")
               .build();
 
@@ -105,17 +128,19 @@ public class EurLexSOAPSearchService implements SearchService {
       throw new EurLexSearchException(ex);
     }
 
-    Map<String, CourtDTO> courts = new HashMap<>();
-    courts.put("EuGH", courtRepository.findByType("EuGH"));
-    courts.put("EuG", courtRepository.findByType("EuG"));
-    List<EurLexResultDTO> transformedList =
-        EurLexSearchResultTransformer.transformXmlToDTO(searchResults, courts);
+    if (searchResults != null) {
+      Map<String, CourtDTO> courts = new HashMap<>();
+      courts.put("EuGH", courtRepository.findByType("EuGH"));
+      courts.put("EuG", courtRepository.findByType("EuG"));
+      List<EurLexResultDTO> transformedList =
+          EurLexSearchResultTransformer.transformXmlToDTO(searchResults, courts);
 
-    repository.saveAll(transformedList);
+      repository.saveAll(transformedList);
 
-    int totalNum = EurLexSearchResultTransformer.getTotalNum(searchResults);
-    if (totalNum > pageNumber * PAGE_SIZE) {
-      requestNewestDecisions(pageNumber + 1);
+      int totalNum = EurLexSearchResultTransformer.getTotalNum(searchResults);
+      if (totalNum > pageNumber * PAGE_SIZE) {
+        requestNewestDecisions(pageNumber + 1, lastUpdate);
+      }
     }
   }
 
@@ -141,7 +166,7 @@ public class EurLexSOAPSearchService implements SearchService {
     }
   }
 
-  private String generatePayload(int pageNumber) {
+  private String generatePayload(int pageNumber, LocalDate lastUpdate) {
     return "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:sear=\"http://eur-lex.europa.eu/search\">"
         + "<soap:Header>"
         + "<wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" soap:mustUnderstand=\"true\">"
@@ -158,7 +183,9 @@ public class EurLexSOAPSearchService implements SearchService {
         + "<soap:Body>"
         + "<sear:searchRequest>"
         + "<sear:expertQuery><![CDATA["
-        + "DTS_SUBDOM = EU_CASE_LAW AND PD >= 01/04/2025  <= 15/04/2025 AND CASE_LAW_SUMMARY = false"
+        + "DTS_SUBDOM = EU_CASE_LAW AND PD >= "
+        + lastUpdate
+        + " AND CASE_LAW_SUMMARY = false"
         + "]]></sear:expertQuery>"
         + "<sear:page>"
         + pageNumber
