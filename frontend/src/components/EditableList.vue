@@ -1,7 +1,7 @@
 <script lang="ts" setup generic="T extends ListItem">
 import Button from "primevue/button"
 import type { Component, Ref } from "vue"
-import { ref, watch, computed } from "vue"
+import { ref, watch, computed, nextTick, onBeforeUpdate } from "vue"
 import Tooltip from "./Tooltip.vue"
 import DefaultSummary from "@/components/DefaultSummary.vue"
 import { useScroll } from "@/composables/useScroll"
@@ -29,6 +29,7 @@ const editEntry = ref<T | undefined>() as Ref<T | undefined>
 const modelValueList = ref<T[]>([...props.modelValue]) as Ref<T[]>
 const localNewEntry = ref<T | undefined>() as Ref<T | undefined>
 const editableListContainer = ref(null)
+const focusAnchors = ref<HTMLElement[]>([])
 const { scrollNearestRefIntoViewport } = useScroll()
 
 /**
@@ -62,7 +63,7 @@ function isEditEntry(entry: T) {
  * Resetting the edit to undefined, to show all list items in summary mode
  */
 async function cancelEdit() {
-  toggleNewEntry(false)
+  await toggleNewEntry(false)
   await scrollNearestRefIntoViewport(editableListContainer)
 }
 
@@ -87,7 +88,7 @@ async function removeEntry(entry: T) {
  */
 async function updateModel() {
   emit("update:modelValue", mergedValues.value)
-  toggleNewEntry(true)
+  await toggleNewEntry(true)
   await scrollNearestRefIntoViewport(editableListContainer)
 }
 
@@ -96,10 +97,21 @@ async function handleAddFromSummary(newEntry: T) {
   setEditEntry(newEntry)
 }
 
-function toggleNewEntry(shouldDisplay: boolean) {
+async function resetFocus() {
+  await nextTick()
+  const index = mergedValues.value.findIndex(
+    (item) => item.id === localNewEntry.value?.id,
+  )
+  if (index !== -1 && focusAnchors.value[index - 1]) {
+    focusAnchors.value[index - 1].focus()
+  }
+}
+
+async function toggleNewEntry(shouldDisplay: boolean) {
   if (shouldDisplay) {
     localNewEntry.value = props.createEntry()
     setEditEntry(localNewEntry.value)
+    await resetFocus()
   } else {
     localNewEntry.value = undefined
     setEditEntry()
@@ -133,7 +145,7 @@ watch(
   () => modelValueList,
   async () => {
     if (modelValueList.value.length == 0 && !localNewEntry.value) {
-      toggleNewEntry(true)
+      await toggleNewEntry(true)
     }
   },
   {
@@ -141,7 +153,10 @@ watch(
     deep: true,
   },
 )
-
+// Clear the refs before each DOM update to prevent stale references
+onBeforeUpdate(() => {
+  focusAnchors.value = []
+})
 // Expose the method
 defineExpose({
   toggleNewEntry,
@@ -194,9 +209,19 @@ defineExpose({
           ></Button>
         </Tooltip>
       </div>
+      <!-- ↓↓↓ Helper: hidden focussed HTMLElement to be able to set focus into EditComponent on next tab -->
+      <div
+        :ref="
+          (el) => {
+            if (el) focusAnchors[index] = el as HTMLElement
+          }
+        "
+        class="sr-only absolute h-0 w-0 overflow-hidden"
+        tabindex="-1"
+      />
       <component
         :is="editComponent"
-        v-else
+        v-if="isEditEntry(entry)"
         v-model="mergedValues[index]"
         class="py-24"
         :class="{ 'pt-0': index == 0 }"
