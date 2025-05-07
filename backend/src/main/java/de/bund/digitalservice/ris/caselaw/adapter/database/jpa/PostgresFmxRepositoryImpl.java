@@ -19,19 +19,22 @@ public class PostgresFmxRepositoryImpl implements FmxRepository {
 
     return dbRepository
         .findByDocumentationUnitId(documentationUnitUuid)
-        .filter(originalXmlDTO -> OriginalXmlDTO.Type.JURIS.equals(originalXmlDTO.type))
+        .filter(originalXmlDTO -> OriginalXmlDTO.Type.FMX.equals(originalXmlDTO.type))
         .map(OriginalXmlDTO::getContent)
         .orElse(null);
   }
 
   @Override
-  public void attachFmxToDocumentationUnit(UUID documentationUnitUuid, String content) {
+  public void attachFmxToDocumentationUnit(
+      UUID documentationUnitUuid, String content, String source) {
     var originalXml =
         OriginalXmlDTO.builder()
             .type(OriginalXmlDTO.Type.FMX)
             .content(content)
+            .source(source)
             .documentationUnitId(documentationUnitUuid)
             .createdAt(Instant.now())
+            .updatedAt(Instant.now())
             .build();
     dbRepository.save(originalXml);
   }

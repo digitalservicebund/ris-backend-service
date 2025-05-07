@@ -43,6 +43,8 @@ public class OriginalXmlDTO {
 
   @Column @NotBlank private String content;
 
+  @Column private String source;
+
   public enum Type {
     JURIS,
     FMX,

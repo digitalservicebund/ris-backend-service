@@ -4,7 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpa
 
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
-import de.bund.digitalservice.ris.caselaw.adapter.FmxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -37,7 +37,7 @@ public class DocumentationUnitService {
   private final DocumentNumberService documentNumberService;
   private final DocumentationUnitStatusService statusService;
   private final AttachmentService attachmentService;
-  private final FmxConverterService fmxConverterService;
+  private final FmxService fmxService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
   private final AuthService authService;
@@ -64,7 +64,7 @@ public class DocumentationUnitService {
       UserService userService,
       Validator validator,
       AttachmentService attachmentService,
-      FmxConverterService fmxConverterService,
+      FmxService fmxService,
       @Lazy AuthService authService,
       PatchMapperService patchMapperService,
       DuplicateCheckService duplicateCheckService) {
@@ -75,7 +75,7 @@ public class DocumentationUnitService {
     this.userService = userService;
     this.validator = validator;
     this.attachmentService = attachmentService;
-    this.fmxConverterService = fmxConverterService;
+    this.fmxService = fmxService;
     this.patchMapperService = patchMapperService;
     this.statusService = statusService;
     this.authService = authService;
@@ -134,9 +134,9 @@ public class DocumentationUnitService {
     var newDocumentationUnit =
         repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
 
-    if (params.celexNumber() != null && !params.celexNumber().isBlank()) {
-      fmxConverterService.getDataFromEurlex(params.celexNumber(), newDocumentationUnit);
-    }
+    fmxService.getDataFromEurlex(
+        "67474f27-bded-11ef-91ed-01aa75ed71a1.0001.03", newDocumentationUnit);
+    if (params.celexNumber() != null && !params.celexNumber().isBlank()) {}
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
     return newDocumentationUnit;
   }

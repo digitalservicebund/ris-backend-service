@@ -15,7 +15,7 @@ interface AttachmentService {
 
   getAttachmentAsHtml(
     uuid: string,
-    s3path: string,
+    s3path: string | undefined,
     format: string,
   ): Promise<ServiceResponse<Docx2HTML>>
 }

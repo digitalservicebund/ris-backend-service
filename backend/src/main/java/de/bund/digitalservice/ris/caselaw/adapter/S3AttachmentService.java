@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -113,6 +114,7 @@ public class S3AttachmentService implements AttachmentService {
   public void deleteAllObjectsFromBucketForDocumentationUnit(UUID uuid) {
     repository.findAllByDocumentationUnitId(uuid).stream()
         .map(AttachmentDTO::getS3ObjectPath)
+        .filter(Objects::nonNull)
         .forEach(this::deleteObjectFromBucket);
   }
 
