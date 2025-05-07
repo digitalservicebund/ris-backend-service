@@ -59,6 +59,8 @@ test.describe(
           await expect(page.getByLabel("Termin setzen")).toBeEnabled()
           await page.getByLabel("Termin setzen").click()
 
+          // When the save request is finished, the delete button will appear
+          await expect(page.getByLabel("Termin löschen")).toBeEnabled()
           await expect(page.getByLabel("Terminiertes Datum")).not.toBeEditable()
           await expect(
             page.getByLabel("Terminierte Uhrzeit"),
@@ -140,6 +142,8 @@ test.describe(
           await page.getByLabel("Terminiertes Datum").fill("31.12.2080")
           await page.getByLabel("Terminierte Uhrzeit").fill("13:14")
           await page.getByLabel("Termin setzen").click()
+          // When the save request is finished, the delete button will appear
+          await expect(page.getByLabel("Termin löschen")).toBeEnabled()
         })
 
         await navigateToSearch(page)

@@ -87,8 +87,10 @@ const isValidDateTime = computed<boolean>(
 
 const docUnitSaveError = ref<ResponseError | null>(null)
 
+const isSaving = ref(false)
 const saveScheduling = async () => {
   docUnitSaveError.value = null
+  isSaving.value = true
   if (dateValidationError.value || !isDateValid.value || !isTimeValid.value) {
     // This is needed as the DateInput does not update its modelValue when the date is incomplete.
     // First input correct date "01.01.2080", then delete last char "01.01.208". Without blurring input, click on button.
@@ -102,6 +104,7 @@ const saveScheduling = async () => {
     sessionStore.user?.email
 
   const { error } = await documentUnitStore.updateDocumentUnit()
+  isSaving.value = false
 
   if (error) {
     storedScheduledPublicationDateTime.value = undefined
@@ -116,12 +119,14 @@ const saveScheduling = async () => {
 }
 
 const removeScheduling = async () => {
+  isSaving.value = true
   docUnitSaveError.value = null
   const previousDate = storedScheduledPublicationDateTime.value
   storedScheduledPublicationDateTime.value = undefined
   documentUnitStore.documentUnit!.managementData.scheduledByEmail = undefined
 
   const { error } = await documentUnitStore.updateDocumentUnit()
+  isSaving.value = false
 
   if (error) {
     storedScheduledPublicationDateTime.value = previousDate
@@ -163,19 +168,22 @@ const dateValidationError = ref<ValidationError | undefined>()
         ></InputMask>
       </InputField>
       <Button
-        v-if="!isScheduled"
+        v-if="(!isScheduled && !isSaving) || (isScheduled && isSaving)"
         aria-label="Termin setzen"
         class="w-fit"
-        :disabled="!isPublishable || !isValidDateTime"
+        :disabled="!isPublishable || !isValidDateTime || isSaving"
         label="Termin&nbsp;setzen"
+        :loading="isSaving"
         size="small"
         @click="saveScheduling"
       ></Button>
       <Button
-        v-if="isScheduled"
+        v-if="(isScheduled && !isSaving) || (!isScheduled && isSaving)"
         aria-label="Termin löschen"
         class="w-fit shrink-0"
+        :disabled="isSaving"
         label="Termin&nbsp;löschen"
+        :loading="isSaving"
         severity="danger"
         size="small"
         @click="removeScheduling"
