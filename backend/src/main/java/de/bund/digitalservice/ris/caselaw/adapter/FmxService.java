@@ -88,7 +88,7 @@ public class FmxService {
     this.attachmentRepository = attachmentRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
 
-    fmxToHtml = xmlUtilService.getTemplates("caselawhandover/fmxToHtml.xslt");
+    fmxToHtml = xmlUtilService.getTemplates("xml/fmxToHtml.xslt");
     xPath = XPathFactory.newInstance().newXPath();
   }
 
