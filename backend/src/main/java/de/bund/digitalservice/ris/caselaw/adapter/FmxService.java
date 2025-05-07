@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -113,14 +114,12 @@ public class FmxService {
 
       ZipEntry entry;
       while ((entry = zipInputStream.getNextEntry()) != null) {
-        log.info("Reading zip entry: {}", entry.getName());
         if (entry.getName().endsWith(".xml")) {
           fmxFileContent = new String(zipInputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
       }
     } catch (IOException | InterruptedException | URISyntaxException ex) {
-      log.error("Downloading FMX file from Eurlex Database failed.", ex);
-      throw new RuntimeException(ex);
+      throw new FmxTransformationException("Downloading FMX file from Eurlex Database failed.", ex);
     }
 
     if (fmxFileContent != null && !fmxFileContent.isBlank()) {
@@ -146,23 +145,13 @@ public class FmxService {
     attachmentRepository.save(attachmentDTO);
   }
 
-  public void extractMetaDataFromFmx(String fmxContent, DocumentationUnit documentationUnit) {
-
-    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+  public void extractMetaDataFromFmx(String fileContent, DocumentationUnit documentationUnit) {
+    if (fileContent == null || fileContent.isBlank()) {
+      throw new FmxTransformationException("FMX file has no content.");
+    }
+    xsltTransformer = initialiseXsltTransformer();
     try {
-      factory.setIgnoringComments(true);
-      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-
-      xsltTransformer = fmxToHtml.newTransformer();
-
-      if (fmxContent == null || fmxContent.isBlank()) {
-        return;
-      }
-
-      final DocumentBuilder builder = factory.newDocumentBuilder();
-      final Document doc = builder.parse(new ByteArrayInputStream(fmxContent.getBytes()));
-      doc.getDocumentElement().normalize();
-
+      final Document doc = parseFmx(fileContent);
       String fileNumber = xPath.compile(FILE_NUMBER_XPATH).evaluate(doc);
       String ecli = xPath.compile(ECLI_XPATH).evaluate(doc);
       String celex = xPath.compile(CELEX_XPATH).evaluate(doc);
@@ -194,12 +183,39 @@ public class FmxService {
           documentationUnit.toBuilder().coreData(coreData).longTexts(longTexts).build();
 
       documentationUnitRepository.save(updatedDocumentationUnit);
-    } catch (ParserConfigurationException
-        | IOException
-        | SAXException
-        | XPathExpressionException
-        | TransformerConfigurationException ignored) {
-      // log
+    } catch (XPathExpressionException exception) {
+      throw new FmxTransformationException("Failed to extract data from FMX file.", exception);
+    }
+  }
+
+  private Transformer initialiseXsltTransformer() {
+    try {
+      return fmxToHtml.newTransformer();
+    } catch (TransformerConfigurationException e) {
+      throw new FmxTransformationException("Failed to initialise XSLT transformer.", e);
+    }
+  }
+
+  private DocumentBuilder initialiseDocumentBuilder() {
+    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    try {
+      factory.setIgnoringComments(true);
+      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      return factory.newDocumentBuilder();
+    } catch (ParserConfigurationException e) {
+      throw new FmxTransformationException("Failed to initialise document builder.", e);
+    }
+  }
+
+  private Document parseFmx(String fmxFileContent) {
+    try {
+      final DocumentBuilder builder = initialiseDocumentBuilder();
+      final Document doc;
+      doc = builder.parse(new ByteArrayInputStream(fmxFileContent.getBytes()));
+      doc.getDocumentElement().normalize();
+      return doc;
+    } catch (SAXException | IOException e) {
+      throw new FmxTransformationException("Failed to parse FMX file content.", e);
     }
   }
 
@@ -223,7 +239,6 @@ public class FmxService {
     try {
       StringWriter xsltOutput = new StringWriter();
       xsltTransformer.transform(new DOMSource(textNode), new StreamResult(xsltOutput));
-      log.info(xsltOutput.toString());
       return xsltOutput.toString();
     } catch (TransformerException e) {
       log.error("Xslt transformation error.", e);
