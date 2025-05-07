@@ -423,7 +423,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@dd4524afd480a43ead9543a08be1c5004ee8b0a7
+      - uses: chainguard-dev/actions/setup-gitsign@9c0be1ee0103db886d1887d114ec97f8766b7ef8
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -458,8 +458,8 @@ jobs:
       group: deploy-staging
       cancel-in-progress: true
     needs: [ deploy-staging ]
-    # We do not include the matrix directly, so that the concurrency group does not apply to each matrix job individually
-    uses: ./.github/workflows/e2e_matrix.yml
+    # We do not include the matrix directly so that the concurrency group does not apply to each matrix job individually
+    uses: ./.github/workflows/e2e-tests.yml
     secrets: inherit
 
   query-performance-tests:
@@ -574,7 +574,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@dd4524afd480a43ead9543a08be1c5004ee8b0a7
+      - uses: chainguard-dev/actions/setup-gitsign@9c0be1ee0103db886d1887d114ec97f8766b7ef8
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -616,7 +616,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@dd4524afd480a43ead9543a08be1c5004ee8b0a7
+      - uses: chainguard-dev/actions/setup-gitsign@9c0be1ee0103db886d1887d114ec97f8766b7ef8
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -702,6 +702,7 @@ jobs:
           path: latest.mmd
 
   generate-backend-code-documentation:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
