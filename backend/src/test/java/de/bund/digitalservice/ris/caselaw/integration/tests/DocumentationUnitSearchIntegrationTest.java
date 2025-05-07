@@ -28,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumb
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
@@ -37,10 +38,12 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
@@ -84,7 +87,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       OAuthService.class,
       TestConfig.class,
       DocumentNumberPatternConfig.class,
-      KeycloakUserService.class
+      KeycloakUserService.class,
+      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
+      DocumentationUnitHistoryLogService.class
     },
     controllers = {DocumentationUnitController.class, ProcedureController.class})
 class DocumentationUnitSearchIntegrationTest {
@@ -175,6 +180,78 @@ class DocumentationUnitSearchIntegrationTest {
                 "AkteY",
                 Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build()));
     assertThat(responseBody.getNumberOfElements()).isEqualTo(2);
+  }
+
+  @Test
+  void shouldFilterByInboxStatus() {
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .documentNumber("ABCD202200001")
+            .documentationOffice(docOfficeDTO)
+            .inboxStatus(null));
+
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .documentNumber("ABCD202200002")
+            .documentationOffice(docOfficeDTO)
+            .inboxStatus(InboxStatus.EU));
+
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .documentNumber("ABCD202200003")
+            .documentationOffice(docOfficeDTO)
+            .inboxStatus(InboxStatus.EXTERNAL_HANDOVER));
+
+    Slice<DocumentationUnitListItem> responseBodyWithoutFilter =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=5")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(responseBodyWithoutFilter.getNumberOfElements()).isEqualTo(3);
+    assertThat(responseBodyWithoutFilter)
+        .map(DocumentationUnitListItem::documentNumber)
+        .containsExactly("ABCD202200001", "ABCD202200002", "ABCD202200003");
+
+    Slice<DocumentationUnitListItem> responseBodyWithEUFilter =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=5&inboxStatus=EU")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(responseBodyWithEUFilter.getNumberOfElements()).isEqualTo(1);
+    assertThat(responseBodyWithEUFilter)
+        .map(DocumentationUnitListItem::documentNumber)
+        .containsExactly("ABCD202200002");
+
+    Slice<DocumentationUnitListItem> responseBodyWithExternalHandoverFilter =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=5&inboxStatus=EXTERNAL_HANDOVER")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(responseBodyWithExternalHandoverFilter.getNumberOfElements()).isEqualTo(1);
+    assertThat(responseBodyWithExternalHandoverFilter)
+        .map(DocumentationUnitListItem::documentNumber)
+        .containsExactly("ABCD202200003");
   }
 
   @Test

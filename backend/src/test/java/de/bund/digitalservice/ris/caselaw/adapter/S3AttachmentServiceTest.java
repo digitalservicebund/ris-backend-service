@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -59,6 +60,7 @@ class S3AttachmentServiceTest {
   @MockitoSpyBean S3AttachmentService service;
 
   @MockitoBean AttachmentRepository repository;
+  @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
 
   @MockitoBean
   @Qualifier("docxS3Client")

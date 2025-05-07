@@ -497,4 +497,47 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       })
     },
   )
+  // Due to unhandled performance issues
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
+    "handover shows text check mistakes",
+    {
+      tag: ["@RISDEV-254", "@RISDEV-6245"],
+    },
+    async ({ page, prefilledDocumentUnit, request }) => {
+      await test.step("Befülle Langtexte und Kurztexte mit texts", async () => {
+        const text = "<p>das wort hat einen Flerher</p>"
+
+        const documentationUnit = {
+          ...prefilledDocumentUnit,
+          shortTexts: {
+            headline: text,
+            guidingPrinciple: text,
+            headnote: text,
+            otherHeadnote: text,
+          },
+          longTexts: {
+            tenor: text,
+            caseFacts: text,
+            decisionReasons: text,
+            otherLongText: text,
+            dissentingOpinion: text,
+          },
+        } as DocumentUnit
+        await updateDocumentationUnit(page, documentationUnit, request)
+      })
+
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+
+      await test.step("Validate errors are counted", async () => {
+        const handover = page.getByLabel("Rechtschreibprüfung")
+
+        await expect(handover.getByLabel("Ladestatus"), {}).toBeHidden()
+
+        await expect(
+          page.getByText("Es wurden Rechtschreibfehler identifiziert:"),
+        ).toBeVisible()
+      })
+    },
+  )
 })

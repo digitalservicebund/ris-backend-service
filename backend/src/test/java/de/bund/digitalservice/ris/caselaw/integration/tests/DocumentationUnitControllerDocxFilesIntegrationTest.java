@@ -36,21 +36,28 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -113,6 +120,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
       PostgresCourtRepositoryImpl.class,
       PostgresDocumentTypeRepositoryImpl.class,
       KeycloakUserService.class,
+      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
+      DocumentationUnitHistoryLogService.class
     },
     controllers = {DocumentationUnitController.class})
 @Sql(scripts = {"classpath:doc_office_init.sql"})
@@ -144,6 +153,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   @Autowired private DocumentTypeRepository documentTypeRepository;
   @MockitoSpyBean private DocumentationUnitDocxMetadataInitializationService service;
   @Autowired private DocumentationUnitService documentationUnitService;
+  @Autowired private DocumentationUnitHistoryLogService historyLogService;
 
   @MockitoBean
   @Qualifier("docxS3Client")
@@ -202,6 +212,16 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     var savedAttachment = attachmentRepository.findAllByDocumentationUnitId(dto.getId()).get(0);
     assertThat(savedAttachment.getUploadTimestamp()).isInstanceOf(Instant.class);
     assertThat(savedAttachment.getId()).isInstanceOf(UUID.class);
+
+    DocumentationOffice docOffice = DocumentationOfficeTransformer.transformToDomain(dsDocOffice);
+    User user = User.builder().documentationOffice(docOffice).build();
+    var logs = historyLogService.getHistoryLogs(dto.getId(), user);
+    assertThat(logs).hasSize(2);
+    assertThat(logs)
+        .map(HistoryLog::eventType)
+        .containsExactly(HistoryLogEventType.UPDATE, HistoryLogEventType.FILES);
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser");
+    assertThat(logs.get(1).description()).isEqualTo("Word-Dokument hinzugefügt");
   }
 
   @Test
@@ -522,6 +542,14 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
     assertThat(managementData.lastUpdatedAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
+
+    DocumentationOffice docOffice = DocumentationOfficeTransformer.transformToDomain(dsDocOffice);
+    User user = User.builder().documentationOffice(docOffice).build();
+    var logs = historyLogService.getHistoryLogs(dto.getId(), user);
+    assertThat(logs).hasSize(1);
+    assertThat(logs.getFirst().eventType()).isEqualTo(HistoryLogEventType.FILES);
+    assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");
+    assertThat(logs.getFirst().description()).isEqualTo("Word-Dokument gelöscht");
   }
 
   @Test

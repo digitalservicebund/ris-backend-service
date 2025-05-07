@@ -37,6 +37,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelation
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
@@ -53,6 +54,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
@@ -115,7 +117,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       OAuthService.class,
       TestConfig.class,
       DocumentNumberPatternConfig.class,
-      KeycloakUserService.class
+      KeycloakUserService.class,
+      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
+      DocumentationUnitHistoryLogService.class
     },
     controllers = {DocumentationUnitController.class})
 @Sql(scripts = {"classpath:courts_init.sql", "classpath:document_types.sql"})

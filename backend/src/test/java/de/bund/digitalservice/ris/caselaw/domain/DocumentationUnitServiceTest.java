@@ -72,6 +72,7 @@ class DocumentationUnitServiceTest {
   @MockitoBean private AuthService authService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean UserService userService;
+  @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
@@ -159,6 +160,7 @@ class DocumentationUnitServiceTest {
             DocumentationUnit.builder()
                 .version(0L)
                 .documentNumber("nextDocumentNumber")
+                .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
                 .coreData(
                     CoreData.builder()
                         .creatingDocOffice(userDocumentationOffice)
@@ -423,6 +425,7 @@ class DocumentationUnitServiceTest {
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
+        Optional.empty(),
         Optional.empty());
     verify(repository)
         .searchByDocumentationUnitSearchInput(pageRequest, oidcUser, documentationUnitSearchInput);
@@ -449,6 +452,7 @@ class DocumentationUnitServiceTest {
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courttype\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courtlocation\u180Ewith\u2060spaces"),
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),

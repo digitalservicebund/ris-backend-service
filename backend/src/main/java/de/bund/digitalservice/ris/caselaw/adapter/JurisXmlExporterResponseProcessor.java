@@ -252,12 +252,12 @@ public class JurisXmlExporterResponseProcessor {
       if (lastStatus == null) {
         return;
       }
-      statusService.update(
-          messageWrapper.getIdentifier(),
+      Status status =
           Status.builder()
               .publicationStatus(lastStatus)
               .withError(messageWrapper.hasErrors() || !messageWrapper.isPublished().orElse(true))
-              .build());
+              .build();
+      statusService.update(messageWrapper.getIdentifier(), status, null);
     } catch (Exception e) {
       throw new StatusImporterException("Could not update publicationStatus", e);
     }

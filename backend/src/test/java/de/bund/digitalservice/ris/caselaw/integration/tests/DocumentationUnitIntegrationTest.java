@@ -6,6 +6,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLIS
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -49,10 +50,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -66,6 +69,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -73,6 +78,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
@@ -86,6 +92,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -96,6 +103,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +144,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       OAuthService.class,
       TestConfig.class,
       DocumentNumberPatternConfig.class,
-      KeycloakUserService.class
+      KeycloakUserService.class,
+      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
+      DocumentationUnitHistoryLogService.class
     },
     controllers = {DocumentationUnitController.class})
 @Sql(scripts = {"classpath:courts_init.sql"})
@@ -172,6 +182,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private AuthService authService;
   @Autowired private HandoverService handoverService;
   @Autowired private DocumentationUnitStatusService documentationUnitStatusService;
+  @Autowired private DocumentationUnitHistoryLogRepository historyLogRepository;
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
   @MockitoBean private DocxConverterService docxConverterService;
@@ -233,6 +244,16 @@ class DocumentationUnitIntegrationTest {
 
     List<DocumentationUnitDTO> list = repository.findAll();
     assertThat(list).hasSize(1);
+
+    User user = User.builder().documentationOffice(docOffice).build();
+    var historyLogs = historyLogRepository.findByDocumentationUnitId(list.getFirst().getId(), user);
+    assertThat(historyLogs).hasSize(1);
+    assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.CREATE);
+    assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
+    assertThat(historyLogs.getFirst().description()).isEqualTo("Dokeinheit angelegt");
+    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
+    assertThat(historyLogs.getFirst().createdAt())
+        .isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
   }
 
   @Test
@@ -1392,7 +1413,7 @@ class DocumentationUnitIntegrationTest {
             .publicationStatus(PublicationStatus.PUBLISHED)
             .createdAt(Instant.now())
             .build();
-    documentationUnitStatusService.update(createdDocUnit.documentNumber(), status);
+    documentationUnitStatusService.update(createdDocUnit.documentNumber(), status, null);
 
     var docUnitForDifferentDocOffice =
         risWebTestClient
@@ -1466,13 +1487,16 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  void testTakeOverDocumentationUnit_setsStatusAndPermissionsCorrectly() {
+  void testTakeOverDocumentationUnit_setsStatusAndPermissionsCorrectlyAndCreatesHistoryLog() {
     DocumentationOfficeDTO creatingDocumentationOffice =
         documentationOfficeRepository.findByAbbreviation("BGH");
     String documentNumber = "1234567890123";
 
-    EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
-        repository, documentationOffice, creatingDocumentationOffice, documentNumber);
+    var ds = documentationOfficeRepository.findByAbbreviation("DS");
+
+    var pendingDocUnit =
+        EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
+            repository, documentationOffice, creatingDocumentationOffice, documentNumber);
 
     risWebTestClient
         .withDefaultLogin()
@@ -1490,5 +1514,20 @@ class DocumentationUnitIntegrationTest {
               assertThat(response.getResponseBody().isDeletable()).isTrue();
               assertThat(response.getResponseBody().isEditable()).isTrue();
             });
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitId(
+            pendingDocUnit.getId(),
+            User.builder()
+                .documentationOffice(DocumentationOfficeTransformer.transformToDomain(ds))
+                .build());
+    assertThat(historyLogs).hasSize(1);
+    assertThat(historyLogs.getFirst().createdAt())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
+    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
+    assertThat(historyLogs.getFirst().description())
+        .isEqualTo("Status geändert: Fremdanlage → Unveröffentlicht");
+    assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.STATUS);
   }
 }

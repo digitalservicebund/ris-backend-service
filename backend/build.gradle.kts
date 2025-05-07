@@ -11,7 +11,7 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.4.4"
+    id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.0.3"
     id("org.sonarqube") version "6.1.0.5360"
@@ -20,8 +20,8 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.7.2"
-    id("io.sentry.jvm.gradle") version "5.3.0"
+    id("org.flywaydb.flyway") version "11.8.0"
+    id("io.sentry.jvm.gradle") version "5.4.0"
 }
 
 group = "de.bund.digitalservice"
@@ -147,7 +147,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.20.6"
+    val testContainersVersion = "1.21.0"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -205,11 +205,12 @@ dependencies {
 
     implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.63")
     // for local development:
-    //implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.59.jar"))
+//    implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.63.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.18.3")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.3")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.19.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.0")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
@@ -220,18 +221,18 @@ dependencies {
 
     implementation("io.getunleash:unleash-client-java:9.3.2")
     implementation("org.apache.commons:commons-text:1.13.1")
-    implementation("org.jsoup:jsoup:1.19.1")
+    implementation("org.jsoup:jsoup:1.20.1")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.4.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.4.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.5.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.5.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.11.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.7.2"
+    val flywayCore = "org.flywaydb:flyway-core:11.8.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.7.2")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.8.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -275,9 +276,9 @@ tasks {
         maxParallelForks = Runtime.getRuntime().availableProcessors().div(2)
     }
 
-    getByName<Test>("test") {
+    test {
         useJUnitPlatform {
-            excludeTags("integration", "manual")
+            excludeTags("integration")
         }
     }
 
@@ -286,18 +287,12 @@ tasks {
         group = "verification"
         useJUnitPlatform {
             includeTags("integration")
-            excludeTags("manual")
         }
 
-        // So that running integration test require running unit tests first,
-        // and we won"t even attempt running integration tests when there are
-        // failing unit tests.
-        dependsOn("test")
-        finalizedBy("jacocoTestReport")
     }
 
     check {
-        dependsOn("integrationTest")
+        dependsOn("test", "integrationTest")
     }
 
     jacocoTestReport {
@@ -311,7 +306,7 @@ tasks {
                 },
             ),
         )
-        dependsOn("integrationTest")
+        dependsOn("test", "integrationTest")
         reports {
             xml.required.set(true)
             html.required.set(true)

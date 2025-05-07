@@ -55,7 +55,8 @@ public class ScheduledPublicationService {
   private void handoverDocument(DocumentationUnit docUnit) {
     try {
       String email = docUnit.managementData().scheduledByEmail();
-      var result = this.handoverService.handoverDocumentationUnitAsMail(docUnit.uuid(), email);
+      var result =
+          this.handoverService.handoverDocumentationUnitAsMail(docUnit.uuid(), email, null);
       if (!result.isSuccess()) {
         throw new HandoverException(String.join(", ", result.statusMessages()));
       }

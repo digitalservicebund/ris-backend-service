@@ -31,11 +31,11 @@ text-check {
     }
   }
 
-  &[type="ignored"] {
-    border-bottom: 2px solid #01854a;
+  &[ignored="true"] {
+    border-bottom: 2px solid #26a7f2;
 
     &:hover {
-      background: rgba($color: #01854a, $alpha: 20%) !important;
+      background: rgba($color: #26a7f2, $alpha: 20%) !important;
     }
   }
 }

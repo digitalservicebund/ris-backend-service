@@ -1,8 +1,21 @@
-import { Match, Suggestion } from "@/types/textCheck"
+import {
+  DocumentationType,
+  IgnoredTextCheckWord,
+  Match,
+  Suggestion,
+} from "@/types/textCheck"
 
-const matches: Match[] = [
-  {
-    id: 1,
+function generateIgnoredWord(type: DocumentationType): IgnoredTextCheckWord {
+  return {
+    id: "0dd15ae7-bece-4133-9eb3-e01563a39102",
+    type: type,
+    word: "Rechtshcreibfehler",
+  } as IgnoredTextCheckWord
+}
+
+function generateMatch(id?: number): Match {
+  return {
+    id: id ?? 1,
     word: "Rechtshcreibfehler",
     message: "Möglicher Tippfehler gefunden.",
     shortMessage: "Rechtschreibfehler",
@@ -35,7 +48,11 @@ const matches: Match[] = [
     },
     ignoreForIncompleteSentence: false,
     contextForSureMatch: 0,
-  },
+    ignoredTextCheckWords: [],
+  }
+}
+
+const matches: Match[] = [
   {
     id: 4,
     word: "Rechtshcreibfehler",
@@ -79,4 +96,4 @@ const suggestions: Suggestion[] = [
   },
 ]
 
-export { suggestions, matches }
+export { suggestions, matches, generateMatch, generateIgnoredWord }

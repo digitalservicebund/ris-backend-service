@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
@@ -160,7 +161,7 @@ public class DocumentationUnitController {
             .s3path();
     try {
       var attachment2Html = converterService.getConvertedObject(attachmentPath);
-      initializeCoreDataAndCheckDuplicates(uuid, attachment2Html);
+      initializeCoreDataAndCheckDuplicates(uuid, attachment2Html, userService.getUser(oidcUser));
       return ResponseEntity.status(HttpStatus.OK).body(attachment2Html);
 
     } catch (Exception e) {
@@ -169,12 +170,13 @@ public class DocumentationUnitController {
     }
   }
 
-  private void initializeCoreDataAndCheckDuplicates(UUID uuid, Attachment2Html attachment2Html) {
+  private void initializeCoreDataAndCheckDuplicates(
+      UUID uuid, Attachment2Html attachment2Html, User user) {
     try {
       Documentable documentable = service.getByUuid(uuid);
       if (documentable instanceof DocumentationUnit docUnit) {
         documentationUnitDocxMetadataInitializationService.initializeCoreData(
-            docUnit, attachment2Html);
+            docUnit, attachment2Html, user);
         checkDuplicates(docUnit.documentNumber());
       } else {
         log.info("Documentable type not supported: {}", documentable.getClass().getName());
@@ -228,6 +230,7 @@ public class DocumentationUnitController {
       @RequestParam(value = "withError") Optional<Boolean> withError,
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
       @RequestParam(value = "withDuplicateWarning") Optional<Boolean> withDuplicateWarning,
+      @RequestParam(value = "inboxStatus") Optional<InboxStatus> inboxStatus,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     return service.searchByDocumentationUnitSearchInput(
@@ -244,7 +247,8 @@ public class DocumentationUnitController {
         publicationStatus,
         withError,
         myDocOfficeOnly,
-        withDuplicateWarning);
+        withDuplicateWarning,
+        inboxStatus);
   }
 
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -361,7 +365,8 @@ public class DocumentationUnitController {
 
     try {
       HandoverMail handoverMail =
-          handoverService.handoverDocumentationUnitAsMail(uuid, userService.getEmail(oidcUser));
+          handoverService.handoverDocumentationUnitAsMail(
+              uuid, userService.getEmail(oidcUser), userService.getUser(oidcUser));
       if (handoverMail == null || !handoverMail.isSuccess()) {
         log.warn("Failed to send mail for documentation unit {}", uuid);
         return ResponseEntity.unprocessableEntity().body(handoverMail);

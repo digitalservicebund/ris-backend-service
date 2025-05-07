@@ -94,7 +94,7 @@ public interface DocumentationUnitRepository {
    *
    * @param documentationUnit the documentation unit to save the procedures for
    */
-  void saveProcedures(Documentable documentationUnit);
+  void saveProcedures(Documentable documentationUnit, User user);
 
   /**
    * Save lastPublicationDateTime of a documentation unit

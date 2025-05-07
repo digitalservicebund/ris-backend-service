@@ -18,4 +18,5 @@ public record DocumentationUnitSearchInput(
     DocumentationOffice documentationOffice,
     Status status,
     boolean myDocOfficeOnly,
-    boolean withDuplicateWarning) {}
+    boolean withDuplicateWarning,
+    InboxStatus inboxStatus) {}

@@ -134,6 +134,53 @@ class NeurisTextCheckService implements TextCheckService {
   }
 
   /**
+   * Updates the ignored status of a match by id
+   * @param matchId match id to update status to
+   * @param isIgnored the new status
+   * @param state
+   * @param dispatch
+   */
+  toggleMatchIgnoredStatus = (
+    matchId: number,
+    isIgnored: boolean,
+    state: EditorState,
+    dispatch: ((args?: any) => any) | undefined,
+  ): void => {
+    const { tr, schema } = state
+
+    state.doc.descendants((node, pos) => {
+      if (
+        node.isText &&
+        node.marks.some(
+          (mark) =>
+            mark.type.name === TextCheckTagName &&
+            mark.attrs.id === matchId.toString(),
+        )
+      ) {
+        const updatedMarks = node.marks.map((mark) => {
+          if (
+            mark.type.name === TextCheckTagName &&
+            mark.attrs.id === matchId.toString()
+          ) {
+            return mark.type.create({
+              ...mark.attrs,
+              ignored: isIgnored,
+            })
+          }
+          return mark
+        })
+
+        const updatedText = schema.text(node.text ?? "", updatedMarks)
+        tr.replaceWith(pos, pos + node.nodeSize, updatedText)
+      }
+    })
+
+    if (dispatch) {
+      dispatch(tr)
+    }
+  }
+
+  /**
    * Selects a match by id, if no id is provided or the id is not found, the previously selected match is cleared
    * @param matchId
    */
@@ -152,7 +199,7 @@ class NeurisTextCheckService implements TextCheckService {
     this.selectedMatch.value = undefined
   }
 
-  ignoreWord = async (word: string) => {
+  ignoreWord = async (word: string): Promise<boolean> => {
     const store = useDocumentUnitStore()
 
     if (store.documentUnit?.uuid) {
@@ -164,11 +211,13 @@ class NeurisTextCheckService implements TextCheckService {
       } else {
         this.selectedMatch.value.ignoredTextCheckWords ??= []
         this.selectedMatch.value.ignoredTextCheckWords.push(response.data)
+        return true
       }
     }
+    return false
   }
 
-  removeIgnoredWord = async (word: string): Promise<void> => {
+  removeIgnoredWord = async (word: string): Promise<boolean> => {
     const store = useDocumentUnitStore()
 
     if (store.documentUnit?.uuid) {
@@ -180,16 +229,19 @@ class NeurisTextCheckService implements TextCheckService {
 
       if (response.status >= 300) {
         this.responseError.value = response.error
+        return false
       } else {
         this.selectedMatch.value.ignoredTextCheckWords = (
           this.selectedMatch.value
             .ignoredTextCheckWords as IgnoredTextCheckWord[]
         ).filter(({ type }) => type !== "documentation_unit")
+        return true
       }
     }
+    return false
   }
 
-  ignoreWordGlobally = async (word: string) => {
+  ignoreWordGlobally = async (word: string): Promise<boolean> => {
     const response: ServiceResponse<IgnoredTextCheckWord> =
       await languageToolService.addGlobalIgnore(word)
 
@@ -198,10 +250,12 @@ class NeurisTextCheckService implements TextCheckService {
     } else {
       this.selectedMatch.value.ignoredTextCheckWords ??= []
       this.selectedMatch.value.ignoredTextCheckWords.push(response.data)
+      return true
     }
+    return false
   }
 
-  removeGloballyIgnoredWord = async (word: string): Promise<void> => {
+  removeGloballyIgnoredWord = async (word: string): Promise<boolean> => {
     const response: ServiceResponse<void> =
       await languageToolService.removeGlobalIgnore(word)
 
@@ -211,7 +265,9 @@ class NeurisTextCheckService implements TextCheckService {
       this.selectedMatch.value.ignoredTextCheckWords = (
         this.selectedMatch.value.ignoredTextCheckWords as IgnoredTextCheckWord[]
       ).filter(({ type }) => type !== "global")
+      return true
     }
+    return false
   }
 }
 

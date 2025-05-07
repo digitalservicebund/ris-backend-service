@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -84,12 +86,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     when(databaseCourtRepository.findOneByTypeAndLocation("AG", "Berlin"))
         .thenReturn(Optional.of(CourtDTO.builder().type("AG").location("Berlin").build()));
-
-    service.initializeCoreData(documentationUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(documentationUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("ECLI:ABCD", savedCoreData.ecli());
@@ -108,12 +110,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
   void testInitializeCoreData_doNotSetEcliIfMultipleFound() {
     List<String> ecliList = List.of("ECLI:TEST", "ECLI:TEST2");
     Docx2Html docx2html = new Docx2Html(null, ecliList, Collections.emptyMap());
-
-    service.initializeCoreData(documentationUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(documentationUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.ecli());
@@ -125,15 +127,15 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.ECLI, "ECLI:ABCD");
 
     Docx2Html docx2html = new Docx2Html(null, ecliList, properties);
-
-    service.initializeCoreData(documentationUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(documentationUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
-    assertEquals("ECLI:ABCD", savedCoreData.ecli());
+    assertThat(savedCoreData.ecli()).isEqualTo("ECLI:ABCD");
   }
 
   @Test
@@ -151,12 +153,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     Map<DocxMetadataProperty, String> properties =
         Map.of(DocxMetadataProperty.LEGAL_EFFECT, "Nein");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
-
-    service.initializeCoreData(docUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(docUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
 
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
     assertEquals(LegalEffect.NO.getLabel(), savedCoreData.legalEffect());
@@ -168,12 +170,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
     when(databaseCourtRepository.findByExactSearchString("AG B")).thenReturn(List.of());
-
-    service.initializeCoreData(documentationUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(documentationUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
@@ -186,12 +188,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     when(databaseCourtRepository.findOneByType("BFH"))
         .thenReturn(Optional.of(CourtDTO.builder().type("BFH").build()));
-
-    service.initializeCoreData(documentationUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(documentationUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("BFH", savedCoreData.court().label());
@@ -203,12 +205,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
     when(courtRepository.findByTypeAndLocation("AG", null)).thenReturn(Optional.empty());
-
-    service.initializeCoreData(documentationUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(documentationUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
@@ -222,12 +224,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     when(databaseCourtRepository.findOneByTypeAndLocation(null, "Bonn"))
         .thenReturn(Optional.empty());
-
-    service.initializeCoreData(documentationUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(documentationUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
@@ -240,11 +242,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     when(databaseCourtRepository.findByExactSearchString("LG Bern"))
         .thenReturn(List.of(CourtDTO.builder().type("LG").location("Bern").build()));
-    service.initializeCoreData(documentationUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(documentationUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bern", savedCoreData.court().label());
@@ -270,12 +273,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
             List.of(
                 CourtDTO.builder().type("LG").location("Bernau").build(),
                 CourtDTO.builder().type("LG").location("Bern").build()));
-
-    service.initializeCoreData(documentationUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(documentationUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bern", savedCoreData.court().label());
@@ -299,12 +302,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     when(databaseCourtRepository.findByExactSearchString("LG Bernau"))
         .thenReturn(List.of(CourtDTO.builder().type("LG").location("Bernau").build()));
-
-    service.initializeCoreData(documentationUnit, docx2html);
+    User user = User.builder().name("test").build();
+    service.initializeCoreData(documentationUnit, docx2html, user);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bernau", savedCoreData.court().label());

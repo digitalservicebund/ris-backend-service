@@ -107,13 +107,21 @@ export interface TextCheckService {
 
   clearSelectedMatch(): void
 
-  ignoreWord(word: string): Promise<void>
+  ignoreWord(word: string): Promise<boolean>
 
-  removeIgnoredWord(word: string): Promise<void>
+  removeIgnoredWord(word: string): Promise<boolean>
 
-  ignoreWordGlobally(word: string): Promise<void>
+  ignoreWordGlobally(word: string): Promise<boolean>
 
-  removeGloballyIgnoredWord(word: string): Promise<void>
+  removeGloballyIgnoredWord(word: string): Promise<boolean>
+
+  toggleMatchIgnoredStatus(
+    matchId: number,
+    isIgnored: boolean,
+    state: EditorState,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    dispatch: ((args?: any) => any) | undefined,
+  ): void
 }
 
 export const TextCheckTagName = "textCheck"

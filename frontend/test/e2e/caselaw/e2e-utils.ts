@@ -664,3 +664,69 @@ export async function createDataTransfer(
     },
   )
 }
+
+export async function assignUserGroupToProcedure(
+  page: Page,
+  procedureName: string,
+) {
+  await test.step("Internal user assigns a user group to the given procedure", async () => {
+    await navigateToProcedures(page, procedureName)
+
+    const assignRequest = page.waitForRequest(
+      "**/api/v1/caselaw/procedure/*/assign/*",
+      { timeout: 5_000 },
+    )
+
+    await page
+      .getByLabel("Vorgang Listenelement")
+      .getByLabel("dropdown input")
+      .click()
+    await page
+      .getByRole("option", {
+        name: "Extern",
+        exact: true,
+      })
+      .click()
+    await assignRequest
+    await page.reload()
+
+    await expect(
+      page.getByLabel("Vorgang Listenelement").getByLabel("dropdown input"),
+      // The id of the user group "Extern"
+    ).toHaveText(/.+/, { timeout: 5_000 })
+  })
+}
+
+export async function unassignUserGroupFromProcedure(
+  page: Page,
+  procedureName: string,
+) {
+  await test.step("Internal user unassigns a user group from the given procedure", async () => {
+    await navigateToProcedures(page, procedureName)
+
+    const unassignRequest = page.waitForRequest(
+      "**/api/v1/caselaw/procedure/*/unassign",
+      { timeout: 5_000 },
+    )
+
+    await page
+      .getByLabel("Vorgang Listenelement")
+      .getByLabel("dropdown input")
+      .click()
+
+    await page
+      .getByRole("option", {
+        name: "Nicht zugewiesen",
+        exact: true,
+      })
+      .click({ timeout: 5000 })
+
+    await unassignRequest
+    await page.reload()
+
+    await expect(
+      page.getByLabel("Vorgang Listenelement").getByLabel("dropdown input"),
+      // The unassigned option has an empty value
+    ).toHaveText("Nicht zugewiesen", { timeout: 5_000 })
+  })
+}
