@@ -453,11 +453,11 @@ jobs:
 
 
   e2e-tests:
-    if: ${{ github.ref == 'refs/heads/main' }}
+    # if: ${{ github.ref == 'refs/heads/main' }}
     concurrency:
       group: deploy-staging
       cancel-in-progress: true
-    needs: [ deploy-staging ]
+    # needs: [ deploy-staging ]
     # We do not include the matrix directly so that the concurrency group does not apply to each matrix job individually
     uses: ./.github/workflows/e2e-tests.yml
     secrets: inherit
@@ -476,7 +476,7 @@ jobs:
     secrets: inherit
 
   generate-test-reports:
-    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    #  if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
     needs: [ e2e-tests ]
     runs-on: ubuntu-latest
     steps:
@@ -504,17 +504,8 @@ jobs:
         with:
           path: ./frontend/all-blob-reports
           pattern: test-results-blob-*
-      - name: Prepare test reports for merge
-        working-directory: ./frontend/all-blob-reports
-        run: |
-          for DIR in test-results-blob-*; do
-            unzip -o "$DIR/test-report.zip" -d "$DIR"
-            rm "$DIR/test-report.zip"
-            ZIP_FILE="../$(basename "$DIR").zip"
-            (cd "$DIR" && zip -r "$ZIP_FILE" ./*.jsonl)
-            rm -rf "$DIR"
-          done
-        shell: bash
+          merge-multiple: 'true'
+          
       - name: Merge into html report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
         working-directory: ./frontend
