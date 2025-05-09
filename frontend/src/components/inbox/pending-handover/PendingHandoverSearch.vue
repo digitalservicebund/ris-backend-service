@@ -171,16 +171,20 @@ export type DocumentUnitSearchParameter =
     class="flex flex-col bg-blue-200"
   >
     <div
-      class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
+      class="m-40 grid grid-cols-[auto_fr_auto_fr] grid-rows-[auto_auto_auto] gap-x-12 gap-y-20 [grid-template-areas:'az-label_az-input_docnumber-label_docnumber-input''court-label_court-input_date-label_date-input''._._._search-button'] lg:gap-x-32"
     >
-      <!-- Column 1 -->
-      <div class="ris-body1-regular ml-3 flex flex-row items-center">
+      <div
+        class="ris-body1-regular ml-3 flex flex-row items-center [grid-area:az-label]"
+      >
         Aktenzeichen
       </div>
-      <div class="ris-body1-regular flex flex-row items-center">Gericht</div>
-      <div></div>
-      <!-- Column 2 -->
-      <div>
+      <div
+        class="ris-body1-regular flex flex-row items-center [grid-area:court-label]"
+      >
+        Gericht
+      </div>
+
+      <div class="[grid-area:az-input]">
         <InputField
           id="fileNumber"
           v-slot="{ id }"
@@ -197,7 +201,7 @@ export type DocumentUnitSearchParameter =
           ></InputText>
         </InputField>
       </div>
-      <div class="flex flex-row gap-10">
+      <div class="flex flex-row gap-10 [grid-area:court-input]">
         <InputField
           id="courtType"
           v-slot="{ id }"
@@ -232,17 +236,17 @@ export type DocumentUnitSearchParameter =
           ></InputText>
         </InputField>
       </div>
-      <div></div>
-      <!-- Column 3 -->
-      <div class="ris-body1-regular flex flex-row items-center pl-24 lg:pl-48">
+      <div
+        class="ris-body1-regular flex flex-row items-center pl-24 [grid-area:docnumber-label] lg:pl-48"
+      >
         Dokumentnummer
       </div>
-      <div class="ris-body1-regular flex flex-row items-center pl-24 lg:pl-48">
+      <div
+        class="ris-body1-regular flex flex-row items-center pl-24 [grid-area:date-label] lg:pl-48"
+      >
         Datum
       </div>
-      <div></div>
-      <!-- Column 4 -->
-      <div class="">
+      <div class="[grid-area:docnumber-input]">
         <InputField
           id="documentNumber"
           v-slot="{ id }"
@@ -259,7 +263,7 @@ export type DocumentUnitSearchParameter =
           ></InputText>
         </InputField>
       </div>
-      <div class="flex flex-row gap-10">
+      <div class="flex flex-row gap-10 [grid-area:date-input]">
         <InputField
           id="decisionDate"
           v-slot="{ id, hasError }"
@@ -306,7 +310,7 @@ export type DocumentUnitSearchParameter =
         </InputField>
       </div>
 
-      <div class="flex flex-row">
+      <div class="flex flex-row [grid-area:search-button]">
         <div class="flex flex-col gap-8">
           <Button
             aria-label="Nach Dokumentationseinheiten suchen"
