@@ -9,7 +9,7 @@ import PendingHandover from "@/components/inbox/pending-handover/PendingHandover
 </script>
 
 <template>
-  <Tabs class="m-32" value="2">
+  <Tabs class="m-32" lazy value="2">
     <TabList>
       <Tab data-testId="external-handover-tab" value="0">Fremdanlagen</Tab>
       <Tab value="1">EU-Rechtsprechung</Tab>

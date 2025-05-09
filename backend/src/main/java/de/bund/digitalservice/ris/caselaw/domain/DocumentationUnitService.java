@@ -134,8 +134,8 @@ public class DocumentationUnitService {
     var newDocumentationUnit =
         repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
 
-    fmxService.getDataFromEurlex(
-        "67474f27-bded-11ef-91ed-01aa75ed71a1.0001.03", newDocumentationUnit);
+    //    fmxService.getDataFromEurlex(
+    //        "67474f27-bded-11ef-91ed-01aa75ed71a1.0001.03", newDocumentationUnit);
     if (params.celexNumber() != null && !params.celexNumber().isBlank()) {}
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
     return newDocumentationUnit;

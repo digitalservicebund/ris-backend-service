@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
 import InputText from "primevue/inputtext"
-import { computed, ref, watch } from "vue"
+import { computed, onBeforeUnmount, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import { ValidationError } from "@/components/input/types"
@@ -142,6 +142,10 @@ watch(
   },
   { deep: true, immediate: true },
 )
+
+onBeforeUnmount(() => {
+  resetSearch()
+})
 </script>
 
 <script lang="ts">

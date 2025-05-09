@@ -38,6 +38,7 @@ public class DocumentationUnitListItemTransformer {
         .uuid(documentationUnitListItemDTO.getId())
         .documentNumber(documentationUnitListItemDTO.getDocumentNumber())
         .decisionDate(documentationUnitListItemDTO.getDate())
+        .createdAt(documentationUnitListItemDTO.getManagementData().getCreatedAtDateTime())
         .scheduledPublicationDateTime(
             documentationUnitListItemDTO.getScheduledPublicationDateTime())
         .lastPublicationDateTime(documentationUnitListItemDTO.getLastPublicationDateTime())

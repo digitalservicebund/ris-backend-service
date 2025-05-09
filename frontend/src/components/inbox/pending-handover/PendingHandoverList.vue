@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
@@ -156,7 +157,16 @@ function toggleModal() {
         ></Column>
         <Column field="court.type" header="Gerichtstyp"></Column>
         <Column field="court.location" header="Ort"></Column>
-        <Column field="decisionDate" header="Datum"> </Column>
+
+        <Column field="decisionDate" header="Datum">
+          <template #body="{ data: item }"
+            >{{
+              item.decisionDate
+                ? dayjs(item.decisionDate).format("DD.MM.YYYY")
+                : "-"
+            }}
+          </template>
+        </Column>
         <Column field="fileNumber" header="Aktenzeichen"></Column>
         <Column field="source" header="Quelle">
           <template #body="{ data: item }">
@@ -170,7 +180,13 @@ function toggleModal() {
             }}</template
           >
         </Column>
-        <Column field="createdAt" header="Angelegt am"> </Column>
+        <Column field="createdAt" header="Angelegt am">
+          <template #body="{ data: item }"
+            >{{
+              item.createdAt ? dayjs(item.createdAt).format("DD.MM.YYYY") : "-"
+            }}
+          </template></Column
+        >
         <Column header="Status">
           <template #body="{ data: item }">
             <IconBadge
