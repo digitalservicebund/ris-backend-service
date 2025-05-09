@@ -8,9 +8,12 @@ interface Props {
 const props = defineProps<Props>()
 </script>
 <template>
-  <div v-if="errorMessage" class="mb-10 flex flex-row items-center">
-    <IconErrorOutline class="text-gray-900" />
-    <p class="ris-label2-regular m-4 text-gray-900">
+  <div
+    v-if="errorMessage"
+    class="mb-10 flex flex-row items-center text-red-800"
+  >
+    <IconErrorOutline />
+    <p class="ris-label2-regular m-4">
       {{ props.errorMessage }}
     </p>
   </div>

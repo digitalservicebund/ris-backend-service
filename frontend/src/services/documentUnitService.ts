@@ -37,6 +37,11 @@ interface DocumentUnitService {
 
   takeOver(documentNumber: string): Promise<ServiceResponse<unknown>>
 
+  bulkAssignProcedure(
+    procedureLabel: string,
+    documentationUnitIds: string[],
+  ): Promise<ServiceResponse<unknown>>
+
   searchByRelatedDocumentation(
     query: RelatedDocumentation,
     requestParams?: { [key: string]: string } | undefined,
@@ -178,6 +183,26 @@ const service: DocumentUnitService = {
     if (response.status >= 300) {
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_TAKEOVER_FAILED.title,
+      }
+    }
+    return response
+  },
+
+  async bulkAssignProcedure(
+    procedureLabel: string,
+    documentationUnitIds: string[],
+  ) {
+    const response = await httpClient.patch<
+      { procedureLabel: string; documentationUnitIds: string[] },
+      unknown
+    >(
+      `caselaw/documentunits/bulk-assign-procedure`,
+      {},
+      { procedureLabel, documentationUnitIds },
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.BULK_PROCEDURE_ASSIGNMENT_FAILED.title,
       }
     }
     return response

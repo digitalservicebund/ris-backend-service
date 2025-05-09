@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useHead, useSeoMeta } from "@unhead/vue"
+import Toast from "primevue/toast"
 import Navbar from "./components/NavbarTop.vue"
 
 useHead({
@@ -22,5 +23,6 @@ useSeoMeta({
         <router-view class="grow" />
       </main>
     </Suspense>
+    <Toast position="bottom-right" />
   </div>
 </template>
