@@ -211,6 +211,17 @@ public class OAuthService implements AuthService {
     };
   }
 
+  /**
+   * User needs to have write access to all given doc unit uuids.
+   *
+   * @see OAuthService#userHasWriteAccess
+   */
+  @Bean
+  public Function<List<UUID>, Boolean> userHasBulkWriteAccess(
+      Function<UUID, Boolean> userHasWriteAccess) {
+    return uuids -> uuids.stream().allMatch(userHasWriteAccess::apply);
+  }
+
   @Bean
   public Function<String, Boolean> userHasSameDocOfficeAsDocument() {
     return documentNumber ->

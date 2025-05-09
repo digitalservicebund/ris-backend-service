@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatc
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -485,6 +487,30 @@ public class DocumentationUnitService {
           "Won't recycle document number {}: {}",
           documentationUnit.documentNumber(),
           e.getMessage());
+    }
+  }
+
+  @Transactional(rollbackFor = BadRequestException.class)
+  public void bulkAssignProcedure(
+      @NotNull List<UUID> documentationUnitIds, String procedureLabel, User user)
+      throws DocumentationUnitNotExistsException, BadRequestException {
+    Procedure procedure = Procedure.builder().label(procedureLabel).build();
+    for (UUID documentationUnitId : documentationUnitIds) {
+      Documentable documentable = repository.findByUuid(documentationUnitId, user);
+      if (documentable instanceof DocumentationUnit docUnit) {
+        DocumentationUnit updatedDocUnit =
+            docUnit.toBuilder()
+                .coreData(docUnit.coreData().toBuilder().procedure(procedure).build())
+                // When a procedure is assigned, the doc unit is removed from the inbox
+                // This might be replaced by explicit workflow management later
+                .inboxStatus(null)
+                .build();
+        // Calling updateDocumentationUnit throws a JPA exception, unclear why.
+        repository.saveProcedures(updatedDocUnit, user);
+        repository.save(updatedDocUnit, user);
+      } else {
+        throw new BadRequestException("Can only assign procedures to decisions.");
+      }
     }
   }
 
