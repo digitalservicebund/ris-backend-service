@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { useToast } from "primevue/usetoast"
 import { ref } from "vue"
 import AssignProcedure from "@/components/AssignProcedure.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
-import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { Procedure } from "@/domain/procedure"
 import { PublicationState } from "@/domain/publicationStatus"
@@ -22,15 +22,13 @@ const emit =
   >()
 
 const hasBulkAssignError = ref(false)
-const isLoading = ref(false)
+const toast = useToast()
 
 const assignProcedure = async (procedure: Procedure) => {
   hasBulkAssignError.value = false
   if (!areSelectedDocUnitsValid()) {
     return
   }
-
-  isLoading.value = true
 
   const documentationUnitIds =
     props.documentationUnits?.map((docUnit) => docUnit.uuid!) ?? []
@@ -39,7 +37,17 @@ const assignProcedure = async (procedure: Procedure) => {
     documentationUnitIds,
   )
 
-  isLoading.value = false
+  if (!error) {
+    const isPlural = documentationUnitIds.length > 1
+    const verb = isPlural ? "en sind" : " ist"
+    toast.add({
+      severity: "success",
+      summary: "Hinzufügen erfolgreich",
+      detail: `Die Dokumentationseinheit${verb} jetzt im Vorgang ${procedure.label}.`,
+      life: 5_000,
+    })
+  }
+
   hasBulkAssignError.value = !!error
 }
 
@@ -80,8 +88,5 @@ const areSelectedDocUnitsValid = () => {
     :status="InfoStatus.ERROR"
     title="Die Dokumentationseinheit(en) konnten nicht zum Vorgang hinzugefügt werden."
   />
-  <div class="flex justify-end">
-    <LoadingSpinner v-if="isLoading" class="mt-10 mr-4" size="small" />
-    <AssignProcedure @assign-procedure="assignProcedure" />
-  </div>
+  <AssignProcedure class="justify-end" @assign-procedure="assignProcedure" />
 </template>

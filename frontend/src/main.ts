@@ -3,6 +3,7 @@ import * as Sentry from "@sentry/vue"
 import { createHead } from "@unhead/vue/client"
 import { createPinia } from "pinia"
 import PrimeVue from "primevue/config"
+import ToastService from "primevue/toastservice"
 import { createApp } from "vue"
 import "@/styles/global.css"
 import App from "./App.vue"
@@ -21,6 +22,7 @@ const app = createApp(App).use(PrimeVue, {
 })
 app.directive("ctrl-enter", onSearchShortcutDirective)
 app.use(createHead())
+app.use(ToastService)
 
 function targets(): string[] {
   return [`${window.location.origin}/api`]

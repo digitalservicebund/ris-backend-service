@@ -9,6 +9,11 @@ const AssignProcedureStub = {
   template: `<span @click="$emit('assign-procedure', {label: 'Vorgangsname'})">AssignProcedureMock</span>`,
 }
 
+const addToastMock = vi.fn()
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: addToastMock }),
+}))
+
 describe("BulkAssignProcedure", () => {
   let bulkAssignServiceSpy: MockInstance<
     (
@@ -81,6 +86,8 @@ describe("BulkAssignProcedure", () => {
   })
 
   it("should call the service with valid input and not show an error on success", async () => {
+    bulkAssignServiceSpy.mockResolvedValue({ data: {}, status: 200 })
+
     const { emitted } = render(BulkAssignProcedure, {
       props: {
         documentationUnits: [
@@ -102,6 +109,12 @@ describe("BulkAssignProcedure", () => {
       "Vorgangsname",
       ["8123"],
     )
+    expect(addToastMock).toHaveBeenCalledExactlyOnceWith({
+      detail: "Die Dokumentationseinheit ist jetzt im Vorgang Vorgangsname.",
+      life: 5000,
+      severity: "success",
+      summary: "Hinzufügen erfolgreich",
+    })
     expect(
       screen.queryByTestId("bulk-assign-procedure-success"),
     ).not.toBeInTheDocument()
