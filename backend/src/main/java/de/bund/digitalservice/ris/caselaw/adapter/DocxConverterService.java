@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentationUn
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.FooterConverter;
-import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentationUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
@@ -64,7 +63,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @Service
 @Slf4j
-public class DocxConverterService implements ConverterService {
+public class DocxConverterService {
   private static final String PARAGRAPH = "paragraph";
   private static final List<UnhandledElement> IRRELEVANT_ELEMENTS =
       List.of(
@@ -139,6 +138,10 @@ public class DocxConverterService implements ConverterService {
     if (fileName == null) {
       return null;
     }
+    return getDocx(fileName);
+  }
+
+  private Docx2Html getDocx(String fileName) {
 
     GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
 

@@ -13,4 +13,5 @@ public record DocumentationUnitCreationParameters(
     DocumentType documentType,
     @PastOrPresent LocalDate decisionDate,
     String fileNumber,
+    String celexNumber,
     Reference reference) {}

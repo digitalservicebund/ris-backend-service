@@ -149,6 +149,7 @@ export type DocumentationUnitParameters = {
   documentType?: DocumentType
   decisionDate?: string
   fileNumber?: string
+  celexNumber?: string
   court?: Court
   reference?: Reference
 }

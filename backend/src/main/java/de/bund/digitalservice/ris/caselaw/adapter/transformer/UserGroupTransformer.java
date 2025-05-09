@@ -18,7 +18,7 @@ public class UserGroupTransformer {
         .isInternal(group.isInternal())
         .docOffice(
             DocumentationOffice.builder()
-                .uuid(group.getDocumentationOffice().getId())
+                .id(group.getDocumentationOffice().getId())
                 .abbreviation(group.getDocumentationOffice().getAbbreviation())
                 .build())
         .build();

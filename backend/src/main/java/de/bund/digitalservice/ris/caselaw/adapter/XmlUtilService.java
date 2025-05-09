@@ -41,8 +41,8 @@ public class XmlUtilService {
 
   public XmlUtilService(@Qualifier("saxon") TransformerFactory transformerFactory) {
     this.transformerFactory = transformerFactory;
-    this.htmlToAknHtml = getTemplates("caselawhandover/htmlToAknHtml.xslt");
-    this.schema = getSchema("caselawhandover/shared/akomantoso30.xsd");
+    this.htmlToAknHtml = getTemplates("xml/htmlToAknHtml.xslt");
+    this.schema = getSchema("xml/akomantoso30.xsd");
   }
 
   public Templates getTemplates(String filePath) {

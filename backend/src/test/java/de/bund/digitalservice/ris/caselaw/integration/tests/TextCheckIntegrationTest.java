@@ -224,7 +224,7 @@ class TextCheckIntegrationTest {
                 .getFirst()
                 .getDocumentationOffice()
                 .getId())
-        .isEqualTo(docOffice.uuid());
+        .isEqualTo(docOffice.id());
 
     risWebTestClient
         .withDefaultLogin()

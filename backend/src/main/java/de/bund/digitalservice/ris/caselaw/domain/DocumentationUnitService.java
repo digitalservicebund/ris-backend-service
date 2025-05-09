@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpa
 
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,7 @@ public class DocumentationUnitService {
   private final DocumentNumberService documentNumberService;
   private final DocumentationUnitStatusService statusService;
   private final AttachmentService attachmentService;
+  private final FmxService fmxService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
   private final AuthService authService;
@@ -62,6 +65,7 @@ public class DocumentationUnitService {
       UserService userService,
       Validator validator,
       AttachmentService attachmentService,
+      FmxService fmxService,
       @Lazy AuthService authService,
       PatchMapperService patchMapperService,
       DuplicateCheckService duplicateCheckService) {
@@ -72,6 +76,7 @@ public class DocumentationUnitService {
     this.userService = userService;
     this.validator = validator;
     this.attachmentService = attachmentService;
+    this.fmxService = fmxService;
     this.patchMapperService = patchMapperService;
     this.statusService = statusService;
     this.authService = authService;
@@ -96,7 +101,7 @@ public class DocumentationUnitService {
     boolean isExternalHandover =
         params.documentationOffice() != null
             && userDocOffice != null
-            && !userDocOffice.uuid().equals(params.documentationOffice().uuid());
+            && !userDocOffice.id().equals(params.documentationOffice().id());
 
     DocumentationUnit docUnit =
         DocumentationUnit.builder()
@@ -130,6 +135,9 @@ public class DocumentationUnitService {
     var newDocumentationUnit =
         repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
 
+    if (Strings.isNotBlank(params.celexNumber())) {
+      fmxService.getDataFromEurlex(params.celexNumber(), newDocumentationUnit);
+    }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
     return newDocumentationUnit;
   }

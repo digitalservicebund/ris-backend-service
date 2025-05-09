@@ -129,7 +129,7 @@ public class DatabaseProcedureService implements ProcedureService {
     DocumentationOffice documentationOfficeOfUser = userService.getDocumentationOffice(oidcUser);
     boolean isInternalUser = userService.isInternal(oidcUser);
     return repository
-        .findByIdAndDocumentationOffice(procedureId, documentationOfficeOfUser.uuid())
+        .findByIdAndDocumentationOffice(procedureId, documentationOfficeOfUser.id())
         .map(
             procedureDTO ->
                 procedureDTO.getDocumentationUnits().stream()
