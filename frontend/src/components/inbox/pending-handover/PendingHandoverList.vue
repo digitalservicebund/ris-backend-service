@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+import { useScrollLock } from "@vueuse/core"
 import dayjs from "dayjs"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
-import { computed, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
@@ -33,22 +34,23 @@ const entries = computed(() => {
   return props.pageEntries?.content || []
 })
 
-const showModal = ref(false)
+const showDeleteModal = ref(false)
 const selectedDocumentUnitListEntry = ref<DocumentUnitListEntry>()
 const popupModalText = computed(
   () =>
     `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry?.value?.documentNumber} wirklich dauerhaft löschen?`,
 )
+const scrollLock = useScrollLock(document)
 
 /**
- * Clicking on a delete icon of a list entry triggers toggleModal() and asks for user input to proceed
+ * Clicking on a delete icon of a list entry shows a modal, which asks for user input to proceed
  * @param {DocumentUnitListEntry} documentUnitListEntry - The documentationunit list entry to be deleted
  */
-function setSelectedDocumentUnitListEntry(
+function showDeleteConfirmationDialog(
   documentUnitListEntry: DocumentUnitListEntry,
 ) {
   selectedDocumentUnitListEntry.value = documentUnitListEntry
-  toggleModal()
+  showDeleteModal.value = true
 }
 
 /**
@@ -57,39 +59,23 @@ function setSelectedDocumentUnitListEntry(
 function onDelete() {
   if (selectedDocumentUnitListEntry.value) {
     emit("deleteDocumentationUnit", selectedDocumentUnitListEntry.value)
-    toggleModal()
+    showDeleteModal.value = false
   }
 }
 
-/**
- * Stops propagation of scrolling event, and toggles the showModal value
- */
-function toggleModal() {
-  showModal.value = !showModal.value
-  if (showModal.value) {
-    const scrollLeft = document.documentElement.scrollLeft
-    const scrollTop = document.documentElement.scrollTop
-    window.onscroll = () => {
-      window.scrollTo(scrollLeft, scrollTop)
-    }
-  } else {
-    window.onscroll = () => {
-      return
-    }
-  }
-}
+watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
 </script>
 
 <template>
   <div data-testId="pending-handover-list">
     <PopupModal
-      v-if="showModal"
+      v-if="showDeleteModal"
       aria-label="Dokumentationseinheit löschen"
       :content-text="popupModalText"
       header-text="Dokumentationseinheit löschen"
       primary-button-text="Löschen"
       primary-button-type="destructive"
-      @close-modal="toggleModal"
+      @close-modal="showDeleteModal = false"
       @primary-action="onDelete"
     />
     <Pagination
@@ -269,7 +255,7 @@ function toggleModal() {
                   severity="secondary"
                   size="small"
                   @click="
-                    setSelectedDocumentUnitListEntry(
+                    showDeleteConfirmationDialog(
                       entries?.find(
                         (entry) => entry.uuid == item.uuid,
                       ) as DocumentUnitListEntry,

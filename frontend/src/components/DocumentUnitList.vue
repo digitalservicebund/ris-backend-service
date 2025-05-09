@@ -304,7 +304,7 @@ function onDelete() {
                   :disabled="
                     !listEntry.isEditable ||
                     listEntry.status?.publicationStatus ==
-                      'EXTERNAL_HANDOVER_PENDING'
+                      PublicationState.EXTERNAL_HANDOVER_PENDING
                   "
                   severity="secondary"
                   size="small"

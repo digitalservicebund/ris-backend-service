@@ -1,34 +1,21 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue"
+import { onMounted, ref } from "vue"
 import PendingHandoverList from "./PendingHandoverList.vue"
 import PendingHandoverSearch, {
   DocumentUnitSearchParameter,
 } from "./PendingHandoverSearch.vue"
 import { Page } from "@/components/Pagination.vue"
 import { Query } from "@/composables/useQueryFromRoute"
-import { Court } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/documentUnitService"
+import { ResponseError } from "@/services/httpClient"
 
 const isLoading = ref(false)
 const pageNumber = ref<number>(0)
 const itemsPerPage = 100
 const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()
-const searchResponseError = ref()
-const courtFilter = ref("")
-
-const courtFromQuery = ref<Court | undefined>()
-
-const isSearchCompletedWithNoResults = computed(
-  () =>
-    currentPage.value?.content != undefined &&
-    currentPage.value?.content.length === 0,
-)
-
-const { data: courts, execute: fetchCourts } =
-  comboboxItemService.getCourts(courtFilter)
+const searchResponseError = ref<ResponseError>()
 
 /**
  * Searches all documentation units by given input and updates the local
@@ -56,27 +43,6 @@ async function search() {
   if (response.error) {
     searchResponseError.value = response.error
   }
-
-  if (isSearchCompletedWithNoResults.value && searchQuery.value?.courtType) {
-    courtFilter.value =
-      searchQuery.value.courtType +
-      (searchQuery.value.courtLocation
-        ? ` ${searchQuery.value.courtLocation}`
-        : "")
-
-    await fetchCourts()
-
-    const courtResponse = courts.value
-
-    //filter for exact matches
-    const matches = courtResponse
-      ? courtResponse.filter((item) => item.label === courtFilter.value)
-      : []
-
-    // add as court query only if 1 exact match
-    courtFromQuery.value =
-      matches.length === 1 ? (matches[0].value as Court) : undefined
-  } else courtFromQuery.value = undefined
   isLoading.value = false
 }
 
