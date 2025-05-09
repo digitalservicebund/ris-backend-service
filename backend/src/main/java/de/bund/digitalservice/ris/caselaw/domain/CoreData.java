@@ -19,6 +19,7 @@ public record CoreData(
     Procedure procedure,
     List<String> previousProcedures,
     String ecli,
+    String celexNumber,
     @UniqueElements List<String> deviatingEclis,
     String appraisalBody,
     @PastOrPresent LocalDate decisionDate,

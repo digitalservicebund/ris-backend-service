@@ -1,0 +1,174 @@
+package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
+
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultRepository;
+import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
+import de.bund.digitalservice.ris.caselaw.domain.SearchService;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+/** Implementation of the search service with a SOAP webservice to the EUR-Lex API. */
+@Service
+@Slf4j
+public class EurLexSOAPSearchService implements SearchService {
+  private static final int PAGE_SIZE = 100;
+
+  @Value("${eurlex.username:}")
+  private String userName;
+
+  @Value("${eurlex.password:}")
+  private String password;
+
+  private final EurLexResultRepository repository;
+  private final DatabaseCourtRepository courtRepository;
+
+  public EurLexSOAPSearchService(
+      EurLexResultRepository repository, DatabaseCourtRepository courtRepository) {
+    this.repository = repository;
+    this.courtRepository = courtRepository;
+  }
+
+  /**
+   * Search the EUR-Lex API for european caselaw decisions.
+   *
+   * @param page - page number to filter the decisions. The entries per page are always 100. If the
+   *     page parameter is null, the first page is requested.
+   * @return a page object with the 100 entries of the page
+   */
+  @Override
+  public Page<SearchResult> getSearchResults(String page) {
+    int pageNumber = 1;
+    if (page != null) {
+      try {
+        pageNumber = Integer.parseInt(page) + 1;
+      } catch (NumberFormatException ignored) {
+      }
+    }
+
+    Optional<EurLexResultDTO> lastResult = repository.findTopByOrderByCreatedAtDesc();
+
+    if (lastResult.isEmpty()
+        || lastResult.get().getCreatedAt().plus(1, ChronoUnit.DAYS).isBefore(Instant.now())) {
+      requestNewestDecisions(pageNumber);
+    }
+
+    return repository
+        .findAll(PageRequest.of(pageNumber, PAGE_SIZE))
+        .map(EurLexSearchResultTransformer::transformDTOToDomain);
+  }
+
+  private void requestNewestDecisions(int pageNumber) {
+    Element searchResults;
+
+    try {
+      HttpClient client = HttpClient.newBuilder().build();
+
+      HttpRequest request =
+          HttpRequest.newBuilder()
+              .uri(new URI("https://eur-lex.europa.eu/EURLexWebService?WSDL"))
+              .POST(BodyPublishers.ofString(generatePayload(pageNumber)))
+              .header("Content-Type", "application/soap+xml")
+              .build();
+
+      HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+
+      searchResults = extractSearchResultsFromResponse(response);
+    } catch (IOException | InterruptedException | URISyntaxException ex) {
+      log.error("Can't get search results from EUR-Lex webservice.", ex);
+      throw new EurLexSearchException(ex);
+    }
+
+    Map<String, CourtDTO> courts = new HashMap<>();
+    courts.put("EuGH", courtRepository.findByType("EuGH"));
+    courts.put("EuG", courtRepository.findByType("EuG"));
+    List<EurLexResultDTO> transformedList =
+        EurLexSearchResultTransformer.transformXmlToDTO(searchResults, courts);
+
+    repository.saveAll(transformedList);
+
+    int totalNum = EurLexSearchResultTransformer.getTotalNum(searchResults);
+    if (totalNum > pageNumber * PAGE_SIZE) {
+      requestNewestDecisions(pageNumber + 1);
+    }
+  }
+
+  private Element extractSearchResultsFromResponse(HttpResponse<String> response) {
+    try {
+      DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+      Document doc =
+          documentBuilderFactory
+              .newDocumentBuilder()
+              .parse(new InputSource(new StringReader(response.body())));
+
+      NodeList searchResultsList = doc.getElementsByTagName("searchResults");
+
+      if (searchResultsList.getLength() == 1
+          && searchResultsList.item(0) instanceof Element element) {
+        return element;
+      }
+
+      return null;
+    } catch (ParserConfigurationException | SAXException | IOException ex) {
+      log.error("Can't get search results from EUR-Lex webservice.", ex);
+      throw new EurLexSearchException(ex);
+    }
+  }
+
+  private String generatePayload(int pageNumber) {
+    return "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:sear=\"http://eur-lex.europa.eu/search\">"
+        + "<soap:Header>"
+        + "<wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" soap:mustUnderstand=\"true\">"
+        + "<wsse:UsernameToken xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" wsu:Id=\"UsernameToken-1\">"
+        + "<wsse:Username>"
+        + userName
+        + "</wsse:Username>"
+        + "<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">"
+        + password
+        + "</wsse:Password>"
+        + "</wsse:UsernameToken>"
+        + "</wsse:Security>"
+        + "</soap:Header>"
+        + "<soap:Body>"
+        + "<sear:searchRequest>"
+        + "<sear:expertQuery><![CDATA["
+        + "DTS_SUBDOM = EU_CASE_LAW AND PD >= 01/04/2025  <= 15/04/2025 AND CASE_LAW_SUMMARY = false"
+        + "]]></sear:expertQuery>"
+        + "<sear:page>"
+        + pageNumber
+        + "</sear:page>"
+        + "<sear:pageSize>"
+        + PAGE_SIZE
+        + "</sear:pageSize>"
+        + "<sear:searchLanguage>de</sear:searchLanguage>"
+        + "</sear:searchRequest>"
+        + "</soap:Body>"
+        + "</soap:Envelope>";
+  }
+}
