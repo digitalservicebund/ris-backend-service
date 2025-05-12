@@ -73,7 +73,7 @@ test.describe(
         const wordWithTypo = generateString({ prefix: "etoe" }) // e.g. etoedsfjg
 
         await test.step("add text in headnote (Orientierungssatz)", async () => {
-          await clearTextField(page, headNoteEditorTextArea)
+          await headNoteEditorTextArea.fill("")
           await headNoteEditorTextArea.fill("Text mit Fehler: " + wordWithTypo)
         })
 
