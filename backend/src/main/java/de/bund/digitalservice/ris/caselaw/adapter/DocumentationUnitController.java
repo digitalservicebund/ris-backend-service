@@ -495,7 +495,7 @@ public class DocumentationUnitController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody @Valid BulkAssignProcedureRequest body) {
     try {
-      var user = userService.getUser(oidcUser);
+      User user = userService.getUser(oidcUser);
       service.bulkAssignProcedure(body.getDocumentationUnitIds(), body.getProcedureLabel(), user);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
