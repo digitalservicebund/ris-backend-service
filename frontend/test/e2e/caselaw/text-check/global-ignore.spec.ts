@@ -1,6 +1,7 @@
 import { expect, Page } from "@playwright/test"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import {
+  clearTextField,
   navigateToCategories,
   navigateToHandover,
 } from "~/e2e/caselaw/e2e-utils"
@@ -33,13 +34,13 @@ test.describe(
         })
 
         const headNoteEditor = page.getByTestId("Orientierungssatz")
+        const headNoteEditorTextArea = headNoteEditor.locator("div")
 
         await test.step("add jDV globally ignored word in headnote (Orientierungssatz)", async () => {
-          await headNoteEditor.locator("div").fill("")
-          await expect(headNoteEditor.locator("div")).not.toBeEmpty()
+          await headNoteEditorTextArea.fill("")
 
-          await headNoteEditor.locator("div").fill("VDberbglStPr") // this is ignored by jDV
-          await expect(headNoteEditor.locator("div")).toHaveText("VDberbglStPr")
+          await headNoteEditorTextArea.fill("VDberbglStPr") // this is ignored by jDV
+          await expect(headNoteEditorTextArea).toHaveText("VDberbglStPr")
         })
 
         await test.step("check text of headnote (Orientierungssatz)", async () => {
@@ -72,10 +73,8 @@ test.describe(
         const wordWithTypo = generateString({ prefix: "etoe" }) // e.g. etoedsfjg
 
         await test.step("add text in headnote (Orientierungssatz)", async () => {
-          await headNoteEditor.locator("div").fill("")
-          await headNoteEditor
-            .locator("div")
-            .fill("Text mit Fehler: " + wordWithTypo)
+          await clearTextField(page, headNoteEditorTextArea)
+          await headNoteEditorTextArea.fill("Text mit Fehler: " + wordWithTypo)
         })
 
         await test.step("add word to global ignore", async () => {
@@ -112,8 +111,11 @@ test.describe(
 
         const secondHeadNoteEditor =
           pageWithBghUser.getByTestId("Orientierungssatz")
+
+        const secondHeadNoteEditorFieldArea =
+          secondHeadNoteEditor.locator("div")
         await test.step("type same text in headnote (Orientierungssatz)", async () => {
-          await secondHeadNoteEditor.locator("div").fill("")
+          await clearTextField(page, secondHeadNoteEditorFieldArea)
           await secondHeadNoteEditor.locator("div").fill(wordWithTypo)
         })
 
@@ -142,7 +144,7 @@ test.describe(
             { category: DocumentUnitCategoriesEnum.TEXTS },
           )
           await expect(page.getByTestId("headnote")).toBeVisible()
-          await headNoteEditor.locator("div").click()
+          await headNoteEditorTextArea.click()
           await checkTextOfHeadnote(page)
           await headNoteEditor
             .locator("text-check")

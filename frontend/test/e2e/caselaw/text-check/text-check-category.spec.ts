@@ -1,5 +1,5 @@
 import { expect, Locator } from "@playwright/test"
-import { navigateToCategories } from "../e2e-utils"
+import { clearTextField, navigateToCategories } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { convertHexToRGB } from "~/test-helper/coloursUtil"
@@ -63,7 +63,10 @@ test.describe(
         tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],
       },
       async ({ page, prefilledDocumentUnit }) => {
-        await test.step("navigate to other headnote (Orientierungssatz) in categories", async () => {
+        const headNoteEditor = page.getByTestId("Orientierungssatz")
+        const headNoteEditorTextArea = headNoteEditor.locator("div")
+
+        await test.step("navigate to headnote (Orientierungssatz) in categories", async () => {
           await navigateToCategories(
             page,
             prefilledDocumentUnit.documentNumber,
@@ -71,19 +74,14 @@ test.describe(
           )
         })
 
-        await test.step("replace text in otherHeadNote (Orientierungssatz)", async () => {
-          const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
-          await otherHeadNoteEditor.locator("div").fill("")
+        await test.step("replace text in headnote (Orientierungssatz)", async () => {
+          await clearTextField(page, headNoteEditorTextArea)
 
-          await otherHeadNoteEditor.locator("div").fill(textWithErrors.text)
-          await expect(otherHeadNoteEditor.locator("div")).toHaveText(
-            textWithErrors.text,
-          )
+          await headNoteEditorTextArea.fill(textWithErrors.text)
+          await expect(headNoteEditorTextArea).toHaveText(textWithErrors.text)
         })
 
         await test.step("trigger category text button shows loading status and highlights matches", async () => {
-          const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
-
           await page
             .getByLabel("Orientierungssatz Button")
             .getByRole("button", { name: "Rechtschreibprüfung" })
@@ -93,7 +91,7 @@ test.describe(
             page.getByTestId("text-check-loading-status"),
           ).toHaveText("Rechtschreibprüfung läuft")
 
-          await otherHeadNoteEditor
+          await headNoteEditor
             .locator("text-check")
             .first()
             .waitFor({ state: "visible" })
@@ -166,10 +164,9 @@ test.describe(
         })
 
         await test.step("accept a selected suggestion replaces in text", async () => {
-          const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
-          await otherHeadNoteEditor.click()
+          await headNoteEditor.click()
 
-          await otherHeadNoteEditor.getByText("zB.").click()
+          await headNoteEditor.getByText("zB.").click()
 
           const textCheckLiteral = "zB."
           await expect(
@@ -179,7 +176,7 @@ test.describe(
           await page.getByTestId("suggestion-accept-button").click()
           await expect(page.getByTestId("text-check-modal")).toBeHidden()
 
-          await expect(otherHeadNoteEditor.locator("div")).toHaveText(
+          await expect(headNoteEditorTextArea).toHaveText(
             textWithErrors.text.replace(textCheckLiteral, "z. B."),
           )
 
@@ -187,11 +184,9 @@ test.describe(
         })
 
         await test.step("click on a selected suggestion, then click on a non-tag closes the text check modal", async () => {
-          const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
-
           await page.locator("text-check").nth(0).click()
           await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
-          await otherHeadNoteEditor.getByText("LanguageTool").click()
+          await headNoteEditor.getByText("LanguageTool").click()
           await expect(page.getByTestId("text-check-modal-word")).toBeHidden()
         })
 
