@@ -37,6 +37,7 @@ describe("BulkAssignProcedure", () => {
       "Wählen Sie mindestens eine Dokumentationseinheit aus",
       [],
     ])
+    expect(emitted().procedureAssigned).toBeUndefined()
     expect(bulkAssignServiceSpy).not.toHaveBeenCalled()
   })
 
@@ -52,6 +53,7 @@ describe("BulkAssignProcedure", () => {
       "Wählen Sie mindestens eine Dokumentationseinheit aus",
       [],
     ])
+    expect(emitted().procedureAssigned).toBeUndefined()
     expect(bulkAssignServiceSpy).not.toHaveBeenCalled()
   })
 
@@ -82,6 +84,7 @@ describe("BulkAssignProcedure", () => {
       "Nehmen Sie die Fremdanlage an, um sie zu einem Vorgang hinzuzufügen",
       ["1"],
     ])
+    expect(emitted().procedureAssigned).toBeUndefined()
     expect(bulkAssignServiceSpy).not.toHaveBeenCalled()
   })
 
@@ -105,6 +108,7 @@ describe("BulkAssignProcedure", () => {
     await fireEvent.click(screen.getByText("AssignProcedureMock"))
 
     expect(emitted().updateSelectionErrors[0]).toEqual([undefined, []])
+    expect(emitted().procedureAssigned[0]).toEqual([])
     expect(bulkAssignServiceSpy).toHaveBeenCalledExactlyOnceWith(
       "Vorgangsname",
       ["8123"],
@@ -148,6 +152,7 @@ describe("BulkAssignProcedure", () => {
     await fireEvent.click(screen.getByText("AssignProcedureMock"))
 
     expect(emitted().updateSelectionErrors[0]).toEqual([undefined, []])
+    expect(emitted().procedureAssigned).toBeUndefined()
     expect(bulkAssignServiceSpy).toHaveBeenCalledExactlyOnceWith(
       "Vorgangsname",
       ["4321", "1234"],

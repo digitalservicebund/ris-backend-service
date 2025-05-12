@@ -12,14 +12,14 @@ import DocumentUnitService from "@/services/documentUnitService"
 const props = defineProps<{
   documentationUnits: DocumentUnitListEntry[] | undefined
 }>()
-const emit =
-  defineEmits<
-    (
-      e: "updateSelectionErrors",
-      error: string | undefined,
-      documentationUnitIdsWithErrors: string[],
-    ) => void
-  >()
+const emit = defineEmits<{
+  (
+    e: "updateSelectionErrors",
+    error: string | undefined,
+    documentationUnitIdsWithErrors: string[],
+  ): void
+  (e: "procedureAssigned"): void
+}>()
 
 const hasBulkAssignError = ref(false)
 const toast = useToast()
@@ -38,6 +38,7 @@ const assignProcedure = async (procedure: Procedure) => {
   )
 
   if (!error) {
+    emit("procedureAssigned")
     const isPlural = documentationUnitIds.length > 1
     const verb = isPlural ? "en sind" : " ist"
     toast.add({
