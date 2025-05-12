@@ -88,13 +88,15 @@ public class FmxService {
     this.attachmentRepository = attachmentRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
 
-    fmxToHtml = xmlUtilService.getTemplates("caselawhandover/fmxToHtml.xslt");
+    fmxToHtml = xmlUtilService.getTemplates("xml/fmxToHtml.xslt");
     xPath = XPathFactory.newInstance().newXPath();
   }
 
   public void getDataFromEurlex(String celexNumber, DocumentationUnit documentationUnit) {
     String fmxFileContent = null;
-    String sourceUrl = "https://publications.europa.eu/resource/cellar/" + celexNumber + "/zip";
+    //    String sourceUrl = "https://publications.europa.eu/resource/celex/" + celexNumber;
+    String sourceUrl =
+        "http://publications.europa.eu/resource/cellar/fb003bb4-f7e2-11ee-a251-01aa75ed71a1";
     try {
       HttpClient client =
           HttpClient.newBuilder()
@@ -105,7 +107,7 @@ public class FmxService {
           HttpRequest.newBuilder()
               .uri(new URI(sourceUrl))
               .GET()
-              .header("Content-Type", "application/zip;mtype=fmx4")
+              .header("Accept", "application/zip;mtype=fmx4")
               .header("Accept-Language", "de")
               .build();
 

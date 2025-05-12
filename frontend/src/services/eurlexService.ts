@@ -4,16 +4,51 @@ import EURLexResult from "@/domain/eurlex"
 import errorMessages from "@/i18n/errors.json"
 
 interface EURLexService {
-  get(pageNumber?: number): Promise<ServiceResponse<Page<EURLexResult>>>
+  get(
+    pageNumber?: number,
+    fileNumber?: string,
+    celex?: string,
+    court?: string,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<ServiceResponse<Page<EURLexResult>>>
   transform(uri: string): Promise<ServiceResponse<string>>
 }
 
 const service: EURLexService = {
-  async get(pageNumber?: number) {
+  async get(
+    pageNumber?: number,
+    fileNumber?: string,
+    celex?: string,
+    court?: string,
+    startDate?: string,
+    endDate?: string,
+  ) {
+    const queryParams: { [key: string]: string } = {}
+
+    if (pageNumber) {
+      queryParams.page = "" + pageNumber
+    }
+    if (fileNumber) {
+      queryParams["file-number"] = fileNumber
+    }
+    if (celex) {
+      queryParams.celex = celex
+    }
+    if (court) {
+      queryParams.court = court
+    }
+    if (startDate) {
+      queryParams["start-date"] = startDate
+    }
+    if (endDate) {
+      queryParams["end-date"] = endDate
+    }
+
     const response = await httpClient.get<Page<EURLexResult>>(
       "caselaw/eurlex",
       {
-        params: pageNumber ? { page: "" + pageNumber } : {},
+        params: queryParams,
       },
     )
 

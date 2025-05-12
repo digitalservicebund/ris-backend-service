@@ -12,8 +12,24 @@ import service from "@/services/eurlexService"
 const searchResults = ref<Page<EURLexResult>>()
 const isEmptySearch = ref<boolean>(true)
 
+// query parameters
+const fileNumber = ref<string>()
+const celex = ref<string>()
+const court = ref<string>()
+const startDate = ref<string>()
+const endDate = ref<string>()
+
 async function updatePage(pageNumber: number) {
-  searchResults.value = (await service.get(pageNumber)).data
+  searchResults.value = (
+    await service.get(
+      pageNumber,
+      fileNumber.value,
+      celex.value,
+      court.value,
+      startDate.value,
+      endDate.value,
+    )
+  ).data
 }
 
 function resetSearch() {}
@@ -34,6 +50,7 @@ function resetSearch() {}
       <div>
         <InputField id="fileNumber" label="Aktenzeichen" visually-hide-label>
           <InputText
+            v-model="fileNumber"
             aria-label="Aktenzeichen Suche"
             fluid
             size="small"
@@ -43,6 +60,7 @@ function resetSearch() {}
       <div class="flex flex-row gap-10">
         <InputField id="courtType" label="Gerichtstyp" visually-hide-label>
           <InputText
+            v-model="court"
             aria-label="Gerichtstyp Suche"
             fluid
             placeholder="Gerichtstyp"
@@ -72,6 +90,7 @@ function resetSearch() {}
       <div class="">
         <InputField id="celex" label="Celex" visually-hide-label>
           <InputText
+            v-model="celex"
             aria-label="Celex-Nummer Suche"
             fluid
             size="small"
@@ -87,6 +106,7 @@ function resetSearch() {}
         >
           <DateInput
             id="decisionDateStartInput"
+            v-model="startDate"
             aria-label="Entscheidungsdatum Suche Start"
           ></DateInput>
         </InputField>
@@ -99,6 +119,7 @@ function resetSearch() {}
         >
           <DateInput
             id="decisionDateEndInput"
+            v-model="endDate"
             aria-label="Entscheidungsdatum Suche Ende"
             placeholder="TT.MM.JJJJ (optional)"
           ></DateInput>

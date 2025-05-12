@@ -8,9 +8,11 @@ import { computed, onMounted, ref } from "vue"
 import { ComboboxItem } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
+import { DocumentationUnitParameters } from "@/domain/documentUnit"
 import EURLexResult from "@/domain/eurlex"
 import errorMessages from "@/i18n/errors.json"
 import service from "@/services/comboboxItemService"
+import documentationUnitService from "@/services/documentUnitService"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconCallMade from "~icons/material-symbols/call-made"
 
@@ -48,7 +50,7 @@ function openPreview(entry: EURLexResult) {
   }
 }
 
-function handleAssignToDocOffice() {
+async function handleAssignToDocOffice() {
   if (selectedEntries.value?.length == 0) {
     noDecisionSelected.value = true
   }
@@ -56,6 +58,12 @@ function handleAssignToDocOffice() {
   if (!selectedDocumentationOffice.value) {
     noDocumentationOfficeSelected.value = true
   }
+
+  const params: DocumentationUnitParameters = {
+    documentationOffice: selectedDocumentationOffice.value,
+    celexNumber: selectedEntries.value[0].celex,
+  }
+  await documentationUnitService.createNew(params)
 }
 
 function selectRow() {

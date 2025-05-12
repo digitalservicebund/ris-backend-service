@@ -11,18 +11,18 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface DocumentationUnitHistoryLogRepository {
 
   /**
-   * Find all history logs for a documentation unit by its uuid
+   * Find all history logs for a documentation unit by its id
    *
-   * @param documentationUnitId the uuid of the documentation unit
+   * @param documentationUnitId the id of the documentation unit
    * @param user logged-in user for checking view permissions
    * @return a list of history logs for this documentation unit
    */
   List<HistoryLog> findByDocumentationUnitId(UUID documentationUnitId, User user);
 
   /**
-   * Find all history logs for a documentation unit by its uuid for a certain duration
+   * Find all history logs for a documentation unit by its id for a certain duration
    *
-   * @param documentationUnitId the uuid of the documentation unit
+   * @param documentationUnitId the id of the documentation unit
    * @param user logged-in user for checking view permissions
    * @param start timestamp for the start
    * @param end timestamp for the end
@@ -37,7 +37,7 @@ public interface DocumentationUnitHistoryLogRepository {
    *
    * @param id the id of the history log to be updated (can be null, if it is the first update log
    *     of the day, for the user
-   * @param documentationUnitId the uuid of the documentation unit
+   * @param documentationUnitId the id of the documentation unit
    * @param user logged-in user for checking view permissions
    */
   void saveHistoryLog(

@@ -23,7 +23,7 @@ public class FmxConverterService {
 
   public FmxConverterService(FmxRepository fmxRepository, XmlUtilService xmlUtilService) {
     this.fmxRepository = fmxRepository;
-    fmxToHtml = xmlUtilService.getTemplates("caselawhandover/fmxToHtml.xslt");
+    fmxToHtml = xmlUtilService.getTemplates("xml/fmxToHtml.xslt");
   }
 
   public Fmx2Html getFmx(UUID documentationUnitId) {

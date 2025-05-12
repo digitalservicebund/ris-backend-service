@@ -789,7 +789,7 @@ class ActiveCitationIntegrationTest {
                           .activeCitations()
                           .get(0)
                           .getCitationType())
-                  .extracting("uuid")
+                  .extracting("id")
                   .isEqualTo(UUID.fromString("4e768071-1a19-43a1-8ab9-c185adec94bf"));
               assertThat(
                       response
@@ -807,7 +807,7 @@ class ActiveCitationIntegrationTest {
                           .activeCitations()
                           .get(1)
                           .getCitationType())
-                  .extracting("uuid")
+                  .extracting("id")
                   .isEqualTo(UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"));
               assertThat(
                       response

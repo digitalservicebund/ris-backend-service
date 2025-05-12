@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -100,7 +101,7 @@ public class DocumentationUnitService {
     boolean isExternalHandover =
         params.documentationOffice() != null
             && userDocOffice != null
-            && !userDocOffice.uuid().equals(params.documentationOffice().uuid());
+            && !userDocOffice.id().equals(params.documentationOffice().id());
 
     DocumentationUnit docUnit =
         DocumentationUnit.builder()
@@ -134,9 +135,9 @@ public class DocumentationUnitService {
     var newDocumentationUnit =
         repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
 
-    //    fmxService.getDataFromEurlex(
-    //        "67474f27-bded-11ef-91ed-01aa75ed71a1.0001.03", newDocumentationUnit);
-    if (params.celexNumber() != null && !params.celexNumber().isBlank()) {}
+    if (Strings.isNotBlank(params.celexNumber())) {
+      fmxService.getDataFromEurlex(params.celexNumber(), newDocumentationUnit);
+    }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
     return newDocumentationUnit;
   }
