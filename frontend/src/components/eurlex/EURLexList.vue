@@ -145,6 +145,7 @@ function selectDocumentationOffice() {
         <Column>
           <template #body="{ data }">
             <Button
+              v-if="data.htmlLink"
               class="self-start"
               icon="pi"
               severity="secondary"
