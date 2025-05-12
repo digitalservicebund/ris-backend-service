@@ -79,7 +79,7 @@ describe("BulkAssignProcedure", () => {
     await fireEvent.click(screen.getByText("AssignProcedureMock"))
 
     expect(emitted().updateSelectionErrors[0]).toEqual([
-      "Nehmen Sie die Fremdanlage(n) an, um sie zu einem Vorgang hinzuzufügen",
+      "Nehmen Sie die Fremdanlage an, um sie zu einem Vorgang hinzuzufügen",
       ["1"],
     ])
     expect(bulkAssignServiceSpy).not.toHaveBeenCalled()

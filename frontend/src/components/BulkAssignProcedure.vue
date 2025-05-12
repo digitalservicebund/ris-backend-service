@@ -68,9 +68,10 @@ const areSelectedDocUnitsValid = () => {
     )
     .map((docUnit) => docUnit.uuid!)
   if (pendingDocUnitIds.length > 0) {
+    const noun = pendingDocUnitIds.length > 1 ? "Fremdanlagen" : "Fremdanlage"
     emit(
       "updateSelectionErrors",
-      "Nehmen Sie die Fremdanlage(n) an, um sie zu einem Vorgang hinzuzufügen",
+      `Nehmen Sie die ${noun} an, um sie zu einem Vorgang hinzuzufügen`,
       pendingDocUnitIds,
     )
     return false
