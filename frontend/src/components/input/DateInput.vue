@@ -3,7 +3,7 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import InputMask from "primevue/inputmask"
 import { computed, onMounted, ref, watch } from "vue"
-import { ValidationError } from "@/components/input/types"
+import { ValidationError } from "@/components/types"
 
 interface Props {
   id: string

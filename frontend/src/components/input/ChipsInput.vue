@@ -4,7 +4,7 @@ import { produce } from "immer"
 import { vMaska } from "maska/vue"
 import { nextTick, ref, watch, watchEffect, computed } from "vue"
 import ChipsList from "@/components/input/ChipsList.vue"
-import { ValidationError } from "@/components/input/types"
+import { ValidationError } from "@/components/types"
 import IconSubdirectoryArrowLeft from "~icons/ic/baseline-subdirectory-arrow-left"
 
 interface Props {

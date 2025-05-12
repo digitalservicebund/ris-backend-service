@@ -5,7 +5,7 @@ import { fireEvent, render, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
-import { TextAreaInputAttributes } from "@/components/input/types"
+import { TextAreaInputAttributes } from "@/components/types"
 import { longTextLabels } from "@/domain/documentUnit"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 

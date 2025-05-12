@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch, watchEffect } from "vue"
-import { ValidationError } from "@/components/input/types"
+import { ValidationError } from "@/components/types"
 
 type Props = {
   id: string

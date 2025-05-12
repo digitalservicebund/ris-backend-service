@@ -46,9 +46,7 @@ test.describe("inbox", () => {
         await navigateToInbox(pageWithBghUser)
         await expect(tab).toBeVisible()
         await tab.click()
-        await expect(
-          pageWithBghUser.getByTestId("pending-handover-list"),
-        ).toBeVisible()
+        await expect(pageWithBghUser.getByTestId("inbox-list")).toBeVisible()
       })
 
       await test.step("shows all pending handover documentation units for docoffice", async () => {
@@ -216,6 +214,116 @@ test.describe("inbox", () => {
       })
     },
   )
+
+  test("eu caselaw", { tag: ["@RISDEV-7375"] }, async ({ page }) => {
+    const documentNumber = "YYTestDoc0012"
+
+    await test.step("eu caselaw inbox can be accessed via top navbar", async () => {
+      const tab = page.getByTestId("eu-tab")
+      await navigateToInbox(page)
+      await expect(tab).toBeVisible()
+      await tab.click()
+      await expect(page.getByTestId("inbox-list")).toBeVisible()
+    })
+
+    await test.step("shows all eu documentation units for docoffice", async () => {
+      const rows = page.locator("tr")
+      const row = rows.filter({ hasText: documentNumber })
+      await expect(row).toHaveCount(1)
+
+      // Icons
+      await expect(
+        row.locator('[data-testid="file-attached-icon"]'),
+      ).toBeVisible()
+      await expect(row.getByTestId("headnote-principle-icon")).toBeVisible()
+      await expect(row.getByTestId("note-icon")).toBeVisible()
+      await expect(row.getByTestId("scheduling-icon")).toBeVisible()
+
+      await expect(row).toContainText("BVerwG") // Gerichtstyp
+      await expect(row).toContainText("09.09.1987") // Datum
+      await expect(row).toContainText("fileNumber4") // Aktenzeichen
+      await expect(row).toContainText("Veröffentlicht") // Status
+    })
+
+    await test.step("user can filter eu documentation units", async () => {
+      const tab = page.getByTestId("eu-inbox")
+      const fileNumberInput = tab.getByLabel("Aktenzeichen Suche")
+      const courtType = tab.getByLabel("Gerichtstyp Suche")
+      const courtLocation = tab.getByLabel("Gerichtsort Suche")
+      const docNumber = tab.getByLabel("Dokumentnummer Suche")
+      const decisionDate = tab.getByLabel("Entscheidungsdatum Suche", {
+        exact: true,
+      })
+      const decisionDateEnd = tab.getByLabel("Entscheidungsdatum Suche Ende", {
+        exact: true,
+      })
+
+      await expect(fileNumberInput).toBeVisible()
+      await expect(courtType).toBeVisible()
+      await expect(courtLocation).toBeVisible()
+      await expect(docNumber).toBeVisible()
+      await expect(decisionDate).toBeVisible()
+      await expect(decisionDateEnd).toBeVisible()
+
+      // search input filters only one docunit
+      await fileNumberInput.fill("fileNumber4")
+      await courtType.fill("BVerwG")
+      await courtLocation.fill("")
+      await docNumber.fill("YYTestDoc0012")
+      await decisionDate.fill("09.09.1987")
+
+      await page
+        .getByTestId("eu-inbox")
+        .getByLabel("Nach Dokumentationseinheiten suchen")
+        .click()
+
+      // header row and result row
+      await expect(page.locator("tr")).toHaveCount(2)
+    })
+
+    await test.step("switching tabs, resets the search form", async () => {
+      await page.getByRole("tab", { name: "Fremdanlagen" }).click()
+
+      // Wait for queries in url to be resetted
+      await page.waitForFunction(() => {
+        return !window.location.href.includes("fileNumber1")
+      })
+      await page.getByRole("tab", { name: "EU-Rechtsprechung" }).click()
+
+      await expect(page.getByLabel("Aktenzeichen Suche")).toHaveValue("")
+      await expect(page.getByLabel("Gerichtstyp Suche")).toHaveValue("")
+      await expect(page.getByLabel("Gerichtsort Suche")).toHaveValue("")
+      await expect(page.getByLabel("Dokumentnummer Suche")).toHaveValue("")
+      await expect(
+        page
+          .getByTestId("decision-date-input")
+          .getByLabel("Entscheidungsdatum Suche"),
+      ).toHaveValue("")
+    })
+
+    await test.step("eu documentation units can be edited and deleted", async () => {
+      const pagePromise = page.context().waitForEvent("page")
+      const rows = page.locator("tr")
+      const row = rows.filter({ hasText: documentNumber })
+      const editButton = row.getByRole("button", {
+        name: "Dokumentationseinheit bearbeiten",
+      })
+
+      await editButton.click()
+
+      const newTab = await pagePromise
+
+      await expect(newTab).toHaveURL(
+        /\/caselaw\/documentunit\/[A-Za-z0-9]{13}\/categories$/,
+      )
+
+      await row
+        .getByRole("button", {
+          name: "Dokumentationseinheit löschen",
+        })
+        .click()
+    })
+  })
 })
 
 async function createPendingHandoverDecisionForBGH(

@@ -2,7 +2,7 @@
 import Checkbox from "primevue/checkbox"
 import { computed, ref } from "vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import { ValidationError } from "@/components/input/types"
+import { ValidationError } from "@/components/types"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 

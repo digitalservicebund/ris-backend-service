@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import PendingHandoverList from "@/components/inbox/pending-handover/PendingHandoverList.vue"
+import InboxList from "@/components/inbox/shared/InboxList.vue"
 import { Page } from "@/components/Pagination.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
@@ -52,7 +52,7 @@ function renderComponent(props = {}) {
   })
   return {
     user,
-    ...render(PendingHandoverList, {
+    ...render(InboxList, {
       props: {
         pageEntries,
         ...props,

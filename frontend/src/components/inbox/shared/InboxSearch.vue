@@ -4,7 +4,10 @@ import InputText from "primevue/inputtext"
 import { computed, onBeforeUnmount, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import { ValidationError } from "@/components/input/types"
+import {
+  DocumentUnitSearchParameter,
+  ValidationError,
+} from "@/components/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 
@@ -146,23 +149,6 @@ watch(
 onBeforeUnmount(() => {
   resetSearch()
 })
-</script>
-
-<script lang="ts">
-export type DocumentUnitSearchParameter =
-  | "documentNumber"
-  | "fileNumber"
-  | "publicationStatus"
-  | "publicationDate"
-  | "scheduledOnly"
-  | "courtType"
-  | "courtLocation"
-  | "decisionDate"
-  | "decisionDateEnd"
-  | "withError"
-  | "myDocOfficeOnly"
-  | "withDuplicateWarning"
-  | "inboxStatus"
 </script>
 
 <template>

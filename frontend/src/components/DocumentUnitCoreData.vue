@@ -2,7 +2,7 @@
 import InputText from "primevue/inputtext"
 import InputSelect from "primevue/select"
 import { computed, toRefs, watch, ref, onMounted, onBeforeUnmount } from "vue"
-import { DropdownItem } from "./input/types"
+import { DropdownItem } from "./types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"

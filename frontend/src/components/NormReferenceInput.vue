@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
 import { computed, ref, watch } from "vue"
-import { ValidationError } from "./input/types"
+import { ValidationError } from "./types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import SingleNormInput from "@/components/SingleNormInput.vue"

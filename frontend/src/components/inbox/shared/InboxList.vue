@@ -67,7 +67,7 @@ watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
 </script>
 
 <template>
-  <div data-testId="pending-handover-list">
+  <div data-testId="inbox-list">
     <PopupModal
       v-if="showDeleteModal"
       aria-label="Dokumentationseinheit löschen"

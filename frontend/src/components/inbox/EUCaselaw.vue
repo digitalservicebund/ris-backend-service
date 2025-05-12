@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import PendingHandoverList from "./PendingHandoverList.vue"
-import PendingHandoverSearch, {
-  DocumentUnitSearchParameter,
-} from "./PendingHandoverSearch.vue"
+import { DocumentUnitSearchParameter } from "../types"
+import InboxList from "./shared/InboxList.vue"
+import InboxSearch from "./shared/InboxSearch.vue"
 import { Page } from "@/components/Pagination.vue"
 import { Query } from "@/composables/useQueryFromRoute"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
@@ -33,7 +32,7 @@ async function search() {
       : {}),
     ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
     ...searchQuery.value,
-    inboxStatus: "EXTERNAL_HANDOVER",
+    inboxStatus: "EU",
     myDocOfficeOnly: "true",
   })
   if (response.data) {
@@ -129,13 +128,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-24" data-testId="pending-handover-inbox">
-    <PendingHandoverSearch
+  <div class="flex flex-col gap-24" data-testId="eu-inbox">
+    <InboxSearch
       :is-loading="isLoading"
       @reset-search-results="handleReset"
       @search="updateQuery"
     />
-    <PendingHandoverList
+    <InboxList
       :page-entries="currentPage"
       @delete-documentation-unit="handleDelete"
       @take-over-documentation-unit="handleTakeOver"

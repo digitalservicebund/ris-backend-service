@@ -2,8 +2,8 @@ import httpClient, {
   FailedValidationServerResponse,
   ServiceResponse,
 } from "./httpClient"
-import { DocumentUnitSearchParameter } from "@/components/DocumentUnitSearchEntryForm.vue"
 import { Page } from "@/components/Pagination.vue"
+import { DocumentUnitSearchParameter } from "@/components/types"
 import DocumentUnit, {
   DocumentationUnitParameters,
   DuplicateRelationStatus,

@@ -4,7 +4,7 @@ import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import ChipsYearInput from "@/components/input/ChipsYearInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import type { ChipsInputModelType } from "@/components/input/types"
+import type { ChipsInputModelType } from "@/components/types"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 

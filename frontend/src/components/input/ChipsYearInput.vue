@@ -3,7 +3,7 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { computed, ref } from "vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
-import { ValidationError } from "@/components/input/types"
+import { ValidationError } from "@/components/types"
 
 interface Props {
   id: string

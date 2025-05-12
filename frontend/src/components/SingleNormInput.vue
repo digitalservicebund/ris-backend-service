@@ -2,7 +2,7 @@
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import { computed, onMounted, ref } from "vue"
-import { ValidationError } from "./input/types"
+import { ValidationError } from "./types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"

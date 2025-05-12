@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { config } from "@vue/test-utils"
 import InputText from "primevue/inputtext"
 import { createRouter, createWebHistory } from "vue-router"
-import PendingHandoverSearch from "@/components/inbox/pending-handover/PendingHandoverSearch.vue"
+import InboxSearch from "@/components/inbox/shared/InboxSearch.vue"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
@@ -16,7 +16,7 @@ function renderComponent() {
   })
   return {
     user,
-    ...render(PendingHandoverSearch, {
+    ...render(InboxSearch, {
       global: {
         directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [router],

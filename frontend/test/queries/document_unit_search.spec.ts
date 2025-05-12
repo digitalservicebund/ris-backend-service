@@ -1,6 +1,6 @@
 import { expect, test, Page, TestInfo } from "@playwright/test"
 import DocumentUnit from "../../src/domain/documentUnit"
-import { DocumentUnitSearchParameter } from "@/components/DocumentUnitSearchEntryForm.vue"
+import { DocumentUnitSearchParameter } from "@/components/types"
 import { getRequest } from "~/e2e/caselaw/e2e-utils"
 
 // This is a performance test for the backend search endpoint

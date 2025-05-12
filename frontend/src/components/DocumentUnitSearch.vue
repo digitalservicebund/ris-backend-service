@@ -3,10 +3,9 @@ import Button from "primevue/button"
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import DateUtil from "../utils/dateUtil"
+import { DocumentUnitSearchParameter } from "./types"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
-import DocumentUnitSearchEntryForm, {
-  DocumentUnitSearchParameter,
-} from "@/components/DocumentUnitSearchEntryForm.vue"
+import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { useInternalUser } from "@/composables/useInternalUser"

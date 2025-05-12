@@ -6,7 +6,11 @@ import InputSelect from "primevue/select"
 import { computed, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import { DropdownItem, ValidationError } from "@/components/input/types"
+import {
+  DocumentUnitSearchParameter,
+  DropdownItem,
+  ValidationError,
+} from "@/components/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { PublicationState } from "@/domain/publicationStatus"
@@ -213,22 +217,6 @@ watch(
   },
   { deep: true, immediate: true },
 )
-</script>
-
-<script lang="ts">
-export type DocumentUnitSearchParameter =
-  | "documentNumber"
-  | "fileNumber"
-  | "publicationStatus"
-  | "publicationDate"
-  | "scheduledOnly"
-  | "courtType"
-  | "courtLocation"
-  | "decisionDate"
-  | "decisionDateEnd"
-  | "withError"
-  | "myDocOfficeOnly"
-  | "withDuplicateWarning"
 </script>
 
 <template>
