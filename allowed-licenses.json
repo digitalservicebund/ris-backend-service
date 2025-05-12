@@ -80,6 +80,9 @@
     },
     {
       "moduleLicense": "GPL-3.0-only"
+    },
+    {
+      "moduleLicense": "BlueOak-1.0.0"
     }
   ]
 }
