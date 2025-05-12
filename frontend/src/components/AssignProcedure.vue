@@ -23,7 +23,7 @@ const assignProcedures = () => {
 
 <template>
   <div
-    class="grid grid-cols-[270px_auto] grid-rows-[auto_40px] gap-x-8 gap-y-4 [grid-template-areas:'input_button''errors_errors']"
+    class="my-16 grid grid-cols-[270px_auto] grid-rows-[auto_auto] gap-x-8 gap-y-4 [grid-template-areas:'input_button''errors_errors']"
   >
     <ComboboxInput
       id="procedure"
