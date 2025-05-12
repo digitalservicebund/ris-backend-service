@@ -104,7 +104,7 @@ describe("BulkAssignProcedure", () => {
 
     await fireEvent.click(screen.getByText("AssignProcedureMock"))
 
-    expect(emitted().updateSelectionErrors).toBeUndefined()
+    expect(emitted().updateSelectionErrors[0]).toEqual([undefined, []])
     expect(bulkAssignServiceSpy).toHaveBeenCalledExactlyOnceWith(
       "Vorgangsname",
       ["8123"],
@@ -147,7 +147,7 @@ describe("BulkAssignProcedure", () => {
 
     await fireEvent.click(screen.getByText("AssignProcedureMock"))
 
-    expect(emitted().updateSelectionErrors).toBeUndefined()
+    expect(emitted().updateSelectionErrors[0]).toEqual([undefined, []])
     expect(bulkAssignServiceSpy).toHaveBeenCalledExactlyOnceWith(
       "Vorgangsname",
       ["4321", "1234"],

@@ -16,7 +16,7 @@ const emit =
   defineEmits<
     (
       e: "updateSelectionErrors",
-      error: string,
+      error: string | undefined,
       documentationUnitIdsWithErrors: string[],
     ) => void
   >()
@@ -75,6 +75,7 @@ const areSelectedDocUnitsValid = () => {
     )
     return false
   }
+  emit("updateSelectionErrors", undefined, [])
   return true
 }
 </script>
