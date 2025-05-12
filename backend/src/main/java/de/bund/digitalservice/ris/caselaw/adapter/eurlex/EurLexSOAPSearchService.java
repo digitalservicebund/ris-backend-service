@@ -17,6 +17,7 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +91,8 @@ public class EurLexSOAPSearchService implements SearchService {
     if (lastResult.isEmpty()
         || lastResult.get().getCreatedAt().plus(1, ChronoUnit.DAYS).isBefore(Instant.now())) {
       if (lastResult.isPresent()) {
-        lastUpdate = lastResult.get().getPublicationDate();
+        lastUpdate =
+            LocalDate.ofInstant(lastResult.get().getCreatedAt(), ZoneId.of("Europe/Berlin"));
       } else {
         lastUpdate = LocalDate.now().withDayOfMonth(1);
         if (ChronoUnit.DAYS.between(lastUpdate, LocalDate.now()) < 5) {
@@ -183,7 +185,9 @@ public class EurLexSOAPSearchService implements SearchService {
         + "<soap:Body>"
         + "<sear:searchRequest>"
         + "<sear:expertQuery><![CDATA["
-        + "DTS_SUBDOM = EU_CASE_LAW AND PD >= "
+        + "DTS_SUBDOM = EU_CASE_LAW"
+        + " AND (FM_CODED = JUDG OR FM_CODED = ORDER)"
+        + " AND PD >= "
         + lastUpdate
         + " AND CASE_LAW_SUMMARY = false"
         + "]]></sear:expertQuery>"

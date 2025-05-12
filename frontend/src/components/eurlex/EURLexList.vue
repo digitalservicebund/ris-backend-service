@@ -8,13 +8,13 @@ import { computed, onMounted, ref } from "vue"
 import { ComboboxItem } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
+import { DocumentationUnitParameters } from "@/domain/documentUnit"
 import EURLexResult from "@/domain/eurlex"
 import errorMessages from "@/i18n/errors.json"
 import service from "@/services/comboboxItemService"
 import documentationUnitService from "@/services/documentUnitService"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconCallMade from "~icons/material-symbols/call-made"
-import { DocumentationUnitParameters } from "@/domain/documentUnit"
 
 const props = defineProps<{
   pageEntries?: Page<EURLexResult>
@@ -42,7 +42,7 @@ onMounted(async () => {
   documentationOffices.value = comboboxItems?.map(
     (item) =>
       ({
-        id: item.value?.uuid,
+        id: item.value?.id,
         abbreviation: item.value?.abbreviation,
       }) as DocumentationOffice,
   )
