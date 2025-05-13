@@ -321,7 +321,7 @@ test.describe("inbox", () => {
         ).toBeVisible()
       })
 
-      await test.step("Weise den Zugang zu, so dass die Dokumnetationseinheiten aus dem Eingang entfernt werden", async () => {
+      await test.step("Weise den Zugang zu, so dass die Dokumentationseinheiten aus dem Eingang entfernt werden", async () => {
         await pageWithBghUser
           .getByRole("button", { name: "Zu Vorgang hinzufügen" })
           .click()
@@ -330,7 +330,11 @@ test.describe("inbox", () => {
           pageWithBghUser.getByText("Hinzufügen erfolgreich"),
         ).toBeVisible()
 
-        // TODO: expect "Keine Ergebnisse" Text
+        await expect(
+          pageWithBghUser.getByText(
+            "Es liegen keine Dokumentationseinheiten vor.",
+          ),
+        ).toBeVisible()
       })
 
       await deleteDocumentUnit(pageWithBghUser, docNumber1)
