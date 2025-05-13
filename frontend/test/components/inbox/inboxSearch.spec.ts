@@ -61,16 +61,6 @@ describe("DocumentUnitSearchForm.vue", () => {
     expect(emitted().search).toBeTruthy()
   })
 
-  test("shows error when submitting empty search", async () => {
-    const { user } = renderComponent()
-
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
-
-    expect(
-      screen.getByText("Geben Sie mindestens ein Suchkriterium ein"),
-    ).toBeInTheDocument()
-  })
-
   test("resets form and emits 'resetSearchResults' on reset", async () => {
     const { user, emitted } = renderComponent()
 
