@@ -20,6 +20,8 @@ test.describe("inbox", () => {
 
       let documentNumber1 = ""
       let documentNumber2 = ""
+      const fileNumber1 = generateString({ length: 10 })
+      const fileNumber2 = generateString({ length: 10 })
 
       await test.step("create pending handover documentation units for docoffice", async () => {
         documentNumber1 = await createPendingHandoverDecisionForBGH(
@@ -28,7 +30,7 @@ test.describe("inbox", () => {
           "12",
           "AG Aachen",
           dayjs("2025-01-01").format("DD.MM.YYYY"),
-          "fileNumber1",
+          fileNumber1,
           "AnU",
         )
 
@@ -38,7 +40,7 @@ test.describe("inbox", () => {
           "13",
           "AG Aalen",
           dayjs("2001-01-01").format("DD.MM.YYYY"),
-          "fileNumber2",
+          fileNumber2,
           "Bes",
         )
       })
@@ -72,7 +74,7 @@ test.describe("inbox", () => {
         await expect(rowWithDocNumber1).toContainText("AG") // Gerichtstyp
         await expect(rowWithDocNumber1).toContainText("Aachen") // Gerichtsort
         await expect(rowWithDocNumber1).toContainText("01.01.2025") // Datum
-        await expect(rowWithDocNumber1).toContainText("fileNumber1") // Aktenzeichen
+        await expect(rowWithDocNumber1).toContainText(fileNumber1) // Aktenzeichen
         await expect(rowWithDocNumber1).toContainText(
           `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (DS)`,
         ) // Quelle
@@ -120,7 +122,7 @@ test.describe("inbox", () => {
         await expect(decisionDateEnd).toBeVisible()
 
         // search input filters only one docunit
-        await fileNumberInput.fill("fileNumber1")
+        await fileNumberInput.fill(fileNumber1)
         await courtType.fill("AG")
         await courtLocation.fill("Aachen")
         await docNumber.fill(documentNumber1)
@@ -140,10 +142,10 @@ test.describe("inbox", () => {
           .getByRole("tab", { name: "EU-Rechtsprechung" })
           .click()
 
-        // Wait for queries in url to be resetted
-        await pageWithBghUser.waitForFunction(() => {
-          return !window.location.href.includes("fileNumber1")
-        })
+        // Wait for queries in url to be reset
+        await pageWithBghUser.waitForFunction((fileNumber) => {
+          return !window.location.href.includes(fileNumber)
+        }, fileNumber1)
         await pageWithBghUser.getByRole("tab", { name: "Fremdanlagen" }).click()
 
         await expect(
