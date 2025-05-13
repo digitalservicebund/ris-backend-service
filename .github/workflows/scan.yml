@@ -25,7 +25,7 @@ jobs:
 #        with:
 #          scan-type: "image"
       - name: Download trivy vulnerabilities DB
-        uses: aquasecurity/trivy-action@99baf0d8b4e787c3cfd7b602664c8ce60a43cd38
+        uses: aquasecurity/trivy-action@b3dafe507ffa004210975439a1e6156b8ebb3f50
         env:
           TRIVY_DEBUG: true
           TRIVY_DOWNLOAD_DB_ONLY: true
@@ -34,7 +34,7 @@ jobs:
         with:
           scan-type: "image"
       - name: Download trivy Java index DB
-        uses: aquasecurity/trivy-action@99baf0d8b4e787c3cfd7b602664c8ce60a43cd38
+        uses: aquasecurity/trivy-action@b3dafe507ffa004210975439a1e6156b8ebb3f50
         env:
           TRIVY_DEBUG: true
           TRIVY_DOWNLOAD_JAVA_DB_ONLY: true
@@ -55,7 +55,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@99baf0d8b4e787c3cfd7b602664c8ce60a43cd38
+        uses: aquasecurity/trivy-action@b3dafe507ffa004210975439a1e6156b8ebb3f50
         env:
           TRIVY_USERNAME: ${{ github.actor }}
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@99baf0d8b4e787c3cfd7b602664c8ce60a43cd38
+        uses: aquasecurity/trivy-action@b3dafe507ffa004210975439a1e6156b8ebb3f50
         env:
           TRIVY_USERNAME: ${{ github.actor }}
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
@@ -95,7 +95,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb
+        uses: sigstore/cosign-installer@e9a05e6d32d7ed22b5656cd874ef31af58d05bfa
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -127,7 +127,7 @@ jobs:
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@99baf0d8b4e787c3cfd7b602664c8ce60a43cd38
+        uses: aquasecurity/trivy-action@b3dafe507ffa004210975439a1e6156b8ebb3f50
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
@@ -153,7 +153,7 @@ jobs:
       - name: Run Trivy vulnerability file scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@99baf0d8b4e787c3cfd7b602664c8ce60a43cd38
+        uses: aquasecurity/trivy-action@b3dafe507ffa004210975439a1e6156b8ebb3f50
         with:
           scan-type: "fs"
           scan-ref: "./frontend"
@@ -178,7 +178,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@99baf0d8b4e787c3cfd7b602664c8ce60a43cd38
+        uses: aquasecurity/trivy-action@b3dafe507ffa004210975439a1e6156b8ebb3f50
         env:
           TRIVY_USERNAME: ${{ github.actor }}
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
@@ -189,7 +189,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb
+        uses: sigstore/cosign-installer@e9a05e6d32d7ed22b5656cd874ef31af58d05bfa
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions

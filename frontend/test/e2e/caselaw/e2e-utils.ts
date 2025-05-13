@@ -446,6 +446,11 @@ export async function clearInput(page: Page, ariaLabel: string) {
   await input.clear()
 }
 
+export async function clearTextField(page: Page, locator: Locator) {
+  await locator.click({ clickCount: 3 })
+  await page.keyboard.press("Backspace")
+}
+
 export async function fillNormInputs(
   page: Page,
   values?: {

@@ -216,6 +216,7 @@ describe("ScheduledPublishingDateTime", () => {
     await fireEvent.update(dateField, "40.01.205")
     await fireEvent.blur(dateField)
 
+    expect(dateField).toHaveValue("40.01.205")
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
 
     expect(
@@ -231,10 +232,10 @@ describe("ScheduledPublishingDateTime", () => {
     })
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
-    await fireEvent.update(timeField, "a")
+    await fireEvent.update(timeField, "invalid")
     await fireEvent.blur(timeField)
 
-    expect(timeField).toHaveValue("a")
+    expect(timeField).toHaveValue("invalid")
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
 
     expect(

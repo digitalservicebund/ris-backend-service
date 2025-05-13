@@ -17,22 +17,22 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.proxy.HibernateProxy;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-@EqualsAndHashCode(callSuper = true)
 @ToString(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "decision", schema = "incremental_migration")
@@ -203,4 +203,29 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   @Builder.Default
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
+
+  @Override
+  @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar
+  public final boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null) return false;
+    Class<?> oEffectiveClass =
+        o instanceof HibernateProxy hibernateProxy
+            ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass()
+            : o.getClass();
+    Class<?> thisEffectiveClass =
+        this instanceof HibernateProxy hibernateProxy
+            ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass()
+            : this.getClass();
+    if (thisEffectiveClass != oEffectiveClass) return false;
+    DecisionDTO that = (DecisionDTO) o;
+    return getId() != null && Objects.equals(getId(), that.getId());
+  }
+
+  @Override
+  public final int hashCode() {
+    return this instanceof HibernateProxy hibernateProxy
+        ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass().hashCode()
+        : getClass().hashCode();
+  }
 }
