@@ -8,6 +8,8 @@ import {
   navigateToPeriodicalReferences,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("inbox", () => {
   test(
@@ -212,6 +214,125 @@ test.describe("inbox", () => {
 
         await expect(doc2Row).toBeHidden()
       })
+    },
+  )
+
+  test(
+    "Angenommene Fremdanlagen können einem Vorgang zugewiesen werden",
+    { tag: ["@RISDEV-7374"] },
+    async ({ page, pageWithBghUser, edition }) => {
+      const fileNumber = generateString({ length: 10 })
+
+      let docNumber1 = ""
+      let docNumber2 = ""
+
+      await test.step("Erstelle zwei Fremdanlagen für BGH", async () => {
+        docNumber1 = await createPendingHandoverDecisionForBGH(
+          page,
+          edition,
+          "12",
+          "AG Aachen",
+          dayjs("2025-01-01").format("DD.MM.YYYY"),
+          fileNumber,
+          "AnU",
+        )
+
+        docNumber2 = await createPendingHandoverDecisionForBGH(
+          page,
+          edition,
+          "12",
+          "AG Aachen",
+          dayjs("2025-01-01").format("DD.MM.YYYY"),
+          fileNumber,
+          "AnU",
+        )
+      })
+
+      await test.step("Suche nach Aktenzeichen der Fremdanlagen", async () => {
+        await navigateToInbox(pageWithBghUser)
+        const fileNumberInput = pageWithBghUser.getByLabel("Aktenzeichen Suche")
+        await fileNumberInput.fill(fileNumber)
+        await pageWithBghUser
+          .getByTestId("pending-handover-inbox")
+          .getByLabel("Nach Dokumentationseinheiten suchen")
+          .click()
+        // 2 results + 1 header
+        await expect(pageWithBghUser.getByRole("row")).toHaveCount(2 + 1)
+      })
+
+      await test.step("Nimm eine Fremdanlage an", async () => {
+        const rows = pageWithBghUser.locator("tr")
+        const doc1Row = rows.filter({ hasText: docNumber1 })
+
+        const takeOverButton = doc1Row.getByRole("button", {
+          name: "Dokumentationseinheit übernehmen",
+        })
+        await takeOverButton.click()
+      })
+
+      await test.step("Wähle Vorgang aus", async () => {
+        const procedureName = generateString({ length: 10 })
+        await pageWithBghUser
+          .getByRole("textbox", { name: "Vorgang auswählen" })
+          .fill(procedureName)
+        await pageWithBghUser
+          .getByText(`${procedureName} neu erstellen`)
+          .click()
+      })
+
+      await test.step("Wähle alle Dokumentationseinheiten aus", async () => {
+        await pageWithBghUser
+          .getByRole("checkbox", {
+            name: "Alle Elemente abgewählt",
+          })
+          .click()
+        await expect(
+          pageWithBghUser.getByRole("checkbox", {
+            name: "Alle Elemente ausgewählt",
+          }),
+        ).toBeChecked()
+      })
+
+      await test.step("Weise den Zugang zu und erhalte einen Fehler wegen der offenen Fremdanlage", async () => {
+        await pageWithBghUser
+          .getByRole("button", { name: "Zu Vorgang hinzufügen" })
+          .click()
+        await expect(
+          pageWithBghUser.getByText(
+            "Nehmen Sie die Fremdanlage an, um sie zu einem Vorgang hinzuzufügen",
+          ),
+        ).toBeVisible()
+      })
+
+      await test.step("Nimm die zweite Fremdanlage an", async () => {
+        const rows = pageWithBghUser.locator("tr")
+        const doc2Row = rows.filter({ hasText: docNumber2 })
+
+        await doc2Row
+          .getByRole("button", { name: "Dokumentationseinheit übernehmen" })
+          .click()
+
+        await expect(
+          doc2Row.getByRole("button", {
+            name: "Dokumentationseinheit bearbeiten",
+          }),
+        ).toBeVisible()
+      })
+
+      await test.step("Weise den Zugang zu, so dass die Dokumnetationseinheiten aus dem Eingang entfernt werden", async () => {
+        await pageWithBghUser
+          .getByRole("button", { name: "Zu Vorgang hinzufügen" })
+          .click()
+
+        await expect(
+          pageWithBghUser.getByText("Hinzufügen erfolgreich"),
+        ).toBeVisible()
+
+        // TODO: expect "Keine Ergebnisse" Text
+      })
+
+      await deleteDocumentUnit(pageWithBghUser, docNumber1)
+      await deleteDocumentUnit(pageWithBghUser, docNumber2)
     },
   )
 

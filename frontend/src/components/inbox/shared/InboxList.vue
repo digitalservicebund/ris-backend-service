@@ -5,7 +5,9 @@ import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import { computed, ref, watch } from "vue"
+import BulkAssignProcedure from "@/components/BulkAssignProcedure.vue"
 import IconBadge from "@/components/IconBadge.vue"
+import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import Tooltip from "@/components/Tooltip.vue"
@@ -53,6 +55,23 @@ function showDeleteConfirmationDialog(
   showDeleteModal.value = true
 }
 
+// When changing a page or accepting a Fremdanlage (takeover), the docUnit list is updated.
+// We only want to keep docUnits in the selection if the docUnit is still visible.
+watch(
+  () => props.pageEntries,
+  () => {
+    const selectedIds = selectedDocumentationUnits.value.map(
+      (docUnit) => docUnit.uuid,
+    )
+    selectedDocumentationUnits.value =
+      props.pageEntries?.content.filter((entry) =>
+        selectedIds.includes(entry.uuid),
+      ) ?? []
+  },
+  // On takeover, we mutate the page content -> needs deep watching
+  { deep: 2 },
+)
+
 /**
  * Propagates delete event to parent and closes modal again
  */
@@ -63,7 +82,29 @@ function onDelete() {
   }
 }
 
+const selectedDocumentationUnits = ref<DocumentUnitListEntry[]>([])
+const selectionErrorMessage = ref<string | undefined>(undefined)
+const selectionErrorDocUnitIds = ref<string[]>([])
+function updateSelectionErrors(
+  error: string | undefined,
+  docUnitIds: string[],
+) {
+  selectionErrorMessage.value = error
+  selectionErrorDocUnitIds.value = docUnitIds
+}
+
+function reloadList() {
+  selectedDocumentationUnits.value = []
+  emit("updatePage", 0)
+}
+
 watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
+
+const rowStyleClass = (rowData: DocumentUnitListEntry) => {
+  return selectionErrorDocUnitIds.value.includes(rowData.uuid!)
+    ? "bg-red-300"
+    : ""
+}
 </script>
 
 <template>
@@ -78,21 +119,53 @@ watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
       @close-modal="showDeleteModal = false"
       @primary-action="onDelete"
     />
+    <BulkAssignProcedure
+      :documentation-units="selectedDocumentationUnits"
+      @procedure-assigned="reloadList"
+      @update-selection-errors="updateSelectionErrors"
+    />
+    <InputErrorMessages
+      v-if="selectionErrorMessage"
+      :error-message="selectionErrorMessage"
+    />
     <Pagination
       navigation-position="bottom"
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
     >
       <DataTable
+        v-model:selection="selectedDocumentationUnits"
         class="ris-label2-bold text-gray-900"
         :pt="{
           thead: {
             style: 'box-shadow: inset 0 -2px #DCE8EF;',
           },
         }"
+        :row-class="rowStyleClass"
         :value="entries"
       >
-        <Column selection-mode="multiple"></Column>
+        <Column
+          :pt="{
+            pcRowCheckbox: {
+              input: {
+                style:
+                  selectionErrorMessage && selectionErrorDocUnitIds.length === 0
+                    ? 'border-color: var(--color-red-800)'
+                    : '',
+              },
+            },
+            pcHeaderCheckbox: {
+              input: {
+                style:
+                  selectionErrorMessage && selectionErrorDocUnitIds.length === 0
+                    ? 'border-color: var(--color-red-800)'
+                    : '',
+              },
+            },
+          }"
+          selection-mode="multiple"
+        >
+        </Column>
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center space-x-8">

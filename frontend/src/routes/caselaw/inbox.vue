@@ -10,7 +10,7 @@ import PendingHandover from "@/components/inbox/PendingHandover.vue"
 </script>
 
 <template>
-  <Tabs class="m-32" lazy value="2">
+  <Tabs class="m-32" lazy value="0">
     <TabList>
       <Tab data-testId="external-handover-tab" value="0">Fremdanlagen</Tab>
       <Tab data-testId="eu-tab" value="1">EU-Rechtsprechung</Tab>

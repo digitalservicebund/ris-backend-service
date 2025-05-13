@@ -7,6 +7,12 @@ import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
 import routes from "~/test-helper/routes"
 
+// The bulk-assign-procedure component uses a toast
+const addToastMock = vi.fn()
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: addToastMock }),
+}))
+
 const mockEntries = [
   new DocumentUnitListEntry({
     uuid: "1",
