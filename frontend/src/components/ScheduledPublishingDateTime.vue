@@ -52,10 +52,12 @@ const scheduledPublishingTime = ref<string | undefined>(
 /* eslint-enable vue/no-ref-object-reactivity-loss */
 
 const scheduledDateTimeInput = computed(() =>
-  dayjs.tz(
-    scheduledPublishingDate.value + "T" + scheduledPublishingTime.value,
-    "Europe/Berlin",
-  ),
+  isDateValid.value && isTimeValid.value
+    ? dayjs.tz(
+        scheduledPublishingDate.value + "T" + scheduledPublishingTime.value,
+        "Europe/Berlin",
+      )
+    : undefined,
 )
 
 const isScheduled = computed<boolean>(
@@ -66,6 +68,7 @@ const isDateInFuture = computed<boolean>(
   () =>
     !scheduledPublishingDate.value ||
     !scheduledPublishingTime.value ||
+    !scheduledDateTimeInput.value ||
     scheduledDateTimeInput.value.isAfter(new Date()),
 )
 
@@ -98,7 +101,7 @@ const saveScheduling = async () => {
   }
 
   storedScheduledPublicationDateTime.value =
-    scheduledDateTimeInput.value.toISOString()
+    scheduledDateTimeInput.value?.toISOString()
 
   documentUnitStore.documentUnit!.managementData.scheduledByEmail =
     sessionStore.user?.email
@@ -143,7 +146,7 @@ const dateValidationError = ref<ValidationError | undefined>()
 <template>
   <div class="flex flex-col gap-16">
     <p>Oder für später terminieren:</p>
-    <div class="flex max-w-640 flex-row items-end gap-8">
+    <div class="flex max-w-[640px] flex-row items-end gap-8">
       <InputField id="scheduledPublishingDate" label="Datum *">
         <DateInput
           id="publishingDate"
@@ -161,7 +164,9 @@ const dateValidationError = ref<ValidationError | undefined>()
           id="publishingTime"
           v-model="scheduledPublishingTime"
           aria-label="Terminierte Uhrzeit"
+          class="w-full"
           :disabled="!isPublishable"
+          :invalid="!isTimeValid"
           mask="99:99"
           placeholder="HH:MM"
           :readonly="isScheduled"
@@ -170,7 +175,7 @@ const dateValidationError = ref<ValidationError | undefined>()
       <Button
         v-if="(!isScheduled && !isSaving) || (isScheduled && isSaving)"
         aria-label="Termin setzen"
-        class="w-fit"
+        class="mb-4 w-fit"
         :disabled="!isPublishable || !isValidDateTime || isSaving"
         label="Termin&nbsp;setzen"
         :loading="isSaving"
@@ -180,7 +185,7 @@ const dateValidationError = ref<ValidationError | undefined>()
       <Button
         v-if="(isScheduled && !isSaving) || (!isScheduled && isSaving)"
         aria-label="Termin löschen"
-        class="w-fit shrink-0"
+        class="mb-4 w-fit shrink-0"
         :disabled="isSaving"
         label="Termin&nbsp;löschen"
         :loading="isSaving"

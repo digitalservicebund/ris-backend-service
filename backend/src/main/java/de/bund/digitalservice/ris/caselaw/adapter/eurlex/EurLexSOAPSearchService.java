@@ -15,9 +15,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,19 +86,22 @@ public class EurLexSOAPSearchService implements SearchService {
     Optional<EurLexResultDTO> lastResult = repository.findTopByOrderByCreatedAtDesc();
 
     LocalDate lastUpdate;
-    if (lastResult.isEmpty()
-        || lastResult.get().getCreatedAt().plus(1, ChronoUnit.DAYS).isBefore(Instant.now())) {
-      if (lastResult.isPresent()) {
-        lastUpdate = lastResult.get().getPublicationDate();
-      } else {
-        lastUpdate = LocalDate.now().withDayOfMonth(1);
-        if (ChronoUnit.DAYS.between(lastUpdate, LocalDate.now()) < 5) {
-          lastUpdate = lastUpdate.minusMonths(1);
-        }
-      }
-
-      requestNewestDecisions(1, lastUpdate);
-    }
+    //    if (lastResult.isEmpty()
+    //        || lastResult.get().getCreatedAt().plus(1, ChronoUnit.DAYS).isBefore(Instant.now())) {
+    //      if (lastResult.isPresent()) {
+    //
+    //        lastUpdate =
+    //            LocalDate.ofInstant(lastResult.get().getCreatedAt(), ZoneId.of("Europe/Berlin"));
+    //      } else {
+    //        lastUpdate = LocalDate.now().withDayOfMonth(1);
+    //        if (ChronoUnit.DAYS.between(lastUpdate, LocalDate.now()) < 5) {
+    //          lastUpdate = lastUpdate.minusMonths(1);
+    //        }
+    //      }
+    //
+    //      requestNewestDecisions(1, lastUpdate.minusMonths(1));
+    //    }
+    requestNewestDecisions(1, LocalDate.now().minusMonths(1));
 
     return repository
         .findAllBySearchParameters(
@@ -183,8 +185,10 @@ public class EurLexSOAPSearchService implements SearchService {
         + "<soap:Body>"
         + "<sear:searchRequest>"
         + "<sear:expertQuery><![CDATA["
-        + "DTS_SUBDOM = EU_CASE_LAW AND PD >= "
-        + lastUpdate
+        + "DTS_SUBDOM = EU_CASE_LAW"
+        + " AND (FM_CODED = JUDG OR FM_CODED = ORDER)"
+        + " AND DD >= "
+        + lastUpdate.format(DateTimeFormatter.ofPattern("dd/MM/yyy"))
         + " AND CASE_LAW_SUMMARY = false"
         + "]]></sear:expertQuery>"
         + "<sear:page>"

@@ -45,6 +45,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -94,9 +95,7 @@ public class FmxService {
 
   public void getDataFromEurlex(String celexNumber, DocumentationUnit documentationUnit) {
     String fmxFileContent = null;
-    //    String sourceUrl = "https://publications.europa.eu/resource/celex/" + celexNumber;
-    String sourceUrl =
-        "http://publications.europa.eu/resource/cellar/fb003bb4-f7e2-11ee-a251-01aa75ed71a1";
+    String sourceUrl = "https://publications.europa.eu/resource/celex/" + celexNumber;
     try {
       HttpClient client =
           HttpClient.newBuilder()
@@ -162,14 +161,20 @@ public class FmxService {
       Node tenor = (Node) xPath.compile(TENOR_XPATH).evaluate(doc, XPathConstants.NODE);
       Node reasons = (Node) xPath.compile(REASONS_XPATH).evaluate(doc, XPathConstants.NODE);
       Node signatures = (Node) xPath.compile(SIGNATURES_XPATH).evaluate(doc, XPathConstants.NODE);
-      reasons.removeChild(tenor);
-      reasons.appendChild(signatures);
+      if (reasons != null && tenor != null) {
+        reasons.removeChild(tenor);
+      }
+      if (reasons != null && signatures != null) {
+        reasons.appendChild(signatures);
+      }
 
       CoreData.CoreDataBuilder coreDataBuilder = documentationUnit.coreData().toBuilder();
       LongTexts.LongTextsBuilder longTextsBuilder = documentationUnit.longTexts().toBuilder();
 
-      coreDataBuilder.decisionDate(
-          LocalDate.parse(decisionDate, DateTimeFormatter.ofPattern("yyyyMMdd")));
+      if (Strings.isNotBlank(decisionDate)) {
+        coreDataBuilder.decisionDate(
+            LocalDate.parse(decisionDate, DateTimeFormatter.ofPattern("yyyyMMdd")));
+      }
       coreDataBuilder.ecli(ecli);
       coreDataBuilder.fileNumbers(List.of(fileNumber));
       coreDataBuilder.celexNumber(celex);

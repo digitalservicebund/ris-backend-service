@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.CacheControl;
@@ -482,6 +484,26 @@ public class DocumentationUnitController {
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Error handing over documentation unit '{}' to portal", uuid, e);
       return ResponseEntity.internalServerError().build();
+    }
+  }
+
+  /**
+   * Assigns a procedure to a list of documentation units. Also removes the documentation units from
+   * the inbox (e.g. EU inbox or Fremdanlage inbox)
+   */
+  @PatchMapping(value = "/bulk-assign-procedure")
+  @PreAuthorize("@userHasBulkWriteAccess.apply(#body.getDocumentationUnitIds())")
+  public ResponseEntity<Void> bulkAssignProcedure(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @RequestBody @Valid BulkAssignProcedureRequest body) {
+    try {
+      User user = userService.getUser(oidcUser);
+      service.bulkAssignProcedure(body.getDocumentationUnitIds(), body.getProcedureLabel(), user);
+      return ResponseEntity.ok().build();
+    } catch (DocumentationUnitNotExistsException e) {
+      return ResponseEntity.notFound().build();
+    } catch (BadRequestException e) {
+      return ResponseEntity.badRequest().build();
     }
   }
 

@@ -20,8 +20,8 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.8.0"
-    id("io.sentry.jvm.gradle") version "5.4.0"
+    id("org.flywaydb.flyway") version "11.8.1"
+    id("io.sentry.jvm.gradle") version "5.5.0"
 }
 
 group = "de.bund.digitalservice"
@@ -171,7 +171,7 @@ dependencies {
     implementation("net.minidev:json-smart:2.5.2")
 
     // CVE-2025-24970
-    implementation("io.netty:netty-handler:4.2.0.Final")
+    implementation("io.netty:netty-handler:4.2.1.Final")
 
     implementation("org.postgresql:postgresql:42.7.5")
 
@@ -183,12 +183,12 @@ dependencies {
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.2")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.3")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
     implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.6")
-    implementation("net.sf.saxon:Saxon-HE:12.5")
+    implementation("net.sf.saxon:Saxon-HE:12.6")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
@@ -214,8 +214,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.14.6")
-    implementation("io.micrometer:micrometer-core:1.14.6")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.7")
+    implementation("io.micrometer:micrometer-core:1.14.7")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
@@ -223,16 +223,16 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.13.1")
     implementation("org.jsoup:jsoup:1.20.1")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.5.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.5.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.6.1")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.6.1")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.11.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.8.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.8.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.8.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.8.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -242,7 +242,7 @@ dependencies {
 
     testImplementation("io.projectreactor:reactor-test:3.7.5")
     testImplementation("org.springframework.security:spring-security-test:6.4.5")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
