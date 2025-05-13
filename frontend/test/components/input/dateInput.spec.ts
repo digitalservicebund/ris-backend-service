@@ -4,7 +4,7 @@ import { config } from "@vue/test-utils"
 import InputText from "primevue/inputtext"
 import { nextTick } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
-import { ValidationError } from "@/components/types"
+import { ValidationError } from "@/components/input/types"
 
 function renderComponent(options?: {
   ariaLabel?: string

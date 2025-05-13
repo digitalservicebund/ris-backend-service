@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
-import { ValidationError } from "@/components/types"
+import { ValidationError } from "@/components/input/types"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 

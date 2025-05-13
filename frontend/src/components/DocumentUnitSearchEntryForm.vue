@@ -6,13 +6,10 @@ import InputSelect from "primevue/select"
 import { computed, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import {
-  DocumentUnitSearchParameter,
-  DropdownItem,
-  ValidationError,
-} from "@/components/types"
+import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
+import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
 import { PublicationState } from "@/domain/publicationStatus"
 
 defineProps<{

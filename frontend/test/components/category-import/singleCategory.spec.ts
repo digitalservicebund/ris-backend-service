@@ -2,7 +2,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
-import { ValidationError } from "@/components/types"
+import { ValidationError } from "@/components/input/types"
 import routes from "~/test-helper/routes"
 
 function renderComponent(options?: {

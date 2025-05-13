@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { ComboboxAttributes, ComboboxItem } from "@/components/types"
+import { ComboboxAttributes, ComboboxItem } from "@/components/input/types"
 import { Court } from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"
 

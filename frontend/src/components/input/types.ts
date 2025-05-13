@@ -225,17 +225,3 @@ export type ValidationError = {
   message: string
   instance: string
 }
-
-export type DocumentUnitSearchParameter =
-  | "documentNumber"
-  | "fileNumber"
-  | "publicationStatus"
-  | "publicationDate"
-  | "scheduledOnly"
-  | "courtType"
-  | "courtLocation"
-  | "decisionDate"
-  | "decisionDateEnd"
-  | "withError"
-  | "myDocOfficeOnly"
-  | "withDuplicateWarning"

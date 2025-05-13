@@ -2,7 +2,7 @@
 import { Component, nextTick } from "vue"
 import TextEditor from "../input/TextEditor.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
-import { TextAreaInputAttributes } from "@/components/types"
+import { TextAreaInputAttributes } from "@/components/input/types"
 
 interface Props {
   id: string

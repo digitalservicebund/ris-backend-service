@@ -20,9 +20,9 @@ import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
 import TextEditorFooter from "@/components/input/TextEditorFooter.vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
+import { TextAreaInputAttributes } from "@/components/input/types"
 import TextCheckModal from "@/components/text-check/TextCheckModal.vue"
 import TextCheckStatus from "@/components/text-check/TextCheckStatus.vue"
-import { TextAreaInputAttributes } from "@/components/types"
 import {
   BorderNumber,
   BorderNumberContent,

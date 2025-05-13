@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios"
-import { ValidationError } from "@/components/types"
+import { ValidationError } from "@/components/input/types"
 import errorMessages from "@/i18n/errors.json"
 
 type RequestOptions = {

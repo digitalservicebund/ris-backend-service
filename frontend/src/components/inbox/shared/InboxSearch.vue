@@ -4,12 +4,10 @@ import InputText from "primevue/inputtext"
 import { computed, onBeforeUnmount, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import {
-  DocumentUnitSearchParameter,
-  ValidationError,
-} from "@/components/types"
+import { ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
+import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
 
 defineProps<{
   isLoading?: boolean

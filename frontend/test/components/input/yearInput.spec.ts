@@ -3,8 +3,8 @@ import { render, screen } from "@testing-library/vue"
 import { config } from "@vue/test-utils"
 import InputText from "primevue/inputtext"
 import { nextTick } from "vue"
+import { ValidationError } from "@/components/input/types"
 import YearInput from "@/components/input/YearInput.vue"
-import { ValidationError } from "@/components/types"
 
 function renderComponent(options?: {
   id?: string

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import { DocumentUnitSearchParameter } from "../types"
 import InboxList from "./shared/InboxList.vue"
 import InboxSearch from "./shared/InboxSearch.vue"
 import { Page } from "@/components/Pagination.vue"
 import { Query } from "@/composables/useQueryFromRoute"
+import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"

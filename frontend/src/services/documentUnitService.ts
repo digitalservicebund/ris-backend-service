@@ -3,8 +3,8 @@ import httpClient, {
   ServiceResponse,
 } from "./httpClient"
 import { Page } from "@/components/Pagination.vue"
-import { DocumentUnitSearchParameter } from "@/components/types"
 import DocumentUnit, {
+  DocumentUnitSearchParameter,
   DocumentationUnitParameters,
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"

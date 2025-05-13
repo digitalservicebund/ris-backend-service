@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import { ValidationError } from "@/components/types"
+import { ValidationError } from "@/components/input/types"
 import errors from "@/i18n/errors.json"
 import { isErrorCode } from "@/i18n/utils"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"

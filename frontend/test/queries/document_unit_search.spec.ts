@@ -1,6 +1,7 @@
 import { expect, test, Page, TestInfo } from "@playwright/test"
-import DocumentUnit from "../../src/domain/documentUnit"
-import { DocumentUnitSearchParameter } from "@/components/types"
+import DocumentUnit, {
+  DocumentUnitSearchParameter,
+} from "@/domain/documentUnit"
 import { getRequest } from "~/e2e/caselaw/e2e-utils"
 
 // This is a performance test for the backend search endpoint
