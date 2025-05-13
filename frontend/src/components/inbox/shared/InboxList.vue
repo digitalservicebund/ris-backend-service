@@ -7,12 +7,14 @@ import DataTable from "primevue/datatable"
 import { computed, ref, watch } from "vue"
 import BulkAssignProcedure from "@/components/BulkAssignProcedure.vue"
 import IconBadge from "@/components/IconBadge.vue"
+import InfoModal from "@/components/InfoModal.vue"
 import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { ResponseError } from "@/services/httpClient"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconCheck from "~icons/ic/baseline-check"
 import IconDelete from "~icons/ic/baseline-close"
@@ -24,6 +26,7 @@ import IconClock from "~icons/ic/outline-watch-later"
 
 const props = defineProps<{
   pageEntries?: Page<DocumentUnitListEntry>
+  error?: ResponseError
 }>()
 
 const emit = defineEmits<{
@@ -343,7 +346,16 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
             </div>
           </template>
         </Column>
+        <template v-if="!error" #empty>
+          <div class="mt-40 grid justify-items-center bg-white">
+            Es liegen keine Dokumentationseinheiten vor.
+          </div>
+        </template>
       </DataTable>
+      <!-- Error State -->
+      <div v-if="error">
+        <InfoModal :description="error.description" :title="error.title" />
+      </div>
     </Pagination>
   </div>
 </template>

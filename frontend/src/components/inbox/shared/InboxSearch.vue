@@ -45,11 +45,6 @@ function resetErrors(id?: DocumentUnitSearchParameter) {
 }
 
 function isSearchInputInvalid() {
-  if (isEmptySearch.value) {
-    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
-    return true
-  }
-
   if (hasValidationErrors()) {
     submitButtonError.value = "Fehler in Suchkriterien"
     return true
@@ -131,11 +126,7 @@ function handleSearchButtonClicked() {
 }
 
 function handleSearch() {
-  if (!isEmptySearch.value) {
-    emit("search", getQueryFromRoute())
-  } else {
-    resetSearch()
-  }
+  emit("search", getQueryFromRoute())
 }
 
 watch(
@@ -301,8 +292,8 @@ onBeforeUnmount(() => {
           <Button
             aria-label="Nach Dokumentationseinheiten suchen"
             class="self-start"
-            :disabled="isLoading"
             label="Ergebnisse anzeigen"
+            :loading="isLoading"
             size="small"
             @click="handleSearchButtonClicked"
           ></Button>

@@ -135,6 +135,7 @@ onMounted(async () => {
       @search="updateQuery"
     />
     <InboxList
+      :error="searchResponseError"
       :page-entries="currentPage"
       @delete-documentation-unit="handleDelete"
       @take-over-documentation-unit="handleTakeOver"
