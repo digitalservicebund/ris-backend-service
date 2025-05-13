@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -56,6 +57,8 @@ public class PostgresEurLexResultRepository implements EurLexResultRepository {
       builderQuery.where(predicates.toArray(new Predicate[0]));
     }
 
+    builderQuery.orderBy(builder.desc(root.get("createdAt")));
+
     Query query =
         entityManager
             .createQuery(builderQuery)
@@ -110,6 +113,8 @@ public class PostgresEurLexResultRepository implements EurLexResultRepository {
 
     endDate.ifPresent(
         date -> predicates.add(builder.lessThanOrEqualTo(root.get("createdAt"), date)));
+
+    predicates.add(builder.equal(root.get("status"), EurLexResultStatus.NEW));
 
     return predicates;
   }

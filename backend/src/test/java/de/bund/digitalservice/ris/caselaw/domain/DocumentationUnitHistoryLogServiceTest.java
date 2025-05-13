@@ -30,7 +30,7 @@ class DocumentationUnitHistoryLogServiceTest {
   @Test
   void getHistoryLogs() {
     DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
+        DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
@@ -55,7 +55,7 @@ class DocumentationUnitHistoryLogServiceTest {
   @Test
   void saveHistoryLog_NonUpdateType() {
     DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
+        DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
@@ -71,7 +71,7 @@ class DocumentationUnitHistoryLogServiceTest {
   @Test
   void saveHistoryLog_UpdateTypeWithoutExistingLog() {
     DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
+        DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
@@ -88,7 +88,7 @@ class DocumentationUnitHistoryLogServiceTest {
   @Test
   void saveHistoryLog_UpdateTypeWithExistingLog() {
     DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
+        DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 

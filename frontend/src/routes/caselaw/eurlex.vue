@@ -5,6 +5,11 @@ import TabPanel from "primevue/tabpanel"
 import TabPanels from "primevue/tabpanels"
 import Tabs from "primevue/tabs"
 import EURLexSearch from "@/components/eurlex/EURLexSearch.vue"
+import useSessionStore from "@/stores/sessionStore"
+
+const sessionStore = useSessionStore()
+const documentationOfficeAbbreviation =
+  sessionStore.user?.documentationOffice?.abbreviation
 </script>
 
 <template>
@@ -12,7 +17,15 @@ import EURLexSearch from "@/components/eurlex/EURLexSearch.vue"
     <TabList>
       <Tab value="0">Fremdanlagen</Tab>
       <Tab value="1">EU-Rechtsprechung</Tab>
-      <Tab value="2">EUR-Lex</Tab>
+      <Tab
+        v-if="
+          documentationOfficeAbbreviation === 'BFH' ||
+          documentationOfficeAbbreviation === 'BGH' ||
+          documentationOfficeAbbreviation === 'DS'
+        "
+        value="2"
+        >EUR-Lex</Tab
+      >
     </TabList>
     <TabPanels>
       <TabPanel value="0"></TabPanel>

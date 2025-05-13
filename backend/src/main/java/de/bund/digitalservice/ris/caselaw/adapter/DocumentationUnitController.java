@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurlexCreationParameters;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -34,6 +35,7 @@ import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -117,6 +119,30 @@ public class DocumentationUnitController {
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
       return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
+    }
+  }
+
+  /**
+   * Generate a new documentation unit out of eurlex decision.
+   *
+   * @param oidcUser the logged-in user
+   * @param parameters the parameters for the new documentation unit (optional)
+   * @return the new documentation unit or an empty response with status code 500 if the creation
+   *     failed
+   */
+  @PutMapping(value = "new/eurlex", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
+  public ResponseEntity<List<String>> generateNewDocumentationUnitOutOfEurlexDecision(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @RequestBody(required = false) Optional<EurlexCreationParameters> parameters) {
+    try {
+
+      List<String> documentationNumbers =
+          service.generateNewDocumentationUnitOutOfEurlexDecision(userService.getUser(oidcUser), parameters);
+      return ResponseEntity.status(HttpStatus.CREATED).body(documentationNumbers);
+    } catch (DocumentationUnitException e) {
+      log.error("error in generate new documentation unit", e);
+      return ResponseEntity.internalServerError().body(Collections.emptyList());
     }
   }
 

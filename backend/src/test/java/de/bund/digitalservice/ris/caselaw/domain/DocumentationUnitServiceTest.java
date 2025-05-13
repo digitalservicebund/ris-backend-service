@@ -82,7 +82,7 @@ class DocumentationUnitServiceTest {
           DocumentNumberPatternException,
           DocumentNumberFormatterException {
     DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
+        DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
@@ -123,10 +123,10 @@ class DocumentationUnitServiceTest {
           DocumentNumberPatternException,
           DocumentNumberFormatterException {
     DocumentationOffice userDocumentationOffice =
-        DocumentationOffice.builder().abbreviation("BAG").uuid(UUID.randomUUID()).build();
+        DocumentationOffice.builder().abbreviation("BAG").id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(userDocumentationOffice).build();
     DocumentationOffice designatedDocumentationOffice =
-        DocumentationOffice.builder().abbreviation("BGH").uuid(UUID.randomUUID()).build();
+        DocumentationOffice.builder().abbreviation("BGH").id(UUID.randomUUID()).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
     DocumentationUnitCreationParameters parameters =
         DocumentationUnitCreationParameters.builder()

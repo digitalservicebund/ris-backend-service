@@ -347,7 +347,7 @@ class ManagementDataTransformerTest {
           User.builder()
               .documentationOffice(
                   DocumentationOffice.builder()
-                      .uuid(creatingAndUpdatingDocOffice.getId())
+                      .id(creatingAndUpdatingDocOffice.getId())
                       .abbreviation(creatingAndUpdatingDocOffice.getAbbreviation())
                       .build())
               .build();
@@ -382,7 +382,7 @@ class ManagementDataTransformerTest {
       User user =
           User.builder()
               .documentationOffice(
-                  DocumentationOffice.builder().uuid(docOfficeId).abbreviation("BGH").build())
+                  DocumentationOffice.builder().id(docOfficeId).abbreviation("BGH").build())
               .build();
 
       // Act
@@ -418,7 +418,7 @@ class ManagementDataTransformerTest {
       User user =
           User.builder()
               .documentationOffice(
-                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
               .build();
 
       // Act
@@ -452,7 +452,7 @@ class ManagementDataTransformerTest {
       User user =
           User.builder()
               .documentationOffice(
-                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
               .build();
 
       // Act
@@ -479,7 +479,7 @@ class ManagementDataTransformerTest {
       User user =
           User.builder()
               .documentationOffice(
-                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
               .build();
 
       // Act
@@ -573,7 +573,7 @@ class ManagementDataTransformerTest {
       User user =
           User.builder()
               .documentationOffice(
-                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
               .build();
 
       // Act
@@ -658,7 +658,7 @@ class ManagementDataTransformerTest {
       User user =
           User.builder()
               .documentationOffice(
-                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
               .build();
 
       // Act
@@ -692,7 +692,7 @@ class ManagementDataTransformerTest {
       User user =
           User.builder()
               .documentationOffice(
-                  DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
               .build();
 
       // Act

@@ -5,6 +5,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpa
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurlexCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -12,8 +13,8 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatc
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,32 @@ public class DocumentationUnitService {
   public DocumentationUnit generateNewDocumentationUnit(
       User user, Optional<DocumentationUnitCreationParameters> parameters)
       throws DocumentationUnitException {
+
+    return generateNewDocumentationUnit(user, parameters, null);
+  }
+
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public List<String> generateNewDocumentationUnitOutOfEurlexDecision(
+      User user, Optional<EurlexCreationParameters> parameters)
+      throws DocumentationUnitException {
+
+    List<String> documentNumbers = new ArrayList<>();
+
+    if (parameters.isPresent() && !parameters.get().celexNumbers().isEmpty()) {
+      for (String celexNumber : parameters.get().celexNumbers()) {
+        documentNumbers.add(
+            generateNewDocumentationUnit(
+                    user,
+                    parameters.map(params -> DocumentationUnitCreationParameters.builder().documentationOffice(params.documentationOffice()).build()),
+                    celexNumber)
+                .documentNumber());
+      }
+    }
+
+    return documentNumbers;
+  }
+
+  private DocumentationUnit generateNewDocumentationUnit(User user, Optional<DocumentationUnitCreationParameters> parameters, String celexNumber) {
     var userDocOffice = user.documentationOffice();
     // default office is user office
     DocumentationUnitCreationParameters params =
@@ -137,10 +164,11 @@ public class DocumentationUnitService {
     var newDocumentationUnit =
         repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
 
-    if (Strings.isNotBlank(params.celexNumber())) {
-      fmxService.getDataFromEurlex(params.celexNumber(), newDocumentationUnit);
+    if (celexNumber != null) {
+      fmxService.getDataFromEurlex(celexNumber, newDocumentationUnit);
     }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
+
     return newDocumentationUnit;
   }
 

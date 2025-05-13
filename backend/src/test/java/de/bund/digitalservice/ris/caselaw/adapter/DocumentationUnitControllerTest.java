@@ -668,7 +668,7 @@ class DocumentationUnitControllerTest {
       throws DocumentationUnitNotExistsException {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder()
-            .uuid(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .id(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
             .abbreviation("DS")
             .build();
     String documentNumber = "ABCD202200001";
@@ -804,7 +804,7 @@ class DocumentationUnitControllerTest {
     when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder()
-            .uuid(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .id(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
             .abbreviation("DS")
             .build();
 
@@ -840,7 +840,7 @@ class DocumentationUnitControllerTest {
     when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder()
-            .uuid(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .id(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
             .abbreviation("DS")
             .build();
 
@@ -879,7 +879,7 @@ class DocumentationUnitControllerTest {
     when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder()
-            .uuid(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .id(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
             .abbreviation("DS")
             .build();
 
