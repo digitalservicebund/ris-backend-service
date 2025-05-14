@@ -53,8 +53,13 @@ public class HandoverMailTransformer {
                 .map(
                     attachmentDTO -> {
                       String fileContent;
+
                       try {
-                        fileContent = prettifyXml(attachmentDTO.getXml());
+                        if (entityType == HandoverEntityType.DOCUMENTATION_UNIT) {
+                          fileContent = prettifyXml(attachmentDTO.getXml());
+                        } else {
+                          fileContent = attachmentDTO.getXml();
+                        }
                       } catch (Exception e) {
                         fileContent = attachmentDTO.getXml();
                       }
