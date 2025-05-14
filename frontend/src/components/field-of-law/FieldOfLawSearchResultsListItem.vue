@@ -16,7 +16,7 @@ const emit = defineEmits<{
   <div class="flex flex-row items-start gap-8 px-16 py-8">
     <button
       :aria-label="fieldOfLaw.identifier + ' hinzufügen'"
-      class="ds-link-02-bold"
+      class="ris-link2-bold"
       tabindex="0"
       @click="emit('node:add', fieldOfLaw)"
       @keyup.enter="emit('node:add', fieldOfLaw)"
@@ -25,7 +25,7 @@ const emit = defineEmits<{
         fieldOfLaw.identifier
       }}</span>
     </button>
-    <span class="ds-label-02-reg mt-2">
+    <span class="ris-label2-regular mt-2">
       <TokenizeText
         :keywords="fieldOfLaw.linkedFields ?? []"
         :text="fieldOfLaw.text"

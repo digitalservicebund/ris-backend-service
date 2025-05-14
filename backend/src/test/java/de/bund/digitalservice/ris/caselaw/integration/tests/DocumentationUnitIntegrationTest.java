@@ -6,6 +6,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLIS
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -21,9 +22,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
@@ -34,6 +35,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
@@ -48,17 +50,22 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
+import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
@@ -66,14 +73,20 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -84,8 +97,10 @@ import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisBodySpec;
@@ -93,13 +108,16 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -133,7 +151,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       OAuthService.class,
       TestConfig.class,
       DocumentNumberPatternConfig.class,
-      KeycloakUserService.class
+      KeycloakUserService.class,
+      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
+      DocumentationUnitHistoryLogService.class
     },
     controllers = {DocumentationUnitController.class})
 @Sql(scripts = {"classpath:courts_init.sql"})
@@ -168,6 +188,9 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
   @Autowired private AuthService authService;
   @Autowired private HandoverService handoverService;
+  @Autowired private DocumentationUnitStatusService documentationUnitStatusService;
+  @Autowired private DocumentationUnitHistoryLogRepository historyLogRepository;
+  @Autowired private DatabaseProcedureRepository procedureRepository;
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
   @MockitoBean private DocxConverterService docxConverterService;
@@ -176,7 +199,7 @@ class DocumentationUnitIntegrationTest {
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private HandoverReportRepository handoverReportRepository;
-  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
+  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
 
@@ -229,6 +252,16 @@ class DocumentationUnitIntegrationTest {
 
     List<DocumentationUnitDTO> list = repository.findAll();
     assertThat(list).hasSize(1);
+
+    User user = User.builder().documentationOffice(docOffice).build();
+    var historyLogs = historyLogRepository.findByDocumentationUnitId(list.getFirst().getId(), user);
+    assertThat(historyLogs).hasSize(1);
+    assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.CREATE);
+    assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
+    assertThat(historyLogs.getFirst().description()).isEqualTo("Dokeinheit angelegt");
+    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
+    assertThat(historyLogs.getFirst().createdAt())
+        .isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
   }
 
   @Test
@@ -1318,6 +1351,98 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
+  void testGenerateNewDocumentationUnit_ManagementData_shouldSetCreatedBy() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "ZZREYYYY*****"));
+    var createdDocUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/new")
+            .exchange()
+            .expectStatus()
+            .isCreated()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData createdManagementData = createdDocUnit.managementData();
+    assertThat(createdManagementData.createdByDocOffice()).isEqualTo("DS");
+    assertThat(createdManagementData.createdAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(createdManagementData.createdByName()).isEqualTo("testUser");
+
+    var docUnitGetSameDocOffice =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + createdDocUnit.documentNumber())
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData managementDataSameDocOffice = docUnitGetSameDocOffice.managementData();
+    assertThat(managementDataSameDocOffice.createdByDocOffice()).isEqualTo("DS");
+    assertThat(managementDataSameDocOffice.createdAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(managementDataSameDocOffice.createdByName()).isEqualTo("testUser");
+  }
+
+  @Test
+  void
+      testGenerateNewDocumentationUnit_ManagementData_shouldSetCreatedByAndHideNameForOtherDocOffice()
+          throws DocumentationUnitNotExistsException {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "ZZREYYYY*****"));
+    var createdDocUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/new")
+            .exchange()
+            .expectStatus()
+            .isCreated()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData createdManagementData = createdDocUnit.managementData();
+    assertThat(createdManagementData.createdByDocOffice()).isEqualTo("DS");
+    assertThat(createdManagementData.createdAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(createdManagementData.createdByName()).isEqualTo("testUser");
+
+    // Publish the doc unit so that other doc office can access it
+    var status =
+        Status.builder()
+            .publicationStatus(PublicationStatus.PUBLISHED)
+            .createdAt(Instant.now())
+            .build();
+    documentationUnitStatusService.update(createdDocUnit.documentNumber(), status, null);
+
+    var docUnitForDifferentDocOffice =
+        risWebTestClient
+            .withLogin("/BGH")
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + createdDocUnit.documentNumber())
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    ManagementData managementDataForOtherDocOffice = docUnitForDifferentDocOffice.managementData();
+    assertThat(managementDataForOtherDocOffice.createdByDocOffice()).isEqualTo("DS");
+    assertThat(managementDataForOtherDocOffice.createdAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(managementDataForOtherDocOffice.createdByName()).isNull();
+  }
+
+  @Test
   void testGenerateNewDocumentationUnit_withExternalUser_shouldBeForbidden() {
     risWebTestClient
         .withExternalLogin()
@@ -1370,13 +1495,16 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  void testTakeOverDocumentationUnit_setsStatusAndPermissionsCorrectly() {
+  void testTakeOverDocumentationUnit_setsStatusAndPermissionsCorrectlyAndCreatesHistoryLog() {
     DocumentationOfficeDTO creatingDocumentationOffice =
         documentationOfficeRepository.findByAbbreviation("BGH");
     String documentNumber = "1234567890123";
 
-    EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
-        repository, documentationOffice, creatingDocumentationOffice, documentNumber);
+    var ds = documentationOfficeRepository.findByAbbreviation("DS");
+
+    var pendingDocUnit =
+        EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
+            repository, documentationOffice, creatingDocumentationOffice, documentNumber);
 
     risWebTestClient
         .withDefaultLogin()
@@ -1394,5 +1522,180 @@ class DocumentationUnitIntegrationTest {
               assertThat(response.getResponseBody().isDeletable()).isTrue();
               assertThat(response.getResponseBody().isEditable()).isTrue();
             });
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitId(
+            pendingDocUnit.getId(),
+            User.builder()
+                .documentationOffice(DocumentationOfficeTransformer.transformToDomain(ds))
+                .build());
+    assertThat(historyLogs).hasSize(1);
+    assertThat(historyLogs.getFirst().createdAt())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
+    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
+    assertThat(historyLogs.getFirst().description())
+        .isEqualTo("Status geändert: Fremdanlage → Unveröffentlicht");
+    assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.STATUS);
+  }
+
+  @Nested
+  class BulkAssignProcedure {
+    @Test
+    void shouldAssignNewProcedureToMultipleDocUnitsWithInboxStatus() {
+      var decisionBuilder1 =
+          DecisionDTO.builder()
+              .documentNumber("DOCNUMBER_001")
+              .documentationOffice(documentationOffice)
+              .inboxStatus(InboxStatus.EXTERNAL_HANDOVER);
+      var docUnit1 =
+          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+              repository, decisionBuilder1);
+
+      var decisionBuilder2 =
+          DecisionDTO.builder()
+              .documentNumber("DOCNUMBER_002")
+              .documentationOffice(documentationOffice)
+              .inboxStatus(InboxStatus.EU);
+      var docUnit2 =
+          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+              repository, decisionBuilder2);
+      var docUnitIds = List.of(docUnit1.getId(), docUnit2.getId());
+      risWebTestClient
+          .withDefaultLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/bulk-assign-procedure")
+          .bodyValue(new BulkAssignProcedureRequest("new_procedure", docUnitIds))
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      var updatedDocUnits = repository.findAll();
+      assertThat(updatedDocUnits)
+          .hasSize(2)
+          .map(DocumentationUnitDTO::getProcedure)
+          .map(ProcedureDTO::getLabel)
+          .containsExactlyInAnyOrder("new_procedure", "new_procedure");
+
+      assertThat(updatedDocUnits)
+          .map(DocumentationUnitDTO::getInboxStatus)
+          .containsExactly(null, null);
+    }
+
+    @Test
+    void shouldAssignExistingProcedureToSingleDocUnitWithoutInboxStatus() {
+      var procedure =
+          ProcedureDTO.builder()
+              .documentationOffice(documentationOffice)
+              .label("existing_procedure")
+              .build();
+      procedureRepository.save(procedure);
+      var decisionBuilder1 =
+          DecisionDTO.builder()
+              .documentNumber("DOCNUMBER_001")
+              .documentationOffice(documentationOffice)
+              .inboxStatus(null);
+      var docUnit1 =
+          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+              repository, decisionBuilder1);
+
+      var docUnitIds = List.of(docUnit1.getId());
+      risWebTestClient
+          .withDefaultLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/bulk-assign-procedure")
+          .bodyValue(new BulkAssignProcedureRequest("existing_procedure", docUnitIds))
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      var updatedDocUnits = repository.findAll();
+      assertThat(updatedDocUnits).hasSize(1);
+
+      assertThat(updatedDocUnits.getFirst().getProcedure().getLabel())
+          .isEqualTo("existing_procedure");
+
+      assertThat(updatedDocUnits.getFirst().getInboxStatus()).isNull();
+    }
+
+    @Test
+    void shouldRollbackIfOneUpdateFails() {
+      ProcedureDTO procedure =
+          ProcedureDTO.builder()
+              .documentationOffice(documentationOffice)
+              .label("old_procedure")
+              .build();
+      procedureRepository.save(procedure);
+      var decisionBuilder1 =
+          DecisionDTO.builder()
+              .documentNumber("DOCNUMBER_001")
+              .documentationOffice(documentationOffice)
+              .procedure(procedure)
+              .inboxStatus(InboxStatus.EXTERNAL_HANDOVER);
+      var docUnit1 =
+          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+              repository, decisionBuilder1);
+
+      var pendingProceedingBuilder2 =
+          PendingProceedingDTO.builder()
+              .documentNumber("DOCNUMBER_002")
+              .documentationOffice(documentationOffice)
+              .inboxStatus(InboxStatus.EU);
+      var pendingProceeding2 = repository.save(pendingProceedingBuilder2.build());
+
+      var decisionBuilder3 =
+          DecisionDTO.builder()
+              .documentNumber("DOCNUMBER_003")
+              .documentationOffice(documentationOffice)
+              .inboxStatus(InboxStatus.EU);
+      var docUnit3 =
+          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+              repository, decisionBuilder3);
+      var docUnitIds = List.of(docUnit1.getId(), pendingProceeding2.getId(), docUnit3.getId());
+      risWebTestClient
+          .withDefaultLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/bulk-assign-procedure")
+          .bodyValue(new BulkAssignProcedureRequest("new_procedure", docUnitIds))
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
+
+      var updatedDocUnits = repository.findAll();
+      assertThat(updatedDocUnits)
+          .hasSize(3)
+          .map(DocumentationUnitDTO::getProcedure)
+          .map(Optional::ofNullable)
+          .map(p -> p.map(ProcedureDTO::getLabel).orElse(null))
+          .containsExactlyInAnyOrder("old_procedure", null, null);
+
+      assertThat(updatedDocUnits)
+          .map(DocumentationUnitDTO::getInboxStatus)
+          .containsExactlyInAnyOrder(InboxStatus.EXTERNAL_HANDOVER, InboxStatus.EU, InboxStatus.EU);
+    }
+
+    @Test
+    void shouldRejectRequestForDocUnitFromOtherDocOffice() {
+      var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+
+      var decisionBuilder1 =
+          DecisionDTO.builder()
+              .documentNumber("DOCNUMBER_001")
+              .documentationOffice(bghDocOffice)
+              .inboxStatus(InboxStatus.EXTERNAL_HANDOVER);
+      var docUnit1 =
+          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+              repository, decisionBuilder1);
+
+      var docUnitIds = List.of(docUnit1.getId());
+      risWebTestClient
+          .withDefaultLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/bulk-assign-procedure")
+          .bodyValue(new BulkAssignProcedureRequest("new_procedure", docUnitIds))
+          .exchange()
+          .expectStatus()
+          .isForbidden();
+    }
   }
 }

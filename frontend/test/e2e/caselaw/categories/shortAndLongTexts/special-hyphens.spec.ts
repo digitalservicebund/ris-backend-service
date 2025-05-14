@@ -4,9 +4,9 @@ import {
   copyPasteTextFromAttachmentIntoEditor,
   navigateToAttachments,
   navigateToCategories,
+  navigateToHandover,
   save,
   uploadTestfile,
-  navigateToHandover,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -54,7 +54,7 @@ test.describe(
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
         await page.getByLabel("Navigation schließen").click()
         await clickCategoryButton("Gründe", page)
-        const editor = page.locator("[data-testid='Gründe']")
+        const editor = page.getByTestId("Gründe")
 
         await test.step("copy text with special hyphen from side panel into reasons", async () => {
           const attachmentLocator = page

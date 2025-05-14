@@ -4,7 +4,6 @@ import {
   navigateToAttachments,
   navigateToCategories,
   uploadTestfile,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -55,9 +54,7 @@ test.describe(
         // procedure is only displayed in categories
         await test.step("open categories and check if procedure is filled", async () => {
           await navigateToCategories(page, documentNumber)
-          await waitForInputValue(
-            page,
-            "[aria-label='Vorgang']",
+          await expect(page.getByLabel("Vorgang", { exact: true })).toHaveValue(
             "metadata-vorgang",
           )
         })

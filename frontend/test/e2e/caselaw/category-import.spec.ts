@@ -5,7 +5,6 @@ import {
   fillNormInputs,
   navigateToCategories,
   save,
-  waitForInputValue,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 import SingleNorm from "@/domain/singleNorm"
@@ -182,12 +181,14 @@ test.describe("category import", () => {
           }),
         ).toBeVisible()
         await page.getByText("MM | Mieter Magazin", { exact: true }).click()
-        await waitForInputValue(page, "[aria-label='Periodikum']", "MM")
+        await expect(
+          page.getByLabel("Periodikum", { exact: true }),
+        ).toHaveValue("MM")
 
         await fillInput(page, "Zitatstelle", "2024, 50-53, Heft 1")
         await fillInput(page, "Klammernzusatz", "LT")
 
-        await page.locator("[aria-label='Fundstelle speichern']").click()
+        await page.getByLabel("Fundstelle speichern", { exact: true }).click()
         await expect(
           page.getByText("MM 2024, 50-53, Heft 1 (LT)"),
         ).toBeVisible()
@@ -278,11 +279,9 @@ test.describe("category import", () => {
           }),
         ).toBeVisible()
         await page.getByText("MM | Mieter Magazin", { exact: true }).click()
-        await waitForInputValue(
-          page,
-          "[aria-label='Periodikum Literaturfundstelle']",
-          "MM",
-        )
+        await expect(
+          page.getByLabel("Periodikum Literaturfundstelle", { exact: true }),
+        ).toHaveValue("MM")
 
         await fillInput(
           page,
@@ -292,13 +291,11 @@ test.describe("category import", () => {
         await fillInput(page, "Autor Literaturfundstelle", "Einstein, Albert")
         await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
         await page.getByText("Ean", { exact: true }).click()
-        await waitForInputValue(
-          page,
-          "[aria-label='Dokumenttyp Literaturfundstelle']",
-          "Anmerkung",
-        )
+        await expect(
+          page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+        ).toHaveValue("Anmerkung")
         await page
-          .locator("[aria-label='Literaturfundstelle speichern']")
+          .getByLabel("Literaturfundstelle speichern", { exact: true })
           .click()
         await expect(
           page.getByText("MM 2024, 50-53, Heft 1, Einstein, Albert (Ean)"),
@@ -409,7 +406,9 @@ test.describe("category import", () => {
         // add a field of law manually
         await page.getByRole("button", { name: "Sachgebiete" }).click()
         await page
-          .locator("[aria-label='Direkteingabe-Sachgebietssuche eingeben']")
+          .getByLabel("Direkteingabe-Sachgebietssuche eingeben", {
+            exact: true,
+          })
           .fill("VR-01-02")
         await expect(page.getByText("Völkergewohnheitsrecht")).toBeVisible()
         await page.getByText("Völkergewohnheitsrecht").click()
@@ -440,7 +439,9 @@ test.describe("category import", () => {
 
       await test.step("do not import duplicates and keep first field of law", async () => {
         await page
-          .locator("[aria-label='Direkteingabe-Sachgebietssuche eingeben']")
+          .getByLabel("Direkteingabe-Sachgebietssuche eingeben", {
+            exact: true,
+          })
           .fill("EU-01-01")
         await expect(page.getByText("Aufgaben und Ziele")).toBeVisible()
         await page.getByText("Aufgaben und Ziele").click()
@@ -485,11 +486,9 @@ test.describe("category import", () => {
         await page.getByLabel("Normen übernehmen").click()
 
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(3) // the last entry is the input field
-
-        const correctOrder = ["PBefG", "BGB"]
         await expect(
           normContainer.getByTestId("editable-list-container"),
-        ).toHaveText(correctOrder.join("") + "RIS-Abkürzung *")
+        ).toHaveText("PBefG BGB RIS-Abkürzung * ")
       })
 
       await test.step("show success badge", async () => {
@@ -512,10 +511,9 @@ test.describe("category import", () => {
 
         await page.getByLabel("Normen übernehmen").click()
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(4) // the last entry is the input field
-        const correctOrder = ["PBefG", "BGB", "KBErrG, § 8"]
         await expect(
           normContainer.getByTestId("editable-list-container"),
-        ).toHaveText(correctOrder.join("") + "RIS-Abkürzung *")
+        ).toHaveText("PBefG BGB KBErrG, § 8 RIS-Abkürzung *")
       })
     },
   )
@@ -1010,10 +1008,7 @@ test.describe("category import", () => {
   async function navigateToCategoryImport(page: Page, documentNumber: string) {
     await navigateToCategories(page, documentNumber)
     await page.getByLabel("Seitenpanel öffnen").click()
-    await page
-      .getByTestId("category-import-button")
-      .getByLabel("Rubriken-Import anzeigen")
-      .click()
+    await page.getByTestId("category-import-button").click()
 
     await expect(page.getByText("Rubriken importieren")).toBeVisible()
     await expect(page.getByLabel("Dokumentnummer Eingabefeld")).toBeVisible()

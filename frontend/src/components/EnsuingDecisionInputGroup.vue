@@ -1,13 +1,13 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
+import Checkbox from "primevue/checkbox"
+import InputText from "primevue/inputtext"
 import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
@@ -173,15 +173,16 @@ onMounted(() => {
         id="isPending"
         v-slot="{ id }"
         label="Anhängig"
-        label-class="ds-label-01-reg"
+        label-class="ris-label1-regular"
         :label-position="LabelPosition.RIGHT"
       >
-        <CheckboxInput
-          :id="id"
+        <Checkbox
           v-model="isPending"
           aria-label="Anhängige Entscheidung"
-          :readonly="ensuingDecision.hasForeignSource"
-          size="small"
+          binary
+          :disabled="ensuingDecision.hasForeignSource"
+          :input-id="id"
+          size="large"
         />
       </InputField>
       <div class="flex justify-between gap-24">
@@ -217,7 +218,6 @@ onMounted(() => {
               id="decisionDate"
               v-model="ensuingDecision.decisionDate"
               aria-label="Entscheidungsdatum Nachgehende Entscheidung"
-              class="ds-input-medium"
               :has-error="slotProps.hasError"
               :readonly="ensuingDecision.hasForeignSource"
               @focus="validationStore.remove('decisionDate')"
@@ -235,15 +235,16 @@ onMounted(() => {
           label="Aktenzeichen *"
           :validation-error="validationStore.getByField('fileNumber')"
         >
-          <TextInput
+          <InputText
             id="fileNumber"
             v-model="ensuingDecision.fileNumber"
             aria-label="Aktenzeichen Nachgehende Entscheidung"
-            :has-error="slotProps.hasError"
+            fluid
+            :invalid="slotProps.hasError"
             :readonly="ensuingDecision.hasForeignSource"
-            size="medium"
+            size="small"
             @focus="validationStore.remove('fileNumber')"
-          ></TextInput>
+          ></InputText>
         </InputField>
 
         <InputField
@@ -268,53 +269,53 @@ onMounted(() => {
       label="Vermerk"
       :validation-error="validationStore.getByField('note')"
     >
-      <TextInput
+      <InputText
         :id="id"
         v-model="ensuingDecision.note"
         aria-label="Vermerk"
-        :has-error="hasError"
-        size="medium"
+        fluid
+        :invalid="hasError"
+        size="small"
         @input="validationStore.remove('note')"
-      ></TextInput>
+      ></InputText>
     </InputField>
 
     <div class="flex w-full flex-row justify-between">
       <div>
         <div class="flex gap-16">
-          <TextButton
+          <Button
             v-if="!ensuingDecision.hasForeignSource"
             aria-label="Nach Entscheidung suchen"
-            button-type="primary"
             label="Suchen"
             size="small"
             @click="search"
-          />
-          <TextButton
+          ></Button>
+          <Button
             aria-label="Nachgehende Entscheidung speichern"
-            button-type="tertiary"
             :disabled="ensuingDecision.isEmpty"
             label="Übernehmen"
+            severity="secondary"
             size="small"
             @click.stop="addEnsuingDecision"
-          />
-          <TextButton
+          ></Button>
+          <Button
             v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
-            button-type="ghost"
             label="Abbrechen"
             size="small"
+            text
             @click.stop="emit('cancelEdit')"
-          />
+          ></Button>
         </div>
       </div>
-      <TextButton
+      <Button
         v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
-        button-type="destructive"
         label="Eintrag löschen"
+        severity="danger"
         size="small"
         @click.stop="emit('removeEntry', true)"
-      />
+      ></Button>
     </div>
 
     <div v-if="isLoading || searchResults" class="bg-blue-200">

@@ -30,6 +30,8 @@ public interface Documentable {
 
   List<Reference> literatureReferences();
 
+  List<String> documentalists();
+
   boolean isEditable();
 
   boolean isDeletable();

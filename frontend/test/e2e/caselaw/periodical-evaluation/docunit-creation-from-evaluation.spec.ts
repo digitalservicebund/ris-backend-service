@@ -1,7 +1,6 @@
 import { expect, Page } from "@playwright/test"
 import dayjs from "dayjs"
 import {
-  deleteDocumentUnit,
   fillInput,
   navigateToPeriodicalReferences,
   navigateToPreview,
@@ -11,6 +10,7 @@ import {
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { generateString } from "~/test-helper/dataGenerators"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")
@@ -53,8 +53,13 @@ async function verifyDocUnitCanBeTakenOver(
 
   await pageWithBghUser.getByLabel("Dokumentnummer Suche").fill(documentNumber)
 
-  const select = pageWithBghUser.locator(`select[id="status"]`)
-  await select.selectOption("Fremdanlage")
+  await pageWithBghUser.getByLabel("Status Suche").click()
+  await pageWithBghUser
+    .getByRole("option", {
+      name: "Fremdanlage",
+      exact: true,
+    })
+    .click()
   await pageWithBghUser
     .getByLabel("Nach Dokumentationseinheiten suchen")
     .click()
@@ -289,8 +294,8 @@ test.describe(
           ).toHaveValue("Anerkenntnisurteil")
 
           await expect(
-            newTab.locator("[aria-label='Rechtskraft']"),
-          ).toHaveValue("Keine Angabe")
+            newTab.getByLabel("Rechtskraft", { exact: true }),
+          ).toHaveText("Keine Angabe")
         })
 
         // this test has nothing to do with the other test steps
@@ -307,7 +312,7 @@ test.describe(
           ).toBeVisible()
 
           await page.getByTestId("list-entry-0").first().click()
-          await page.locator("[aria-label='Eintrag löschen']").click()
+          await page.getByLabel("Eintrag löschen", { exact: true }).click()
 
           await expect(
             page.getByText(referenceSummary, {
@@ -583,7 +588,7 @@ test.describe(
       {
         tag: ["@RISDEV-4832", "@RISDEV-4980, @RISDEV-6381"],
       },
-      async ({ page, pageWithBghUser, edition }) => {
+      async ({ page, pageWithBghUser, edition, browserName }) => {
         await navigateToPeriodicalReferences(page, edition.id ?? "")
         const randomFileNumber = generateString()
         let documentNumber = ""
@@ -647,13 +652,23 @@ test.describe(
           ).toBeVisible()
         })
 
+        // Todo: Known error in firefox (NS_BINDING_ABORTED),
+        // when navigating with a concurrent navigation triggered
+        // eslint-disable-next-line playwright/no-wait-for-timeout,playwright/no-conditional-in-test
+        if (browserName === "firefox") await page.waitForTimeout(500)
+
         await test.step("Created documentation unit is not visible to creating doc office in search with Fremdanlage status", async () => {
           await navigateToSearch(newTab)
 
           await newTab.getByLabel("Dokumentnummer Suche").fill(documentNumber)
 
-          const select = newTab.locator(`select[id="status"]`)
-          await select.selectOption("Fremdanlage")
+          await newTab.getByLabel("Status Suche").click()
+          await newTab
+            .getByRole("option", {
+              name: "Fremdanlage",
+              exact: true,
+            })
+            .click()
           await newTab.getByLabel("Nach Dokumentationseinheiten suchen").click()
           const listEntry = newTab.getByRole("row")
           await expect(listEntry).toHaveCount(0)
@@ -808,8 +823,13 @@ test.describe(
             .getByLabel("Dokumentnummer Suche")
             .fill(documentNumber1)
 
-          const select = pageWithBghUser.locator(`select[id="status"]`)
-          await select.selectOption("Fremdanlage")
+          await pageWithBghUser.getByLabel("Status Suche").click()
+          await pageWithBghUser
+            .getByRole("option", {
+              name: "Fremdanlage",
+              exact: true,
+            })
+            .click()
           await pageWithBghUser
             .getByLabel("Nach Dokumentationseinheiten suchen")
             .click()

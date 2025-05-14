@@ -1,9 +1,8 @@
 import { expect } from "@playwright/test"
 import {
+  fillInput,
   navigateToPeriodicalReferences,
   searchForDocUnitWithFileNumberAndDecisionDate,
-  fillInput,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -63,7 +62,7 @@ test.describe(
 
           // the added reference + one added empty entry
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(2)
         })
 
@@ -90,7 +89,7 @@ test.describe(
 
           // the new decision is written into the existing empty entry/ the new entry with decision replaces the existing empty one
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(2)
 
           await fillInput(page, "Zitatstelle *", "6")
@@ -117,7 +116,7 @@ test.describe(
           await page.reload()
 
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(2)
           await page
             .getByLabel("Weitere Fundstelle zu dieser Entscheidung")
@@ -143,7 +142,7 @@ test.describe(
 
           // 2 in summary, 1 in edit mode
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(3)
         })
 
@@ -154,11 +153,9 @@ test.describe(
           await fillInput(page, "Autor Literaturfundstelle", "Einstein, Albert")
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
           await page.getByText("Ean", { exact: true }).click()
-          await waitForInputValue(
-            page,
-            "[aria-label='Dokumenttyp Literaturfundstelle']",
-            "Anmerkung",
-          )
+          await expect(
+            page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+          ).toHaveValue("Anmerkung")
           // Listen for the request triggered by "Fundstelle vermerken" and wait for it to finish, so the fixture cleanup does not run into concurrency issues
           const putRequestPromise = page.waitForRequest((request) =>
             request.url().includes("api/v1/caselaw/legalperiodicaledition"),
@@ -182,7 +179,7 @@ test.describe(
 
           // 2 in summary, 1 in edit mode
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(4)
         })
       },
@@ -260,7 +257,7 @@ test.describe(
 
           // 4 references + 1 new entry in edit mode with copied decision
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(5)
         })
 
@@ -268,7 +265,7 @@ test.describe(
           await page.getByLabel("Abbrechen").click()
           // 4 references all in summary list mode
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(4)
         })
 
@@ -289,7 +286,7 @@ test.describe(
 
           // 4 references + 1 new entry in edit mode with copied decision
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(5)
         })
 
@@ -302,7 +299,7 @@ test.describe(
           ).toBeVisible()
           // 5 references + 1 new entry in edit mode with copied decision
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(6)
         })
 
@@ -345,7 +342,7 @@ test.describe(
 
           // 4 references all in summary list mode
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            page.getByLabel("Listen Eintrag", { exact: true }),
           ).toHaveCount(4)
         })
       },

@@ -1,11 +1,15 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { config } from "@vue/test-utils"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
+import InputText from "primevue/inputtext"
 import { createRouter, createWebHistory } from "vue-router"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
-import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
+import { DocumentType } from "@/domain/documentType"
+
+import DocumentUnit, { Court } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
@@ -105,6 +109,13 @@ describe("EnsuingDecisions", () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
   beforeEach(() => {
+    // InputMask evaluates cursor position on every keystroke, however, our browser vitest setup does not
+    // implement any layout-related functionality, meaning the required functions for cursor offset
+    // calculation are missing. When we deal with typing in date/ year / time inputs, we can mock it with
+    // TextInput, as we only need the string and do not need to test the actual mask behaviour.
+    config.global.stubs = {
+      InputMask: InputText,
+    }
     vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
       status: 200,
       data: true,
@@ -145,9 +156,18 @@ describe("EnsuingDecisions", () => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
   })
 
+  afterEach(() => {
+    // Mock needs to be reset (and can not be mocked globally) because InputMask has interdependencies
+    // with the PrimeVue select component. When testing the select components with InputMask
+    // mocked globally, they fail due to these dependencies.
+    config.global.stubs = {}
+  })
+
   it("renders empty ensuing decision in edit mode, when no ensuingDecisions in list", async () => {
     renderComponent()
-    expect(await screen.findByLabelText("Anhängige Entscheidung")).toBeVisible()
+    expect(
+      await screen.findByLabelText("Anhängige Entscheidung"),
+    ).toBeInTheDocument()
     expect(
       await screen.findByLabelText("Gericht Nachgehende Entscheidung"),
     ).toBeVisible()

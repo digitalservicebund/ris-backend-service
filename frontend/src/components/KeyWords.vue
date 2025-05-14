@@ -19,7 +19,7 @@ const keywords = computed({
 
 <template>
   <div>
-    <h2 class="ds-label-01-bold mb-16">Schlagwörter</h2>
+    <h2 class="ris-label1-bold mb-16">Schlagwörter</h2>
     <ListInput v-model="keywords" label="Schlagwörter" @reset="emit('reset')" />
   </div>
 </template>

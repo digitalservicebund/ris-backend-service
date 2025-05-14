@@ -38,7 +38,7 @@ describe("legislative mandate", () => {
     // Assert
     expect(screen.getByText(headline)).toBeInTheDocument()
     expect(screen.getByText(label)).toBeInTheDocument()
-    expect(screen.getByTestId("legislative-mandate")).not.toBeChecked()
+    expect(screen.getByLabelText("Gesetzgebungsauftrag")).not.toBeChecked()
   })
 
   test("should have checkbox checked when legislative mandate is true", async () => {
@@ -58,6 +58,7 @@ describe("legislative mandate", () => {
     // Assert
     expect(screen.getByText(headline)).toBeInTheDocument()
     expect(screen.getByText(label)).toBeInTheDocument()
-    expect(screen.getByTestId("legislative-mandate")).toBeChecked()
+
+    expect(screen.getByLabelText("Gesetzgebungsauftrag")).toBeChecked()
   })
 })

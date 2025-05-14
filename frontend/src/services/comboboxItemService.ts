@@ -5,11 +5,14 @@ import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
 import { CitationType } from "@/domain/citationType"
 import DocumentationOffice from "@/domain/documentationOffice"
-import { Court, DocumentType, Procedure } from "@/domain/documentUnit"
+import { DocumentType } from "@/domain/documentType"
+import { Court } from "@/domain/documentUnit"
+
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
+import { Procedure } from "@/domain/procedure"
 import errorMessages from "@/i18n/errors.json"
 
 enum Endpoint {

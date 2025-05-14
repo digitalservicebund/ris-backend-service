@@ -21,7 +21,7 @@ services:
       - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-08-31
 
   traefik:
-    image: traefik:v3.3
+    image: traefik:v3.4
     extra_hosts:
       - localhost:host-gateway
     container_name: traefik
@@ -154,7 +154,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:81cd2bc173dc5feae01236ce47baf4513f78c80e604c819d05df8250a6215d9d
+    image: cgr.dev/chainguard/redis@sha256:82610a390d9f8079eb940791c9dae50022fe436b2a3cb6a60adef3adb7495313
     extra_hosts:
       - localhost:host-gateway
     container_name: redis
@@ -179,13 +179,13 @@ services:
       timeout: 5s
 
   languagetool:
-    image: ghcr.io/digitalservicebund/neuris-languagetool:0959e4ecbbaaca981540824b5d3ecd8e9c42371b
+    image: ghcr.io/digitalservicebund/neuris-languagetool:acd74fa7b0775fe95942c65e1e6f1d413012d777
     extra_hosts:
-    - localhost:host-gateway
+      - localhost:host-gateway
     ports:
       - 8181:8181
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://localhost:8181/v2/languages || exit 1"]
+      test: [ "CMD-SHELL", "wget --spider -q http://localhost:8181/v2/languages || exit 1" ]
       interval: 5s
       retries: 3
       start_period: 5s

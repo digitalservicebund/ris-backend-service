@@ -1295,3 +1295,17 @@ VALUES
     )
 ON CONFLICT DO NOTHING;
 
+
+-- TEXT CHECK IGNORED WORDS
+INSERT INTO incremental_migration.ignored_text_check_word (id,
+                                                           documentation_unit_id,
+                                                           word,
+                                                           juris_id,
+                                                           created_at)
+VALUES (gen_random_uuid(),
+        NULL,
+        'Testgnorierteswort',
+        -1001,
+        NOW()
+       )
+ON CONFLICT DO NOTHING;

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
 import { computed, ref, watch } from "vue"
 import { NodeHelperInterface } from "@/components/field-of-law/fieldOfLawNode"
 import FlexContainer from "@/components/FlexContainer.vue"
-import Checkbox from "@/components/input/CheckboxInput.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
@@ -141,9 +141,8 @@ watch(
         </div>
       </div>
       <span v-else class="pl-[1.3333em]" />
-      <div v-if="!props.isRoot" data-testid>
+      <div v-if="!props.isRoot" class="ml-12" data-testid>
         <Checkbox
-          :id="`field-of-law-node-${node.identifier}`"
           v-model="isSelected"
           :aria-label="
             node.identifier +
@@ -151,17 +150,18 @@ watch(
             node.text +
             (isSelected ? ' entfernen' : ' hinzufügen')
           "
-          class="ds-checkbox-mini ml-12 bg-white"
+          binary
           :data-testid="`field-of-law-node-${node.identifier}`"
+          :input-id="`field-of-law-node-${node.identifier}`"
         />
       </div>
 
       <div>
         <div class="flex flex-col">
-          <div class="ds-label-02-reg flex flex-row">
+          <div class="ris-label2-regular flex flex-row">
             <div v-if="!props.isRoot" class="pl-6">
               <span
-                class="whitespace-nowrap p-2"
+                class="p-2 whitespace-nowrap"
                 :class="isSearchCandidate ? 'bg-yellow-300' : ''"
               >
                 {{ node.identifier }} |
@@ -175,10 +175,7 @@ watch(
           class="pb-6 pl-8"
           flex-direction="flex-col"
         >
-          <FlexContainer
-            class="text-[14px] text-[#66522e]"
-            flex-wrap="flex-wrap"
-          >
+          <FlexContainer flex-wrap="flex-wrap">
             <span v-for="(norm, idx) in node.norms" :key="idx">
               <strong>{{ norm.singleNormDescription }}</strong>
               {{ norm.abbreviation

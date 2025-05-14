@@ -30,4 +30,12 @@ text-check {
       background: rgba($color: #e86a69, $alpha: 20%) !important;
     }
   }
+
+  &[ignored="true"] {
+    border-bottom: 2px solid #26a7f2;
+
+    &:hover {
+      background: rgba($color: #26a7f2, $alpha: 20%) !important;
+    }
+  }
 }

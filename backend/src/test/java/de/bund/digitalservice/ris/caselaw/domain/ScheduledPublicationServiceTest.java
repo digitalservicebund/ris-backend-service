@@ -58,7 +58,7 @@ class ScheduledPublicationServiceTest {
 
     this.service.handoverScheduledDocUnits();
 
-    verify(handoverService, never()).handoverDocumentationUnitAsMail(any(), any());
+    verify(handoverService, never()).handoverDocumentationUnitAsMail(any(), any(), any());
     verify(docUnitRepository, never()).save(any());
     verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any());
   }
@@ -104,7 +104,7 @@ class ScheduledPublicationServiceTest {
     var unpublishedDocUnit = this.createDocUnit(null, pastDate);
     when(this.docUnitRepository.getScheduledDocumentationUnitsDueNow())
         .thenReturn(List.of(publishedDocUnit, unpublishedDocUnit));
-    when(this.handoverService.handoverDocumentationUnitAsMail(any(), any()))
+    when(this.handoverService.handoverDocumentationUnitAsMail(any(), any(), any()))
         .thenThrow(DocumentationUnitNotExistsException.class);
 
     this.service.handoverScheduledDocUnits();
@@ -134,7 +134,8 @@ class ScheduledPublicationServiceTest {
   private void mockHandoverWithSuccessStatus(boolean successStatus)
       throws DocumentationUnitNotExistsException {
     var result = new HandoverMail(null, null, "", "", null, successStatus, null, null, null);
-    when(this.handoverService.handoverDocumentationUnitAsMail(any(), any())).thenReturn(result);
+    when(this.handoverService.handoverDocumentationUnitAsMail(any(), any(), any()))
+        .thenReturn(result);
   }
 
   private DocumentationUnit createDocUnit(
@@ -158,7 +159,7 @@ class ScheduledPublicationServiceTest {
       throws DocumentationUnitNotExistsException {
     verify(handoverService, times(1))
         .handoverDocumentationUnitAsMail(
-            docUnit.uuid(), docUnit.managementData().scheduledByEmail());
+            docUnit.uuid(), docUnit.managementData().scheduledByEmail(), null);
     verify(docUnitRepository, times(1))
         .save(
             argThat(

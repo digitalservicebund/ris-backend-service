@@ -71,6 +71,8 @@ class DocumentationUnitServiceTest {
   @MockitoBean private OidcUser oidcUser;
   @MockitoBean private AuthService authService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean UserService userService;
+  @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
@@ -81,6 +83,7 @@ class DocumentationUnitServiceTest {
           DocumentNumberFormatterException {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
+    User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
     when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
@@ -91,7 +94,7 @@ class DocumentationUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    assertNotNull(service.generateNewDocumentationUnit(documentationOffice, Optional.empty()));
+    assertNotNull(service.generateNewDocumentationUnit(user, Optional.empty()));
 
     verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
     verify(duplicateCheckService, times(1)).checkDuplicates("nextDocumentNumber");
@@ -111,7 +114,8 @@ class DocumentationUnitServiceTest {
                 .withError(false)
                 .build(),
             null,
-            null);
+            null,
+            user);
   }
 
   @Test
@@ -121,6 +125,7 @@ class DocumentationUnitServiceTest {
           DocumentNumberFormatterException {
     DocumentationOffice userDocumentationOffice =
         DocumentationOffice.builder().abbreviation("BAG").uuid(UUID.randomUUID()).build();
+    User user = User.builder().documentationOffice(userDocumentationOffice).build();
     DocumentationOffice designatedDocumentationOffice =
         DocumentationOffice.builder().abbreviation("BGH").uuid(UUID.randomUUID()).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
@@ -147,8 +152,7 @@ class DocumentationUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    assertNotNull(
-        service.generateNewDocumentationUnit(userDocumentationOffice, Optional.of(parameters)));
+    assertNotNull(service.generateNewDocumentationUnit(user, Optional.of(parameters)));
 
     verify(documentNumberService)
         .generateDocumentNumber(designatedDocumentationOffice.abbreviation());
@@ -157,6 +161,7 @@ class DocumentationUnitServiceTest {
             DocumentationUnit.builder()
                 .version(0L)
                 .documentNumber("nextDocumentNumber")
+                .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
                 .coreData(
                     CoreData.builder()
                         .creatingDocOffice(userDocumentationOffice)
@@ -172,7 +177,8 @@ class DocumentationUnitServiceTest {
                 .withError(false)
                 .build(),
             parameters.reference(),
-            parameters.fileNumber());
+            parameters.fileNumber(),
+            user);
   }
 
   @Test
@@ -192,7 +198,7 @@ class DocumentationUnitServiceTest {
     // something flaky with the repository mock? Investigate this later
     DocumentationUnit documentationUnit = DocumentationUnit.builder().uuid(TEST_UUID).build();
     // can we also test that the fileUuid from the DocumentationUnit is used? with a captor somehow?
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentationUnit);
+    when(repository.findByUuid(TEST_UUID, null)).thenReturn(documentationUnit);
 
     var string = service.deleteByUuid(TEST_UUID);
     assertNotNull(string);
@@ -211,7 +217,7 @@ class DocumentationUnitServiceTest {
                     Attachment.builder().s3path(TEST_UUID.toString()).build()))
             .build();
 
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentationUnit);
+    when(repository.findByUuid(TEST_UUID, null)).thenReturn(documentationUnit);
 
     var string = service.deleteByUuid(TEST_UUID);
     assertNotNull(string);
@@ -224,7 +230,7 @@ class DocumentationUnitServiceTest {
   void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository()
       throws DocumentationUnitNotExistsException {
 
-    when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentationUnit.builder().build());
+    when(repository.findByUuid(TEST_UUID, null)).thenReturn(DocumentationUnit.builder().build());
     doThrow(new IllegalArgumentException())
         .when(repository)
         .delete(DocumentationUnit.builder().build());
@@ -232,12 +238,12 @@ class DocumentationUnitServiceTest {
     Assertions.assertThrows(
         DocumentationUnitDeletionException.class, () -> service.deleteByUuid(TEST_UUID));
 
-    verify(repository, times(1)).findByUuid(TEST_UUID);
+    verify(repository, times(1)).findByUuid(TEST_UUID, null);
   }
 
   @Test
   void testDeleteByUuid_withLinks() throws DocumentationUnitNotExistsException {
-    when(repository.findByUuid(TEST_UUID))
+    when(repository.findByUuid(TEST_UUID, null))
         .thenReturn(DocumentationUnit.builder().documentNumber("foo").build());
     when(repository.getAllRelatedDocumentationUnitsByDocumentNumber(any(String.class)))
         .thenReturn(Map.of(ACTIVE_CITATION, 2L));
@@ -261,12 +267,12 @@ class DocumentationUnitServiceTest {
                 Collections.singletonList(
                     Attachment.builder().uploadTimestamp(Instant.now()).build()))
             .build();
-    when(repository.findByUuid(documentationUnit.uuid())).thenReturn(documentationUnit);
+    when(repository.findByUuid(documentationUnit.uuid(), null)).thenReturn(documentationUnit);
 
     var du = service.updateDocumentationUnit(documentationUnit);
     assertEquals(du, documentationUnit);
 
-    verify(repository).save(documentationUnit);
+    verify(repository).save(documentationUnit, null);
   }
 
   @Test
@@ -281,7 +287,8 @@ class DocumentationUnitServiceTest {
                     Attachment.builder().uploadTimestamp(Instant.now()).build()))
             .version(0L)
             .build();
-    when(repository.findByUuid(documentationUnit.uuid())).thenReturn(documentationUnit);
+    User user = User.builder().build();
+    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
     when(patchMapperService.calculatePatch(any(), any())).thenReturn(new JsonPatch(List.of()));
     when(patchMapperService.removePatchForSamePath(any(), any()))
         .thenReturn(new JsonPatch(List.of()));
@@ -298,7 +305,7 @@ class DocumentationUnitServiceTest {
     JsonPatch patch = new JsonPatch(List.of(replaceOp));
     var risJsonPatch = RisJsonPatch.builder().documentationUnitVersion(1L).patch(patch).build();
 
-    var response = service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch);
+    var response = service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch, user);
     assertEquals(0L, response.documentationUnitVersion());
   }
 
@@ -320,8 +327,9 @@ class DocumentationUnitServiceTest {
     JsonNode valueToAdd = new TextNode("old value");
     JsonPatchOperation addOperation = new AddOperation(path, valueToAdd);
     JsonPatch patch = new JsonPatch(List.of(addOperation));
+    User user = User.builder().build();
 
-    when(repository.findByUuid(documentationUnit.uuid())).thenReturn(documentationUnit);
+    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
     when(patchMapperService.calculatePatch(any(), any())).thenReturn(new JsonPatch(List.of()));
     when(patchMapperService.removePatchForSamePath(any(), any())).thenReturn(patch);
     when(patchMapperService.applyPatchToEntity(any(), any())).thenReturn(documentationUnit);
@@ -339,7 +347,7 @@ class DocumentationUnitServiceTest {
     var risJsonPatch = RisJsonPatch.builder().patch(jsonPatch).build();
 
     // Act
-    service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch);
+    service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch, user);
 
     // Assert
     verify(duplicateCheckService, times(1)).checkDuplicates("ABCDE20220001");
@@ -363,8 +371,9 @@ class DocumentationUnitServiceTest {
     JsonNode valueToAdd = new TextNode("old value");
     JsonPatchOperation addOperation = new AddOperation(path, valueToAdd);
     JsonPatch patch = new JsonPatch(List.of(addOperation));
+    User user = User.builder().build();
 
-    when(repository.findByUuid(documentationUnit.uuid())).thenReturn(documentationUnit);
+    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
     when(patchMapperService.calculatePatch(any(), any())).thenReturn(new JsonPatch(List.of()));
     when(patchMapperService.removePatchForSamePath(any(), any())).thenReturn(patch);
     when(patchMapperService.applyPatchToEntity(any(), any())).thenReturn(documentationUnit);
@@ -382,7 +391,7 @@ class DocumentationUnitServiceTest {
     var risJsonPatch = RisJsonPatch.builder().patch(jsonPatch).build();
 
     // Act
-    service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch);
+    service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch, user);
 
     // Assert
     verify(duplicateCheckService, never()).checkDuplicates("ABCDE20220001");
@@ -406,6 +415,7 @@ class DocumentationUnitServiceTest {
     service.searchByDocumentationUnitSearchInput(
         pageRequest,
         oidcUser,
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
@@ -443,6 +453,7 @@ class DocumentationUnitServiceTest {
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courttype\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courtlocation\u180Ewith\u2060spaces"),
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),

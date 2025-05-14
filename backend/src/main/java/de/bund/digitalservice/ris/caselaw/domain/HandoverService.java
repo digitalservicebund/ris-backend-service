@@ -17,6 +17,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
@@ -27,11 +28,11 @@ import org.xml.sax.SAXException;
 public class HandoverService {
 
   private final DocumentationUnitRepository repository;
-
   private final LegalPeriodicalEditionRepository editionRepository;
   private final HandoverReportRepository handoverReportRepository;
   private final MailService mailService;
   private final DeltaMigrationRepository deltaMigrationRepository;
+  private final DocumentationUnitHistoryLogService historyLogService;
 
   @Value("${mail.exporter.recipientAddress:neuris@example.com}")
   private String recipientAddress;
@@ -41,13 +42,15 @@ public class HandoverService {
       MailService mailService,
       DeltaMigrationRepository migrationService,
       HandoverReportRepository handoverReportRepository,
-      LegalPeriodicalEditionRepository editionRepository) {
+      LegalPeriodicalEditionRepository editionRepository,
+      DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
     this.mailService = mailService;
     this.deltaMigrationRepository = migrationService;
     this.handoverReportRepository = handoverReportRepository;
     this.editionRepository = editionRepository;
+    this.historyLogService = historyLogService;
   }
 
   /**
@@ -59,11 +62,15 @@ public class HandoverService {
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
    */
   public HandoverMail handoverDocumentationUnitAsMail(
-      UUID documentationUnitId, String issuerAddress) throws DocumentationUnitNotExistsException {
+      UUID documentationUnitId, String issuerAddress, @Nullable User user)
+      throws DocumentationUnitNotExistsException {
 
     Documentable documentable = repository.findByUuid(documentationUnitId);
 
     if (documentable instanceof DocumentationUnit documentationUnit) {
+      String description = "Dokeinheit an jDV übergeben";
+      historyLogService.saveHistoryLog(
+          documentationUnit.uuid(), user, HistoryLogEventType.HANDOVER, description);
       return mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
     } else {
       log.info("Documentable type not supported: {}", documentable.getClass().getName());

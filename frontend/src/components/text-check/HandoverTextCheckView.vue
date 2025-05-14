@@ -1,13 +1,12 @@
 <script setup lang="ts">
+import Button from "primevue/button"
 import { onBeforeMount, ref } from "vue"
+import { getCategoryLabel } from "./categoryLabels"
 import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
-import { getCategoryLabels } from "@/components/text-check/categoryLabels"
 import router from "@/router"
 import { ResponseError } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
-import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
@@ -20,7 +19,6 @@ const responseError = ref<ResponseError | undefined>()
 
 const loading = ref()
 const totalTextCheckErrors = ref(0)
-const sidePanelStore = useExtraContentSidePanelStore()
 const textCategories = ref<string[] | undefined>()
 
 async function navigateToTextCheckSummaryInCategories() {
@@ -30,8 +28,6 @@ async function navigateToTextCheckSummaryInCategories() {
       documentNumber: props.documentNumber,
     },
   })
-  sidePanelStore.setSidePanelMode("text-check")
-  sidePanelStore.togglePanel(true)
 }
 
 function resetResults() {
@@ -49,10 +45,18 @@ const checkAll = async (documentUnitId: string) => {
   } else if (response.data && response.data.suggestions) {
     responseError.value = undefined
     totalTextCheckErrors.value = response.data.totalTextCheckErrors
-    textCategories.value = getCategoryLabels(response.data.categoryTypes)
+    textCategories.value = response.data.categoryTypes
   }
   loading.value = false
 }
+
+const textCategoriesRouter = (category: string) => ({
+  name: "caselaw-documentUnit-documentNumber-categories",
+  hash: `#${category}`,
+  params: {
+    documentNumber: props.documentNumber,
+  },
+})
 
 onBeforeMount(async () => {
   await checkAll(props.documentId)
@@ -61,7 +65,7 @@ onBeforeMount(async () => {
 
 <template>
   <div aria-label="Rechtschreibprüfung" class="flex flex-col">
-    <h2 class="ds-label-01-bold mb-16">Rechtschreibprüfung</h2>
+    <h2 class="ris-label1-bold mb-16">Rechtschreibprüfung</h2>
 
     <div v-if="responseError">
       <InfoModal
@@ -87,27 +91,37 @@ onBeforeMount(async () => {
                     class="grid grid-cols-[auto_1fr] gap-x-16 px-0"
                     data-testid="total-text-check-errors"
                   >
-                    <dt class="ds-label-02-bold self-center">Anzahl</dt>
-                    <dd class="ds-body-02-reg">
+                    <dt class="ris-label2-bold self-center">Anzahl</dt>
+                    <dd class="ris-body2-regular">
                       {{ totalTextCheckErrors }}
                     </dd>
-                    <dt class="ds-label-02-bold self-center">Rubrik</dt>
-                    <dd class="ds-body-02-reg">
-                      {{ textCategories?.join(", ") }}
+                    <dt class="ris-label2-bold self-center">Rubrik</dt>
+                    <dd class="ris-body2-regular">
+                      <div class="flex flex-row gap-8">
+                        <RouterLink
+                          v-for="category in textCategories"
+                          :key="category"
+                          class="ris-link2-regular"
+                          :data-testid="`text-check-handover-link-${category}`"
+                          :to="textCategoriesRouter(category)"
+                        >
+                          {{ getCategoryLabel(category) }}
+                        </RouterLink>
+                      </div>
                     </dd>
                   </div>
                 </dl>
               </div>
             </div>
           </div>
-          <TextButton
+          <Button
             aria-label="Rechtschreibfehler prüfen"
-            button-type="tertiary"
             class="w-fit"
             label="Rechtschreibfehler prüfen"
+            severity="secondary"
             size="small"
             @click="navigateToTextCheckSummaryInCategories"
-          />
+          ></Button>
         </div>
       </div>
       <div v-else class="flex flex-row gap-8">

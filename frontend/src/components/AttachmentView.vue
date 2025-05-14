@@ -50,7 +50,7 @@ watch(
   >
     <div
       v-if="isLoading"
-      class="my-112 grid justify-items-center bg-white bg-opacity-60"
+      class="bg-opacity-60 my-112 grid justify-items-center bg-white"
     >
       <LoadingSpinner />
     </div>

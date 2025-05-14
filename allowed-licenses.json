@@ -47,6 +47,9 @@
       "moduleLicense": "MIT"
     },
     {
+      "moduleLicense": "MPL-2.0"
+    },
+    {
       "moduleLicense": "Apache-2.0"
     },
     {
@@ -63,7 +66,6 @@
     },
     {
       "moduleLicense": "Mozilla Public License Version 2.0",
-      "moduleVersion": "12.5",
       "moduleName": "net.sf.saxon:Saxon-HE"
     },
 
@@ -74,6 +76,12 @@
     {
       "moduleLicense": null,
       "moduleName": "io.sentry:sentry-bom"
+    },
+    {
+      "moduleLicense": "GPL-3.0-only"
+    },
+    {
+      "moduleLicense": "BlueOak-1.0.0"
     }
   ]
 }

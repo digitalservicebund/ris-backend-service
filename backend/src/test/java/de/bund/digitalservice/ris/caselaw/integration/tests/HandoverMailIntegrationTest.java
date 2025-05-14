@@ -1,8 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,14 +17,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.HandoverMailService;
-import de.bund.digitalservice.ris.caselaw.adapter.InternalPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseIgnoredTextCheckWordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
@@ -33,12 +36,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailAttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverReportDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IgnoredTextCheckWordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresIgnoredTextCheckWordRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
@@ -48,14 +54,17 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.EventType;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
@@ -65,7 +74,10 @@ import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
+import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
+import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -79,8 +91,9 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -105,6 +118,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresLegalPeriodicalRepositoryImpl.class,
       PostgresHandoverRepositoryImpl.class,
       PostgresHandoverReportRepositoryImpl.class,
+      PostgresIgnoredTextCheckWordRepositoryImpl.class,
       HandoverMailService.class,
       DatabaseDocumentationUnitStatusService.class,
       LegalPeriodicalEditionService.class,
@@ -114,7 +128,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class,
       OAuthService.class,
       TestConfig.class,
-      DocumentNumberPatternConfig.class
+      TextCheckService.class,
+      DocumentNumberPatternConfig.class,
+      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
+      DocumentationUnitHistoryLogService.class
     },
     controllers = {DocumentationUnitController.class, LegalPeriodicalEditionController.class})
 @TestPropertySource(
@@ -154,6 +171,8 @@ class HandoverMailIntegrationTest {
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
+  @Autowired private DatabaseIgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
+  @Autowired private DocumentationUnitHistoryLogService docUnitHistoryLogService;
 
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private S3AsyncClient s3AsyncClient;
@@ -162,9 +181,10 @@ class HandoverMailIntegrationTest {
   @MockitoBean AttachmentService attachmentService;
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private InternalPortalPublicationService internalPortalPublicationService;
+  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -175,6 +195,9 @@ class HandoverMailIntegrationTest {
   @BeforeEach
   void setUp() {
     docOffice = documentationOfficeRepository.findByAbbreviation("DS");
+
+    when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
+
     mockUserGroups(userGroupService);
   }
 
@@ -187,12 +210,101 @@ class HandoverMailIntegrationTest {
     dblegalPeriodicalRepository.deleteAll();
   }
 
-  public static List<HandoverEntityType> getHandoverMailTestData() {
-    return List.of(HandoverEntityType.DOCUMENTATION_UNIT, HandoverEntityType.EDITION);
+  @Test
+  void testDocUnitPreview() {
+    String identifier = "docnr22345678";
+
+    DocumentationUnitDTO savedDocumentationUnitDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DecisionDTO.builder()
+                .documentationOffice(docOffice)
+                .documentNumber(identifier)
+                .date(LocalDate.now())
+                .headnote("xml"));
+    UUID entityId = savedDocumentationUnitDTO.getId();
+
+    assertThat(repository.findAll()).hasSize(1);
+
+    XmlTransformationResult expectedHandoverMail =
+        XmlTransformationResult.builder()
+            .xml("xml")
+            .fileName("test.xml")
+            .success(true)
+            .statusMessages(List.of("message 1", "message 2"))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + entityId + "/preview-xml")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(XmlTransformationResult.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody())
+                    .usingRecursiveComparison()
+                    .ignoringFields("creationDate")
+                    .isEqualTo(expectedHandoverMail));
+  }
+
+  @Test
+  void testDocUnitPreview_withGloballyAndLocallyIgnoredWords() {
+    String identifier = "docnr32345678";
+
+    DocumentationUnitDTO savedDocumentationUnitDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DecisionDTO.builder()
+                .documentationOffice(docOffice)
+                .documentNumber(identifier)
+                .date(LocalDate.now())
+                .headnote(
+                    "headnote with ignoredWordOnDocUnitLevel, ignoredWordOnGlobalLevel, ignoredWordOnGlobalJDVLevel and notIgnoredWord"));
+    UUID entityId = savedDocumentationUnitDTO.getId();
+
+    assertThat(repository.findAll()).hasSize(1);
+
+    ignoredTextCheckWordRepository.save(
+        IgnoredTextCheckWordDTO.builder().word("ignoredWordOnGlobalLevel").build());
+    ignoredTextCheckWordRepository.save(
+        IgnoredTextCheckWordDTO.builder()
+            .word("ignoredWordOnDocUnitLevel")
+            .documentationUnitId(entityId)
+            .build());
+    ignoredTextCheckWordRepository.save(
+        IgnoredTextCheckWordDTO.builder().word("ignoredWordOnGlobalJDVLevel").jurisId(1).build());
+    assertThat(ignoredTextCheckWordRepository.findAll()).hasSize(3);
+
+    XmlTransformationResult expectedHandoverMail =
+        XmlTransformationResult.builder()
+            .xml(
+                "headnote with <noindex>ignoredWordOnDocUnitLevel</noindex>, <noindex>ignoredWordOnGlobalLevel</noindex>, ignoredWordOnGlobalJDVLevel and notIgnoredWord")
+            .fileName("test.xml")
+            .success(true)
+            .statusMessages(List.of("message 1", "message 2"))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + entityId + "/preview-xml")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(XmlTransformationResult.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody())
+                    .usingRecursiveComparison()
+                    .ignoringFields("creationDate")
+                    .isEqualTo(expectedHandoverMail));
   }
 
   @ParameterizedTest
-  @MethodSource("getHandoverMailTestData")
+  @EnumSource(HandoverEntityType.class)
   void testHandover(HandoverEntityType entityType) {
     String identifier = "docnr12345678";
 
@@ -202,6 +314,7 @@ class HandoverMailIntegrationTest {
             DecisionDTO.builder()
                 .documentationOffice(docOffice)
                 .documentNumber(identifier)
+                .headnote("xml")
                 .date(LocalDate.now()));
     UUID entityId = savedDocumentationUnitDTO.getId();
 
@@ -307,10 +420,23 @@ class HandoverMailIntegrationTest {
         .usingRecursiveComparison()
         .ignoringFields("sentDate", "id", "attachments")
         .isEqualTo(expectedHandoverMailDTO);
+
+    var user = User.builder().documentationOffice(buildDSDocOffice()).build();
+    var logs = docUnitHistoryLogService.getHistoryLogs(entityId, user);
+
+    if (entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)) {
+      assertThat(logs).hasSize(1);
+      assertThat(logs.getFirst().description()).isEqualTo("Dokeinheit an jDV übergeben");
+      assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");
+      assertThat(logs.getFirst().eventType()).isEqualTo(HistoryLogEventType.HANDOVER);
+      assertThat(logs.getFirst().createdAt())
+          .isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
+      assertThat(logs.getFirst().documentationOffice()).isEqualTo("DS");
+    }
   }
 
   @ParameterizedTest
-  @MethodSource("getHandoverMailTestData")
+  @EnumSource(HandoverEntityType.class)
   void testHandoverWithNotAllMandatoryFieldsFilled_shouldNotSucceed(HandoverEntityType entityType) {
     UUID entityId = UUID.randomUUID();
 
@@ -370,7 +496,7 @@ class HandoverMailIntegrationTest {
   }
 
   @ParameterizedTest
-  @MethodSource("getHandoverMailTestData")
+  @EnumSource(HandoverEntityType.class)
   void testGetLastXmlHandoverMail(HandoverEntityType entityType) {
     UUID entityId = UUID.randomUUID();
 
@@ -441,7 +567,7 @@ class HandoverMailIntegrationTest {
   }
 
   @ParameterizedTest
-  @MethodSource("getHandoverMailTestData")
+  @EnumSource(HandoverEntityType.class)
   void testGetEventLog(HandoverEntityType entityType) {
     UUID entityId = UUID.randomUUID();
     if (entityType == HandoverEntityType.DOCUMENTATION_UNIT) {

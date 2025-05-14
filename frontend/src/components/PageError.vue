@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import TextButton from "@/components/input/TextButton.vue"
+import Button from "primevue/button"
 import router from "@/router"
 
 interface Props {
@@ -18,8 +18,8 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div class="ml-48 mt-48 gap-16 p-16">
-    <h1 class="ds-heading-02-reg mb-32">{{ props.title }}</h1>
+  <div class="mt-48 ml-48 gap-16 p-16">
+    <h1 class="ris-heading2-regular mb-32">{{ props.title }}</h1>
     <p class="mb-32">{{ props.description }}</p>
     <p class="mb-16">
       <strong>Haben Sie die Internetadresse direkt eingegeben?</strong><br />
@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
       <strong>Haben Sie die Internetadresse kopiert?</strong><br />
       Überprüfen Sie, ob Sie die gesamte Adresse kopiert haben.
     </p>
-    <TextButton
+    <Button
       :aria-label="backButtonLabel"
       class="w-auto"
       :label="backButtonLabel"
@@ -38,6 +38,6 @@ const props = withDefaults(defineProps<Props>(), {
           name: backRouterName,
         })
       "
-    />
+    ></Button>
   </div>
 </template>

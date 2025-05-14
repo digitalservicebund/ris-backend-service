@@ -1,0 +1,19 @@
+on:
+  workflow_call:
+    inputs:
+      project:
+        required: true
+        type: string
+
+jobs:
+  e2e-sharding-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [ 1, 2 ]
+    uses: ./.github/workflows/_playwright-test.yml
+    with:
+      project: ${{ inputs.project }}
+      shard_index: ${{ matrix.shardIndex }}
+      shard_total: 2
+    secrets: inherit

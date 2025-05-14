@@ -76,16 +76,16 @@ const ariaLabelIcon = props.title + " icon"
     <ModalIcon :aria-label="ariaLabelIcon" />
 
     <div class="flex flex-col">
-      <span class="ds-label-02-bold">{{ title }}</span>
+      <span class="ris-label2-bold">{{ title }}</span>
       <div
         v-if="isArray && props.description.length > 1"
-        class="ds-body-01-reg"
+        class="ris-body1-regular"
       >
         <ul class="m-0 list-disc ps-20">
           <li v-for="(desc, index) in description" :key="index">{{ desc }}</li>
         </ul>
       </div>
-      <span v-else class="ds-body-01-reg">{{
+      <span v-else class="ris-body1-regular">{{
         isArray ? description[0] : description
       }}</span>
     </div>

@@ -5,7 +5,6 @@ import {
   navigateToPeriodicalReferences,
   save,
   searchForDocUnitWithFileNumberAndDecisionDate,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -80,11 +79,9 @@ test.describe(
         await fillInput(page, "Autor Literaturfundstelle", "Berg, Peter")
         await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
         await page.getByText("Ean", { exact: true }).click()
-        await waitForInputValue(
-          page,
-          "[aria-label='Dokumenttyp Literaturfundstelle']",
-          "Anmerkung",
-        )
+        await expect(
+          page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+        ).toHaveValue("Anmerkung")
 
         const putRequestPromise = page.waitForRequest((request) =>
           request.url().includes("api/v1/caselaw/legalperiodicaledition"),
@@ -103,7 +100,7 @@ test.describe(
       await test.step("Navigate to documentation unit categories, add file number and save", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
-        await page.locator("[aria-label='Aktenzeichen']").fill("test")
+        await page.getByLabel("Aktenzeichen", { exact: true }).fill("test")
         await page.keyboard.press("Enter")
 
         await save(page)

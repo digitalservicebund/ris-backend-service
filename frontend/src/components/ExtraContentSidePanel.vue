@@ -35,7 +35,7 @@ const { panelMode, currentAttachmentIndex, importDocumentNumber } =
 
 const route = useRoute()
 
-const textCheckAll = useFeatureToggle("neuris.text-check-all")
+const textCheckAll = useFeatureToggle("neuris.text-side-panel")
 
 const hasNote = computed(() => {
   return !!props.documentUnit!.note && props.documentUnit!.note.length > 0
@@ -148,6 +148,7 @@ onMounted(() => {
               v-model="props.documentUnit!.note"
               aria-label="Notiz Eingabefeld"
               autosize
+              class="w-full"
               custom-classes="max-h-[65vh]"
             />
           </InputField>
@@ -164,7 +165,7 @@ onMounted(() => {
               props.documentUnit!.attachments[currentAttachmentIndex].s3path
             "
           />
-          <div v-else class="ds-label-01-reg">
+          <div v-else class="ris-label1-regular">
             Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.
           </div>
         </div>

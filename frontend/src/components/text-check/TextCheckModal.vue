@@ -1,28 +1,51 @@
 <script lang="ts" setup>
+import { computed } from "vue"
+import IgnoredWordHandler from "@/components/text-check/IgnoredWordHandler.vue"
 import ReplacementBar from "@/components/text-check/ReplacementBar.vue"
-
 import { Match, Replacement } from "@/types/textCheck"
 
-defineProps<{
+const props = defineProps<{
   match: Match
 }>()
 
 const emit = defineEmits<{
-  "suggestion:update": [value: string]
-  "suggestion:ignore": [void]
+  "word:remove": [value: string]
+  "word:add": [word: string]
+  "globalWord:remove": [value: string]
+  "globalWord:add": [word: string]
+  "word:replace": [value: string]
 }>()
 
 function acceptSuggestion(replacement: string) {
-  emit("suggestion:update", replacement)
+  emit("word:replace", replacement)
 }
 
-function ignoreSuggestion() {
-  emit("suggestion:ignore")
+function addIgnoredWord(word: string) {
+  emit("word:add", word)
+}
+
+function removeIgnoredWord(word: string) {
+  emit("word:remove", word)
+}
+
+function addIgnoredWordGlobally() {
+  emit("globalWord:add", props.match.word)
+}
+
+function removeGloballyIgnoredWord(word: string) {
+  emit("globalWord:remove", word)
 }
 
 function getValues(replacements: Replacement[]) {
   return replacements.flatMap((replacement) => replacement.value)
 }
+
+const isMatchIgnored = computed(() => {
+  return (
+    Array.isArray(props.match.ignoredTextCheckWords) &&
+    props.match.ignoredTextCheckWords.length > 0
+  )
+})
 </script>
 
 <template>
@@ -31,17 +54,25 @@ function getValues(replacements: Replacement[]) {
     data-testid="text-check-modal"
   >
     <div class="flex flex-row gap-8">
-      <span class="font-bold" data-testid="text-check-modal-word">
+      <span class="ris-body1-bold" data-testid="text-check-modal-word">
         {{ match.word }}
       </span>
     </div>
 
-    <p>{{ match.shortMessage || match.message }}</p>
+    <IgnoredWordHandler
+      :match="match"
+      @globally-ignored-word:add="addIgnoredWordGlobally"
+      @globally-ignored-word:remove="removeGloballyIgnoredWord(match.word)"
+      @ignored-word:remove="removeIgnoredWord(match.word)"
+    />
+
+    <p v-if="!isMatchIgnored">{{ match.shortMessage || match.message }}</p>
 
     <ReplacementBar
+      v-if="!isMatchIgnored"
       replacement-mode="single"
       :replacements="getValues(match.replacements)"
-      @suggestion:ignore="ignoreSuggestion"
+      @ignored-word:add="addIgnoredWord(match.word)"
       @suggestion:update="acceptSuggestion"
     />
   </div>

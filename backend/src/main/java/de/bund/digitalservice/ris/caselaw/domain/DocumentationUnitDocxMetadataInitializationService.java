@@ -30,25 +30,27 @@ public class DocumentationUnitDocxMetadataInitializationService {
     this.documentTypeRepository = documentTypeRepository;
   }
 
-  public void initializeCoreData(DocumentationUnit documentationUnit, Docx2Html docx2html) {
+  public void initializeCoreData(
+      DocumentationUnit documentationUnit, Docx2Html docx2html, User user) {
     CoreData.CoreDataBuilder builder = documentationUnit.coreData().toBuilder();
 
     initializeFieldsFromProperties(docx2html.properties(), documentationUnit, builder);
 
     if (docx2html.ecliList().size() == 1) {
-      handleEcli(documentationUnit, builder, docx2html.ecliList().get(0));
+      handleEcli(documentationUnit, builder, docx2html.ecliList().getFirst());
     }
 
     DocumentationUnit updatedDocumentationUnit =
         documentationUnit.toBuilder().coreData(builder.build()).build();
-    repository.saveProcedures(updatedDocumentationUnit);
+    repository.saveProcedures(updatedDocumentationUnit, user);
     // save new court first to avoid override of legal effect
     repository.save(
         documentationUnit.toBuilder()
             .coreData(
                 documentationUnit.coreData().toBuilder().court(builder.build().court()).build())
-            .build());
-    repository.save(updatedDocumentationUnit);
+            .build(),
+        user);
+    repository.save(updatedDocumentationUnit, user);
   }
 
   private void initializeFieldsFromProperties(

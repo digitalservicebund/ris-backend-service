@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
+import InputText from "primevue/inputtext"
 import { computed, onMounted, ref } from "vue"
 import { ValidationError } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import YearInput from "@/components/input/YearInput.vue"
 import { useInjectCourtType } from "@/composables/useCourtType"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -31,7 +31,7 @@ const emit = defineEmits<{
 const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
 const legalForceValidationStore =
   useValidationStore<(typeof LegalForce.fields)[number]>()
-const singleNormInput = ref<InstanceType<typeof TextInput> | null>(null)
+const singleNormInput = ref<InstanceType<typeof InputText> | null>(null)
 
 const courtTypeRef = useInjectCourtType()
 
@@ -192,7 +192,11 @@ onMounted(async () => {
   validateLegalForce()
 
   hasLegalForce.value = !!singleNorm.value?.legalForce
-  singleNormInput.value?.focusInput()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const inputElement = (singleNormInput.value as any)?.$el.querySelector(
+    "input",
+  )
+  inputElement?.focus() // This works without TypeScript errors
 })
 </script>
 
@@ -206,15 +210,16 @@ onMounted(async () => {
         :id="'legalForce' + index"
         v-slot="{ id }"
         label="Mit Gesetzeskraft"
-        label-class="ds-label-01-reg"
+        label-class="ris-label1-regular"
         :label-position="LabelPosition.RIGHT"
       >
-        <CheckboxInput
-          :id="id"
+        <Checkbox
           v-model="hasLegalForce"
           aria-label="Gesetzeskraft der Norm"
+          binary
           data-testid="legal-force-checkbox"
-          size="small"
+          :input-id="id"
+          size="large"
         />
       </InputField>
       <button
@@ -240,16 +245,17 @@ onMounted(async () => {
         label="Einzelnorm"
         :validation-error="validationStore.getByField('singleNorm')"
       >
-        <TextInput
+        <InputText
           id="singleNorm"
           ref="singleNormInput"
           v-model.trim="singleNorm.singleNorm"
           aria-label="Einzelnorm der Norm"
-          :has-error="slotProps.hasError"
-          size="medium"
+          fluid
+          :invalid="slotProps.hasError"
+          size="small"
           @blur="validateNorm"
           @focus="validationStore.remove('singleNorm')"
-        ></TextInput>
+        ></InputText>
       </InputField>
       <InputField
         id="dateOfVersion"
@@ -265,7 +271,6 @@ onMounted(async () => {
           id="dateOfVersion"
           v-model="singleNorm.dateOfVersion"
           aria-label="Fassungsdatum der Norm"
-          class="ds-input-medium"
           :has-error="slotProps.hasError"
           @focus="validationStore.remove('dateOfVersion')"
           @update:validation-error="slotProps.updateValidationError"
@@ -286,7 +291,6 @@ onMounted(async () => {
           v-model="singleNorm.dateOfRelevance"
           aria-label="Jahr der Norm"
           :has-error="slotProps.hasError"
-          size="medium"
           @focus="validationStore.remove('dateOfRelevance')"
           @update:validation-error="slotProps.updateValidationError"
         />

@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
+import Checkbox from "primevue/checkbox"
+import InputText from "primevue/inputtext"
+import InputSelect from "primevue/select"
 import { computed, ref, watch } from "vue"
-import Checkbox from "@/components/input/CheckboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
-import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
-import TextInput from "@/components/input/TextInput.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -240,14 +240,14 @@ export type DocumentUnitSearchParameter =
       class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
     >
       <!-- Column 1 -->
-      <div class="ds-body-01-reg ml-3 flex flex-row items-center">
+      <div class="ris-body1-regular ml-3 flex flex-row items-center">
         Aktenzeichen
       </div>
-      <div class="ds-body-01-reg flex flex-row items-center">Gericht</div>
-      <div class="ds-body-01-reg flex flex-row items-center">Datum</div>
+      <div class="ris-body1-regular flex flex-row items-center">Gericht</div>
+      <div class="ris-body1-regular flex flex-row items-center">Datum</div>
       <div
         v-if="myDocOfficeOnly"
-        class="ds-body-01-reg flex flex-row items-center"
+        class="ris-body1-regular flex flex-row items-center"
       >
         jDV Übergabe
       </div>
@@ -255,37 +255,55 @@ export type DocumentUnitSearchParameter =
       <div></div>
       <!-- Column 2 -->
       <div>
-        <InputField id="fileNumber" label="Aktenzeichen" visually-hide-label>
-          <TextInput
-            id="fileNumber"
+        <InputField
+          id="fileNumber"
+          v-slot="{ id }"
+          label="Aktenzeichen"
+          visually-hide-label
+        >
+          <InputText
+            :id="id"
             v-model="query.fileNumber"
             aria-label="Aktenzeichen Suche"
-            class="ds-input-small"
-            @focus="resetErrors"
-          ></TextInput>
+            fluid
+            size="small"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+          ></InputText>
         </InputField>
       </div>
       <div class="flex flex-row gap-10">
-        <InputField id="courtType" label="Gerichtstyp" visually-hide-label>
-          <TextInput
-            id="courtType"
+        <InputField
+          id="courtType"
+          v-slot="{ id }"
+          label="Gerichtstyp"
+          visually-hide-label
+        >
+          <InputText
+            :id="id"
             v-model="query.courtType"
             aria-label="Gerichtstyp Suche"
-            class="ds-input-small"
+            fluid
             placeholder="Gerichtstyp"
-            @focus="resetErrors"
-          ></TextInput>
+            size="small"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+          ></InputText>
         </InputField>
         <span class="pt-6">-</span>
-        <InputField id="courtLocation" label="Gerichtsort" visually-hide-label>
-          <TextInput
-            id="courtLocation"
+        <InputField
+          id="courtLocation"
+          v-slot="{ id }"
+          label="Gerichtsort"
+          visually-hide-label
+        >
+          <InputText
+            :id="id"
             v-model="query.courtLocation"
             aria-label="Gerichtsort Suche"
-            class="ds-input-small"
+            fluid
             placeholder="Ort"
-            @focus="resetErrors"
-          ></TextInput>
+            size="small"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+          ></InputText>
         </InputField>
       </div>
       <div class="flex flex-row gap-10">
@@ -301,7 +319,6 @@ export type DocumentUnitSearchParameter =
             :id="id"
             v-model="query.decisionDate"
             aria-label="Entscheidungsdatum Suche"
-            class="ds-input-small"
             :has-error="hasError"
             @blur="validateSearchInput"
             @focus="resetErrors(id as DocumentUnitSearchParameter)"
@@ -324,7 +341,6 @@ export type DocumentUnitSearchParameter =
             :id="id"
             v-model="query.decisionDateEnd"
             aria-label="Entscheidungsdatum Suche Ende"
-            class="ds-input-small"
             :has-error="hasError"
             placeholder="TT.MM.JJJJ (optional)"
             @blur="validateSearchInput"
@@ -349,7 +365,6 @@ export type DocumentUnitSearchParameter =
             :id="id"
             v-model="query.publicationDate"
             aria-label="jDV Übergabedatum Suche"
-            class="ds-input-small"
             :has-error="hasError"
             is-future-date
             @blur="validateSearchInput"
@@ -364,25 +379,24 @@ export type DocumentUnitSearchParameter =
           id="scheduled"
           v-slot="{ id }"
           label="Nur terminiert"
-          label-class="ds-label-01-reg"
+          label-class="ris-label1-regular"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
-            :id="id"
             v-model="scheduledOnly"
             aria-label="Terminiert Filter"
-            class="ds-checkbox-mini bg-white"
-            @focus="resetErrors"
+            binary
+            :input-id="id"
           />
         </InputField>
       </div>
       <div v-if="!myDocOfficeOnly" />
       <div class="pl-32"></div>
       <!-- Column 3 -->
-      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
+      <div class="ris-body1-regular flex flex-row items-center pl-24 lg:pl-48">
         Dokumentnummer
       </div>
-      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
+      <div class="ris-body1-regular flex flex-row items-center pl-24 lg:pl-48">
         Status
       </div>
       <div></div>
@@ -392,27 +406,37 @@ export type DocumentUnitSearchParameter =
       <div class="">
         <InputField
           id="documentNumber"
+          v-slot="{ id }"
           label="Dokumentnummer"
           visually-hide-label
         >
-          <TextInput
-            id="documentNumber"
+          <InputText
+            :id="id"
             v-model="query.documentNumber"
             aria-label="Dokumentnummer Suche"
-            class="ds-input-small"
-            @focus="resetErrors"
-          ></TextInput>
+            fluid
+            size="small"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+          ></InputText>
         </InputField>
       </div>
       <div class="">
-        <InputField id="status" label="Status" visually-hide-label>
-          <DropdownInput
-            id="status"
+        <InputField
+          id="status"
+          v-slot="{ id }"
+          label="Status"
+          visually-hide-label
+        >
+          <InputSelect
+            :id="id"
             v-model="query.publicationStatus"
             aria-label="Status Suche"
-            class="ds-select-small"
-            :items="dropdownItems"
-            @focus="resetErrors"
+            fluid
+            option-label="label"
+            option-value="value"
+            :options="dropdownItems"
+            placeholder="Bitte auswählen"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
           />
         </InputField>
       </div>
@@ -421,15 +445,15 @@ export type DocumentUnitSearchParameter =
           id="documentationOffice"
           v-slot="{ id }"
           label="Nur meine Dokstelle"
-          label-class="ds-label-01-reg"
+          label-class="ris-label1-regular"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
-            :id="id"
             v-model="myDocOfficeOnly"
             aria-label="Nur meine Dokstelle Filter"
-            class="ds-checkbox-mini bg-white"
-            @focus="resetErrors"
+            binary
+            :input-id="id"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
           />
         </InputField>
         <InputField
@@ -437,15 +461,15 @@ export type DocumentUnitSearchParameter =
           id="withErrorsOnly"
           v-slot="{ id }"
           label="Nur Fehler"
-          label-class="ds-label-01-reg"
+          label-class="ris-label1-regular"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
-            :id="id"
             v-model="withError"
             aria-label="Nur fehlerhafte Dokumentationseinheiten"
-            class="ds-checkbox-mini bg-white"
-            @focus="resetErrors"
+            binary
+            :input-id="id"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
           />
         </InputField>
         <InputField
@@ -453,45 +477,45 @@ export type DocumentUnitSearchParameter =
           id="withDuplicateWaring"
           v-slot="{ id }"
           label="Dublettenverdacht"
-          label-class="ds-label-01-reg"
+          label-class="ris-label1-regular"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
-            :id="id"
             v-model="withDuplicateWarning"
             aria-label="Dokumentationseinheiten mit Dublettenverdacht"
-            class="ds-checkbox-mini bg-white"
-            @focus="resetErrors"
+            binary
+            :input-id="id"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
         /></InputField>
       </div>
       <div class="flex flex-row">
-        <div class="flex flex-col gap-4">
-          <TextButton
+        <div class="flex flex-col gap-8">
+          <Button
             aria-label="Nach Dokumentationseinheiten suchen"
             class="self-start"
             :disabled="isLoading"
             label="Ergebnisse anzeigen"
             size="small"
             @click="handleSearchButtonClicked"
-          />
+          ></Button>
 
           <span
             v-if="submitButtonError"
-            class="ds-label-03-reg min-h-[1rem] text-red-800"
+            class="ris-label3-regular min-h-[1rem] text-red-800"
           >
             {{ submitButtonError }}
           </span>
         </div>
 
-        <TextButton
+        <Button
           v-if="!isEmptySearch"
           aria-label="Suche zurücksetzen"
-          button-type="ghost"
           class="ml-8 self-start"
           label="Suche zurücksetzen"
           size="small"
+          text
           @click="resetSearch"
-        />
+        ></Button>
       </div>
     </div>
   </div>

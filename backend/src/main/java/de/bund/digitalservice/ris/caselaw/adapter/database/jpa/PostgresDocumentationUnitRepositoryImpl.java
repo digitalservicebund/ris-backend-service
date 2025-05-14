@@ -11,9 +11,12 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -22,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
@@ -74,6 +78,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final UserService userService;
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
+  private final DocumentationUnitHistoryLogService historyLogService;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -85,7 +90,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       UserService userService,
       EntityManager entityManager,
-      DatabaseReferenceRepository referenceRepository) {
+      DatabaseReferenceRepository referenceRepository,
+      DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -97,23 +103,37 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.referenceRepository = referenceRepository;
     this.userService = userService;
     this.entityManager = entityManager;
+    this.historyLogService = historyLogService;
   }
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public Documentable findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException {
+    return findByDocumentNumberNonTransactional(documentNumber, null);
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public Documentable findByDocumentNumber(String documentNumber, User user)
+      throws DocumentationUnitNotExistsException {
+    return findByDocumentNumberNonTransactional(documentNumber, user);
+  }
+
+  private Documentable findByDocumentNumberNonTransactional(String documentNumber, User user)
+      throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository
             .findByDocumentNumber(documentNumber)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-    return getDocumentationUnit(documentationUnit);
+    return getDocumentationUnit(documentationUnit, user);
   }
 
   @Nullable
-  private static Documentable getDocumentationUnit(DocumentationUnitDTO documentationUnit) {
+  private static Documentable getDocumentationUnit(
+      DocumentationUnitDTO documentationUnit, @Nullable User user) {
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
-      return DecisionTransformer.transformToDomain(decisionDTO);
+      return DecisionTransformer.transformToDomain(decisionDTO, user);
     }
     if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
       return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
@@ -134,16 +154,31 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
+  public Documentable findByUuid(UUID uuid, User user) throws DocumentationUnitNotExistsException {
+    return this.findByUuidNonTransactional(uuid, user);
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Documentable findByUuid(UUID uuid) throws DocumentationUnitNotExistsException {
+    return this.findByUuidNonTransactional(uuid, null);
+  }
+
+  private Documentable findByUuidNonTransactional(UUID uuid, User user)
+      throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
-    return getDocumentationUnit(documentationUnit);
+    return getDocumentationUnit(documentationUnit, user);
   }
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit docUnit, Status status, Reference createdFromReference, String fileNumber) {
+      DocumentationUnit docUnit,
+      Status status,
+      Reference createdFromReference,
+      String fileNumber,
+      User user) {
 
     var documentationUnitDTO =
         repository.save(
@@ -173,35 +208,67 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       sources.add(SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
     }
 
-    DecisionDTO.DecisionDTOBuilder<?, ?> builder =
-        documentationUnitDTO.toBuilder()
-            .source(sources)
-            .fileNumbers(
-                fileNumber == null
-                    ? null
-                    : List.of(
-                        FileNumberDTO.builder()
-                            .documentationUnit(documentationUnitDTO)
-                            .value(fileNumber)
-                            .rank(0L)
-                            .build()))
-            .status(
-                StatusTransformer.transformToDTO(status).toBuilder()
-                    .documentationUnit(documentationUnitDTO)
-                    .createdAt(Instant.now())
-                    .build());
+    if (fileNumber != null) {
+      documentationUnitDTO.setFileNumbers(
+          List.of(
+              FileNumberDTO.builder()
+                  .documentationUnit(documentationUnitDTO)
+                  .value(fileNumber)
+                  .rank(0L)
+                  .build()));
+    }
 
-    // saving a second time is necessary because status and reference need a reference to a
+    ManagementDataDTO managementData = getCreatedBy(user, documentationUnitDTO);
+    documentationUnitDTO.setManagementData(managementData);
+
+    historyLogService.saveHistoryLog(
+        documentationUnitDTO.getId(), user, HistoryLogEventType.CREATE, "Dokeinheit angelegt");
+
+    StatusDTO statusDTO =
+        StatusTransformer.transformToDTO(status).toBuilder()
+            .documentationUnit(documentationUnitDTO)
+            .createdAt(Instant.now())
+            .build();
+
+    documentationUnitDTO.setStatus(statusDTO);
+    documentationUnitDTO.setSource(sources);
+
+    // saving a second time is necessary because status, managementData and reference need a
+    // reference to a
     // persisted documentation unit
-    DecisionDTO savedDocUnit = repository.save(builder.build());
+    DecisionDTO savedDocUnit = repository.save(documentationUnitDTO);
+    return DecisionTransformer.transformToDomain(savedDocUnit, user);
+  }
 
-    return DecisionTransformer.transformToDomain(savedDocUnit);
+  private ManagementDataDTO getCreatedBy(User user, DecisionDTO documentationUnitDTO) {
+    ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
+        ManagementDataDTO.builder()
+            .documentationUnit(documentationUnitDTO)
+            .createdAtDateTime(Instant.now());
+
+    if (user != null) {
+      managementDataBuilder
+          .createdByDocumentationOffice(
+              DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
+          .createdByUserId(user.id())
+          .createdByUserName(user.name());
+    }
+    return managementDataBuilder.build();
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(Documentable documentable) {
+    saveNonTransactional(documentable, null);
+  }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
+  @Override
+  public void save(Documentable documentable, @Nullable User currentUser) {
+    saveNonTransactional(documentable, currentUser);
+  }
+
+  private void saveNonTransactional(Documentable documentable, @Nullable User currentUser) {
     DocumentationUnitDTO documentationUnitDTO =
         repository.findById(documentable.uuid()).orElse(null);
     if (documentationUnitDTO == null) {
@@ -235,6 +302,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       }
     }
 
+    setLastUpdated(currentUser, documentationUnitDTO);
+    historyLogService.saveHistoryLog(
+        documentationUnitDTO.getId(),
+        currentUser,
+        HistoryLogEventType.UPDATE,
+        "Dokeinheit bearbeitet");
+
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       documentationUnitDTO =
@@ -242,6 +316,26 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       repository.save(documentationUnitDTO);
     }
     // TODO pending proceeding
+  }
+
+  private void setLastUpdated(User currentUser, DocumentationUnitDTO docUnitDTO) {
+    if (currentUser == null) {
+      return;
+    }
+
+    if (docUnitDTO.getManagementData() == null) {
+      docUnitDTO.setManagementData(new ManagementDataDTO());
+      docUnitDTO.getManagementData().setDocumentationUnit(docUnitDTO);
+    }
+
+    DocumentationOfficeDTO docOffice =
+        DocumentationOfficeTransformer.transformToDTO(currentUser.documentationOffice());
+
+    docUnitDTO.getManagementData().setLastUpdatedByUserId(currentUser.id());
+    docUnitDTO.getManagementData().setLastUpdatedByUserName(currentUser.name());
+    docUnitDTO.getManagementData().setLastUpdatedBySystemName(null);
+    docUnitDTO.getManagementData().setLastUpdatedByDocumentationOffice(docOffice);
+    docUnitDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
   }
 
   @Override
@@ -345,7 +439,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void saveProcedures(Documentable documentationUnit) {
+  public void saveProcedures(Documentable documentationUnit, @Nullable User user) {
     if (documentationUnit == null
         || documentationUnit.coreData() == null
         || documentationUnit.coreData().procedure() == null
@@ -367,13 +461,22 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     boolean sameAsLast =
         decisionDTO.getProcedure() != null && decisionDTO.getProcedure().equals(procedureDTO);
 
-    // add the previous procedure to the history
     if (procedureDTO != null && !sameAsLast) {
       decisionDTO.getProcedureHistory().add(procedureDTO);
-    }
-    // set new procedure
-    decisionDTO.setProcedure(procedureDTO);
+      String description;
+      if (decisionDTO.getProcedure() != null) {
+        String oldProcedureLabel = decisionDTO.getProcedure().getLabel();
+        description =
+            "Vorgang geändert: %s → %s".formatted(oldProcedureLabel, procedureDTO.getLabel());
 
+      } else {
+        description = "Vorgang gesetzt: %s".formatted(procedureDTO.getLabel());
+      }
+      historyLogService.saveHistoryLog(
+          decisionDTO.getId(), user, HistoryLogEventType.PROCEDURE, description);
+    }
+
+    decisionDTO.setProcedure(procedureDTO);
     repository.save(decisionDTO);
   }
 
@@ -553,6 +656,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Boolean withError,
       Boolean myDocOfficeOnly,
       Boolean withDuplicateWarning,
+      InboxStatus inboxStatus,
       DocumentationOfficeDTO documentationOfficeDTO) {
     return repository.searchByDocumentationUnitSearchInput(
         documentationOfficeDTO.getId(),
@@ -568,6 +672,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         withError,
         myDocOfficeOnly,
         withDuplicateWarning,
+        inboxStatus,
         pageable);
   }
 
@@ -601,6 +706,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             withError,
             searchInput.myDocOfficeOnly(),
             searchInput.withDuplicateWarning(),
+            searchInput.inboxStatus(),
             documentationOfficeDTO);
 
     return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);

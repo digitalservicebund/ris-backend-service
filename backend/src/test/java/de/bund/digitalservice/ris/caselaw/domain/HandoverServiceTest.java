@@ -36,6 +36,7 @@ class HandoverServiceTest {
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
 
   @MockitoSpyBean private HandoverService service;
+  @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
 
   @MockitoBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
 
@@ -68,7 +69,7 @@ class HandoverServiceTest {
             .build();
     when(mailService.handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString()))
         .thenReturn(handoverMail);
-    var mailResponse = service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS);
+    var mailResponse = service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null);
     assertThat(mailResponse).usingRecursiveComparison().isEqualTo(handoverMail);
     verify(repository).findByUuid(TEST_UUID);
     verify(mailService).handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString());
@@ -110,7 +111,7 @@ class HandoverServiceTest {
 
     Assertions.assertThrows(
         DocumentationUnitNotExistsException.class,
-        () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS));
+        () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null));
     verify(repository).findByUuid(TEST_UUID);
     verify(mailService, never())
         .handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString());

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import Button from "primevue/button"
+import Checkbox from "primevue/checkbox"
 import { computed, nextTick, ref, watch } from "vue"
-import Checkbox from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import TextButton from "@/components/input/TextButton.vue"
 
 const props = defineProps<{
   label: string
@@ -78,14 +78,14 @@ watch(
 <template>
   <div class="flex flex-col gap-24">
     <div class="flex flex-col gap-4">
-      <label id="list-input" class="ds-label-02-reg" for="list-input-id">
+      <label id="list-input" class="ris-label2-regular" for="list-input-id">
         {{ label }}</label
       >
       <textarea
         id="list-input-id"
         v-model="localModelValue"
         :aria-label="`${label} Input`"
-        class="ds-input h-auto resize-none overflow-hidden p-20"
+        class="shadow-blue h-auto resize-none overflow-hidden p-20"
         :data-testid="`${label}_ListInputEdit`"
         placeholder="Geben Sie jeden Wert in eine eigene Zeile ein"
         :rows="listItemCount"
@@ -98,28 +98,27 @@ watch(
       :label-position="LabelPosition.RIGHT"
     >
       <Checkbox
-        :id="`sortAlphabetically_${label}`"
         v-model="sortAlphabetically"
         aria-label="Alphabetisch sortieren"
-        class="ds-checkbox-mini bg-white"
+        binary
+        :input-id="`sortAlphabetically_${label}`"
       />
     </InputField>
     <div class="flex w-full flex-row">
       <div class="flex gap-16">
-        <TextButton
+        <Button
           :aria-label="`${label} übernehmen`"
-          button-type="primary"
           label="Übernehmen"
           size="small"
           @click.stop="emit('update:modelValue', localModelValue)"
-        />
-        <TextButton
+        ></Button>
+        <Button
           aria-label="Abbrechen"
-          button-type="ghost"
           label="Abbrechen"
           size="small"
+          text
           @click.stop="cancelEdit"
-        />
+        ></Button>
       </div>
     </div>
   </div>

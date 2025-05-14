@@ -1,5 +1,6 @@
-import DocumentUnit, { Court, DocumentType } from "./documentUnit"
+import DocumentUnit, { Court } from "./documentUnit"
 import DocumentationOffice from "@/domain/documentationOffice"
+import { DocumentType } from "@/domain/documentType"
 
 export default class DocumentUnitListEntry {
   public id?: string

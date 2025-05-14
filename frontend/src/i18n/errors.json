@@ -63,6 +63,10 @@
     "title": "Dokumentationseinheit konnte nicht übernommen werden.",
     "description": ""
   },
+  "BULK_PROCEDURE_ASSIGNMENT_FAILED": {
+    "title": "Vorgang konnte nicht zugewiesen werden.",
+    "description": ""
+  },
   "DOCUMENT_UNIT_DELETE_FAILED": {
     "title": "Dokumentationseinheit konnte nicht gelöscht werden.",
     "description": ""
@@ -226,5 +230,20 @@
   },
   "TEXT_CHECK_FAILED": {
     "title": "Fehler beim Prüfen der Rechtschreibung"
+  },
+  "IGNORED_TEXT_CHECK_WORD_COULD_NOT_BE_SAVED": {
+    "title": "Wort konnte nicht ignoriert werden"
+  },
+  "IGNORED_TEXT_CHECK_WORD_COULD_NOT_BE_DELETED": {
+    "title": "Ignoriertes Wort konnte nicht gelöscht werden"
+  },
+  "IGNORED_TEXT_CHECK_WORD_GLOBAL_COULD_NOT_BE_SAVED": {
+    "title": "Wort konnte nicht dem Wörterbuch hinzugefügt werden"
+  },
+  "IGNORED_TEXT_CHECK_WORD_GLOBAL_COULD_NOT_BE_DELETED": {
+    "title": "Wort konnte nicht aus dem Wörterbuch gelöscht werden"
+  },
+  "DOCUMENTATION_UNIT_HISTORY_LOG_COULD_NOT_BE_LOADED": {
+    "title": "Die Historie konnte nicht geladen werden."
   }
 }

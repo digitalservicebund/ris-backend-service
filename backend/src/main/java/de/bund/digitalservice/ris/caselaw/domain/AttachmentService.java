@@ -6,9 +6,9 @@ import org.springframework.http.HttpHeaders;
 
 public interface AttachmentService {
   Attachment attachFileToDocumentationUnit(
-      UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders);
+      UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders, User user);
 
-  void deleteByS3Path(String s3Path);
+  void deleteByS3Path(String s3Path, UUID documentationUnitId, User user);
 
   void deleteAllObjectsFromBucketForDocumentationUnit(UUID documentationUnitId);
 }

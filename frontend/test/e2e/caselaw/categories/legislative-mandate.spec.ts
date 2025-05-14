@@ -4,7 +4,6 @@ import {
   navigateToHandover,
   navigateToPreview,
   save,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -57,7 +56,7 @@ test.describe(
       await reloadWithCheck(page)
 
       await test.step("remove court type", async () => {
-        await page.locator("[aria-label='Gericht']").fill("")
+        await page.getByLabel("Gericht", { exact: true }).fill("")
         await save(page)
       })
 
@@ -87,7 +86,7 @@ test.describe(
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
       await test.step("uncheck legislative mandate", async () => {
-        const checkBox = page.getByTestId("legislative-mandate")
+        const checkBox = page.getByLabel("Gesetzgebungsauftrag")
         await checkBox.uncheck()
         await expect(checkBox).not.toBeChecked()
         await save(page)
@@ -113,7 +112,7 @@ test.describe(
     async function reloadWithCheck(page: Page) {
       await test.step("reload page and check that checkbox is checked and button is hidden", async () => {
         await page.reload()
-        const checkBox = page.getByTestId("legislative-mandate")
+        const checkBox = page.getByLabel("Gesetzgebungsauftrag")
         await expect(checkBox).toBeChecked()
         await expect(
           page.getByText("Gesetzgebungsauftrag vorhanden"),
@@ -126,13 +125,17 @@ test.describe(
 
     async function addCourtType(page: Page, courtType: string) {
       await test.step(`add court type : ${courtType}`, async () => {
-        await page.locator("[aria-label='Gericht']").fill(courtType)
-        await waitForInputValue(page, "[aria-label='Gericht']", courtType)
+        await page.getByLabel("Gericht", { exact: true }).fill(courtType)
+        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+          courtType,
+        )
         await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
           courtType,
         )
         await page.getByText(courtType).click()
-        await waitForInputValue(page, "[aria-label='Gericht']", courtType)
+        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+          courtType,
+        )
 
         await save(page)
       })
@@ -140,7 +143,7 @@ test.describe(
 
     async function checkLegislativeMandate(page: Page) {
       await test.step("check legislative mandate", async () => {
-        const checkBox = page.getByTestId("legislative-mandate")
+        const checkBox = page.getByLabel("Gesetzgebungsauftrag")
         await checkBox.check()
         await expect(checkBox).toBeChecked()
         await save(page)

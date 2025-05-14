@@ -5,45 +5,61 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublication
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskType;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
 public class PortalPublicationJobService {
 
   private final PortalPublicationJobRepository publicationJobRepository;
-  private final PublicPortalPublicationService internalPortalPublicationService;
+  private final PortalPublicationService portalPublicationService;
 
   public PortalPublicationJobService(
       PortalPublicationJobRepository publicationJobRepository,
-      PublicPortalPublicationService publicPortalPublicationService) {
+      PortalPublicationService portalPublicationService) {
     this.publicationJobRepository = publicationJobRepository;
-    this.internalPortalPublicationService = publicPortalPublicationService;
+    this.portalPublicationService = portalPublicationService;
+  }
+
+  //                        ↓ day of month (1-31)
+  //                      ↓ hour (0-23)
+  //                    ↓ minute (0-59)
+  //                 ↓ second (0-59)
+  // Default:        0 30 2 * * * (After migration: CET: 4:30)
+  @Scheduled(cron = "0 30 2 * * *")
+  @SchedulerLock(name = "nightly-changelog-publish")
+  public void publishNightlyChangelog() {
+    try {
+      portalPublicationService.uploadFullReindexChangelog();
+    } catch (Exception e) {
+      log.error("Could not upload nightly changelog file.", e);
+    }
   }
 
   @Scheduled(fixedDelayString = "PT5S")
-  @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT1H")
-  @Transactional
+  @SchedulerLock(name = "portal-publication-job", lockAtMostFor = "PT15M")
   public void executePendingJobs() {
-    List<PortalPublicationJobDTO> pendingJobs = publicationJobRepository.findLatestPendingJobs();
+
+    List<PortalPublicationJobDTO> pendingJobs = publicationJobRepository.findNextPendingJobsBatch();
     if (pendingJobs.isEmpty()) {
       return;
     }
 
     log.info("Executing {} portal publication jobs", pendingJobs.size());
+    log.info(
+        "Executing portal publication jobs for doc numbers: {}",
+        pendingJobs.stream()
+            .map(PortalPublicationJobDTO::getDocumentNumber)
+            .collect(Collectors.joining(", ")));
     for (PortalPublicationJobDTO job : pendingJobs) {
       executeJob(job);
     }
-    var publicationResult = publishChangelog(pendingJobs);
+    var publicationResult = writeChangelog(pendingJobs);
     publicationJobRepository.saveAll(pendingJobs);
-    pendingJobs.forEach(
-        pendingJob ->
-            publicationJobRepository.ignoreOlderJobsByDocumentNumber(
-                pendingJob.getDocumentNumber()));
 
     log.info(
         "Portal publication jobs successfully executed: {} units published, {} units deleted.",
@@ -54,7 +70,7 @@ public class PortalPublicationJobService {
   private void executeJob(PortalPublicationJobDTO job) {
     if (job.getPublicationType() == PortalPublicationTaskType.PUBLISH) {
       try {
-        this.internalPortalPublicationService.publishDocumentationUnit(job.getDocumentNumber());
+        this.portalPublicationService.publishDocumentationUnit(job.getDocumentNumber());
         job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
       } catch (Exception e) {
         log.error("Could not publish documentation unit {}", job.getDocumentNumber(), e);
@@ -64,7 +80,7 @@ public class PortalPublicationJobService {
 
     if (job.getPublicationType() == PortalPublicationTaskType.DELETE) {
       try {
-        this.internalPortalPublicationService.deleteDocumentationUnit(job.getDocumentNumber());
+        this.portalPublicationService.deleteDocumentationUnit(job.getDocumentNumber());
         job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
       } catch (Exception e) {
         log.error("Could not unpublish documentation unit {}", job.getDocumentNumber(), e);
@@ -73,25 +89,36 @@ public class PortalPublicationJobService {
     }
   }
 
-  private PublicationResult publishChangelog(List<PortalPublicationJobDTO> pendingJobs) {
-    List<String> publishDocNumbers =
+  private PublicationResult writeChangelog(List<PortalPublicationJobDTO> pendingJobs) {
+    List<PortalPublicationJobDTO> successFullJobsWithoutDuplicates =
         pendingJobs.stream()
-            .filter(job -> job.getPublicationType() == PortalPublicationTaskType.PUBLISH)
             .filter(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS)
-            .map(PortalPublicationJobDTO::getDocumentNumber)
-            .map(documentNumber -> documentNumber + ".xml")
+            .collect(
+                Collectors.toMap(
+                    PortalPublicationJobDTO::getDocumentNumber,
+                    job -> job,
+                    (existing, replacement) ->
+                        existing.getCreatedAt().isAfter(replacement.getCreatedAt())
+                            ? existing
+                            : replacement))
+            .values()
+            .stream()
+            .toList();
+
+    List<String> publishDocNumbers =
+        successFullJobsWithoutDuplicates.stream()
+            .filter(job -> job.getPublicationType() == PortalPublicationTaskType.PUBLISH)
+            .map(job -> job.getDocumentNumber() + ".xml")
             .toList();
     List<String> deletedDocNumbers =
-        pendingJobs.stream()
+        successFullJobsWithoutDuplicates.stream()
             .filter(job -> job.getPublicationType() == PortalPublicationTaskType.DELETE)
-            .filter(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS)
-            .map(PortalPublicationJobDTO::getDocumentNumber)
-            .map(documentNumber -> documentNumber + ".xml")
+            .map(job -> job.getDocumentNumber() + ".xml")
             .toList();
 
     if (!publishDocNumbers.isEmpty() || !deletedDocNumbers.isEmpty()) {
       try {
-        this.internalPortalPublicationService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
+        this.portalPublicationService.uploadChangelog(publishDocNumbers, deletedDocNumbers);
       } catch (Exception e) {
         log.error("Could not upload changelog file.", e);
       }

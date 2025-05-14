@@ -31,7 +31,10 @@ const viteConfig = defineViteConfig({
       dirs: "src/routes",
       // We disable lazy loading as it leads to problems when an old user sessions requests resources that were
       // removed with a new deployment. see https://stackoverflow.com/q/69300341/4694994
-      importMode: "sync",
+      // Avoid using 'sync' in test environment resulting in SSR pre-evaluation (after switching to vite 6.3.3).
+      // Otherwise, import of pages in router.ts results in a ReferenceError:
+      // Cannot access '__vite_ssr_export_default__' before initialization
+      importMode: process.env.VITEST === "true" ? "async" : "sync",
     }),
     EnvironmentPlugin({
       BACKEND_HOST: "",

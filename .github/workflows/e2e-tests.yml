@@ -1,0 +1,19 @@
+on:
+  workflow_call:
+
+jobs:
+  e2e-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [ chromium, firefox ]
+    uses: ./.github/workflows/e2e-sharding-matrix.yml
+    with:
+      project: ${{ matrix.project }}
+    secrets: inherit
+
+  a11y:
+    uses: ./.github/workflows/_playwright-test.yml
+    with:
+      project: a11y
+    secrets: inherit

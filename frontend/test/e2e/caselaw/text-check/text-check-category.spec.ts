@@ -1,5 +1,5 @@
-import { expect } from "@playwright/test"
-import { navigateToCategories } from "../e2e-utils"
+import { expect, Locator } from "@playwright/test"
+import { clearTextField, navigateToCategories } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { convertHexToRGB } from "~/test-helper/coloursUtil"
@@ -10,8 +10,33 @@ test.skip(
   "Skipping firefox flaky test",
 )
 
+const textCheckUnderlinesColors = {
+  uncategorized: "#e86a69",
+  style: "#9d8eff",
+  grammar: "#eeb55c",
+  typographical: "#eeb55c",
+  ignored: "#26A7F2",
+  misspelling: "#e86a69",
+} as const
+
+type TextCheckType = keyof typeof textCheckUnderlinesColors
+
+async function getMarkId(tag: Locator): Promise<string | null> {
+  return await tag.evaluate((el) => el.getAttribute("id"))
+}
+
+function getTextCheckColorRGB(type: string | null): {
+  red: number
+  green: number
+  blue: number
+} {
+  const typeKey = (type ?? "uncategorized") as TextCheckType
+  const hex = textCheckUnderlinesColors[typeKey]
+  return convertHexToRGB(hex)
+}
+
 const textWithErrors = {
-  text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten.",
+  text: "LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten. Testgnorierteswort ist grün markiert",
   incorrectWords: [
     "sie",
     "Rechtshcreibfehler",
@@ -23,28 +48,25 @@ const textWithErrors = {
     "zB.",
     "Donnerstag, dem 13",
   ],
+  ignoredWords: ["Testgnorierteswort"],
 }
 
 test.describe(
   "check text category",
   {
-    annotation: {
-      description: "https://digitalservicebund.atlassian.net/browse/RISDEV-254",
-      type: "epic",
-    },
+    tag: ["@RISDEV-254"],
   },
   () => {
     test(
       "clicking on text check button, save document and returns matches",
       {
-        annotation: {
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-6154",
-          type: "story",
-        },
+        tag: ["@RISDEV-6205", "@RISDEV-6154", "@RISDEV-7397"],
       },
       async ({ page, prefilledDocumentUnit }) => {
-        await test.step("navigate to other headnote (Orientierungssatz) in categories", async () => {
+        const headNoteEditor = page.getByTestId("Orientierungssatz")
+        const headNoteEditorTextArea = headNoteEditor.locator("div")
+
+        await test.step("navigate to headnote (Orientierungssatz) in categories", async () => {
           await navigateToCategories(
             page,
             prefilledDocumentUnit.documentNumber,
@@ -52,19 +74,14 @@ test.describe(
           )
         })
 
-        await test.step("replace text in otherHeadNote (Orientierungssatz)", async () => {
-          const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
-          await otherHeadNoteEditor.locator("div").fill("")
+        await test.step("replace text in headnote (Orientierungssatz)", async () => {
+          await clearTextField(page, headNoteEditorTextArea)
 
-          await otherHeadNoteEditor.locator("div").fill(textWithErrors.text)
-          await expect(otherHeadNoteEditor.locator("div")).toHaveText(
-            textWithErrors.text,
-          )
+          await headNoteEditorTextArea.fill(textWithErrors.text)
+          await expect(headNoteEditorTextArea).toHaveText(textWithErrors.text)
         })
 
         await test.step("trigger category text button shows loading status and highlights matches", async () => {
-          const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
-
           await page
             .getByLabel("Orientierungssatz Button")
             .getByRole("button", { name: "Rechtschreibprüfung" })
@@ -74,7 +91,7 @@ test.describe(
             page.getByTestId("text-check-loading-status"),
           ).toHaveText("Rechtschreibprüfung läuft")
 
-          await otherHeadNoteEditor
+          await headNoteEditor
             .locator("text-check")
             .first()
             .waitFor({ state: "visible" })
@@ -85,30 +102,41 @@ test.describe(
             .getByTestId("Orientierungssatz")
             .locator("text-check")
 
-          for (let i = 0; i < textWithErrors.incorrectWords.length; i++) {
-            await expect(textCheckTags.nth(i)).not.toHaveText("")
+          const allTextCheckTags = page.locator(`text-check`)
 
-            const type =
+          for (
+            let ignoredTextCheckTag = 0;
+            ignoredTextCheckTag < (await allTextCheckTags.count());
+            ignoredTextCheckTag++
+          ) {
+            await expect(textCheckTags.nth(ignoredTextCheckTag)).not.toHaveText(
+              "",
+            )
+
+            const isTextCheckIgnored = await textCheckTags
+              .nth(ignoredTextCheckTag)
+              .getAttribute("ignored")
+
+            let expectedRGBUnderlinesColor
+
+            // eslint-disable-next-line playwright/no-conditional-in-test
+            if (isTextCheckIgnored == "true") {
+              expectedRGBUnderlinesColor = convertHexToRGB(
+                textCheckUnderlinesColors.ignored,
+              )
+            } else {
+              const typeAttr = await textCheckTags
+                .nth(ignoredTextCheckTag)
+                .getAttribute("type")
               // eslint-disable-next-line playwright/no-conditional-in-test
-              (await textCheckTags.nth(i).getAttribute("type")) ??
-              "uncategorized"
+              const type = typeAttr ?? "uncategorized"
+              expectedRGBUnderlinesColor = getTextCheckColorRGB(type)
+            }
 
-            const uncategorized = "#e86a69"
-            const expectedBorder =
-              // eslint-disable-next-line playwright/no-conditional-in-test
-              {
-                uncategorized: uncategorized,
-                style: "#9d8eff",
-                grammar: "#eeb55c",
-                typographical: "#eeb55c",
-              }[type] || uncategorized
-
-            const rgbColors = convertHexToRGB(expectedBorder)
-
-            await expect(textCheckTags.nth(i)).toHaveCSS(
+            await expect(textCheckTags.nth(ignoredTextCheckTag)).toHaveCSS(
               "border-bottom",
               "2px solid " +
-                `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
+                `rgb(${expectedRGBUnderlinesColor.red}, ${expectedRGBUnderlinesColor.green}, ${expectedRGBUnderlinesColor.blue})`,
             )
           }
         })
@@ -136,10 +164,9 @@ test.describe(
         })
 
         await test.step("accept a selected suggestion replaces in text", async () => {
-          const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
-          await otherHeadNoteEditor.click()
+          await headNoteEditor.click()
 
-          await otherHeadNoteEditor.getByText("zB.").click()
+          await headNoteEditor.getByText("zB.").click()
 
           const textCheckLiteral = "zB."
           await expect(
@@ -149,7 +176,7 @@ test.describe(
           await page.getByTestId("suggestion-accept-button").click()
           await expect(page.getByTestId("text-check-modal")).toBeHidden()
 
-          await expect(otherHeadNoteEditor.locator("div")).toHaveText(
+          await expect(headNoteEditorTextArea).toHaveText(
             textWithErrors.text.replace(textCheckLiteral, "z. B."),
           )
 
@@ -157,12 +184,85 @@ test.describe(
         })
 
         await test.step("click on a selected suggestion, then click on a non-tag closes the text check modal", async () => {
-          const otherHeadNoteEditor = page.getByTestId("Orientierungssatz")
-
           await page.locator("text-check").nth(0).click()
           await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
-          await otherHeadNoteEditor.getByText("LanguageTool").click()
+          await headNoteEditor.getByText("LanguageTool").click()
           await expect(page.getByTestId("text-check-modal-word")).toBeHidden()
+        })
+
+        await test.step("clicking on an ignored words shows ignore reason", async () => {
+          const allTextCheckById = page.locator(`text-check[type='ignored']`)
+          const totalTextCheckTags = await allTextCheckById.count()
+
+          for (let index = 0; index < totalTextCheckTags; index++) {
+            const textCheckTag = allTextCheckById.nth(index)
+            await textCheckTag.click()
+            await expect(page.getByTestId("text-check-modal")).toBeVisible()
+
+            const locator = page.getByTestId("ignored-word-handler")
+            await expect(locator).toHaveText(
+              /.*(Von jDV ignoriert|Aus globalem Wörterbuch entfernen|Nicht ignorieren).*/i,
+            )
+          }
+        })
+
+        await test.step("ignoring a word highlights it in blue after text re-check", async () => {
+          const textCheckTag = page
+            .locator(`text-check[ignored='false']`)
+            .first()
+
+          const textCheckId = await getMarkId(textCheckTag)
+
+          await textCheckTag.click()
+
+          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
+          await page.getByTestId("ignored-word-add-button").click()
+
+          const rgbColors = convertHexToRGB(textCheckUnderlinesColors.ignored)
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toBeHidden()
+
+          await expect(
+            page.locator(`text-check[id='${textCheckId}']`),
+          ).toHaveCSS(
+            "border-bottom",
+            "2px solid " +
+              `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
+          )
+        })
+
+        await test.step("removing ignored word highlights it in red after text re-check", async () => {
+          const textCheckTag = page
+            .locator(`text-check[ignored='true']`)
+            .first()
+
+          const textCheckId = await getMarkId(textCheckTag)
+
+          await textCheckTag.click()
+
+          await expect(page.getByTestId("text-check-modal-word")).toBeVisible()
+
+          const removeIgnoredWordButton = page.getByTestId(
+            /^(ignored-word-remove-button|ignored-word-global-remove-button)$/,
+          )
+          await removeIgnoredWordButton.click()
+
+          const rgbColors = convertHexToRGB(
+            textCheckUnderlinesColors.uncategorized,
+          )
+
+          await expect(
+            page.getByTestId("text-check-loading-status"),
+          ).toBeHidden()
+
+          await expect(
+            page.locator(`text-check[id='${textCheckId}']`),
+          ).toHaveCSS(
+            "border-bottom",
+            "2px solid " +
+              `rgb(${rgbColors.red}, ${rgbColors.green}, ${rgbColors.blue})`,
+          )
         })
       },
     )

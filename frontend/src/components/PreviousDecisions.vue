@@ -19,7 +19,7 @@ const previousDecisions = computed({
 <template>
   <div>
     <div aria-label="Vorgehende Entscheidung">
-      <h2 class="ds-label-01-bold mb-16">Vorgehende Entscheidungen</h2>
+      <h2 class="ris-label1-bold mb-16">Vorgehende Entscheidungen</h2>
       <div class="flex flex-row">
         <div class="flex-1">
           <EditableList

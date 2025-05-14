@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatc
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@SuppressWarnings("java:S6539") // Too many dependencies warning
 public class DocumentationUnitService {
 
   private final DocumentationUnitRepository repository;
@@ -38,6 +41,7 @@ public class DocumentationUnitService {
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
   private final AuthService authService;
+  private final UserService userService;
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
   private static final List<String> pathsForDuplicateCheck =
@@ -57,6 +61,7 @@ public class DocumentationUnitService {
       DocumentNumberService documentNumberService,
       DocumentationUnitStatusService statusService,
       DocumentNumberRecyclingService documentNumberRecyclingService,
+      UserService userService,
       Validator validator,
       AttachmentService attachmentService,
       @Lazy AuthService authService,
@@ -66,6 +71,7 @@ public class DocumentationUnitService {
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
+    this.userService = userService;
     this.validator = validator;
     this.attachmentService = attachmentService;
     this.patchMapperService = patchMapperService;
@@ -76,9 +82,9 @@ public class DocumentationUnitService {
 
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit generateNewDocumentationUnit(
-      DocumentationOffice userDocOffice, Optional<DocumentationUnitCreationParameters> parameters)
+      User user, Optional<DocumentationUnitCreationParameters> parameters)
       throws DocumentationUnitException {
-
+    var userDocOffice = user.documentationOffice();
     // default office is user office
     DocumentationUnitCreationParameters params =
         parameters.orElse(
@@ -88,6 +94,11 @@ public class DocumentationUnitService {
     if (params.documentationOffice() == null) {
       params = params.toBuilder().documentationOffice(userDocOffice).build();
     }
+
+    boolean isExternalHandover =
+        params.documentationOffice() != null
+            && userDocOffice != null
+            && !userDocOffice.uuid().equals(params.documentationOffice().uuid());
 
     DocumentationUnit docUnit =
         DocumentationUnit.builder()
@@ -99,30 +110,27 @@ public class DocumentationUnitService {
                     .documentType(params.documentType())
                     .decisionDate(params.decisionDate())
                     .court(params.court())
-                    .creatingDocOffice(
-                        params.documentationOffice() == null
-                                || userDocOffice.uuid().equals(params.documentationOffice().uuid())
-                            ? null
-                            : userDocOffice)
+                    .creatingDocOffice(isExternalHandover ? userDocOffice : null)
                     .legalEffect(
                         LegalEffect.deriveFrom(params.court(), true)
                             .orElse(LegalEffect.NOT_SPECIFIED)
                             .getLabel())
                     .build())
+            .inboxStatus(isExternalHandover ? InboxStatus.EXTERNAL_HANDOVER : null)
             .build();
 
     Status status =
         Status.builder()
             .publicationStatus(
-                userDocOffice.uuid().equals(docUnit.coreData().documentationOffice().uuid())
-                    ? PublicationStatus.UNPUBLISHED
-                    : PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                isExternalHandover
+                    ? PublicationStatus.EXTERNAL_HANDOVER_PENDING
+                    : PublicationStatus.UNPUBLISHED)
             .withError(false)
             .build();
 
-    DocumentationUnit newDocumentationUnit =
+    var newDocumentationUnit =
         repository.createNewDocumentationUnit(
-            docUnit, status, params.reference(), params.fileNumber());
+            docUnit, status, params.reference(), params.fileNumber(), user);
 
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
     return newDocumentationUnit;
@@ -150,7 +158,8 @@ public class DocumentationUnitService {
       Optional<String> publicationStatus,
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly,
-      Optional<Boolean> withDuplicateWarning) {
+      Optional<Boolean> withDuplicateWarning,
+      Optional<InboxStatus> inboxStatus) {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
@@ -172,6 +181,7 @@ public class DocumentationUnitService {
                     : null)
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .withDuplicateWarning(withDuplicateWarning.orElse(false))
+            .inboxStatus(inboxStatus.orElse(null))
             .build();
 
     Slice<DocumentationUnitListItem> documentationUnitListItems =
@@ -186,9 +196,9 @@ public class DocumentationUnitService {
   public DocumentationUnitListItem takeOverDocumentationUnit(
       String documentNumber, OidcUser oidcUser) throws DocumentationUnitNotExistsException {
 
-    statusService.update(
-        documentNumber,
-        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build());
+    Status status =
+        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build();
+    statusService.update(documentNumber, status, userService.getUser(oidcUser));
 
     return addPermissions(
         oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));
@@ -229,7 +239,8 @@ public class DocumentationUnitService {
 
   public Documentable getByDocumentNumberWithUser(String documentNumber, OidcUser oidcUser)
       throws DocumentationUnitNotExistsException {
-    var documentable = repository.findByDocumentNumber(documentNumber);
+    var documentable =
+        repository.findByDocumentNumber(documentNumber, userService.getUser(oidcUser));
     if (documentable instanceof DocumentationUnit documentationUnit) {
       return documentationUnit.toBuilder()
           .isEditable(
@@ -247,7 +258,12 @@ public class DocumentationUnitService {
 
   public Documentable getByUuid(UUID documentationUnitId)
       throws DocumentationUnitNotExistsException {
-    return repository.findByUuid(documentationUnitId);
+    return repository.findByUuid(documentationUnitId, null);
+  }
+
+  public Documentable getByUuid(UUID documentationUnitId, User user)
+      throws DocumentationUnitNotExistsException {
+    return repository.findByUuid(documentationUnitId, user);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -294,12 +310,14 @@ public class DocumentationUnitService {
    *
    * @param documentationUnitId id of the documentation unit
    * @param patch patch to update the documentation unit
+   * @param user current logged-in user
    * @return a patch with changes the client not know yet (automatically set fields, fields update
    *     by other user)
    * @throws DocumentationUnitNotExistsException if the documentation unit not exist
    * @throws DocumentationUnitPatchException if the documentation unit couldn't updated
    */
-  public RisJsonPatch updateDocumentationUnit(UUID documentationUnitId, RisJsonPatch patch)
+  public RisJsonPatch updateDocumentationUnit(
+      UUID documentationUnitId, RisJsonPatch patch, User user)
       throws DocumentationUnitNotExistsException, DocumentationUnitPatchException {
 
     /*
@@ -308,7 +326,7 @@ public class DocumentationUnitService {
        * handle unique following operation (sometimes by add and remove operations at the same time)
     */
 
-    Documentable documentable = getByUuid(documentationUnitId);
+    Documentable documentable = getByUuid(documentationUnitId, user);
 
     if (!(documentable instanceof DocumentationUnit existingDocumentationUnit)) {
       throw new UnsupportedOperationException(
@@ -352,7 +370,7 @@ public class DocumentationUnitService {
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
         DocumentationUnit updatedDocumentationUnit =
-            updateDocumentationUnit(patchedDocumentationUnit, duplicateCheckStatus);
+            updateDocumentationUnit(patchedDocumentationUnit, duplicateCheckStatus, user);
 
         toFrontendJsonPatch =
             patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
@@ -407,17 +425,17 @@ public class DocumentationUnitService {
 
   public DocumentationUnit updateDocumentationUnit(DocumentationUnit documentationUnit)
       throws DocumentationUnitNotExistsException {
-    return this.updateDocumentationUnit(documentationUnit, DuplicateCheckStatus.DISABLED);
+    return this.updateDocumentationUnit(documentationUnit, DuplicateCheckStatus.DISABLED, null);
   }
 
   public DocumentationUnit updateDocumentationUnit(
-      DocumentationUnit documentationUnit, DuplicateCheckStatus duplicateCheckStatus)
+      DocumentationUnit documentationUnit, DuplicateCheckStatus duplicateCheckStatus, User user)
       throws DocumentationUnitNotExistsException {
     repository.saveKeywords(documentationUnit);
     repository.saveFieldsOfLaw(documentationUnit);
-    repository.saveProcedures(documentationUnit);
+    repository.saveProcedures(documentationUnit, user);
 
-    repository.save(documentationUnit);
+    repository.save(documentationUnit, user);
 
     if (duplicateCheckStatus == DuplicateCheckStatus.ENABLED) {
       try {
@@ -427,7 +445,7 @@ public class DocumentationUnitService {
       }
     }
 
-    return (DocumentationUnit) repository.findByUuid(documentationUnit.uuid());
+    return (DocumentationUnit) repository.findByUuid(documentationUnit.uuid(), user);
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
@@ -469,6 +487,30 @@ public class DocumentationUnitService {
           "Won't recycle document number {}: {}",
           documentationUnit.documentNumber(),
           e.getMessage());
+    }
+  }
+
+  @Transactional(rollbackFor = BadRequestException.class)
+  public void bulkAssignProcedure(
+      @NotNull List<UUID> documentationUnitIds, String procedureLabel, User user)
+      throws DocumentationUnitNotExistsException, BadRequestException {
+    Procedure procedure = Procedure.builder().label(procedureLabel).build();
+    for (UUID documentationUnitId : documentationUnitIds) {
+      Documentable documentable = repository.findByUuid(documentationUnitId, user);
+      if (documentable instanceof DocumentationUnit docUnit) {
+        DocumentationUnit updatedDocUnit =
+            docUnit.toBuilder()
+                .coreData(docUnit.coreData().toBuilder().procedure(procedure).build())
+                // When a procedure is assigned, the doc unit is removed from the inbox
+                // This might be replaced by explicit workflow management later
+                .inboxStatus(null)
+                .build();
+        // Calling updateDocumentationUnit throws a JPA exception, unclear why.
+        repository.saveProcedures(updatedDocUnit, user);
+        repository.save(updatedDocUnit, user);
+      } else {
+        throw new BadRequestException("Can only assign procedures to decisions.");
+      }
     }
   }
 

@@ -27,7 +27,7 @@ useHead({
   title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
 })
 
-const textCheck = useFeatureToggle("neuris.text-check")
+const textCheck = useFeatureToggle("neuris.text-check-side-panel")
 
 const store = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
@@ -206,7 +206,6 @@ onMounted(async () => {
               documentUnit &&
               !(
                 route.path.includes('handover') ||
-                route.path.includes('managementdata') ||
                 route.path.includes('preview')
               )
             "

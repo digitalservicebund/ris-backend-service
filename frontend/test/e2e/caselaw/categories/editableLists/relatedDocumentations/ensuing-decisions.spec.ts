@@ -1,9 +1,8 @@
 import { expect } from "@playwright/test"
 import {
   fillEnsuingDecisionInputs,
-  navigateToCategories,
-  waitForInputValue,
   handoverDocumentationUnit,
+  navigateToCategories,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -151,7 +150,9 @@ test.describe("ensuing decisions", () => {
     await expect(page.getByLabel("Vermerk")).toBeVisible()
 
     await page.getByLabel("Vermerk").fill("Vermerk")
-    await waitForInputValue(page, `[aria-label='Vermerk']`, "Vermerk")
+    await expect(page.getByLabel("Vermerk", { exact: true })).toHaveValue(
+      "Vermerk",
+    )
     await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await expect(
       page.getByText(

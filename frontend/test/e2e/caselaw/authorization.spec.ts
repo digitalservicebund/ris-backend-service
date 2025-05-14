@@ -19,22 +19,22 @@ test.describe("ensuring the authorization works as expected", () => {
     await navigateToCategories(pageWithBghUser, documentNumber, options)
 
     await expect(
-      pageWithBghUser.locator(
-        "text=Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
+      pageWithBghUser.getByText(
+        "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
       ),
     ).toBeVisible()
 
     await navigateToAttachments(pageWithBghUser, documentNumber, options)
     await expect(
-      pageWithBghUser.locator(
-        "text=Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
+      pageWithBghUser.getByText(
+        "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
       ),
     ).toBeVisible()
 
     await navigateToHandover(pageWithBghUser, documentNumber, options)
     await expect(
-      pageWithBghUser.locator(
-        "text=Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
+      pageWithBghUser.getByText(
+        "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
       ),
     ).toBeVisible()
   })
@@ -99,7 +99,7 @@ test.describe("ensuring the authorization works as expected", () => {
           )
 
           await expect(
-            page.locator(`text=` + (error ? error : documentNumber)),
+            page.getByText(error ? error : documentNumber),
           ).toBeVisible()
         })
       }

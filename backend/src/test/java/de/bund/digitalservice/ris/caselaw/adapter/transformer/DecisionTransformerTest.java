@@ -16,8 +16,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
@@ -30,7 +30,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudg
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -38,14 +37,12 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
@@ -57,12 +54,10 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -1370,7 +1365,8 @@ class DecisionTransformerTest {
                 .hasLegislativeMandate(false)
                 .build())
         .caselawReferences(Collections.emptyList())
-        .literatureReferences(Collections.emptyList());
+        .literatureReferences(Collections.emptyList())
+        .documentalists(Collections.emptyList());
   }
 
   private CoreDataBuilder generateSimpleCoreDataBuilder() {
@@ -1388,213 +1384,27 @@ class DecisionTransformerTest {
   }
 
   @Test
-  void
-      testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations1_shouldFilterOutWarning() {
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var unpublishedStatus =
-        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
-    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
-    var unpublishedDuplicateFromOtherDocOffice =
+  void testTransformToDomain_withDocumentalists_shouldAddDocumentalists() {
+    DecisionDTO decisionDTO =
         generateSimpleDTOBuilder()
-            .documentNumber("duplicate")
-            .documentationOffice(otherDocOffice)
-            .id(UUID.randomUUID())
-            .status(unpublishedStatus)
+            .documentalists(
+                List.of(
+                    DocumentalistDTO.builder().value("documentalist1").build(),
+                    DocumentalistDTO.builder().value("documentalist2").build()))
             .build();
-    var duplicateRelationship =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(original)
-            .documentationUnit2(unpublishedDuplicateFromOtherDocOffice)
-            .build();
-    original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
 
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(decisionDTO);
 
-    assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
+    assertThat(documentationUnit.documentalists())
+        .containsExactly("documentalist1", "documentalist2");
   }
 
   @Test
-  void
-      testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations2_shouldFilterOutWarning() {
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var unpublishedStatus =
-        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
-    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
-    var unpublishedDuplicateFromOtherDocOffice =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate")
-            .documentationOffice(otherDocOffice)
-            .id(UUID.randomUUID())
-            .status(unpublishedStatus)
-            .build();
-    var duplicateRelationship =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
-            .documentationUnit2(original)
-            .build();
-    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+  void testTransformToDomain_withoutDocumentalists_shouldNotAddDocumentalists() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
 
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(decisionDTO);
 
-    assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
-  }
-
-  @Test
-  void
-      testTransformToDomain_withUnpublishedDuplicateWarningFromSameDocOffice_shouldNotFilterOutWarning() {
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var unpublishedStatus =
-        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
-    var unpublishedDuplicateFromOtherDocOffice =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate")
-            .id(UUID.randomUUID())
-            .status(unpublishedStatus)
-            .build();
-    var duplicateRelationship =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(original)
-            .documentationUnit2(unpublishedDuplicateFromOtherDocOffice)
-            .build();
-    original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
-
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
-
-    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
-  }
-
-  @Test
-  void
-      testTransformToDomain_withPublishedDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var publishedStatus =
-        StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHED).build();
-    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
-    var unpublishedDuplicateFromOtherDocOffice =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate")
-            .documentationOffice(otherDocOffice)
-            .id(UUID.randomUUID())
-            .status(publishedStatus)
-            .build();
-    var duplicateRelationship =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
-            .documentationUnit2(original)
-            .build();
-    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
-
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
-
-    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
-    assertThat(
-            documentationUnit.managementData().duplicateRelations().stream()
-                .findFirst()
-                .get()
-                .documentNumber())
-        .isEqualTo("duplicate");
-  }
-
-  @Test
-  void
-      testTransformToDomain_withPublishingDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var publishedStatus =
-        StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHING).build();
-    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
-    var unpublishedDuplicateFromOtherDocOffice =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate")
-            .documentationOffice(otherDocOffice)
-            .id(UUID.randomUUID())
-            .status(publishedStatus)
-            .build();
-    var duplicateRelationship =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
-            .documentationUnit2(original)
-            .build();
-    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
-
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
-
-    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
-    assertThat(
-            documentationUnit.managementData().duplicateRelations().stream()
-                .findFirst()
-                .get()
-                .documentNumber())
-        .isEqualTo("duplicate");
-  }
-
-  @Test
-  void testTransformToDomain_withMultipleDuplicateWarnings_shouldSortByDecisionDateAndDocNumber() {
-    var original =
-        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
-    var duplicate1 =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate1")
-            .date(LocalDate.of(2020, 1, 1))
-            .id(UUID.randomUUID())
-            .build();
-    var duplicate2 =
-        generateSimpleDTOBuilder().documentNumber("duplicate2").id(UUID.randomUUID()).build();
-    var duplicate3 =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate3")
-            .date(LocalDate.of(2021, 1, 1))
-            .id(UUID.randomUUID())
-            .build();
-    var duplicate4 =
-        generateSimpleDTOBuilder()
-            .documentNumber("duplicate4")
-            .date(LocalDate.of(2021, 1, 1))
-            .id(UUID.randomUUID())
-            .build();
-    var duplicate5 =
-        generateSimpleDTOBuilder().documentNumber("duplicate05").id(UUID.randomUUID()).build();
-    var duplicateRelationship1 =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(duplicate1)
-            .documentationUnit2(original)
-            .build();
-    var duplicateRelationship2 =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(duplicate2)
-            .documentationUnit2(original)
-            .build();
-    var duplicateRelationship3 =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(duplicate3)
-            .documentationUnit2(original)
-            .build();
-    var duplicateRelationship4 =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(duplicate4)
-            .documentationUnit2(original)
-            .build();
-    var duplicateRelationship5 =
-        DuplicateRelationDTO.builder()
-            .documentationUnit1(duplicate5)
-            .documentationUnit2(original)
-            .build();
-    original =
-        original.toBuilder()
-            .duplicateRelations2(
-                Set.of(duplicateRelationship1, duplicateRelationship2, duplicateRelationship5))
-            .duplicateRelations1(Set.of(duplicateRelationship4, duplicateRelationship3))
-            .build();
-
-    DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
-
-    var transformedRelations = documentationUnit.managementData().duplicateRelations();
-    assertThat(transformedRelations).hasSize(5);
-    assertThat(transformedRelations.stream().map(DuplicateRelation::documentNumber))
-        .containsExactly("duplicate3", "duplicate4", "duplicate1", "duplicate05", "duplicate2");
+    assertThat(documentationUnit.documentalists()).isEmpty();
   }
 }

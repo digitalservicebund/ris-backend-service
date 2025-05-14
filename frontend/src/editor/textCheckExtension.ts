@@ -1,6 +1,5 @@
 import { Extension } from "@tiptap/core"
-import { TextCheckService } from "@/editor/commands/textCheckCommands"
-import { TextCheckExtensionOptions } from "@/types/textCheck"
+import { TextCheckExtensionOptions, TextCheckService } from "@/types/textCheck"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -9,6 +8,10 @@ declare module "@tiptap/core" {
       setSelectedMatch: (matchId?: number) => ReturnType
       handleMatchSelection: () => ReturnType
       acceptMatch: (matchId: number, text: string) => ReturnType
+      toggleMatchIgnoredStatus: (
+        matchId: number,
+        ignored: boolean,
+      ) => ReturnType
     }
   }
 }
@@ -57,6 +60,18 @@ export const TextCheckExtension = Extension.create<TextCheckExtensionOptions>({
             const service = this.options.service as TextCheckService
 
             service.replaceMatch(matchId, text, state, dispatch)
+            return true
+          }
+          return false
+        },
+
+      toggleMatchIgnoredStatus:
+        (matchId: number, ignored: boolean) =>
+        ({ state, dispatch }) => {
+          if (matchId) {
+            const service = this.options.service as TextCheckService
+
+            service.toggleMatchIgnoredStatus(matchId, ignored, state, dispatch)
             return true
           }
           return false
