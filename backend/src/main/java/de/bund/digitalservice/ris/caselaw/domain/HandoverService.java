@@ -165,7 +165,6 @@ public class HandoverService {
     try {
       // Parse input string to DOM Document
 
-      @SuppressWarnings("java:S2755")
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
       factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
@@ -173,6 +172,7 @@ public class HandoverService {
       Document document =
           builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
 
+      @SuppressWarnings("java:S2755")
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
       transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
