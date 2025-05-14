@@ -20,8 +20,7 @@ public class MockXmlExporter implements XmlExporter {
    * @return the XML export result
    */
   @Override
-  public XmlTransformationResult transformToXml(
-      DocumentationUnit documentationUnit, boolean prettyPrint) {
+  public XmlTransformationResult transformToXml(DocumentationUnit documentationUnit) {
     return new XmlTransformationResult(
         (documentationUnit.shortTexts() != null
                 && documentationUnit.shortTexts().headnote() != null)

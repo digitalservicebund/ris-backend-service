@@ -182,7 +182,7 @@ public class HandoverService {
       return result.getWriter().toString();
 
     } catch (TransformerException | IOException | ParserConfigurationException | SAXException e) {
-      throw new HandoverException("Could not prettify XML");
+      return "Could not prettify XML";
     }
   }
 }

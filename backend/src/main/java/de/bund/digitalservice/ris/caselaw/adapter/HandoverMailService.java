@@ -84,8 +84,7 @@ public class HandoverMailService implements MailService {
       xml =
           xmlExporter.transformToXml(
               getTestDocumentationUnit(
-                  textCheckService.addNoIndexTagsForHandOver(documentationUnit)),
-              false);
+                  textCheckService.addNoIndexTagsForHandOver(documentationUnit)));
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new HandoverException("Couldn't generate xml for documentationUnit.", ex);
     }
@@ -166,7 +165,7 @@ public class HandoverMailService implements MailService {
   public XmlTransformationResult getXmlPreview(DocumentationUnit documentationUnit) {
     try {
       return xmlExporter.transformToXml(
-          textCheckService.addNoIndexTagsForHandOver(documentationUnit), true);
+          textCheckService.addNoIndexTagsForHandOver(documentationUnit));
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new HandoverException("Couldn't generate xml for documentation unit.", ex);
     }

@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -123,8 +122,7 @@ class XmlMailServiceProdTest {
                     .build())
             .attachments(Collections.singletonList(Attachment.builder().name("file_name").build()))
             .build();
-    when(xmlExporter.transformToXml(any(DocumentationUnit.class), anyBoolean()))
-        .thenReturn(FORMATTED_XML);
+    when(xmlExporter.transformToXml(any(DocumentationUnit.class))).thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE_PROD)).thenReturn(SAVED_XML_MAIL_PROD);
   }
@@ -137,7 +135,7 @@ class XmlMailServiceProdTest {
 
     assertThat(response.mailSubject()).isEqualTo(PROD_MAIL_SUBJECT);
 
-    verify(xmlExporter).transformToXml(documentationUnit, false);
+    verify(xmlExporter).transformToXml(documentationUnit);
     verify(repository).save(EXPECTED_BEFORE_SAVE_PROD);
     verify(mailSender)
         .sendMail(
