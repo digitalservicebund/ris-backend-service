@@ -484,6 +484,9 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         await expect(page.getByText("Email wurde versendet")).toBeVisible()
         await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
 
+        // workaround: formatting works on page referseh
+        await page.reload()
+
         await expect(
           page
             .getByTestId("xml-handover-code-snippet-preview")
