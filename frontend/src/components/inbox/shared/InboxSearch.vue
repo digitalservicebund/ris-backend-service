@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
 import InputText from "primevue/inputtext"
-import { computed, onBeforeUnmount, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import { ValidationError } from "@/components/input/types"
@@ -19,8 +19,7 @@ const emit = defineEmits<{
 }>()
 
 const validationStore = useValidationStore<DocumentUnitSearchParameter>()
-const { route, getQueryFromRoute, pushQueryToRoute } =
-  useQuery<DocumentUnitSearchParameter>()
+const { route, getQueryFromRoute, pushQueryToRoute } = useQuery()
 const query = ref(getQueryFromRoute())
 
 const isEmptySearch = computed(() => {
@@ -33,7 +32,11 @@ function resetSearch() {
   validationStore.reset()
   submitButtonError.value = undefined
   query.value = {}
-  pushQueryToRoute(query.value)
+
+  pushQueryToRoute({
+    tab: route.query.tab as string,
+  })
+
   emit("resetSearchResults")
 }
 
@@ -120,7 +123,7 @@ function handleSearchButtonClicked() {
   if (isIdenticalSearch()) {
     handleSearch()
   }
-  pushQueryToRoute(query.value)
+  pushQueryToRoute({ ...query.value, tab: route.query.tab as string })
 }
 
 function handleSearch() {
@@ -135,9 +138,13 @@ watch(
   { deep: true, immediate: true },
 )
 
-onBeforeUnmount(() => {
-  resetSearch()
-})
+watch(
+  () => route.query,
+  () => {
+    query.value = getQueryFromRoute()
+  },
+  { deep: true },
+)
 </script>
 
 <template>

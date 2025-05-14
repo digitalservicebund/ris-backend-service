@@ -137,16 +137,27 @@ test.describe("inbox", () => {
         ).toHaveCount(1)
       })
 
-      await test.step("switching tabs, resets the search form", async () => {
+      await test.step("switching tabs, resets the search form, updates search parameters", async () => {
         await pageWithBghUser
           .getByRole("tab", { name: "EU-Rechtsprechung" })
           .click()
 
-        // Wait for queries in url to be reset
+        // Wait for the URL tab param to update
+        await pageWithBghUser.waitForFunction(() => {
+          return window.location.href.includes("tab=eu-rechtsprechung")
+        })
+
+        // Wait for fileNumber query not to be visible anymore
         await pageWithBghUser.waitForFunction((fileNumber) => {
           return !window.location.href.includes(fileNumber)
         }, fileNumber1)
+
         await pageWithBghUser.getByRole("tab", { name: "Fremdanlagen" }).click()
+
+        // Wait for the URL tab param to update
+        await pageWithBghUser.waitForFunction(() => {
+          return window.location.href.includes("tab=fremdanlagen")
+        })
 
         await expect(
           pageWithBghUser.getByLabel("Aktenzeichen Suche"),
@@ -411,11 +422,21 @@ test.describe("inbox", () => {
     await test.step("switching tabs, resets the search form", async () => {
       await page.getByRole("tab", { name: "Fremdanlagen" }).click()
 
+      // Wait for the URL tab param to update
+      await page.waitForFunction(() => {
+        return window.location.href.includes("tab=fremdanlagen")
+      })
+
       // Wait for queries in url to be resetted
       await page.waitForFunction(() => {
         return !window.location.href.includes("fileNumber1")
       })
       await page.getByRole("tab", { name: "EU-Rechtsprechung" }).click()
+
+      // Wait for the URL tab param to update
+      await page.waitForFunction(() => {
+        return window.location.href.includes("tab=eu-rechtsprechung")
+      })
 
       await expect(page.getByLabel("Aktenzeichen Suche")).toHaveValue("")
       await expect(page.getByLabel("Gerichtstyp Suche")).toHaveValue("")

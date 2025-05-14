@@ -25,7 +25,7 @@ function renderComponent() {
   }
 }
 
-describe("DocumentUnitSearchForm.vue", () => {
+describe("inbox search", () => {
   beforeEach(() => {
     // InputMask evaluates cursor position on every keystroke, however, our browser vitest setup does not
     // implement any layout-related functionality, meaning the required functions for cursor offset
