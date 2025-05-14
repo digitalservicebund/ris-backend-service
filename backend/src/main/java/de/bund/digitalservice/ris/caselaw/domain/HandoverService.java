@@ -164,6 +164,8 @@ public class HandoverService {
   public static String prettifyXml(String xml) {
     try {
       // Parse input string to DOM Document
+
+      @SuppressWarnings("java:S2755")
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
       factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
