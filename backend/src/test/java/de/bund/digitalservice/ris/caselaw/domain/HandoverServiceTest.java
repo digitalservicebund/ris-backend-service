@@ -212,7 +212,7 @@ class HandoverServiceTest {
         .isEqualTo(
             deltaMigration.toBuilder()
                 .xml(
-"""
+                    """
 <?xml version="1.0" encoding="UTF-8"?>
 <test>
    <element/>
@@ -335,7 +335,7 @@ class HandoverServiceTest {
     String prettyXml = HandoverService.prettifyXml(xml);
     assertThat(prettyXml)
         .isEqualTo(
-"""
+            """
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
    <child>value</child>
@@ -351,7 +351,7 @@ class HandoverServiceTest {
     String prettyXml = HandoverService.prettifyXml(xml);
     assertThat(prettyXml)
         .isEqualTo(
-"""
+            """
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
    <p>noindex <noindex>tags</noindex> should be in one line</p>
