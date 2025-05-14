@@ -86,7 +86,7 @@ class DocumentationUnitServiceTest {
     User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
+    when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
         .thenReturn(documentationUnit);
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
@@ -143,7 +143,7 @@ class DocumentationUnitServiceTest {
                     .build())
             .build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
+    when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
         .thenReturn(documentationUnit);
 
     when(documentNumberService.generateDocumentNumber(designatedDocumentationOffice.abbreviation()))

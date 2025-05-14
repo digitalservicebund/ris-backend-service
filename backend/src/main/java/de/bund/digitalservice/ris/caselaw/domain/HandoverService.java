@@ -4,14 +4,14 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotE
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -20,8 +20,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
+import org.w3c.dom.Document;
 
 @Service
 @Slf4j
@@ -164,25 +163,29 @@ public class HandoverService {
    */
   public static String prettifyXml(String xml) {
     try {
-      Transformer transformer = TransformerFactory.newDefaultInstance().newTransformer();
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+      // Parse input string to DOM Document
 
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
       factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-      Node node =
-          factory
-              .newDocumentBuilder()
-              .parse(new ByteArrayInputStream(xml.getBytes()))
-              .getDocumentElement();
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      Document document =
+          builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
 
-      StreamResult result = new StreamResult(new StringWriter());
-      transformer.transform(new DOMSource(node), result);
-      return result.getWriter().toString();
+      @SuppressWarnings("java:S2755")
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
-    } catch (TransformerException | IOException | ParserConfigurationException | SAXException e) {
-      return "Could not prettify XML";
+      // Transform to string
+      StringWriter writer = new StringWriter();
+      writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+      transformer.transform(new DOMSource(document), new StreamResult(writer));
+
+      return writer.toString();
+    } catch (Exception e) {
+      throw new HandoverException("Failed to prettify XML", e);
     }
   }
 }

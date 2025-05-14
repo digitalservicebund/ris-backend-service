@@ -590,6 +590,10 @@ class TextCheckServiceTest {
         Arguments.of(
             "<border-number><number>7</number><content><p><noindex>should-keep-text</noindex></p></content></border-number>",
             List.of("Abc§116A"),
-            "<border-number><number>7</number><content><p><noindex>should-keep-text</noindex></p></content></border-number>"));
+            "<border-number><number>7</number><content><p><noindex>should-keep-text</noindex></p></content></border-number>"),
+        Arguments.of(
+            "<em>vgl - should not add white space</em>",
+            List.of("vgl"),
+            "<em><noindex>vgl</noindex> - should not add white space</em>"));
   }
 }

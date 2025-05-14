@@ -219,7 +219,7 @@ class DocumentationUnitSearchIntegrationTest {
     assertThat(responseBodyWithoutFilter.getNumberOfElements()).isEqualTo(3);
     assertThat(responseBodyWithoutFilter)
         .map(DocumentationUnitListItem::documentNumber)
-        .containsExactly("ABCD202200001", "ABCD202200002", "ABCD202200003");
+        .containsExactly("ABCD202200003", "ABCD202200002", "ABCD202200001");
 
     Slice<DocumentationUnitListItem> responseBodyWithEUFilter =
         risWebTestClient
