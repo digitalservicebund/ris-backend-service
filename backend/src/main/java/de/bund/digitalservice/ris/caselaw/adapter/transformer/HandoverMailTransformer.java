@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import static de.bund.digitalservice.ris.caselaw.domain.HandoverService.prettifyXml;
+
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailAttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailDTO;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
@@ -49,11 +51,23 @@ public class HandoverMailTransformer {
         .attachments(
             handoverMailDTO.getAttachments().stream()
                 .map(
-                    attachmentDTO ->
-                        MailAttachment.builder()
-                            .fileContent(attachmentDTO.getXml())
-                            .fileName(attachmentDTO.getFileName())
-                            .build())
+                    attachmentDTO -> {
+                      String fileContent;
+
+                      try {
+                        if (entityType == HandoverEntityType.DOCUMENTATION_UNIT) {
+                          fileContent = prettifyXml(attachmentDTO.getXml());
+                        } else {
+                          fileContent = attachmentDTO.getXml();
+                        }
+                      } catch (Exception e) {
+                        fileContent = attachmentDTO.getXml();
+                      }
+                      return MailAttachment.builder()
+                          .fileContent(fileContent)
+                          .fileName(attachmentDTO.getFileName())
+                          .build();
+                    })
                 .toList())
         .build();
   }
