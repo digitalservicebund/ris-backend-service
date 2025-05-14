@@ -165,7 +165,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.1")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.30.2")
+    implementation("com.google.protobuf:protobuf-java:4.31.0")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.5.2")
