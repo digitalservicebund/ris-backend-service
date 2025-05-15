@@ -143,6 +143,9 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
           thead: {
             style: 'box-shadow: inset 0 -2px #DCE8EF;',
           },
+          tablecontainer: {
+            style: 'overflow: visible;',
+          },
         }"
         :row-class="rowStyleClass"
         :value="entries"
