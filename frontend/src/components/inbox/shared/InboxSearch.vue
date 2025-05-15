@@ -32,11 +32,7 @@ function resetSearch() {
   validationStore.reset()
   submitButtonError.value = undefined
   query.value = {}
-
-  pushQueryToRoute({
-    tab: route.query.tab as string,
-  })
-
+  pushQueryToRoute(query.value)
   emit("resetSearchResults")
 }
 
@@ -123,7 +119,7 @@ function handleSearchButtonClicked() {
   if (isIdenticalSearch()) {
     handleSearch()
   }
-  pushQueryToRoute({ ...query.value, tab: route.query.tab as string })
+  pushQueryToRoute(query.value)
 }
 
 function handleSearch() {
@@ -133,17 +129,10 @@ function handleSearch() {
 watch(
   route,
   () => {
+    query.value = getQueryFromRoute()
     handleSearch()
   },
   { deep: true, immediate: true },
-)
-
-watch(
-  () => route.query,
-  () => {
-    query.value = getQueryFromRoute()
-  },
-  { deep: true },
 )
 </script>
 
