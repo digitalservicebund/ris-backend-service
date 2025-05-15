@@ -4,15 +4,16 @@ import TabList from "primevue/tablist"
 import TabPanel from "primevue/tabpanel"
 import TabPanels from "primevue/tabpanels"
 import Tabs from "primevue/tabs"
-import { onMounted, ref, watch } from "vue"
-import { useRoute } from "vue-router"
+import { computed, onMounted, ref, watch } from "vue"
+import { useRoute, useRouter } from "vue-router"
 import EURLexSearch from "@/components/eurlex/EURLexSearch.vue"
 import EUCaselaw from "@/components/inbox/EUCaselaw.vue"
 import PendingHandover from "@/components/inbox/PendingHandover.vue"
-import useQuery from "@/composables/useQueryFromRoute"
 
-const { pushQueryToRoute } = useQuery()
 const route = useRoute()
+const router = useRouter()
+
+const tabParam = computed(() => (route.params.tab as string) ?? "fremdanlagen")
 
 const value = ref()
 
@@ -23,15 +24,16 @@ const tabMap: Record<string, string> = {
 }
 
 onMounted(() => {
-  const tabParam = route.query.tab as string
-  value.value = tabMap[tabParam] ?? "0"
+  value.value = tabMap[tabParam.value] ?? "0"
 })
 
-watch(value, (newVal) => {
-  const newTab = Object.keys(tabMap).find((key) => tabMap[key] === newVal)
-  if (newTab) {
-    pushQueryToRoute({
-      tab: newTab,
+watch(value, async (newVal) => {
+  const pathKey =
+    Object.entries(tabMap).find(([, v]) => v === newVal)?.[0] ?? "fremdanlagen"
+  if (pathKey !== tabParam.value) {
+    await router.replace({
+      name: "caselaw-inbox-tab",
+      params: { tab: pathKey },
     })
   }
 })
