@@ -44,7 +44,7 @@ watch(value, async (newVal) => {
     <TabList>
       <Tab data-testid="external-handover-tab" value="0">Fremdanlagen</Tab>
       <Tab data-testid="eu-tab" value="1">EU-Rechtsprechung</Tab>
-      <Tab data-testid="eur-lex" value="2">EUR-Lex</Tab>
+      <Tab data-testid="eur-lex-tab" value="2">EUR-Lex</Tab>
     </TabList>
     <TabPanels>
       <TabPanel value="0">
