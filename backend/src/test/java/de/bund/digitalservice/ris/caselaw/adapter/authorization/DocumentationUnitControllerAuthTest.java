@@ -12,13 +12,13 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.DocumentationUnitControllerTestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
-import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -66,7 +66,7 @@ class DocumentationUnitControllerAuthTest {
 
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private KeycloakUserService userService;
-  @MockitoBean private DocxConverterService docxConverterService;
+  @MockitoBean private ConverterService converterService;
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
@@ -117,7 +117,7 @@ class DocumentationUnitControllerAuthTest {
     when(attachmentService.attachFileToDocumentationUnit(
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
-    when(docxConverterService.getConvertedObject(anyString())).thenReturn(Docx2Html.EMPTY);
+    when(converterService.getConvertedObject(anyString())).thenReturn(Docx2Html.EMPTY);
     mockDocumentationUnit(docOffice1, null, null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
@@ -243,9 +243,9 @@ class DocumentationUnitControllerAuthTest {
   @Test
   void testGetHtml() throws DocumentationUnitNotExistsException {
     mockDocumentationUnit(docOffice1, "123", Status.builder().publicationStatus(PUBLISHED).build());
-    when(docxConverterService.getConvertedObject("123")).thenReturn(null);
+    when(converterService.getConvertedObject("123")).thenReturn(null);
 
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx/123";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file?s3Path=123&format=";
 
     risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
 

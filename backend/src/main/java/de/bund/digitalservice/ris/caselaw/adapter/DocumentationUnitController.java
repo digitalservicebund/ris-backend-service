@@ -472,7 +472,7 @@ public class DocumentationUnitController {
     try {
       var attachment2Html = converterService.getConvertedObject(format, s3Path, uuid);
       return ResponseEntity.ok()
-          .cacheControl(CacheControl.maxAge(Duration.ofSeconds(1))) // Set cache duration
+          .cacheControl(CacheControl.maxAge(Duration.ofDays(1))) // Set cache duration
           .body(attachment2Html);
     } catch (Exception ex) {
       log.error("Error by getting docx for documentation unit {}", uuid, ex);

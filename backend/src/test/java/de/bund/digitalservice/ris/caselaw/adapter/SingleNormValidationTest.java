@@ -58,6 +58,7 @@ class SingleNormValidationTest {
   @MockitoBean PatchMapperService patchMapperService;
   @MockitoBean DuplicateCheckService duplicateCheckService;
   @MockitoBean UserService userService;
+  @MockitoBean FmxService fmxService;
 
   @BeforeEach
   void setUp() {

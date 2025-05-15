@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -94,7 +95,7 @@ class DocumentationUnitControllerTest {
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private UserService userService;
-  @MockitoBean private DocxConverterService docxConverterService;
+  @MockitoBean private ConverterService converterService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean DatabaseApiKeyRepository apiKeyRepository;
@@ -159,7 +160,7 @@ class DocumentationUnitControllerTest {
   void testAttachUnsupportedFile_shouldDeleteOnFail()
       throws IOException, DocumentationUnitNotExistsException {
     var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
-    when(docxConverterService.getConvertedObject(any())).thenThrow(DocxConverterException.class);
+    when(converterService.getConvertedObject(any())).thenThrow(DocxConverterException.class);
 
     when(attachmentService.attachFileToDocumentationUnit(
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
@@ -648,19 +649,19 @@ class DocumentationUnitControllerTest {
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
-    when(docxConverterService.getConvertedObject("123")).thenReturn(null);
+    when(converterService.getConvertedObject("123")).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx/123")
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file?s3Path=123&format=")
         .exchange()
         .expectStatus()
         .isOk();
 
     // once by the AuthService and once by the controller asking the service
     verify(service, times(2)).getByUuid(TEST_UUID);
-    verify(docxConverterService).getConvertedObject("123");
+    verify(converterService).getConvertedObject("", "123", TEST_UUID);
   }
 
   @Test

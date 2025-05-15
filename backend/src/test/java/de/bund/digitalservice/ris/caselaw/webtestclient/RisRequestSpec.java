@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.webtestclient;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -116,8 +114,8 @@ public class RisRequestSpec {
       return new RisResponseSpec();
     }
 
-    //    request.header("X-XSRF-TOKEN", csrfCookie.getValue()).cookie(csrfCookie);
-    request.with(csrf());
+    request.header("X-XSRF-TOKEN", csrfCookie.getValue()).cookie(csrfCookie);
+    //    request.with(csrf());
 
     if (login != null) {
       request.with(login);
