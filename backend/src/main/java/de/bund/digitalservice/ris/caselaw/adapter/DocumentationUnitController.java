@@ -138,7 +138,8 @@ public class DocumentationUnitController {
     try {
 
       List<String> documentationNumbers =
-          service.generateNewDocumentationUnitOutOfEurlexDecision(userService.getUser(oidcUser), parameters);
+          service.generateNewDocumentationUnitOutOfEurlexDecision(
+              userService.getUser(oidcUser), parameters);
       return ResponseEntity.status(HttpStatus.CREATED).body(documentationNumbers);
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);

@@ -41,6 +41,7 @@ public class EurLexController {
     DocumentationOffice documentationOffice = userService.getUser(oidcUser).documentationOffice();
 
     return ResponseEntity.ok(
-        service.getSearchResults(page, documentationOffice, fileNumber, celex, court, startDate, endDate));
+        service.getSearchResults(
+            page, documentationOffice, fileNumber, celex, court, startDate, endDate));
   }
 }

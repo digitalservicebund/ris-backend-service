@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +30,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.annotations.NotNull;
 
 @Service
 @Slf4j
@@ -96,8 +96,7 @@ public class DocumentationUnitService {
 
   @Transactional(transactionManager = "jpaTransactionManager")
   public List<String> generateNewDocumentationUnitOutOfEurlexDecision(
-      User user, Optional<EurlexCreationParameters> parameters)
-      throws DocumentationUnitException {
+      User user, Optional<EurlexCreationParameters> parameters) throws DocumentationUnitException {
 
     List<String> documentNumbers = new ArrayList<>();
 
@@ -106,7 +105,11 @@ public class DocumentationUnitService {
         documentNumbers.add(
             generateNewDocumentationUnit(
                     user,
-                    parameters.map(params -> DocumentationUnitCreationParameters.builder().documentationOffice(params.documentationOffice()).build()),
+                    parameters.map(
+                        params ->
+                            DocumentationUnitCreationParameters.builder()
+                                .documentationOffice(params.documentationOffice())
+                                .build()),
                     celexNumber)
                 .documentNumber());
       }
@@ -115,7 +118,8 @@ public class DocumentationUnitService {
     return documentNumbers;
   }
 
-  private DocumentationUnit generateNewDocumentationUnit(User user, Optional<DocumentationUnitCreationParameters> parameters, String celexNumber) {
+  private DocumentationUnit generateNewDocumentationUnit(
+      User user, Optional<DocumentationUnitCreationParameters> parameters, String celexNumber) {
     var userDocOffice = user.documentationOffice();
     // default office is user office
     DocumentationUnitCreationParameters params =

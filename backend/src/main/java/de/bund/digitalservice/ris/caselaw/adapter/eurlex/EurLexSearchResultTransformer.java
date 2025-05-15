@@ -30,9 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/**
- * Transformer for the transformation of EURLex search results from webservice
- */
+/** Transformer for the transformation of EURLex search results from webservice */
 @Slf4j
 public class EurLexSearchResultTransformer {
   private EurLexSearchResultTransformer() {}
@@ -41,7 +39,6 @@ public class EurLexSearchResultTransformer {
    * Transform the database object to the domain object
    *
    * @param eurLexResultDTO - database representation of the search result
-   *
    * @return domain object of the search result
    */
   public static SearchResult transformDTOToDomain(EurLexResultDTO eurLexResultDTO) {
@@ -51,14 +48,15 @@ public class EurLexSearchResultTransformer {
 
     String fileNumber = parseFileNumberFromTitle(eurLexResultDTO.getTitle());
 
-    SearchResultBuilder builder = SearchResult.builder()
-        .celex(eurLexResultDTO.getCelex())
-        .ecli(eurLexResultDTO.getEcli())
-        .date(eurLexResultDTO.getDate())
-        .fileNumber(fileNumber)
-        .title(eurLexResultDTO.getTitle())
-        .htmlLink(eurLexResultDTO.getHtmlLink())
-        .uri(eurLexResultDTO.getUri());
+    SearchResultBuilder builder =
+        SearchResult.builder()
+            .celex(eurLexResultDTO.getCelex())
+            .ecli(eurLexResultDTO.getEcli())
+            .date(eurLexResultDTO.getDate())
+            .fileNumber(fileNumber)
+            .title(eurLexResultDTO.getTitle())
+            .htmlLink(eurLexResultDTO.getHtmlLink())
+            .uri(eurLexResultDTO.getUri());
 
     if (eurLexResultDTO.getCreatedAt() == null) {
       log.error("No created at date found. Should be set by database.");
@@ -68,7 +66,8 @@ public class EurLexSearchResultTransformer {
     }
 
     if (eurLexResultDTO.getCourt() != null) {
-      builder.courtType(eurLexResultDTO.getCourt().getType())
+      builder
+          .courtType(eurLexResultDTO.getCourt().getType())
           .courtLocation(eurLexResultDTO.getCourt().getLocation());
     }
 
@@ -132,7 +131,7 @@ public class EurLexSearchResultTransformer {
    *
    * @param searchResults - dom element for the list of search results
    * @return total number of search results, 0 if no total hits element exist or multiple
-   *         representation of the element exists or the number couldn't be parsed
+   *     representation of the element exists or the number couldn't be parsed
    */
   public static int getTotalNum(Element searchResults) {
     NodeList totalHits = searchResults.getElementsByTagName("totalhits");
@@ -176,13 +175,15 @@ public class EurLexSearchResultTransformer {
       String ecli = xPath.compile("./content/NOTICE/WORK/ECLI/VALUE").evaluate(result);
       builder.ecli(ecli);
     } catch (XPathExpressionException e) {
-      throw new EurLexSearchException("ECLI of the result couldn't be parsed", e);    }
+      throw new EurLexSearchException("ECLI of the result couldn't be parsed", e);
+    }
 
     try {
       String celex = xPath.compile("./content/NOTICE/WORK/ID_CELEX/VALUE").evaluate(result);
       builder.celex(celex);
     } catch (XPathExpressionException e) {
-      throw new EurLexSearchException("Celex number of the result couldn't be parsed", e);    }
+      throw new EurLexSearchException("Celex number of the result couldn't be parsed", e);
+    }
 
     try {
       String uri = xPath.compile("./content/NOTICE/WORK/URI/VALUE").evaluate(result);
@@ -195,12 +196,13 @@ public class EurLexSearchResultTransformer {
       String courtId =
           xPath.compile("./content/NOTICE/WORK/WORK_CREATED_BY_AGENT/IDENTIFIER").evaluate(result);
       if (courtId.equals("CJ")) {
-          builder.court(courts.get("EuGH"));
+        builder.court(courts.get("EuGH"));
       } else if (courtId.equals("GCEU")) {
-          builder.court(courts.get("EuG"));
+        builder.court(courts.get("EuG"));
       }
     } catch (XPathExpressionException e) {
-      throw new EurLexSearchException("Court of the result couldn't be parsed", e);    }
+      throw new EurLexSearchException("Court of the result couldn't be parsed", e);
+    }
 
     try {
       String dayString =

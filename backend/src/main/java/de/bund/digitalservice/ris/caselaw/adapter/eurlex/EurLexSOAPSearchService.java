@@ -69,7 +69,6 @@ public class EurLexSOAPSearchService implements SearchService {
    * @param court - filter option for the court
    * @param startDate - start date as filter for the publication date
    * @param endDate - end date as filter for the publication date
-   *
    * @return a page object with the 100 entries of the page
    */
   @Override
@@ -81,9 +80,9 @@ public class EurLexSOAPSearchService implements SearchService {
       Optional<String> court,
       Optional<LocalDate> startDate,
       Optional<LocalDate> endDate) {
-    if (!documentationOffice.abbreviation().equals("DS") &&
-        !documentationOffice.abbreviation().equals("BGH") &&
-        !documentationOffice.abbreviation().equals("BFH")) {
+    if (!documentationOffice.abbreviation().equals("DS")
+        && !documentationOffice.abbreviation().equals("BGH")
+        && !documentationOffice.abbreviation().equals("BFH")) {
       return Page.empty();
     }
 

@@ -20,31 +20,33 @@ class EurLexSearchResultTransformerTest {
   @Test
   void testTransformDTOToDomain() {
     Instant now = Instant.now();
-    EurLexResultDTO dto = EurLexResultDTO.builder()
-        .resultXml("<xml><result>s/result>")
-        .celex("celex")
-        .court(CourtDTO.builder().type("court-type").location("court-location").build())
-        .uri("uri")
-        .date(LocalDate.of(2024, Month.DECEMBER, 24))
-        .ecli("ecli")
-        .htmlLink("html-link")
-        .status(EurLexResultStatus.NEW)
-        .title("title with file number T-123/45")
-        .createdAt(now)
-        .publicationDate(LocalDate.of(2025, Month.JANUARY, 2))
-        .build();
-    SearchResult expected = SearchResult.builder()
-        .courtType("court-type")
-        .courtLocation("court-location")
-        .uri("uri")
-        .celex("celex")
-        .htmlLink("html-link")
-        .ecli("ecli")
-        .title("title with file number T-123/45")
-        .fileNumber("T-123/45")
-        .date(LocalDate.of(2024, Month.DECEMBER, 24))
-        .publicationDate(LocalDate.ofInstant(now, ZoneId.systemDefault()))
-        .build();
+    EurLexResultDTO dto =
+        EurLexResultDTO.builder()
+            .resultXml("<xml><result>s/result>")
+            .celex("celex")
+            .court(CourtDTO.builder().type("court-type").location("court-location").build())
+            .uri("uri")
+            .date(LocalDate.of(2024, Month.DECEMBER, 24))
+            .ecli("ecli")
+            .htmlLink("html-link")
+            .status(EurLexResultStatus.NEW)
+            .title("title with file number T-123/45")
+            .createdAt(now)
+            .publicationDate(LocalDate.of(2025, Month.JANUARY, 2))
+            .build();
+    SearchResult expected =
+        SearchResult.builder()
+            .courtType("court-type")
+            .courtLocation("court-location")
+            .uri("uri")
+            .celex("celex")
+            .htmlLink("html-link")
+            .ecli("ecli")
+            .title("title with file number T-123/45")
+            .fileNumber("T-123/45")
+            .date(LocalDate.of(2024, Month.DECEMBER, 24))
+            .publicationDate(LocalDate.ofInstant(now, ZoneId.systemDefault()))
+            .build();
 
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
 
@@ -53,12 +55,8 @@ class EurLexSearchResultTransformerTest {
 
   @Test
   void testTransformDTOToDomain_withoutFileNumberInTitle_hasNoFileNumberInDomainObject() {
-    EurLexResultDTO dto = EurLexResultDTO.builder()
-        .title("title without file number")
-        .build();
-    SearchResult expected = SearchResult.builder()
-        .fileNumber(null)
-        .build();
+    EurLexResultDTO dto = EurLexResultDTO.builder().title("title without file number").build();
+    SearchResult expected = SearchResult.builder().fileNumber(null).build();
 
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
 
@@ -74,14 +72,10 @@ class EurLexSearchResultTransformerTest {
     "title with file number T-123/45\u00A0abc and T-987/65\u00A0zyx, T-123/45\u00A0abc, T-987/65\u00A0zyx",
     "title with file number C-123/45\u00A0abc and C-987/65\u00A0zyx, C-123/45\u00A0abc, C-987/65\u00A0zyx"
   })
-  void testTransformDTOToDomain_withFileNumberWithAllowedPattern_hasParsedFileNumber(String title, String fileNumbers) {
-    EurLexResultDTO dto = EurLexResultDTO.builder()
-        .title(title)
-        .build();
-    SearchResult expected = SearchResult.builder()
-        .title(title)
-        .fileNumber(fileNumbers)
-        .build();
+  void testTransformDTOToDomain_withFileNumberWithAllowedPattern_hasParsedFileNumber(
+      String title, String fileNumbers) {
+    EurLexResultDTO dto = EurLexResultDTO.builder().title(title).build();
+    SearchResult expected = SearchResult.builder().title(title).fileNumber(fileNumbers).build();
 
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
 
@@ -89,20 +83,17 @@ class EurLexSearchResultTransformerTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {
-      "title with file number T-12345\u00A0abc",
-      "title with file number T-12/345\u00A0123",
-      "title with file number T-12/345 abc",
-      "title with file number T-12a45\u00A0abc"
-  })
-  void testTransformDTOToDomain_withFileNumberWithWrongFormat_hasNoFileNumberInDomainObject(String title) {
-    EurLexResultDTO dto = EurLexResultDTO.builder()
-        .title(title)
-        .build();
-    SearchResult expected = SearchResult.builder()
-        .title(title)
-        .fileNumber(null)
-        .build();
+  @ValueSource(
+      strings = {
+        "title with file number T-12345\u00A0abc",
+        "title with file number T-12/345\u00A0123",
+        "title with file number T-12/345 abc",
+        "title with file number T-12a45\u00A0abc"
+      })
+  void testTransformDTOToDomain_withFileNumberWithWrongFormat_hasNoFileNumberInDomainObject(
+      String title) {
+    EurLexResultDTO dto = EurLexResultDTO.builder().title(title).build();
+    SearchResult expected = SearchResult.builder().title(title).fileNumber(null).build();
 
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
 

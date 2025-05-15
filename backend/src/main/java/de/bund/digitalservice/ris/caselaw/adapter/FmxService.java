@@ -15,12 +15,6 @@ import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -28,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,7 +52,8 @@ public class FmxService {
   public static final String ECLI_XPATH = "//NO.ECLI/@ECLI";
   public static final String CELEX_XPATH = "//NO.CELEX";
   public static final String AUTHOR_XPATH = "//AUTHOR";
-  public static final String DATE_XPATH = "//CURR.TITLE/PAGE.HEADER/P/HT/DATE/@ISO";
+  public static final String DATE_XPATH =
+      "//CURR.TITLE/PAGE.HEADER/P/HT/DATE/@ISO | //CURR.TITLE/PAGE.HEADER/P/DATE/@ISO";
   public static final String TENOR_XPATH = "//JURISDICTION";
   public static final String REASONS_XPATH = "//CONTENTS.JUDGMENT | //CONTENTS.ORDER";
   public static final String SIGNATURES_XPATH = "//SIGNATURE.CASE";
@@ -70,9 +63,10 @@ public class FmxService {
   private final FmxRepository fmxRepository;
   private final AttachmentRepository attachmentRepository;
   private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
+  private final EurlexRetrievalService eurlexRetrievalService;
+  private final XmlUtilService xmlUtilService;
 
   private Transformer xsltTransformer;
-  private final Templates fmxToHtml;
 
   private final XPath xPath;
 
@@ -82,50 +76,28 @@ public class FmxService {
       FmxRepository fmxRepository,
       AttachmentRepository attachmentRepository,
       DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository,
+      EurlexRetrievalService eurlexRetrievalService,
       XmlUtilService xmlUtilService) {
     this.documentationUnitRepository = documentationUnitRepository;
     this.courtRepository = courtRepository;
     this.fmxRepository = fmxRepository;
     this.attachmentRepository = attachmentRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
+    this.eurlexRetrievalService = eurlexRetrievalService;
+    this.xmlUtilService = xmlUtilService;
 
-    fmxToHtml = xmlUtilService.getTemplates("xml/fmxToHtml.xslt");
     xPath = XPathFactory.newInstance().newXPath();
   }
 
   public void getDataFromEurlex(String celexNumber, DocumentationUnit documentationUnit) {
-    String fmxFileContent = null;
     String sourceUrl = "https://publications.europa.eu/resource/celex/" + celexNumber;
-    try {
-      HttpClient client =
-          HttpClient.newBuilder()
-              .followRedirects(HttpClient.Redirect.ALWAYS) // follow redirects
-              .build();
+    String fmxFileContent = eurlexRetrievalService.getDocumentFromEurlex(sourceUrl);
 
-      HttpRequest request =
-          HttpRequest.newBuilder()
-              .uri(new URI(sourceUrl))
-              .GET()
-              .header("Accept", "application/zip;mtype=fmx4")
-              .header("Accept-Language", "de")
-              .build();
-
-      HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-      ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(response.body()));
-
-      ZipEntry entry;
-      while ((entry = zipInputStream.getNextEntry()) != null) {
-        if (entry.getName().endsWith(".xml")) {
-          fmxFileContent = new String(zipInputStream.readAllBytes(), StandardCharsets.UTF_8);
-        }
-      }
-    } catch (IOException | InterruptedException | URISyntaxException ex) {
-      throw new FmxTransformationException("Downloading FMX file from Eurlex Database failed.", ex);
-    }
-
-    if (fmxFileContent != null && !fmxFileContent.isBlank()) {
+    if (Strings.isNotBlank(fmxFileContent)) {
       attachFmxToDocumentationUnit(documentationUnit.uuid(), fmxFileContent, sourceUrl);
       extractMetaDataFromFmx(fmxFileContent, documentationUnit);
+    } else {
+      throw new FmxTransformationException("FMX file has no content.");
     }
   }
 
@@ -146,10 +118,7 @@ public class FmxService {
     attachmentRepository.save(attachmentDTO);
   }
 
-  public void extractMetaDataFromFmx(String fileContent, DocumentationUnit documentationUnit) {
-    if (fileContent == null || fileContent.isBlank()) {
-      throw new FmxTransformationException("FMX file has no content.");
-    }
+  private void extractMetaDataFromFmx(String fileContent, DocumentationUnit documentationUnit) {
     xsltTransformer = initialiseXsltTransformer();
     try {
       final Document doc = parseFmx(fileContent);
@@ -197,6 +166,7 @@ public class FmxService {
 
   private Transformer initialiseXsltTransformer() {
     try {
+      Templates fmxToHtml = xmlUtilService.getTemplates("xml/fmxToHtml.xslt");
       return fmxToHtml.newTransformer();
     } catch (TransformerConfigurationException e) {
       throw new FmxTransformationException("Failed to initialise XSLT transformer.", e);
