@@ -329,7 +329,7 @@ function onDelete() {
               >
                 <Button
                   aria-label="Dokumentationseinheit ansehen"
-                  class="z-20"
+                  class="z-10"
                   severity="secondary"
                   size="small"
                 >
