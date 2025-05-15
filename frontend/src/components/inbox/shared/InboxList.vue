@@ -35,9 +35,7 @@ const emit = defineEmits<{
   takeOverDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
 
-const entries = computed(() => {
-  return props.pageEntries?.content || []
-})
+const entries = computed(() => props.pageEntries?.content || [])
 
 const showDeleteModal = ref(false)
 const selectedDocumentUnitListEntry = ref<DocumentUnitListEntry>()
@@ -71,8 +69,7 @@ watch(
         selectedIds.includes(entry.uuid),
       ) ?? []
   },
-  // On takeover, we mutate the page content -> needs deep watching
-  { deep: 2 },
+  { deep: true },
 )
 
 /**
@@ -138,7 +135,7 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
     >
       <DataTable
         v-model:selection="selectedDocumentationUnits"
-        class="ris-label2-bold text-gray-900"
+        class="text-gray-900"
         :pt="{
           thead: {
             style: 'box-shadow: inset 0 -2px #DCE8EF;',
@@ -170,70 +167,91 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
             },
           }"
           selection-mode="multiple"
+        />
+        <Column
+          field="documentNumber"
+          header="Dokumentnummer"
+          header-class="ris-label3-bold"
         >
-        </Column>
-        <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
-            <div class="flex flex-row items-center space-x-8">
+            <div class="flex flex-row items-center gap-8">
               <div>{{ item.documentNumber }}</div>
+              <div class="flex flex-row items-center">
+                <Tooltip text="Tooltip Text">
+                  <IconAttachedFile
+                    class="flex-end m-4 h-20 w-20"
+                    :class="
+                      item.hasAttachments ? 'text-blue-800' : 'text-gray-500'
+                    "
+                    data-testid="file-attached-icon"
+                  />
+                </Tooltip>
 
-              <Tooltip text="Tooltip Text">
-                <IconAttachedFile
-                  class="flex-end h-20 w-20"
-                  :class="
-                    item.hasAttachments ? 'text-blue-800' : 'text-gray-500'
-                  "
-                  data-testid="file-attached-icon"
-                />
-              </Tooltip>
+                <Tooltip text="Tooltip Text">
+                  <IconSubject
+                    class="flex-end m-4 flex h-20 w-20"
+                    :class="
+                      item.hasHeadnoteOrPrinciple
+                        ? 'text-blue-800'
+                        : 'text-gray-500'
+                    "
+                    data-testid="headnote-principle-icon"
+                  />
+                </Tooltip>
 
-              <Tooltip text="Tooltip Text">
-                <IconSubject
-                  class="flex-end flex h-20 w-20"
-                  :class="
-                    item.hasHeadnoteOrPrinciple
-                      ? 'text-blue-800'
-                      : 'text-gray-500'
-                  "
-                  data-testid="headnote-principle-icon"
-                />
-              </Tooltip>
+                <Tooltip text="Tooltip Text">
+                  <IconNote
+                    class="flex-end m-4 flex h-20 w-20"
+                    :class="!!item.note ? 'text-blue-800' : 'text-gray-500'"
+                    data-testid="note-icon"
+                  />
+                </Tooltip>
 
-              <Tooltip text="Tooltip Text">
-                <IconNote
-                  class="flex-end flex h-20 w-20"
-                  :class="!!item.note ? 'text-blue-800' : 'text-gray-500'"
-                  data-testid="note-icon"
-                />
-              </Tooltip>
+                <Tooltip text="Tooltip Text">
+                  <IconClock
+                    class="flex-end m-4 flex h-20 w-20"
+                    :class="
+                      item.scheduledPublicationDateTime
+                        ? 'text-blue-800'
+                        : 'text-gray-500'
+                    "
+                    data-testid="scheduling-icon"
+                  />
+                </Tooltip>
+              </div>
+            </div>
+          </template>
+        </Column>
+        <Column
+          field="court.type"
+          header="Gerichtstyp"
+          header-class="ris-label3-bold"
+        />
+        <Column
+          field="court.location"
+          header="Ort"
+          header-class="ris-label3-bold"
+        />
 
-              <Tooltip text="Tooltip Text">
-                <IconClock
-                  class="flex-end flex h-20 w-20"
-                  :class="
-                    item.scheduledPublicationDateTime
-                      ? 'text-blue-800'
-                      : 'text-gray-500'
-                  "
-                  data-testid="scheduling-icon"
-                />
-              </Tooltip>
-            </div> </template
-        ></Column>
-        <Column field="court.type" header="Gerichtstyp"></Column>
-        <Column field="court.location" header="Ort"></Column>
-
-        <Column field="decisionDate" header="Datum">
-          <template #body="{ data: item }"
-            >{{
+        <Column
+          field="decisionDate"
+          header="Datum"
+          header-class="ris-label3-bold"
+        >
+          <template #body="{ data: item }">
+            {{
               item.decisionDate
                 ? dayjs(item.decisionDate).format("DD.MM.YYYY")
                 : "-"
             }}
           </template>
         </Column>
-        <Column field="fileNumber" header="Aktenzeichen"></Column>
-        <Column field="source" header="Quelle">
+        <Column
+          field="fileNumber"
+          header="Aktenzeichen"
+          header-class="ris-label3-bold"
+        />
+        <Column field="source" header="Quelle" header-class="ris-label3-bold">
           <template #body="{ data: item }">
             {{
               item.source
@@ -242,17 +260,21 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
                   item.creatingDocumentationOffice?.abbreviation +
                   ")"
                 : ""
-            }}</template
-          >
+            }}
+          </template>
         </Column>
-        <Column field="createdAt" header="Angelegt am">
-          <template #body="{ data: item }"
-            >{{
+        <Column
+          field="createdAt"
+          header="Angelegt am"
+          header-class="ris-label3-bold"
+        >
+          <template #body="{ data: item }">
+            {{
               item.createdAt ? dayjs(item.createdAt).format("DD.MM.YYYY") : "-"
             }}
-          </template></Column
-        >
-        <Column header="Status">
+          </template>
+        </Column>
+        <Column header="Status" header-class="ris-label3-bold">
           <template #body="{ data: item }">
             <IconBadge
               v-if="item.status?.publicationStatus"
@@ -335,8 +357,8 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
                   size="small"
                   @click="
                     showDeleteConfirmationDialog(
-                      entries?.find(
-                        (entry) => entry.uuid == item.uuid,
+                      entries.find(
+                        (entry) => entry.uuid === item.uuid,
                       ) as DocumentUnitListEntry,
                     )
                   "
