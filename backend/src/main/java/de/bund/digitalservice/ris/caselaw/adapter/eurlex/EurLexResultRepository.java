@@ -1,5 +1,6 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
+package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;

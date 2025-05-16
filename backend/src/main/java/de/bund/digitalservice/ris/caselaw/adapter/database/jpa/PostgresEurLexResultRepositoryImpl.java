@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;

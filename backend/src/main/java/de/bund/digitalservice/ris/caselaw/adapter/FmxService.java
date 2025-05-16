@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.TransformationService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import java.io.ByteArrayInputStream;
@@ -46,7 +47,7 @@ import org.xml.sax.SAXException;
 
 @Service
 @Slf4j
-public class FmxService {
+public class FmxService implements TransformationService {
 
   public static final String FILE_NUMBER_XPATH = "//REF.CASE/NO.CASE";
   public static final String ECLI_XPATH = "//NO.ECLI/@ECLI";

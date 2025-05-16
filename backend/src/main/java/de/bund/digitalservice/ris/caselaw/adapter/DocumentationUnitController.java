@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurlexCreationParameters;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -14,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatusRequest;
+import de.bund.digitalservice.ris.caselaw.domain.EurlexCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;

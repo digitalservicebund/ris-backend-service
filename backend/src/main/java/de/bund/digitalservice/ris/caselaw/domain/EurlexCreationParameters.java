@@ -1,6 +1,5 @@
-package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
+package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.List;
 
 public record EurlexCreationParameters(

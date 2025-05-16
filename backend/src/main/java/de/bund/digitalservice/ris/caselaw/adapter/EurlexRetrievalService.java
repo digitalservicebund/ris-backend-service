@@ -20,6 +20,7 @@ public class EurlexRetrievalService {
 
   public String getDocumentFromEurlex(String sourceUrl) {
     String fmxFileContent = null;
+
     try {
       HttpClient client =
           HttpClient.newBuilder()

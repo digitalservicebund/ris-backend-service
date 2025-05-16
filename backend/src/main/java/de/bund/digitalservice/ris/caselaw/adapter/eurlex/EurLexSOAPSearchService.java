@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.SearchService;

@@ -4,8 +4,6 @@ import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpa
 
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
-import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurlexCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -41,7 +39,7 @@ public class DocumentationUnitService {
   private final DocumentNumberService documentNumberService;
   private final DocumentationUnitStatusService statusService;
   private final AttachmentService attachmentService;
-  private final FmxService fmxService;
+  private final TransformationService transformationService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
   private final AuthService authService;
@@ -68,7 +66,7 @@ public class DocumentationUnitService {
       UserService userService,
       Validator validator,
       AttachmentService attachmentService,
-      FmxService fmxService,
+      TransformationService transformationService,
       @Lazy AuthService authService,
       PatchMapperService patchMapperService,
       DuplicateCheckService duplicateCheckService) {
@@ -79,7 +77,7 @@ public class DocumentationUnitService {
     this.userService = userService;
     this.validator = validator;
     this.attachmentService = attachmentService;
-    this.fmxService = fmxService;
+    this.transformationService = transformationService;
     this.patchMapperService = patchMapperService;
     this.statusService = statusService;
     this.authService = authService;
@@ -169,7 +167,7 @@ public class DocumentationUnitService {
         repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
 
     if (celexNumber != null) {
-      fmxService.getDataFromEurlex(celexNumber, newDocumentationUnit);
+      transformationService.getDataFromEurlex(celexNumber, newDocumentationUnit);
     }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
 
