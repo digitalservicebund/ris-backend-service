@@ -29,7 +29,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import software.amazon.awssdk.annotations.NotNull;
 
 @Service
 @Slf4j

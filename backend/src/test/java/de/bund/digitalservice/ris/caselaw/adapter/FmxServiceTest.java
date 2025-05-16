@@ -35,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -53,7 +54,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 })
 class FmxServiceTest {
 
-  private FmxService service;
+  @Autowired private FmxService service;
 
   @MockitoBean DocumentationUnitRepository documentationUnitRepository;
   @MockitoBean CourtRepository courtRepository;
@@ -67,15 +68,6 @@ class FmxServiceTest {
 
   @BeforeEach
   void setup() throws TransformerConfigurationException, IOException {
-    service =
-        new FmxService(
-            documentationUnitRepository,
-            courtRepository,
-            fmxRepository,
-            attachmentRepository,
-            databaseDocumentationUnitRepository,
-            retrievalService,
-            xmlUtilService);
     ClassPathResource xsltResource = new ClassPathResource("xml/fmxToHtml.xslt");
     String fileContent = IOUtils.toString(xsltResource.getInputStream(), StandardCharsets.UTF_8);
     Templates templates =

@@ -31,14 +31,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @WebMvcTest(controllers = EurLexController.class)
 @Import({TestConfig.class})
 class EurLexControllerTest {
-  @Autowired
-  private RisWebTestClient risWebClient;
+  @Autowired private RisWebTestClient risWebClient;
 
-  @MockitoBean
-  private SearchService service;
+  @MockitoBean private SearchService service;
 
-  @MockitoBean
-  private UserService userService;
+  @MockitoBean private UserService userService;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
 
@@ -56,7 +53,8 @@ class EurLexControllerTest {
 
   @Test
   void testGetSearchResults_withoutParameters() {
-    risWebClient.withDefaultLogin()
+    risWebClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/eurlex")
         .exchange()
@@ -64,24 +62,37 @@ class EurLexControllerTest {
         .isOk()
         .expectBody(Page.class);
 
-    verify(service, times(1)).getSearchResults(null,
-        docOffice, Optional.empty(), Optional.empty(),
-        Optional.empty(), Optional.empty(), Optional.empty());
+    verify(service, times(1))
+        .getSearchResults(
+            null,
+            docOffice,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
   }
 
   @Test
   void testGetSearchResults_withAllParameters() {
-    risWebClient.withDefaultLogin()
+    risWebClient
+        .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/eurlex?page=2&file-number=file-number&celex=celex&court=court&start-date=2025-01-01&end-date=2025-03-01")
+        .uri(
+            "/api/v1/caselaw/eurlex?page=2&file-number=file-number&celex=celex&court=court&start-date=2025-01-01&end-date=2025-03-01")
         .exchange()
         .expectStatus()
         .isOk()
         .expectBody(Page.class);
 
-    verify(service, times(1)).getSearchResults("2",
-        docOffice, Optional.of("file-number"), Optional.of("celex"),
-        Optional.of("court"), Optional.of(LocalDate.of(2025, Month.JANUARY, 1)),
-        Optional.of(LocalDate.of(2025, Month.MARCH, 1)));
+    verify(service, times(1))
+        .getSearchResults(
+            "2",
+            docOffice,
+            Optional.of("file-number"),
+            Optional.of("celex"),
+            Optional.of("court"),
+            Optional.of(LocalDate.of(2025, Month.JANUARY, 1)),
+            Optional.of(LocalDate.of(2025, Month.MARCH, 1)));
   }
 }

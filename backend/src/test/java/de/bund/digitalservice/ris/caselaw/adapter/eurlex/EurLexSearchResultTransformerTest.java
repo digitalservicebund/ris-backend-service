@@ -34,31 +34,33 @@ class EurLexSearchResultTransformerTest {
   @Test
   void testTransformDTOToDomain() {
     Instant now = Instant.now();
-    EurLexResultDTO dto = EurLexResultDTO.builder()
-        .resultXml("<xml><result>s/result>")
-        .celex("celex")
-        .court(CourtDTO.builder().type("court-type").location("court-location").build())
-        .uri("uri")
-        .date(LocalDate.of(2024, Month.DECEMBER, 24))
-        .ecli("ecli")
-        .htmlLink("html-link")
-        .status(EurLexResultStatus.NEW)
-        .title("title with file number T-123/45")
-        .createdAt(now)
-        .publicationDate(LocalDate.of(2025, Month.JANUARY, 2))
-        .build();
-    SearchResult expected = SearchResult.builder()
-        .courtType("court-type")
-        .courtLocation("court-location")
-        .uri("uri")
-        .celex("celex")
-        .htmlLink("html-link")
-        .ecli("ecli")
-        .title("title with file number T-123/45")
-        .fileNumber("T-123/45")
-        .date(LocalDate.of(2024, Month.DECEMBER, 24))
-        .publicationDate(LocalDate.ofInstant(now, ZoneId.systemDefault()))
-        .build();
+    EurLexResultDTO dto =
+        EurLexResultDTO.builder()
+            .resultXml("<xml><result>s/result>")
+            .celex("celex")
+            .court(CourtDTO.builder().type("court-type").location("court-location").build())
+            .uri("uri")
+            .date(LocalDate.of(2024, Month.DECEMBER, 24))
+            .ecli("ecli")
+            .htmlLink("html-link")
+            .status(EurLexResultStatus.NEW)
+            .title("title with file number T-123/45")
+            .createdAt(now)
+            .publicationDate(LocalDate.of(2025, Month.JANUARY, 2))
+            .build();
+    SearchResult expected =
+        SearchResult.builder()
+            .courtType("court-type")
+            .courtLocation("court-location")
+            .uri("uri")
+            .celex("celex")
+            .htmlLink("html-link")
+            .ecli("ecli")
+            .title("title with file number T-123/45")
+            .fileNumber("T-123/45")
+            .date(LocalDate.of(2024, Month.DECEMBER, 24))
+            .publicationDate(LocalDate.ofInstant(now, ZoneId.systemDefault()))
+            .build();
 
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
 
@@ -74,13 +76,9 @@ class EurLexSearchResultTransformerTest {
 
   @Test
   void testTransformDTOToDomain_withoutFileNumberInTitle_hasNoFileNumberInDomainObject() {
-    EurLexResultDTO dto = EurLexResultDTO.builder()
-        .title("title without file number")
-        .build();
-    SearchResult expected = SearchResult.builder()
-        .title("title without file number")
-        .fileNumber(null)
-        .build();
+    EurLexResultDTO dto = EurLexResultDTO.builder().title("title without file number").build();
+    SearchResult expected =
+        SearchResult.builder().title("title without file number").fileNumber(null).build();
 
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
 
@@ -98,14 +96,10 @@ class EurLexSearchResultTransformerTest {
     "title with file number T-12/345 abc and text behind, T-12/345",
     "title with file number T-12/345\u00A0123 and text behind, T-12/345",
   })
-  void testTransformDTOToDomain_withFileNumberWithAllowedPattern_hasParsedFileNumber(String title, String fileNumbers) {
-    EurLexResultDTO dto = EurLexResultDTO.builder()
-        .title(title)
-        .build();
-    SearchResult expected = SearchResult.builder()
-        .title(title)
-        .fileNumber(fileNumbers)
-        .build();
+  void testTransformDTOToDomain_withFileNumberWithAllowedPattern_hasParsedFileNumber(
+      String title, String fileNumbers) {
+    EurLexResultDTO dto = EurLexResultDTO.builder().title(title).build();
+    SearchResult expected = SearchResult.builder().title(title).fileNumber(fileNumbers).build();
 
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
 
@@ -113,18 +107,15 @@ class EurLexSearchResultTransformerTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {
-      "title with file number T-12345\u00A0abc and text behind",
-      "title with file number T-12a45\u00A0abc and text behind"
-  })
-  void testTransformDTOToDomain_withFileNumberWithWrongFormat_hasNoFileNumberInDomainObject(String title) {
-    EurLexResultDTO dto = EurLexResultDTO.builder()
-        .title(title)
-        .build();
-    SearchResult expected = SearchResult.builder()
-        .title(title)
-        .fileNumber(null)
-        .build();
+  @ValueSource(
+      strings = {
+        "title with file number T-12345\u00A0abc and text behind",
+        "title with file number T-12a45\u00A0abc and text behind"
+      })
+  void testTransformDTOToDomain_withFileNumberWithWrongFormat_hasNoFileNumberInDomainObject(
+      String title) {
+    EurLexResultDTO dto = EurLexResultDTO.builder().title(title).build();
+    SearchResult expected = SearchResult.builder().title(title).fileNumber(null).build();
 
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
 
@@ -132,17 +123,23 @@ class EurLexSearchResultTransformerTest {
   }
 
   @Test
-  void testTransformXmlToDTO_withOnlyDecisionDateSet_shouldLetAllOtherValuesEmpty() throws ParserConfigurationException, IOException, SAXException {
-    String resultXml = "<result>"
-        + "<document_link type=\"html\">html-link</document_link>"
-        + "<content><NOTICE><WORK><WORK_DATE_DOCUMENT>"
-        + "<DAY>12</DAY>"
-        + "<MONTH>12</MONTH>"
-        + "<YEAR>2024</YEAR>"
-        + "</WORK_DATE_DOCUMENT></WORK></NOTICE></content>"
-        + "</result>";
-    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        .parse(new InputSource(new StringReader("<searchResults>" + resultXml + "</searchResults>")));
+  void testTransformXmlToDTO_withOnlyDecisionDateSet_shouldLetAllOtherValuesEmpty()
+      throws ParserConfigurationException, IOException, SAXException {
+    String resultXml =
+        "<result>"
+            + "<document_link type=\"html\">html-link</document_link>"
+            + "<content><NOTICE><WORK><WORK_DATE_DOCUMENT>"
+            + "<DAY>12</DAY>"
+            + "<MONTH>12</MONTH>"
+            + "<YEAR>2024</YEAR>"
+            + "</WORK_DATE_DOCUMENT></WORK></NOTICE></content>"
+            + "</result>";
+    Document doc =
+        DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(
+                new InputSource(
+                    new StringReader("<searchResults>" + resultXml + "</searchResults>")));
     Element element = doc.getDocumentElement();
     EurLexResultDTO expected =
         EurLexResultDTO.builder()
@@ -152,8 +149,8 @@ class EurLexSearchResultTransformerTest {
             .resultXml("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + resultXml)
             .build();
 
-    List<EurLexResultDTO> dtos = EurLexSearchResultTransformer.transformXmlToDTO(element,
-        Collections.emptyMap());
+    List<EurLexResultDTO> dtos =
+        EurLexSearchResultTransformer.transformXmlToDTO(element, Collections.emptyMap());
 
     assertThat(dtos).hasSize(1);
     EurLexResultDTO dto = dtos.get(0);
@@ -161,29 +158,34 @@ class EurLexSearchResultTransformerTest {
   }
 
   @Test
-  void testTransformXmlToDTO_withAllPossibleValuesForEuGH_shouldTakeOverAllValues() throws ParserConfigurationException, IOException, SAXException {
-    String resultXml = "<result>"
-        + "<document_link type=\"html\">html-link</document_link>"
-        + "<content><NOTICE>"
-        + "<WORK>"
-        + "<WORK_DATE_DOCUMENT>"
-        + "<DAY>12</DAY>"
-        + "<MONTH>12</MONTH>"
-        + "<YEAR>2024</YEAR>"
-        + "</WORK_DATE_DOCUMENT>"
-        + "<ECLI><VALUE>ecli</VALUE></ECLI>"
-        + "<ID_CELEX><VALUE>celex</VALUE></ID_CELEX>"
-        + "<URI><VALUE>uri</VALUE></URI>"
-        + "<WORK_CREATED_BY_AGENT><IDENTIFIER>CJ</IDENTIFIER></WORK_CREATED_BY_AGENT>"
-        + "</WORK>"
-        + "<EXPRESSION>"
-        + "<EXPRESSION_TITLE><VALUE>title</VALUE></EXPRESSION_TITLE>"
-        + "</EXPRESSION>"
-        + "</NOTICE></content>"
-
-        + "</result>";
-    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        .parse(new InputSource(new StringReader("<searchResults>" + resultXml + "</searchResults>")));
+  void testTransformXmlToDTO_withAllPossibleValuesForEuGH_shouldTakeOverAllValues()
+      throws ParserConfigurationException, IOException, SAXException {
+    String resultXml =
+        "<result>"
+            + "<document_link type=\"html\">html-link</document_link>"
+            + "<content><NOTICE>"
+            + "<WORK>"
+            + "<WORK_DATE_DOCUMENT>"
+            + "<DAY>12</DAY>"
+            + "<MONTH>12</MONTH>"
+            + "<YEAR>2024</YEAR>"
+            + "</WORK_DATE_DOCUMENT>"
+            + "<ECLI><VALUE>ecli</VALUE></ECLI>"
+            + "<ID_CELEX><VALUE>celex</VALUE></ID_CELEX>"
+            + "<URI><VALUE>uri</VALUE></URI>"
+            + "<WORK_CREATED_BY_AGENT><IDENTIFIER>CJ</IDENTIFIER></WORK_CREATED_BY_AGENT>"
+            + "</WORK>"
+            + "<EXPRESSION>"
+            + "<EXPRESSION_TITLE><VALUE>title</VALUE></EXPRESSION_TITLE>"
+            + "</EXPRESSION>"
+            + "</NOTICE></content>"
+            + "</result>";
+    Document doc =
+        DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(
+                new InputSource(
+                    new StringReader("<searchResults>" + resultXml + "</searchResults>")));
     Element element = doc.getDocumentElement();
     CourtDTO court = CourtDTO.builder().type("court-type").location("court-location").build();
     EurLexResultDTO expected =
@@ -199,8 +201,8 @@ class EurLexSearchResultTransformerTest {
             .title("title")
             .build();
 
-    List<EurLexResultDTO> dtos = EurLexSearchResultTransformer.transformXmlToDTO(element,
-        Map.of("EuGH", court));
+    List<EurLexResultDTO> dtos =
+        EurLexSearchResultTransformer.transformXmlToDTO(element, Map.of("EuGH", court));
 
     assertThat(dtos).hasSize(1);
     EurLexResultDTO dto = dtos.get(0);
@@ -208,21 +210,27 @@ class EurLexSearchResultTransformerTest {
   }
 
   @Test
-  void testTransformXmlToDTO_withCourtEuG_shouldAddTheDatabaseObjectForTheCourt() throws ParserConfigurationException, IOException, SAXException {
-    String resultXml = "<result>"
-        + "<content><NOTICE>"
-        + "<WORK>"
-        + "<WORK_DATE_DOCUMENT>"
-        + "<DAY>12</DAY>"
-        + "<MONTH>12</MONTH>"
-        + "<YEAR>2024</YEAR>"
-        + "</WORK_DATE_DOCUMENT>"
-        + "<WORK_CREATED_BY_AGENT><IDENTIFIER>GCEU</IDENTIFIER></WORK_CREATED_BY_AGENT>"
-        + "</WORK>"
-        + "</NOTICE></content>"
-        + "</result>";
-    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        .parse(new InputSource(new StringReader("<searchResults>" + resultXml + "</searchResults>")));
+  void testTransformXmlToDTO_withCourtEuG_shouldAddTheDatabaseObjectForTheCourt()
+      throws ParserConfigurationException, IOException, SAXException {
+    String resultXml =
+        "<result>"
+            + "<content><NOTICE>"
+            + "<WORK>"
+            + "<WORK_DATE_DOCUMENT>"
+            + "<DAY>12</DAY>"
+            + "<MONTH>12</MONTH>"
+            + "<YEAR>2024</YEAR>"
+            + "</WORK_DATE_DOCUMENT>"
+            + "<WORK_CREATED_BY_AGENT><IDENTIFIER>GCEU</IDENTIFIER></WORK_CREATED_BY_AGENT>"
+            + "</WORK>"
+            + "</NOTICE></content>"
+            + "</result>";
+    Document doc =
+        DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(
+                new InputSource(
+                    new StringReader("<searchResults>" + resultXml + "</searchResults>")));
     Element element = doc.getDocumentElement();
     CourtDTO court = CourtDTO.builder().type("court-type").location("court-location").build();
     EurLexResultDTO expected =
@@ -233,8 +241,8 @@ class EurLexSearchResultTransformerTest {
             .court(court)
             .build();
 
-    List<EurLexResultDTO> dtos = EurLexSearchResultTransformer.transformXmlToDTO(element,
-        Map.of("EuG", court));
+    List<EurLexResultDTO> dtos =
+        EurLexSearchResultTransformer.transformXmlToDTO(element, Map.of("EuG", court));
 
     assertThat(dtos).hasSize(1);
     EurLexResultDTO dto = dtos.get(0);
@@ -250,11 +258,15 @@ class EurLexSearchResultTransformerTest {
   }
 
   @Test
-  void testTransformXmlToDTO_withoutDecisionDate_shouldThrowAnException() throws ParserConfigurationException, IOException, SAXException {
-    String resultXml = "<result>"
-        + "</result>";
-    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        .parse(new InputSource(new StringReader("<searchResults>" + resultXml + "</searchResults>")));
+  void testTransformXmlToDTO_withoutDecisionDate_shouldThrowAnException()
+      throws ParserConfigurationException, IOException, SAXException {
+    String resultXml = "<result>" + "</result>";
+    Document doc =
+        DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(
+                new InputSource(
+                    new StringReader("<searchResults>" + resultXml + "</searchResults>")));
     Element element = doc.getDocumentElement();
     Map<String, CourtDTO> courts = new HashMap<>();
 
@@ -265,11 +277,13 @@ class EurLexSearchResultTransformerTest {
 
   @Test
   void testGetTotalNum() throws ParserConfigurationException, IOException, SAXException {
-    String resultXml = "<result>"
-        + "<totalhits>56</totalhits>"
-        + "</result>";
-    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        .parse(new InputSource(new StringReader("<searchResults>" + resultXml + "</searchResults>")));
+    String resultXml = "<result>" + "<totalhits>56</totalhits>" + "</result>";
+    Document doc =
+        DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(
+                new InputSource(
+                    new StringReader("<searchResults>" + resultXml + "</searchResults>")));
     Element element = doc.getDocumentElement();
 
     int result = EurLexSearchResultTransformer.getTotalNum(element);
@@ -278,12 +292,18 @@ class EurLexSearchResultTransformerTest {
   }
 
   @Test
-  void testGetTotalNum_withNotParsableNumber_shouldReturnZero() throws ParserConfigurationException, IOException, SAXException, TransformerConfigurationException {
-    String resultXml = "<result>"
-        + "<totalhits>abc</totalhits>"
-        + "</result>";
-    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        .parse(new InputSource(new StringReader("<searchResults>" + resultXml + "</searchResults>")));
+  void testGetTotalNum_withNotParsableNumber_shouldReturnZero()
+      throws ParserConfigurationException,
+          IOException,
+          SAXException,
+          TransformerConfigurationException {
+    String resultXml = "<result>" + "<totalhits>abc</totalhits>" + "</result>";
+    Document doc =
+        DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(
+                new InputSource(
+                    new StringReader("<searchResults>" + resultXml + "</searchResults>")));
     Element element = doc.getDocumentElement();
 
     int result = EurLexSearchResultTransformer.getTotalNum(element);
@@ -292,13 +312,19 @@ class EurLexSearchResultTransformerTest {
   }
 
   @Test
-  void testGetTotalNum_withMultipleTotalHitsValues_shouldReturnZero() throws ParserConfigurationException, IOException, SAXException, TransformerConfigurationException {
-    String resultXml = "<result>"
-        + "<totalhits>123</totalhits>"
-        + "<totalhits>456</totalhits>"
-        + "</result>";
-    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        .parse(new InputSource(new StringReader("<searchResults>" + resultXml + "</searchResults>")));
+  void testGetTotalNum_withMultipleTotalHitsValues_shouldReturnZero()
+      throws ParserConfigurationException,
+          IOException,
+          SAXException,
+          TransformerConfigurationException {
+    String resultXml =
+        "<result>" + "<totalhits>123</totalhits>" + "<totalhits>456</totalhits>" + "</result>";
+    Document doc =
+        DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(
+                new InputSource(
+                    new StringReader("<searchResults>" + resultXml + "</searchResults>")));
     Element element = doc.getDocumentElement();
 
     int result = EurLexSearchResultTransformer.getTotalNum(element);

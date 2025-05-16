@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
 import java.time.Instant;
@@ -31,19 +30,17 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({ EurLexSOAPSearchService.class })
+@Import({EurLexSOAPSearchService.class})
 class EurLexSOAPSearchServiceTest {
-  @MockitoBean
-  private EurLexResultRepository repository;
+  @MockitoBean private EurLexResultRepository repository;
 
-  @MockitoBean
-  private DatabaseCourtRepository courtRepository;
+  @MockitoBean private DatabaseCourtRepository courtRepository;
 
-  @MockitoSpyBean
-  private EurLexSOAPSearchService service;
+  @MockitoSpyBean private EurLexSOAPSearchService service;
 
   @Test
-  void testGetSearchResults_withAnEmptyDocumentationOffice_shouldNotCallRepositoryRequestAndShouldReturnEmpty() {
+  void
+      testGetSearchResults_withAnEmptyDocumentationOffice_shouldNotCallRepositoryRequestAndShouldReturnEmpty() {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
 
     Page<SearchResult> searchResults =
@@ -61,31 +58,36 @@ class EurLexSOAPSearchServiceTest {
   }
 
   @Test
-  void testGetSearchResults_withDocumentationOfficeIsNull_shouldNotCallRepositoryRequestAndShouldReturnEmpty() {
-    Page<SearchResult> searchResults =service.getSearchResults(
-        "0",
-        null,
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty());
+  void
+      testGetSearchResults_withDocumentationOfficeIsNull_shouldNotCallRepositoryRequestAndShouldReturnEmpty() {
+    Page<SearchResult> searchResults =
+        service.getSearchResults(
+            "0",
+            null,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
 
     assertThat(searchResults).isEmpty();
     verify(repository, never()).findAllBySearchParameters(any(), any(), any(), any(), any(), any());
   }
 
   @Test
-  void testGetSearchResults_withDocumentationOfficeNotAllowed_shouldNotCallRepositoryRequestAndShouldReturnEmpty() {
-    DocumentationOffice documentationOffice = DocumentationOffice.builder().abbreviation("not allowed doc office").build();
-    Page<SearchResult> searchResults =service.getSearchResults(
-        "0",
-        documentationOffice,
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty());
+  void
+      testGetSearchResults_withDocumentationOfficeNotAllowed_shouldNotCallRepositoryRequestAndShouldReturnEmpty() {
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().abbreviation("not allowed doc office").build();
+    Page<SearchResult> searchResults =
+        service.getSearchResults(
+            "0",
+            documentationOffice,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
 
     assertThat(searchResults).isEmpty();
     verify(repository, never()).findAllBySearchParameters(any(), any(), any(), any(), any(), any());
@@ -93,14 +95,54 @@ class EurLexSOAPSearchServiceTest {
 
   @Test
   void testGetSearchResults_withoutPage_shouldCallRepositoryRequestWithPageZero() {
-    DocumentationOffice documentationOffice = DocumentationOffice.builder().abbreviation("DS").build();
-    when(repository.findAllBySearchParameters(PageRequest.of(0, 100),
-        Optional.empty(), Optional.empty(), Optional.empty(),
-        Optional.empty(), Optional.empty()))
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().abbreviation("DS").build();
+    when(repository.findAllBySearchParameters(
+            PageRequest.of(0, 100),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty()))
         .thenReturn(Page.empty());
 
-    Page<SearchResult> searchResults = service.getSearchResults(
-        null,
+    Page<SearchResult> searchResults =
+        service.getSearchResults(
+            null,
+            documentationOffice,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
+
+    assertThat(searchResults).isEmpty();
+    verify(repository, times(1))
+        .findAllBySearchParameters(
+            PageRequest.of(0, 100),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
+  }
+
+  @Test
+  void
+      testGetSearchResults_withBGHDocumentationOfficeAndNoCourtParameter_shouldReturnOnlyEuGDecisions() {
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().abbreviation("BGH").build();
+    when(repository.findAllBySearchParameters(
+            any(Pageable.class),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.of("EuG")),
+            eq(Optional.empty()),
+            eq(Optional.empty())))
+        .thenReturn(Page.empty());
+
+    service.getSearchResults(
+        "0",
         documentationOffice,
         Optional.empty(),
         Optional.empty(),
@@ -108,74 +150,106 @@ class EurLexSOAPSearchServiceTest {
         Optional.empty(),
         Optional.empty());
 
-    assertThat(searchResults).isEmpty();
-    verify(repository, times(1)).findAllBySearchParameters(
-        PageRequest.of(0, 100), Optional.empty(),
-        Optional.empty(), Optional.empty(), Optional.empty(),
-        Optional.empty());
+    verify(repository, times(1))
+        .findAllBySearchParameters(
+            any(Pageable.class),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.of("EuG")),
+            eq(Optional.empty()),
+            eq(Optional.empty()));
   }
 
   @Test
-  void testGetSearchResults_withBGHDocumentationOfficeAndNoCourtParameter_shouldReturnOnlyEuGDecisions() {
-    DocumentationOffice documentationOffice = DocumentationOffice.builder().abbreviation("BGH").build();
-    when(repository.findAllBySearchParameters(any(Pageable.class), eq(Optional.empty()), eq(Optional.empty()),
-        eq(Optional.of("EuG")), eq(Optional.empty()), eq(Optional.empty())))
+  void
+      testGetSearchResults_withBFHDocumentationOfficeAndNoCourtParameter_shouldReturnOnlyEuGHDecisions() {
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().abbreviation("BFH").build();
+    when(repository.findAllBySearchParameters(
+            any(Pageable.class),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.of("EuGH")),
+            eq(Optional.empty()),
+            eq(Optional.empty())))
         .thenReturn(Page.empty());
 
-    service.getSearchResults("0", documentationOffice, Optional.empty(),
-        Optional.empty(), Optional.empty(), Optional.empty(),
+    service.getSearchResults(
+        "0",
+        documentationOffice,
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty());
 
-    verify(repository, times(1)).findAllBySearchParameters(
-        any(Pageable.class), eq(Optional.empty()), eq(Optional.empty()),
-        eq(Optional.of("EuG")), eq(Optional.empty()), eq(Optional.empty()));
+    verify(repository, times(1))
+        .findAllBySearchParameters(
+            any(Pageable.class),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.of("EuGH")),
+            eq(Optional.empty()),
+            eq(Optional.empty()));
   }
 
   @Test
-  void testGetSearchResults_withBFHDocumentationOfficeAndNoCourtParameter_shouldReturnOnlyEuGHDecisions() {
-    DocumentationOffice documentationOffice = DocumentationOffice.builder().abbreviation("BFH").build();
-    when(repository.findAllBySearchParameters(any(Pageable.class), eq(Optional.empty()), eq(Optional.empty()),
-        eq(Optional.of("EuGH")), eq(Optional.empty()), eq(Optional.empty())))
+  void
+      testGetSearchResults_withBFHDocumentationOfficeAndCourtParameterSetToEuG_shouldReturnOnlyEuGDecisions() {
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().abbreviation("BFH").build();
+    when(repository.findAllBySearchParameters(
+            any(Pageable.class),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.of("EuG")),
+            eq(Optional.empty()),
+            eq(Optional.empty())))
         .thenReturn(Page.empty());
 
-    service.getSearchResults("0", documentationOffice, Optional.empty(),
-        Optional.empty(), Optional.empty(), Optional.empty(),
+    service.getSearchResults(
+        "0",
+        documentationOffice,
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of("EuG"),
+        Optional.empty(),
         Optional.empty());
 
-    verify(repository, times(1)).findAllBySearchParameters(
-        any(Pageable.class), eq(Optional.empty()), eq(Optional.empty()),
-        eq(Optional.of("EuGH")), eq(Optional.empty()), eq(Optional.empty()));
-  }
-
-  @Test
-  void testGetSearchResults_withBFHDocumentationOfficeAndCourtParameterSetToEuG_shouldReturnOnlyEuGDecisions() {
-    DocumentationOffice documentationOffice = DocumentationOffice.builder().abbreviation("BFH").build();
-    when(repository.findAllBySearchParameters(any(Pageable.class), eq(Optional.empty()), eq(Optional.empty()),
-        eq(Optional.of("EuG")), eq(Optional.empty()), eq(Optional.empty())))
-        .thenReturn(Page.empty());
-
-    service.getSearchResults("0", documentationOffice, Optional.empty(),
-        Optional.empty(), Optional.of("EuG"), Optional.empty(),
-        Optional.empty());
-
-    verify(repository, times(1)).findAllBySearchParameters(
-        any(Pageable.class), eq(Optional.empty()), eq(Optional.empty()),
-        eq(Optional.of("EuG")), eq(Optional.empty()), eq(Optional.empty()));
+    verify(repository, times(1))
+        .findAllBySearchParameters(
+            any(Pageable.class),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.of("EuG")),
+            eq(Optional.empty()),
+            eq(Optional.empty()));
   }
 
   @Test
   void testGetSearchResults_lastUpdate5MinutesBefore_shouldNotCallRequestNewDecisions() {
-    DocumentationOffice documentationOffice = DocumentationOffice.builder().abbreviation("DS").build();
-    when(repository.findAllBySearchParameters(any(Pageable.class), eq(Optional.empty()), eq(Optional.empty()),
-        eq(Optional.empty()), eq(Optional.empty()), eq(Optional.empty())))
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().abbreviation("DS").build();
+    when(repository.findAllBySearchParameters(
+            any(Pageable.class),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty())))
         .thenReturn(Page.empty());
     Instant fiveMinutesBefore = Instant.now().minus(5, ChronoUnit.MINUTES);
     EurLexResultDTO lastUpdate = EurLexResultDTO.builder().createdAt(fiveMinutesBefore).build();
     when(repository.findTopByOrderByCreatedAtDesc()).thenReturn(Optional.of(lastUpdate));
     doNothing().when(service).requestNewestDecisions(anyInt(), any(LocalDate.class));
 
-    service.getSearchResults("0", documentationOffice, Optional.empty(),
-        Optional.empty(), Optional.empty(), Optional.empty(),
+    service.getSearchResults(
+        "0",
+        documentationOffice,
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty());
 
     verify(service, never()).requestNewestDecisions(anyInt(), any(LocalDate.class));
@@ -183,19 +257,31 @@ class EurLexSOAPSearchServiceTest {
 
   @Test
   void testGetSearchResults_lastUpdate2DaysBefore_shouldCallRequestNewDecisions() {
-    DocumentationOffice documentationOffice = DocumentationOffice.builder().abbreviation("DS").build();
-    when(repository.findAllBySearchParameters(any(Pageable.class), eq(Optional.empty()), eq(Optional.empty()),
-        eq(Optional.empty()), eq(Optional.empty()), eq(Optional.empty())))
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().abbreviation("DS").build();
+    when(repository.findAllBySearchParameters(
+            any(Pageable.class),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty())))
         .thenReturn(Page.empty());
     Instant twoDaysBefore = Instant.now().minus(2, ChronoUnit.DAYS);
     EurLexResultDTO lastUpdate = EurLexResultDTO.builder().createdAt(twoDaysBefore).build();
     when(repository.findTopByOrderByCreatedAtDesc()).thenReturn(Optional.of(lastUpdate));
     doNothing().when(service).requestNewestDecisions(anyInt(), any(LocalDate.class));
 
-    service.getSearchResults("0", documentationOffice, Optional.empty(),
-        Optional.empty(), Optional.empty(), Optional.empty(),
+    service.getSearchResults(
+        "0",
+        documentationOffice,
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty());
 
-    verify(service, times(1)).requestNewestDecisions(1, LocalDate.ofInstant(twoDaysBefore, ZoneId.of("Europe/Berlin")));
+    verify(service, times(1))
+        .requestNewestDecisions(1, LocalDate.ofInstant(twoDaysBefore, ZoneId.of("Europe/Berlin")));
   }
 }
