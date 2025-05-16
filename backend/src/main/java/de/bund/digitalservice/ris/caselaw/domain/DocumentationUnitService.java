@@ -428,11 +428,6 @@ public class DocumentationUnitService {
     return this.updateDocumentationUnit(documentationUnit, DuplicateCheckStatus.DISABLED, null);
   }
 
-  public void updateDocumentationUnit(DocumentationUnit documentationUnit, User user)
-      throws DocumentationUnitNotExistsException {
-    this.updateDocumentationUnit(documentationUnit, DuplicateCheckStatus.DISABLED, user);
-  }
-
   public DocumentationUnit updateDocumentationUnit(
       DocumentationUnit documentationUnit, DuplicateCheckStatus duplicateCheckStatus, User user)
       throws DocumentationUnitNotExistsException {
