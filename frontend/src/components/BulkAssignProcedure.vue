@@ -45,6 +45,7 @@ const assignProcedure = async (procedure: Procedure) => {
       severity: "success",
       summary: "Hinzufügen erfolgreich",
       detail: `Die Dokumentationseinheit${verb} jetzt im Vorgang ${procedure.label}.`,
+      styleClass: "custom-toast",
       life: 5_000,
     })
   }

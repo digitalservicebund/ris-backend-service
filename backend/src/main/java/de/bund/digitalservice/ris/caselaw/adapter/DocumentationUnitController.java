@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
+import de.bund.digitalservice.ris.caselaw.domain.AssignDocumentationOfficeRequest;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
@@ -532,6 +533,42 @@ public class DocumentationUnitController {
       return ResponseEntity.status(HttpStatus.OK).body(result);
     } catch (DocumentationUnitNotExistsException | EntityNotFoundException ex) {
       return ResponseEntity.notFound().build();
+    }
+  }
+
+  /**
+   * Assign an existing document to another documentation office
+   *
+   * @param oidcUser the logged-in user
+   * @param uuid UUID of the documentation unit
+   * @param assignDocumentationOfficeRequest Request containing documentation Office to assign to
+   * @return HTTP 200 with result string for success, 404/400 for client errors, 500 for server
+   *     errors.
+   */
+  @PutMapping(value = "/{uuid}/assign")
+  @PreAuthorize(
+      "isAuthenticated() and @userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
+  public ResponseEntity<String> assignDocumentationOffice(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable @NonNull UUID uuid,
+      @RequestBody @Valid AssignDocumentationOfficeRequest assignDocumentationOfficeRequest) {
+    try {
+      var result =
+          service.assignDocumentationOffice(
+              uuid,
+              assignDocumentationOfficeRequest.getDocumentationOffice(),
+              userService.getUser(oidcUser));
+      return ResponseEntity.ok().body(result);
+    } catch (DocumentationUnitNotExistsException e) {
+      log.warn("Documentation unit not found: {}", uuid, e);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Documentation unit not found");
+    } catch (DocumentationUnitException e) {
+      log.error(
+          "Error assigning documentation office {} to {}",
+          assignDocumentationOfficeRequest.getDocumentationOffice().abbreviation(),
+          uuid,
+          e);
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
   }
 }

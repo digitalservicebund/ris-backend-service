@@ -117,6 +117,7 @@ describe("BulkAssignProcedure", () => {
       detail: "Die Dokumentationseinheit ist jetzt im Vorgang Vorgangsname.",
       life: 5000,
       severity: "success",
+      styleClass: "custom-toast",
       summary: "Hinzufügen erfolgreich",
     })
     expect(

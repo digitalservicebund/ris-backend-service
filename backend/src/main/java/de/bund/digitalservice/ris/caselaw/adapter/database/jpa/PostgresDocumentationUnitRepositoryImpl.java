@@ -484,6 +484,45 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     repository.save(documentationUnitDTO);
   }
 
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void deleteProcedures(UUID documentationUnitId) {
+    if (documentationUnitId == null) {
+      return;
+    }
+    var documentationUnitDTOOptional = repository.findById(documentationUnitId);
+    if (documentationUnitDTOOptional.isPresent()
+        && documentationUnitDTOOptional.get() instanceof DecisionDTO decisionDTO) {
+      decisionDTO.setProcedure(null);
+      decisionDTO.setProcedureHistory(new ArrayList<>());
+      repository.save(decisionDTO);
+    }
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void saveDocumentationOffice(
+      UUID documentationUnitId, DocumentationOffice documentationOffice, User user) {
+    if (documentationUnitId == null) {
+      return;
+    }
+    var documentationUnitDTOOptional = repository.findById(documentationUnitId);
+    if (documentationUnitDTOOptional.isPresent()
+        && documentationUnitDTOOptional.get() instanceof DecisionDTO decisionDTO) {
+      var previousDocumentationOffice = decisionDTO.getDocumentationOffice();
+      decisionDTO.setDocumentationOffice(
+          DocumentationOfficeTransformer.transformToDTO(documentationOffice));
+      repository.save(decisionDTO);
+      var description =
+          "Dokstelle geändert: [%s] → [%s]"
+              .formatted(
+                  previousDocumentationOffice.getAbbreviation(),
+                  documentationOffice.abbreviation());
+      historyLogService.saveHistoryLog(
+          documentationUnitId, user, HistoryLogEventType.DOCUMENTATION_OFFICE, description);
+    }
+  }
+
   private ProcedureDTO getOrCreateProcedure(
       DocumentationOfficeDTO documentationOfficeDTO, Procedure procedure) {
     if (procedure.id() == null) {

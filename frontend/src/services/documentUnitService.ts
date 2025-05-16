@@ -4,6 +4,7 @@ import httpClient, {
 } from "./httpClient"
 import { DocumentUnitSearchParameter } from "@/components/DocumentUnitSearchEntryForm.vue"
 import { Page } from "@/components/Pagination.vue"
+import DocumentationOffice from "@/domain/documentationOffice"
 import DocumentUnit, {
   DocumentationUnitParameters,
   DuplicateRelationStatus,
@@ -60,6 +61,11 @@ interface DocumentUnitService {
     duplicateDocNumber: string,
     status: DuplicateRelationStatus,
   ): Promise<{ error: boolean }>
+
+  assignDocumentationOffice(
+    documentUnitUuid: string,
+    documentationOffice: DocumentationOffice,
+  ): Promise<ServiceResponse<unknown>>
 }
 
 const service: DocumentUnitService = {
@@ -300,6 +306,34 @@ const service: DocumentUnitService = {
     )
 
     return response.status >= 400 ? { error: true } : { error: false }
+  },
+
+  async assignDocumentationOffice(
+    documentUnitUuid: string,
+    documentationOffice: DocumentationOffice,
+  ) {
+    const response = await httpClient.put<
+      { documentationOffice: DocumentationOffice },
+      string
+    >(
+      `caselaw/documentunits/${documentUnitUuid}/assign`,
+      {},
+      { documentationOffice },
+    )
+
+    if (response.status >= 300) {
+      response.error = {
+        title:
+          errorMessages
+            .DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
+            .title,
+        description:
+          errorMessages
+            .DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
+            .description,
+      }
+    }
+    return response
   },
 }
 

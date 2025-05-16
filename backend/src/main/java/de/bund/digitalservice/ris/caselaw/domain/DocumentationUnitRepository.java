@@ -97,11 +97,26 @@ public interface DocumentationUnitRepository {
   void saveProcedures(Documentable documentationUnit, User user);
 
   /**
+   * Delete all procedures of a documentation unit
+   *
+   * @param documentationUnitId the UUID of the documentation unit to delete the procedures from
+   */
+  void deleteProcedures(UUID documentationUnitId);
+
+  /**
    * Save lastPublicationDateTime of a documentation unit
    *
    * @param uuid the UUID of the documentation unit to save the date for
    */
   void saveLastPublicationDateTime(UUID uuid);
+
+  /**
+   * Save the newly assigned documentation office of a documentation unit
+   *
+   * @param id the UUID of the documentation unit to save the new documentation office for
+   * @param user the {@link User}
+   */
+  void saveDocumentationOffice(UUID id, DocumentationOffice documentationOffice, User user);
 
   /**
    * Delete a documentation unit
