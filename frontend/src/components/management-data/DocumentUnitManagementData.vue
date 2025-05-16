@@ -156,13 +156,19 @@ const getDocumentationOffices = (filter: Ref<string | undefined>) => {
       </dl>
       <div v-if="assignDocOfficeResponseError">
         <InfoModal
+          data-testid="assignDocOfficeErrorModal"
           :description="assignDocOfficeResponseError.description"
           :title="assignDocOfficeResponseError.title"
         />
       </div>
       <dl>
         <div class="flex gap-24 px-0">
-          <dt class="ris-body1-bold shrink-0 grow-0 basis-160">Zuweisen</dt>
+          <dt
+            class="ris-body1-bold shrink-0 grow-0 basis-160"
+            data-testid="assign-documentation-office-title"
+          >
+            Zuweisen
+          </dt>
           <dd class="ris-body2-regular w-full gap-32">
             <div class="flex flex-wrap gap-8">
               <div class="w-[320px]">

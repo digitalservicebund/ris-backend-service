@@ -64,4 +64,64 @@ describe("documentUnitService", () => {
       )
     })
   })
+
+  describe("assign Documentation office", () => {
+    it("should return error with unsuccessful status", async () => {
+      const documentationOffice = {
+        id: "documentationOfficeId",
+        abbreviation: "BGH",
+      }
+      const httpMock = vi.spyOn(HttpClient, "put").mockResolvedValue({
+        status: 400,
+        data: "error",
+      })
+
+      const response = await service.assignDocumentationOffice(
+        "documentationUnitId",
+        documentationOffice,
+      )
+
+      expect(response).toEqual({
+        data: "error",
+        error: {
+          description: "Laden Sie die Seite neu.",
+          title: "Die Dokumentationseinheit konnte nicht zugewiesen werden.",
+        },
+        status: 400,
+      })
+
+      expect(httpMock).toHaveBeenCalledWith(
+        "caselaw/documentunits/documentationUnitId/assign",
+        {},
+        { documentationOffice: documentationOffice },
+      )
+    })
+
+    it("should return data on success", async () => {
+      const documentationOffice = {
+        id: "documentationOfficeId",
+        abbreviation: "BGH",
+      }
+      const httpMock = vi.spyOn(HttpClient, "put").mockResolvedValue({
+        status: 200,
+        data: "success",
+      })
+
+      const response = await service.assignDocumentationOffice(
+        "documentationUnitId",
+        documentationOffice,
+      )
+
+      expect(response).toEqual({
+        data: "success",
+        status: 200,
+      })
+
+      expect(httpMock).toHaveBeenCalledWith(
+        "caselaw/documentunits/documentationUnitId/assign",
+        {},
+        { documentationOffice: documentationOffice },
+      )
+    })
+  })
 })
