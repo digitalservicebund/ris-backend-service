@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit.RelatedDocumentationUnitBuilder;
@@ -75,6 +76,12 @@ public class DocumentationUnitListItemTransformer {
                                         + referenceDTO.getCitation())
                             .orElse(String.valueOf(source.getValue())))
                 .collect(Collectors.joining(", ")));
+
+    ManagementDataDTO managementData = documentationUnitListItemDTO.getManagementData();
+    if (managementData != null) {
+      builder.createdAt(managementData.getCreatedAtDateTime());
+    }
+
     return builder.build();
   }
 

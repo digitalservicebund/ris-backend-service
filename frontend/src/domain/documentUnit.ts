@@ -153,6 +153,20 @@ export type DocumentationUnitParameters = {
   reference?: Reference
 }
 
+export type DocumentUnitSearchParameter =
+  | "documentNumber"
+  | "fileNumber"
+  | "publicationStatus"
+  | "publicationDate"
+  | "scheduledOnly"
+  | "courtType"
+  | "courtLocation"
+  | "decisionDate"
+  | "decisionDateEnd"
+  | "withError"
+  | "myDocOfficeOnly"
+  | "withDuplicateWarning"
+
 export type EurlexParameters = {
   documentationOffice: DocumentationOffice
   celexNumbers: string[]

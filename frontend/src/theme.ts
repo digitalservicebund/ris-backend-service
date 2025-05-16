@@ -5,6 +5,7 @@
 import { RisUiTheme } from "@digitalservicebund/ris-ui/primevue"
 import { usePassThrough } from "primevue/passthrough"
 import type { TabPassThroughOptions } from "primevue/tab"
+import type { TabListPassThroughOptions } from "primevue/tablist"
 import type { TabPanelPassThroughOptions } from "primevue/tabpanel"
 
 const tag = (strings: TemplateStringsArray, ...values: unknown[]) =>
@@ -20,8 +21,8 @@ const tabPanel: TabPanelPassThroughOptions = {
 
 const tab: TabPassThroughOptions = {
   root: ({ context }) => {
-    const base = tw`ris-body1-regular h-51 w-full py-12 [&:not(:last-child)]:mr-4`
-    const active = tw`bg-blue-200 text-black ris-body2-bold`
+    const base = tw`h-51 flex-1 py-12 `
+    const active = tw`bg-blue-200 text-black ris-body1-bold`
     const inactive = tw`cursor-pointer text-gray-900 bg-blue-100 hover:underline`
     return {
       class: {
@@ -33,11 +34,21 @@ const tab: TabPassThroughOptions = {
   },
 }
 
+const tabList: TabListPassThroughOptions = {
+  tabList: {
+    class: tw`flex w-full gap-4 relative`,
+  },
+  activeBar: {
+    class: tw`h-1 bottom-0 absolute transition-all duration-300`,
+  },
+}
+
 export default usePassThrough(
   RisUiTheme,
   {
     tab,
     tabPanel,
+    tabList,
   },
   { mergeProps: false, mergeSections: true },
 )

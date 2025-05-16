@@ -138,6 +138,7 @@ export type ComboboxInputModelType =
   | LegalForceRegion
   | LegalForceType
   | LegalPeriodical
+  | DocumentationOffice
 
 export type ComboboxItem = {
   label: string

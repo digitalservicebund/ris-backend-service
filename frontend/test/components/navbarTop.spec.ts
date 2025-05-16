@@ -48,6 +48,11 @@ function renderComponent(options?: { env?: Env; activeUser?: User }) {
             },
             {
               path: "",
+              name: "caselaw-inbox",
+              component: {},
+            },
+            {
+              path: "",
               name: "settings",
               component: {},
             },

@@ -40,11 +40,7 @@ onMounted(async () => {
   ).data.value
 
   documentationOffices.value = comboboxItems?.map(
-    (item) =>
-      ({
-        id: item.value?.id,
-        abbreviation: item.value?.abbreviation,
-      }) as DocumentationOffice,
+    (item) => item.value as DocumentationOffice,
   )
 })
 

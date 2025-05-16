@@ -162,23 +162,23 @@ describe("documentUnit list", () => {
 
     // wait for asynchronous authService.getName method to update the UI according to the user
     expect(
-      screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
-    ).toBeInTheDocument()
+      screen.getAllByRole("button", {
+        name: "Dokumentationseinheit bearbeiten",
+      }),
+    ).toHaveLength(3)
 
     expect(screen.getAllByRole("row").length).toBe(3)
 
     //Spruchkörper visible
     expect(screen.getByText("cba")).toBeVisible()
 
-    // expect only one edit link to 234 documentation unit
-    expect(
-      screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
-    ).toHaveAttribute("href", "/caselaw/documentUnit/234/categories")
-
     // expect only one delete button for 234 documentation unit
-    expect(
-      screen.getByRole("button", { name: "Dokumentationseinheit löschen" }),
-    ).toBeVisible()
+    const enabledButtons = screen
+      .getAllByRole("button", {
+        name: "Dokumentationseinheit bearbeiten",
+      })
+      .filter((button) => !(button as HTMLButtonElement).disabled)
+    expect(enabledButtons).toHaveLength(1)
 
     // expect Notes
     expect(screen.getByLabelText("Keine Notiz vorhanden")).toBeVisible()
@@ -203,7 +203,7 @@ describe("documentUnit list", () => {
 
     // expect three view links
     expect(
-      screen.getAllByRole("link", { name: "Dokumentationseinheit ansehen" }),
+      screen.getAllByRole("button", { name: "Dokumentationseinheit ansehen" }),
     ).toHaveLength(3)
 
     expect(screen.getByText("Fremdanlage")).toBeVisible()
@@ -237,7 +237,7 @@ describe("documentUnit list", () => {
     })
 
     expect(
-      screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
+      screen.getByRole("button", { name: "Dokumentationseinheit bearbeiten" }),
     ).toBeInTheDocument()
 
     await screen.findByText("123")
@@ -248,7 +248,7 @@ describe("documentUnit list", () => {
     expect(emitted().deleteDocumentationUnit).toBeTruthy()
   })
 
-  test("disables edit and delete buttons if foreign documentation office", async () => {
+  test("disables edit button, if not editable", async () => {
     renderComponent({
       documentUnitListEntries: [
         {
@@ -259,27 +259,21 @@ describe("documentUnit list", () => {
           fileNumber: "",
           documentType: { label: "Test", jurisShortcut: "T" },
           court: { type: "typeA", location: "locB", label: "typeA locB" },
+          isEditable: false,
           status: {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
         },
       ],
-      activeUser: {
-        name: "fooUser",
-        documentationOffice: { abbreviation: "fooDocumentationOffice" },
-      },
     })
 
     expect(
-      screen.queryByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole("button", { name: "Dokumentationseinheit löschen" }),
-    ).not.toBeInTheDocument()
+      screen.getByRole("button", { name: "Dokumentationseinheit bearbeiten" }),
+    ).toBeDisabled()
   })
 
-  test("shows 'Übernehmen' icon instead if edit icon, if status equals EXTERNAL_HANDOVER_PENDING", async () => {
+  test("disables delete button, if not deletable", async () => {
     renderComponent({
       documentUnitListEntries: [
         {
@@ -290,6 +284,33 @@ describe("documentUnit list", () => {
           fileNumber: "",
           documentType: { label: "Test", jurisShortcut: "T" },
           court: { type: "typeA", location: "locB", label: "typeA locB" },
+          isDeletable: false,
+          status: {
+            publicationStatus: PublicationState.PUBLISHED,
+            withError: false,
+          },
+        },
+      ],
+    })
+
+    expect(
+      screen.getByRole("button", { name: "Dokumentationseinheit löschen" }),
+    ).toBeDisabled()
+  })
+
+  test("disables edit and delete buttons, if status equals EXTERNAL_HANDOVER_PENDING", async () => {
+    renderComponent({
+      documentUnitListEntries: [
+        {
+          id: "id",
+          uuid: "1",
+          documentNumber: "123",
+          decisionDate: "2022-02-10",
+          fileNumber: "",
+          documentType: { label: "Test", jurisShortcut: "T" },
+          court: { type: "typeA", location: "locB", label: "typeA locB" },
+          isEditable: true,
+          isDeletable: true,
           status: {
             publicationStatus: PublicationState.EXTERNAL_HANDOVER_PENDING,
             withError: false,
@@ -303,11 +324,12 @@ describe("documentUnit list", () => {
     })
 
     expect(
-      screen.queryByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
-    ).not.toBeInTheDocument()
+      screen.getByRole("button", { name: "Dokumentationseinheit bearbeiten" }),
+    ).toBeDisabled()
+
     expect(
-      screen.getByRole("button", { name: "Dokumentationseinheit übernehmen" }),
-    ).toBeInTheDocument()
+      screen.getByRole("button", { name: "Dokumentationseinheit löschen" }),
+    ).toBeDisabled()
   })
 
   test("shows 'jDV Übergabe' column if showPublicationDate is true", async () => {

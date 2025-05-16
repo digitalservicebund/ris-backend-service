@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,6 +36,7 @@ public record DocumentationUnitListItem(
     String fileNumber,
     Boolean hasAttachments,
     LocalDate decisionDate,
+    Instant createdAt,
     LocalDateTime lastPublicationDateTime,
     LocalDateTime scheduledPublicationDateTime,
     String appraisalBody,
