@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue"
+import { ref } from "vue"
 import InboxList from "./shared/InboxList.vue"
 import InboxSearch from "./shared/InboxSearch.vue"
+import { InfoStatus } from "@/components/enumInfoStatus"
+import InfoModal from "@/components/InfoModal.vue"
 import { Page } from "@/components/Pagination.vue"
 import { Query } from "@/composables/useQueryFromRoute"
 import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
@@ -15,6 +17,7 @@ const itemsPerPage = 100
 const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()
 const searchResponseError = ref<ResponseError>()
+const hasTakeOverError = ref(false)
 
 /**
  * Searches all documentation units by given input and updates the local
@@ -74,22 +77,22 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
  * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be updated
  */
 async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
-  const response = await service.takeOver(
+  hasTakeOverError.value = false
+  const { data, error } = await service.takeOver(
     documentUnitListEntry.documentNumber as string,
   )
 
-  if (response.error) {
-    alert(response.error.title)
-  } else if (currentPage.value?.content) {
+  if (!error && currentPage.value?.content) {
     const index = currentPage.value.content.findIndex(
       (entry) => entry.uuid === documentUnitListEntry.uuid,
     )
 
     if (index !== -1) {
       // Replace the old entry with the updated one
-      currentPage.value.content[index] = response.data as DocumentUnitListEntry
+      currentPage.value.content[index] = data as DocumentUnitListEntry
     }
   }
+  hasTakeOverError.value = !!error
 }
 
 /**
@@ -121,14 +124,18 @@ async function updateQuery(value: Query<DocumentUnitSearchParameter>) {
 async function handleReset() {
   currentPage.value = undefined
 }
-
-onMounted(async () => {
-  await search()
-})
 </script>
 
 <template>
   <div class="flex flex-col" data-testId="pending-handover-inbox">
+    <InfoModal
+      v-if="hasTakeOverError"
+      class="mb-16"
+      data-testid="take-over-error"
+      description="Bitte laden Sie die Seite neu."
+      :status="InfoStatus.ERROR"
+      title="Die Fremdanlage konnte nicht angenommen werden."
+    />
     <InboxSearch
       :is-loading="isLoading"
       @reset-search-results="handleReset"

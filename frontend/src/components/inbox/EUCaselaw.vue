@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue"
+import { ref } from "vue"
 import InboxList from "./shared/InboxList.vue"
 import InboxSearch from "./shared/InboxSearch.vue"
 import { Page } from "@/components/Pagination.vue"
@@ -70,29 +70,6 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
 }
 
 /**
- * Updates the status from 'Fremdanlage' to 'Unveröffentlicht'
- * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be updated
- */
-async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
-  const response = await service.takeOver(
-    documentUnitListEntry.documentNumber as string,
-  )
-
-  if (response.error) {
-    alert(response.error.title)
-  } else if (currentPage.value?.content) {
-    const index = currentPage.value.content.findIndex(
-      (entry) => entry.uuid === documentUnitListEntry.uuid,
-    )
-
-    if (index !== -1) {
-      // Replace the old entry with the updated one
-      currentPage.value.content[index] = response.data as DocumentUnitListEntry
-    }
-  }
-}
-
-/**
  * When using the navigation a new page number is set, the search is triggered,
  * with the given page number.
  * @param {number} page - The page to be updated
@@ -121,10 +98,6 @@ async function updateQuery(value: Query<DocumentUnitSearchParameter>) {
 async function handleReset() {
   currentPage.value = undefined
 }
-
-onMounted(async () => {
-  await search()
-})
 </script>
 
 <template>
@@ -138,7 +111,6 @@ onMounted(async () => {
       :error="searchResponseError"
       :page-entries="currentPage"
       @delete-documentation-unit="handleDelete"
-      @take-over-documentation-unit="handleTakeOver"
       @update-page="updatePage"
     />
   </div>
