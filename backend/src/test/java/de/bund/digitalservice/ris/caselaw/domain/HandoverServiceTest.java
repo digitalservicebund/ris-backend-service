@@ -160,7 +160,13 @@ class HandoverServiceTest {
         .usingRecursiveComparison()
         .isEqualTo(
             deltaMigration.toBuilder()
-                .xml("<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>\n  <element/>\n</test>\n")
+                .xml(
+                    """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <test>
+                   <element/>
+                </test>
+                """)
                 .build());
 
     verify(mailService).getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
@@ -205,7 +211,13 @@ class HandoverServiceTest {
         .usingRecursiveComparison()
         .isEqualTo(
             deltaMigration.toBuilder()
-                .xml("<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>\n  <element/>\n</test>\n")
+                .xml(
+                    """
+<?xml version="1.0" encoding="UTF-8"?>
+<test>
+   <element/>
+</test>
+""")
                 .build());
 
     verify(deltaMigrationRepository).getLatestMigration(TEST_UUID);
@@ -323,6 +335,27 @@ class HandoverServiceTest {
     String prettyXml = HandoverService.prettifyXml(xml);
     assertThat(prettyXml)
         .isEqualTo(
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>\n  <child>value</child>\n</root>\n");
+            """
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+   <child>value</child>
+</root>
+""");
+  }
+
+  @Test
+  void testPrettifyXml_withNoIndexTags_shouldNotSplitLines() {
+    String xml =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><p>noindex <noindex>tags</noindex> should be in one line</p></root>";
+
+    String prettyXml = HandoverService.prettifyXml(xml);
+    assertThat(prettyXml)
+        .isEqualTo(
+            """
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+   <p>noindex <noindex>tags</noindex> should be in one line</p>
+</root>
+""");
   }
 }

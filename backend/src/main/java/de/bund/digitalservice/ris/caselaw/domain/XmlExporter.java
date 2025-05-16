@@ -5,7 +5,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 public interface XmlExporter {
-  XmlTransformationResult transformToXml(DocumentationUnit documentationUnit)
+  XmlTransformationResult transformToXml(DocumentationUnit documentationUnit, boolean prettyPrint)
       throws ParserConfigurationException, TransformerException;
 
   String generateEncryptedXMLString(DocumentationUnit documentationUnit)
