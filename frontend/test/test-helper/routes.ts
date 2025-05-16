@@ -49,6 +49,11 @@ const routes = [
     name: "caselaw-periodical-evaluation-editionId-handover",
     component: {},
   },
+  {
+    path: "/caselaw/inbox",
+    name: "caselaw-inbox",
+    component: {},
+  },
 ]
 
 export default routes

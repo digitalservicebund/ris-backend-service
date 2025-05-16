@@ -9,6 +9,7 @@ import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
+import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
 import { PublicationState } from "@/domain/publicationStatus"
 
 defineProps<{
@@ -213,22 +214,6 @@ watch(
   },
   { deep: true, immediate: true },
 )
-</script>
-
-<script lang="ts">
-export type DocumentUnitSearchParameter =
-  | "documentNumber"
-  | "fileNumber"
-  | "publicationStatus"
-  | "publicationDate"
-  | "scheduledOnly"
-  | "courtType"
-  | "courtLocation"
-  | "decisionDate"
-  | "decisionDateEnd"
-  | "withError"
-  | "myDocOfficeOnly"
-  | "withDuplicateWarning"
 </script>
 
 <template>

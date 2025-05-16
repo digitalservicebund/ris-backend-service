@@ -15,37 +15,37 @@
 
 
 	  <xsd:import namespace="http://www.w3.org/XML/1998/namespace"
-               schemaLocation="./xml.xsd"/>
+               schemaLocation="xml.xsd"/>
 
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
 		Akoma Ntoso main schema
-		
+
 		Release 01/04/2016 - Akoma Ntoso 3.0 WD17 with errata
 		Complete version.
-		
-		
+
+
 		technical supervision Fabio Vitali - University of Bologna
 		legal domain supervision Monica Palmirani - University of Bologna
-		
+
 		The present schema uses systematically XML design patterns as
 		described in http://www.xmlpatterns.com/
 		A few of them are explicitly mentioned, when their use or approach
 		was not felt clear or natural enough. Others are just used without
 		mentions.
-				
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		Main element groups
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -611,10 +611,10 @@ The group inlineCM is the content model of blocks and inlines, and is composed o
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		Attribute groups
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -911,12 +911,12 @@ The attribute for is used in modification elements to specify the element this i
 
 	  <xsd:annotation>
 		    <xsd:documentation>
-		 The mappingAtts attributes represent the reference to the permanent wId (attribute original) of a structure, and to the eId (attribute current) such structure had during the time interval included between an initial temporalGroup (attribute start) and a final temporalGroup (attribute end). 
+		 The mappingAtts attributes represent the reference to the permanent wId (attribute original) of a structure, and to the eId (attribute current) such structure had during the time interval included between an initial temporalGroup (attribute start) and a final temporalGroup (attribute end).
 		</xsd:documentation>
 	  </xsd:annotation>
 
 	  <xsd:attributeGroup name="mappingAtts">
-		
+
 
 		    <xsd:attribute name="original" type="wIdRef"/>
 		    <xsd:attribute name="current" type="eIdRef"/>
@@ -1059,7 +1059,7 @@ The attribute upTo is used in range-based elements to specify the eId of the end
 	  </xsd:attributeGroup>
 
 	  <xsd:attributeGroup name="upToOpt">
-		
+
 
 		    <xsd:attribute name="upTo" type="eIdRef"/>
 	  </xsd:attributeGroup>
@@ -1079,7 +1079,7 @@ These attributes are used in range-based elements to specify the eId of the begi
 	  </xsd:attributeGroup>
 
 	  <xsd:attributeGroup name="rangeOpt">
-		
+
 
 		    <xsd:attribute name="from" type="eIdRef" use="required"/>
 		    <xsd:attributeGroup ref="upToOpt"/>
@@ -1167,10 +1167,10 @@ This attribute specifies the eId of the element in the references section detail
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		Attribute groups: attribute "type"
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -1205,7 +1205,7 @@ This is the list of allowed values for the type attribute of the event and actio
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="eventType">
-		
+
 
 		    <xsd:attribute name="type" type="eventType"/>
 	  </xsd:attributeGroup>
@@ -1228,7 +1228,7 @@ This is the list of allowed values for the type attribute of the opinion element
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="opinionType">
-		
+
 
 		    <xsd:attribute name="type" type="opinionType"/>
 	  </xsd:attributeGroup>
@@ -1256,7 +1256,7 @@ This is the list of allowed values for the type attribute of the result element<
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="resultType">
-		
+
 
 		    <xsd:attribute name="type" type="resultType" use="required"/>
 	  </xsd:attributeGroup>
@@ -1277,7 +1277,7 @@ This is the list of allowed values for the restriction type attribute</comment>
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="restrictionType">
-		
+
 
 		    <xsd:attribute name="type" type="restrictionType" use="required"/>
 	  </xsd:attributeGroup>
@@ -1301,7 +1301,7 @@ This is the list of allowed values for the type attribute of the remark element 
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="remarkType">
-		
+
 
 		    <xsd:attribute name="type" type="remarkType"/>
 	  </xsd:attributeGroup>
@@ -1323,7 +1323,7 @@ This is the list of allowed values for the type attribute of the recordedTime el
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="recordedTimeType">
-		
+
 
 		    <xsd:attribute name="type" type="timeType"/>
 	  </xsd:attributeGroup>
@@ -1350,7 +1350,7 @@ The simple type TextualMods lists all the types of textual modifications as valu
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="textualModType">
-		
+
 
 		    <xsd:attribute name="type" type="TextualMods" use="required"/>
 	  </xsd:attributeGroup>
@@ -1373,7 +1373,7 @@ The simple type MeaningMods lists all the types of modifications in meaning as v
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="meaningModType">
-		
+
 
 		    <xsd:attribute name="type" type="MeaningMods" use="required"/>
 	  </xsd:attributeGroup>
@@ -1395,7 +1395,7 @@ The simple type ScopeMods lists all the types of modifications in scope as value
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="scopeModType">
-		
+
 
 		    <xsd:attribute name="type" type="ScopeMods" use="required"/>
 	  </xsd:attributeGroup>
@@ -1421,7 +1421,7 @@ The simple type ForceMods lists all the types of modifications in force as value
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="forceModType">
-		
+
 
 		    <xsd:attribute name="type" type="ForceMods" use="required"/>
 	  </xsd:attributeGroup>
@@ -1448,7 +1448,7 @@ The simple type EfficacyMods lists all the types of modifications in efficacy as
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="efficacyModType">
-		
+
 
 		    <xsd:attribute name="type" type="EfficacyMods" use="required"/>
 	  </xsd:attributeGroup>
@@ -1480,7 +1480,7 @@ The simple type LegalSystemMods lists all the types of modifications in the lega
 	  </xsd:simpleType>
 
 	  <xsd:attributeGroup name="legalSystemModType">
-		
+
 
 		    <xsd:attribute name="type" type="LegalSystemMods" use="required"/>
 	  </xsd:attributeGroup>
@@ -1500,7 +1500,7 @@ These attributes are used in metadata to propose visible representations of the 
 	  </xsd:attributeGroup>
 
 	  <xsd:attributeGroup name="showopt">
-		
+
 
 		    <xsd:attribute name="showAs" type="xsd:string"/>
 		    <xsd:attribute name="shortForm" type="xsd:string"/>
@@ -1806,10 +1806,10 @@ This is the list of the core attributes that all elements in the content part of
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		Simple types (data values)
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -2064,10 +2064,10 @@ This is the list of possible positions of the text being analyzed by the element
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		Complex types (markup structures)
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -2433,13 +2433,13 @@ the complex type docContainerType defines a shared content model for elements th
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		Root element
 		Comment: One generic root element contains all document elements
 		Pattern: Universal Root
 		Reference: http://www.xmlpatterns.com/UniversalRootMain.shtml
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -2472,13 +2472,13 @@ the type documentType lists all the document types that are managed by Akoma Nto
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		Document elements
 		Comment: All document elements share just two content models
 		Pattern: Consistent Element Set
 		Reference: http://www.xmlpatterns.com/ConsistentElementSetMain.shtml
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -2512,7 +2512,7 @@ the element akomaNtoso is the root element of all document types in Akoma Ntoso.
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="openStructure">
@@ -2568,7 +2568,7 @@ the element mainBody is the container of the main part of all other document typ
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="statement" type="openStructure">
@@ -2609,7 +2609,7 @@ The element component is a container of a subdocument specified in a composite d
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="collectionStructure">
@@ -2719,7 +2719,7 @@ the element collectionBody is the container of a list of other documents (e.g, a
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="portionStructure">
@@ -2795,7 +2795,7 @@ the element portionBody is the container of a portion of another document</comme
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="hierarchicalStructure">
@@ -2887,7 +2887,7 @@ the element body is the container of the main hierarchy of a hierarchical docume
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="debateStructure">
@@ -2977,7 +2977,7 @@ the element debateBody is the container of the main hierarchy of a debate</comme
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="judgmentStructure">
@@ -3048,7 +3048,7 @@ the element judgmentBody is the container of the main hierarchy of a judgment do
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="amendmentStructure">
@@ -3119,11 +3119,11 @@ the element amendmentBody is the container of the main hierarchy of a amendment 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="recitalHierarchy">
-		
+
 
 		    <xsd:complexContent>
 			      <xsd:extension base="basehierarchy">
@@ -3150,7 +3150,7 @@ the element recitals is the section of the preamble that contains recitals</comm
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="recital" type="itemType">
@@ -3163,11 +3163,11 @@ the element recital is the individual element of the preface that is called reci
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="citationHierarchy">
-		
+
 
 		    <xsd:complexContent>
 			      <xsd:extension base="basehierarchy">
@@ -3194,7 +3194,7 @@ the element citations is the section of the preamble that contains citations</co
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="citation" type="itemType">
@@ -3207,7 +3207,7 @@ the element citation is the individual element of the preface that is called cit
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="longTitle" type="blocksreq">
@@ -3220,7 +3220,7 @@ the element longTitle is the section of the preface or preamble that is called l
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="formula">
@@ -3269,7 +3269,7 @@ the element coverPage is used as a container of the text that acts as a cover pa
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="preambleopt">
@@ -3299,7 +3299,7 @@ the element preamble is used as a container of the text that opens the main body
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="prefaceopt">
@@ -3329,7 +3329,7 @@ the element preface is used as a container of all prefacing material (e.g. heade
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="conclusions" type="basicopt">
@@ -3342,7 +3342,7 @@ the element conclusion is used as a container of all concluding material (e.g. d
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="header" type="blocksopt">
@@ -3355,7 +3355,7 @@ the element header is used as a container of all prefacing material of judgments
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="attachments">
@@ -3376,7 +3376,7 @@ the element attachment is used as a container of individual attachment elements<
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="interstitial" type="blocksreq">
@@ -3389,7 +3389,7 @@ the element interstitial is used as a container of text elements and blocks that
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="componentRef" type="srcType">
@@ -3402,7 +3402,7 @@ the element componentRef is a reference to a separate manifestation-level resour
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="documentRef" type="linkType">
@@ -3415,16 +3415,16 @@ the element documentRef is a reference to a separate work- or expression-level r
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		Elements for hierarchical documents
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -3438,7 +3438,7 @@ this element is a hierarchical container called "clause" either explicitly or du
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="section" type="hierarchy">
@@ -3451,7 +3451,7 @@ this element is a hierarchical container called "section" either explicitly or d
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="part" type="hierarchy">
@@ -3464,7 +3464,7 @@ this element is a hierarchical container called "part" either explicitly or due 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="paragraph" type="hierarchy">
@@ -3477,7 +3477,7 @@ this element is a hierarchical container called "paragraph" either explicitly or
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="chapter" type="hierarchy">
@@ -3490,7 +3490,7 @@ this element is a hierarchical container called "chapter" either explicitly or d
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="title" type="hierarchy">
@@ -3503,7 +3503,7 @@ this element is a hierarchical container called "title" either explicitly or due
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="book" type="hierarchy">
@@ -3516,7 +3516,7 @@ this element is a hierarchical container called "book" either explicitly or due 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="tome" type="hierarchy">
@@ -3529,7 +3529,7 @@ this element is a hierarchical container called "tome" either explicitly or due 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="article" type="hierarchy">
@@ -3542,7 +3542,7 @@ this element is a hierarchical container called "article" either explicitly or d
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="division" type="hierarchy">
@@ -3555,7 +3555,7 @@ this element is a hierarchical container called "division" either explicitly or 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="list" type="hierarchy">
@@ -3568,7 +3568,7 @@ this element is a hierarchical container called "list" either explicitly or due 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="point" type="hierarchy">
@@ -3581,7 +3581,7 @@ this element is a hierarchical container called "point" either explicitly or due
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="indent" type="hierarchy">
@@ -3594,7 +3594,7 @@ this element is a hierarchical container called "indent" either explicitly or du
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="alinea" type="hierarchy">
@@ -3607,7 +3607,7 @@ this element is a hierarchical container called "alinea" either explicitly or du
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="rule" type="hierarchy">
@@ -3620,7 +3620,7 @@ this element is a hierarchical container called "rule" either explicitly or due 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="subrule" type="hierarchy">
@@ -3633,7 +3633,7 @@ this element is a hierarchical container called "subrule" either explicitly or d
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="proviso" type="hierarchy">
@@ -3646,7 +3646,7 @@ this element is a hierarchical container called "proviso" either explicitly or d
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="subsection" type="hierarchy">
@@ -3659,7 +3659,7 @@ this element is a hierarchical container called "subsection" either explicitly o
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="subpart" type="hierarchy">
@@ -3672,7 +3672,7 @@ this element is a hierarchical container called "subpart" either explicitly or d
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="subparagraph" type="hierarchy">
@@ -3685,7 +3685,7 @@ this element is a hierarchical container called "subparagraph" either explicitly
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="subchapter" type="hierarchy">
@@ -3698,7 +3698,7 @@ this element is a hierarchical container called "subchapter" either explicitly o
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="subtitle" type="hierarchy">
@@ -3711,7 +3711,7 @@ this element is a hierarchical container called "subtitle" either explicitly or 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="subdivision" type="hierarchy">
@@ -3724,7 +3724,7 @@ this element is a hierarchical container called "subdivision" either explicitly 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="subclause" type="hierarchy">
@@ -3737,7 +3737,7 @@ this element is a hierarchical container called "subclause" either explicitly or
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="sublist" type="hierarchy">
@@ -3750,7 +3750,7 @@ this element is a hierarchical container called "sublist" either explicitly or d
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="level" type="hierarchy">
@@ -3763,7 +3763,7 @@ this element is a hierarchical container called "level" either explicitly or due
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="transitional" type="hierarchy">
@@ -3776,7 +3776,7 @@ this element is a hierarchical container called "transitional" either explicitly
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="content" type="blocksreq">
@@ -3789,7 +3789,7 @@ the element content is the final container in a hierarchy, and is where the bloc
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="num" type="inline">
@@ -3802,7 +3802,7 @@ the element num is a heading element in a hierarchy that contains a number or an
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="heading" type="inlinereq">
@@ -3815,7 +3815,7 @@ the element heading is a heading element in a hierarchy that contains a title or
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="subheading" type="inlinereq">
@@ -3828,7 +3828,7 @@ the element subheading is a heading element in a hierarchy that contains a subti
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="crossHeading" type="inlinereq">
@@ -3841,7 +3841,7 @@ the element crossHeading is a heading element that is placed side by side with h
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="intro" type="blocksreq">
@@ -3854,7 +3854,7 @@ the element intro is a heading element in a hierarchy that contains paragraphs i
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="wrapUp" type="blocksreq">
@@ -3867,16 +3867,16 @@ the element wrapUp is a concluding element in a hierarchy that contains paragrap
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		Elements for debates documents
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -3890,7 +3890,7 @@ this element is a structural container for parts of a debates that contain the a
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="rollCall" type="althierarchy">
@@ -3903,7 +3903,7 @@ this element is a structural container for parts of a debates that contain a rol
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="prayers" type="althierarchy">
@@ -3916,7 +3916,7 @@ this element is a structural container for parts of a debates that contain praye
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="oralStatements" type="althierarchy">
@@ -3929,7 +3929,7 @@ this element is a structural container for parts of a debates that contain oral 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="writtenStatements" type="althierarchy">
@@ -3942,7 +3942,7 @@ this element is a structural container for parts of a debates that contain writt
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="personalStatements" type="althierarchy">
@@ -3955,7 +3955,7 @@ this element is a structural container for parts of a debates that contain writt
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="ministerialStatements" type="althierarchy">
@@ -3968,7 +3968,7 @@ this element is a structural container for parts of a debates that contain writt
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="resolutions" type="althierarchy">
@@ -3981,7 +3981,7 @@ this element is a structural container for parts of a debates that contain resol
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="nationalInterest" type="althierarchy">
@@ -3994,7 +3994,7 @@ this element is a structural container for parts of a debates that contain resol
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="declarationOfVote" type="althierarchy">
@@ -4007,7 +4007,7 @@ this element is a structural container for parts of a debates that are relevant 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="communication" type="althierarchy">
@@ -4020,7 +4020,7 @@ this element is a structural container for parts of a debates that contain commu
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="petitions" type="althierarchy">
@@ -4033,7 +4033,7 @@ this element is a structural container for parts of a debates that are relevant 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="papers" type="althierarchy">
@@ -4046,7 +4046,7 @@ this element is a structural container for parts of a debates that are relevant 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="noticesOfMotion" type="althierarchy">
@@ -4059,7 +4059,7 @@ this element is a structural container for parts of a debates that are relevant 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="questions" type="althierarchy">
@@ -4072,7 +4072,7 @@ this element is a structural container for parts of a debates that are relevant 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="address" type="althierarchy">
@@ -4085,7 +4085,7 @@ this element is a structural container for parts of a debates that are relevant 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="proceduralMotions" type="althierarchy">
@@ -4098,7 +4098,7 @@ this element is a structural container for parts of a debates that are relevant 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="pointOfOrder" type="althierarchy">
@@ -4111,7 +4111,7 @@ this element is a structural container for parts of a debates that are relevant 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="adjournment" type="althierarchy">
@@ -4124,7 +4124,7 @@ this element is a structural container for parts of a debates that contain adjou
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="debateSection">
@@ -4175,7 +4175,7 @@ the element speech is a container of a single speech utterance in a debate. Dial
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="question" type="speechType">
@@ -4188,7 +4188,7 @@ the element question is a container of a single official question as proposed by
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="answer" type="speechType">
@@ -4201,7 +4201,7 @@ the element answer is a container of a single official answer to a question</com
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="other" type="blocksreq">
@@ -4214,7 +4214,7 @@ the element other is a container of parts of a debate that are not speeches, nor
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="scene" type="inline">
@@ -4227,7 +4227,7 @@ the element scene is a container of descriptions of the scene elements happening
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="narrative" type="inline">
@@ -4240,7 +4240,7 @@ the element narrative is a block element in a debate to mark description in the 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="summary" type="inline">
@@ -4253,7 +4253,7 @@ the element summary is a block element in a debate to mark summaries of speeches
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="from" type="inline">
@@ -4266,7 +4266,7 @@ the element from is a heading element in a debate that contains the name or role
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="vote">
@@ -4298,7 +4298,7 @@ the element outcome is an inline that wraps the outcome of a vote</comment>
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="introduction" type="maincontent">
@@ -4311,7 +4311,7 @@ this element is a structural container for the section of a judgment containing 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="background" type="maincontent">
@@ -4324,7 +4324,7 @@ this element is a structural container for the section of a judgment containing 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="arguments" type="maincontent">
@@ -4337,7 +4337,7 @@ this element is a structural container for the section of a judgment containing 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="remedies" type="maincontent">
@@ -4350,7 +4350,7 @@ this element is a structural container for the section of a judgment containing 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="motivation" type="maincontent">
@@ -4363,7 +4363,7 @@ this element is a structural container for the section of a judgment containing 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="decision" type="maincontent">
@@ -4376,7 +4376,7 @@ this element is a structural container for the section of a judgment containing 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="affectedDocument">
@@ -4427,7 +4427,7 @@ the element change is an inline element that identifies the changes expressed in
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="amendmentHeading" type="blocksopt">
@@ -4440,7 +4440,7 @@ this element is a structural container for the section of an amendment containin
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="amendmentContent" type="blocksopt">
@@ -4453,7 +4453,7 @@ this element is a structural container for the section of an amendment containin
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="amendmentReference" type="blocksopt">
@@ -4466,7 +4466,7 @@ this element is a structural container for the section of an amendment containin
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="amendmentJustification" type="blocksopt">
@@ -4479,19 +4479,19 @@ this element is a structural container for the section of an amendment containin
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		AN block elements
 		Comment: the only AN-specific block are the table of content (TOC),
 		a structure containing toc items related to the various subparts of the
 		main document, the list item and the titled block
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -4521,13 +4521,13 @@ the element blockContainer is used as a container of many individual block eleme
 	  </xsd:complexType>
 
 	  <xsd:element name="blockContainer" type="blockContainerType"/>
-		
+
 
 
 	  <xsd:element name="blockList">
       <xsd:annotation>
 		       <xsd:documentation>
-		 The element item is a container belonging to a list 
+		 The element item is a container belonging to a list
 		</xsd:documentation>
 	     </xsd:annotation>
 		    <xsd:complexType>
@@ -4540,10 +4540,10 @@ the element blockContainer is used as a container of many individual block eleme
 		    </xsd:complexType>
 	  </xsd:element>
 
-	
+
 
 	  <xsd:element name="item" type="itemType"/>
-		
+
 
 
 	  <xsd:element name="listIntroduction" type="inline">
@@ -4556,7 +4556,7 @@ the element listIntroduction is an optional element of list before any item of t
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="listWrapUp" type="inline">
@@ -4569,7 +4569,7 @@ the element listWrapUp is an optional element of list after all items of the lis
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="tblock" type="itemType">
@@ -4582,7 +4582,7 @@ The element tblock (titled block) is used to specify a container for blocks intr
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="toc">
@@ -4614,7 +4614,7 @@ the element tocItem is a component of the table of content and contains header i
 		    </xsd:complexType>
 	  </xsd:element>
 
-	
+
 
 	  <xsd:element name="docType" type="inline">
       <xsd:annotation>
@@ -4626,7 +4626,7 @@ the element docType is an inline element within preface to identify the string u
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="docTitle" type="inline">
@@ -4639,7 +4639,7 @@ the element docTitle is an inline element within preface to identify the string 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="docNumber" type="inline">
@@ -4652,7 +4652,7 @@ the element docNumber is an inline element within preface to identify the string
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="docProponent">
@@ -4741,7 +4741,7 @@ the element shortTitle is an inline element within preface to identify the strin
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="docAuthority" type="inline">
@@ -4754,7 +4754,7 @@ the element docAuthority is an inline element within preface to identify the str
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="docPurpose" type="inline">
@@ -4767,7 +4767,7 @@ the element docPurpose is an inline element within preface to identify the strin
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="docCommittee">
@@ -4799,7 +4799,7 @@ the element docIntroducer is an inline element within preface to identify the st
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="docStage" type="inline">
@@ -4812,7 +4812,7 @@ the element docStage is an inline element within preface to identify the string 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="docStatus" type="inline">
@@ -4825,7 +4825,7 @@ the element docStatus is an inline element within preface to identify the string
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="docJurisdiction" type="inline">
@@ -4838,7 +4838,7 @@ the element docJurisdiction is an inline element within preface to identify the 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="docketNumber" type="inline">
@@ -4851,7 +4851,7 @@ the element docketNumber is an inline element within preface to identify the str
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="courtType" type="inline">
@@ -4864,7 +4864,7 @@ the element courtType is an inline element within judgments to identify the stri
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="neutralCitation" type="inline">
@@ -4877,7 +4877,7 @@ the element neutralCitation is an inline element within judgments to identify th
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="party">
@@ -4966,7 +4966,7 @@ the element argument is an inline element within judgments for classifying the a
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="signature" type="inline">
@@ -4979,7 +4979,7 @@ the element signature is an inline element within conclusions to identify where 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="date">
@@ -5068,7 +5068,7 @@ The element organization is an inline element to identify a text fragment introd
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="concept" type="inlinereqreq">
@@ -5081,7 +5081,7 @@ The element concept is is an inline element to identify a text fragment introduc
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="object" type="inlinereqreq">
@@ -5094,7 +5094,7 @@ The element object is is an inline element to identify a text fragment introduci
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="event" type="inlinereqreq">
@@ -5107,7 +5107,7 @@ The element event is an inline element to identify a text fragment introducing o
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="location" type="inlinereqreq">
@@ -5120,7 +5120,7 @@ The element location is an inline element to identify a text fragment introducin
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="process" type="inlinereqreq">
@@ -5133,7 +5133,7 @@ The element process is an inline element to identify a text fragment introducing
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="role" type="inlinereqreq">
@@ -5146,7 +5146,7 @@ The element role is an inline element to identify a text fragment introducing or
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="term" type="inlinereqreq">
@@ -5159,7 +5159,7 @@ The element term is an inline element to identify a text fragment introducing or
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="quantity">
@@ -5191,7 +5191,7 @@ the element def is an inline element used for the definition of a term used in t
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="ref">
@@ -5223,7 +5223,7 @@ the element mref is an inline element containing multiple references (each in tu
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="rref">
@@ -5274,7 +5274,7 @@ the element mod is an inline element containing the specification of a modificat
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="mmod" type="modType">
@@ -5287,7 +5287,7 @@ the element mmod is an inline element containing multiple specifications of modi
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="rmod">
@@ -5378,7 +5378,7 @@ the element ins is an inline element for the specification of editorial insertio
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="del" type="inline">
@@ -5391,7 +5391,7 @@ the element del is an inline element for the specification of editorial deletion
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="omissis" type="inline">
@@ -5404,7 +5404,7 @@ the element omissis is an inline element for the specification of a text that su
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="placeholder">
@@ -5455,19 +5455,19 @@ the element decoration is an inline element to represent a decorative aspect tha
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		AN marker elements
 		Comment: AN-specific marker elements are connected to the
 		identification of locations within the legal structure, anywhere where
 		there is text.
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -5521,7 +5521,7 @@ the break of a word at the end of the line with the attribute breakWith.</commen
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="eop" type="eolType">
@@ -5534,19 +5534,19 @@ the element eop (end of page) is a marker for where in the original text the pag
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		AN subFlow elements
 		Comment: AN-specific subFlow elements are connected to the
 		identification of structural elements that contain full structures
 		within a text content, but are not of textual nature.
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -5697,13 +5697,13 @@ the element foreign is a generic container for elements not belonging to the Ako
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:annotation>
 		    <xsd:documentation>
 		 =====================================================================
-		
+
 		Generic elements
 		Comment: All elements in this schema fall under one of five
 		content models: hierarchical container, container, block, inline
@@ -5720,8 +5720,8 @@ the element foreign is a generic container for elements not belonging to the Ako
 		Pattern: Generic Document + Role Attribute
 		Reference: http://www.xmlpatterns.com/GenericDocumentMain.shtml +
 		http://www.xmlpatterns.com/RoleAttributeMain.shtml
-		
-		===================================================================== 
+
+		=====================================================================
 		</xsd:documentation>
 	  </xsd:annotation>
 
@@ -5772,7 +5772,7 @@ the element container is a generic element for a container.</comment>
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="block">
@@ -5832,7 +5832,7 @@ the element marker is a generic element for a marker. It can be placed in a bloc
 		    </xsd:complexType>
 	  </xsd:element>
 
-	
+
 
 	  <xsd:element name="div" type="blocksreq">
       <xsd:annotation>
@@ -5844,7 +5844,7 @@ The element div is an HTML element, but is NOT used in Akoma Ntoso as in HTML. I
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="p" type="inline">
@@ -5857,7 +5857,7 @@ The element p is an HTML element and is used in Akoma Ntoso as in HTML, for the 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="span" type="inline">
@@ -5870,7 +5870,7 @@ The element span is an HTML element and is used in Akoma Ntoso as in HTML, for t
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="br" type="markeropt">
@@ -5883,7 +5883,7 @@ The element br is an HTML element and is used in Akoma Ntoso as in HTML, for the
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="b" type="inline">
@@ -5896,7 +5896,7 @@ The element b is an HTML element and is used in Akoma Ntoso as in HTML, for the 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="i" type="inline">
@@ -5909,7 +5909,7 @@ The element i is an HTML element and is used in Akoma Ntoso as in HTML, for the 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="u" type="inline">
@@ -5922,7 +5922,7 @@ The element u is an HTML element and is used in Akoma Ntoso as in HTML, for the 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="sup" type="inline">
@@ -5935,7 +5935,7 @@ The element sup is an HTML element and is used in Akoma Ntoso as in HTML, for th
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="sub" type="inline">
@@ -5948,7 +5948,7 @@ The element sub is an HTML element and is used in Akoma Ntoso as in HTML, for th
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="abbr" type="inline">
@@ -5961,7 +5961,7 @@ The element abbr is an HTML element and is used in Akoma Ntoso as in HTML, for t
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="a">
@@ -6030,7 +6030,7 @@ The element ul is an HTML element and is used in Akoma Ntoso as in HTML, for an 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="ol" type="listItems">
@@ -6043,7 +6043,7 @@ The element ol is an HTML element and is used in Akoma Ntoso as in HTML, for an 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="li">
@@ -6093,7 +6093,7 @@ The element caption is an HTML element and is used in Akoma Ntoso as in HTML, fo
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="tr">
@@ -6144,7 +6144,7 @@ The element td is an HTML element and is used in Akoma Ntoso as in HTML, for a d
 		    </xsd:complexType>
 	  </xsd:element>
 
-	
+
 
 	  <xsd:element name="meta">
 		    <xsd:complexType>
@@ -6325,7 +6325,7 @@ The element FRBRItem is the metadata container of identifying properties related
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="valueType">
@@ -6374,7 +6374,7 @@ The element FRBRthis is the metadata property containing the IRI of the specific
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="FRBRuri" type="valueType">
@@ -6387,7 +6387,7 @@ The element FRBRuri is the metadata property containing the IRI of the whole doc
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="FRBRalias">
@@ -6501,7 +6501,7 @@ The element FRBRsubtype is the metadata property containing a string for the spe
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="FRBRcountry" type="valueType">
@@ -6514,7 +6514,7 @@ The element FRBRcountry is the metadata property containing a ISO 3166-1 Alpha-2
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="FRBRnumber" type="valueType">
@@ -6527,7 +6527,7 @@ The element FRBRnumber is the metadata property containing a string or number fo
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="FRBRname" type="valueType">
@@ -6540,7 +6540,7 @@ The element FRBRname is the metadata property containing a string for the title 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="FRBRportion">
@@ -6574,7 +6574,7 @@ The element FRBRformat is the metadata property containing the Internet Media Ty
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="FRBRprescriptive" type="booleanValueType">
@@ -6587,7 +6587,7 @@ The element FRBRprescriptive is the metadata property containing a boolean value
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="FRBRversionNumber" type="valueType">
@@ -6600,7 +6600,7 @@ The element FRBRversionNumber is the metadata property containing the value of t
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="FRBRauthoritative" type="booleanValueType">
@@ -6613,7 +6613,7 @@ The element FRBRauthoritative is the metadata property containing a boolean valu
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="FRBRmasterExpression" type="linkType">
@@ -6626,7 +6626,7 @@ The element FRBRmasterExpression is the metadata property identifying the master
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="componentInfo">
@@ -6660,7 +6660,7 @@ The element preservation is the metadata property containing an arbitrary list o
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="publication">
@@ -6853,7 +6853,7 @@ The element activeModifications is a metadata container of the active modificati
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="passiveModifications" type="Amendments">
@@ -6866,7 +6866,7 @@ The element passiveModifications is a metadata container of the passive modifica
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="textualMod">
@@ -7054,7 +7054,7 @@ The element judicial is a metadata container of the analysis of the judicial arg
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="result">
@@ -7086,7 +7086,7 @@ The element supports is a metadata element specifying a reference to a source su
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="isAnalogTo" type="judicialArgumentType">
@@ -7099,7 +7099,7 @@ The element isAnalogTo is a metadata element specifying a reference to a source 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="applies" type="judicialArgumentType">
@@ -7112,7 +7112,7 @@ The element applies is a metadata element specifying a reference to a source app
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="extends" type="judicialArgumentType">
@@ -7125,7 +7125,7 @@ The element extends is a metadata element specifying a reference to a source ext
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="restricts" type="judicialArgumentType">
@@ -7138,7 +7138,7 @@ The element restricts is a metadata element specifying a reference to a source r
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="derogates" type="judicialArgumentType">
@@ -7151,7 +7151,7 @@ The element derogates is a metadata element specifying a reference to a source d
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="contrasts" type="judicialArgumentType">
@@ -7164,7 +7164,7 @@ The element contrasts is a metadata element specifying a reference to a source c
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="overrules" type="judicialArgumentType">
@@ -7177,7 +7177,7 @@ The element overrules is a metadata element specifying a reference to a source o
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="dissentsFrom" type="judicialArgumentType">
@@ -7190,7 +7190,7 @@ The element dissentsFrom is a metadata element specifying a reference to a sourc
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="putsInQuestion" type="judicialArgumentType">
@@ -7203,7 +7203,7 @@ The element putsInQuestions is a metadata element specifying a reference to a so
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="distinguishes" type="judicialArgumentType">
@@ -7216,7 +7216,7 @@ The element distinguishes is a metadata element specifying a reference to a sour
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="restrictions">
@@ -7275,7 +7275,7 @@ The element parliamentary is a metadata container of the analysis of the events 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="parliamentaryAnalysisType">
@@ -7309,7 +7309,7 @@ The element quorumVerification is a metadata container containing information ab
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="voting" type="parliamentaryAnalysisType">
@@ -7322,7 +7322,7 @@ The element voting is a metadata container containing information about an event
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="recount" type="parliamentaryAnalysisType">
@@ -7335,7 +7335,7 @@ The element recount is a metadata container containing information about an even
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:complexType name="countType">
@@ -7371,7 +7371,7 @@ The element quorum is a metadata container containing the value of a quorum in a
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="count" type="countType">
@@ -7384,13 +7384,13 @@ The element count is a metadata container containing the value of a count in a v
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="mappings">
       <xsd:annotation>
 		       <xsd:documentation>
-		 The element mapping contains a reference to the permanent wId (attribute original) of a structure, and to the eId (attribute current) such structure had during the time interval included between an initial temporalGroup and a final temporalGroup. This is useful for tracking the evolving ids of documents frequently renumbered (e,g., bills). Every single element whose wId does not match its eId needs to be represented here. 
+		 The element mapping contains a reference to the permanent wId (attribute original) of a structure, and to the eId (attribute current) such structure had during the time interval included between an initial temporalGroup and a final temporalGroup. This is useful for tracking the evolving ids of documents frequently renumbered (e,g., bills). Every single element whose wId does not match its eId needs to be represented here.
 		</xsd:documentation>
 	     </xsd:annotation>
 		    <xsd:complexType>
@@ -7401,10 +7401,10 @@ The element count is a metadata container containing the value of a count in a v
 		    </xsd:complexType>
 	  </xsd:element>
 
-	
+
 
 	  <xsd:element name="mapping">
-		
+
 
 		    <xsd:complexType>
 			      <xsd:complexContent>
@@ -7418,7 +7418,7 @@ The element count is a metadata container containing the value of a count in a v
 	  <xsd:element name="otherReferences">
       <xsd:annotation>
 		       <xsd:documentation>
-		 The element otherRef contains a legal reference to a document that is not explicitly mentioned in the content of the document. 
+		 The element otherRef contains a legal reference to a document that is not explicitly mentioned in the content of the document.
 		</xsd:documentation>
 	     </xsd:annotation>
 		    <xsd:complexType>
@@ -7429,7 +7429,7 @@ The element count is a metadata container containing the value of a count in a v
 		    </xsd:complexType>
 	  </xsd:element>
 
-	
+
 
 	  <xsd:element name="otherRef">
 		    <xsd:complexType>
@@ -7509,7 +7509,7 @@ The element source is a metadata element specifying the IRI of the source of the
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="destination" type="argumentType">
@@ -7522,7 +7522,7 @@ The element destination is a metadata element specifying the IRI of the destinat
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="force" type="periodType">
@@ -7535,7 +7535,7 @@ The element force is a metadata element specifying the period of the force modif
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="efficacy" type="periodType">
@@ -7548,7 +7548,7 @@ The element efficacy is a metadata element specifying the period of the efficacy
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="application" type="periodType">
@@ -7561,7 +7561,7 @@ The element application is a metadata element specifying the period of the appli
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="duration" type="periodType">
@@ -7574,7 +7574,7 @@ The element duration is a metadata element specifying the period of the duration
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="condition">
@@ -7606,7 +7606,7 @@ The element previous is a metadata element referring to the element (rather than
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="old" type="anyOtherType">
@@ -7619,7 +7619,7 @@ The element old is a metadata element containing (in some non-managed form) the 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="new" type="anyOtherType">
@@ -7632,7 +7632,7 @@ The element new is a metadata element containing (in some non-managed form) the 
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="domain" type="anyOtherType">
@@ -7645,13 +7645,13 @@ The element domain is a metadata element containing (in some non-managed form) t
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="temporalData">
       <xsd:annotation>
 		       <xsd:documentation>
-		 The element temporalGroup contains a list of time Intervals that need to be applied together to an element of the document that is associated to time information. Each temporal group can contain any number of time interval associated via the refersTo to a different time-specific concept. 
+		 The element temporalGroup contains a list of time Intervals that need to be applied together to an element of the document that is associated to time information. Each temporal group can contain any number of time interval associated via the refersTo to a different time-specific concept.
 		</xsd:documentation>
 	     </xsd:annotation>
 		    <xsd:complexType>
@@ -7662,12 +7662,12 @@ The element domain is a metadata element containing (in some non-managed form) t
 		    </xsd:complexType>
 	  </xsd:element>
 
-	
+
 
 	  <xsd:element name="temporalGroup">
       <xsd:annotation>
 		       <xsd:documentation>
-		 The element timeInterval contains all the data needed to identify a specific time interval. It is built either with two dates or with a date and a duration (exactly two of the 'start', 'end' and 'duration' attributes can be specified). Values of the 'start' and 'end' attributes are NOT dates, but references to event elements in the corresponding metadata section. The refers attribute is a reference to a temporal concept belonging to the Akoma Ntoso ontology and specified in the references section 
+		 The element timeInterval contains all the data needed to identify a specific time interval. It is built either with two dates or with a date and a duration (exactly two of the 'start', 'end' and 'duration' attributes can be specified). Values of the 'start' and 'end' attributes are NOT dates, but references to event elements in the corresponding metadata section. The refers attribute is a reference to a temporal concept belonging to the Akoma Ntoso ontology and specified in the references section
 		</xsd:documentation>
 	     </xsd:annotation>
 		    <xsd:complexType>
@@ -7679,10 +7679,10 @@ The element domain is a metadata element containing (in some non-managed form) t
 		    </xsd:complexType>
 	  </xsd:element>
 
-	
+
 
 	  <xsd:element name="timeInterval">
-		
+
 
 		    <xsd:complexType>
 			      <xsd:complexContent>
@@ -7766,7 +7766,7 @@ The element references is a metadata container of all the references to entities
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="original" type="referenceType">
@@ -7779,7 +7779,7 @@ The element original is a metadata reference to the Akoma Ntoso IRI of the origi
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="passiveRef" type="referenceType">
@@ -7792,7 +7792,7 @@ The element passiveRef is a metadata reference to the Akoma Ntoso IRI of a docum
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="activeRef" type="referenceType">
@@ -7805,7 +7805,7 @@ The element activeRef is a metadata reference to the Akoma Ntoso IRI of a docume
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="jurisprudence" type="referenceType">
@@ -7818,7 +7818,7 @@ The element jurisprudence is a metadata reference to the Akoma Ntoso IRI of a do
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="hasAttachment">
@@ -7869,7 +7869,7 @@ The element TLCPerson is a metadata reference to the Akoma Ntoso IRI of an ontol
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="TLCOrganization" type="referenceType">
@@ -7882,7 +7882,7 @@ The element TLCOrganization is a metadata reference to the Akoma Ntoso IRI of an
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="TLCConcept" type="referenceType">
@@ -7895,7 +7895,7 @@ The element TLCConcept is a metadata reference to the Akoma Ntoso IRI of an onto
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="TLCObject" type="referenceType">
@@ -7908,7 +7908,7 @@ The element TLCObject is a metadata reference to the Akoma Ntoso IRI of an ontol
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="TLCEvent" type="referenceType">
@@ -7921,7 +7921,7 @@ The element TLCEvent is a metadata reference to the Akoma Ntoso IRI of an ontolo
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="TLCLocation" type="referenceType">
@@ -7934,7 +7934,7 @@ The element TLCLocation is a metadata reference to the Akoma Ntoso IRI of an ont
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="TLCProcess" type="referenceType">
@@ -7947,7 +7947,7 @@ The element TLCProcess is a metadata reference to the Akoma Ntoso IRI of an onto
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="TLCRole" type="referenceType">
@@ -7960,7 +7960,7 @@ The element TLCRole is a metadata reference to the Akoma Ntoso IRI of an ontolog
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="TLCTerm" type="referenceType">
@@ -7973,7 +7973,7 @@ The element TLCTerm is a metadata reference to the Akoma Ntoso IRI of an ontolog
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="TLCReference">
@@ -8015,7 +8015,7 @@ The element note is a metadata element containing the text of the footnote and e
 				     </xsd:documentation>
 		    </xsd:annotation>
    </xsd:element>
-		
+
 
 
 	  <xsd:element name="proprietary">
@@ -8056,6 +8056,6 @@ The element presentation is a metadata container of any presentation specificati
 		    </xsd:complexType>
 	  </xsd:element>
 
-	
+
 
 </xsd:schema>

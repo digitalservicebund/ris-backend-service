@@ -4,14 +4,12 @@ import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import DateUtil from "../utils/dateUtil"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
-import DocumentUnitSearchEntryForm, {
-  DocumentUnitSearchParameter,
-} from "@/components/DocumentUnitSearchEntryForm.vue"
+import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { Query } from "@/composables/useQueryFromRoute"
-import { Court } from "@/domain/documentUnit"
+import { Court, DocumentUnitSearchParameter } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import errorMessages from "@/i18n/errors.json"
 import comboboxItemService from "@/services/comboboxItemService"
@@ -121,30 +119,6 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
       currentPage.value.empty = newEntries.length == 0
     } else {
       alert("Fehler beim Löschen der Dokumentationseinheit: " + response.data)
-    }
-  }
-}
-
-/**
- * Updates the status from 'Fremdanlage' to 'Unveröffentlicht'
- * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be updated
- */
-async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
-  const response = await service.takeOver(
-    documentUnitListEntry.documentNumber as string,
-  )
-
-  if (response.error) {
-    alert(response.error.title)
-  } else if (documentUnitListEntries.value) {
-    const index = documentUnitListEntries.value.findIndex(
-      (entry) => entry.uuid === documentUnitListEntry.uuid,
-    )
-
-    if (index !== -1) {
-      // Replace the old entry with the updated one
-      documentUnitListEntries.value[index] =
-        response.data as DocumentUnitListEntry
     }
   }
 }
@@ -290,7 +264,6 @@ const showDefaultLink = computed(() => {
           searchQuery?.scheduledOnly === 'true'
         "
         @delete-documentation-unit="handleDelete"
-        @take-over-documentation-unit="handleTakeOver"
       >
         <template v-if="isInternalUser" #newlink>
           <Button

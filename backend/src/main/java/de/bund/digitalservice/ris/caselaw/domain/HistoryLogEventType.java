@@ -7,6 +7,7 @@ public enum HistoryLogEventType {
   PROCEDURE,
   STATUS,
   HANDOVER,
+  EXTERNAL_HANDOVER,
   LEGACY_DOKEDIT,
   LEGACY_DOKABGABE
 }

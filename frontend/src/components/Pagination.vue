@@ -36,6 +36,7 @@ export type Page<T> = {
   number: number
   numberOfElements: number
   totalElements?: number
+  totalPages?: number
   first: boolean
   last: boolean
   empty: boolean
@@ -69,7 +70,10 @@ export type Page<T> = {
       flex-wrap="flex-wrap"
       justify-content="justify-center"
     >
-      <b v-if="!(page.first && page.last)">Seite {{ page.number + 1 }}: </b>
+      <b v-if="!(page.first && page.last)"
+        >Seite {{ page.number + 1
+        }}{{ page.totalPages ? " von " + page.totalPages : "" }}:
+      </b>
       <span>&nbsp;</span>
       <FlexContainer flex-direction="flex-row">
         {{

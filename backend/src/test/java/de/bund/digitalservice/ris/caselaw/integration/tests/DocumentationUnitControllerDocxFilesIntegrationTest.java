@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.CommonConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
@@ -14,6 +15,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.S3AttachmentService;
@@ -44,6 +47,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -115,6 +119,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
       TestConfig.class,
       DocumentNumberPatternConfig.class,
       S3AttachmentService.class,
+      CommonConverterService.class,
       DocxConverterService.class,
       DocxConverter.class,
       PostgresCourtRepositoryImpl.class,
@@ -148,7 +153,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private AttachmentService attachmentService;
   @Autowired private AttachmentRepository attachmentRepository;
-  @Autowired private DocxConverterService docxConverterService;
+  @Autowired private ConverterService converterService;
   @Autowired private CourtRepository courtRepository;
   @Autowired private DocumentTypeRepository documentTypeRepository;
   @MockitoSpyBean private DocumentationUnitDocxMetadataInitializationService service;
@@ -170,6 +175,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private FmxService fmxService;
+  @MockitoBean private FmxConverterService fmxConverterService;
 
   private DocumentationOfficeDTO dsDocOffice = null;
 

@@ -122,7 +122,7 @@ class TextCheckServiceTest {
                 .coreData(
                     CoreData.builder()
                         .documentationOffice(
-                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                            DocumentationOffice.builder().id(UUID.randomUUID()).build())
                         .build())
                 .shortTexts(
                     ShortTexts.builder()
@@ -158,7 +158,7 @@ class TextCheckServiceTest {
                 .coreData(
                     CoreData.builder()
                         .documentationOffice(
-                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                            DocumentationOffice.builder().id(UUID.randomUUID()).build())
                         .build())
                 .shortTexts(
                     ShortTexts.builder()
@@ -181,7 +181,7 @@ class TextCheckServiceTest {
                 .coreData(
                     CoreData.builder()
                         .documentationOffice(
-                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                            DocumentationOffice.builder().id(UUID.randomUUID()).build())
                         .build())
                 .build());
 
@@ -199,7 +199,7 @@ class TextCheckServiceTest {
                 .coreData(
                     CoreData.builder()
                         .documentationOffice(
-                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                            DocumentationOffice.builder().id(UUID.randomUUID()).build())
                         .build())
                 .longTexts(LongTexts.builder().build())
                 .build());
@@ -489,7 +489,7 @@ class TextCheckServiceTest {
             .coreData(
                 CoreData.builder()
                     .documentationOffice(
-                        DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        DocumentationOffice.builder().id(UUID.randomUUID()).build())
                     .build())
             .shortTexts(
                 ShortTexts.builder()

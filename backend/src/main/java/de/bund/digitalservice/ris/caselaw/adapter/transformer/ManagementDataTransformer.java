@@ -189,7 +189,7 @@ public class ManagementDataTransformer {
       return false;
     }
 
-    return documentationOffice.getId().equals(userDocumentationOffice.uuid());
+    return documentationOffice.getId().equals(userDocumentationOffice.id());
   }
 
   private static String transformCreatedByUserName(

@@ -68,6 +68,6 @@ public class HistoryLogTransformer {
       return false;
     }
 
-    return documentationOffice.getId().equals(userDocumentationOffice.uuid());
+    return documentationOffice.getId().equals(userDocumentationOffice.id());
   }
 }

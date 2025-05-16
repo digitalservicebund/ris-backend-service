@@ -70,7 +70,7 @@ public class AuthUtils {
   public static DocumentationOffice buildDSDocOffice() {
     return DocumentationOffice.builder()
         .abbreviation("DS")
-        .uuid(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+        .id(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
         .build();
   }
 
@@ -81,14 +81,14 @@ public class AuthUtils {
   public static DocumentationOffice buildCCRisDocOffice() {
     return DocumentationOffice.builder()
         .abbreviation("CC-RIS")
-        .uuid(UUID.fromString("f13c2fdb-5323-49aa-bc6d-09fa68c3acb9"))
+        .id(UUID.fromString("f13c2fdb-5323-49aa-bc6d-09fa68c3acb9"))
         .build();
   }
 
   public static DocumentationOffice buildBGHDocOffice() {
     return DocumentationOffice.builder()
         .abbreviation("BGH")
-        .uuid(UUID.fromString("41e62dbc-e5b6-414f-91e2-0cfe559447d1"))
+        .id(UUID.fromString("41e62dbc-e5b6-414f-91e2-0cfe559447d1"))
         .build();
   }
 

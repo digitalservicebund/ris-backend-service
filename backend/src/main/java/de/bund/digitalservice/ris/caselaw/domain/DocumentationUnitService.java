@@ -13,6 +13,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.annotations.NotNull;
 
 @Service
 @Slf4j
@@ -38,6 +40,7 @@ public class DocumentationUnitService {
   private final DocumentNumberService documentNumberService;
   private final DocumentationUnitStatusService statusService;
   private final AttachmentService attachmentService;
+  private final TransformationService transformationService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
   private final AuthService authService;
@@ -55,6 +58,7 @@ public class DocumentationUnitService {
           "/coreData/decisionDate",
           "/coreData/deviatingDecisionDates",
           "/coreData/documentType");
+  private final DocumentationUnitHistoryLogService historyLogService;
 
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
@@ -64,9 +68,11 @@ public class DocumentationUnitService {
       UserService userService,
       Validator validator,
       AttachmentService attachmentService,
+      TransformationService transformationService,
       @Lazy AuthService authService,
       PatchMapperService patchMapperService,
-      DuplicateCheckService duplicateCheckService) {
+      DuplicateCheckService duplicateCheckService,
+      DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -74,16 +80,48 @@ public class DocumentationUnitService {
     this.userService = userService;
     this.validator = validator;
     this.attachmentService = attachmentService;
+    this.transformationService = transformationService;
     this.patchMapperService = patchMapperService;
     this.statusService = statusService;
     this.authService = authService;
     this.duplicateCheckService = duplicateCheckService;
+    this.historyLogService = historyLogService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit generateNewDocumentationUnit(
       User user, Optional<DocumentationUnitCreationParameters> parameters)
       throws DocumentationUnitException {
+
+    return generateNewDocumentationUnit(user, parameters, null);
+  }
+
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public List<String> generateNewDocumentationUnitOutOfEurlexDecision(
+      User user, Optional<EurlexCreationParameters> parameters) throws DocumentationUnitException {
+
+    List<String> documentNumbers = new ArrayList<>();
+
+    if (parameters.isPresent() && !parameters.get().celexNumbers().isEmpty()) {
+      for (String celexNumber : parameters.get().celexNumbers()) {
+        documentNumbers.add(
+            generateNewDocumentationUnit(
+                    user,
+                    parameters.map(
+                        params ->
+                            DocumentationUnitCreationParameters.builder()
+                                .documentationOffice(params.documentationOffice())
+                                .build()),
+                    celexNumber)
+                .documentNumber());
+      }
+    }
+
+    return documentNumbers;
+  }
+
+  private DocumentationUnit generateNewDocumentationUnit(
+      User user, Optional<DocumentationUnitCreationParameters> parameters, String celexNumber) {
     var userDocOffice = user.documentationOffice();
     // default office is user office
     DocumentationUnitCreationParameters params =
@@ -98,7 +136,7 @@ public class DocumentationUnitService {
     boolean isExternalHandover =
         params.documentationOffice() != null
             && userDocOffice != null
-            && !userDocOffice.uuid().equals(params.documentationOffice().uuid());
+            && !userDocOffice.id().equals(params.documentationOffice().id());
 
     DocumentationUnit docUnit =
         DocumentationUnit.builder()
@@ -132,7 +170,19 @@ public class DocumentationUnitService {
     var newDocumentationUnit =
         repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
 
+    if (isExternalHandover) {
+      // TODO: Add backend integration test
+      String description =
+          "Fremdanalage angelegt für " + params.documentationOffice().abbreviation();
+      historyLogService.saveHistoryLog(
+          newDocumentationUnit.uuid(), user, HistoryLogEventType.EXTERNAL_HANDOVER, description);
+    }
+
+    if (celexNumber != null) {
+      transformationService.getDataFromEurlex(celexNumber, newDocumentationUnit);
+    }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
+
     return newDocumentationUnit;
   }
 
