@@ -44,6 +44,24 @@ const popupModalText = computed(
     `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry?.value?.documentNumber} wirklich dauerhaft löschen?`,
 )
 const scrollLock = useScrollLock(document)
+const attachmentText = (listEntry: DocumentUnitListEntry) =>
+  listEntry.hasAttachments ? "Anhang vorhanden" : "Kein Anhang vorhanden"
+
+const headNoteOrPrincipleText = (listEntry: DocumentUnitListEntry) =>
+  listEntry.hasHeadnoteOrPrinciple
+    ? "Kurztext vorhanden"
+    : "Kein Kurztext vorhanden"
+
+const trimText = (text: string, length: number = 50) =>
+  text.length > length ? `${text.slice(0, length)}...` : text
+
+const noteTooltip = (listEntry: DocumentUnitListEntry) =>
+  listEntry.note ? trimText(listEntry.note) : "Keine Notiz vorhanden"
+
+const schedulingTooltip = (publicationDate?: string) =>
+  publicationDate
+    ? `Terminierte Übergabe am\n${dayjs.utc(publicationDate).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")}`
+    : "Keine Übergabe terminiert"
 
 /**
  * Clicking on a delete icon of a list entry shows a modal, which asks for user input to proceed
@@ -177,8 +195,9 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
             <div class="flex flex-row items-center gap-8">
               <div>{{ item.documentNumber }}</div>
               <div class="flex flex-row items-center">
-                <Tooltip text="Tooltip Text">
+                <Tooltip :text="attachmentText(item)">
                   <IconAttachedFile
+                    :aria-label="attachmentText(item)"
                     class="flex-end m-4 h-20 w-20"
                     :class="
                       item.hasAttachments ? 'text-blue-800' : 'text-gray-500'
@@ -187,8 +206,9 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
                   />
                 </Tooltip>
 
-                <Tooltip text="Tooltip Text">
+                <Tooltip :text="headNoteOrPrincipleText(item)">
                   <IconSubject
+                    :aria-label="headNoteOrPrincipleText(item)"
                     class="flex-end m-4 flex h-20 w-20"
                     :class="
                       item.hasHeadnoteOrPrinciple
@@ -199,16 +219,22 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
                   />
                 </Tooltip>
 
-                <Tooltip text="Tooltip Text">
+                <Tooltip :text="noteTooltip(item)">
                   <IconNote
+                    :aria-label="noteTooltip(item)"
                     class="flex-end m-4 flex h-20 w-20"
                     :class="!!item.note ? 'text-blue-800' : 'text-gray-500'"
                     data-testid="note-icon"
                   />
                 </Tooltip>
 
-                <Tooltip text="Tooltip Text">
+                <Tooltip
+                  :text="schedulingTooltip(item.scheduledPublicationDateTime)"
+                >
                   <IconClock
+                    :aria-label="
+                      schedulingTooltip(item.scheduledPublicationDateTime)
+                    "
                     class="flex-end m-4 flex h-20 w-20"
                     :class="
                       item.scheduledPublicationDateTime
