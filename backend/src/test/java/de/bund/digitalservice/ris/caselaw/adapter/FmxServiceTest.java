@@ -13,12 +13,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +48,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
   FmxService.class,
   DocumentationUnitRepository.class,
   CourtRepository.class,
+  DocumentTypeRepository.class,
   FmxRepository.class,
   AttachmentRepository.class,
   DatabaseDocumentationUnitRepository.class,
@@ -58,6 +61,7 @@ class FmxServiceTest {
 
   @MockitoBean DocumentationUnitRepository documentationUnitRepository;
   @MockitoBean CourtRepository courtRepository;
+  @MockitoBean DocumentTypeRepository documentTypeRepository;
   @MockitoBean FmxRepository fmxRepository;
   @MockitoBean AttachmentRepository attachmentRepository;
   @MockitoBean DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
@@ -76,7 +80,7 @@ class FmxServiceTest {
   }
 
   @Test
-  void shouldAttach() {
+  void shouldAttachFmxToDocumentationUnit() {
     String celexNumber = "CELEX1234";
     UUID id = UUID.randomUUID();
     DocumentationUnit documentationUnit =
@@ -125,6 +129,8 @@ class FmxServiceTest {
         .findById(id);
     when(courtRepository.findByTypeAndLocation("EuGH", null))
         .thenReturn(Optional.ofNullable(Court.builder().label("EuGH").build()));
+    when(documentTypeRepository.findUniqueCaselawBySearchStr("Urteil"))
+        .thenReturn(Optional.of(DocumentType.builder().label("Urteil").build()));
 
     service.getDataFromEurlex(celexNumber, documentationUnit);
 
@@ -135,6 +141,7 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().decisionDate()).isEqualTo(LocalDate.of(2017, 2, 14));
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2024:60");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo("62022CJ0303");
+    assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Urteil");
   }
 
   @Test

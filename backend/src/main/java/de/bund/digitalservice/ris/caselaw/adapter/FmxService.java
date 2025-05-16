@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
@@ -13,9 +14,12 @@ import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.TransformationService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -55,12 +59,21 @@ public class FmxService implements TransformationService {
   public static final String AUTHOR_XPATH = "//AUTHOR";
   public static final String DATE_XPATH =
       "//CURR.TITLE/PAGE.HEADER/P/HT/DATE/@ISO | //CURR.TITLE/PAGE.HEADER/P/DATE/@ISO";
-  public static final String TENOR_XPATH = "//JURISDICTION";
-  public static final String REASONS_XPATH = "//CONTENTS.JUDGMENT | //CONTENTS.ORDER";
+  public static final String JURISDICTION_XPATH = "//JURISDICTION";
+  public static final String CONTENTS_XPATH =
+      "//CONTENTS.JUDGMENT | //CONTENTS.ORDER | //CONTENTS.OPINION";
   public static final String SIGNATURES_XPATH = "//SIGNATURE.CASE";
+  public static final String PREAMBLE_GEN_XPATH = "//PREAMBLE.GEN";
+  public static final String ENACTING_TERMS_CJT_XPATH = "//ENACTING.TERMS.CJT";
+  public static final String FINAL_XPATH = "//FINAL";
+
+  public static final String JUDGMENT_TYPE = "JUDGMENT";
+  public static final String ORDER_TYPE = "ORDER";
+  public static final String OPINION_TYPE = "OPINION";
 
   private final DocumentationUnitRepository documentationUnitRepository;
   private final CourtRepository courtRepository;
+  private final DocumentTypeRepository documentTypeRepository;
   private final FmxRepository fmxRepository;
   private final AttachmentRepository attachmentRepository;
   private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
@@ -74,6 +87,7 @@ public class FmxService implements TransformationService {
   public FmxService(
       DocumentationUnitRepository documentationUnitRepository,
       CourtRepository courtRepository,
+      DocumentTypeRepository documentTypeRepository,
       FmxRepository fmxRepository,
       AttachmentRepository attachmentRepository,
       DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository,
@@ -81,6 +95,7 @@ public class FmxService implements TransformationService {
       XmlUtilService xmlUtilService) {
     this.documentationUnitRepository = documentationUnitRepository;
     this.courtRepository = courtRepository;
+    this.documentTypeRepository = documentTypeRepository;
     this.fmxRepository = fmxRepository;
     this.attachmentRepository = attachmentRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
@@ -91,7 +106,9 @@ public class FmxService implements TransformationService {
   }
 
   public void getDataFromEurlex(String celexNumber, DocumentationUnit documentationUnit) {
-    String sourceUrl = "https://publications.europa.eu/resource/celex/" + celexNumber;
+    String sourceUrl =
+        "https://publications.europa.eu/resource/celex/"
+            + URLEncoder.encode(celexNumber, StandardCharsets.UTF_8);
     String fmxFileContent = eurlexRetrievalService.getDocumentFromEurlex(sourceUrl);
 
     if (Strings.isNotBlank(fmxFileContent)) {
@@ -123,20 +140,21 @@ public class FmxService implements TransformationService {
     xsltTransformer = initialiseXsltTransformer();
     try {
       final Document doc = parseFmx(fileContent);
+      String rootTag = doc.getDocumentElement().getTagName();
       String fileNumber = xPath.compile(FILE_NUMBER_XPATH).evaluate(doc);
       String ecli = xPath.compile(ECLI_XPATH).evaluate(doc);
       String celex = xPath.compile(CELEX_XPATH).evaluate(doc);
       String author = xPath.compile(AUTHOR_XPATH).evaluate(doc);
       String decisionDate = xPath.compile(DATE_XPATH).evaluate(doc);
-      Node tenor = (Node) xPath.compile(TENOR_XPATH).evaluate(doc, XPathConstants.NODE);
-      Node reasons = (Node) xPath.compile(REASONS_XPATH).evaluate(doc, XPathConstants.NODE);
+      Node jurisdiction =
+          (Node) xPath.compile(JURISDICTION_XPATH).evaluate(doc, XPathConstants.NODE);
+      Node content = (Node) xPath.compile(CONTENTS_XPATH).evaluate(doc, XPathConstants.NODE);
       Node signatures = (Node) xPath.compile(SIGNATURES_XPATH).evaluate(doc, XPathConstants.NODE);
-      if (reasons != null && tenor != null) {
-        reasons.removeChild(tenor);
-      }
-      if (reasons != null && signatures != null) {
-        reasons.appendChild(signatures);
-      }
+      Node preambleGen =
+          (Node) xPath.compile(PREAMBLE_GEN_XPATH).evaluate(doc, XPathConstants.NODE);
+      Node enactingTermsCjt =
+          (Node) xPath.compile(ENACTING_TERMS_CJT_XPATH).evaluate(doc, XPathConstants.NODE);
+      Node finalNode = (Node) xPath.compile(FINAL_XPATH).evaluate(doc, XPathConstants.NODE);
 
       CoreData.CoreDataBuilder coreDataBuilder = documentationUnit.coreData().toBuilder();
       LongTexts.LongTextsBuilder longTextsBuilder = documentationUnit.longTexts().toBuilder();
@@ -149,9 +167,29 @@ public class FmxService implements TransformationService {
       coreDataBuilder.fileNumbers(List.of(fileNumber));
       coreDataBuilder.celexNumber(celex);
       coreDataBuilder.court(transformCourt(author).orElse(null));
+      coreDataBuilder.documentType(transformDocumentType(rootTag).orElse(null));
 
-      longTextsBuilder.tenor(transformLongText(tenor));
-      longTextsBuilder.reasons(transformLongText(reasons));
+      if (JUDGMENT_TYPE.equals(rootTag) || ORDER_TYPE.equals(rootTag)) {
+        if (content != null && jurisdiction != null) {
+          content.removeChild(jurisdiction);
+        }
+        if (content != null && signatures != null) {
+          content.appendChild(signatures);
+        }
+        longTextsBuilder.tenor(transformLongText(jurisdiction));
+        longTextsBuilder.reasons(transformLongText(content));
+      } else if (OPINION_TYPE.equals(rootTag)) {
+        if (content != null && preambleGen != null && enactingTermsCjt != null) {
+          content.removeChild(preambleGen);
+          content.removeChild(enactingTermsCjt);
+        }
+        if (content != null && finalNode != null) {
+          content.appendChild(finalNode);
+        }
+        var tenor = transformLongText(preambleGen) + transformLongText(enactingTermsCjt);
+        longTextsBuilder.tenor(tenor);
+        longTextsBuilder.reasons(transformLongText(content));
+      }
 
       CoreData coreData = coreDataBuilder.build();
       LongTexts longTexts = longTextsBuilder.build();
@@ -211,6 +249,26 @@ public class FmxService implements TransformationService {
       court = courtRepository.findUniqueBySearchString(courtType);
     }
     return court;
+  }
+
+  private Optional<DocumentType> transformDocumentType(String rootTag) {
+    var rootNodeToDocTypeMap = new HashMap<String, String>();
+    rootNodeToDocTypeMap.put(JUDGMENT_TYPE, "Urteil");
+    rootNodeToDocTypeMap.put(ORDER_TYPE, "Beschluss");
+    rootNodeToDocTypeMap.put(OPINION_TYPE, "Gutachten");
+
+    var docTypeLabel = rootNodeToDocTypeMap.get(rootTag);
+    Optional<DocumentType> documentType = Optional.empty();
+    if (docTypeLabel != null) {
+      documentType = documentTypeRepository.findUniqueCaselawBySearchStr(docTypeLabel);
+    }
+    if (documentType.isEmpty() && docTypeLabel != null) {
+      var docTypes = documentTypeRepository.findCaselawBySearchStr(docTypeLabel);
+      if (!docTypes.isEmpty()) {
+        documentType = Optional.of(docTypes.getFirst());
+      }
+    }
+    return documentType;
   }
 
   private String transformLongText(Node textNode) {

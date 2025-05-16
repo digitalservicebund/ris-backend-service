@@ -87,9 +87,9 @@ public class EurLexSOAPSearchService implements SearchService {
       return Page.empty();
     }
 
-    if (!documentationOffice.abbreviation().equals("DS") &&
-        !documentationOffice.abbreviation().equals("BGH") &&
-        !documentationOffice.abbreviation().equals("BFH")) {
+    if (!documentationOffice.abbreviation().equals("DS")
+        && !documentationOffice.abbreviation().equals("BGH")
+        && !documentationOffice.abbreviation().equals("BFH")) {
       return Page.empty();
     }
 
@@ -216,7 +216,7 @@ public class EurLexSOAPSearchService implements SearchService {
         + "<sear:searchRequest>"
         + "<sear:expertQuery><![CDATA["
         + "DTS_SUBDOM = EU_CASE_LAW"
-        + " AND (FM_CODED = JUDG OR FM_CODED = ORDER)"
+        + " AND (FM_CODED = JUDG OR FM_CODED = OPIN_JUR OR FM_CODED = ORDER)"
         + " AND DD >= "
         + lastUpdate.format(DateTimeFormatter.ofPattern("dd/MM/yyy"))
         + " AND CASE_LAW_SUMMARY = false"
