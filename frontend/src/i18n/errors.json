@@ -245,5 +245,9 @@
   },
   "DOCUMENTATION_UNIT_HISTORY_LOG_COULD_NOT_BE_LOADED": {
     "title": "Die Historie konnte nicht geladen werden."
+  },
+  "DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED": {
+    "title": "Die Dokumentationseinheit konnte nicht zugewiesen werden.",
+    "description": "Laden Sie die Seite neu."
   }
 }

@@ -84,7 +84,9 @@ public class DecisionTransformer extends DocumentableTransformer {
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
                   : null)
-          .court(CourtTransformer.transformToDTO(coreData.court()));
+          .court(CourtTransformer.transformToDTO(coreData.court()))
+          .documentationOffice(
+              DocumentationOfficeTransformer.transformToDTO(coreData.documentationOffice()));
 
       builder.ecli(StringUtils.normalizeSpace(coreData.ecli()));
 

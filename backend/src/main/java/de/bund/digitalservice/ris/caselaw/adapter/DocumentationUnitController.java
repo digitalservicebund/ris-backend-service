@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
+import de.bund.digitalservice.ris.caselaw.domain.AssignDocumentationOfficeRequest;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
@@ -532,6 +533,35 @@ public class DocumentationUnitController {
       return ResponseEntity.status(HttpStatus.OK).body(result);
     } catch (DocumentationUnitNotExistsException | EntityNotFoundException ex) {
       return ResponseEntity.notFound().build();
+    }
+  }
+
+  /**
+   * Assign an existing document to another documentation office
+   *
+   * @param oidcUser the logged-in user
+   * @param uuid UUID of the documentation unit
+   * @param assignDocumentationOfficeRequest Request containing the documentation Office to assign
+   *     to
+   * @return a String response or empty response with status code 4xx if invalid auth or input
+   */
+  @PutMapping(value = "/{uuid}/assign")
+  @PreAuthorize(
+      "isAuthenticated() and @userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
+  public ResponseEntity<String> assignDocumentationOffice(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID uuid,
+      @RequestBody @Valid AssignDocumentationOfficeRequest assignDocumentationOfficeRequest) {
+    try {
+      var result =
+          service.assignDocumentationOffice(
+              uuid,
+              assignDocumentationOfficeRequest.getDocumentationOffice(),
+              userService.getUser(oidcUser));
+      return ResponseEntity.status(HttpStatus.OK).body(result);
+    } catch (DocumentationUnitException | DocumentationUnitNotExistsException e) {
+      log.error("error in assigning documentation office", e);
+      return ResponseEntity.internalServerError().build();
     }
   }
 }

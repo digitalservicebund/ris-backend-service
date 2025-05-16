@@ -484,6 +484,18 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     repository.save(documentationUnitDTO);
   }
 
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void deleteProceduresFromDocumentationUnit(DocumentationUnit documentationUnit) {
+    var documentationUnitDTOOptional = repository.findById(documentationUnit.uuid());
+    if (documentationUnitDTOOptional.isPresent()
+        && documentationUnitDTOOptional.get() instanceof DecisionDTO decisionDTO) {
+      decisionDTO.setProcedure(null);
+      decisionDTO.setProcedureHistory(new ArrayList<>());
+      repository.save(decisionDTO);
+    }
+  }
+
   private ProcedureDTO getOrCreateProcedure(
       DocumentationOfficeDTO documentationOfficeDTO, Procedure procedure) {
     if (procedure.id() == null) {
