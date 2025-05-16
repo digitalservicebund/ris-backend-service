@@ -63,8 +63,7 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     }
   }
 
-  // Runs every night at 05:05:10
-  @Scheduled(cron = "10 5 5 * * *")
+  @Scheduled(cron = "10 5 5 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "duplicate-check-job", lockAtMostFor = "PT15M")
   @Transactional
   @Override
