@@ -31,13 +31,15 @@ public class DocumentationUnitDocxMetadataInitializationService {
   }
 
   public void initializeCoreData(
-      DocumentationUnit documentationUnit, Docx2Html docx2html, User user) {
+      DocumentationUnit documentationUnit, Attachment2Html attachment2Html, User user) {
     CoreData.CoreDataBuilder builder = documentationUnit.coreData().toBuilder();
+    if (attachment2Html instanceof Docx2Html docx2html) {
 
-    initializeFieldsFromProperties(docx2html.properties(), documentationUnit, builder);
+      initializeFieldsFromProperties(docx2html.properties(), documentationUnit, builder);
 
-    if (docx2html.ecliList().size() == 1) {
-      handleEcli(documentationUnit, builder, docx2html.ecliList().getFirst());
+      if (docx2html.ecliList().size() == 1) {
+        handleEcli(documentationUnit, builder, docx2html.ecliList().getFirst());
+      }
     }
 
     DocumentationUnit updatedDocumentationUnit =

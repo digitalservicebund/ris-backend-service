@@ -38,3 +38,6 @@ neuris:
     DS: XXRE0******YY
     CC-RIS: XXRE1******YY
     # TODO: other docoffices
+
+eurlex:
+  url: https://eur-lex.europa.eu/EURLexWebService?WSDL

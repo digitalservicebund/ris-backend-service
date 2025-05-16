@@ -19,6 +19,7 @@ public class PostgresDeltaMigrationRepositoryImpl implements DeltaMigrationRepos
 
     return dbRepository
         .findByDocumentationUnitId(documentationUnitUuid)
+        .filter(originalXmlDTO -> OriginalXmlDTO.Type.JURIS.equals(originalXmlDTO.type))
         .map(
             originalXmlDTO ->
                 DeltaMigration.builder()
