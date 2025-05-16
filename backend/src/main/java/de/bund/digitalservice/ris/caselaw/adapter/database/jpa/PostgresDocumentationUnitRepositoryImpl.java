@@ -486,13 +486,40 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void deleteProceduresFromDocumentationUnit(DocumentationUnit documentationUnit) {
-    var documentationUnitDTOOptional = repository.findById(documentationUnit.uuid());
+  public void deleteProcedures(UUID documentationUnitId) {
+    if (documentationUnitId == null) {
+      return;
+    }
+    var documentationUnitDTOOptional = repository.findById(documentationUnitId);
     if (documentationUnitDTOOptional.isPresent()
         && documentationUnitDTOOptional.get() instanceof DecisionDTO decisionDTO) {
       decisionDTO.setProcedure(null);
       decisionDTO.setProcedureHistory(new ArrayList<>());
       repository.save(decisionDTO);
+    }
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void saveDocumentationOffice(
+      UUID documentationUnitId, DocumentationOffice documentationOffice, User user) {
+    if (documentationUnitId == null) {
+      return;
+    }
+    var documentationUnitDTOOptional = repository.findById(documentationUnitId);
+    if (documentationUnitDTOOptional.isPresent()
+        && documentationUnitDTOOptional.get() instanceof DecisionDTO decisionDTO) {
+      var previousDocumentationOffice = decisionDTO.getDocumentationOffice();
+      decisionDTO.setDocumentationOffice(
+          DocumentationOfficeTransformer.transformToDTO(documentationOffice));
+      repository.save(decisionDTO);
+      var description =
+          "Dokstelle geändert: [%s] → [%s]"
+              .formatted(
+                  previousDocumentationOffice.getAbbreviation(),
+                  documentationOffice.abbreviation());
+      historyLogService.saveHistoryLog(
+          documentationUnitId, user, HistoryLogEventType.DOCUMENTATION_OFFICE, description);
     }
   }
 

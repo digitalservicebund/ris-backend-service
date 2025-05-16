@@ -541,16 +541,16 @@ public class DocumentationUnitController {
    *
    * @param oidcUser the logged-in user
    * @param uuid UUID of the documentation unit
-   * @param assignDocumentationOfficeRequest Request containing the documentation Office to assign
-   *     to
-   * @return a String response or empty response with status code 4xx if invalid auth or input
+   * @param assignDocumentationOfficeRequest Request containing documentation Office to assign to
+   * @return HTTP 200 with result string for success, 404/400 for client errors, 500 for server
+   *     errors.
    */
   @PutMapping(value = "/{uuid}/assign")
   @PreAuthorize(
       "isAuthenticated() and @userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<String> assignDocumentationOffice(
       @AuthenticationPrincipal OidcUser oidcUser,
-      @PathVariable UUID uuid,
+      @PathVariable @NonNull UUID uuid,
       @RequestBody @Valid AssignDocumentationOfficeRequest assignDocumentationOfficeRequest) {
     try {
       var result =
@@ -558,10 +558,17 @@ public class DocumentationUnitController {
               uuid,
               assignDocumentationOfficeRequest.getDocumentationOffice(),
               userService.getUser(oidcUser));
-      return ResponseEntity.status(HttpStatus.OK).body(result);
-    } catch (DocumentationUnitException | DocumentationUnitNotExistsException e) {
-      log.error("error in assigning documentation office", e);
-      return ResponseEntity.internalServerError().build();
+      return ResponseEntity.ok().body(result);
+    } catch (DocumentationUnitNotExistsException e) {
+      log.warn("Documentation unit not found: {}", uuid, e);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Documentation unit not found");
+    } catch (DocumentationUnitException e) {
+      log.error(
+          "Error assigning documentation office {} to {}",
+          assignDocumentationOfficeRequest.getDocumentationOffice().abbreviation(),
+          uuid,
+          e);
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
   }
 }

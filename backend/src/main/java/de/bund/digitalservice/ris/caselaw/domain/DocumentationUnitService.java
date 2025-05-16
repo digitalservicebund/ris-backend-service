@@ -44,7 +44,6 @@ public class DocumentationUnitService {
   private final UserService userService;
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
-  private final DocumentationUnitHistoryLogService historyLogService;
   private static final List<String> pathsForDuplicateCheck =
       List.of(
           "/coreData/ecli",
@@ -67,8 +66,7 @@ public class DocumentationUnitService {
       AttachmentService attachmentService,
       @Lazy AuthService authService,
       PatchMapperService patchMapperService,
-      DuplicateCheckService duplicateCheckService,
-      DocumentationUnitHistoryLogService historyLogService) {
+      DuplicateCheckService duplicateCheckService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -80,7 +78,6 @@ public class DocumentationUnitService {
     this.statusService = statusService;
     this.authService = authService;
     this.duplicateCheckService = duplicateCheckService;
-    this.historyLogService = historyLogService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -488,40 +485,14 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException {
     Documentable documentable = repository.findByUuid(documentationUnitId, user);
     if (documentable instanceof DocumentationUnit docUnit) {
-      DocumentationUnit updatedDocUnit =
-          docUnit.toBuilder()
-              .coreData(
-                  docUnit.coreData().toBuilder()
-                      .procedure(null)
-                      .previousProcedures(List.of())
-                      .documentationOffice(documentationOffice)
-                      .build())
-              .build();
-
       // Procedures need to be deleted as they are linked to the previous documentation Office
-      repository.deleteProceduresFromDocumentationUnit(docUnit);
-      updateDocumentationUnit(updatedDocUnit, user);
-
-      addHistoryLog(documentationUnitId, documentationOffice, user, documentable);
+      repository.deleteProcedures(docUnit.uuid());
+      repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
       return "The documentation office [%s] has been successfully assigned."
           .formatted(documentationOffice.abbreviation());
     }
     throw new DocumentationUnitException(
         "The documentation office could not be reassigned: Document is not a DocumentationUnit.");
-  }
-
-  private void addHistoryLog(
-      UUID documentationUnitId,
-      DocumentationOffice documentationOffice,
-      User user,
-      Documentable documentable) {
-    var description =
-        "Dokstelle geändert: [%s] → [%s]"
-            .formatted(
-                documentable.coreData().documentationOffice().abbreviation(),
-                documentationOffice.abbreviation());
-    historyLogService.saveHistoryLog(
-        documentationUnitId, user, HistoryLogEventType.DOCUMENTATION_OFFICE, description);
   }
 
   private void saveForRecycling(Documentable documentationUnit) {
