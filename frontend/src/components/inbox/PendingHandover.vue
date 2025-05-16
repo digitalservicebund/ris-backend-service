@@ -128,18 +128,18 @@ async function handleReset() {
 
 <template>
   <div class="flex flex-col" data-testId="pending-handover-inbox">
-    <InfoModal
-      v-if="hasTakeOverError"
-      class="mb-16"
-      data-testid="take-over-error"
-      description="Bitte laden Sie die Seite neu."
-      :status="InfoStatus.ERROR"
-      title="Die Fremdanlage konnte nicht angenommen werden."
-    />
     <InboxSearch
       :is-loading="isLoading"
       @reset-search-results="handleReset"
       @search="updateQuery"
+    />
+    <InfoModal
+      v-if="hasTakeOverError"
+      class="my-16"
+      data-testid="take-over-error"
+      description="Bitte laden Sie die Seite neu."
+      :status="InfoStatus.ERROR"
+      title="Die Fremdanlage konnte nicht angenommen werden."
     />
     <InboxList
       :error="searchResponseError"
