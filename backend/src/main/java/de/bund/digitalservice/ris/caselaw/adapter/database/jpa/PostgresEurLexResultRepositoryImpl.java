@@ -20,11 +20,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PostgresEurLexResultRepository implements EurLexResultRepository {
+public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepository {
   private final DatabaseEurLexResultRepository repository;
   private final EntityManager entityManager;
 
-  public PostgresEurLexResultRepository(
+  public PostgresEurLexResultRepositoryImpl(
       DatabaseEurLexResultRepository repository, EntityManager entityManager) {
     this.repository = repository;
     this.entityManager = entityManager;
