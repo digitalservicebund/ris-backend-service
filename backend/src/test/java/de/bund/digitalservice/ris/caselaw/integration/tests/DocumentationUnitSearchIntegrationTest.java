@@ -172,12 +172,12 @@ class DocumentationUnitSearchIntegrationTest {
         .extracting("documentNumber", "fileNumber", "status")
         .containsExactly(
             tuple(
-                "MIGR202200012",
-                "AkteM",
-                Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build()),
-            tuple(
                 "NEUR202300008",
                 "AkteY",
+                Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build()),
+            tuple(
+                "MIGR202200012",
+                "AkteM",
                 Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build()));
     assertThat(responseBody.getNumberOfElements()).isEqualTo(2);
   }
@@ -219,7 +219,7 @@ class DocumentationUnitSearchIntegrationTest {
     assertThat(responseBodyWithoutFilter.getNumberOfElements()).isEqualTo(3);
     assertThat(responseBodyWithoutFilter)
         .map(DocumentationUnitListItem::documentNumber)
-        .containsExactly("ABCD202200001", "ABCD202200002", "ABCD202200003");
+        .containsExactly("ABCD202200003", "ABCD202200002", "ABCD202200001");
 
     Slice<DocumentationUnitListItem> responseBodyWithEUFilter =
         risWebTestClient
@@ -490,6 +490,7 @@ class DocumentationUnitSearchIntegrationTest {
               // index 0-4 get a "AB" docNumber
               .documentNumber((i <= 4 ? "AB" : "GE") + "123456780" + i)
               .documentationOffice(docOfficeDTO)
+              .date(LocalDate.of(2022, 1, 20 - i))
               .fileNumbers(
                   // even indices get a fileNumber
                   i % 2 == 1
