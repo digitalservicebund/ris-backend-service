@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatc
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;

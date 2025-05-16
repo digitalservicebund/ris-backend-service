@@ -49,6 +49,9 @@ public class EurLexSOAPSearchService implements SearchService {
   @Value("${eurlex.password:}")
   private String password;
 
+  @Value("${eurlex.url}")
+  private String url;
+
   private final EurLexResultRepository repository;
   private final DatabaseCourtRepository courtRepository;
 
@@ -79,9 +82,14 @@ public class EurLexSOAPSearchService implements SearchService {
       Optional<String> court,
       Optional<LocalDate> startDate,
       Optional<LocalDate> endDate) {
-    if (!documentationOffice.abbreviation().equals("DS")
-        && !documentationOffice.abbreviation().equals("BGH")
-        && !documentationOffice.abbreviation().equals("BFH")) {
+
+    if (documentationOffice == null || documentationOffice.abbreviation() == null) {
+      return Page.empty();
+    }
+
+    if (!documentationOffice.abbreviation().equals("DS") &&
+        !documentationOffice.abbreviation().equals("BGH") &&
+        !documentationOffice.abbreviation().equals("BFH")) {
       return Page.empty();
     }
 
@@ -131,7 +139,7 @@ public class EurLexSOAPSearchService implements SearchService {
     }
   }
 
-  private void requestNewestDecisions(int pageNumber, LocalDate lastUpdate) {
+  void requestNewestDecisions(int pageNumber, LocalDate lastUpdate) {
     Element searchResults;
 
     try {
@@ -139,7 +147,7 @@ public class EurLexSOAPSearchService implements SearchService {
 
       HttpRequest request =
           HttpRequest.newBuilder()
-              .uri(new URI("https://eur-lex.europa.eu/EURLexWebService?WSDL"))
+              .uri(new URI(url))
               .POST(BodyPublishers.ofString(generatePayload(pageNumber, lastUpdate)))
               .header("Content-Type", "application/soap+xml")
               .build();

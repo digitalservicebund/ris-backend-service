@@ -38,7 +38,7 @@ public class EurLexController {
       @RequestParam(value = "start-date") Optional<LocalDate> startDate,
       @RequestParam(value = "end-date") Optional<LocalDate> endDate) {
 
-    DocumentationOffice documentationOffice = userService.getUser(oidcUser).documentationOffice();
+    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
 
     return ResponseEntity.ok(
         service.getSearchResults(

@@ -26,6 +26,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -75,9 +76,9 @@ public class EurLexSearchResultTransformer {
   }
 
   private static String parseFileNumberFromTitle(String title) {
-    Pattern tPattern = Pattern.compile("T-(\\d*)/(\\d*)(\u00A0\\w)?");
+    Pattern tPattern = Pattern.compile("T-(\\d*)/(\\d*)(\u00A0[a-zA-Z]+)?");
     Matcher tMatcher = tPattern.matcher(title);
-    Pattern cPattern = Pattern.compile("C-(\\d*)/(\\d*)(\u00A0\\w)?");
+    Pattern cPattern = Pattern.compile("C-(\\d*)/(\\d*)(\u00A0[a-zA-Z]+)?");
     Matcher cMatcher = cPattern.matcher(title);
 
     List<String> fileNumbers = new ArrayList<>();
@@ -152,7 +153,9 @@ public class EurLexSearchResultTransformer {
 
     try {
       String htmlDocumentLink = xPath.compile("./document_link[@type='html']").evaluate(result);
-      builder.htmlLink(htmlDocumentLink);
+      if (Strings.isNotBlank(htmlDocumentLink)) {
+        builder.htmlLink(htmlDocumentLink);
+      }
     } catch (XPathExpressionException e) {
       throw new EurLexSearchException("Html link of the result couldn't be parsed", e);
     }
@@ -166,28 +169,36 @@ public class EurLexSearchResultTransformer {
     try {
       String title =
           xPath.compile("./content/NOTICE/EXPRESSION/EXPRESSION_TITLE/VALUE").evaluate(result);
-      builder.title(title);
+      if (Strings.isNotBlank(title)) {
+        builder.title(title);
+      }
     } catch (XPathExpressionException e) {
       throw new EurLexSearchException("Title of the result couldn't be parsed", e);
     }
 
     try {
       String ecli = xPath.compile("./content/NOTICE/WORK/ECLI/VALUE").evaluate(result);
-      builder.ecli(ecli);
+      if (Strings.isNotBlank(ecli)) {
+        builder.ecli(ecli);
+      }
     } catch (XPathExpressionException e) {
       throw new EurLexSearchException("ECLI of the result couldn't be parsed", e);
     }
 
     try {
       String celex = xPath.compile("./content/NOTICE/WORK/ID_CELEX/VALUE").evaluate(result);
-      builder.celex(celex);
+      if (Strings.isNotBlank(celex)) {
+        builder.celex(celex);
+      }
     } catch (XPathExpressionException e) {
       throw new EurLexSearchException("Celex number of the result couldn't be parsed", e);
     }
 
     try {
       String uri = xPath.compile("./content/NOTICE/WORK/URI/VALUE").evaluate(result);
-      builder.uri(uri);
+      if (Strings.isNotBlank(uri)) {
+        builder.uri(uri);
+      }
     } catch (XPathExpressionException e) {
       throw new EurLexSearchException("URI of the result couldn't be parsed", e);
     }
