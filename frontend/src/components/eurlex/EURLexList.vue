@@ -8,7 +8,7 @@ import { computed, onMounted, ref } from "vue"
 import { ComboboxItem } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
-import { DocumentationUnitParameters } from "@/domain/documentUnit"
+import { EurlexParameters } from "@/domain/documentUnit"
 import EURLexResult from "@/domain/eurlex"
 import errorMessages from "@/i18n/errors.json"
 import service from "@/services/comboboxItemService"
@@ -59,11 +59,14 @@ async function handleAssignToDocOffice() {
     noDocumentationOfficeSelected.value = true
   }
 
-  const params: DocumentationUnitParameters = {
-    documentationOffice: selectedDocumentationOffice.value,
-    celexNumber: selectedEntries.value[0].celex,
+  if (selectedDocumentationOffice.value) {
+    const params: EurlexParameters = {
+      documentationOffice: selectedDocumentationOffice.value,
+      celexNumbers: selectedEntries.value.map(({ celex }) => celex),
+    }
+
+    await documentationUnitService.createNewOutOfEurlexDecision(params)
   }
-  await documentationUnitService.createNew(params)
 }
 
 function selectRow() {
@@ -133,7 +136,7 @@ function selectDocumentationOffice() {
           </template>
         </Column>
         <Column field="fileNumber" header="Aktenzeichen"></Column>
-        <Column header="Veröffentlichungsdatum">
+        <Column header="Abzugsdatum">
           <template #body="{ data }">
             {{ dayjs(data.publicationDate).format("DD.MM.YYYY") }}
           </template>

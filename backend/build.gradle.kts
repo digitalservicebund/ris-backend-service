@@ -14,13 +14,13 @@ plugins {
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.0.3"
-    id("org.sonarqube") version "6.1.0.5360"
+    id("org.sonarqube") version "6.2.0.5505"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.8.1"
+    id("org.flywaydb.flyway") version "11.8.2"
     id("io.sentry.jvm.gradle") version "5.5.0"
 }
 
@@ -165,7 +165,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.1")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.30.2")
+    implementation("com.google.protobuf:protobuf-java:4.31.0")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.5.2")
@@ -195,7 +195,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.3")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.32") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.33") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -214,8 +214,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.14.7")
-    implementation("io.micrometer:micrometer-core:1.14.7")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.15.0")
+    implementation("io.micrometer:micrometer-core:1.15.0")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
@@ -229,10 +229,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.11.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.8.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.8.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.8.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.8.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -240,7 +240,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.17.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.5")
+    testImplementation("io.projectreactor:reactor-test:3.7.6")
     testImplementation("org.springframework.security:spring-security-test:6.4.5")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")

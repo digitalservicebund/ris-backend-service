@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
@@ -53,6 +54,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -157,6 +159,8 @@ class PatchUpdateIntegrationTest {
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private FmxService fmxService;
+  @MockitoBean private ConverterService converterService;
 
   private UUID court1Id;
   private UUID court2Id;
@@ -3125,7 +3129,7 @@ class PatchUpdateIntegrationTest {
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(3);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/id");
+                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 operation = responsePatch.patch().getOperations().get(4);
@@ -3212,7 +3216,7 @@ class PatchUpdateIntegrationTest {
                 operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/id");
+                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 operation = responsePatch.patch().getOperations().get(5);
@@ -3293,7 +3297,7 @@ class PatchUpdateIntegrationTest {
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(3);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/id");
+                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 operation = responsePatch.patch().getOperations().get(4);
@@ -3383,7 +3387,7 @@ class PatchUpdateIntegrationTest {
                 operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/id");
+                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 operation = responsePatch.patch().getOperations().get(5);
@@ -3477,7 +3481,7 @@ class PatchUpdateIntegrationTest {
                 operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/id");
+                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 operation = responsePatch.patch().getOperations().get(5);
@@ -3571,7 +3575,7 @@ class PatchUpdateIntegrationTest {
                 JsonPatchOperation operation = responsePatch.patch().getOperations().get(3);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/id");
+                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 operation = responsePatch.patch().getOperations().get(4);
@@ -3668,7 +3672,7 @@ class PatchUpdateIntegrationTest {
                 operation = responsePatch.patch().getOperations().get(4);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 replaceOperation = (ReplaceOperation) operation;
-                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/id");
+                assertThat(replaceOperation.getPath()).isEqualTo("/previousDecisions/0/uuid");
                 assertThat(replaceOperation.getValue().textValue()).isNotBlank();
 
                 operation = responsePatch.patch().getOperations().get(5);
@@ -4406,7 +4410,7 @@ class PatchUpdateIntegrationTest {
           "op": "add",
           "path": "/previousDecisions/0",
           "value": {
-            "id": null,
+            "uuid": null,
             "newEntry": false,
             "documentNumber": "%s",
             "status": {
@@ -4445,7 +4449,7 @@ class PatchUpdateIntegrationTest {
         """
         {
           "op": "replace",
-          "path": "/previousDecisions/0/id",
+          "path": "/previousDecisions/0/uuid",
           "value": "%s"
         }
         """

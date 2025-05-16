@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO.EurLexResultDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
+import de.bund.digitalservice.ris.caselaw.domain.SearchResult.SearchResultBuilder;
 import jakarta.transaction.TransactionalException;
 import java.io.StringWriter;
 import java.time.LocalDate;
@@ -25,16 +26,22 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.apache.logging.log4j.util.Strings;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/** Transformer for the transformation of EURLex search results from webservice */
 @Slf4j
 public class EurLexSearchResultTransformer {
   private EurLexSearchResultTransformer() {}
 
+  /**
+   * Transform the database object to the domain object
+   *
+   * @param eurLexResultDTO - database representation of the search result
+   * @return domain object of the search result
+   */
   public static SearchResult transformDTOToDomain(EurLexResultDTO eurLexResultDTO) {
     if (eurLexResultDTO == null) {
       return null;
@@ -42,31 +49,46 @@ public class EurLexSearchResultTransformer {
 
     String fileNumber = parseFileNumberFromTitle(eurLexResultDTO.getTitle());
 
-    return SearchResult.builder()
-        .celex(eurLexResultDTO.getCelex())
-        .ecli(eurLexResultDTO.getEcli())
-        .courtType(eurLexResultDTO.getCourt().getType())
-        .courtLocation(eurLexResultDTO.getCourt().getLocation())
-        .date(eurLexResultDTO.getDate())
-        .fileNumber(fileNumber)
-        .publicationDate(
-            LocalDate.ofInstant(eurLexResultDTO.getCreatedAt(), ZoneId.of("Europe/Berlin")))
-        .title(eurLexResultDTO.getTitle())
-        .htmlLink(eurLexResultDTO.getHtmlLink())
-        .uri(eurLexResultDTO.getUri())
-        .build();
+    SearchResultBuilder builder =
+        SearchResult.builder()
+            .celex(eurLexResultDTO.getCelex())
+            .ecli(eurLexResultDTO.getEcli())
+            .date(eurLexResultDTO.getDate())
+            .fileNumber(fileNumber)
+            .title(eurLexResultDTO.getTitle())
+            .htmlLink(eurLexResultDTO.getHtmlLink())
+            .uri(eurLexResultDTO.getUri());
+
+    if (eurLexResultDTO.getCreatedAt() == null) {
+      log.error("No created at date found. Should be set by database.");
+    } else {
+      builder.publicationDate(
+          LocalDate.ofInstant(eurLexResultDTO.getCreatedAt(), ZoneId.of("Europe/Berlin")));
+    }
+
+    if (eurLexResultDTO.getCourt() != null) {
+      builder
+          .courtType(eurLexResultDTO.getCourt().getType())
+          .courtLocation(eurLexResultDTO.getCourt().getLocation());
+    }
+
+    return builder.build();
   }
 
   private static String parseFileNumberFromTitle(String title) {
-    Pattern tPattern = Pattern.compile("T-(\\d*)/(\\d*)(\u00A0\\w)?");
+    Pattern tPattern = Pattern.compile("T-(\\d*)/(\\d*)(\u00A0[a-zA-Z]+)?");
     Matcher tMatcher = tPattern.matcher(title);
-    Pattern cPattern = Pattern.compile("C-(\\d*)/(\\d*)(\u00A0\\w)?");
+    Pattern cPattern = Pattern.compile("C-(\\d*)/(\\d*)(\u00A0[a-zA-Z]+)?");
     Matcher cMatcher = cPattern.matcher(title);
 
     List<String> fileNumbers = new ArrayList<>();
     tMatcher.results().forEach(result -> fileNumbers.add(result.group()));
     cMatcher.results().forEach(result -> fileNumbers.add(result.group()));
-    return String.join(", ", fileNumbers);
+    if (!fileNumbers.isEmpty()) {
+      return String.join(", ", fileNumbers);
+    }
+
+    return null;
   }
 
   public static List<EurLexResultDTO> transformXmlToDTO(
@@ -81,6 +103,7 @@ public class EurLexSearchResultTransformer {
       EurLexResultDTOBuilder builder = EurLexResultDTO.builder();
       parseContent(nodeList.item(i), builder, courts);
       parseDocumentLink(nodeList.item(i), builder);
+      builder.status(EurLexResultStatus.NEW);
       builder.resultXml(getXmlAsString(nodeList.item(i)));
 
       results.add(builder.build());
@@ -104,33 +127,25 @@ public class EurLexSearchResultTransformer {
     return null;
   }
 
+  /**
+   * Extract the total number of search results from the xml of the webservice
+   *
+   * @param searchResults - dom element for the list of search results
+   * @return total number of search results, 0 if no total hits element exist or multiple
+   *     representation of the element exists or the number couldn't be parsed
+   */
   public static int getTotalNum(Element searchResults) {
     NodeList totalHits = searchResults.getElementsByTagName("totalhits");
+
     if (totalHits.getLength() == 1) {
       try {
         return Integer.parseInt(totalHits.item(0).getTextContent());
-      } catch (NumberFormatException ignored) {
+      } catch (NumberFormatException ex) {
+        // format parsing exception is ignored
       }
     }
 
     return 0;
-  }
-
-  private static Pageable getPageable(Element searchResults) {
-    NodeList numHits = searchResults.getElementsByTagName("numhits");
-    NodeList page = searchResults.getElementsByTagName("page");
-
-    if (numHits.getLength() == 1 && page.getLength() == 1) {
-      try {
-        int pageValue = Integer.parseInt(page.item(0).getTextContent());
-        int numHitsValue = Integer.parseInt(numHits.item(0).getTextContent());
-
-        return PageRequest.of(pageValue - 1, numHitsValue);
-      } catch (NumberFormatException ignored) {
-      }
-    }
-
-    return Pageable.unpaged();
   }
 
   private static void parseDocumentLink(Node result, EurLexResultDTOBuilder builder) {
@@ -138,9 +153,11 @@ public class EurLexSearchResultTransformer {
 
     try {
       String htmlDocumentLink = xPath.compile("./document_link[@type='html']").evaluate(result);
-      builder.htmlLink(htmlDocumentLink);
+      if (Strings.isNotBlank(htmlDocumentLink)) {
+        builder.htmlLink(htmlDocumentLink);
+      }
     } catch (XPathExpressionException e) {
-      throw new RuntimeException(e);
+      throw new EurLexSearchException("Html link of the result couldn't be parsed", e);
     }
   }
 
@@ -152,45 +169,50 @@ public class EurLexSearchResultTransformer {
     try {
       String title =
           xPath.compile("./content/NOTICE/EXPRESSION/EXPRESSION_TITLE/VALUE").evaluate(result);
-      builder.title(title);
+      if (Strings.isNotBlank(title)) {
+        builder.title(title);
+      }
     } catch (XPathExpressionException e) {
-      throw new RuntimeException(e);
+      throw new EurLexSearchException("Title of the result couldn't be parsed", e);
     }
 
     try {
       String ecli = xPath.compile("./content/NOTICE/WORK/ECLI/VALUE").evaluate(result);
-      builder.ecli(ecli);
+      if (Strings.isNotBlank(ecli)) {
+        builder.ecli(ecli);
+      }
     } catch (XPathExpressionException e) {
-      throw new RuntimeException(e);
+      throw new EurLexSearchException("ECLI of the result couldn't be parsed", e);
     }
 
     try {
       String celex = xPath.compile("./content/NOTICE/WORK/ID_CELEX/VALUE").evaluate(result);
-      builder.celex(celex);
+      if (Strings.isNotBlank(celex)) {
+        builder.celex(celex);
+      }
     } catch (XPathExpressionException e) {
-      throw new RuntimeException(e);
+      throw new EurLexSearchException("Celex number of the result couldn't be parsed", e);
     }
 
     try {
       String uri = xPath.compile("./content/NOTICE/WORK/URI/VALUE").evaluate(result);
-      builder.uri(uri);
+      if (Strings.isNotBlank(uri)) {
+        builder.uri(uri);
+      }
     } catch (XPathExpressionException e) {
-      throw new RuntimeException(e);
+      throw new EurLexSearchException("URI of the result couldn't be parsed", e);
     }
 
     try {
       String courtId =
           xPath.compile("./content/NOTICE/WORK/WORK_CREATED_BY_AGENT/IDENTIFIER").evaluate(result);
-      switch (courtId) {
-        case "CJ":
-          builder.court(courts.get("EuGH"));
-          break;
-        case "GCEU":
-          builder.court(courts.get("EuG"));
-          break;
+      if (courtId.equals("CJ")) {
+        builder.court(courts.get("EuGH"));
+      } else if (courtId.equals("GCEU")) {
+        builder.court(courts.get("EuG"));
       }
     } catch (XPathExpressionException e) {
-      throw new RuntimeException(e);
+      throw new EurLexSearchException("Court of the result couldn't be parsed", e);
     }
 
     try {
@@ -205,7 +227,7 @@ public class EurLexSearchResultTransformer {
       int year = Integer.parseInt(yearString);
       builder.date(LocalDate.of(year, month, day));
     } catch (XPathExpressionException | NumberFormatException e) {
-      throw new RuntimeException(e);
+      throw new EurLexSearchException("Decision date of the result couldn't be parsed", e);
     }
   }
 }

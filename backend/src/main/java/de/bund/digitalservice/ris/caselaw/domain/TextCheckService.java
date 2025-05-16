@@ -171,6 +171,9 @@ public class TextCheckService {
             .findAllByDocumentationUnitId(documentationUnit.uuid())
             .stream()
             .map(IgnoredTextCheckWord::word)
+            .sorted(
+                (s1, s2) ->
+                    Integer.compare(s2.length(), s1.length())) // sort by length (long words first)
             .toList();
 
     if (ignoredTextCheckWords.isEmpty()) {
@@ -230,14 +233,10 @@ public class TextCheckService {
     document.outputSettings().prettyPrint(false);
 
     for (String ignoredWord : ignoredWords) {
-      NodeTraversor.traverse(new NoIndexNodeWrapperVisitor(htmlText, ignoredWord), document.body());
+      NodeTraversor.traverse(new NoIndexNodeWrapperVisitor(ignoredWord), document.body());
     }
 
-    var htmlWithNoIndexTags = document.body().html();
-    htmlWithNoIndexTags = htmlWithNoIndexTags.replace("&lt;noindex&gt;", "<noindex>");
-    htmlWithNoIndexTags = htmlWithNoIndexTags.replace("&lt;/noindex&gt;", "</noindex>");
-
-    return htmlWithNoIndexTags;
+    return document.body().html();
   }
 
   protected TextCheckCategoryResponse checkCategoryByHTML(
@@ -347,34 +346,56 @@ public class TextCheckService {
         .toList();
   }
 
-  /**
-   * See test method for covered cases {@code
-   * TextCheckServiceTest#testAddNoIndexTags_withMultipleCases()}
-   */
-  @SuppressWarnings("java:S3776")
-  protected record NoIndexNodeWrapperVisitor(String html, String ignoredWord)
-      implements NodeVisitor {
+  protected record NoIndexNodeWrapperVisitor(String ignoredWord) implements NodeVisitor {
 
     @Override
-    public void head(@NotNull Node node, int i) {
-      if (node instanceof TextNode textNode) {
-        String text = textNode.getWholeText();
+    public void head(@NotNull Node node, int depth) {
+      if (!(node instanceof TextNode textNode)) return;
+      if (isInsideNoIndex(textNode)) return;
 
-        Pattern exactWordsMatchPattern =
-            Pattern.compile(
-                "(?<![\\p{L}\\p{N}])" + Pattern.quote(ignoredWord) + "(?![\\p{L}\\p{N}])",
-                Pattern.UNICODE_CHARACTER_CLASS);
+      String text = textNode.getWholeText();
+      Pattern pattern =
+          Pattern.compile(
+              "(?<![\\p{L}\\p{N}])" + Pattern.quote(ignoredWord) + "(?![\\p{L}\\p{N}])",
+              Pattern.UNICODE_CHARACTER_CLASS);
+      Matcher matcher = pattern.matcher(text);
 
-        Matcher matcher = exactWordsMatchPattern.matcher(text);
+      if (!matcher.find()) return;
 
-        StringBuilder newTextBuffer = new StringBuilder();
-        while (matcher.find()) {
-          matcher.appendReplacement(newTextBuffer, "<noindex>" + matcher.group() + "</noindex>");
+      // Build new content
+      List<Node> newNodes = new ArrayList<>();
+      int lastEnd = 0;
+      matcher.reset();
+
+      while (matcher.find()) {
+        if (matcher.start() > lastEnd) {
+          newNodes.add(new TextNode(text.substring(lastEnd, matcher.start())));
         }
-        matcher.appendTail(newTextBuffer);
-
-        textNode.text(newTextBuffer.toString());
+        newNodes.add(new Element("noindex").text(matcher.group()));
+        lastEnd = matcher.end();
       }
+
+      if (lastEnd < text.length()) {
+        newNodes.add(new TextNode(text.substring(lastEnd)));
+      }
+
+      // Replace original text node
+      Node parent = textNode.parent();
+      if (parent instanceof Element element) {
+        int index = textNode.siblingIndex();
+        textNode.remove();
+        element.insertChildren(index, newNodes);
+      }
+    }
+
+    private boolean isInsideNoIndex(Node node) {
+      while (node != null) {
+        if ("noindex".equalsIgnoreCase(node.nodeName())) {
+          return true;
+        }
+        node = node.parent();
+      }
+      return false;
     }
   }
 

@@ -80,7 +80,7 @@ function resetSearch() {}
       <div></div>
       <!-- Column 3 -->
       <div class="ris-body1-regular flex flex-row items-center pl-24 lg:pl-48">
-        Celex
+        CELEX
       </div>
       <div class="ris-body1-regular flex flex-row items-center pl-24 lg:pl-48">
         Datum
@@ -88,10 +88,10 @@ function resetSearch() {}
       <div></div>
       <!-- Column 4 -->
       <div class="">
-        <InputField id="celex" label="Celex" visually-hide-label>
+        <InputField id="celex" label="CELEX" visually-hide-label>
           <InputText
             v-model="celex"
-            aria-label="Celex-Nummer Suche"
+            aria-label="CELEX-Nummer Suche"
             fluid
             size="small"
           ></InputText>

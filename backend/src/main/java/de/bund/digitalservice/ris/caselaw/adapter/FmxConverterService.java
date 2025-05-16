@@ -19,15 +19,16 @@ import org.springframework.stereotype.Service;
 public class FmxConverterService {
 
   private final FmxRepository fmxRepository;
-  private final Templates fmxToHtml;
+  private final XmlUtilService xmlUtilService;
 
   public FmxConverterService(FmxRepository fmxRepository, XmlUtilService xmlUtilService) {
     this.fmxRepository = fmxRepository;
-    fmxToHtml = xmlUtilService.getTemplates("xml/fmxToHtml.xslt");
+    this.xmlUtilService = xmlUtilService;
   }
 
   public Fmx2Html getFmx(UUID documentationUnitId) {
     try {
+      Templates fmxToHtml = xmlUtilService.getTemplates("xml/fmxToHtml.xslt");
       Transformer xsltTransformer = fmxToHtml.newTransformer();
       String content = fmxRepository.getFmxAsString(documentationUnitId);
       if (content == null || content.isEmpty()) {

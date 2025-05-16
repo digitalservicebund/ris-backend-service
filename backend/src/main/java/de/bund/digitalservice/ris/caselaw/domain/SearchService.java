@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 public interface SearchService {
   Page<SearchResult> getSearchResults(
       String page,
+      DocumentationOffice documentationOffice,
       Optional<String> fileNumber,
       Optional<String> celex,
       Optional<String> court,

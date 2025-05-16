@@ -9,9 +9,13 @@ import { useRoute, useRouter } from "vue-router"
 import EURLexSearch from "@/components/eurlex/EURLexSearch.vue"
 import EUCaselaw from "@/components/inbox/EUCaselaw.vue"
 import PendingHandover from "@/components/inbox/PendingHandover.vue"
+import useSessionStore from "@/stores/sessionStore"
 
 const route = useRoute()
 const router = useRouter()
+const sessionStore = useSessionStore()
+const documentationOfficeAbbreviation =
+  sessionStore.user?.documentationOffice?.abbreviation
 
 const tabParam = computed(() => (route.params.tab as string) ?? "fremdanlagen")
 
@@ -44,7 +48,15 @@ watch(value, async (newVal) => {
     <TabList>
       <Tab data-testid="external-handover-tab" value="0">Fremdanlagen</Tab>
       <Tab data-testid="eu-tab" value="1">EU-Rechtsprechung</Tab>
-      <Tab data-testid="eur-lex-tab" value="2">EUR-Lex</Tab>
+      <Tab
+        v-if="
+          documentationOfficeAbbreviation === 'BFH' ||
+          documentationOfficeAbbreviation === 'BGH' ||
+          documentationOfficeAbbreviation === 'DS'
+        "
+        value="2"
+        >EUR-Lex</Tab
+      >
     </TabList>
     <TabPanels>
       <TabPanel value="0">

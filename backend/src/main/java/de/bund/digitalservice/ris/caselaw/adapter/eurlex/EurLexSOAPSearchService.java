@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.SearchService;
 import java.io.IOException;
@@ -15,8 +15,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +49,9 @@ public class EurLexSOAPSearchService implements SearchService {
   @Value("${eurlex.password:}")
   private String password;
 
+  @Value("${eurlex.url}")
+  private String url;
+
   private final EurLexResultRepository repository;
   private final DatabaseCourtRepository courtRepository;
 
@@ -60,48 +66,51 @@ public class EurLexSOAPSearchService implements SearchService {
    *
    * @param page - page number to filter the decisions. The entries per page are always 100. If the
    *     page parameter is null, the first page is requested.
-   * @param fileNumber
-   * @param celex
-   * @param court
-   * @param startDate
-   * @param endDate
+   * @param fileNumber - filter option for the file number
+   * @param celex - filter option for the celex number
+   * @param court - filter option for the court
+   * @param startDate - start date as filter for the publication date
+   * @param endDate - end date as filter for the publication date
    * @return a page object with the 100 entries of the page
    */
   @Override
   public Page<SearchResult> getSearchResults(
       String page,
+      DocumentationOffice documentationOffice,
       Optional<String> fileNumber,
       Optional<String> celex,
       Optional<String> court,
       Optional<LocalDate> startDate,
       Optional<LocalDate> endDate) {
+
+    if (documentationOffice == null || documentationOffice.abbreviation() == null) {
+      return Page.empty();
+    }
+
+    if (!documentationOffice.abbreviation().equals("DS")
+        && !documentationOffice.abbreviation().equals("BGH")
+        && !documentationOffice.abbreviation().equals("BFH")) {
+      return Page.empty();
+    }
+
     int pageNumber = 0;
     if (page != null) {
       try {
         pageNumber = Integer.parseInt(page);
       } catch (NumberFormatException ignored) {
+        // ignore errors by number parsing
       }
     }
 
-    Optional<EurLexResultDTO> lastResult = repository.findTopByOrderByCreatedAtDesc();
+    requestNewestDecisions();
 
-    LocalDate lastUpdate;
-    //    if (lastResult.isEmpty()
-    //        || lastResult.get().getCreatedAt().plus(1, ChronoUnit.DAYS).isBefore(Instant.now())) {
-    //      if (lastResult.isPresent()) {
-    //
-    //        lastUpdate =
-    //            LocalDate.ofInstant(lastResult.get().getCreatedAt(), ZoneId.of("Europe/Berlin"));
-    //      } else {
-    //        lastUpdate = LocalDate.now().withDayOfMonth(1);
-    //        if (ChronoUnit.DAYS.between(lastUpdate, LocalDate.now()) < 5) {
-    //          lastUpdate = lastUpdate.minusMonths(1);
-    //        }
-    //      }
-    //
-    //      requestNewestDecisions(1, lastUpdate.minusMonths(1));
-    //    }
-    requestNewestDecisions(1, LocalDate.now().minusMonths(1));
+    if (court.isEmpty()) {
+      if (documentationOffice.abbreviation().equals("BGH")) {
+        court = Optional.of("EuG");
+      } else if (documentationOffice.abbreviation().equals("BFH")) {
+        court = Optional.of("EuGH");
+      }
+    }
 
     return repository
         .findAllBySearchParameters(
@@ -109,7 +118,28 @@ public class EurLexSOAPSearchService implements SearchService {
         .map(EurLexSearchResultTransformer::transformDTOToDomain);
   }
 
-  private void requestNewestDecisions(int pageNumber, LocalDate lastUpdate) {
+  private void requestNewestDecisions() {
+    Optional<EurLexResultDTO> lastResult = repository.findTopByOrderByCreatedAtDesc();
+
+    LocalDate lastUpdate;
+    if (lastResult.isEmpty()
+        || lastResult.get().getCreatedAt().plus(1, ChronoUnit.DAYS).isBefore(Instant.now())) {
+      if (lastResult.isPresent()) {
+
+        lastUpdate =
+            LocalDate.ofInstant(lastResult.get().getCreatedAt(), ZoneId.of("Europe/Berlin"));
+      } else {
+        lastUpdate = LocalDate.now().withDayOfMonth(1);
+        if (ChronoUnit.DAYS.between(lastUpdate, LocalDate.now()) < 5) {
+          lastUpdate = lastUpdate.minusMonths(1);
+        }
+      }
+
+      requestNewestDecisions(1, lastUpdate);
+    }
+  }
+
+  void requestNewestDecisions(int pageNumber, LocalDate lastUpdate) {
     Element searchResults;
 
     try {
@@ -117,7 +147,7 @@ public class EurLexSOAPSearchService implements SearchService {
 
       HttpRequest request =
           HttpRequest.newBuilder()
-              .uri(new URI("https://eur-lex.europa.eu/EURLexWebService?WSDL"))
+              .uri(new URI(url))
               .POST(BodyPublishers.ofString(generatePayload(pageNumber, lastUpdate)))
               .header("Content-Type", "application/soap+xml")
               .build();

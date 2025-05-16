@@ -32,9 +32,10 @@ public class JurisXmlExporterWrapper implements XmlExporter {
    * @throws TransformerException if the XML generation fails due to failed transformation
    */
   @Override
-  public XmlTransformationResult transformToXml(DocumentationUnit documentationUnit)
+  public XmlTransformationResult transformToXml(
+      DocumentationUnit documentationUnit, boolean prettyPrint)
       throws ParserConfigurationException, TransformerException {
-    ResultObject resultObject = jurisXmlExporter.generateXml(documentationUnit);
+    ResultObject resultObject = jurisXmlExporter.generateXml(documentationUnit, true, prettyPrint);
     return new XmlTransformationResult(
         resultObject.xml(),
         resultObject.status().statusCode().equals("200"),
@@ -75,7 +76,8 @@ public class JurisXmlExporterWrapper implements XmlExporter {
                   .documentNumber(reference.documentationUnit().getDocumentNumber())
                   .caselawReferences(List.of(reference))
                   .build(),
-              false);
+              false,
+              true);
       results.add(
           new XmlTransformationResult(
               resultObject.xml(),

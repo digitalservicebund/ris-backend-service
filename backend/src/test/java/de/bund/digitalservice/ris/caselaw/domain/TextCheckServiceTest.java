@@ -122,7 +122,7 @@ class TextCheckServiceTest {
                 .coreData(
                     CoreData.builder()
                         .documentationOffice(
-                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                            DocumentationOffice.builder().id(UUID.randomUUID()).build())
                         .build())
                 .shortTexts(
                     ShortTexts.builder()
@@ -158,7 +158,7 @@ class TextCheckServiceTest {
                 .coreData(
                     CoreData.builder()
                         .documentationOffice(
-                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                            DocumentationOffice.builder().id(UUID.randomUUID()).build())
                         .build())
                 .shortTexts(
                     ShortTexts.builder()
@@ -181,7 +181,7 @@ class TextCheckServiceTest {
                 .coreData(
                     CoreData.builder()
                         .documentationOffice(
-                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                            DocumentationOffice.builder().id(UUID.randomUUID()).build())
                         .build())
                 .build());
 
@@ -199,7 +199,7 @@ class TextCheckServiceTest {
                 .coreData(
                     CoreData.builder()
                         .documentationOffice(
-                            DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                            DocumentationOffice.builder().id(UUID.randomUUID()).build())
                         .build())
                 .longTexts(LongTexts.builder().build())
                 .build());
@@ -489,7 +489,7 @@ class TextCheckServiceTest {
             .coreData(
                 CoreData.builder()
                     .documentationOffice(
-                        DocumentationOffice.builder().uuid(UUID.randomUUID()).build())
+                        DocumentationOffice.builder().id(UUID.randomUUID()).build())
                     .build())
             .shortTexts(
                 ShortTexts.builder()
@@ -594,6 +594,10 @@ class TextCheckServiceTest {
         Arguments.of(
             "<em>vgl - should not add white space</em>",
             List.of("vgl"),
-            "<em><noindex>vgl</noindex> - should not add white space</em>"));
+            "<em><noindex>vgl</noindex> - should not add white space</em>"),
+        Arguments.of(
+            "<em>NJW-RR - should not nest noindex tag</em>",
+            List.of("NJW-RR", "NJW"),
+            "<em><noindex>NJW-RR</noindex> - should not nest noindex tag</em>"));
   }
 }

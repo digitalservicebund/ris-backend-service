@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.HandoverMailService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
@@ -53,6 +54,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -185,6 +187,8 @@ class HandoverMailIntegrationTest {
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private FeatureToggleService featureToggleService;
+  @MockitoBean private FmxService fmxService;
+  @MockitoBean private ConverterService converterService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService

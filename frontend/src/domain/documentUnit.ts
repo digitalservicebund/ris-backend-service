@@ -149,7 +149,6 @@ export type DocumentationUnitParameters = {
   documentType?: DocumentType
   decisionDate?: string
   fileNumber?: string
-  celexNumber?: string
   court?: Court
   reference?: Reference
 }
@@ -167,6 +166,11 @@ export type DocumentUnitSearchParameter =
   | "withError"
   | "myDocOfficeOnly"
   | "withDuplicateWarning"
+
+export type EurlexParameters = {
+  documentationOffice: DocumentationOffice
+  celexNumbers: string[]
+}
 
 export default class DocumentUnit {
   readonly uuid: string

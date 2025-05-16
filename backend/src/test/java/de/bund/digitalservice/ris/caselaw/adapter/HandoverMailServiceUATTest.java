@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -176,7 +177,8 @@ class HandoverMailServiceUATTest {
                                 .build())
                         .build()))
             .build();
-    when(xmlExporter.transformToXml(any(DocumentationUnit.class))).thenReturn(DOC_UNIT_XML);
+    when(xmlExporter.transformToXml(any(DocumentationUnit.class), anyBoolean()))
+        .thenReturn(DOC_UNIT_XML);
     when(xmlExporter.transformToXml(any(LegalPeriodicalEdition.class))).thenReturn(EDITION_XML);
     when(repository.save(DOC_UNIT_SAVED_MAIL)).thenReturn(DOC_UNIT_SAVED_MAIL);
     when(repository.save(EDITION_SAVED_MAIL)).thenReturn(EDITION_SAVED_MAIL);
@@ -202,7 +204,9 @@ class HandoverMailServiceUATTest {
                                 .build())
                         .fileNumbers(List.of("TEST"))
                         .build())
-                .build());
+                .build(),
+            false);
+
     verify(repository).save(DOC_UNIT_SAVED_MAIL);
     verify(mailSender)
         .sendMail(
@@ -326,7 +330,7 @@ class HandoverMailServiceUATTest {
             .success(false)
             .build();
 
-    when(xmlExporter.transformToXml(any(DocumentationUnit.class)))
+    when(xmlExporter.transformToXml(any(DocumentationUnit.class), anyBoolean()))
         .thenReturn(xmlWithValidationError);
 
     var response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
@@ -364,7 +368,7 @@ class HandoverMailServiceUATTest {
   @Test
   void testSendDocumentationUnit_withExceptionFromXmlExporter()
       throws ParserConfigurationException, TransformerException {
-    when(xmlExporter.transformToXml(any(DocumentationUnit.class)))
+    when(xmlExporter.transformToXml(any(DocumentationUnit.class), anyBoolean()))
         .thenThrow(ParserConfigurationException.class);
 
     HandoverException ex =

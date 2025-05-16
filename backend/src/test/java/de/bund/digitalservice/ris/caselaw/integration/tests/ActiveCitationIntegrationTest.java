@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
@@ -31,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -116,6 +118,8 @@ class ActiveCitationIntegrationTest {
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private FmxService fmxService;
+  @MockitoBean private ConverterService converterService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -789,7 +793,7 @@ class ActiveCitationIntegrationTest {
                           .activeCitations()
                           .get(0)
                           .getCitationType())
-                  .extracting("id")
+                  .extracting("uuid")
                   .isEqualTo(UUID.fromString("4e768071-1a19-43a1-8ab9-c185adec94bf"));
               assertThat(
                       response
@@ -807,7 +811,7 @@ class ActiveCitationIntegrationTest {
                           .activeCitations()
                           .get(1)
                           .getCitationType())
-                  .extracting("id")
+                  .extracting("uuid")
                   .isEqualTo(UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"));
               assertThat(
                       response
