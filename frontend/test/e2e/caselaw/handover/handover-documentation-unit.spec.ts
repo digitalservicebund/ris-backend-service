@@ -500,7 +500,6 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       })
     },
   )
-  // Due to unhandled performance issues
 
   test(
     "handover shows text check mistakes",
