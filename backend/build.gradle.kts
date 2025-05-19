@@ -188,7 +188,7 @@ dependencies {
 
     // caselaw tranformation to LDML for the communication with the portal
     implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.6")
-    implementation("net.sf.saxon:Saxon-HE:12.6")
+    implementation("net.sf.saxon:Saxon-HE:12.7")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
