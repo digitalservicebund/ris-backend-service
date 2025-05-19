@@ -29,8 +29,8 @@ public class PortalPublicationJobService {
   //                      ↓ hour (0-23)
   //                    ↓ minute (0-59)
   //                 ↓ second (0-59)
-  // Default:        0 30 2 * * * (After migration: CET: 4:30)
-  @Scheduled(cron = "0 30 2 * * *")
+  // Default:        0 30 4 * * * (After migration: 4:30)
+  @Scheduled(cron = "0 30 4 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "nightly-changelog-publish")
   public void publishNightlyChangelog() {
     try {
