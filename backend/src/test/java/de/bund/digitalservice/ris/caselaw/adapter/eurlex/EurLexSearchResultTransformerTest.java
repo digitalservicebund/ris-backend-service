@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -293,10 +292,7 @@ class EurLexSearchResultTransformerTest {
 
   @Test
   void testGetTotalNum_withNotParsableNumber_shouldReturnZero()
-      throws ParserConfigurationException,
-          IOException,
-          SAXException,
-          TransformerConfigurationException {
+      throws ParserConfigurationException, IOException, SAXException {
     String resultXml = "<result>" + "<totalhits>abc</totalhits>" + "</result>";
     Document doc =
         DocumentBuilderFactory.newInstance()
@@ -313,10 +309,7 @@ class EurLexSearchResultTransformerTest {
 
   @Test
   void testGetTotalNum_withMultipleTotalHitsValues_shouldReturnZero()
-      throws ParserConfigurationException,
-          IOException,
-          SAXException,
-          TransformerConfigurationException {
+      throws ParserConfigurationException, IOException, SAXException {
     String resultXml =
         "<result>" + "<totalhits>123</totalhits>" + "<totalhits>456</totalhits>" + "</result>";
     Document doc =

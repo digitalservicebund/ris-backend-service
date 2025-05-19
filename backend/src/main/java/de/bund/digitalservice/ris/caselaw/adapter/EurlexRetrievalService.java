@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class EurlexRetrievalService {
 
+  @SuppressWarnings("java:S5042")
   public String getDocumentFromEurlex(String sourceUrl) {
     String fmxFileContent = null;
 
@@ -39,6 +40,7 @@ public class EurlexRetrievalService {
       ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(response.body()));
 
       ZipEntry entry;
+
       while ((entry = zipInputStream.getNextEntry()) != null) {
         if (entry.getName().endsWith(".xml")) {
           fmxFileContent = new String(zipInputStream.readAllBytes(), StandardCharsets.UTF_8);

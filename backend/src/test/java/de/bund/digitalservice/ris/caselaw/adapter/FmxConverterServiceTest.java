@@ -45,6 +45,7 @@ class FmxConverterServiceTest {
   }
 
   @Test
+  @SuppressWarnings("java:S5961")
   void content_shouldReturnHtml() {
     UUID uuid = UUID.randomUUID();
     when(fmxRepository.getFmxAsString(uuid)).thenReturn(xml);

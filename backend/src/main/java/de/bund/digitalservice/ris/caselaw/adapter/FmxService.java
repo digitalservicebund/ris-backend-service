@@ -136,6 +136,7 @@ public class FmxService implements TransformationService {
     attachmentRepository.save(attachmentDTO);
   }
 
+  @SuppressWarnings("java:S3776")
   private void extractMetaDataFromFmx(String fileContent, DocumentationUnit documentationUnit) {
     xsltTransformer = initialiseXsltTransformer();
     try {
@@ -212,6 +213,7 @@ public class FmxService implements TransformationService {
     }
   }
 
+  @SuppressWarnings("java:S2755")
   private DocumentBuilder initialiseDocumentBuilder() {
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     try {
