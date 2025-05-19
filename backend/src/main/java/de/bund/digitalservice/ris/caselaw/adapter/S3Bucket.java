@@ -7,9 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -54,13 +57,15 @@ public class S3Bucket {
     return s3Response.map(bytes -> new String(bytes, StandardCharsets.UTF_8));
   }
 
-  public Optional<byte[]> get(String eli) {
+  public Optional<byte[]> get(String filename) {
     try {
-      var request = GetObjectRequest.builder().bucket(bucketName).key(eli).build();
-      var response = s3Client.getObject(request);
-      return Optional.of(response.readAllBytes());
+      GetObjectRequest request =
+          GetObjectRequest.builder().bucket(bucketName).key(filename).build();
+      ResponseBytes<GetObjectResponse> response =
+          s3Client.getObject(request, ResponseTransformer.toBytes());
+      return Optional.of(response.asByteArray());
     } catch (NoSuchKeyException e) {
-      log.error(String.format("Object key %s does not exist", eli), e);
+      log.error(String.format("Object key %s does not exist", filename), e);
     } catch (S3Exception e) {
       log.error("AWS S3 encountered an issue: {}", e.awsErrorDetails().errorMessage());
     } catch (Exception e) {

@@ -16,6 +16,7 @@ describe("attachments are shown in side panel", () => {
       props: {
         documentUnitUuid: "123",
         s3Path: "foo-path",
+        format: "docx",
       },
     })
 

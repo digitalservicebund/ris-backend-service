@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -29,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -106,6 +108,8 @@ class DocumentationUnitKeywordIntegrationTest {
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private FmxService fmxService;
+  @MockitoBean private ConverterService converterService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService

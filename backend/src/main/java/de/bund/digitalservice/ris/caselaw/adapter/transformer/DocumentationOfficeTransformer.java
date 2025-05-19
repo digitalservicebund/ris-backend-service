@@ -13,7 +13,7 @@ public class DocumentationOfficeTransformer {
         .map(
             dto ->
                 DocumentationOffice.builder()
-                    .uuid(dto.getId())
+                    .id(dto.getId())
                     .abbreviation(dto.getAbbreviation())
                     .build())
         .orElse(null);
@@ -24,7 +24,7 @@ public class DocumentationOfficeTransformer {
         .map(
             dto ->
                 DocumentationOfficeDTO.builder()
-                    .id(dto.uuid())
+                    .id(dto.id())
                     .abbreviation(dto.abbreviation())
                     .build())
         .orElse(null);

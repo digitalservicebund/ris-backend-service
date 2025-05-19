@@ -500,9 +500,8 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       })
     },
   )
-  // Due to unhandled performance issues
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip(
+
+  test(
     "handover shows text check mistakes",
     {
       tag: ["@RISDEV-254", "@RISDEV-6245"],
@@ -535,7 +534,12 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       await test.step("Validate errors are counted", async () => {
         const handover = page.getByLabel("Rechtschreibprüfung")
 
-        await expect(handover.getByLabel("Ladestatus"), {}).toBeHidden()
+        await expect(
+          handover.getByLabel("Ladestatus"),
+          "Text check might take longer then expected",
+        ).toBeHidden({
+          timeout: 20_000,
+        })
 
         await expect(
           page.getByText("Es wurden Rechtschreibfehler identifiziert:"),

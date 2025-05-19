@@ -1,0 +1,459 @@
+package de.bund.digitalservice.ris.caselaw.adapter;
+
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
+import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamSource;
+import net.sf.saxon.jaxp.SaxonTransformerFactory;
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+@ExtendWith(SpringExtension.class)
+@Import({
+  FmxService.class,
+  DocumentationUnitRepository.class,
+  CourtRepository.class,
+  DocumentTypeRepository.class,
+  FmxRepository.class,
+  AttachmentRepository.class,
+  DatabaseDocumentationUnitRepository.class,
+  EurlexRetrievalService.class,
+  XmlUtilService.class
+})
+class FmxServiceTest {
+
+  @Autowired private FmxService service;
+
+  @MockitoBean DocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean CourtRepository courtRepository;
+  @MockitoBean DocumentTypeRepository documentTypeRepository;
+  @MockitoBean FmxRepository fmxRepository;
+  @MockitoBean AttachmentRepository attachmentRepository;
+  @MockitoBean DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
+  @MockitoBean EurlexRetrievalService retrievalService;
+  @MockitoBean XmlUtilService xmlUtilService;
+
+  private final TransformerFactory transformerFactory = new SaxonTransformerFactory();
+
+  @BeforeEach
+  void setup() throws TransformerConfigurationException, IOException {
+    ClassPathResource xsltResource = new ClassPathResource("xml/fmxToHtml.xslt");
+    String fileContent = IOUtils.toString(xsltResource.getInputStream(), StandardCharsets.UTF_8);
+    Templates templates =
+        transformerFactory.newTemplates(new StreamSource(new StringReader(fileContent)));
+    when(xmlUtilService.getTemplates("xml/fmxToHtml.xslt")).thenReturn(templates);
+  }
+
+  @Test
+  void shouldAttachFmxToDocumentationUnit() {
+    String celexNumber = "CELEX1234";
+    UUID id = UUID.randomUUID();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(id)
+            .coreData(CoreData.builder().build())
+            .longTexts(LongTexts.builder().build())
+            .build();
+
+    doReturn(judgment)
+        .when(retrievalService)
+        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+    ArgumentCaptor<AttachmentDTO> attachmentCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);
+    DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
+    doReturn(Optional.of(documentationUnitDTO))
+        .when(databaseDocumentationUnitRepository)
+        .findById(id);
+
+    service.getDataFromEurlex(celexNumber, documentationUnit);
+
+    verify(attachmentRepository).save(attachmentCaptor.capture());
+    AttachmentDTO attachmentDTO = attachmentCaptor.getValue();
+    assertThat(attachmentDTO.getFilename()).isEqualTo("Originalentscheidung");
+    assertThat(attachmentDTO.getFormat()).isEqualTo("fmx");
+  }
+
+  @Test
+  void judgment_shouldExtractMetadata() {
+    String celexNumber = "62022CJ0303";
+    UUID id = UUID.randomUUID();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(id)
+            .coreData(CoreData.builder().build())
+            .longTexts(LongTexts.builder().build())
+            .build();
+
+    doReturn(judgment)
+        .when(retrievalService)
+        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
+    doReturn(Optional.of(documentationUnitDTO))
+        .when(databaseDocumentationUnitRepository)
+        .findById(id);
+    when(courtRepository.findByTypeAndLocation("EuGH", null))
+        .thenReturn(Optional.ofNullable(Court.builder().label("EuGH").build()));
+    when(documentTypeRepository.findUniqueCaselawBySearchStr("Urteil"))
+        .thenReturn(Optional.of(DocumentType.builder().label("Urteil").build()));
+
+    service.getDataFromEurlex(celexNumber, documentationUnit);
+
+    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuGH");
+    assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("C-303/22");
+    assertThat(savedDocUnit.coreData().decisionDate()).isEqualTo(LocalDate.of(2017, 2, 14));
+    assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2024:60");
+    assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
+    assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Urteil");
+  }
+
+  @Test
+  void order_shouldExtractMetadata() {
+    String celexNumber = "62018TO0235(04)";
+    UUID id = UUID.randomUUID();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(id)
+            .coreData(CoreData.builder().build())
+            .longTexts(LongTexts.builder().build())
+            .build();
+    doReturn(order)
+        .when(retrievalService)
+        .getDocumentFromEurlex(
+            "https://publications.europa.eu/resource/celex/"
+                + URLEncoder.encode(celexNumber, StandardCharsets.UTF_8));
+    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
+    doReturn(Optional.of(documentationUnitDTO))
+        .when(databaseDocumentationUnitRepository)
+        .findById(id);
+    when(courtRepository.findByTypeAndLocation("EuG", null))
+        .thenReturn(Optional.ofNullable(Court.builder().label("EuG").build()));
+    when(documentTypeRepository.findCaselawBySearchStr("Beschluss"))
+        .thenReturn(List.of(DocumentType.builder().label("Beschluss").build()));
+
+    service.getDataFromEurlex(celexNumber, documentationUnit);
+
+    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuG");
+    assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("T-235/18");
+    assertThat(savedDocUnit.coreData().decisionDate()).isEqualTo(LocalDate.of(2024, 2, 29));
+    assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:T:2024:142");
+    assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
+    assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Beschluss");
+  }
+
+  @Test
+  void opinion_shouldExtractMetadata() {
+    String celexNumber = "62013CV0001";
+    UUID id = UUID.randomUUID();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(id)
+            .coreData(CoreData.builder().build())
+            .longTexts(LongTexts.builder().build())
+            .build();
+    doReturn(opinion)
+        .when(retrievalService)
+        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
+    doReturn(Optional.of(documentationUnitDTO))
+        .when(databaseDocumentationUnitRepository)
+        .findById(id);
+    when(courtRepository.findByTypeAndLocation("EuGH", null))
+        .thenReturn(Optional.ofNullable(Court.builder().label("EuGH").build()));
+    when(documentTypeRepository.findCaselawBySearchStr("Gutachten"))
+        .thenReturn(List.of(DocumentType.builder().label("Gutachten").build()));
+
+    service.getDataFromEurlex(celexNumber, documentationUnit);
+
+    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuGH");
+    assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("Avis 1/13");
+    assertThat(savedDocUnit.coreData().decisionDate()).isEqualTo(LocalDate.of(2014, 10, 14));
+    assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2014:2303");
+    assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
+    assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Gutachten");
+  }
+
+  @Test
+  void judgment_shouldExtractLongTexts() {
+    String celexNumber = "CELEX1234";
+    UUID id = UUID.randomUUID();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(id)
+            .coreData(CoreData.builder().build())
+            .longTexts(LongTexts.builder().build())
+            .build();
+    doReturn(judgment)
+        .when(retrievalService)
+        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
+    when(databaseDocumentationUnitRepository.findById(id))
+        .thenReturn(Optional.of(documentationUnitDTO));
+
+    service.getDataFromEurlex(celexNumber, documentationUnit);
+
+    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    assertThat(savedDocUnit.longTexts().reasons()).contains("Urteil");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("Unterschriften");
+    assertThat(savedDocUnit.longTexts().reasons())
+        .doesNotContain(
+            "Aus diesen Gründen hat der Gerichtshof (Vierte Kammer) für Recht erkannt:");
+    assertThat(savedDocUnit.longTexts().tenor())
+        .contains("Aus diesen Gründen hat der Gerichtshof (Vierte Kammer) für Recht erkannt:");
+  }
+
+  @Test
+  void order_shouldExtractLongTexts() {
+    String celexNumber = "CELEX1234";
+    UUID id = UUID.randomUUID();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(id)
+            .coreData(CoreData.builder().build())
+            .longTexts(LongTexts.builder().build())
+            .build();
+    doReturn(order)
+        .when(retrievalService)
+        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
+    when(databaseDocumentationUnitRepository.findById(id))
+        .thenReturn(Optional.of(documentationUnitDTO));
+
+    service.getDataFromEurlex(celexNumber, documentationUnit);
+
+    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    assertThat(savedDocUnit.longTexts().reasons()).contains("Beschluss");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("Luxemburg, den");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("Der Kanzler");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("V.&nbsp;Di Bucci");
+    assertThat(savedDocUnit.longTexts().reasons())
+        .doesNotContain(
+            "Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:");
+    assertThat(savedDocUnit.longTexts().tenor())
+        .contains("Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:");
+  }
+
+  @Test
+  void opinion_shouldExtractLongTexts() {
+    String celexNumber = "CELEX1234";
+    UUID id = UUID.randomUUID();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(id)
+            .coreData(CoreData.builder().build())
+            .longTexts(LongTexts.builder().build())
+            .build();
+    doReturn(opinion)
+        .when(retrievalService)
+        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
+    when(databaseDocumentationUnitRepository.findById(id))
+        .thenReturn(Optional.of(documentationUnitDTO));
+
+    service.getDataFromEurlex(celexNumber, documentationUnit);
+
+    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    assertThat(savedDocUnit.longTexts().reasons()).contains("Gutachten");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("Unterschriften");
+    assertThat(savedDocUnit.longTexts().reasons())
+        .doesNotContain(
+            "Folglich äußert sich der Gerichtshof (Große Kammer) gutachtlich wie folgt:");
+    assertThat(savedDocUnit.longTexts().reasons())
+        .doesNotContain("Das Einverständnis zum Beitritt eines Drittstaats...");
+    assertThat(savedDocUnit.longTexts().tenor())
+        .contains("Folglich äußert sich der Gerichtshof (Große Kammer) gutachtlich wie folgt:");
+    assertThat(savedDocUnit.longTexts().tenor())
+        .contains("Das Einverständnis zum Beitritt eines Drittstaats...");
+  }
+
+  @Test
+  void emptyXml_shouldThrowTransformationException() {
+    String celexNumber = "CELEX1234";
+    UUID id = UUID.randomUUID();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(id)
+            .coreData(CoreData.builder().build())
+            .longTexts(LongTexts.builder().build())
+            .build();
+    doReturn("")
+        .when(retrievalService)
+        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+
+    assertThatExceptionOfType(FmxTransformationException.class)
+        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit))
+        .withMessageContaining("FMX file has no content.");
+  }
+
+  @Test
+  void malformedXml_shouldThrowTransformationException() {
+    String celexNumber = "CELEX1234";
+    UUID id = UUID.randomUUID();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(id)
+            .coreData(CoreData.builder().build())
+            .longTexts(LongTexts.builder().build())
+            .build();
+    doReturn("lorem ipsum")
+        .when(retrievalService)
+        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+    DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
+    when(databaseDocumentationUnitRepository.findById(id))
+        .thenReturn(Optional.of(documentationUnitDTO));
+
+    assertThatExceptionOfType(FmxTransformationException.class)
+        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit))
+        .withMessageContaining("Failed to parse FMX file content.");
+  }
+
+  private final String judgment =
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <JUDGMENT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:noNamespaceSchemaLocation="http://formex.publications.europa.eu/schema/formex-05.58-20161101.xd">
+          <BIB.JUDGMENT>
+              <REF.CASE FILE="n.a.">
+                  <NO.CASE>C-303/22</NO.CASE>
+              </REF.CASE>
+              <NO.CELEX>62022CJ0303</NO.CELEX>
+              <NO.ECLI ECLI="ECLI:EU:C:2024:60">EU:C:2024:60</NO.ECLI>
+              <AUTHOR>CJ</AUTHOR>
+          </BIB.JUDGMENT>
+          <CURR.TITLE>
+                  <PAGE.HEADER>
+                      <P>Urteil vom <DATE ISO="20170214">14. 2. 2017</DATE></P>
+                  </PAGE.HEADER>
+              </CURR.TITLE>
+          <CONTENTS.JUDGMENT><TXT>Urteil</TXT>
+              <JURISDICTION>
+                  <INTRO>Aus diesen Gründen hat der Gerichtshof (Vierte Kammer) für Recht erkannt:</INTRO>
+              </JURISDICTION>
+          </CONTENTS.JUDGMENT>
+          <SIGNATURE.CASE>
+              <SIGNATORY>
+                  <P>Unterschriften</P>
+              </SIGNATORY>
+          </SIGNATURE.CASE>
+      </JUDGMENT>
+      """;
+
+  private final String order =
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <ORDER xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:noNamespaceSchemaLocation="http://formex.publications.europa.eu/schema/formex-05.58-20161101.xd">
+          <BIB.ORDER>
+              <REF.CASE FILE="n.a.">
+                  <NO.CASE>T-235/18</NO.CASE>
+              </REF.CASE>
+              <NO.CELEX>62018TO0235(04)</NO.CELEX>
+              <NO.ECLI ECLI="ECLI:EU:T:2024:142">EU:T:2024:142</NO.ECLI>
+              <AUTHOR>T</AUTHOR>
+          </BIB.ORDER>
+          <CURR.TITLE>
+                  <PAGE.HEADER>
+                      <P>Beschluss vom <DATE ISO="20240229">29. 2. 2024</DATE></P>
+                  </PAGE.HEADER>
+              </CURR.TITLE>
+          <CONTENTS.ORDER><TXT>Beschluss</TXT>
+              <JURISDICTION>
+                  <INTRO>Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:</INTRO>
+              </JURISDICTION>
+          </CONTENTS.ORDER>
+          <SIGNATURE.CASE>
+              <P>Luxemburg, den <DATE ISO="20240229">29. Februar 2024</DATE></P>
+              <SIGNATORY>
+                  <P>Der Kanzler</P>
+                  <P>V. Di Bucci</P>
+              </SIGNATORY>
+          </SIGNATURE.CASE>
+      </ORDER>
+      """;
+
+  private final String opinion =
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <OPINION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:noNamespaceSchemaLocation="http://formex.publications.europa.eu/schema/formex-05.58-20161101.xd">
+          <BIB.OPINION>
+              <REF.CASE FILE="n.a.">
+                  <NO.CASE>Avis 1/13</NO.CASE>
+              </REF.CASE>
+              <NO.CELEX>62013CV0001</NO.CELEX>
+              <NO.ECLI ECLI="ECLI:EU:C:2014:2303">EU:C:2014:2303</NO.ECLI>
+              <AUTHOR>CJ</AUTHOR>
+          </BIB.OPINION>
+          <CURR.TITLE>
+                  <PAGE.HEADER>
+                      <P>GUTACHTEN 1/13 VOM vom <DATE ISO="20141014">14. 10. 2014</DATE></P>
+                  </PAGE.HEADER>
+              </CURR.TITLE>
+          <CONTENTS.OPINION><TXT>Gutachten</TXT>
+              <PREAMBLE.GEN>
+                  <P>Folglich äußert sich der Gerichtshof (Große Kammer) gutachtlich wie folgt:</P>
+              </PREAMBLE.GEN>
+              <ENACTING.TERMS.CJT>
+                  <P>Das Einverständnis zum Beitritt eines Drittstaats...</P>
+              </ENACTING.TERMS.CJT>
+               <FINAL><P>Unterschriften</P></FINAL>
+          </CONTENTS.OPINION>
+      </OPINION>
+      """;
+}

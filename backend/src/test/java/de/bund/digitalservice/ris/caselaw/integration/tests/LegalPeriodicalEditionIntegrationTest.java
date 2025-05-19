@@ -8,6 +8,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
@@ -29,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -142,6 +144,8 @@ class LegalPeriodicalEditionIntegrationTest {
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private FmxService fmxService;
+  @MockitoBean private ConverterService converterService;
 
   private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
   private final DocumentationOffice docOffice = buildDSDocOffice();

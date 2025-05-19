@@ -88,6 +88,7 @@ DB_PASSWORD=test
 AWS_ACCESS_KEY_ID=$(op read "op://Employee/NeuRIS S3/access-key-id")
 AWS_SECRET_ACCESS_KEY=$(op read "op://Employee/NeuRIS S3/secret-access-key")
 AWS_BUCKET_NAME=neuris-migration-juris-data
+EURLEX_URL=https://eur-lex.europa.eu/EURLexWebService?WSDL
 
 EOF
 

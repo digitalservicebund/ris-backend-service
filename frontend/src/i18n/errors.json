@@ -246,6 +246,18 @@
   "DOCUMENTATION_UNIT_HISTORY_LOG_COULD_NOT_BE_LOADED": {
     "title": "Die Historie konnte nicht geladen werden."
   },
+  "EURLEX_SEARCH_FAILED": {
+    "title": "Die EUR-Lex-Suche hat zu einem Fehler geführt."
+  },
+  "EURLEX_TRANSFORMATION_FAILED": {
+    "title": "Die Übernahme der EUR-Lex-Entscheidung hat zu einem Fehler geführt."
+  },
+  "EURLEX_NO_DECISION_SELECTED": {
+    "title": "Wählen Sie mindestens eine Dokumentationsseinheit aus"
+  },
+  "EURLEX_NO_DOCUMENTATION_OFFICE_SELECTED": {
+    "title": "Wählen Sie eine Dokumentationsstelle aus"
+  },
   "DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED": {
     "title": "Die Dokumentationseinheit konnte nicht zugewiesen werden.",
     "description": "Laden Sie die Seite neu."

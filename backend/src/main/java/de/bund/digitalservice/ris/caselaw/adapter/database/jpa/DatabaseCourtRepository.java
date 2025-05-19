@@ -64,4 +64,8 @@ public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
                       LIMIT :size
                       """)
   List<CourtDTO> findBySearchStr(@Param("searchStr") String searchStr, @Param("size") Integer size);
+
+  CourtDTO findByType(String type);
+
+  List<CourtDTO> findAllByTypeStartsWith(String type);
 }

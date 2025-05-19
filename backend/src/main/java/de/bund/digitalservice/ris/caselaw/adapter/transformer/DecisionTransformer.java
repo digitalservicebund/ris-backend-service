@@ -140,10 +140,11 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     if (updatedDomainObject.shortTexts() != null) {
-      addShortTexts(updatedDomainObject, builder);
+      addShortTexts(updatedDomainObject, builder, currentDto);
     } else {
+      currentDto.getDecisionNames().clear();
       builder
-          .decisionNames(Collections.emptyList())
+          .decisionNames(currentDto.getDecisionNames())
           .guidingPrinciple(null)
           .headnote(null)
           .otherHeadnote(null)
@@ -239,7 +240,9 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addShortTexts(
-      DocumentationUnit updatedDomainObject, DecisionDTOBuilder<?, ?> builder) {
+      DocumentationUnit updatedDomainObject,
+      DecisionDTOBuilder<?, ?> builder,
+      DecisionDTO currentDto) {
     ShortTexts shortTexts = updatedDomainObject.shortTexts();
 
     builder
@@ -248,13 +251,12 @@ public class DecisionTransformer extends DocumentableTransformer {
         .otherHeadnote(shortTexts.otherHeadnote())
         .headline(shortTexts.headline());
 
+    var currentDecisionNames = currentDto.getDecisionNames();
+    currentDecisionNames.clear();
     if (shortTexts.decisionName() != null) {
-      // Todo multiple decision names?
-      builder.decisionNames(
-          List.of(DecisionNameDTO.builder().value(shortTexts.decisionName()).build()));
-    } else {
-      builder.decisionNames(Collections.emptyList());
+      currentDecisionNames.add(DecisionNameDTO.builder().value(shortTexts.decisionName()).build());
     }
+    builder.decisionNames(currentDto.getDecisionNames());
   }
 
   private static void addActiveCitations(

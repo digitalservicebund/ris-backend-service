@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseUserGroupService;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.UserGroupController;
@@ -94,6 +95,7 @@ class UserGroupIntegrationTest {
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private FmxService fmxService;
 
   @MockitoBean private DatabaseUserGroupService databaseUserGroupService;
 

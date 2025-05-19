@@ -44,7 +44,7 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
   /**
    * A method to track deleted unpublished document for reuse
    *
-   * @param documentationUnitId uuid of the documentation unit
+   * @param documentationUnitId id of the documentation unit
    * @param documentationUnitNumber following by the validation pattern of juris
    * @param documentationOfficeAbbreviation office abbreviation
    */
