@@ -32,7 +32,9 @@ async function updatePage(pageNumber: number) {
   ).data
 }
 
-function resetSearch() {}
+function resetSearch() {
+  // implementation later
+}
 </script>
 
 <template>

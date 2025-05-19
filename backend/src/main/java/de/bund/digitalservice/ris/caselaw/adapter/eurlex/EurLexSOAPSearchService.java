@@ -139,6 +139,7 @@ public class EurLexSOAPSearchService implements SearchService {
     }
   }
 
+  @SuppressWarnings("java:S2142")
   void requestNewestDecisions(int pageNumber, LocalDate lastUpdate) {
     Element searchResults;
 

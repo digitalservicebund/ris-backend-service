@@ -25,6 +25,8 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
   private final DatabaseEurLexResultRepository repository;
   private final EntityManager entityManager;
 
+  private static final String CREATED_AT = "createdAt";
+
   public PostgresEurLexResultRepositoryImpl(
       DatabaseEurLexResultRepository repository, EntityManager entityManager) {
     this.repository = repository;
@@ -58,7 +60,7 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
       builderQuery.where(predicates.toArray(new Predicate[0]));
     }
 
-    builderQuery.orderBy(builder.desc(root.get("createdAt")));
+    builderQuery.orderBy(builder.desc(root.get(CREATED_AT)));
 
     Query query =
         entityManager
@@ -85,6 +87,7 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
     return new PageImpl<>(query.getResultList(), pageable, count);
   }
 
+  @SuppressWarnings("java:S107")
   private List<Predicate> generatePredicates(
       CriteriaBuilder builder,
       Root<EurLexResultDTO> root,
@@ -110,10 +113,10 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
     }
 
     startDate.ifPresent(
-        date -> predicates.add(builder.greaterThanOrEqualTo(root.get("createdAt"), date)));
+        date -> predicates.add(builder.greaterThanOrEqualTo(root.get(CREATED_AT), date)));
 
     endDate.ifPresent(
-        date -> predicates.add(builder.lessThanOrEqualTo(root.get("createdAt"), date)));
+        date -> predicates.add(builder.lessThanOrEqualTo(root.get(CREATED_AT), date)));
 
     predicates.add(builder.equal(root.get("status"), EurLexResultStatus.NEW));
 
