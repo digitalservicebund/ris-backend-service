@@ -10,7 +10,7 @@
     </xsl:template>
 
     <!-- remove BIB element - only contains metadata -->
-    <xsl:template match="BIB.JUDGMENT | BIB.ORDER"/>
+    <xsl:template match="BIB.JUDGMENT | BIB.ORDER | BIB.OPINION"/>
     <!-- remove CURR.TITLE - doesn't need to be displayed on the web -->
     <xsl:template match="CURR.TITLE"/>
 

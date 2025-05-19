@@ -216,7 +216,7 @@ public class EurLexSOAPSearchService implements SearchService {
         + "<sear:searchRequest>"
         + "<sear:expertQuery><![CDATA["
         + "DTS_SUBDOM = EU_CASE_LAW"
-        + " AND (FM_CODED = JUDG OR FM_CODED = ORDER)"
+        + " AND (FM_CODED = JUDG OR FM_CODED = OPIN_JUR OR FM_CODED = ORDER)"
         + " AND DD >= "
         + lastUpdate.format(DateTimeFormatter.ofPattern("dd/MM/yyy"))
         + " AND CASE_LAW_SUMMARY = false"
