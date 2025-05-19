@@ -145,6 +145,7 @@ function selectDocumentationOffice() {
           <template #body="{ data }">
             <Button
               v-if="data.htmlLink"
+              aria-label="Öffne Vorschau"
               class="self-start"
               icon="pi"
               severity="secondary"

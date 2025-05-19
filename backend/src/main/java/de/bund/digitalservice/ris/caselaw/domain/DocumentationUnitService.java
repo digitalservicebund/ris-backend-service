@@ -135,7 +135,8 @@ public class DocumentationUnitService {
     boolean isExternalHandover =
         params.documentationOffice() != null
             && userDocOffice != null
-            && !userDocOffice.id().equals(params.documentationOffice().id());
+            && !userDocOffice.id().equals(params.documentationOffice().id())
+            && celexNumber == null;
 
     DocumentationUnit docUnit =
         DocumentationUnit.builder()

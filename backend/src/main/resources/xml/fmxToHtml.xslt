@@ -44,36 +44,6 @@
     </xsl:template>
 
     <!-- format highlighted text https://op.europa.eu/documents/3938058/5910419/formex_manual_on_screen_version.html/#HT -->
-    <xsl:template match="HT[@TYPE = 'BOLD']">
-        <b>
-            <xsl:apply-templates/>
-        </b>
-    </xsl:template>
-
-    <xsl:template match="HT[@TYPE = 'ITALIC']">
-        <em>
-            <xsl:apply-templates/>
-        </em>
-    </xsl:template>
-
-    <xsl:template match="HT[@TYPE = 'SC']">
-        <span style="font-variant-caps: small-caps; color: red;">
-            <xsl:apply-templates/>
-        </span>
-    </xsl:template>
-
-    <xsl:template match="HT[@TYPE = 'UNDERLINE']">
-        <u>
-            <xsl:apply-templates/>
-        </u>
-    </xsl:template>
-
-    <xsl:template match="HT[@TYPE = 'EXPANDED']">
-        <span style="letter-spacing: 2px; color: blue;">
-            <xsl:apply-templates/>
-        </span>
-    </xsl:template>
-
     <xsl:template match="HT">
         <xsl:choose>
             <xsl:when test="@TYPE='BOLD'">
@@ -107,22 +77,22 @@
                 </sup>
             </xsl:when>
             <xsl:when test="@TYPE='UC'">
-                <span style="text-transform: uppercase; color: purple;">
+                <span style="text-transform: uppercase;">
                     <xsl:apply-templates/>
                 </span>
             </xsl:when>
             <xsl:when test="@TYPE='SC'">
-                <span style="font-variant-caps: small-caps; color: red;">
+                <span style="font-variant-caps: small-caps;">
                     <xsl:apply-templates/>
                 </span>
             </xsl:when>
             <xsl:when test="@TYPE='EXPANDED'">
-                <span style="letter-spacing: 2px; color: blue;">
+                <span style="letter-spacing: 2px;">
                     <xsl:apply-templates/>
                 </span>
             </xsl:when>
             <xsl:when test="@TYPE='BOX'">
-                <span style="outline: solid black; color: magenta;">
+                <span style="outline: solid black;">
                     <xsl:apply-templates/>
                 </span>
             </xsl:when>

@@ -51,8 +51,8 @@ public class PrototypePortalPublicationService extends CommonPortalPublicationSe
   //                      ↓ hour (0-23)
   //                    ↓ minute (0-59)
   //                 ↓ second (0-59)
-  // Default:        0 30 3 * * * (After migration: CET: 5:30)
-  @Scheduled(cron = "0 30 3 * * *")
+  // Default:        0 30 5 * * * (After migration: 5:30)
+  @Scheduled(cron = "0 30 5 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logPortalPublicationSanityCheck() {
     List<String> portalBucketDocumentNumbers =

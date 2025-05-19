@@ -188,7 +188,7 @@ dependencies {
 
     // caselaw tranformation to LDML for the communication with the portal
     implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.6")
-    implementation("net.sf.saxon:Saxon-HE:12.6")
+    implementation("net.sf.saxon:Saxon-HE:12.7")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
@@ -203,9 +203,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.63")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.64")
     // for local development:
-//    implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.63.jar"))
+//    implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.64.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.19.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
