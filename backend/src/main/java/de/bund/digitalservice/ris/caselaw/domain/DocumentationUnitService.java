@@ -168,7 +168,7 @@ public class DocumentationUnitService {
         repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
 
     if (celexNumber != null) {
-      transformationService.getDataFromEurlex(celexNumber, newDocumentationUnit);
+      transformationService.getDataFromEurlex(celexNumber, newDocumentationUnit, user);
     }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
 
