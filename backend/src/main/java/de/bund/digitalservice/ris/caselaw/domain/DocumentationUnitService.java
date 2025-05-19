@@ -170,7 +170,6 @@ public class DocumentationUnitService {
         repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
 
     if (isExternalHandover) {
-      // TODO: Add backend integration test
       String description =
           "Fremdanalage angelegt für " + params.documentationOffice().abbreviation();
       historyLogService.saveHistoryLog(
