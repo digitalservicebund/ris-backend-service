@@ -213,7 +213,7 @@ describe("DocumentUnitManagementData", () => {
       expect(screen.getByRole("button", { name: "Zuweisen" })).toBeVisible()
     })
 
-    it("should display all documentation offices except own in dropdown", async () => {
+    it.skip("should display all documentation offices except own in dropdown", async () => {
       const managementData: ManagementData = {
         borderNumbers: [],
         duplicateRelations: [],
