@@ -1,8 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
-import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
-import { describe, it } from "vitest"
+import { it } from "vitest"
 import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitManagementData from "@/components/management-data/DocumentUnitManagementData.vue"
@@ -20,12 +19,8 @@ vi.mock("primevue/usetoast", () => ({
 }))
 describe("DocumentUnitManagementData", () => {
   beforeEach(() => {
-    vi.restoreAllMocks()
     setActivePinia(createTestingPinia())
-    vi.spyOn(DocumentUnitHistoryLogService, "get").mockResolvedValue({
-      status: 200,
-      data: [],
-    })
+    vi.resetAllMocks()
   })
 
   it("should show doc unit metadata", () => {
@@ -164,7 +159,6 @@ describe("DocumentUnitManagementData", () => {
 
   function renderManagementData(managementData: ManagementData) {
     const store = mockDocUnitStore(managementData)
-    const user = userEvent.setup()
 
     const router = createRouter({
       history: createWebHistory(),
@@ -176,7 +170,7 @@ describe("DocumentUnitManagementData", () => {
         plugins: [router],
       },
     })
-    return { user, store, router }
+    return store
   }
 
   function duplicateRelation(docNumber: string): DuplicateRelation {
