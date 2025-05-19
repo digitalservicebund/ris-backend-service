@@ -40,11 +40,7 @@ onMounted(async () => {
   ).data.value
 
   documentationOffices.value = comboboxItems?.map(
-    (item) =>
-      ({
-        id: item.value?.id,
-        abbreviation: item.value?.abbreviation,
-      }) as DocumentationOffice,
+    ({ value }) => value as DocumentationOffice,
   )
 })
 
@@ -149,6 +145,7 @@ function selectDocumentationOffice() {
           <template #body="{ data }">
             <Button
               v-if="data.htmlLink"
+              aria-label="Öffne Vorschau"
               class="self-start"
               icon="pi"
               severity="secondary"
