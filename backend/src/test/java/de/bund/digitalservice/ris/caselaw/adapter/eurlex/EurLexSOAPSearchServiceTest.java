@@ -25,12 +25,17 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @Import({EurLexSOAPSearchService.class})
+@TestPropertySource(
+    properties = {
+      "eurlex.url=https://eur-lex.europa.eu/EURLexWebService?WSDL",
+    })
 class EurLexSOAPSearchServiceTest {
   @MockitoBean private EurLexResultRepository repository;
 
