@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class EurlexRetrievalService {
 
-  @SuppressWarnings("java:S5042")
+  @SuppressWarnings({"java:S2142", "java:S5042"})
   public String getDocumentFromEurlex(String sourceUrl) {
     String fmxFileContent = null;
 
