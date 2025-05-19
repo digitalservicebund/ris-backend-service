@@ -53,8 +53,7 @@ class FmxConverterServiceTest {
 
     // all text content should be present with given styles where applicable
     assertThat(result.html())
-        .contains(
-            "<span style=\"text-transform: uppercase; color: purple;\">Urteil des Gerichtshofs</span>");
+        .contains("<span style=\"text-transform: uppercase;\">Urteil des Gerichtshofs</span>");
     assertThat(result.html())
         .contains("<p>„Keyword one&nbsp;– Keyword two&nbsp;– Keyword three“</p>");
     assertThat(result.html()).contains("<p>25.&nbsp;Januar 2024<p>");

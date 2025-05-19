@@ -43,13 +43,13 @@ import org.xml.sax.SAXException;
 public class EurLexSOAPSearchService implements SearchService {
   private static final int PAGE_SIZE = 100;
 
-  @Value("${eurlex.username:}")
+  @Value("${eurlex.username:test}")
   private String userName;
 
-  @Value("${eurlex.password:}")
+  @Value("${eurlex.password:test}")
   private String password;
 
-  @Value("${eurlex.url}")
+  @Value("${eurlex.url:https://eur-lex.europa.eu/EURLexWebService?WSDL}")
   private String url;
 
   private final EurLexResultRepository repository;
