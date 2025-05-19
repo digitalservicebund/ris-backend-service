@@ -112,11 +112,11 @@ class AdminControllerTest {
         """
                         {
                           "event": "delivered",
-                          "tags": ["no-uuid"],
+                          "tags": ["no-id"],
                           "ignoredKey": 123
                         }""";
 
-    when(mailTrackingService.processMailSendingState("no-uuid", "delivered"))
+    when(mailTrackingService.processMailSendingState("no-id", "delivered"))
         .thenReturn(ResponseEntity.noContent().build());
     when(mailTrackingService.mapEventToStatus("delivered")).thenReturn(MailStatus.SUCCESS);
 
@@ -130,7 +130,7 @@ class AdminControllerTest {
         .expectStatus()
         .isNoContent();
 
-    verify(mailTrackingService).processMailSendingState("no-uuid", "delivered");
+    verify(mailTrackingService).processMailSendingState("no-id", "delivered");
   }
 
   @Test

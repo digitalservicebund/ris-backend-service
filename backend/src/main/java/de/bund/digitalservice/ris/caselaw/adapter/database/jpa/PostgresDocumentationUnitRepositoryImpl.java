@@ -225,6 +225,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // reference to a
     // persisted documentation unit
     DecisionDTO savedDocUnit = repository.save(documentationUnitDTO);
+
     return DecisionTransformer.transformToDomain(savedDocUnit, user);
   }
 

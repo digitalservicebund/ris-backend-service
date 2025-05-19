@@ -7,6 +7,7 @@ import { Page } from "@/components/Pagination.vue"
 import DocumentUnit, {
   DocumentationUnitParameters,
   DuplicateRelationStatus,
+  EurlexParameters,
 } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import PendingProceeding from "@/domain/pendingProceeding"
@@ -27,6 +28,10 @@ interface DocumentUnitService {
   createNew(
     params?: DocumentationUnitParameters,
   ): Promise<ServiceResponse<DocumentUnit>>
+
+  createNewOutOfEurlexDecision(
+    params?: EurlexParameters,
+  ): Promise<ServiceResponse<string[]>>
 
   update(
     documentUnitUuid: string,
@@ -124,6 +129,26 @@ const service: DocumentUnitService = {
         ...(response.data as DocumentUnit),
       })
     }
+    return response
+  },
+  async createNewOutOfEurlexDecision(parameters?: EurlexParameters) {
+    const response = await httpClient.put<EurlexParameters, string[]>(
+      "caselaw/documentunits/new/eurlex",
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      parameters,
+    )
+
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.DOCUMENT_UNIT_CREATION_FAILED.title,
+      }
+    }
+
     return response
   },
 

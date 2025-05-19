@@ -44,7 +44,7 @@ class HistoryLogTransformerTest {
         User.builder()
             .documentationOffice(
                 DocumentationOffice.builder()
-                    .uuid(docOfficeId)
+                    .id(docOfficeId)
                     .abbreviation(officeAbbreviation)
                     .build())
             .build();
@@ -95,7 +95,7 @@ class HistoryLogTransformerTest {
     User user =
         User.builder()
             .documentationOffice(
-                DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+                DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
             .build();
 
     HistoryLog expected =
@@ -143,7 +143,7 @@ class HistoryLogTransformerTest {
     User user =
         User.builder()
             .documentationOffice(
-                DocumentationOffice.builder().uuid(UUID.randomUUID()).abbreviation("DS").build())
+                DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
             .build();
 
     HistoryLog expected =

@@ -10,6 +10,7 @@ import fileService from "@/services/attachmentService"
 const props = defineProps<{
   documentUnitUuid?: string
   s3Path?: string
+  format?: string
 }>()
 
 const isLoading = ref(false)
@@ -18,10 +19,11 @@ const fileAsHTML = ref<Docx2HTML>()
 
 const getAttachmentHTML = async () => {
   isLoading.value = true
-  if (props.documentUnitUuid && props.s3Path) {
+  if (props.documentUnitUuid && props.format) {
     const htmlResponse = await fileService.getAttachmentAsHtml(
       props.documentUnitUuid,
       props.s3Path,
+      props.format,
     )
     isLoading.value = false
     if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data

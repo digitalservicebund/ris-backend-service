@@ -18,6 +18,7 @@ import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -73,6 +74,7 @@ class DocumentationUnitServiceTest {
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean UserService userService;
   @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
+  @MockitoBean private FmxService fmxService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
@@ -82,7 +84,7 @@ class DocumentationUnitServiceTest {
           DocumentNumberPatternException,
           DocumentNumberFormatterException {
     DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
+        DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
@@ -123,10 +125,10 @@ class DocumentationUnitServiceTest {
           DocumentNumberPatternException,
           DocumentNumberFormatterException {
     DocumentationOffice userDocumentationOffice =
-        DocumentationOffice.builder().abbreviation("BAG").uuid(UUID.randomUUID()).build();
+        DocumentationOffice.builder().abbreviation("BAG").id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(userDocumentationOffice).build();
     DocumentationOffice designatedDocumentationOffice =
-        DocumentationOffice.builder().abbreviation("BGH").uuid(UUID.randomUUID()).build();
+        DocumentationOffice.builder().abbreviation("BGH").id(UUID.randomUUID()).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
     DocumentationUnitCreationParameters parameters =
         DocumentationUnitCreationParameters.builder()

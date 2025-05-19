@@ -21,7 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
-import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
@@ -67,6 +67,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -193,7 +194,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
-  @MockitoBean private DocxConverterService docxConverterService;
+  @MockitoBean private ConverterService converterService;
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private AttachmentService attachmentService;
@@ -202,6 +203,7 @@ class DocumentationUnitIntegrationTest {
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
+  @MockitoBean private FmxService fmxService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService

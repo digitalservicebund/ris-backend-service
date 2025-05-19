@@ -1,4 +1,4 @@
-import { RisUiLocale, RisUiTheme } from "@digitalservicebund/ris-ui/primevue"
+import { RisUiLocale } from "@digitalservicebund/ris-ui/primevue"
 import * as Sentry from "@sentry/vue"
 import { createHead } from "@unhead/vue/client"
 import { createPinia } from "pinia"
@@ -9,6 +9,7 @@ import "@/styles/global.css"
 import App from "./App.vue"
 import router from "./router"
 import useSessionStore from "./stores/sessionStore"
+import CaselawUiTheme from "@/theme"
 import { filterConsoleWarnings } from "@/utils/filterConsoleWarnings"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import "@digitalservicebund/ris-ui/fonts.css"
@@ -17,7 +18,7 @@ filterConsoleWarnings()
 
 const app = createApp(App).use(PrimeVue, {
   unstyled: true,
-  pt: RisUiTheme,
+  pt: CaselawUiTheme,
   locale: RisUiLocale.deDE,
 })
 app.directive("ctrl-enter", onSearchShortcutDirective)
