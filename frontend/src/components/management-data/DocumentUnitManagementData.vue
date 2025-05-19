@@ -87,7 +87,6 @@ const assignDocumentationOffice = async () => {
         severity: "success",
         summary: "Zuweisen erfolgreich",
         detail: `Die Dokumentationseinheit ${documentUnit.value!.documentNumber} ist jetzt in der Zuständigkeit der Dokumentationsstelle ${documentationOffice.value?.abbreviation}.`,
-        styleClass: "custom-toast",
         life: 5_000,
       })
     }
