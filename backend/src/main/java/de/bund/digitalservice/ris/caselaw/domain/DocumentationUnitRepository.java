@@ -75,6 +75,8 @@ public interface DocumentationUnitRepository {
 
   void save(Documentable documentable, User currentUser);
 
+  void save(Documentable documentable, User currentUser, String description);
+
   /**
    * Save the keywords of a documentation unit
    *
