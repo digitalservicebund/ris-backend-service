@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -126,6 +127,7 @@ class DocumentationUnitSearchIntegrationTest {
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private FmxService fmxService;
   @MockitoBean private ConverterService converterService;
+  @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService

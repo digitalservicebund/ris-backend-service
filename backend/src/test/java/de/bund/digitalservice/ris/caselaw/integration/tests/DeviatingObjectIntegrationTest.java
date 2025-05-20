@@ -29,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigr
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -115,6 +116,7 @@ class DeviatingObjectIntegrationTest {
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private FmxService fmxService;
   @MockitoBean private ConverterService converterService;
+  @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService

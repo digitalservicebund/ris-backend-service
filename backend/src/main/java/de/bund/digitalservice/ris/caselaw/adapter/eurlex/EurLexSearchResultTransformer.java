@@ -23,6 +23,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -185,22 +186,14 @@ public class EurLexSearchResultTransformer {
       throw new EurLexSearchException("ECLI of the result couldn't be parsed", e);
     }
 
+    String celex = null;
     try {
-      String celex = xPath.compile("./content/NOTICE/WORK/ID_CELEX/VALUE").evaluate(result);
+      celex = xPath.compile("./content/NOTICE/WORK/ID_CELEX/VALUE").evaluate(result);
       if (Strings.isNotBlank(celex)) {
         builder.celex(celex);
       }
     } catch (XPathExpressionException e) {
       throw new EurLexSearchException("Celex number of the result couldn't be parsed", e);
-    }
-
-    try {
-      String uri = xPath.compile("./content/NOTICE/WORK/URI/VALUE").evaluate(result);
-      if (Strings.isNotBlank(uri)) {
-        builder.uri(uri);
-      }
-    } catch (XPathExpressionException e) {
-      throw new EurLexSearchException("URI of the result couldn't be parsed", e);
     }
 
     try {
@@ -228,6 +221,21 @@ public class EurLexSearchResultTransformer {
       builder.date(LocalDate.of(year, month, day));
     } catch (XPathExpressionException | NumberFormatException e) {
       throw new EurLexSearchException("Decision date of the result couldn't be parsed", e);
+    }
+
+    try {
+      NodeList manifestations =
+          (NodeList)
+              xPath
+                  .compile("./content//MANIFESTATION/SAMEAS/URI/VALUE")
+                  .evaluate(result, XPathConstants.NODESET);
+      for (int i = 0; i < manifestations.getLength(); i++) {
+        if (manifestations.item(i).getTextContent().contains("/celex/" + celex + ".DEU.fmx4")) {
+          builder.uri(manifestations.item(i).getTextContent());
+        }
+      }
+    } catch (XPathExpressionException e) {
+      throw new EurLexSearchException("FMX4 manifestation of the result couldn't be parsed", e);
     }
   }
 }

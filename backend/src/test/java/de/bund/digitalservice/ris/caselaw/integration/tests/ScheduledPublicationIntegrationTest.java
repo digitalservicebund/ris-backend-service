@@ -38,6 +38,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverR
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -139,6 +140,7 @@ class ScheduledPublicationIntegrationTest {
   @MockitoBean private FeatureToggleService featureToggleService;
   @MockitoBean private FmxService fmxService;
   @MockitoBean private ConverterService converterService;
+  @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService

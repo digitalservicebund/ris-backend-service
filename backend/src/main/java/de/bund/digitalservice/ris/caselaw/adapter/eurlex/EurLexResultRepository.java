@@ -12,13 +12,15 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface EurLexResultRepository {
   Optional<EurLexResultDTO> findTopByOrderByCreatedAtDesc();
 
-  Page<EurLexResultDTO> findAllBySearchParameters(
+  Page<EurLexResultDTO> findAllNewWithUriBySearchParameters(
       Pageable pageable,
       Optional<String> fileNumber,
       Optional<String> celex,
       Optional<String> court,
       Optional<LocalDate> startDate,
       Optional<LocalDate> endDate);
+
+  List<EurLexResultDTO> findAllByCelexNumbers(List<String> celexNumbers);
 
   void saveAll(List<EurLexResultDTO> transformedList);
 }

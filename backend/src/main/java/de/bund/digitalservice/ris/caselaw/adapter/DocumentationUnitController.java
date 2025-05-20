@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -77,6 +78,7 @@ public class DocumentationUnitController {
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
   private final DuplicateCheckService duplicateCheckService;
+  private final EurLexSOAPSearchService eurLexSOAPSearchService;
 
   public DocumentationUnitController(
       DocumentationUnitService service,
@@ -87,7 +89,8 @@ public class DocumentationUnitController {
       PortalPublicationService portalPublicationService,
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService,
-      DuplicateCheckService duplicateCheckService) {
+      DuplicateCheckService duplicateCheckService,
+      EurLexSOAPSearchService eurLexSOAPSearchService) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
@@ -97,6 +100,7 @@ public class DocumentationUnitController {
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
     this.duplicateCheckService = duplicateCheckService;
+    this.eurLexSOAPSearchService = eurLexSOAPSearchService;
   }
 
   /**
@@ -136,11 +140,15 @@ public class DocumentationUnitController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody(required = false) Optional<EurlexCreationParameters> parameters) {
     try {
-
-      List<String> documentationNumbers =
-          service.generateNewDocumentationUnitOutOfEurlexDecision(
-              userService.getUser(oidcUser), parameters);
-      return ResponseEntity.status(HttpStatus.CREATED).body(documentationNumbers);
+      if (parameters.isPresent()) {
+        List<String> documentationNumbers =
+            service.generateNewDocumentationUnitOutOfEurlexDecision(
+                userService.getUser(oidcUser), parameters);
+        eurLexSOAPSearchService.updateResultStatus(parameters.get().celexNumbers());
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentationNumbers);
+      }
+      log.error("Missing eurlex creation parameters.");
+      return ResponseEntity.badRequest().body(List.of("Missing eurlex creation parameters."));
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
       return ResponseEntity.internalServerError().body(Collections.emptyList());

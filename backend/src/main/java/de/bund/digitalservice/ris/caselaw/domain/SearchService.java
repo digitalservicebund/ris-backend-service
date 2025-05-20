@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 
@@ -13,4 +14,6 @@ public interface SearchService {
       Optional<String> court,
       Optional<LocalDate> startDate,
       Optional<LocalDate> endDate);
+
+  void updateResultStatus(List<String> celexNumbers);
 }
