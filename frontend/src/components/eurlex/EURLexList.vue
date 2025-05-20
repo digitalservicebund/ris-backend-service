@@ -66,6 +66,8 @@ async function handleAssignToDocOffice() {
     }
 
     await documentationUnitService.createNewOutOfEurlexDecision(params)
+
+    selectedEntries.value = []
   }
 }
 
@@ -84,7 +86,7 @@ function selectDocumentationOffice() {
     <div class="flex">
       <Select
         v-model="selectedDocumentationOffice"
-        aria-label="Dokumentationstelle auswählen"
+        aria-label="Dokumentationsstelle auswählen"
         class="w-2xs"
         option-label="abbreviation"
         :options="documentationOffices"
@@ -92,6 +94,7 @@ function selectDocumentationOffice() {
         @change="selectDocumentationOffice"
       ></Select>
       <Button
+        aria-label="Dokumentationsstelle zuweisen"
         class="ml-8"
         label="Zuweisen"
         severity="secondary"

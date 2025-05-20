@@ -42,5 +42,5 @@ languagetool:
   language: de-DE
 
 eurlex:
-  username: ${EURLEX_USERNAME}
-  password: ${EURLEX_PASSWORD}
+#  username: ${EURLEX_USERNAME}
+#  password: ${EURLEX_PASSWORD}
