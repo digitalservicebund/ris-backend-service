@@ -157,7 +157,7 @@ const isFetchingOrTyping = ref(false)
  */
 async function updateCurrentItems() {
   isFetchingOrTyping.value = true
-  if (canAbort?.value) {
+  if (canAbort.value) {
     abort()
   }
   const response = await debouncedFetchItems()

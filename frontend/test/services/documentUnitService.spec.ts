@@ -67,10 +67,6 @@ describe("documentUnitService", () => {
 
   describe("assign Documentation office", () => {
     it("should return error with unsuccessful status", async () => {
-      const documentationOffice = {
-        id: "documentationOfficeId",
-        abbreviation: "BGH",
-      }
       const httpMock = vi.spyOn(HttpClient, "put").mockResolvedValue({
         status: 400,
         data: "error",
@@ -78,7 +74,7 @@ describe("documentUnitService", () => {
 
       const response = await service.assignDocumentationOffice(
         "documentationUnitId",
-        documentationOffice.id,
+        "documentationOfficeId",
       )
 
       expect(response).toEqual({
@@ -91,17 +87,11 @@ describe("documentUnitService", () => {
       })
 
       expect(httpMock).toHaveBeenCalledWith(
-        `caselaw/documentunits/documentationUnitId/assign/${documentationOffice.id}`,
-        {},
-        {},
+        `caselaw/documentunits/documentationUnitId/assign/documentationOfficeId`,
       )
     })
 
     it("should return data on success", async () => {
-      const documentationOffice = {
-        id: "documentationOfficeId",
-        abbreviation: "BGH",
-      }
       const httpMock = vi.spyOn(HttpClient, "put").mockResolvedValue({
         status: 200,
         data: "success",
@@ -109,7 +99,7 @@ describe("documentUnitService", () => {
 
       const response = await service.assignDocumentationOffice(
         "documentationUnitId",
-        documentationOffice.id,
+        "documentationOfficeId",
       )
 
       expect(response).toEqual({
@@ -118,9 +108,7 @@ describe("documentUnitService", () => {
       })
 
       expect(httpMock).toHaveBeenCalledWith(
-        `caselaw/documentunits/documentationUnitId/assign/${documentationOffice.id}`,
-        {},
-        {},
+        `caselaw/documentunits/documentationUnitId/assign/documentationOfficeId`,
       )
     })
   })

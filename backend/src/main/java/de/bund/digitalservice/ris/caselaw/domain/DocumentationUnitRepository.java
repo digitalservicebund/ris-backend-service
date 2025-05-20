@@ -117,7 +117,7 @@ public interface DocumentationUnitRepository {
    *
    * @param id the UUID of the documentation unit to save the new documentation office for
    * @param user the {@link User}
-   * @return newDocumentationOfficeAbbreviation
+   * @return abbreviation of the newly assigned documentation office
    */
   String saveDocumentationOffice(UUID id, UUID documentationOfficeId, User user);
 
