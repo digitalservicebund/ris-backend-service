@@ -1462,6 +1462,7 @@ class DocumentationUnitIntegrationTest {
     LegalPeriodicalDTO legalPeriodical =
         legalPeriodicalRepository.save(
             LegalPeriodicalDTO.builder()
+                .jurisId(1)
                 .abbreviation("ABC")
                 .primaryReference(true)
                 .title("Longer title")
@@ -1508,6 +1509,7 @@ class DocumentationUnitIntegrationTest {
     LegalPeriodicalDTO legalPeriodical =
         legalPeriodicalRepository.save(
             LegalPeriodicalDTO.builder()
+                .jurisId(2)
                 .abbreviation("ABC")
                 .primaryReference(true)
                 .title("Longer title")
