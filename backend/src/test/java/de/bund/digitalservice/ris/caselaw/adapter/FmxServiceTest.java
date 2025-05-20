@@ -274,6 +274,9 @@ class FmxServiceTest {
     DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Urteil");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Unterschriften");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("<p>Verfahrenssprache: Englisch.</p>");
+    assertThat(savedDocUnit.longTexts().reasons())
+        .doesNotContain("Beschluss des Gerichts (Zweite erweiterte Kammer)");
     assertThat(savedDocUnit.longTexts().reasons())
         .doesNotContain(
             "Aus diesen Gründen hat der Gerichtshof (Vierte Kammer) für Recht erkannt:");
@@ -315,6 +318,8 @@ class FmxServiceTest {
     assertThat(savedDocUnit.longTexts().reasons())
         .doesNotContain(
             "Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("<p>Verfahrenssprache: Deutsch.</p>");
+    assertThat(savedDocUnit.longTexts().reasons()).doesNotContain("25.&nbsp;Januar 2024");
     assertThat(savedDocUnit.longTexts().tenor())
         .contains("Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:");
   }
@@ -424,6 +429,14 @@ class FmxServiceTest {
                       <P>Urteil vom <DATE ISO="20170214">14. 2. 2017</DATE></P>
                   </PAGE.HEADER>
               </CURR.TITLE>
+          <TITLE>
+              <TI>
+                  <P>Beschluss des Gerichts (Zweite erweiterte Kammer)</P>
+                  <NOTE TYPE="FOOTNOTE" NUMBERING="STAR" NOTE.ID="E0001" NUMBERING.CONTINUED="YES">
+                      <P>Verfahrenssprache: Englisch.</P>
+                  </NOTE>
+              </TI>
+          </TITLE>
           <CONTENTS.JUDGMENT><TXT>Urteil</TXT>
               <JURISDICTION>
                   <INTRO>Aus diesen Gründen hat der Gerichtshof (Vierte Kammer) für Recht erkannt:</INTRO>
@@ -455,6 +468,16 @@ class FmxServiceTest {
                       <P>Beschluss vom <DATE ISO="20240229">29. 2. 2024</DATE></P>
                   </PAGE.HEADER>
               </CURR.TITLE>
+          <TITLE>
+              <TI>
+                  <P>
+                      <DATE ISO="20240125">25. Januar 2024</DATE>
+                      <NOTE TYPE="FOOTNOTE" NUMBERING="STAR" NOTE.ID="E0001">
+                          <P>Verfahrenssprache: Deutsch.</P>
+                      </NOTE>
+                  </P>
+              </TI>
+          </TITLE>
           <CONTENTS.ORDER><TXT>Beschluss</TXT>
               <JURISDICTION>
                   <INTRO>Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:</INTRO>
