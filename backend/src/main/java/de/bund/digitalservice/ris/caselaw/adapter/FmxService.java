@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.TransformationService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
@@ -178,7 +179,11 @@ public class FmxService implements TransformationService {
       }
 
       DocumentationUnit updatedDocumentationUnit =
-          documentationUnit.toBuilder().coreData(coreData).longTexts(longTexts).build();
+          documentationUnit.toBuilder()
+              .inboxStatus(InboxStatus.EU)
+              .coreData(coreData)
+              .longTexts(longTexts)
+              .build();
 
       documentationUnitRepository.save(
           updatedDocumentationUnit,

@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -157,6 +158,7 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2024:60");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Urteil");
+    assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
   @Test
@@ -199,6 +201,7 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:T:2024:142");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Beschluss");
+    assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
   @Test
@@ -239,6 +242,7 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2014:2303");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Gutachten");
+    assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
   @Test
