@@ -78,7 +78,7 @@ describe("documentUnitService", () => {
 
       const response = await service.assignDocumentationOffice(
         "documentationUnitId",
-        documentationOffice,
+        documentationOffice.id,
       )
 
       expect(response).toEqual({
@@ -91,9 +91,9 @@ describe("documentUnitService", () => {
       })
 
       expect(httpMock).toHaveBeenCalledWith(
-        "caselaw/documentunits/documentationUnitId/assign",
+        `caselaw/documentunits/documentationUnitId/assign/${documentationOffice.id}`,
         {},
-        { documentationOffice: documentationOffice },
+        {},
       )
     })
 
@@ -109,7 +109,7 @@ describe("documentUnitService", () => {
 
       const response = await service.assignDocumentationOffice(
         "documentationUnitId",
-        documentationOffice,
+        documentationOffice.id,
       )
 
       expect(response).toEqual({
@@ -118,9 +118,9 @@ describe("documentUnitService", () => {
       })
 
       expect(httpMock).toHaveBeenCalledWith(
-        "caselaw/documentunits/documentationUnitId/assign",
+        `caselaw/documentunits/documentationUnitId/assign/${documentationOffice.id}`,
         {},
-        { documentationOffice: documentationOffice },
+        {},
       )
     })
   })

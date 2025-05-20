@@ -515,15 +515,16 @@ public class DocumentationUnitService {
   }
 
   public String assignDocumentationOffice(
-      UUID documentationUnitId, DocumentationOffice documentationOffice, User user)
+      UUID documentationUnitId, UUID documentationOfficeId, User user)
       throws DocumentationUnitNotExistsException {
     Documentable documentable = repository.findByUuid(documentationUnitId, user);
     if (documentable instanceof DocumentationUnit docUnit) {
       // Procedures need to be deleted as they are linked to the previous documentation Office
       repository.deleteProcedures(docUnit.uuid());
-      repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
+      var newDocOfficeAbbreviation =
+          repository.saveDocumentationOffice(documentationUnitId, documentationOfficeId, user);
       return "The documentation office [%s] has been successfully assigned."
-          .formatted(documentationOffice.abbreviation());
+          .formatted(newDocOfficeAbbreviation);
     }
     throw new DocumentationUnitException(
         "The documentation office could not be reassigned: Document is not a DocumentationUnit.");

@@ -1,6 +1,4 @@
 import { createTestingPinia } from "@pinia/testing"
-import { userEvent } from "@testing-library/user-event"
-
 import { fireEvent, render, screen, within } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
@@ -52,7 +50,6 @@ const server = setupServer(
 
 function renderManagementData(managementData: ManagementData) {
   const store = mockDocUnitStore(managementData)
-  const user = userEvent.setup()
 
   const router = createRouter({
     history: createWebHistory(),
@@ -64,7 +61,7 @@ function renderManagementData(managementData: ManagementData) {
       plugins: [router],
     },
   })
-  return { user, store, router }
+  return { store, router }
 }
 
 describe("Assigning a new documentation office", () => {

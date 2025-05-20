@@ -503,33 +503,39 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (documentationUnitDTOOptional.isPresent()
         && documentationUnitDTOOptional.get() instanceof DecisionDTO decisionDTO) {
       decisionDTO.setProcedure(null);
-      decisionDTO.setProcedureHistory(new ArrayList<>());
+      decisionDTO.getProcedureHistory().clear();
       repository.save(decisionDTO);
     }
   }
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void saveDocumentationOffice(
-      UUID documentationUnitId, DocumentationOffice documentationOffice, User user) {
-    if (documentationUnitId == null) {
-      return;
+  public String saveDocumentationOffice(
+      UUID documentationUnitId, UUID documentationOfficeId, User user) {
+    if (documentationUnitId == null || documentationOfficeId == null) {
+      return null;
     }
     var documentationUnitDTOOptional = repository.findById(documentationUnitId);
+    var documentationOfficeDTOOptional =
+        documentationOfficeRepository.findById(documentationOfficeId);
+
     if (documentationUnitDTOOptional.isPresent()
-        && documentationUnitDTOOptional.get() instanceof DecisionDTO decisionDTO) {
+        && documentationUnitDTOOptional.get() instanceof DecisionDTO decisionDTO
+        && documentationOfficeDTOOptional.isPresent()) {
       var previousDocumentationOffice = decisionDTO.getDocumentationOffice();
-      decisionDTO.setDocumentationOffice(
-          DocumentationOfficeTransformer.transformToDTO(documentationOffice));
+      var newDocumentationOffice = documentationOfficeDTOOptional.get();
+      decisionDTO.setDocumentationOffice(newDocumentationOffice);
       repository.save(decisionDTO);
       var description =
           "Dokstelle geändert: [%s] → [%s]"
               .formatted(
                   previousDocumentationOffice.getAbbreviation(),
-                  documentationOffice.abbreviation());
+                  newDocumentationOffice.getAbbreviation());
       historyLogService.saveHistoryLog(
           documentationUnitId, user, HistoryLogEventType.DOCUMENTATION_OFFICE, description);
+      return newDocumentationOffice.getAbbreviation();
     }
+    return null;
   }
 
   private ProcedureDTO getOrCreateProcedure(

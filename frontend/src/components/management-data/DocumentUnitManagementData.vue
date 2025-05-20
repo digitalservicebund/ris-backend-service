@@ -72,11 +72,11 @@ const documentationOfficeInput = computed({
   },
 })
 const assignDocumentationOffice = async () => {
-  if (documentationOfficeInput.value && documentationOffice.value) {
+  if (documentationOfficeInput.value && documentationOffice.value?.id) {
     hasNoSelection.value = false
     const response = await DocumentUnitService.assignDocumentationOffice(
       documentUnit.value!.uuid,
-      documentationOffice.value,
+      documentationOffice.value.id,
     )
     if (response.error) {
       assignDocOfficeResponseError.value = response.error
