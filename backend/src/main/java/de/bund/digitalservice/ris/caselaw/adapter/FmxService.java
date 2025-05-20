@@ -10,8 +10,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.TransformationService;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -66,6 +68,7 @@ public class FmxService implements TransformationService {
   public static final String PREAMBLE_GEN_XPATH = "//PREAMBLE.GEN";
   public static final String ENACTING_TERMS_CJT_XPATH = "//ENACTING.TERMS.CJT";
   public static final String FINAL_XPATH = "//FINAL";
+  public static final String NOTE_XPATH = "//TITLE//NOTE";
 
   public static final String JUDGMENT_TYPE = "JUDGMENT";
   public static final String ORDER_TYPE = "ORDER";
@@ -105,7 +108,8 @@ public class FmxService implements TransformationService {
     xPath = XPathFactory.newInstance().newXPath();
   }
 
-  public void getDataFromEurlex(String celexNumber, DocumentationUnit documentationUnit) {
+  public void getDataFromEurlex(
+      String celexNumber, DocumentationUnit documentationUnit, User user) {
     String sourceUrl =
         "https://publications.europa.eu/resource/celex/"
             + URLEncoder.encode(celexNumber, StandardCharsets.UTF_8);
@@ -113,7 +117,7 @@ public class FmxService implements TransformationService {
 
     if (Strings.isNotBlank(fmxFileContent)) {
       attachFmxToDocumentationUnit(documentationUnit.uuid(), fmxFileContent, sourceUrl);
-      extractMetaDataFromFmx(fmxFileContent, documentationUnit);
+      extractMetaDataFromFmx(fmxFileContent, documentationUnit, user);
     } else {
       throw new FmxTransformationException("FMX file has no content.");
     }
@@ -136,8 +140,8 @@ public class FmxService implements TransformationService {
     attachmentRepository.save(attachmentDTO);
   }
 
-  @SuppressWarnings("java:S3776")
-  private void extractMetaDataFromFmx(String fileContent, DocumentationUnit documentationUnit) {
+  private void extractMetaDataFromFmx(
+      String fileContent, DocumentationUnit documentationUnit, User user) {
     xsltTransformer = initialiseXsltTransformer();
     try {
       final Document doc = parseFmx(fileContent);
@@ -156,49 +160,38 @@ public class FmxService implements TransformationService {
       Node enactingTermsCjt =
           (Node) xPath.compile(ENACTING_TERMS_CJT_XPATH).evaluate(doc, XPathConstants.NODE);
       Node finalNode = (Node) xPath.compile(FINAL_XPATH).evaluate(doc, XPathConstants.NODE);
+      Node note = (Node) xPath.compile(NOTE_XPATH).evaluate(doc, XPathConstants.NODE);
 
       CoreData.CoreDataBuilder coreDataBuilder = documentationUnit.coreData().toBuilder();
       LongTexts.LongTextsBuilder longTextsBuilder = documentationUnit.longTexts().toBuilder();
 
-      if (Strings.isNotBlank(decisionDate)) {
-        coreDataBuilder.decisionDate(
-            LocalDate.parse(decisionDate, DateTimeFormatter.ofPattern("yyyyMMdd")));
-      }
-      coreDataBuilder.ecli(ecli);
-      coreDataBuilder.fileNumbers(List.of(fileNumber));
-      coreDataBuilder.celexNumber(celex);
-      coreDataBuilder.court(transformCourt(author).orElse(null));
-      coreDataBuilder.documentType(transformDocumentType(rootTag).orElse(null));
+      CoreData coreData =
+          transformCoreData(
+              coreDataBuilder, rootTag, decisionDate, ecli, fileNumber, celex, author);
 
+      LongTexts longTexts;
       if (JUDGMENT_TYPE.equals(rootTag) || ORDER_TYPE.equals(rootTag)) {
-        if (content != null && jurisdiction != null) {
-          content.removeChild(jurisdiction);
-        }
-        if (content != null && signatures != null) {
-          content.appendChild(signatures);
-        }
-        longTextsBuilder.tenor(transformLongText(jurisdiction));
-        longTextsBuilder.reasons(transformLongText(content));
+        longTexts = transformLongTexts(longTextsBuilder, content, jurisdiction, signatures, note);
       } else if (OPINION_TYPE.equals(rootTag)) {
-        if (content != null && preambleGen != null && enactingTermsCjt != null) {
-          content.removeChild(preambleGen);
-          content.removeChild(enactingTermsCjt);
-        }
-        if (content != null && finalNode != null) {
-          content.appendChild(finalNode);
-        }
-        var tenor = transformLongText(preambleGen) + transformLongText(enactingTermsCjt);
-        longTextsBuilder.tenor(tenor);
-        longTextsBuilder.reasons(transformLongText(content));
+        longTexts =
+            transformOpinionLongTexts(
+                longTextsBuilder, content, preambleGen, enactingTermsCjt, finalNode, note);
+      } else {
+        longTexts = longTextsBuilder.build();
       }
-
-      CoreData coreData = coreDataBuilder.build();
-      LongTexts longTexts = longTextsBuilder.build();
 
       DocumentationUnit updatedDocumentationUnit =
-          documentationUnit.toBuilder().coreData(coreData).longTexts(longTexts).build();
+          documentationUnit.toBuilder()
+              .inboxStatus(InboxStatus.EU)
+              .coreData(coreData)
+              .longTexts(longTexts)
+              .build();
 
-      documentationUnitRepository.save(updatedDocumentationUnit);
+      documentationUnitRepository.save(
+          updatedDocumentationUnit,
+          user,
+          "EU-Entscheidung angelegt für "
+              + documentationUnit.coreData().documentationOffice().abbreviation());
     } catch (XPathExpressionException exception) {
       throw new FmxTransformationException("Failed to extract data from FMX file.", exception);
     }
@@ -237,6 +230,27 @@ public class FmxService implements TransformationService {
     }
   }
 
+  private CoreData transformCoreData(
+      CoreData.CoreDataBuilder coreDataBuilder,
+      String rootTag,
+      String decisionDate,
+      String ecli,
+      String fileNumber,
+      String celex,
+      String author) {
+    if (Strings.isNotBlank(decisionDate)) {
+      coreDataBuilder.decisionDate(
+          LocalDate.parse(decisionDate, DateTimeFormatter.ofPattern("yyyyMMdd")));
+    }
+    coreDataBuilder.ecli(ecli);
+    coreDataBuilder.fileNumbers(List.of(fileNumber));
+    coreDataBuilder.celexNumber(celex);
+    coreDataBuilder.court(transformCourt(author).orElse(null));
+    coreDataBuilder.documentType(transformDocumentType(rootTag).orElse(null));
+
+    return coreDataBuilder.build();
+  }
+
   private Optional<Court> transformCourt(String author) {
     var authorToCourtMap = new HashMap<String, String>();
     authorToCourtMap.put("CJ", "EuGH");
@@ -273,7 +287,53 @@ public class FmxService implements TransformationService {
     return documentType;
   }
 
-  private String transformLongText(Node textNode) {
+  private LongTexts transformLongTexts(
+      LongTexts.LongTextsBuilder longTextsBuilder,
+      Node content,
+      Node jurisdiction,
+      Node signatures,
+      Node note) {
+
+    if (content != null && jurisdiction != null) {
+      content.removeChild(jurisdiction);
+    }
+    if (content != null && signatures != null) {
+      content.appendChild(signatures);
+    }
+    if (content != null && note != null) {
+      content.appendChild(note);
+    }
+    longTextsBuilder.tenor(transformLongTextNode(jurisdiction));
+    longTextsBuilder.reasons(transformLongTextNode(content));
+
+    return longTextsBuilder.build();
+  }
+
+  private LongTexts transformOpinionLongTexts(
+      LongTexts.LongTextsBuilder longTextsBuilder,
+      Node content,
+      Node preambleGen,
+      Node enactingTermsCjt,
+      Node finalNode,
+      Node note) {
+    if (content != null && preambleGen != null && enactingTermsCjt != null) {
+      content.removeChild(preambleGen);
+      content.removeChild(enactingTermsCjt);
+    }
+    if (content != null && finalNode != null) {
+      content.appendChild(finalNode);
+    }
+    if (content != null && note != null) {
+      content.appendChild(note);
+    }
+    var tenor = transformLongTextNode(preambleGen) + transformLongTextNode(enactingTermsCjt);
+    longTextsBuilder.tenor(tenor);
+    longTextsBuilder.reasons(transformLongTextNode(content));
+
+    return longTextsBuilder.build();
+  }
+
+  private String transformLongTextNode(Node textNode) {
     try {
       StringWriter xsltOutput = new StringWriter();
       xsltTransformer.transform(new DOMSource(textNode), new StreamResult(xsltOutput));

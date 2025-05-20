@@ -178,7 +178,7 @@ public class DocumentationUnitService {
     }
 
     if (celexNumber != null) {
-      transformationService.getDataFromEurlex(celexNumber, newDocumentationUnit);
+      transformationService.getDataFromEurlex(celexNumber, newDocumentationUnit, user);
     }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
 

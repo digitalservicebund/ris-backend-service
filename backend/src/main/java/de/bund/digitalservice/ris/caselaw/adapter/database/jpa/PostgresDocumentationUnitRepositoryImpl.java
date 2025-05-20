@@ -248,16 +248,24 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(Documentable documentable) {
-    saveNonTransactional(documentable, null);
+    saveNonTransactional(documentable, null, null);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(Documentable documentable, @Nullable User currentUser) {
-    saveNonTransactional(documentable, currentUser);
+    saveNonTransactional(documentable, currentUser, null);
   }
 
-  private void saveNonTransactional(Documentable documentable, @Nullable User currentUser) {
+  @Transactional(transactionManager = "jpaTransactionManager")
+  @Override
+  public void save(
+      Documentable documentable, @Nullable User currentUser, @Nullable String description) {
+    saveNonTransactional(documentable, currentUser, description);
+  }
+
+  private void saveNonTransactional(
+      Documentable documentable, @Nullable User currentUser, String description) {
     DocumentationUnitDTO documentationUnitDTO =
         repository.findById(documentable.uuid()).orElse(null);
     if (documentationUnitDTO == null) {
@@ -296,7 +304,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         documentationUnitDTO.getId(),
         currentUser,
         HistoryLogEventType.UPDATE,
-        "Dokeinheit bearbeitet");
+        description == null ? "Dokeinheit bearbeitet" : description);
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {

@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -14,10 +15,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -39,6 +43,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
@@ -70,6 +75,8 @@ class FmxServiceTest {
   @MockitoBean EurlexRetrievalService retrievalService;
   @MockitoBean XmlUtilService xmlUtilService;
 
+  @Mock User user;
+
   private final TransformerFactory transformerFactory = new SaxonTransformerFactory();
 
   @BeforeEach
@@ -88,7 +95,10 @@ class FmxServiceTest {
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
             .uuid(id)
-            .coreData(CoreData.builder().build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
             .longTexts(LongTexts.builder().build())
             .build();
 
@@ -101,7 +111,7 @@ class FmxServiceTest {
         .when(databaseDocumentationUnitRepository)
         .findById(id);
 
-    service.getDataFromEurlex(celexNumber, documentationUnit);
+    service.getDataFromEurlex(celexNumber, documentationUnit, user);
 
     verify(attachmentRepository).save(attachmentCaptor.capture());
     AttachmentDTO attachmentDTO = attachmentCaptor.getValue();
@@ -116,7 +126,10 @@ class FmxServiceTest {
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
             .uuid(id)
-            .coreData(CoreData.builder().build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
             .longTexts(LongTexts.builder().build())
             .build();
 
@@ -134,9 +147,10 @@ class FmxServiceTest {
     when(documentTypeRepository.findUniqueCaselawBySearchStr("Urteil"))
         .thenReturn(Optional.of(DocumentType.builder().label("Urteil").build()));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit);
+    service.getDataFromEurlex(celexNumber, documentationUnit, user);
 
-    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    verify(documentationUnitRepository)
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
     DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuGH");
     assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("C-303/22");
@@ -144,6 +158,7 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2024:60");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Urteil");
+    assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
   @Test
@@ -153,7 +168,10 @@ class FmxServiceTest {
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
             .uuid(id)
-            .coreData(CoreData.builder().build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
             .longTexts(LongTexts.builder().build())
             .build();
     doReturn(order)
@@ -172,9 +190,10 @@ class FmxServiceTest {
     when(documentTypeRepository.findCaselawBySearchStr("Beschluss"))
         .thenReturn(List.of(DocumentType.builder().label("Beschluss").build()));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit);
+    service.getDataFromEurlex(celexNumber, documentationUnit, user);
 
-    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    verify(documentationUnitRepository)
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
     DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuG");
     assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("T-235/18");
@@ -182,6 +201,7 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:T:2024:142");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Beschluss");
+    assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
   @Test
@@ -191,7 +211,10 @@ class FmxServiceTest {
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
             .uuid(id)
-            .coreData(CoreData.builder().build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
             .longTexts(LongTexts.builder().build())
             .build();
     doReturn(opinion)
@@ -208,9 +231,10 @@ class FmxServiceTest {
     when(documentTypeRepository.findCaselawBySearchStr("Gutachten"))
         .thenReturn(List.of(DocumentType.builder().label("Gutachten").build()));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit);
+    service.getDataFromEurlex(celexNumber, documentationUnit, user);
 
-    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    verify(documentationUnitRepository)
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
     DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuGH");
     assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("Avis 1/13");
@@ -218,6 +242,7 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2014:2303");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Gutachten");
+    assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
   @Test
@@ -227,7 +252,10 @@ class FmxServiceTest {
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
             .uuid(id)
-            .coreData(CoreData.builder().build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
             .longTexts(LongTexts.builder().build())
             .build();
     doReturn(judgment)
@@ -239,12 +267,16 @@ class FmxServiceTest {
     when(databaseDocumentationUnitRepository.findById(id))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit);
+    service.getDataFromEurlex(celexNumber, documentationUnit, user);
 
-    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    verify(documentationUnitRepository)
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
     DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Urteil");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Unterschriften");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("<p>Verfahrenssprache: Englisch.</p>");
+    assertThat(savedDocUnit.longTexts().reasons())
+        .doesNotContain("Beschluss des Gerichts (Zweite erweiterte Kammer)");
     assertThat(savedDocUnit.longTexts().reasons())
         .doesNotContain(
             "Aus diesen Gründen hat der Gerichtshof (Vierte Kammer) für Recht erkannt:");
@@ -259,7 +291,10 @@ class FmxServiceTest {
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
             .uuid(id)
-            .coreData(CoreData.builder().build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
             .longTexts(LongTexts.builder().build())
             .build();
     doReturn(order)
@@ -271,9 +306,10 @@ class FmxServiceTest {
     when(databaseDocumentationUnitRepository.findById(id))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit);
+    service.getDataFromEurlex(celexNumber, documentationUnit, user);
 
-    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    verify(documentationUnitRepository)
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
     DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Beschluss");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Luxemburg, den");
@@ -282,6 +318,8 @@ class FmxServiceTest {
     assertThat(savedDocUnit.longTexts().reasons())
         .doesNotContain(
             "Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("<p>Verfahrenssprache: Deutsch.</p>");
+    assertThat(savedDocUnit.longTexts().reasons()).doesNotContain("25.&nbsp;Januar 2024");
     assertThat(savedDocUnit.longTexts().tenor())
         .contains("Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:");
   }
@@ -293,7 +331,10 @@ class FmxServiceTest {
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
             .uuid(id)
-            .coreData(CoreData.builder().build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
             .longTexts(LongTexts.builder().build())
             .build();
     doReturn(opinion)
@@ -305,9 +346,10 @@ class FmxServiceTest {
     when(databaseDocumentationUnitRepository.findById(id))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit);
+    service.getDataFromEurlex(celexNumber, documentationUnit, user);
 
-    verify(documentationUnitRepository).save(docUnitCaptor.capture());
+    verify(documentationUnitRepository)
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
     DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Gutachten");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Unterschriften");
@@ -329,7 +371,10 @@ class FmxServiceTest {
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
             .uuid(id)
-            .coreData(CoreData.builder().build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
             .longTexts(LongTexts.builder().build())
             .build();
     doReturn("")
@@ -337,7 +382,7 @@ class FmxServiceTest {
         .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
 
     assertThatExceptionOfType(FmxTransformationException.class)
-        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit))
+        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
         .withMessageContaining("FMX file has no content.");
   }
 
@@ -348,7 +393,10 @@ class FmxServiceTest {
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
             .uuid(id)
-            .coreData(CoreData.builder().build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
             .longTexts(LongTexts.builder().build())
             .build();
     doReturn("lorem ipsum")
@@ -359,7 +407,7 @@ class FmxServiceTest {
         .thenReturn(Optional.of(documentationUnitDTO));
 
     assertThatExceptionOfType(FmxTransformationException.class)
-        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit))
+        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
         .withMessageContaining("Failed to parse FMX file content.");
   }
 
@@ -381,6 +429,14 @@ class FmxServiceTest {
                       <P>Urteil vom <DATE ISO="20170214">14. 2. 2017</DATE></P>
                   </PAGE.HEADER>
               </CURR.TITLE>
+          <TITLE>
+              <TI>
+                  <P>Beschluss des Gerichts (Zweite erweiterte Kammer)</P>
+                  <NOTE TYPE="FOOTNOTE" NUMBERING="STAR" NOTE.ID="E0001" NUMBERING.CONTINUED="YES">
+                      <P>Verfahrenssprache: Englisch.</P>
+                  </NOTE>
+              </TI>
+          </TITLE>
           <CONTENTS.JUDGMENT><TXT>Urteil</TXT>
               <JURISDICTION>
                   <INTRO>Aus diesen Gründen hat der Gerichtshof (Vierte Kammer) für Recht erkannt:</INTRO>
@@ -412,6 +468,16 @@ class FmxServiceTest {
                       <P>Beschluss vom <DATE ISO="20240229">29. 2. 2024</DATE></P>
                   </PAGE.HEADER>
               </CURR.TITLE>
+          <TITLE>
+              <TI>
+                  <P>
+                      <DATE ISO="20240125">25. Januar 2024</DATE>
+                      <NOTE TYPE="FOOTNOTE" NUMBERING="STAR" NOTE.ID="E0001">
+                          <P>Verfahrenssprache: Deutsch.</P>
+                      </NOTE>
+                  </P>
+              </TI>
+          </TITLE>
           <CONTENTS.ORDER><TXT>Beschluss</TXT>
               <JURISDICTION>
                   <INTRO>Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:</INTRO>
