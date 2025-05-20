@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { useScrollLock } from "@vueuse/core"
 import dayjs from "dayjs"
+import dayjsTimezone from "dayjs/plugin/timezone"
+import dayjsUtc from "dayjs/plugin/utc"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
@@ -28,12 +30,13 @@ const props = defineProps<{
   pageEntries?: Page<DocumentUnitListEntry>
   error?: ResponseError
 }>()
-
 const emit = defineEmits<{
   updatePage: [number]
   deleteDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
   takeOverDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
+dayjs.extend(dayjsUtc)
+dayjs.extend(dayjsTimezone)
 
 const entries = computed(() => props.pageEntries?.content || [])
 
