@@ -113,9 +113,19 @@ public class EurLexSOAPSearchService implements SearchService {
     }
 
     return repository
-        .findAllBySearchParameters(
+        .findAllNewWithUriBySearchParameters(
             PageRequest.of(pageNumber, PAGE_SIZE), fileNumber, celex, court, startDate, endDate)
         .map(EurLexSearchResultTransformer::transformDTOToDomain);
+  }
+
+  @Override
+  public void updateResultStatus(List<String> celexNumbers) {
+    List<EurLexResultDTO> existing = repository.findAllByCelexNumbers(celexNumbers);
+    if (existing.isEmpty()) {
+      return;
+    }
+    existing.forEach(eurLexResultDTO -> eurLexResultDTO.setStatus(EurLexResultStatus.ASSIGNED));
+    repository.saveAll(existing);
   }
 
   private void requestNewestDecisions() {
@@ -229,6 +239,7 @@ public class EurLexSOAPSearchService implements SearchService {
         + PAGE_SIZE
         + "</sear:pageSize>"
         + "<sear:searchLanguage>de</sear:searchLanguage>"
+        + "<sear:showDocumentsAvailableIn>de</sear:showDocumentsAvailableIn>"
         + "</sear:searchRequest>"
         + "</soap:Body>"
         + "</soap:Envelope>";

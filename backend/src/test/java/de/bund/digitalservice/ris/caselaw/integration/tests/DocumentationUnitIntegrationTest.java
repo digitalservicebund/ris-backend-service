@@ -58,6 +58,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverR
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -83,6 +84,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
@@ -194,6 +196,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DocumentationUnitStatusService documentationUnitStatusService;
   @Autowired private DocumentationUnitHistoryLogRepository historyLogRepository;
   @Autowired private DatabaseProcedureRepository procedureRepository;
+  @Autowired private DocumentationUnitHistoryLogService historyLogService;
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
   @MockitoBean private ConverterService converterService;
@@ -206,6 +209,7 @@ class DocumentationUnitIntegrationTest {
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
   @MockitoBean private FmxService fmxService;
+  @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -1463,6 +1467,7 @@ class DocumentationUnitIntegrationTest {
     LegalPeriodicalDTO legalPeriodical =
         legalPeriodicalRepository.save(
             LegalPeriodicalDTO.builder()
+                .jurisId(1)
                 .abbreviation("ABC")
                 .primaryReference(true)
                 .title("Longer title")
@@ -1497,6 +1502,62 @@ class DocumentationUnitIntegrationTest {
                 assertThat(response.getResponseBody())
                     .extracting("coreData.source.value")
                     .isEqualTo(SourceValue.Z));
+  }
+
+  @Test
+  void testGenerateNewDocumentationUnit_isExternalHandover_shouldWriteHistoryLog() {
+    DocumentationOfficeDTO creatingDocumentationOfficeDTO =
+        documentationOfficeRepository.findByAbbreviation("BGH");
+
+    DocumentationOffice creatingDocumentationOffice =
+        DocumentationOfficeTransformer.transformToDomain(creatingDocumentationOfficeDTO);
+    LegalPeriodicalDTO legalPeriodical =
+        legalPeriodicalRepository.save(
+            LegalPeriodicalDTO.builder()
+                .jurisId(2)
+                .abbreviation("ABC")
+                .primaryReference(true)
+                .title("Longer title")
+                .build());
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("BGH", "ZZREYYYY*****"));
+
+    DocumentationUnitCreationParameters parameters =
+        DocumentationUnitCreationParameters.builder()
+            .documentationOffice(creatingDocumentationOffice)
+            .reference(
+                Reference.builder()
+                    .id(UUID.randomUUID())
+                    .referenceType(ReferenceType.CASELAW)
+                    .legalPeriodical(LegalPeriodicalTransformer.transformToDomain(legalPeriodical))
+                    .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
+                    .citation("test")
+                    .build())
+            .build();
+
+    DocumentationUnit createdDocUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/new")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(parameters)
+            .exchange()
+            .expectStatus()
+            .isCreated()
+            .expectBody(DocumentationUnit.class)
+            .returnResult()
+            .getResponseBody();
+
+    User user = User.builder().documentationOffice(creatingDocumentationOffice).build();
+    var logs = historyLogService.getHistoryLogs(createdDocUnit.uuid(), user);
+    assertThat(logs).hasSize(2);
+    assertThat(logs)
+        .map(HistoryLog::eventType)
+        .containsExactly(HistoryLogEventType.EXTERNAL_HANDOVER, HistoryLogEventType.CREATE);
+    // As DS User I am not able to see the user from BGH docoffice, who created the docunit
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly(null, null);
+    assertThat(logs.getFirst().description()).isEqualTo("Fremdanalage angelegt für BGH");
   }
 
   @Test

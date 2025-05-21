@@ -19,7 +19,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
@@ -99,6 +101,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
 
     doReturn(judgment)
@@ -130,6 +133,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
 
     doReturn(judgment)
@@ -157,6 +161,8 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2024:60");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Urteil");
+    assertThat(savedDocUnit.shortTexts().headnote()).isEqualTo("CELEX Nummer: " + celexNumber);
+    assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
   @Test
@@ -171,6 +177,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn(order)
         .when(retrievalService)
@@ -199,6 +206,8 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:T:2024:142");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Beschluss");
+    assertThat(savedDocUnit.shortTexts().headnote()).isEqualTo("CELEX Nummer: " + celexNumber);
+    assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
   @Test
@@ -213,6 +222,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn(opinion)
         .when(retrievalService)
@@ -239,6 +249,8 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2014:2303");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Gutachten");
+    assertThat(savedDocUnit.shortTexts().headnote()).isEqualTo("CELEX Nummer: " + celexNumber);
+    assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
   @Test
@@ -253,6 +265,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn(judgment)
         .when(retrievalService)
@@ -270,6 +283,9 @@ class FmxServiceTest {
     DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Urteil");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Unterschriften");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("<p>Verfahrenssprache: Englisch.</p>");
+    assertThat(savedDocUnit.longTexts().reasons())
+        .doesNotContain("Beschluss des Gerichts (Zweite erweiterte Kammer)");
     assertThat(savedDocUnit.longTexts().reasons())
         .doesNotContain(
             "Aus diesen Gründen hat der Gerichtshof (Vierte Kammer) für Recht erkannt:");
@@ -289,6 +305,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn(order)
         .when(retrievalService)
@@ -311,6 +328,8 @@ class FmxServiceTest {
     assertThat(savedDocUnit.longTexts().reasons())
         .doesNotContain(
             "Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:");
+    assertThat(savedDocUnit.longTexts().reasons()).contains("<p>Verfahrenssprache: Deutsch.</p>");
+    assertThat(savedDocUnit.longTexts().reasons()).doesNotContain("25.&nbsp;Januar 2024");
     assertThat(savedDocUnit.longTexts().tenor())
         .contains("Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:");
   }
@@ -327,6 +346,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn(opinion)
         .when(retrievalService)
@@ -367,6 +387,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn("")
         .when(retrievalService)
@@ -389,6 +410,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn("lorem ipsum")
         .when(retrievalService)
@@ -420,6 +442,14 @@ class FmxServiceTest {
                       <P>Urteil vom <DATE ISO="20170214">14. 2. 2017</DATE></P>
                   </PAGE.HEADER>
               </CURR.TITLE>
+          <TITLE>
+              <TI>
+                  <P>Beschluss des Gerichts (Zweite erweiterte Kammer)</P>
+                  <NOTE TYPE="FOOTNOTE" NUMBERING="STAR" NOTE.ID="E0001" NUMBERING.CONTINUED="YES">
+                      <P>Verfahrenssprache: Englisch.</P>
+                  </NOTE>
+              </TI>
+          </TITLE>
           <CONTENTS.JUDGMENT><TXT>Urteil</TXT>
               <JURISDICTION>
                   <INTRO>Aus diesen Gründen hat der Gerichtshof (Vierte Kammer) für Recht erkannt:</INTRO>
@@ -451,6 +481,16 @@ class FmxServiceTest {
                       <P>Beschluss vom <DATE ISO="20240229">29. 2. 2024</DATE></P>
                   </PAGE.HEADER>
               </CURR.TITLE>
+          <TITLE>
+              <TI>
+                  <P>
+                      <DATE ISO="20240125">25. Januar 2024</DATE>
+                      <NOTE TYPE="FOOTNOTE" NUMBERING="STAR" NOTE.ID="E0001">
+                          <P>Verfahrenssprache: Deutsch.</P>
+                      </NOTE>
+                  </P>
+              </TI>
+          </TITLE>
           <CONTENTS.ORDER><TXT>Beschluss</TXT>
               <JURISDICTION>
                   <INTRO>Aus diesen Gründen hat DAS GERICHT (Zweite erweiterte Kammer) beschlossen:</INTRO>

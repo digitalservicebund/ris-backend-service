@@ -10,7 +10,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.TransformationService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -67,6 +69,7 @@ public class FmxService implements TransformationService {
   public static final String PREAMBLE_GEN_XPATH = "//PREAMBLE.GEN";
   public static final String ENACTING_TERMS_CJT_XPATH = "//ENACTING.TERMS.CJT";
   public static final String FINAL_XPATH = "//FINAL";
+  public static final String NOTE_XPATH = "//TITLE//NOTE";
 
   public static final String JUDGMENT_TYPE = "JUDGMENT";
   public static final String ORDER_TYPE = "ORDER";
@@ -158,9 +161,11 @@ public class FmxService implements TransformationService {
       Node enactingTermsCjt =
           (Node) xPath.compile(ENACTING_TERMS_CJT_XPATH).evaluate(doc, XPathConstants.NODE);
       Node finalNode = (Node) xPath.compile(FINAL_XPATH).evaluate(doc, XPathConstants.NODE);
+      Node note = (Node) xPath.compile(NOTE_XPATH).evaluate(doc, XPathConstants.NODE);
 
       CoreData.CoreDataBuilder coreDataBuilder = documentationUnit.coreData().toBuilder();
       LongTexts.LongTextsBuilder longTextsBuilder = documentationUnit.longTexts().toBuilder();
+      ShortTexts.ShortTextsBuilder shortTextsBuilder = documentationUnit.shortTexts().toBuilder();
 
       CoreData coreData =
           transformCoreData(
@@ -168,17 +173,26 @@ public class FmxService implements TransformationService {
 
       LongTexts longTexts;
       if (JUDGMENT_TYPE.equals(rootTag) || ORDER_TYPE.equals(rootTag)) {
-        longTexts = transformLongTexts(longTextsBuilder, content, jurisdiction, signatures);
+        longTexts = transformLongTexts(longTextsBuilder, content, jurisdiction, signatures, note);
       } else if (OPINION_TYPE.equals(rootTag)) {
         longTexts =
             transformOpinionLongTexts(
-                longTextsBuilder, content, preambleGen, enactingTermsCjt, finalNode);
+                longTextsBuilder, content, preambleGen, enactingTermsCjt, finalNode, note);
       } else {
         longTexts = longTextsBuilder.build();
       }
 
+      if (Strings.isNotBlank(celex)) {
+        shortTextsBuilder.headnote("CELEX Nummer: " + celex);
+      }
+
       DocumentationUnit updatedDocumentationUnit =
-          documentationUnit.toBuilder().coreData(coreData).longTexts(longTexts).build();
+          documentationUnit.toBuilder()
+              .inboxStatus(InboxStatus.EU)
+              .coreData(coreData)
+              .longTexts(longTexts)
+              .shortTexts(shortTextsBuilder.build())
+              .build();
 
       documentationUnitRepository.save(
           updatedDocumentationUnit,
@@ -284,13 +298,17 @@ public class FmxService implements TransformationService {
       LongTexts.LongTextsBuilder longTextsBuilder,
       Node content,
       Node jurisdiction,
-      Node signatures) {
+      Node signatures,
+      Node note) {
 
     if (content != null && jurisdiction != null) {
       content.removeChild(jurisdiction);
     }
     if (content != null && signatures != null) {
       content.appendChild(signatures);
+    }
+    if (content != null && note != null) {
+      content.appendChild(note);
     }
     longTextsBuilder.tenor(transformLongTextNode(jurisdiction));
     longTextsBuilder.reasons(transformLongTextNode(content));
@@ -303,13 +321,17 @@ public class FmxService implements TransformationService {
       Node content,
       Node preambleGen,
       Node enactingTermsCjt,
-      Node finalNode) {
+      Node finalNode,
+      Node note) {
     if (content != null && preambleGen != null && enactingTermsCjt != null) {
       content.removeChild(preambleGen);
       content.removeChild(enactingTermsCjt);
     }
     if (content != null && finalNode != null) {
       content.appendChild(finalNode);
+    }
+    if (content != null && note != null) {
+      content.appendChild(note);
     }
     var tenor = transformLongTextNode(preambleGen) + transformLongTextNode(enactingTermsCjt);
     longTextsBuilder.tenor(tenor);

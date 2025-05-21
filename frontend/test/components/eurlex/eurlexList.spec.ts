@@ -1,7 +1,12 @@
+import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import EURLexList from "@/components/eurlex/EURLexList.vue"
 import { Page } from "@/components/Pagination.vue"
+import DocumentationOffice from "@/domain/documentationOffice"
 import EURLexResult from "@/domain/eurlex"
+import service from "@/services/documentUnitService"
 
 function renderComponent(entries: Page<EURLexResult>) {
   return render(EURLexList, {
@@ -11,7 +16,29 @@ function renderComponent(entries: Page<EURLexResult>) {
   })
 }
 
+const server = setupServer(
+  http.get("/api/v1/caselaw/documentationoffices", () => {
+    const documentationOffice: DocumentationOffice = {
+      id: "id",
+      abbreviation: "DS",
+    }
+    return HttpResponse.json([documentationOffice])
+  }),
+)
+
 describe("eurlex list", () => {
+  const documentationUnitServiceMock = vi.spyOn(
+    service,
+    "createNewOutOfEurlexDecision",
+  )
+  documentationUnitServiceMock.mockResolvedValue({
+    data: ["doc-number"],
+    status: 200,
+  })
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   test("renders the entry in the result page", async () => {
     renderComponent({
       content: [
@@ -80,4 +107,54 @@ describe("eurlex list", () => {
     expect(await screen.findByText("01.06.2010")).toBeInTheDocument()
     expect(screen.queryByLabelText("Öffne Vorschau")).not.toBeInTheDocument()
   })
+
+  test(
+    "select entry, select a doc office and press Zuweisen should call service to generate " +
+      "documentation out out of eurlex decisions, deselect all checkboxes and emit assignment",
+    async () => {
+      const { emitted } = renderComponent({
+        content: [
+          {
+            ecli: "ecli",
+            celex: "celex",
+            courtType: "court-type",
+            courtLocation: "court-location",
+            date: "2000-05-01",
+            title: "title",
+            fileNumber: "file-number",
+            publicationDate: "2010-06-01",
+            uri: "uri",
+          },
+        ],
+        size: 1,
+        number: 1,
+        numberOfElements: 1,
+        totalElements: 1,
+        totalPages: 1,
+        first: true,
+        last: true,
+        empty: false,
+      })
+      const user = userEvent.setup()
+
+      await user.click(screen.getAllByRole("checkbox")[0])
+      await user.click(screen.getByLabelText("Dokumentationsstelle auswählen"))
+      await user.click(screen.getByText("DS"))
+      await user.click(screen.getByLabelText("Dokumentationsstelle zuweisen"))
+
+      expect(documentationUnitServiceMock).toHaveBeenCalledWith({
+        celexNumbers: ["celex"],
+        documentationOffice: {
+          id: "id",
+          abbreviation: "DS",
+        },
+      })
+
+      screen.getAllByRole("checkbox").forEach((checkbox) => {
+        expect(checkbox).not.toBeChecked()
+      })
+
+      expect(emitted()["assign"]).toBeTruthy()
+    },
+  )
 })

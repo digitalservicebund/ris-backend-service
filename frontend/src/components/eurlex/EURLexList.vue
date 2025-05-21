@@ -22,6 +22,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   updatePage: [number]
+  assign: [number]
 }>()
 
 const selectedEntries = ref<EURLexResult[]>([])
@@ -29,6 +30,7 @@ const noDecisionSelected = ref<boolean>(false)
 const selectedDocumentationOffice = ref<DocumentationOffice>()
 const noDocumentationOfficeSelected = ref<boolean>(false)
 const documentationOffices = ref<DocumentationOffice[]>()
+const currentPage = ref<number>(props.pageEntries?.number ?? 0)
 
 const entries = computed(() => {
   return props.pageEntries?.content || []
@@ -40,7 +42,7 @@ onMounted(async () => {
   ).data.value
 
   documentationOffices.value = comboboxItems?.map(
-    ({ value }) => value as DocumentationOffice,
+    (item) => item.value as DocumentationOffice,
   )
 })
 
@@ -48,6 +50,11 @@ function openPreview(entry: EURLexResult) {
   if (entry && entry.celex) {
     window.open(entry.htmlLink, "_blank")
   }
+}
+
+function updatePage(page: number) {
+  emit("updatePage", page)
+  currentPage.value = page
 }
 
 async function handleAssignToDocOffice() {
@@ -66,6 +73,10 @@ async function handleAssignToDocOffice() {
     }
 
     await documentationUnitService.createNewOutOfEurlexDecision(params)
+
+    selectedEntries.value = []
+
+    emit("assign", currentPage.value)
   }
 }
 
@@ -84,7 +95,7 @@ function selectDocumentationOffice() {
     <div class="flex">
       <Select
         v-model="selectedDocumentationOffice"
-        aria-label="Dokumentationstelle auswählen"
+        aria-label="Dokumentationsstelle auswählen"
         class="w-2xs"
         option-label="abbreviation"
         :options="documentationOffices"
@@ -92,6 +103,7 @@ function selectDocumentationOffice() {
         @change="selectDocumentationOffice"
       ></Select>
       <Button
+        aria-label="Dokumentationsstelle zuweisen"
         class="ml-8"
         label="Zuweisen"
         severity="secondary"
@@ -110,7 +122,7 @@ function selectDocumentationOffice() {
     <Pagination
       navigation-position="bottom"
       :page="pageEntries"
-      @update-page="emit('updatePage', $event)"
+      @update-page="updatePage"
     >
       <span
         v-if="noDecisionSelected"

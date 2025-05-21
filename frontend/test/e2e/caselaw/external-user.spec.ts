@@ -51,15 +51,18 @@ test.describe(
           // Preview is allowed
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit ansehen"),
-          ).toHaveRole("link")
+          ).toHaveRole("button")
+          await expect(
+            pageWithExternalUser.getByLabel("Dokumentationseinheit ansehen"),
+          ).toBeEnabled()
 
           // Edit/delete is not allowed
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit bearbeiten"),
-          ).not.toHaveRole("link")
+          ).toBeDisabled()
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit löschen"),
-          ).not.toHaveRole("link")
+          ).toBeDisabled()
         })
       },
     )
@@ -95,15 +98,15 @@ test.describe(
           // Edit/Preview is allowed
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit bearbeiten"),
-          ).toHaveRole("link")
+          ).toBeEnabled()
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit ansehen"),
-          ).toHaveRole("link")
+          ).toBeEnabled()
 
           // Delete is not allowed
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit löschen"),
-          ).not.toHaveRole("link")
+          ).toBeDisabled()
         })
 
         await unassignUserGroupFromProcedure(page, procedureName)
@@ -158,10 +161,10 @@ test.describe(
           await pageWithExternalUser.getByLabel("Vorgang Listenelement").click()
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit bearbeiten"),
-          ).toHaveRole("link")
+          ).toBeEnabled()
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit löschen"),
-          ).not.toHaveRole("link")
+          ).toBeDisabled()
         })
       },
     )

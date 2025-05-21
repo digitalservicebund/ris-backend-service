@@ -170,13 +170,18 @@ class EurLexSearchResultTransformerTest {
             + "<YEAR>2024</YEAR>"
             + "</WORK_DATE_DOCUMENT>"
             + "<ECLI><VALUE>ecli</VALUE></ECLI>"
-            + "<ID_CELEX><VALUE>celex</VALUE></ID_CELEX>"
+            + "<ID_CELEX><VALUE>celex123</VALUE></ID_CELEX>"
             + "<URI><VALUE>uri</VALUE></URI>"
             + "<WORK_CREATED_BY_AGENT><IDENTIFIER>CJ</IDENTIFIER></WORK_CREATED_BY_AGENT>"
             + "</WORK>"
             + "<EXPRESSION>"
             + "<EXPRESSION_TITLE><VALUE>title</VALUE></EXPRESSION_TITLE>"
             + "</EXPRESSION>"
+            + "<MANIFESTATION>"
+            + "<SAMEAS>"
+            + "<URI><VALUE>http://publications.europa.eu/resource/celex/celex123.DEU.fmx4</VALUE></URI>"
+            + "</SAMEAS>"
+            + "</MANIFESTATION>"
             + "</NOTICE></content>"
             + "</result>";
     Document doc =
@@ -194,9 +199,9 @@ class EurLexSearchResultTransformerTest {
             .status(EurLexResultStatus.NEW)
             .resultXml("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + resultXml)
             .ecli("ecli")
-            .uri("uri")
+            .uri("http://publications.europa.eu/resource/celex/celex123.DEU.fmx4")
             .court(court)
-            .celex("celex")
+            .celex("celex123")
             .title("title")
             .build();
 

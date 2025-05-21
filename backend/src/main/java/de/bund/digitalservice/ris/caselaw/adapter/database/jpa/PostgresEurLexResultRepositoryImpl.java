@@ -39,7 +39,7 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
   }
 
   @Override
-  public Page<EurLexResultDTO> findAllBySearchParameters(
+  public Page<EurLexResultDTO> findAllNewWithUriBySearchParameters(
       Pageable pageable,
       Optional<String> fileNumber,
       Optional<String> celex,
@@ -87,6 +87,11 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
     return new PageImpl<>(query.getResultList(), pageable, count);
   }
 
+  @Override
+  public List<EurLexResultDTO> findAllByCelexNumbers(List<String> celexNumbers) {
+    return repository.findAllByCelexIn(celexNumbers);
+  }
+
   @SuppressWarnings("java:S107")
   private List<Predicate> generatePredicates(
       CriteriaBuilder builder,
@@ -99,6 +104,9 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
       Optional<LocalDate> endDate) {
 
     List<Predicate> predicates = new ArrayList<>();
+
+    predicates.add(builder.isNotNull(root.get("uri")));
+    predicates.add(builder.like(root.get("status"), "NEW"));
 
     if (fileNumber.isPresent() && Strings.isNotBlank(fileNumber.get())) {
       predicates.add(builder.like(root.get("fileNumber"), fileNumber.get() + "%"));

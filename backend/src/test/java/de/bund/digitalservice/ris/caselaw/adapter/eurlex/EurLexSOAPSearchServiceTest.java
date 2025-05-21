@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
@@ -18,9 +19,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -59,7 +62,8 @@ class EurLexSOAPSearchServiceTest {
             Optional.empty());
 
     assertThat(searchResults).isEmpty();
-    verify(repository, never()).findAllBySearchParameters(any(), any(), any(), any(), any(), any());
+    verify(repository, never())
+        .findAllNewWithUriBySearchParameters(any(), any(), any(), any(), any(), any());
   }
 
   @Test
@@ -76,7 +80,8 @@ class EurLexSOAPSearchServiceTest {
             Optional.empty());
 
     assertThat(searchResults).isEmpty();
-    verify(repository, never()).findAllBySearchParameters(any(), any(), any(), any(), any(), any());
+    verify(repository, never())
+        .findAllNewWithUriBySearchParameters(any(), any(), any(), any(), any(), any());
   }
 
   @Test
@@ -95,14 +100,15 @@ class EurLexSOAPSearchServiceTest {
             Optional.empty());
 
     assertThat(searchResults).isEmpty();
-    verify(repository, never()).findAllBySearchParameters(any(), any(), any(), any(), any(), any());
+    verify(repository, never())
+        .findAllNewWithUriBySearchParameters(any(), any(), any(), any(), any(), any());
   }
 
   @Test
   void testGetSearchResults_withoutPage_shouldCallRepositoryRequestWithPageZero() {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().abbreviation("DS").build();
-    when(repository.findAllBySearchParameters(
+    when(repository.findAllNewWithUriBySearchParameters(
             PageRequest.of(0, 100),
             Optional.empty(),
             Optional.empty(),
@@ -123,7 +129,7 @@ class EurLexSOAPSearchServiceTest {
 
     assertThat(searchResults).isEmpty();
     verify(repository, times(1))
-        .findAllBySearchParameters(
+        .findAllNewWithUriBySearchParameters(
             PageRequest.of(0, 100),
             Optional.empty(),
             Optional.empty(),
@@ -137,7 +143,7 @@ class EurLexSOAPSearchServiceTest {
       testGetSearchResults_withBGHDocumentationOfficeAndNoCourtParameter_shouldReturnOnlyEuGDecisions() {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().abbreviation("BGH").build();
-    when(repository.findAllBySearchParameters(
+    when(repository.findAllNewWithUriBySearchParameters(
             any(Pageable.class),
             eq(Optional.empty()),
             eq(Optional.empty()),
@@ -156,7 +162,7 @@ class EurLexSOAPSearchServiceTest {
         Optional.empty());
 
     verify(repository, times(1))
-        .findAllBySearchParameters(
+        .findAllNewWithUriBySearchParameters(
             any(Pageable.class),
             eq(Optional.empty()),
             eq(Optional.empty()),
@@ -170,7 +176,7 @@ class EurLexSOAPSearchServiceTest {
       testGetSearchResults_withBFHDocumentationOfficeAndNoCourtParameter_shouldReturnOnlyEuGHDecisions() {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().abbreviation("BFH").build();
-    when(repository.findAllBySearchParameters(
+    when(repository.findAllNewWithUriBySearchParameters(
             any(Pageable.class),
             eq(Optional.empty()),
             eq(Optional.empty()),
@@ -189,7 +195,7 @@ class EurLexSOAPSearchServiceTest {
         Optional.empty());
 
     verify(repository, times(1))
-        .findAllBySearchParameters(
+        .findAllNewWithUriBySearchParameters(
             any(Pageable.class),
             eq(Optional.empty()),
             eq(Optional.empty()),
@@ -203,7 +209,7 @@ class EurLexSOAPSearchServiceTest {
       testGetSearchResults_withBFHDocumentationOfficeAndCourtParameterSetToEuG_shouldReturnOnlyEuGDecisions() {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().abbreviation("BFH").build();
-    when(repository.findAllBySearchParameters(
+    when(repository.findAllNewWithUriBySearchParameters(
             any(Pageable.class),
             eq(Optional.empty()),
             eq(Optional.empty()),
@@ -222,7 +228,7 @@ class EurLexSOAPSearchServiceTest {
         Optional.empty());
 
     verify(repository, times(1))
-        .findAllBySearchParameters(
+        .findAllNewWithUriBySearchParameters(
             any(Pageable.class),
             eq(Optional.empty()),
             eq(Optional.empty()),
@@ -235,7 +241,7 @@ class EurLexSOAPSearchServiceTest {
   void testGetSearchResults_lastUpdate5MinutesBefore_shouldNotCallRequestNewDecisions() {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().abbreviation("DS").build();
-    when(repository.findAllBySearchParameters(
+    when(repository.findAllNewWithUriBySearchParameters(
             any(Pageable.class),
             eq(Optional.empty()),
             eq(Optional.empty()),
@@ -264,7 +270,7 @@ class EurLexSOAPSearchServiceTest {
   void testGetSearchResults_lastUpdate2DaysBefore_shouldCallRequestNewDecisions() {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().abbreviation("DS").build();
-    when(repository.findAllBySearchParameters(
+    when(repository.findAllNewWithUriBySearchParameters(
             any(Pageable.class),
             eq(Optional.empty()),
             eq(Optional.empty()),
@@ -288,5 +294,33 @@ class EurLexSOAPSearchServiceTest {
 
     verify(service, times(1))
         .requestNewestDecisions(1, LocalDate.ofInstant(twoDaysBefore, ZoneId.of("Europe/Berlin")));
+  }
+
+  @Test
+  void updateResultsStatus_withExistingCelexNumbers_shouldUpdate() {
+    String celex1 = "celex1";
+    String celex2 = "celex2";
+    EurLexResultDTO dto1 =
+        EurLexResultDTO.builder().status(EurLexResultStatus.NEW).createdAt(Instant.now()).build();
+    EurLexResultDTO dto2 =
+        EurLexResultDTO.builder().status(EurLexResultStatus.NEW).createdAt(Instant.now()).build();
+    when(repository.findAllByCelexNumbers(List.of(celex1, celex2))).thenReturn(List.of(dto1, dto2));
+    ArgumentCaptor<List<EurLexResultDTO>> captor = ArgumentCaptor.forClass((Class) List.class);
+
+    service.updateResultStatus(List.of(celex1, celex2));
+
+    verify(repository).saveAll(captor.capture());
+    assertThat(captor.getValue().getFirst().getStatus()).isEqualTo(EurLexResultStatus.ASSIGNED);
+    assertThat(captor.getValue().getLast().getStatus()).isEqualTo(EurLexResultStatus.ASSIGNED);
+  }
+
+  @Test
+  void updateResultsStatus_withNonExistantCelexNumbers_shouldUpdate() {
+    String celex1 = "celex1";
+    String celex2 = "celex2";
+
+    service.updateResultStatus(List.of(celex1, celex2));
+
+    verify(repository, never()).saveAll(anyList());
   }
 }

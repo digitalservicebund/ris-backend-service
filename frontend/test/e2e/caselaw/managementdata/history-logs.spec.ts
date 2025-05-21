@@ -3,21 +3,18 @@ import dayjs from "dayjs"
 import {
   assignUserGroupToProcedure,
   clickCategoryButton,
-  fillInput,
   navigateToAttachments,
   navigateToCategories,
   navigateToHandover,
+  navigateToInbox,
   navigateToManagementData,
-  navigateToPeriodicalReferences,
-  navigateToSearch,
+  createPendingHandoverDecisionForBGH,
   save,
   uploadTestfile,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { deleteAllProcedures } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { generateString } from "~/test-helper/dataGenerators"
-
-const formattedDate = dayjs().format("DD.MM.YYYY")
 
 /* eslint-disable playwright/expect-expect */
 test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
@@ -208,51 +205,41 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     pageWithBghUser,
     edition,
   }) => {
-    const randomFileNumber = generateString()
+    const fileNumber = generateString()
     let documentNumber: string
 
     await test.step("Fremdanlage für BGH anlegen", async () => {
-      await navigateToPeriodicalReferences(page, edition.id ?? "")
-      await fillInput(page, "Zitatstelle *", "12")
-      await expect(page.getByLabel("Zitatstelle *")).toHaveValue("12")
-      await fillInput(page, "Klammernzusatz", "L")
-      await searchForDocUnit(
+      documentNumber = await createPendingHandoverDecisionForBGH(
         page,
+        edition,
+        "12",
         "AG Aachen",
-        formattedDate,
-        randomFileNumber,
+        dayjs("2025-01-01").format("DD.MM.YYYY"),
+        fileNumber,
         "AnU",
-      )
-
-      await expect(
-        page.getByText("Übernehmen und weiter bearbeiten"),
-      ).toBeVisible()
-
-      await expect(
-        page.getByLabel("Zuständige Dokumentationsstelle"),
-      ).toHaveValue("BGH")
-
-      const pagePromise = page.context().waitForEvent("page")
-      await page.getByText("Übernehmen und weiter bearbeiten").click()
-      const newTab = await pagePromise
-      documentNumber = await verifyDocUnitOpensInNewTab(
-        newTab,
-        randomFileNumber,
       )
     })
 
+    await test.step("Nach Aktenzeichen der Fremdanlage suchen", async () => {
+      await navigateToInbox(pageWithBghUser)
+      const fileNumberInput = pageWithBghUser.getByLabel("Aktenzeichen Suche")
+      await fileNumberInput.fill(fileNumber)
+      await pageWithBghUser
+        .getByTestId("pending-handover-inbox")
+        .getByLabel("Nach Dokumentationseinheiten suchen")
+        .click()
+      // 1 result + 1 header
+      await expect(pageWithBghUser.getByRole("row")).toHaveCount(1 + 1)
+    })
+
     await test.step("Fremdanlage als BGH-User annehmen", async () => {
-      await navigateToSearch(pageWithBghUser)
-      await pageWithBghUser
-        .getByRole("textbox", { name: "Dokumentnummer Suche" })
-        .fill(documentNumber)
-      await pageWithBghUser
-        .getByRole("button", { name: "Nach Dokumentationseinheiten" })
-        .click()
-      await pageWithBghUser
-        .getByTestId(`listEntry_${documentNumber}`)
-        .getByRole("button", { name: "Dokumentationseinheit übernehmen" })
-        .click()
+      const rows = pageWithBghUser.locator("tr")
+      const doc1Row = rows.filter({ hasText: documentNumber })
+
+      const takeOverButton = doc1Row.getByRole("button", {
+        name: "Dokumentationseinheit übernehmen",
+      })
+      await takeOverButton.click()
     })
 
     await test.step("BGH-User sieht nur BGH Namen in Verwaltungsdaten", async () => {
@@ -262,7 +249,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
         pageWithBghUser,
         1,
         "DS",
-        `Dokeinheit bearbeitet`,
+        `Fremdanalage angelegt für BGH`,
       )
     })
 
@@ -286,60 +273,6 @@ async function expectHistoryCount(page: Page, count: number) {
     page.getByTestId("document-unit-history-log").getByRole("row"),
     // header counts as row
   ).toHaveCount(count + 1)
-}
-
-async function searchForDocUnit(
-  page: Page,
-  court?: string,
-  date?: string,
-  fileNumber?: string,
-  documentType?: string,
-) {
-  if (fileNumber) {
-    await fillInput(page, "Aktenzeichen", fileNumber)
-  }
-  if (court) {
-    await fillInput(page, "Gericht", court)
-    await page.getByText(court, { exact: true }).click()
-  }
-  if (date) {
-    await fillInput(page, "Entscheidungsdatum", date)
-  }
-  if (documentType) {
-    await fillInput(page, "Dokumenttyp", documentType)
-    await page.getByText("Anerkenntnisurteil", { exact: true }).click()
-  }
-
-  await page.getByText("Suchen").click()
-}
-
-async function verifyDocUnitOpensInNewTab(
-  newTab: Page,
-  randomFileNumber: string,
-) {
-  await expect(newTab).toHaveURL(
-    /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
-  )
-  const documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
-    newTab.url(),
-  )?.[1] as string
-  await expect(newTab.getByLabel("Gericht", { exact: true })).toHaveValue(
-    "AG Aachen",
-  )
-  await expect(
-    newTab.getByLabel("Entscheidungsdatum", { exact: true }),
-  ).toHaveValue(formattedDate)
-  await expect(newTab.getByTestId("chip-value")).toHaveText(randomFileNumber)
-  await expect(newTab.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
-    "Anerkenntnisurteil",
-  )
-
-  // Can be edited and saved after creation
-  await newTab
-    .getByLabel("Entscheidungsdatum", { exact: true })
-    .fill("01.01.2021")
-  await save(newTab)
-  return documentNumber
 }
 
 async function expectHistoryLogRow(

@@ -1,6 +1,7 @@
 import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
 import { caselawTest as test } from "./fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
+import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import SingleNorm from "@/domain/singleNorm"
 import { generateString } from "~/test-helper/dataGenerators"
 
@@ -29,6 +30,24 @@ export const navigateToSearch = async (
     await page.waitForURL("/caselaw")
 
     await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
+  })
+}
+
+export const navigateToInbox = async (
+  page: Page,
+  { navigationBy }: { navigationBy: "click" | "url" } = { navigationBy: "url" },
+) => {
+  await test.step("Navigate to 'Eingang'", async () => {
+    if (navigationBy === "url") {
+      await page.goto(`/caselaw/inbox`, { waitUntil: "domcontentloaded" })
+    } else {
+      await page.getByTestId("inbox-navbar-button").click()
+    }
+    await page.waitForURL("/caselaw/inbox")
+
+    await expect(page.getByText("Fremdanlagen")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
   })
@@ -734,4 +753,67 @@ export async function unassignUserGroupFromProcedure(
       // The unassigned option has an empty value
     ).toHaveText("Nicht zugewiesen", { timeout: 5_000 })
   })
+}
+
+export async function createPendingHandoverDecisionForBGH(
+  page: Page,
+  edition: LegalPeriodicalEdition,
+  citation: string,
+  court: string,
+  date: string,
+  fileNumber: string,
+  doctype: string,
+) {
+  await navigateToPeriodicalReferences(page, edition.id ?? "")
+  const addReferenceButton = page.getByLabel("Weitere Angabe")
+
+  if (await addReferenceButton.isVisible()) {
+    await addReferenceButton.click()
+  }
+
+  await fillInput(page, "Zitatstelle *", citation)
+  await fillInput(page, "Klammernzusatz", "L")
+  await searchForDocUnit(page, court, date, fileNumber, doctype)
+
+  await expect(page.getByText("Übernehmen und weiter bearbeiten")).toBeVisible()
+
+  await expect(page.getByLabel("Zuständige Dokumentationsstelle")).toHaveValue(
+    "BGH",
+  )
+
+  const pagePromise = page.context().waitForEvent("page")
+  await page.getByText("Übernehmen und weiter bearbeiten").click()
+  const newTab = await pagePromise
+  await expect(newTab).toHaveURL(
+    /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
+  )
+  const documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
+    newTab.url(),
+  )?.[1] as string
+  return documentNumber
+}
+
+export async function searchForDocUnit(
+  page: Page,
+  court?: string,
+  date?: string,
+  fileNumber?: string,
+  documentType?: string,
+) {
+  if (fileNumber) {
+    await fillInput(page, "Aktenzeichen", fileNumber)
+  }
+  if (court) {
+    await fillInput(page, "Gericht", court)
+    await page.getByText(court, { exact: true }).click()
+  }
+  if (date) {
+    await fillInput(page, "Entscheidungsdatum", date)
+  }
+  if (documentType) {
+    await fillInput(page, "Dokumenttyp", documentType)
+    await page.getByText("Anerkenntnisurteil", { exact: true }).click()
+  }
+
+  await page.getByText("Suchen").click()
 }
