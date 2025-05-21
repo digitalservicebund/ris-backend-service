@@ -1,11 +1,8 @@
-import { expect, Page } from "@playwright/test"
+import { expect } from "@playwright/test"
 import dayjs from "dayjs"
-import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
-
 import {
-  fillInput,
   navigateToInbox,
-  navigateToPeriodicalReferences,
+  createPendingHandoverDecisionForBGH,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
@@ -488,66 +485,3 @@ test.describe("inbox", () => {
     },
   )
 })
-
-async function createPendingHandoverDecisionForBGH(
-  page: Page,
-  edition: LegalPeriodicalEdition,
-  citation: string,
-  court: string,
-  date: string,
-  fileNumber: string,
-  doctype: string,
-) {
-  await navigateToPeriodicalReferences(page, edition.id ?? "")
-  const addReferenceButton = page.getByLabel("Weitere Angabe")
-
-  if (await addReferenceButton.isVisible()) {
-    await addReferenceButton.click()
-  }
-
-  await fillInput(page, "Zitatstelle *", citation)
-  await fillInput(page, "Klammernzusatz", "L")
-  await searchForDocUnit(page, court, date, fileNumber, doctype)
-
-  await expect(page.getByText("Übernehmen und weiter bearbeiten")).toBeVisible()
-
-  await expect(page.getByLabel("Zuständige Dokumentationsstelle")).toHaveValue(
-    "BGH",
-  )
-
-  const pagePromise = page.context().waitForEvent("page")
-  await page.getByText("Übernehmen und weiter bearbeiten").click()
-  const newTab = await pagePromise
-  await expect(newTab).toHaveURL(
-    /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
-  )
-  const documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
-    newTab.url(),
-  )?.[1] as string
-  return documentNumber
-}
-
-async function searchForDocUnit(
-  page: Page,
-  court?: string,
-  date?: string,
-  fileNumber?: string,
-  documentType?: string,
-) {
-  if (fileNumber) {
-    await fillInput(page, "Aktenzeichen", fileNumber)
-  }
-  if (court) {
-    await fillInput(page, "Gericht", court)
-    await page.getByText(court, { exact: true }).click()
-  }
-  if (date) {
-    await fillInput(page, "Entscheidungsdatum", date)
-  }
-  if (documentType) {
-    await fillInput(page, "Dokumenttyp", documentType)
-    await page.getByText("Anerkenntnisurteil", { exact: true }).click()
-  }
-
-  await page.getByText("Suchen").click()
-}
