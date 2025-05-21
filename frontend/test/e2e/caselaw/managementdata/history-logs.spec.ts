@@ -228,7 +228,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
         .getByTestId("pending-handover-inbox")
         .getByLabel("Nach Dokumentationseinheiten suchen")
         .click()
-      // 2 results + 1 header
+      // 1 result + 1 header
       await expect(pageWithBghUser.getByRole("row")).toHaveCount(1 + 1)
     })
 

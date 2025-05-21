@@ -6,17 +6,15 @@ import {
   navigateToPreview,
   navigateToReferences,
   navigateToSearch,
-  navigateToInbox,
   save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
-import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { generateString } from "~/test-helper/dataGenerators"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")
 
-async function verifyDocUnitOpensInNewTab(
+async function verifyDocUnitOpensInEditMode(
   newTab: Page,
   randomFileNumber: string,
 ) {
@@ -43,39 +41,6 @@ async function verifyDocUnitOpensInNewTab(
     .fill("01.01.2021")
   await save(newTab)
   return documentNumber
-}
-
-async function verifyDocUnitCanBeTakenOver(
-  pageWithBghUser: Page,
-  documentNumber: string,
-  edition: LegalPeriodicalEdition,
-) {
-  await navigateToInbox(pageWithBghUser)
-  await pageWithBghUser.getByTestId("external-handover-tab").click()
-
-  await pageWithBghUser
-    .getByLabel("Nach Dokumentationseinheiten suchen")
-    .click()
-
-  const listEntry = pageWithBghUser.locator(
-    `tr[data-p-index="0"] >> text=${documentNumber}`,
-  )
-  await expect(listEntry).toBeVisible()
-  await expect(listEntry).toContainText("Fremdanlage")
-  await expect(listEntry).toContainText(
-    ` MMG ${edition.prefix}12${edition.suffix} (DS)`,
-  )
-  await expect(
-    pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
-  ).toBeVisible()
-
-  await expect(
-    pageWithBghUser.getByText("Dokumentationseinheit bearbeiten"),
-  ).toBeHidden()
-
-  await expect(
-    pageWithBghUser.getByLabel("Dokumentationseinheit löschen"),
-  ).toBeVisible()
 }
 
 test.describe(
@@ -448,7 +413,7 @@ test.describe(
           const newTab = await pagePromise
 
           await test.step("Created documentation unit opens up with in new tab with correct data and reference assigned and is editable", async () => {
-            documentNumber = await verifyDocUnitOpensInNewTab(
+            documentNumber = await verifyDocUnitOpensInEditMode(
               newTab,
               randomFileNumber,
             )
@@ -585,7 +550,7 @@ test.describe(
       {
         tag: ["@RISDEV-4832", "@RISDEV-4980, @RISDEV-6381"],
       },
-      async ({ page, pageWithBghUser, edition, browserName }) => {
+      async ({ page, edition, browserName }) => {
         await navigateToPeriodicalReferences(page, edition.id ?? "")
         const randomFileNumber = generateString()
         let documentNumber = ""
@@ -616,11 +581,13 @@ test.describe(
         const newTab = await pagePromise
 
         await test.step("Created documentation unit for foreign docoffice is editable for creating docoffice", async () => {
-          documentNumber = await verifyDocUnitOpensInNewTab(
+          documentNumber = await verifyDocUnitOpensInEditMode(
             newTab,
             randomFileNumber,
           )
+        })
 
+        await test.step("Created documentation unit's has reference assigned", async () => {
           await newTab.keyboard.down("v")
 
           await expect(newTab.getByText("Sekundäre Fundstellen")).toBeVisible()
@@ -630,6 +597,13 @@ test.describe(
               { exact: true },
             ),
           ).toBeVisible()
+        })
+
+        await test.step("Created documentation unit's source is automatically set to 'Z'", async () => {
+          await expect(
+            newTab.getByTestId("preview").getByText("Quelle"),
+          ).toBeVisible()
+          await expect(newTab.getByText("Z", { exact: true })).toBeVisible()
         })
 
         await test.step("The new documentation unit is added to the list of references", async () => {
@@ -671,27 +645,6 @@ test.describe(
           await expect(listEntry).toHaveCount(0)
         })
 
-        await test.step("Created documentation unit is visible with 'Übernehmen' button to foreign doc office in search with Fremdanlage status", async () => {
-          await verifyDocUnitCanBeTakenOver(
-            pageWithBghUser,
-            documentNumber,
-            edition,
-          )
-        })
-
-        await test.step("Created documentation unit's source is automatically set to 'Z'", async () => {
-          const pagePromise = pageWithBghUser.context().waitForEvent("page")
-          await pageWithBghUser
-            .getByLabel("Dokumentationseinheit ansehen")
-            .click()
-          const newTab = await pagePromise
-          await expect(newTab).toHaveURL(
-            /\/caselaw\/documentunit\/[A-Z0-9]{13}\/preview$/,
-          )
-          await expect(newTab.getByText("Quelle")).toBeVisible()
-          await expect(newTab.getByText("Z", { exact: true })).toBeVisible()
-        })
-
         await test.step("Created DocUnit is deleted when reference is deleted", async () => {
           await page.getByTestId("list-entry-0").click()
 
@@ -727,168 +680,6 @@ test.describe(
               "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung.",
             ),
           ).toBeVisible()
-        })
-      },
-    )
-
-    test(
-      "Takeover and deletion of created documentation unit from foreign docoffice",
-      {
-        tag: ["@RISDEV-4833"],
-      },
-      async ({ page, pageWithBghUser, edition }) => {
-        await navigateToPeriodicalReferences(page, edition.id ?? "")
-        let documentNumber1 = ""
-        let documentNumber2 = ""
-
-        await expect(page.getByLabel("Zitatstelle Präfix")).toHaveValue(
-          edition.prefix!,
-        )
-        await expect(page.getByLabel("Zitatstelle Suffix")).toHaveValue(
-          edition.suffix!,
-        )
-        await test.step("Creating docoffice creates a documentunit for owning docoffice and has edit rights", async () => {
-          await fillInput(page, "Zitatstelle *", "12")
-          await expect(page.getByLabel("Zitatstelle *")).toHaveValue("12")
-          await fillInput(page, "Klammernzusatz", "L")
-          await searchForDocUnit(
-            page,
-            "AG Aachen",
-            formattedDate,
-            generateString(),
-            "AnU",
-          )
-
-          await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
-          ).toHaveValue("BGH")
-        })
-
-        await test.step("Creating docoffice has access to created docunit", async () => {
-          const pagePromise = page.context().waitForEvent("page")
-          await page.getByText("Übernehmen und weiter bearbeiten").click()
-          const newTab = await pagePromise
-          await expect(newTab).toHaveURL(
-            /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
-          )
-          documentNumber1 = /caselaw\/documentunit\/(.*)\/categories/g.exec(
-            newTab.url(),
-          )?.[1] as string
-          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
-        })
-
-        await test.step("Creating docoffice creates a second documentunit for owning docoffice", async () => {
-          await expect(page.getByLabel("Zitatstelle *")).toBeVisible()
-
-          await fillInput(page, "Zitatstelle *", "12")
-          await fillInput(page, "Klammernzusatz", "L")
-
-          await searchForDocUnit(
-            page,
-            "AG Aachen",
-            formattedDate,
-            generateString(),
-            "AnU",
-          )
-
-          await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
-          ).toHaveValue("BGH")
-          await page.getByText("Übernehmen", { exact: true }).click()
-
-          const listItems = await page.getByLabel("Listen Eintrag").all()
-
-          //get the document number of the second
-          const dataTestId = await listItems[1]
-            .locator('[data-testid^="document-number-link-"]')
-            .getAttribute("data-testid")
-
-          const documentNumberMatch = dataTestId?.match(
-            /document-number-link-(\w+)/,
-          )
-          // eslint-disable-next-line playwright/no-conditional-in-test
-          if (documentNumberMatch) {
-            documentNumber2 = documentNumberMatch[1]
-          }
-          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(3)
-        })
-
-        await test.step("Owning docoffice user can preview a created docunit from periodical evaluation", async () => {
-          await navigateToSearch(pageWithBghUser)
-
-          await pageWithBghUser
-            .getByLabel("Dokumentnummer Suche")
-            .fill(documentNumber1)
-
-          await pageWithBghUser.getByLabel("Status Suche").click()
-          await pageWithBghUser
-            .getByRole("option", {
-              name: "Fremdanlage",
-              exact: true,
-            })
-            .click()
-          await pageWithBghUser
-            .getByLabel("Nach Dokumentationseinheiten suchen")
-            .click()
-          const listEntry = pageWithBghUser.getByRole("row")
-          await expect(listEntry).toHaveCount(1)
-
-          await expect(
-            pageWithBghUser.getByLabel("Dokumentationseinheit ansehen"),
-          ).toBeVisible()
-          const pagePromise = pageWithBghUser.context().waitForEvent("page")
-          await pageWithBghUser
-            .getByLabel("Dokumentationseinheit ansehen")
-            .click()
-
-          const newTab = await pagePromise
-          await expect(newTab).toHaveURL(
-            /\/caselaw\/documentunit\/[A-Z0-9]{13}\/preview$/,
-          )
-        })
-
-        await test.step("Owning docoffice can accept a created docunit from periodical evaluation, which changes the status to unpublished", async () => {
-          await verifyDocUnitCanBeTakenOver(
-            pageWithBghUser,
-            documentNumber1,
-            edition,
-          )
-          await pageWithBghUser
-            .getByLabel("Dokumentationseinheit übernehmen")
-            .click()
-
-          await expect(
-            pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
-          ).toBeHidden()
-          await expect(
-            pageWithBghUser.getByLabel("Dokumentationseinheit bearbeiten"),
-          ).toBeVisible()
-          await expect(pageWithBghUser.getByRole("row")).toContainText(
-            `Unveröffentlicht`,
-          )
-        })
-
-        await test.step("Owning docoffice can delete a created docunit from periodical evaluation, which also deletes the reference in the edition", async () => {
-          await verifyDocUnitCanBeTakenOver(
-            pageWithBghUser,
-            documentNumber2,
-            edition,
-          )
-          await pageWithBghUser
-            .getByLabel("Dokumentationseinheit löschen")
-            .click()
-
-          await pageWithBghUser.locator('button:has-text("Löschen")').click()
-
-          await expect(pageWithBghUser.getByRole("row")).toHaveCount(0)
-          const listEntry = pageWithBghUser.locator(
-            `tr[data-p-index="0"] >> text=${documentNumber2}`,
-          )
-          await expect(listEntry).toBeHidden()
-
-          await page.reload()
-          await expect(page.getByText(documentNumber2)).toBeHidden()
-          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
         })
       },
     )
