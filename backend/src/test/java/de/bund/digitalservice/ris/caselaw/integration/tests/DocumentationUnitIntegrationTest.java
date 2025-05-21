@@ -116,6 +116,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -127,6 +128,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -228,6 +230,7 @@ class DocumentationUnitIntegrationTest {
     repository.deleteAll();
     databaseDocumentTypeRepository.deleteAll();
     databaseDocumentNumberRepository.deleteAll();
+    procedureRepository.deleteAll();
   }
 
   @Test
@@ -1699,5 +1702,132 @@ class DocumentationUnitIntegrationTest {
           .expectStatus()
           .isForbidden();
     }
+  }
+
+  @Test
+  void assignDocumentationOffice_withoutRights_shouldBeForbidden() {
+    // Arrange
+    var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+    var decisionBuilder =
+        DecisionDTO.builder()
+            .documentNumber("DOCNUMBER_001")
+            .documentationOffice(documentationOffice);
+    var documentationUnit =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(repository, decisionBuilder);
+
+    // Act
+    risWebTestClient
+        .withExternalLogin()
+        .put()
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentationUnit.getId()
+                + "/assign/"
+                + bghDocOffice.getId())
+        .exchange()
+        .expectStatus()
+        .isForbidden()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              var documentationUnitDTO = repository.findById(documentationUnit.getId());
+              assertThat(documentationUnitDTO.get().getDocumentationOffice())
+                  .isEqualTo(documentationOffice);
+            });
+  }
+
+  @Test
+  void assignDocumentationOffice_withoutProcedures_shouldSucceed() {
+    // Arrange
+    var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+    var decisionBuilder =
+        DecisionDTO.builder()
+            .documentNumber("DOCNUMBER_001")
+            .documentationOffice(documentationOffice);
+    var documentationUnit =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(repository, decisionBuilder);
+
+    // Act
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentationUnit.getId()
+                + "/assign/"
+                + bghDocOffice.getId())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              assertThat(response.getResponseBody())
+                  .isEqualTo("The documentation office [BGH] has been successfully assigned.");
+              var documentationUnitDTO = repository.findById(documentationUnit.getId());
+              assertThat(documentationUnitDTO.get().getDocumentationOffice().getId())
+                  .isEqualTo(bghDocOffice.getId());
+            });
+  }
+
+  @Transactional
+  @Test
+  void assignDocumentationOffice_withProcedures_shouldSucceedAndRemoveProcedures() {
+    // Arrange
+    var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+    var decisionId = createDecisionWithProcedures();
+
+    // Act
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + decisionId + "/assign/" + bghDocOffice.getId())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              assertThat(response.getResponseBody())
+                  .isEqualTo("The documentation office [BGH] has been successfully assigned.");
+              var docUnitWithoutProcedure = repository.findById(decisionId);
+              assertThat(docUnitWithoutProcedure.get().getProcedure()).isNull();
+              assertThat(docUnitWithoutProcedure.get().getProcedureHistory()).isEmpty();
+              assertThat(docUnitWithoutProcedure.get().getDocumentationOffice())
+                  .isEqualTo(bghDocOffice);
+            });
+  }
+
+  private UUID createDecisionWithProcedures() {
+    List<ProcedureDTO> procedures =
+        List.of(
+            ProcedureDTO.builder()
+                .documentationOffice(documentationOffice)
+                .label("vorgang1")
+                .build(),
+            ProcedureDTO.builder()
+                .documentationOffice(documentationOffice)
+                .label("vorgang2")
+                .build());
+    procedureRepository.saveAll(procedures);
+    String documentNumber =
+        new Random().ints(13, 0, 10).mapToObj(Integer::toString).collect(Collectors.joining());
+    var decision =
+        repository.save(
+            DecisionDTO.builder()
+                .documentNumber(documentNumber)
+                .procedure(procedures.get(0))
+                .procedureHistory(new ArrayList<>(List.of(procedures.get(1))))
+                .documentationOffice(documentationOffice)
+                .build());
+    assertThat(procedureRepository.count()).isEqualTo(2);
+    var docUnitWithProcedure = repository.findById(decision.getId());
+    assertThat(docUnitWithProcedure.get().getProcedure().getLabel()).isEqualTo("vorgang1");
+    assertThat(docUnitWithProcedure.get().getProcedureHistory().get(0).getLabel())
+        .isEqualTo("vorgang2");
+    return decision.getId();
   }
 }

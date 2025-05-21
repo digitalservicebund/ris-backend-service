@@ -54,6 +54,7 @@ import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -911,5 +912,88 @@ class DocumentationUnitControllerTest {
         .exchange()
         .expectStatus()
         .is4xxClientError();
+  }
+
+  @Test
+  void test_assignDocumentationOffice_withoutException_shouldSucceed()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    var result = "The documentation office 'Test' has been successfully assigned.";
+    UUID documentationOfficeId = UUID.randomUUID();
+    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+    when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
+        .thenReturn(result);
+
+    // Act
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              assertThat(response.getResponseBody()).isEqualTo(result);
+            });
+  }
+
+  @Test
+  void test_assignDocumentationOffice_withDocumentationUnitNotExistsException_shouldReturn404()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    var result = "Documentation unit not found";
+    UUID documentationOfficeId = UUID.randomUUID();
+    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+    when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
+        .thenThrow(DocumentationUnitNotExistsException.class);
+
+    // Act
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .exchange()
+        .expectStatus()
+        .isNotFound()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              assertThat(response.getResponseBody()).isEqualTo(result);
+            });
+  }
+
+  @Test
+  void test_assignDocumentationOffice_withDocumentationUnitException_shouldReturnBadRequest()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    UUID documentationOfficeId = UUID.randomUUID();
+    var result =
+        String.format(
+            "Error assigning documentation office %s to %s", TEST_UUID, documentationOfficeId);
+    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+    when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
+        .thenThrow(new DocumentationUnitException(result));
+
+    // Act
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              assertThat(response.getResponseBody()).isEqualTo(result);
+            });
   }
 }
