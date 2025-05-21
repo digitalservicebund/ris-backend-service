@@ -11,7 +11,8 @@ INSERT INTO
     documentation_office_id,
     judicial_body,
     last_publication_date_time,
-    scheduled_publication_date_time
+    scheduled_publication_date_time,
+    inbox_status
   )
 VALUES
   (
@@ -45,6 +46,7 @@ VALUES
     ),
     '1.Senat, 2. Kammer',
     '2000-11-21 09:42:49.385920',
+    NULL,
     NULL
   ),
   (
@@ -63,7 +65,8 @@ VALUES
     ),
     NULL,
     NULL,
-    '2100-11-21 09:42:49.385920'
+    '2100-11-21 09:42:49.385920',
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -96,7 +99,8 @@ VALUES
     ),
     '1.Senat, 2. Kammer',
     NULL,
-    '2100-11-30 19:46:49.385920'
+    '2100-11-30 19:46:49.385920',
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -129,6 +133,7 @@ VALUES
         abbreviation = 'DS'
     ),
     '1.Senat, 2. Kammer',
+    NULL,
     NULL,
     NULL
   ),
@@ -163,6 +168,7 @@ VALUES
     ),
     '1.Senat, 2. Kammer',
     '2001-11-21 09:42:49.385920',
+    NULL,
     NULL
   ),
   (
@@ -181,6 +187,7 @@ VALUES
     ),
     NULL,
     '2002-11-21 09:42:49.385920',
+    NULL,
     NULL
   ),
   (
@@ -197,6 +204,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     NULL,
     NULL,
     NULL
@@ -224,6 +232,7 @@ VALUES
     ),
     '1.Senat, 2. Kammer',
     NULL,
+    NULL,
     NULL
   ),
   (
@@ -248,6 +257,7 @@ VALUES
         abbreviation = 'DS'
     ),
     '1.Senat, 2. Kammer',
+    NULL,
     NULL,
     NULL
   ),
@@ -282,6 +292,7 @@ VALUES
     ),
     '1.Senat, 2. Kammer',
     NULL,
+    NULL,
     NULL
   ),
   (
@@ -314,6 +325,7 @@ VALUES
         abbreviation = 'DS'
     ),
     '1.Senat, 2. Kammer',
+    NULL,
     NULL,
     NULL
   ),
@@ -348,7 +360,8 @@ VALUES
     ),
     '1.Senat, 2. Kammer',
     NULL,
-    NULL
+    NULL,
+    'EU'
   ),
   (
     gen_random_uuid (),
@@ -381,7 +394,8 @@ VALUES
     ),
     '1.Senat, 2. Kammer',
     NULL,
-    '2100-11-21 19:42:49.385920'
+    '2100-11-21 19:42:49.385920',
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -415,7 +429,8 @@ VALUES
     ),
     '1.Senat, 2. Kammer',
     NULL,
-    '2100-11-21 10:42:49.385920'
+    '2100-11-21 10:42:49.385920',
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -440,6 +455,7 @@ VALUES
     ),
     '1.Senat, 2. Kammer',
     '2005-11-21 09:42:49.385920',
+    NULL,
     NULL
   ),
   (
@@ -465,7 +481,8 @@ VALUES
       ),
       NULL,
       NULL,
-      NULL
+      NULL,
+    NULL
   ),
     --- pending proceeding ---
     (
@@ -499,7 +516,8 @@ VALUES
       ),
       NULL,
       NULL,
-      NULL
+      NULL,
+    NULL
   ),
     (
         gen_random_uuid (),
@@ -530,6 +548,7 @@ VALUES
       WHERE
       abbreviation = 'DS'
   ),
+    NULL,
     NULL,
     NULL,
     NULL

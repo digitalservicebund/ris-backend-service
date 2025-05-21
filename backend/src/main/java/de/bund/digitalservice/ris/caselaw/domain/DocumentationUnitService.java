@@ -57,6 +57,7 @@ public class DocumentationUnitService {
           "/coreData/decisionDate",
           "/coreData/deviatingDecisionDates",
           "/coreData/documentType");
+  private final DocumentationUnitHistoryLogService historyLogService;
 
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
@@ -69,7 +70,8 @@ public class DocumentationUnitService {
       TransformationService transformationService,
       @Lazy AuthService authService,
       PatchMapperService patchMapperService,
-      DuplicateCheckService duplicateCheckService) {
+      DuplicateCheckService duplicateCheckService,
+      DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -82,6 +84,7 @@ public class DocumentationUnitService {
     this.statusService = statusService;
     this.authService = authService;
     this.duplicateCheckService = duplicateCheckService;
+    this.historyLogService = historyLogService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -166,6 +169,13 @@ public class DocumentationUnitService {
 
     var newDocumentationUnit =
         repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
+
+    if (isExternalHandover) {
+      String description =
+          "Fremdanalage angelegt für " + params.documentationOffice().abbreviation();
+      historyLogService.saveHistoryLog(
+          newDocumentationUnit.uuid(), user, HistoryLogEventType.EXTERNAL_HANDOVER, description);
+    }
 
     if (celexNumber != null) {
       transformationService.getDataFromEurlex(celexNumber, newDocumentationUnit, user);

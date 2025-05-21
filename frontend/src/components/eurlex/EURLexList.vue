@@ -42,7 +42,7 @@ onMounted(async () => {
   ).data.value
 
   documentationOffices.value = comboboxItems?.map(
-    ({ value }) => value as DocumentationOffice,
+    (item) => item.value as DocumentationOffice,
   )
 })
 

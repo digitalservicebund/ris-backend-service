@@ -85,7 +85,7 @@ const ariaLabelIcon = props.title + " icon"
           <li v-for="(desc, index) in description" :key="index">{{ desc }}</li>
         </ul>
       </div>
-      <span v-else class="ris-body1-regular">{{
+      <span v-else class="ris-label2-regular">{{
         isArray ? description[0] : description
       }}</span>
     </div>

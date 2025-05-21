@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
+import Button from "primevue/button"
 import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import Tooltip from "./Tooltip.vue"
@@ -21,7 +22,6 @@ import { useStatusBadge } from "@/composables/useStatusBadge"
 import { PublicationState } from "@/domain/publicationStatus"
 import { ResponseError } from "@/services/httpClient"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
-import IconCheck from "~icons/ic/baseline-check"
 import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
 import IconSubject from "~icons/ic/baseline-subject"
@@ -40,7 +40,6 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   deleteDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
-  takeOverDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
 
 dayjs.extend(dayjsUtc)
@@ -291,48 +290,34 @@ function onDelete() {
           {{ publicationDate(listEntry) }}
         </CellItem>
         <CellItem class="flex">
-          <div class="float-end flex">
-            <Tooltip
-              v-if="
-                listEntry.status?.publicationStatus ==
-                'EXTERNAL_HANDOVER_PENDING'
-              "
-              text="Übernehmen"
-            >
-              <button
-                aria-label="Dokumentationseinheit übernehmen"
-                class="flex cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200 disabled:border-gray-600 disabled:text-gray-600"
-                :disabled="!listEntry.isEditable"
-                @click="emit('takeOverDocumentationUnit', listEntry)"
-              >
-                <IconCheck />
-              </button>
-            </Tooltip>
-            <Tooltip v-else-if="listEntry.isEditable" text="Bearbeiten">
+          <div class="flex flex-row -space-x-2">
+            <Tooltip text="Bearbeiten">
               <router-link
-                aria-label="Dokumentationseinheit bearbeiten"
-                class="flex cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
                 target="_blank"
                 :to="{
                   name: 'caselaw-documentUnit-documentNumber-categories',
                   params: { documentNumber: listEntry.documentNumber },
                 }"
               >
-                <IconEdit />
+                <Button
+                  aria-label="Dokumentationseinheit bearbeiten"
+                  :disabled="
+                    !listEntry.isEditable ||
+                    listEntry.status?.publicationStatus ==
+                      PublicationState.EXTERNAL_HANDOVER_PENDING
+                  "
+                  severity="secondary"
+                  size="small"
+                >
+                  <template #icon>
+                    <IconEdit />
+                  </template>
+                </Button>
               </router-link>
             </Tooltip>
-            <div
-              v-else
-              aria-label="Dokumentationseinheit bearbeiten"
-              class="border-2 border-r-0 border-solid border-gray-600 p-4 text-gray-600"
-            >
-              <IconEdit />
-            </div>
 
             <Tooltip text="Vorschau">
               <router-link
-                aria-label="Dokumentationseinheit ansehen"
-                class="flex cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
                 target="_blank"
                 :to="{
                   name:
@@ -342,13 +327,28 @@ function onDelete() {
                   params: { documentNumber: listEntry.documentNumber },
                 }"
               >
-                <IconView />
+                <Button
+                  aria-label="Dokumentationseinheit ansehen"
+                  class="z-10"
+                  severity="secondary"
+                  size="small"
+                >
+                  <template #icon>
+                    <IconView />
+                  </template>
+                </Button>
               </router-link>
             </Tooltip>
-            <Tooltip v-if="listEntry.isDeletable" text="Löschen">
-              <button
+            <Tooltip text="Löschen">
+              <Button
                 aria-label="Dokumentationseinheit löschen"
-                class="flex cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+                :disabled="
+                  !listEntry.isDeletable ||
+                  listEntry.status?.publicationStatus ==
+                    'EXTERNAL_HANDOVER_PENDING'
+                "
+                severity="secondary"
+                size="small"
                 @click="
                   setSelectedDocumentUnitListEntry(
                     documentUnitListEntries?.find(
@@ -364,16 +364,11 @@ function onDelete() {
                   )
                 "
               >
-                <IconDelete />
-              </button>
+                <template #icon>
+                  <IconDelete />
+                </template>
+              </Button>
             </Tooltip>
-            <div
-              v-else
-              aria-label="Dokumentationseinheit löschen"
-              class="flex border-2 border-l-0 border-solid border-gray-600 p-4 text-gray-600"
-            >
-              <IconDelete />
-            </div>
           </div>
         </CellItem>
       </TableRow>
