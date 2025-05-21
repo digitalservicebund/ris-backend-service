@@ -22,6 +22,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   updatePage: [number]
+  assign: [number]
 }>()
 
 const selectedEntries = ref<EURLexResult[]>([])
@@ -29,6 +30,7 @@ const noDecisionSelected = ref<boolean>(false)
 const selectedDocumentationOffice = ref<DocumentationOffice>()
 const noDocumentationOfficeSelected = ref<boolean>(false)
 const documentationOffices = ref<DocumentationOffice[]>()
+const currentPage = ref<number>(props.pageEntries?.number ?? 0)
 
 const entries = computed(() => {
   return props.pageEntries?.content || []
@@ -50,6 +52,11 @@ function openPreview(entry: EURLexResult) {
   }
 }
 
+function updatePage(page: number) {
+  emit("updatePage", page)
+  currentPage.value = page
+}
+
 async function handleAssignToDocOffice() {
   if (selectedEntries.value?.length == 0) {
     noDecisionSelected.value = true
@@ -68,6 +75,8 @@ async function handleAssignToDocOffice() {
     await documentationUnitService.createNewOutOfEurlexDecision(params)
 
     selectedEntries.value = []
+
+    emit("assign", currentPage.value)
   }
 }
 
@@ -113,7 +122,7 @@ function selectDocumentationOffice() {
     <Pagination
       navigation-position="bottom"
       :page="pageEntries"
-      @update-page="emit('updatePage', $event)"
+      @update-page="updatePage"
     >
       <span
         v-if="noDecisionSelected"

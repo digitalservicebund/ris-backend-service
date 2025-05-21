@@ -110,9 +110,9 @@ describe("eurlex list", () => {
 
   test(
     "select entry, select a doc office and press Zuweisen should call service to generate " +
-      "documentation out out of eurlex decisions and deselect all checklboxes",
+      "documentation out out of eurlex decisions, deselect all checkboxes and emit assignment",
     async () => {
-      renderComponent({
+      const { emitted } = renderComponent({
         content: [
           {
             ecli: "ecli",
@@ -153,6 +153,8 @@ describe("eurlex list", () => {
       screen.getAllByRole("checkbox").forEach((checkbox) => {
         expect(checkbox).not.toBeChecked()
       })
+
+      expect(emitted()["assign"]).toBeTruthy()
     },
   )
 })

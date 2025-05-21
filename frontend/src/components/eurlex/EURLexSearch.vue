@@ -148,5 +148,9 @@ function resetSearch() {
       </div>
     </div>
   </div>
-  <EURLexList :page-entries="searchResults" @update-page="updatePage" />
+  <EURLexList
+    :page-entries="searchResults"
+    @assign="updatePage"
+    @update-page="updatePage"
+  />
 </template>
