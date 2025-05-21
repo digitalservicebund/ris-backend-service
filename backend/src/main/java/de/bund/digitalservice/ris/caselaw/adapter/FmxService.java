@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.TransformationService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -164,6 +165,7 @@ public class FmxService implements TransformationService {
 
       CoreData.CoreDataBuilder coreDataBuilder = documentationUnit.coreData().toBuilder();
       LongTexts.LongTextsBuilder longTextsBuilder = documentationUnit.longTexts().toBuilder();
+      ShortTexts.ShortTextsBuilder shortTextsBuilder = documentationUnit.shortTexts().toBuilder();
 
       CoreData coreData =
           transformCoreData(
@@ -180,11 +182,16 @@ public class FmxService implements TransformationService {
         longTexts = longTextsBuilder.build();
       }
 
+      if (Strings.isNotBlank(celex)) {
+        shortTextsBuilder.headnote("CELEX Nummer: " + celex);
+      }
+
       DocumentationUnit updatedDocumentationUnit =
           documentationUnit.toBuilder()
               .inboxStatus(InboxStatus.EU)
               .coreData(coreData)
               .longTexts(longTexts)
+              .shortTexts(shortTextsBuilder.build())
               .build();
 
       documentationUnitRepository.save(

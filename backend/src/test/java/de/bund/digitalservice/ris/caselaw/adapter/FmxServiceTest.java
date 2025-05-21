@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
@@ -100,6 +101,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
 
     doReturn(judgment)
@@ -131,6 +133,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
 
     doReturn(judgment)
@@ -158,6 +161,7 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2024:60");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Urteil");
+    assertThat(savedDocUnit.shortTexts().headnote()).isEqualTo("CELEX Nummer: " + celexNumber);
     assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
@@ -173,6 +177,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn(order)
         .when(retrievalService)
@@ -201,6 +206,7 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:T:2024:142");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Beschluss");
+    assertThat(savedDocUnit.shortTexts().headnote()).isEqualTo("CELEX Nummer: " + celexNumber);
     assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
@@ -216,6 +222,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn(opinion)
         .when(retrievalService)
@@ -242,6 +249,7 @@ class FmxServiceTest {
     assertThat(savedDocUnit.coreData().ecli()).isEqualTo("ECLI:EU:C:2014:2303");
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Gutachten");
+    assertThat(savedDocUnit.shortTexts().headnote()).isEqualTo("CELEX Nummer: " + celexNumber);
     assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
@@ -257,6 +265,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn(judgment)
         .when(retrievalService)
@@ -296,6 +305,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn(order)
         .when(retrievalService)
@@ -336,6 +346,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn(opinion)
         .when(retrievalService)
@@ -376,6 +387,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn("")
         .when(retrievalService)
@@ -398,6 +410,7 @@ class FmxServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
             .build();
     doReturn("lorem ipsum")
         .when(retrievalService)
