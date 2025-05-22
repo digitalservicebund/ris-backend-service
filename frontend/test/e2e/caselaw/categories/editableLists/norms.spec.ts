@@ -2,6 +2,7 @@ import { expect } from "@playwright/test"
 import SingleNorm from "@/domain/singleNorm"
 import {
   clearInput,
+  fillCombobox,
   fillNormInputs,
   navigateToCategories,
   save,
@@ -239,8 +240,7 @@ test.describe("norm", () => {
     await expect(container.getByText("PBefG")).toBeVisible()
     await expect(container.getByText("§ 123")).toBeVisible()
 
-    await page.getByLabel("RIS-Abkürzung").fill("PBefG")
-    await page.getByText("PBefG", { exact: true }).click()
+    await fillCombobox(page, "RIS-Abkürzung", "PBefG")
 
     await expect(
       container.getByText("RIS-Abkürzung bereits eingegeben"),
@@ -252,8 +252,7 @@ test.describe("norm", () => {
 
     await container.getByLabel("Norm speichern").click()
     await container.getByTestId("list-entry-1").click()
-    await page.getByLabel("RIS-Abkürzung").fill("PBefG")
-    await page.getByText("PBefG", { exact: true }).click()
+    await fillCombobox(page, "RIS-Abkürzung", "PBefG")
 
     await expect(
       container.getByText("RIS-Abkürzung bereits eingegeben"),
@@ -301,12 +300,7 @@ test.describe("norm", () => {
     }) => {
       await navigateToCategories(page, documentNumber)
 
-      await page.getByLabel("Gericht", { exact: true }).fill("aalen")
-      await page.getByText("AG Aalen", { exact: true }).click()
-      page.getByLabel("Gericht", { exact: true })
-      await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-        "AG Aalen",
-      )
+      await fillCombobox(page, "Gericht", "AG Aalen")
 
       await fillNormInputs(page, {
         normAbbreviation: "PBefG",
@@ -317,8 +311,7 @@ test.describe("norm", () => {
 
       await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeHidden()
 
-      await page.getByLabel("Gericht", { exact: true }).fill("VerfG")
-      await page.getByText("VerfG Dessau", { exact: true }).last().click()
+      await fillCombobox(page, "Gericht", "VerfG Dessau")
       await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeVisible()
     })
 
@@ -329,8 +322,7 @@ test.describe("norm", () => {
       await navigateToCategories(page, documentNumber)
       const normContainer = page.getByLabel("Norm")
 
-      await page.getByLabel("Gericht", { exact: true }).fill("VerfG")
-      await page.getByText("VerfG Dessau").last().click()
+      await fillCombobox(page, "Gericht", "VerfG Dessau")
 
       await fillNormInputs(page, {
         normAbbreviation: "PBefG",
@@ -355,12 +347,9 @@ test.describe("norm", () => {
       await expect(legalForceRegionCombobox).toBeVisible()
 
       // add new legal force
-      await page.getByLabel("Gesetzeskraft Typ").fill("Nichtig")
-      await expect(page.getByLabel("dropdown-option")).toHaveCount(1)
-      await page.getByLabel("dropdown-option").getByText("Nichtig").click()
+      await fillCombobox(page, "Gesetzeskraft Typ", "Nichtig")
 
-      await page.getByLabel("Gesetzeskraft Geltungsbereich").fill("Brandenburg")
-      await page.getByLabel("dropdown-option").getByText("Brandenburg").click()
+      await fillCombobox(page, "Gesetzeskraft Geltungsbereich", "Brandenburg")
 
       const saveNormButton = normContainer.getByLabel("Norm speichern")
       await saveNormButton.click()
@@ -372,11 +361,9 @@ test.describe("norm", () => {
       await expect(listEntries).toHaveCount(2)
       await normContainer.getByTestId("list-entry-0").click()
 
-      await page.getByLabel("Gesetzeskraft Typ").fill("Vereinbar")
-      await page.getByLabel("dropdown-option").getByText("Vereinbar").click()
+      await fillCombobox(page, "Gesetzeskraft Typ", "Vereinbar")
 
-      await page.getByLabel("Gesetzeskraft Geltungsbereich").fill("Berlin")
-      await page.getByLabel("dropdown-option").getByText("Berlin (Ost)").click()
+      await fillCombobox(page, "Gesetzeskraft Geltungsbereich", "Berlin (Ost)")
 
       await saveNormButton.click()
 
@@ -386,7 +373,11 @@ test.describe("norm", () => {
       await normContainer.getByTestId("list-entry-0").click()
 
       await clearInput(page, "Gesetzeskraft Typ")
-      await clearInput(page, "Gesetzeskraft Geltungsbereich")
+      // If the combobox is cleared directly without a click action,
+      // the result list of the first combobox will stay open blocking the save button
+      page
+        .getByTestId("legal-force-region-combobox")
+        .getByRole("button", { name: "Auswahl zurücksetzen" })
 
       await saveNormButton.click()
       await expect(page.getByText("Vereinbar (Berlin (Ost))")).toBeHidden()
@@ -396,8 +387,7 @@ test.describe("norm", () => {
       await navigateToCategories(page, documentNumber)
       const normContainer = page.getByLabel("Norm")
 
-      await page.getByLabel("Gericht", { exact: true }).fill("VerfG")
-      await page.getByText("VerfG Dessau").last().click()
+      await fillCombobox(page, "Gericht", "VerfG Dessau")
 
       await fillNormInputs(page, {
         normAbbreviation: "PBefG",
@@ -433,14 +423,12 @@ test.describe("norm", () => {
       // check that both fields display error message
       await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(2)
 
-      await page.getByLabel("Gesetzeskraft Typ").fill("Vereinbar")
-      await page.getByText("Vereinbar", { exact: true }).click()
+      await fillCombobox(page, "Gesetzeskraft Typ", "Vereinbar")
 
       // check that only one field displays error message
       await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeVisible()
 
-      await page.getByLabel("Gesetzeskraft Geltungsbereich").fill("Berlin")
-      await page.getByText("Berlin (Ost)").click()
+      await fillCombobox(page, "Gesetzeskraft Geltungsbereich", "Berlin (Ost)")
 
       await expect(page.getByText("Pflichtfeld nicht befüllt.")).toBeHidden()
 
@@ -457,8 +445,7 @@ test.describe("norm", () => {
     await navigateToCategories(page, documentNumber)
     const normContainer = page.getByLabel("Norm")
 
-    await page.getByLabel("Gericht", { exact: true }).fill("VerfG")
-    await page.getByText("VerfG Dessau", { exact: true }).last().click()
+    await fillCombobox(page, "Gericht", "VerfG Dessau")
 
     await fillNormInputs(page, {
       normAbbreviation: "PBefG",

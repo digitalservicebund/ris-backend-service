@@ -282,6 +282,7 @@ test.describe("inbox", () => {
           name: "Dokumentationseinheit übernehmen",
         })
         await takeOverButton.click()
+        await expect(doc1Row.getByText("Unveröffentlicht")).toBeVisible()
       })
 
       await test.step("Wähle Vorgang aus", async () => {
