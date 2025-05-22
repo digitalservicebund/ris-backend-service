@@ -44,7 +44,7 @@ watch(value, async (newVal) => {
 </script>
 
 <template>
-  <Tabs v-model:value="value" class="m-32" lazy>
+  <Tabs v-model:value="value" class="m-24" lazy>
     <TabList>
       <Tab data-testid="external-handover-tab" value="0">Fremdanlagen</Tab>
       <Tab data-testid="eu-tab" value="1">EU-Rechtsprechung</Tab>
