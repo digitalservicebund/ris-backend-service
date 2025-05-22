@@ -43,9 +43,8 @@ class EurLexSearchResultTransformerTest {
             .ecli("ecli")
             .htmlLink("html-link")
             .status(EurLexResultStatus.NEW)
-            .title("title with file number T-123/45")
+            .fileNumber("T-123/45")
             .createdAt(now)
-            .publicationDate(LocalDate.of(2025, Month.JANUARY, 2))
             .build();
     SearchResult expected =
         SearchResult.builder()
@@ -55,7 +54,6 @@ class EurLexSearchResultTransformerTest {
             .celex("celex")
             .htmlLink("html-link")
             .ecli("ecli")
-            .title("title with file number T-123/45")
             .fileNumber("T-123/45")
             .date(LocalDate.of(2024, Month.DECEMBER, 24))
             .publicationDate(LocalDate.ofInstant(now, ZoneId.systemDefault()))
@@ -71,54 +69,6 @@ class EurLexSearchResultTransformerTest {
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(null);
 
     assertThat(result).isNull();
-  }
-
-  @Test
-  void testTransformDTOToDomain_withoutFileNumberInTitle_hasNoFileNumberInDomainObject() {
-    EurLexResultDTO dto = EurLexResultDTO.builder().title("title without file number").build();
-    SearchResult expected =
-        SearchResult.builder().title("title without file number").fileNumber(null).build();
-
-    SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
-
-    assertThat(result).isEqualTo(expected);
-  }
-
-  @ParameterizedTest
-  @CsvSource({
-    "title with file number T-123/45 and text behind, T-123/45",
-    "title with file number C-123/45 and text behind, C-123/45",
-    "title with file number T-123/45\u00A0abc and text behind, T-123/45\u00A0abc",
-    "title with file number C-123/45\u00A0abc and text behind, C-123/45\u00A0abc",
-    "title with file number T-123/45\u00A0abc and T-987/65\u00A0zyx and text behind, 'T-123/45\u00A0abc, T-987/65\u00A0zyx'",
-    "title with file number C-123/45\u00A0abc and C-987/65\u00A0zyx and text behind, 'C-123/45\u00A0abc, C-987/65\u00A0zyx'",
-    "title with file number T-12/345 abc and text behind, T-12/345",
-    "title with file number T-12/345\u00A0123 and text behind, T-12/345",
-  })
-  void testTransformDTOToDomain_withFileNumberWithAllowedPattern_hasParsedFileNumber(
-      String title, String fileNumbers) {
-    EurLexResultDTO dto = EurLexResultDTO.builder().title(title).build();
-    SearchResult expected = SearchResult.builder().title(title).fileNumber(fileNumbers).build();
-
-    SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
-
-    assertThat(result).isEqualTo(expected);
-  }
-
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "title with file number T-12345\u00A0abc and text behind",
-        "title with file number T-12a45\u00A0abc and text behind"
-      })
-  void testTransformDTOToDomain_withFileNumberWithWrongFormat_hasNoFileNumberInDomainObject(
-      String title) {
-    EurLexResultDTO dto = EurLexResultDTO.builder().title(title).build();
-    SearchResult expected = SearchResult.builder().title(title).fileNumber(null).build();
-
-    SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
-
-    assertThat(result).isEqualTo(expected);
   }
 
   @Test
@@ -175,7 +125,7 @@ class EurLexSearchResultTransformerTest {
             + "<WORK_CREATED_BY_AGENT><IDENTIFIER>CJ</IDENTIFIER></WORK_CREATED_BY_AGENT>"
             + "</WORK>"
             + "<EXPRESSION>"
-            + "<EXPRESSION_TITLE><VALUE>title</VALUE></EXPRESSION_TITLE>"
+            + "<EXPRESSION_TITLE><VALUE>title C-01/20</VALUE></EXPRESSION_TITLE>"
             + "</EXPRESSION>"
             + "<MANIFESTATION>"
             + "<SAMEAS>"
@@ -202,7 +152,7 @@ class EurLexSearchResultTransformerTest {
             .uri("http://publications.europa.eu/resource/celex/celex123.DEU.fmx4")
             .court(court)
             .celex("celex123")
-            .title("title")
+            .fileNumber("C-01/20")
             .build();
 
     List<EurLexResultDTO> dtos =
@@ -277,6 +227,86 @@ class EurLexSearchResultTransformerTest {
     assertThatThrownBy(() -> EurLexSearchResultTransformer.transformXmlToDTO(element, courts))
         .isInstanceOf(EurLexSearchException.class)
         .hasMessage("Decision date of the result couldn't be parsed");
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "title with file number T-123/45 and text behind, T-123/45",
+    "title with file number C-123/45 and text behind, C-123/45",
+    "title with file number T-123/45\u00A0abc and text behind, T-123/45\u00A0abc",
+    "title with file number C-123/45\u00A0abc and text behind, C-123/45\u00A0abc",
+    "title with file number T-123/45\u00A0abc and T-987/65\u00A0zyx and text behind, 'T-123/45\u00A0abc, T-987/65\u00A0zyx'",
+    "title with file number C-123/45\u00A0abc and C-987/65\u00A0zyx and text behind, 'C-123/45\u00A0abc, C-987/65\u00A0zyx'",
+    "title with file number T-12/345 abc and text behind, T-12/345",
+    "title with file number T-12/345\u00A0123 and text behind, T-12/345",
+  })
+  void testTransformXmlToDTO_withFileNumberWithAllowedPattern_hasParsedFileNumber(
+      String title, String fileNumbers)
+      throws ParserConfigurationException, IOException, SAXException {
+    String resultXml =
+        "<result>"
+            + "<content><NOTICE><WORK><WORK_DATE_DOCUMENT>"
+            + "<DAY>12</DAY>"
+            + "<MONTH>12</MONTH>"
+            + "<YEAR>2024</YEAR>"
+            + "</WORK_DATE_DOCUMENT></WORK>"
+            + "<EXPRESSION>"
+            + "<EXPRESSION_TITLE><VALUE>"
+            + title
+            + "</VALUE></EXPRESSION_TITLE>"
+            + "</EXPRESSION></NOTICE></content>"
+            + "</result>";
+    Document doc =
+        DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(
+                new InputSource(
+                    new StringReader("<searchResults>" + resultXml + "</searchResults>")));
+    Element element = doc.getDocumentElement();
+
+    List<EurLexResultDTO> dtos =
+        EurLexSearchResultTransformer.transformXmlToDTO(element, Collections.emptyMap());
+
+    assertThat(dtos).hasSize(1);
+    EurLexResultDTO dto = dtos.get(0);
+    assertThat(dto.getFileNumber()).isEqualTo(fileNumbers);
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "title with file number T-12345\u00A0abc and text behind",
+        "title with file number T-12a45\u00A0abc and text behind"
+      })
+  void testTransformXmlToDTO_withFileNumberWithWrongFormat_hasNoFileNumberInDTO(String title)
+      throws ParserConfigurationException, IOException, SAXException {
+    String resultXml =
+        "<result>"
+            + "<content><NOTICE><WORK><WORK_DATE_DOCUMENT>"
+            + "<DAY>12</DAY>"
+            + "<MONTH>12</MONTH>"
+            + "<YEAR>2024</YEAR>"
+            + "</WORK_DATE_DOCUMENT></WORK>"
+            + "<EXPRESSION>"
+            + "<EXPRESSION_TITLE><VALUE>"
+            + title
+            + "</VALUE></EXPRESSION_TITLE>"
+            + "</EXPRESSION></NOTICE></content>"
+            + "</result>";
+    Document doc =
+        DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(
+                new InputSource(
+                    new StringReader("<searchResults>" + resultXml + "</searchResults>")));
+    Element element = doc.getDocumentElement();
+
+    List<EurLexResultDTO> dtos =
+        EurLexSearchResultTransformer.transformXmlToDTO(element, Collections.emptyMap());
+
+    assertThat(dtos).hasSize(1);
+    EurLexResultDTO dto = dtos.get(0);
+    assertThat(dto.getFileNumber()).isNull();
   }
 
   @Test

@@ -33,7 +33,8 @@ public class EurLexResultDTO {
 
   private String ecli;
 
-  private String title;
+  @Column(name = "file_number")
+  private String fileNumber;
 
   @OneToOne
   @JoinColumn(name = "court_id")
@@ -41,9 +42,6 @@ public class EurLexResultDTO {
 
   @Column(name = "decision_date")
   private LocalDate date;
-
-  @Column(name = "publication_date")
-  private LocalDate publicationDate;
 
   @OneToOne
   @JoinColumn(name = "documentation_unit_id")

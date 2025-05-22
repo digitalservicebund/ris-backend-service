@@ -10,7 +10,6 @@ public record SearchResult(
     String courtType,
     String courtLocation,
     LocalDate date,
-    String title,
     String fileNumber,
     LocalDate publicationDate,
     String uri,
