@@ -48,7 +48,7 @@ public class EurLexSearchResultTransformer {
       return null;
     }
 
-    String fileNumber = parseFileNumberFromTitle(eurLexResultDTO.getTitle());
+    String fileNumber = parseFileNumberFromTitle(eurLexResultDTO.getFileNumber());
 
     SearchResultBuilder builder =
         SearchResult.builder()
@@ -56,7 +56,7 @@ public class EurLexSearchResultTransformer {
             .ecli(eurLexResultDTO.getEcli())
             .date(eurLexResultDTO.getDate())
             .fileNumber(fileNumber)
-            .title(eurLexResultDTO.getTitle())
+            .fileNumber(eurLexResultDTO.getFileNumber())
             .htmlLink(eurLexResultDTO.getHtmlLink())
             .uri(eurLexResultDTO.getUri());
 
@@ -171,7 +171,8 @@ public class EurLexSearchResultTransformer {
       String title =
           xPath.compile("./content/NOTICE/EXPRESSION/EXPRESSION_TITLE/VALUE").evaluate(result);
       if (Strings.isNotBlank(title)) {
-        builder.title(title);
+        String fileNumber = parseFileNumberFromTitle(title);
+        builder.fileNumber(fileNumber);
       }
     } catch (XPathExpressionException e) {
       throw new EurLexSearchException("Title of the result couldn't be parsed", e);
