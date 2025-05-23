@@ -14,6 +14,7 @@ import {
   ComboboxInputModelType,
   ComboboxItem,
 } from "@/components/input/types"
+import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
 import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 import IconClear from "~icons/material-symbols/close-small"
@@ -287,7 +288,13 @@ export type InputModelProps =
         @keydown.esc="closeDropdownAndRevertToLastSavedValue"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
       />
-      <div v-if="!readOnly" class="flex flex-row">
+      <div v-if="!readOnly" class="flex flex-row items-center">
+        <!-- Loading spinner needed for e2e tests -->
+        <LoadingSpinner
+          v-if="isFetchingOrTyping"
+          data-testid="combobox-spinner"
+          size="extra-small"
+        />
         <button
           v-if="inputText && !noClear"
           aria-label="Auswahl zurücksetzen"

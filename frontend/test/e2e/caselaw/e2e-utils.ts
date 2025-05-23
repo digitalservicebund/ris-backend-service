@@ -265,36 +265,34 @@ export async function fillSearchInput(
     status?: string
   },
 ) {
-  const fillInput = async (ariaLabel: string, value = generateString()) => {
-    const input = page.getByLabel(ariaLabel, { exact: true })
-    await input.fill(value ?? ariaLabel)
-    await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
-  }
-
   //reset search first
   await navigateToSearch(page)
 
   if (values?.fileNumber) {
-    await fillInput("Aktenzeichen Suche", values?.fileNumber)
+    await fillInput(page, "Aktenzeichen Suche", values?.fileNumber)
   }
   if (values?.courtType) {
-    await fillInput("Gerichtstyp Suche", values?.courtType)
+    await fillInput(page, "Gerichtstyp Suche", values?.courtType)
   }
 
   if (values?.courtLocation) {
-    await fillInput("Gerichtsort Suche", values?.courtLocation)
+    await fillInput(page, "Gerichtsort Suche", values?.courtLocation)
   }
 
   if (values?.decisionDate) {
-    await fillInput("Entscheidungsdatum Suche", values?.decisionDate)
+    await fillInput(page, "Entscheidungsdatum Suche", values?.decisionDate)
   }
 
   if (values?.decisionDateEnd) {
-    await fillInput("Entscheidungsdatum Suche Ende", values?.decisionDateEnd)
+    await fillInput(
+      page,
+      "Entscheidungsdatum Suche Ende",
+      values?.decisionDateEnd,
+    )
   }
 
   if (values?.documentNumber) {
-    await fillInput("Dokumentnummer Suche", values?.documentNumber)
+    await fillInput(page, "Dokumentnummer Suche", values?.documentNumber)
   }
 
   if (values?.myDocOfficeOnly === true) {
@@ -460,6 +458,16 @@ export async function fillInput(
   await expect(page.getByLabel(ariaLabel, { exact: true })).toHaveValue(value)
 }
 
+export async function fillCombobox(
+  page: Page,
+  ariaLabel: string,
+  value: string,
+) {
+  await fillInput(page, ariaLabel, value)
+  await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+  await page.getByText(value, { exact: true }).click()
+}
+
 export async function clearInput(page: Page, ariaLabel: string) {
   const input = page.getByLabel(ariaLabel, { exact: true })
   await input.clear()
@@ -478,11 +486,7 @@ export async function fillNormInputs(
   },
 ): Promise<void> {
   if (values?.normAbbreviation) {
-    await fillInput(page, "RIS-Abkürzung", values.normAbbreviation)
-    await page.getByText(values.normAbbreviation, { exact: true }).click()
-    await expect(page.getByLabel("RIS-Abkürzung", { exact: true })).toHaveValue(
-      values.normAbbreviation,
-    )
+    await fillCombobox(page, "RIS-Abkürzung", values.normAbbreviation)
   }
   if (values?.singleNorms) {
     for (let index = 0; index < values.singleNorms.length; index++) {
@@ -640,14 +644,15 @@ export async function searchForDocUnitWithFileNumberAndDecisionDate(
  * @param page
  * @param locator
  * @param type
- * @param attemptCount
+ * @param maxAttemptCount
  */
 export async function extraContentMenuKeyboardNavigator(
   page: Page,
   locator: Locator,
   type: "Tab" | "Shift+Tab",
-  attemptCount = 7,
+  maxAttemptCount = 7,
 ) {
+  let attemptCount = 0
   let previousDocumentButtonIsFocused = false
   while (!previousDocumentButtonIsFocused) {
     await page.keyboard.press(type)
@@ -658,8 +663,10 @@ export async function extraContentMenuKeyboardNavigator(
       previousDocumentButtonIsFocused = true
     } catch {
       attemptCount++
-      if (attemptCount > attemptCount) {
-        throw new Error(`Exceeded maximum allowed attempts (${attemptCount})`)
+      if (attemptCount > maxAttemptCount) {
+        throw new Error(
+          `Exceeded maximum allowed attempts (${maxAttemptCount})`,
+        )
       }
     }
   }
@@ -804,15 +811,13 @@ export async function searchForDocUnit(
     await fillInput(page, "Aktenzeichen", fileNumber)
   }
   if (court) {
-    await fillInput(page, "Gericht", court)
-    await page.getByText(court, { exact: true }).click()
+    await fillCombobox(page, "Gericht", court)
   }
   if (date) {
     await fillInput(page, "Entscheidungsdatum", date)
   }
   if (documentType) {
-    await fillInput(page, "Dokumenttyp", documentType)
-    await page.getByText("Anerkenntnisurteil", { exact: true }).click()
+    await fillCombobox(page, "Dokumenttyp", documentType)
   }
 
   await page.getByText("Suchen").click()

@@ -10,6 +10,7 @@ test.describe("court", () => {
     await navigateToCategories(page, documentNumber)
 
     await page.getByLabel("Gericht", { exact: true }).fill("BGH")
+    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("BGH")
     await expect(page.getByText("BGH")).toBeVisible()
     await page.getByText("BGH").click()
@@ -105,6 +106,7 @@ test.describe("court", () => {
 
     // type search string: 3 results for "bayern"
     await page.getByLabel("Gericht", { exact: true }).fill("bayern")
+    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
       "bayern",
     )
@@ -140,6 +142,7 @@ test.describe("court", () => {
     await expect(page.getByLabel("dropdown-option")).toBeHidden()
 
     await page.getByLabel("Gericht", { exact: true }).fill("BVerfG")
+    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
     await page.getByText("BVerfG").click()
 
     await expect(page.getByLabel("dropdown-option")).toBeHidden()
@@ -174,8 +177,7 @@ test.describe("court", () => {
     await navigateToCategories(page, documentNumber)
 
     await page.getByLabel("Gericht", { exact: true }).fill("aalen")
-
-    // clicking on dropdown item triggers auto save
+    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
     await page.getByText("AG Aalen").click()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
       "AG Aalen",
@@ -208,6 +210,7 @@ test.describe("court", () => {
     await expect(dropdown).toHaveText("Keine Angabe")
 
     await page.getByLabel("Gericht", { exact: true }).fill("bgh")
+    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
     await page.getByText("BGH").click()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("BGH")
 
@@ -234,6 +237,7 @@ test.describe("court", () => {
     await expect(dropdown).toHaveText("Keine Angabe")
 
     await page.getByLabel("Gericht", { exact: true }).fill("aachen")
+    await expect(page.getByTestId("combobox-spinner")).toBeHidden()
     await page.getByText("AG Aachen").click()
     await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
       "AG Aachen",

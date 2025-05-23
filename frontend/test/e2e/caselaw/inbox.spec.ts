@@ -12,7 +12,7 @@ test.describe("inbox", () => {
   test(
     "Fremdanlagen können im Eingang eingesehen und weiterverarbeitet werden",
     { tag: ["@RISDEV-7374"] },
-    async ({ page, pageWithBghUser, edition }) => {
+    async ({ page, pageWithBghUser, edition, browserName }) => {
       const today = dayjs().format("DD.MM.YYYY")
 
       let documentNumber1 = ""
@@ -30,6 +30,11 @@ test.describe("inbox", () => {
           fileNumber1,
           "AnU",
         )
+
+        // Todo: Known error in firefox (NS_BINDING_ABORTED),
+        // when navigating with a concurrent navigation triggered
+        // eslint-disable-next-line playwright/no-wait-for-timeout,playwright/no-conditional-in-test
+        if (browserName === "firefox") await page.waitForTimeout(500)
 
         documentNumber2 = await createPendingHandoverDecisionForBGH(
           page,
@@ -234,7 +239,7 @@ test.describe("inbox", () => {
   test(
     "Angenommene Fremdanlagen können einem Vorgang zugewiesen werden",
     { tag: ["@RISDEV-7374"] },
-    async ({ page, pageWithBghUser, edition }) => {
+    async ({ page, pageWithBghUser, edition, browserName }) => {
       const fileNumber = generateString({ length: 10 })
 
       let docNumber1 = ""
@@ -250,6 +255,11 @@ test.describe("inbox", () => {
           fileNumber,
           "AnU",
         )
+
+        // Todo: Known error in firefox (NS_BINDING_ABORTED),
+        // when navigating with a concurrent navigation triggered
+        // eslint-disable-next-line playwright/no-wait-for-timeout,playwright/no-conditional-in-test
+        if (browserName === "firefox") await page.waitForTimeout(500)
 
         docNumber2 = await createPendingHandoverDecisionForBGH(
           page,
@@ -282,6 +292,7 @@ test.describe("inbox", () => {
           name: "Dokumentationseinheit übernehmen",
         })
         await takeOverButton.click()
+        await expect(doc1Row.getByText("Unveröffentlicht")).toBeVisible()
       })
 
       await test.step("Wähle Vorgang aus", async () => {
