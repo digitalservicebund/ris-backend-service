@@ -129,7 +129,7 @@ public class EurLexSOAPSearchService implements SearchService {
 
   @Scheduled(cron = "0 0 3 1 * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "eurlex-update", lockAtMostFor = "PT5M")
-  private void requestNewestDecisions1() {
+  public void requestNewestDecisions() {
     Optional<EurLexResultDTO> lastResult = repository.findTopByOrderByCreatedAtDesc();
 
     LocalDate lastUpdate;
