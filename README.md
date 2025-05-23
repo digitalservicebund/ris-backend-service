@@ -15,8 +15,7 @@ below.
 - [lefthook](https://github.com/evilmartians/lefthook#install) - manages our git hooks
 - [Github CLI](https://cli.github.com/) - used by lefthook to check for pipeline status before push
 - [docker](https://docs.docker.com/get-docker/) - our container runtime (on macOS, the easiest way
-  is to
-  use [Docker Desktop](https://www.docker.com/products/docker-desktop/))
+  is to use [Docker Desktop](https://www.docker.com/products/docker-desktop/))
 - [1Password CLI](https://developer.1password.com/docs/cli/get-started/) - to access secrets
 - [Node.js](https://nodejs.org/en/) - JavaScript runtime & dependency management
 - [nodenv](https://github.com/nodenv/nodenv#installation) - manages the node.js environment
@@ -59,7 +58,7 @@ eval "$(direnv hook zsh)"
 
 ### S3 Credentials for Lookup Table Initialization
 
-The lookup table initialization in your local environment will be performed with data provided by a s3 bucket. Read [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials) on how to revtrieve credentials for it. 
+The lookup table initialization in your local environment will be performed with data provided by a s3 bucket. Read [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials) on how to retrieve credentials for it. 
 
 Then, store the credentials in 1Password:
 
@@ -154,9 +153,7 @@ Ubuntu `sudo ufw disable` might do the trick. You may setup a certain firewall r
 > When first starting the development server, dependencies will be installed automatically. This
 > includes supported
 > browsers for E2E and a11y testing through playwright. Should that fail, you
->
->
-can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
+> can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
 
 To see logs of the containers, use e.g.
 
