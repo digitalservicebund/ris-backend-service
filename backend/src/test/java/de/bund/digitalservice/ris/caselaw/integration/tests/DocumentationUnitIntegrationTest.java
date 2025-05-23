@@ -1862,8 +1862,8 @@ class DocumentationUnitIntegrationTest {
               var docUnitWithoutProcedure = repository.findById(decisionId);
               assertThat(docUnitWithoutProcedure.get().getProcedure()).isNull();
               assertThat(docUnitWithoutProcedure.get().getProcedureHistory()).isEmpty();
-              assertThat(docUnitWithoutProcedure.get().getDocumentationOffice())
-                  .isEqualTo(bghDocOffice);
+              assertThat(docUnitWithoutProcedure.get().getDocumentationOffice().getId())
+                  .isEqualTo(bghDocOffice.getId());
             });
   }
 
