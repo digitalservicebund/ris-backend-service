@@ -52,6 +52,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationOfficeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
@@ -72,6 +73,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -158,7 +160,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentNumberPatternConfig.class,
       KeycloakUserService.class,
       PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class
+      DocumentationUnitHistoryLogService.class,
+      DocumentationOfficeService.class,
+      PostgresDocumentationOfficeRepositoryImpl.class,
     },
     controllers = {DocumentationUnitController.class})
 @Sql(scripts = {"classpath:courts_init.sql"})
@@ -197,6 +201,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DocumentationUnitHistoryLogRepository historyLogRepository;
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DocumentationUnitHistoryLogService historyLogService;
+  @Autowired private DocumentationOfficeService documentationOfficeService;
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
   @MockitoBean private ConverterService converterService;

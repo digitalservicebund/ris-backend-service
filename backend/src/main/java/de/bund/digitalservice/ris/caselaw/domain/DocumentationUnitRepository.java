@@ -99,11 +99,11 @@ public interface DocumentationUnitRepository {
   void saveProcedures(Documentable documentationUnit, User user);
 
   /**
-   * Delete all procedures of a documentation unit
+   * Unassign all procedures of a documentation unit
    *
-   * @param documentationUnitId the UUID of the documentation unit to delete the procedures from
+   * @param documentationUnitId the UUID of the documentation unit to unassign the procedures from
    */
-  void deleteProcedures(UUID documentationUnitId);
+  void unassignProcedures(UUID documentationUnitId);
 
   /**
    * Save lastPublicationDateTime of a documentation unit
@@ -116,10 +116,11 @@ public interface DocumentationUnitRepository {
    * Save the newly assigned documentation office of a documentation unit
    *
    * @param id the UUID of the documentation unit to save the new documentation office for
+   * @param documentationOffice the new {@link DocumentationOffice}
    * @param user the {@link User}
    * @return abbreviation of the newly assigned documentation office
    */
-  String saveDocumentationOffice(UUID id, UUID documentationOfficeId, User user);
+  String saveDocumentationOffice(UUID id, DocumentationOffice documentationOffice, User user);
 
   /**
    * Delete a documentation unit

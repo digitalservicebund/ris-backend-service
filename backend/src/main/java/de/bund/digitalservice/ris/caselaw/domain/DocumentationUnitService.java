@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpa
 
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -46,6 +47,7 @@ public class DocumentationUnitService {
   private final UserService userService;
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
+  private final DocumentationOfficeService documentationOfficeService;
   private static final List<String> pathsForDuplicateCheck =
       List.of(
           "/coreData/ecli",
@@ -71,6 +73,7 @@ public class DocumentationUnitService {
       @Lazy AuthService authService,
       PatchMapperService patchMapperService,
       DuplicateCheckService duplicateCheckService,
+      DocumentationOfficeService documentationOfficeService,
       DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
@@ -84,6 +87,7 @@ public class DocumentationUnitService {
     this.statusService = statusService;
     this.authService = authService;
     this.duplicateCheckService = duplicateCheckService;
+    this.documentationOfficeService = documentationOfficeService;
     this.historyLogService = historyLogService;
   }
 
@@ -526,18 +530,19 @@ public class DocumentationUnitService {
 
   public String assignDocumentationOffice(
       UUID documentationUnitId, UUID documentationOfficeId, User user)
-      throws DocumentationUnitNotExistsException {
+      throws DocumentationUnitNotExistsException, DocumentationOfficeNotExistsException {
     Documentable documentable = repository.findByUuid(documentationUnitId, user);
-    if (documentable instanceof DocumentationUnit docUnit) {
-      // Procedures need to be deleted as they are linked to the previous documentation Office
-      repository.deleteProcedures(docUnit.uuid());
+    var documentationOffice = documentationOfficeService.findByUuid(documentationOfficeId);
+    if (documentable instanceof DocumentationUnit documentationUnit) {
+      // Procedures need to be unassigned as they are linked to the previous documentation Office
+      repository.unassignProcedures(documentationUnit.uuid());
       var newDocOfficeAbbreviation =
-          repository.saveDocumentationOffice(documentationUnitId, documentationOfficeId, user);
+          repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
       return "The documentation office [%s] has been successfully assigned."
           .formatted(newDocOfficeAbbreviation);
     }
     throw new DocumentationUnitException(
-        "The documentation office could not be reassigned: Document is not a DocumentationUnit.");
+        "The documentation office could not be reassigned: Document is not a decision.");
   }
 
   private void saveForRecycling(Documentable documentationUnit) {

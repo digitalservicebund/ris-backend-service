@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -596,6 +597,9 @@ public class DocumentationUnitController {
     } catch (DocumentationUnitNotExistsException e) {
       log.warn("Documentation unit not found: {}", documentationUnitId, e);
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Documentation unit not found");
+    } catch (DocumentationOfficeNotExistsException e) {
+      log.warn("Documentation office not found: {}", documentationOfficeId, e);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Documentation office not found");
     } catch (DocumentationUnitException e) {
       log.error(
           "Error assigning documentation office {} to {}",

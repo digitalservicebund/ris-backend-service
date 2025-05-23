@@ -23,6 +23,6 @@ useSeoMeta({
         <router-view class="grow" />
       </main>
     </Suspense>
-    <Toast class="w-[536px]" position="bottom-right" />
+    <Toast position="bottom-right" />
   </div>
 </template>

@@ -495,47 +495,51 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void deleteProcedures(UUID documentationUnitId) {
+  public void unassignProcedures(UUID documentationUnitId) {
     if (documentationUnitId == null) {
       return;
     }
-    var documentationUnitDTOOptional = repository.findById(documentationUnitId);
-    if (documentationUnitDTOOptional.isPresent()
-        && documentationUnitDTOOptional.get() instanceof DecisionDTO decisionDTO) {
-      decisionDTO.setProcedure(null);
-      decisionDTO.getProcedureHistory().clear();
-      repository.save(decisionDTO);
-    }
+    repository
+        .findById(documentationUnitId)
+        .ifPresent(
+            documentationUnitDTO -> {
+              if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
+                decisionDTO.setProcedure(null);
+                decisionDTO.getProcedureHistory().clear();
+                repository.save(decisionDTO);
+              }
+            });
   }
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public String saveDocumentationOffice(
-      UUID documentationUnitId, UUID documentationOfficeId, User user) {
-    if (documentationUnitId == null || documentationOfficeId == null) {
+      UUID uuid, DocumentationOffice newDocumentationOffice, User user) {
+    if (uuid == null || newDocumentationOffice == null) {
       return null;
     }
-    var documentationUnitDTOOptional = repository.findById(documentationUnitId);
-    var documentationOfficeDTOOptional =
-        documentationOfficeRepository.findById(documentationOfficeId);
 
-    if (documentationUnitDTOOptional.isPresent()
-        && documentationUnitDTOOptional.get() instanceof DecisionDTO decisionDTO
-        && documentationOfficeDTOOptional.isPresent()) {
-      var previousDocumentationOffice = decisionDTO.getDocumentationOffice();
-      var newDocumentationOffice = documentationOfficeDTOOptional.get();
-      decisionDTO.setDocumentationOffice(newDocumentationOffice);
-      repository.save(decisionDTO);
-      var description =
-          "Dokstelle geändert: [%s] → [%s]"
-              .formatted(
-                  previousDocumentationOffice.getAbbreviation(),
-                  newDocumentationOffice.getAbbreviation());
-      historyLogService.saveHistoryLog(
-          documentationUnitId, user, HistoryLogEventType.DOCUMENTATION_OFFICE, description);
-      return newDocumentationOffice.getAbbreviation();
-    }
-    return null;
+    repository
+        .findById(uuid)
+        .ifPresent(
+            documentationUnitDTO -> {
+              var previousDocumentationOffice = documentationUnitDTO.getDocumentationOffice();
+              documentationUnitDTO.setDocumentationOffice(
+                  DocumentationOfficeTransformer.transformToDTO(newDocumentationOffice));
+              repository.save(documentationUnitDTO);
+
+              var description =
+                  "Dokstelle geändert: [%s] → [%s]"
+                      .formatted(
+                          previousDocumentationOffice.getAbbreviation(),
+                          newDocumentationOffice.abbreviation());
+              historyLogService.saveHistoryLog(
+                  documentationUnitDTO.getId(),
+                  user,
+                  HistoryLogEventType.DOCUMENTATION_OFFICE,
+                  description);
+            });
+    return newDocumentationOffice.abbreviation();
   }
 
   private ProcedureDTO getOrCreateProcedure(
