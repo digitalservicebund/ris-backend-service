@@ -161,39 +161,36 @@ const getDocumentationOffices = (filter: Ref<string | undefined>) => {
         />
       </div>
       <dl>
-        <div class="flex gap-24 px-0">
+        <div class="flex gap-24">
           <dt
-            class="ris-body1-bold shrink-0 grow-0 basis-160"
+            class="ris-body1-bold min-w-160"
             data-testid="assign-documentation-office-title"
           >
             Zuweisen
           </dt>
-          <dd class="ris-body2-regular w-full gap-32">
-            <div class="flex flex-wrap gap-8">
-              <div class="w-[320px]">
-                <ComboboxInput
-                  id="documentationOfficeInput"
-                  v-model="documentationOfficeInput"
-                  aria-label="Dokumentationsstelle auswählen"
-                  data-testid="documentation-office-combobox"
-                  :has-error="hasNoSelection"
-                  :item-service="getDocumentationOffices"
-                  placeholder="Dokumentationsstelle auswählen"
-                />
-                <InputErrorMessages
-                  v-if="hasNoSelection"
-                  error-message="Wählen Sie eine Dokumentationsstelle aus"
-                />
-              </div>
-              <div>
-                <Button
-                  aria-label="Zuweisen"
-                  label="Zuweisen"
-                  severity="secondary"
-                  @click="assignDocumentationOffice"
-                />
-              </div>
+          <dd class="ris-body2-regular flex flex-wrap items-start gap-8">
+            <div class="min-w-2xs">
+              <ComboboxInput
+                id="documentationOfficeInput"
+                v-model="documentationOfficeInput"
+                aria-label="Dokumentationsstelle auswählen"
+                data-testid="documentation-office-combobox"
+                :has-error="hasNoSelection"
+                :item-service="getDocumentationOffices"
+                placeholder="Dokumentationsstelle auswählen"
+              />
+              <InputErrorMessages
+                v-if="hasNoSelection"
+                class="ris-body3-regular"
+                error-message="Wählen Sie eine Dokumentationsstelle aus"
+              />
             </div>
+            <Button
+              aria-label="Zuweisen"
+              label="Zuweisen"
+              severity="secondary"
+              @click="assignDocumentationOffice"
+            />
           </dd>
         </div>
       </dl>
