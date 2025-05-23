@@ -57,6 +57,7 @@ public interface DocumentationUnitRepository {
    * @param documentationUnit the documentation unit to create
    * @param status the status of the new documentation unit
    * @param createdFromReference the reference the documentation unit is created from
+   * @param fileNumber Aktenzeichen
    * @param user the {@link User}
    * @return the new documentation unit
    */
@@ -64,6 +65,7 @@ public interface DocumentationUnitRepository {
       DocumentationUnit documentationUnit,
       Status status,
       Reference createdFromReference,
+      String fileNumber,
       User user);
 
   /**
