@@ -60,8 +60,6 @@ function updatePage(page: number) {
 }
 
 async function handleAssignToDocOffice() {
-  emit("handleServiceError")
-
   if (selectedEntries.value?.length == 0) {
     noDecisionSelected.value = true
   }
@@ -78,7 +76,9 @@ async function handleAssignToDocOffice() {
 
     const response =
       await documentationUnitService.createNewOutOfEurlexDecision(params)
-    if (response.status != 201) {
+    if (response.status == 201) {
+      emit("handleServiceError")
+    } else {
       emit("handleServiceError", response.error)
     }
 

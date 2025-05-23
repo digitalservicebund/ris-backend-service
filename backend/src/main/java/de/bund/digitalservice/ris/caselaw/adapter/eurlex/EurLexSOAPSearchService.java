@@ -15,7 +15,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -27,9 +26,11 @@ import java.util.Optional;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -102,8 +103,6 @@ public class EurLexSOAPSearchService implements SearchService {
       }
     }
 
-    requestNewestDecisions();
-
     if (court.isEmpty()) {
       if (documentationOffice.abbreviation().equals("BGH")) {
         court = Optional.of("EuG");
@@ -128,29 +127,26 @@ public class EurLexSOAPSearchService implements SearchService {
     repository.saveAll(existing);
   }
 
-  private void requestNewestDecisions() {
+  @Scheduled(cron = "0 0 3 1 * *", zone = "Europe/Berlin")
+  @SchedulerLock(name = "eurlex-update", lockAtMostFor = "PT5M")
+  private void requestNewestDecisions1() {
     Optional<EurLexResultDTO> lastResult = repository.findTopByOrderByCreatedAtDesc();
 
     LocalDate lastUpdate;
-    if (lastResult.isEmpty()
-        || lastResult.get().getCreatedAt().plus(1, ChronoUnit.DAYS).isBefore(Instant.now())) {
-      if (lastResult.isPresent()) {
-
-        lastUpdate =
-            LocalDate.ofInstant(lastResult.get().getCreatedAt(), ZoneId.of("Europe/Berlin"));
-      } else {
-        lastUpdate = LocalDate.now().withDayOfMonth(1);
-        if (ChronoUnit.DAYS.between(lastUpdate, LocalDate.now()) < 5) {
-          lastUpdate = lastUpdate.minusMonths(1);
-        }
+    if (lastResult.isPresent()) {
+      lastUpdate = LocalDate.ofInstant(lastResult.get().getCreatedAt(), ZoneId.of("Europe/Berlin"));
+    } else {
+      lastUpdate = LocalDate.now().withDayOfMonth(1);
+      if (ChronoUnit.DAYS.between(lastUpdate, LocalDate.now()) < 5) {
+        lastUpdate = lastUpdate.minusMonths(1);
       }
-
-      requestNewestDecisions(1, lastUpdate);
     }
+
+    requestNewestDecisions(1, lastUpdate);
   }
 
   @SuppressWarnings("java:S2142")
-  void requestNewestDecisions(int pageNumber, LocalDate lastUpdate) {
+  private void requestNewestDecisions(int pageNumber, LocalDate lastUpdate) {
     Element searchResults;
 
     try {
