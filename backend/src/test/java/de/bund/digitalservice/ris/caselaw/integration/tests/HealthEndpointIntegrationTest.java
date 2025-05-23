@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import de.bund.digitalservice.ris.caselaw.adapter.EnvironmentService;
 import de.bund.digitalservice.ris.caselaw.config.EnvironmentConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import org.junit.jupiter.api.Tag;
@@ -67,6 +68,7 @@ class HealthEndpointIntegrationTest {
   @MockitoBean EnvironmentConfig environmentConfig;
   @MockitoBean EnvironmentService environmentService;
   @MockitoBean FeatureToggleService featureToggleService;
+  @MockitoBean DocumentationOfficeService documentationOfficeService;
 
   @Test
   void shouldExposeHealthEndpoint() throws Exception {

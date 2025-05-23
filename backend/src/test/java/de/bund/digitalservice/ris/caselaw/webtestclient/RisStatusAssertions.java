@@ -32,6 +32,15 @@ public class RisStatusAssertions {
     return responseSpec;
   }
 
+  public RisResponseSpec isNotFound() {
+    try {
+      resultActions.andExpect(status().isNotFound());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    return responseSpec;
+  }
+
   public RisResponseSpec isNoContent() {
     try {
       resultActions.andExpect(status().isNoContent());

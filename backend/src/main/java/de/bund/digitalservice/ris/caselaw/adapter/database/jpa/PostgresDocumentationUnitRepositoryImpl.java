@@ -493,6 +493,55 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     repository.save(documentationUnitDTO);
   }
 
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void unassignProcedures(UUID documentationUnitId) {
+    if (documentationUnitId == null) {
+      return;
+    }
+    repository
+        .findById(documentationUnitId)
+        .ifPresent(
+            documentationUnitDTO -> {
+              if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
+                decisionDTO.setProcedure(null);
+                decisionDTO.getProcedureHistory().clear();
+                repository.save(decisionDTO);
+              }
+            });
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public String saveDocumentationOffice(
+      UUID uuid, DocumentationOffice newDocumentationOffice, User user) {
+    if (uuid == null || newDocumentationOffice == null) {
+      return null;
+    }
+
+    repository
+        .findById(uuid)
+        .ifPresent(
+            documentationUnitDTO -> {
+              var previousDocumentationOffice = documentationUnitDTO.getDocumentationOffice();
+              documentationUnitDTO.setDocumentationOffice(
+                  DocumentationOfficeTransformer.transformToDTO(newDocumentationOffice));
+              repository.save(documentationUnitDTO);
+
+              var description =
+                  "Dokstelle geändert: [%s] → [%s]"
+                      .formatted(
+                          previousDocumentationOffice.getAbbreviation(),
+                          newDocumentationOffice.abbreviation());
+              historyLogService.saveHistoryLog(
+                  documentationUnitDTO.getId(),
+                  user,
+                  HistoryLogEventType.DOCUMENTATION_OFFICE,
+                  description);
+            });
+    return newDocumentationOffice.abbreviation();
+  }
+
   private ProcedureDTO getOrCreateProcedure(
       DocumentationOfficeDTO documentationOfficeDTO, Procedure procedure) {
     if (procedure.id() == null) {

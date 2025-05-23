@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DeltaMigrationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -61,6 +62,7 @@ class SingleNormValidationTest {
   @MockitoBean UserService userService;
   @MockitoBean FmxService fmxService;
   @MockitoBean DocumentationUnitHistoryLogService logService;
+  @MockitoBean DocumentationOfficeService documentationOfficeService;
 
   @BeforeEach
   void setUp() {
