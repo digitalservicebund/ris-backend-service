@@ -11,7 +11,7 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.4.5"
+    id("org.springframework.boot") version "3.5.0"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.0.3"
     id("org.sonarqube") version "6.2.0.5505"
@@ -21,7 +21,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "11.8.2"
-    id("io.sentry.jvm.gradle") version "5.5.0"
+    id("io.sentry.jvm.gradle") version "5.6.0"
 }
 
 group = "de.bund.digitalservice"
@@ -160,7 +160,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.5")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.0")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.1")
 
@@ -223,8 +223,8 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.13.1")
     implementation("org.jsoup:jsoup:1.20.1")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.6.1")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.6.1")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.7.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.7.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.11.0")
@@ -237,11 +237,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.17.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.6")
-    testImplementation("org.springframework.security:spring-security-test:6.4.5")
+    testImplementation("org.springframework.security:spring-security-test:6.5.0")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
