@@ -13,6 +13,7 @@ import EURLexResult from "@/domain/eurlex"
 import errorMessages from "@/i18n/errors.json"
 import service from "@/services/comboboxItemService"
 import documentationUnitService from "@/services/documentUnitService"
+import { ResponseError } from "@/services/httpClient"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconCallMade from "~icons/material-symbols/call-made"
 
@@ -21,7 +22,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  updatePage: [number]
+  updatePage: [number, string?, string?, string?, string?, string?]
+  handleServiceError: [ResponseError?]
   assign: [number]
 }>()
 
@@ -42,7 +44,7 @@ onMounted(async () => {
   ).data.value
 
   documentationOffices.value = comboboxItems?.map(
-    (item) => item.value as DocumentationOffice,
+    ({ value }) => value as DocumentationOffice,
   )
 })
 
@@ -58,6 +60,8 @@ function updatePage(page: number) {
 }
 
 async function handleAssignToDocOffice() {
+  emit("handleServiceError")
+
   if (selectedEntries.value?.length == 0) {
     noDecisionSelected.value = true
   }
@@ -72,7 +76,11 @@ async function handleAssignToDocOffice() {
       celexNumbers: selectedEntries.value.map(({ celex }) => celex),
     }
 
-    await documentationUnitService.createNewOutOfEurlexDecision(params)
+    const response =
+      await documentationUnitService.createNewOutOfEurlexDecision(params)
+    if (response.status != 201) {
+      emit("handleServiceError", response.error)
+    }
 
     selectedEntries.value = []
 
@@ -141,7 +149,11 @@ function selectDocumentationOffice() {
         <Column header-style="width: 3rem" selection-mode="multiple"></Column>
         <Column field="celex" header="CELEX"></Column>
         <Column field="courtType" header="Gerichtstyp"></Column>
-        <Column field="courtLocation" header="Ort"></Column>
+        <Column header="Ort"
+          ><template #body=""
+            ><span data-testid="court-location">-</span></template
+          ></Column
+        >
         <Column header="Datum">
           <template #body="{ data }">
             {{ dayjs(data.date).format("DD.MM.YYYY") }}

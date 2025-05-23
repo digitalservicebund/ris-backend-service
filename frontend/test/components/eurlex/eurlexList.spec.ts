@@ -65,13 +65,13 @@ describe("eurlex list", () => {
       empty: false,
     })
 
-    expect(await screen.findByText("celex")).toBeInTheDocument()
-    expect(await screen.findByText("court-type")).toBeInTheDocument()
-    expect(await screen.findByText("court-location")).toBeInTheDocument()
-    expect(await screen.findByText("01.05.2000")).toBeInTheDocument()
-    expect(await screen.findByText("file-number")).toBeInTheDocument()
-    expect(await screen.findByText("01.06.2010")).toBeInTheDocument()
-    expect(await screen.findByLabelText("Öffne Vorschau")).toBeVisible()
+    expect(screen.getByText("celex")).toBeVisible()
+    expect(screen.getByText("court-type")).toBeVisible()
+    expect(screen.getByTestId("court-location").innerHTML).toBe("-")
+    expect(screen.getByText("01.05.2000")).toBeVisible()
+    expect(screen.getByText("file-number")).toBeVisible()
+    expect(screen.getByText("01.06.2010")).toBeVisible()
+    expect(screen.getByLabelText("Öffne Vorschau")).toBeVisible()
   })
 
   test("renders entry without html link doesn't show preview button", async () => {
@@ -99,12 +99,12 @@ describe("eurlex list", () => {
       empty: false,
     })
 
-    expect(await screen.findByText("celex")).toBeInTheDocument()
-    expect(await screen.findByText("court-type")).toBeInTheDocument()
-    expect(await screen.findByText("court-location")).toBeInTheDocument()
-    expect(await screen.findByText("01.05.2000")).toBeInTheDocument()
-    expect(await screen.findByText("file-number")).toBeInTheDocument()
-    expect(await screen.findByText("01.06.2010")).toBeInTheDocument()
+    expect(screen.getByText("celex")).toBeVisible()
+    expect(screen.getByText("court-type")).toBeVisible()
+    expect(screen.getByTestId("court-location").innerHTML).toBe("-")
+    expect(screen.getByText("01.05.2000")).toBeVisible()
+    expect(screen.getByText("file-number")).toBeVisible()
+    expect(screen.getByText("01.06.2010")).toBeVisible()
     expect(screen.queryByLabelText("Öffne Vorschau")).not.toBeInTheDocument()
   })
 
