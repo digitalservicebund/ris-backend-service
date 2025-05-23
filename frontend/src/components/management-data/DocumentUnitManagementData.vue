@@ -94,26 +94,32 @@ const assignDocumentationOffice = async () => {
     hasNoSelection.value = true
   }
 }
-
+/**
+ * @summary Provides a dynamically filtered list of documentation offices for a combobox.
+ * @description
+ * Fetches documentation offices and then applies a client-side exclusion
+ * based on the current `documentUnit`. It uses `watchEffect` to ensure the returned
+ * `data` property reactively updates if the fetched list or exclusion criteria change.
+ */
 const getDocumentationOffices = (filter: Ref<string | undefined>) => {
-  const documentationOffices =
-    ComboboxItemService.getDocumentationOffices(filter)
-  const filtered = shallowRef<ComboboxItem[] | null>(null)
+  const rawFetchResult = ComboboxItemService.getDocumentationOffices(filter)
+  const filteredDataRef = shallowRef<ComboboxItem[] | null>(null)
+
   watchEffect(() => {
-    const all = documentationOffices.data.value
-    if (all) {
-      filtered.value = all.filter(
+    const comboboxItems: ComboboxItem[] | null = rawFetchResult.data.value
+    if (comboboxItems) {
+      filteredDataRef.value = comboboxItems.filter(
         (item) =>
           item.label !==
           documentUnit.value?.coreData.documentationOffice?.abbreviation,
       )
     } else {
-      filtered.value = null
+      filteredDataRef.value = null
     }
   })
   return {
-    ...documentationOffices,
-    data: filtered,
+    ...rawFetchResult,
+    data: filteredDataRef,
   }
 }
 </script>
