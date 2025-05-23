@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogServ
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
@@ -82,6 +83,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
+  private final PostgresDocumentationUnitSearchRepositoryImpl
+      postgresDocumentationUnitSearchRepositoryImpl;
+  private final FeatureToggleService featureToggleService;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -94,7 +98,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       UserService userService,
       EntityManager entityManager,
       DatabaseReferenceRepository referenceRepository,
-      DocumentationUnitHistoryLogService historyLogService) {
+      DocumentationUnitHistoryLogService historyLogService,
+      PostgresDocumentationUnitSearchRepositoryImpl criteriaSearchRepo,
+      FeatureToggleService featureToggleService) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -107,6 +113,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.userService = userService;
     this.entityManager = entityManager;
     this.historyLogService = historyLogService;
+    this.postgresDocumentationUnitSearchRepositoryImpl = criteriaSearchRepo;
+    this.featureToggleService = featureToggleService;
   }
 
   @Override
@@ -177,7 +185,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit docUnit, Status status, Reference createdFromReference, User user) {
+      DocumentationUnit docUnit,
+      Status status,
+      Reference createdFromReference,
+      String fileNumber,
+      User user) {
+
     var documentationUnitDTO =
         repository.save(
             DecisionTransformer.transformToDTO(
@@ -204,6 +217,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
       // if created from reference, the source is always 'Z' (Zeitschrift)
       sources.add(SourceDTO.builder().rank(1).value(SourceValue.Z).reference(referenceDTO).build());
+    }
+
+    if (fileNumber != null) {
+      documentationUnitDTO
+          .getFileNumbers()
+          .add(
+              FileNumberDTO.builder()
+                  .documentationUnit(documentationUnitDTO)
+                  .value(fileNumber)
+                  .rank(0L)
+                  .build());
     }
 
     ManagementDataDTO managementData = getCreatedBy(user, documentationUnitDTO);
@@ -655,6 +679,29 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Boolean withDuplicateWarning,
       InboxStatus inboxStatus,
       DocumentationOfficeDTO documentationOfficeDTO) {
+
+    if (featureToggleService.isEnabled("neuris.search-criteria-api")) {
+      var searchParameters =
+          PostgresDocumentationUnitSearchRepositoryImpl.SearchParameters.builder()
+              .courtType(Optional.ofNullable(courtType))
+              .courtLocation(Optional.ofNullable(courtLocation))
+              .documentNumber(Optional.ofNullable(documentNumber))
+              .fileNumber(Optional.ofNullable(fileNumber))
+              .decisionDate(Optional.ofNullable(decisionDate))
+              .decisionDateEnd(Optional.ofNullable(decisionDateEnd))
+              .publicationDate(Optional.ofNullable(publicationDate))
+              .publicationStatus(Optional.ofNullable(status))
+              .scheduledOnly(scheduledOnly)
+              .withError(withError)
+              .myDocOfficeOnly(myDocOfficeOnly)
+              .withDuplicateWarning(withDuplicateWarning)
+              .inboxStatus(Optional.ofNullable(inboxStatus))
+              .documentationOfficeDTO(documentationOfficeDTO)
+              .build();
+
+      return postgresDocumentationUnitSearchRepositoryImpl.search(searchParameters, pageable);
+    }
+
     if ((fileNumber == null || fileNumber.trim().isEmpty())) {
       return repository.searchByDocumentationUnitSearchInput(
           documentationOfficeDTO.getId(),

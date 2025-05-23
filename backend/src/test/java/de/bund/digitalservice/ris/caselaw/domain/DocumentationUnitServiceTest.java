@@ -88,7 +88,7 @@ class DocumentationUnitServiceTest {
     User user = User.builder().documentationOffice(documentationOffice).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
+    when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
         .thenReturn(documentationUnit);
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
@@ -115,6 +115,7 @@ class DocumentationUnitServiceTest {
                 .publicationStatus(PublicationStatus.UNPUBLISHED)
                 .withError(false)
                 .build(),
+            null,
             null,
             user);
   }
@@ -144,7 +145,7 @@ class DocumentationUnitServiceTest {
                     .build())
             .build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
+    when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
         .thenReturn(documentationUnit);
 
     when(documentNumberService.generateDocumentNumber(designatedDocumentationOffice.abbreviation()))
@@ -167,7 +168,6 @@ class DocumentationUnitServiceTest {
                     CoreData.builder()
                         .creatingDocOffice(userDocumentationOffice)
                         .documentationOffice(designatedDocumentationOffice)
-                        .fileNumbers(List.of(parameters.fileNumber()))
                         .court(parameters.court())
                         .legalEffect(LegalEffect.YES.getLabel())
                         .decisionDate(parameters.decisionDate())
@@ -179,6 +179,7 @@ class DocumentationUnitServiceTest {
                 .withError(false)
                 .build(),
             parameters.reference(),
+            parameters.fileNumber(),
             user);
   }
 
