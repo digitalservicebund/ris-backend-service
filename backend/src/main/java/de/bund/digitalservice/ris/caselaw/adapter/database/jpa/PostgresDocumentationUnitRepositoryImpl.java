@@ -513,10 +513,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public String saveDocumentationOffice(
+  public void saveDocumentationOffice(
       UUID uuid, DocumentationOffice newDocumentationOffice, User user) {
     if (uuid == null || newDocumentationOffice == null) {
-      return null;
+      return;
     }
 
     repository
@@ -539,7 +539,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                   HistoryLogEventType.DOCUMENTATION_OFFICE,
                   description);
             });
-    return newDocumentationOffice.abbreviation();
   }
 
   private ProcedureDTO getOrCreateProcedure(

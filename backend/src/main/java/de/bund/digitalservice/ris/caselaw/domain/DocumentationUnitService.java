@@ -536,10 +536,9 @@ public class DocumentationUnitService {
     if (documentable instanceof DocumentationUnit documentationUnit) {
       // Procedures need to be unassigned as they are linked to the previous documentation Office
       repository.unassignProcedures(documentationUnit.uuid());
-      var newDocOfficeAbbreviation =
-          repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
+      repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
       return "The documentation office [%s] has been successfully assigned."
-          .formatted(newDocOfficeAbbreviation);
+          .formatted(documentationOffice.abbreviation());
     }
     throw new DocumentationUnitException(
         "The documentation office could not be reassigned: Document is not a decision.");
