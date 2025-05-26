@@ -67,6 +67,7 @@ const ariaLabelIcon = props.title + " icon"
 <template>
   <div
     :aria-label="ariaLabel"
+    class="flex items-center"
     :class="[
       staticContainerClass,
       modalAttribute.borderClass,
@@ -79,7 +80,7 @@ const ariaLabelIcon = props.title + " icon"
       <span class="ris-label2-bold">{{ title }}</span>
       <div
         v-if="isArray && props.description.length > 1"
-        class="ris-body1-regular"
+        class="ris-label2-regular"
       >
         <ul class="m-0 list-disc ps-20">
           <li v-for="(desc, index) in description" :key="index">{{ desc }}</li>
