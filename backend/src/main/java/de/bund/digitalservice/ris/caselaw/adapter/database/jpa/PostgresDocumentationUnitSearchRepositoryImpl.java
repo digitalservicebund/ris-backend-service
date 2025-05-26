@@ -34,14 +34,15 @@ Once we are type-safe, we do not need string constants anymore */
 // S3655: Sonarqube does not understand that Optional.isPresent() is called on params
 @SuppressWarnings({"java:S1192", "java:S3655"})
 @Repository
-public class DocumentationUnitSearchRepositoryImpl implements DocumentationUnitSearchRepository {
+public class PostgresDocumentationUnitSearchRepositoryImpl
+    implements DocumentationUnitSearchRepository {
 
   private static final Set<PublicationStatus> PublicStatusSet =
       Set.of(PublicationStatus.PUBLISHED, PublicationStatus.PUBLISHING);
   private final FeatureToggleService featureToggleService;
   @PersistenceContext private EntityManager entityManager;
 
-  public DocumentationUnitSearchRepositoryImpl(FeatureToggleService featureToggleService) {
+  public PostgresDocumentationUnitSearchRepositoryImpl(FeatureToggleService featureToggleService) {
     this.featureToggleService = featureToggleService;
   }
 
