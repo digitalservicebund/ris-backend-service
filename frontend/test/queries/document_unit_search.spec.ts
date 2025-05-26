@@ -35,7 +35,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         documentNumber: "notExistingFoo",
       },
-      maxDuration: 400, // last max 488, average 231, min 166
+      maxDuration: 500, // last max 749, average 460, min 420
     },
     {
       title: "vague fileNumber",
