@@ -40,6 +40,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceeding
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
@@ -63,6 +64,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -123,7 +125,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentNumberPatternConfig.class,
       KeycloakUserService.class,
       PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class
+      DocumentationUnitHistoryLogService.class,
+      PostgresDocumentationUnitSearchRepositoryImpl.class
     },
     controllers = {DocumentationUnitController.class})
 @Sql(scripts = {"classpath:courts_init.sql", "classpath:document_types.sql"})
@@ -174,6 +177,7 @@ class DuplicateCheckFullIntegrationTest {
   @MockitoBean private FmxService fmxService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
+  @MockitoBean private FeatureToggleService featureToggleService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
 
   @MockitoBean
@@ -848,61 +852,103 @@ class DuplicateCheckFullIntegrationTest {
         checkDuplicates_pendingProceedingWithFullyDuplicatedAttributes_shouldProduceNoDuplicateRelations()
             throws DocumentationUnitNotExistsException {
       // Arrange
+      var dto1 =
+          repository.save(
+              PendingProceedingDTO.builder()
+                  .documentationOffice(documentationOffice)
+                  .date(LocalDate.of(2023, 12, 11))
+                  .deviatingDates(
+                      List.of(
+                          DeviatingDateDTO.builder()
+                              .rank(0L)
+                              .value(LocalDate.of(2023, 12, 11))
+                              .build()))
+                  .documentNumber("DocumentNumb1")
+                  .court(CourtTransformer.transformToDTO(courtAgAachen))
+                  .deviatingCourts(
+                      List.of(DeviatingCourtDTO.builder().rank(0L).value("AG Aachen").build()))
+                  .documentType(DocumentTypeTransformer.transformToDTO(documentType1))
+                  .build());
       var pendingProceedingDTO1 =
-          PendingProceedingDTO.builder()
-              .documentationOffice(documentationOffice)
-              .date(LocalDate.of(2023, 12, 11))
-              .deviatingDates(
+          dto1.toBuilder()
+              .fileNumbers(
                   List.of(
-                      DeviatingDateDTO.builder()
+                      FileNumberDTO.builder()
+                          .documentationUnit(dto1)
                           .rank(0L)
-                          .value(LocalDate.of(2023, 12, 11))
+                          .value("123")
                           .build()))
-              .documentNumber("DocumentNumb1")
-              .court(CourtTransformer.transformToDTO(courtAgAachen))
-              .deviatingCourts(
-                  List.of(DeviatingCourtDTO.builder().rank(0L).value("AG Aachen").build()))
-              .documentType(DocumentTypeTransformer.transformToDTO(documentType1))
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
               .deviatingFileNumbers(
-                  List.of(DeviatingFileNumberDTO.builder().rank(0L).value("123").build()))
+                  List.of(
+                      DeviatingFileNumberDTO.builder()
+                          .documentationUnit(dto1)
+                          .rank(0L)
+                          .value("123")
+                          .build()))
               .build();
+      var dto2 =
+          repository.save(
+              PendingProceedingDTO.builder()
+                  .documentationOffice(documentationOffice)
+                  .documentationOffice(documentationOffice)
+                  .date(LocalDate.of(2023, 12, 11))
+                  .deviatingDates(
+                      List.of(
+                          DeviatingDateDTO.builder()
+                              .rank(0L)
+                              .value(LocalDate.of(2023, 12, 11))
+                              .build()))
+                  .documentNumber("DocumentNumb2")
+                  .court(CourtTransformer.transformToDTO(courtAgAachen))
+                  .deviatingCourts(
+                      List.of(DeviatingCourtDTO.builder().rank(0L).value("AG Aachen").build()))
+                  .documentType(DocumentTypeTransformer.transformToDTO(documentType1))
+                  .build());
       var pendingProceedingDTO2 =
-          PendingProceedingDTO.builder()
-              .documentationOffice(documentationOffice)
-              .date(LocalDate.of(2023, 12, 11))
-              .deviatingDates(
+          dto2.toBuilder()
+              .fileNumbers(
                   List.of(
-                      DeviatingDateDTO.builder()
+                      FileNumberDTO.builder()
+                          .documentationUnit(dto2)
                           .rank(0L)
-                          .value(LocalDate.of(2023, 12, 11))
+                          .value("123")
                           .build()))
-              .documentNumber("DocumentNumb2")
-              .court(CourtTransformer.transformToDTO(courtAgAachen))
-              .deviatingCourts(
-                  List.of(DeviatingCourtDTO.builder().rank(0L).value("AG Aachen").build()))
-              .documentType(DocumentTypeTransformer.transformToDTO(documentType1))
-              .fileNumbers(List.of(FileNumberDTO.builder().rank(0L).value("123").build()))
               .deviatingFileNumbers(
-                  List.of(DeviatingFileNumberDTO.builder().rank(0L).value("123").build()))
+                  List.of(
+                      DeviatingFileNumberDTO.builder()
+                          .documentationUnit(dto2)
+                          .rank(0L)
+                          .value("123")
+                          .build()))
               .build();
+
+      var dto3 =
+          repository.save(
+              DecisionDTO.builder()
+                  .documentationOffice(documentationOffice)
+                  .documentationOffice(documentationOffice)
+                  .date(LocalDate.of(2023, 12, 11))
+                  .deviatingDates(
+                      List.of(
+                          DeviatingDateDTO.builder()
+                              .rank(0L)
+                              .value(LocalDate.of(2023, 12, 11))
+                              .build()))
+                  .documentNumber("DocumentNumb3")
+                  .court(CourtTransformer.transformToDTO(courtAgAachen))
+                  .deviatingCourts(
+                      List.of(DeviatingCourtDTO.builder().rank(0L).value("AG Aachen").build()))
+                  .documentType(DocumentTypeTransformer.transformToDTO(documentType1))
+                  .build());
       var decisionDTO =
-          DecisionDTO.builder()
-              .documentationOffice(documentationOffice)
-              .date(LocalDate.of(2023, 12, 11))
-              .deviatingDates(
-                  List.of(
-                      DeviatingDateDTO.builder()
-                          .rank(0L)
-                          .value(LocalDate.of(2023, 12, 11))
-                          .build()))
-              .documentNumber("DocumentNumb3")
-              .court(CourtTransformer.transformToDTO(courtAgAachen))
-              .deviatingCourts(
-                  List.of(DeviatingCourtDTO.builder().rank(0L).value("AG Aachen").build()))
-              .documentType(DocumentTypeTransformer.transformToDTO(documentType1))
+          dto3.toBuilder()
               .deviatingFileNumbers(
-                  List.of(DeviatingFileNumberDTO.builder().rank(0L).value("123").build()))
+                  List.of(
+                      DeviatingFileNumberDTO.builder()
+                          .rank(0L)
+                          .value("123")
+                          .documentationUnit(dto3)
+                          .build()))
               .build();
 
       repository.save(pendingProceedingDTO1);
@@ -1332,8 +1378,6 @@ class DuplicateCheckFullIntegrationTest {
             .coreData(
                 CoreData.builder()
                     .documentationOffice(params.documentationOffice())
-                    .fileNumbers(params.fileNumbers())
-                    .deviatingFileNumbers(params.deviatingFileNumbers())
                     .documentType(params.documentType())
                     .decisionDate(params.decisionDate())
                     .deviatingDecisionDates(params.deviatingDecisionDates())
@@ -1358,6 +1402,39 @@ class DuplicateCheckFullIntegrationTest {
                     .isJdvDuplicateCheckActive(params.isJdvDuplicateCheckActive())
                     .build(),
                 docUnit));
+
+    if (params.fileNumbers() != null) {
+      DecisionDTO finalDocumentationUnitDTO = documentationUnitDTO;
+      var fileNumbers =
+          params.fileNumbers.stream()
+              .map(
+                  fileNumber ->
+                      FileNumberDTO.builder()
+                          .documentationUnit(finalDocumentationUnitDTO)
+                          .value(fileNumber)
+                          .rank(0L)
+                          .build())
+              .toList();
+
+      documentationUnitDTO = documentationUnitDTO.toBuilder().fileNumbers(fileNumbers).build();
+    }
+
+    if (params.deviatingFileNumbers() != null) {
+      DecisionDTO finalDocumentationUnitDTO = documentationUnitDTO;
+      var devfileNumbers =
+          params.deviatingFileNumbers.stream()
+              .map(
+                  fileNumber ->
+                      DeviatingFileNumberDTO.builder()
+                          .documentationUnit(finalDocumentationUnitDTO)
+                          .value(fileNumber)
+                          .rank(0L)
+                          .build())
+              .toList();
+
+      documentationUnitDTO =
+          documentationUnitDTO.toBuilder().deviatingFileNumbers(devfileNumbers).build();
+    }
 
     if (params.publicationStatus != null) {
       documentationUnitDTO =

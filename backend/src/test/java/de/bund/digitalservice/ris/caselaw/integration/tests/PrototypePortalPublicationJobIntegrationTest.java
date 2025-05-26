@@ -43,6 +43,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PublicPortalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
@@ -57,6 +58,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataIn
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskType;
@@ -112,7 +114,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
       DocumentNumberPatternConfig.class,
       RiiService.class,
       PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class
+      DocumentationUnitHistoryLogService.class,
+      PostgresDocumentationUnitSearchRepositoryImpl.class
     },
     controllers = {DocumentationUnitController.class})
 class PrototypePortalPublicationJobIntegrationTest {
@@ -153,6 +156,7 @@ class PrototypePortalPublicationJobIntegrationTest {
   @MockitoBean private FmxService fmxService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
+  @MockitoBean private FeatureToggleService featureToggleService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
 
   @MockitoBean

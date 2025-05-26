@@ -41,6 +41,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigr
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -57,6 +58,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataIn
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
@@ -90,6 +92,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.transaction.TestTransaction;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.core.ResponseBytes;
@@ -128,7 +132,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
       PostgresDocumentTypeRepositoryImpl.class,
       KeycloakUserService.class,
       PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class
+      DocumentationUnitHistoryLogService.class,
+      PostgresDocumentationUnitSearchRepositoryImpl.class
     },
     controllers = {DocumentationUnitController.class})
 @Sql(scripts = {"classpath:doc_office_init.sql"})
@@ -181,6 +186,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   @MockitoBean private FmxConverterService fmxConverterService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   private DocumentationOfficeDTO dsDocOffice = null;
 
@@ -450,9 +456,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   }
 
   @Test
+  // Needed to lazy-load procedure
+  @Transactional
   void
       testAttachFileToDocumentationUnit_withMetadataProperties_shouldExtractCoreDataAndShouldNotOverrideFields()
           throws IOException {
+    TestTransaction.end();
     var attachmentWithMetadata =
         Files.readAllBytes(Paths.get("src/test/resources/fixtures/with_metadata.docx"));
     mockS3ClientToReturnFile(attachmentWithMetadata);
@@ -498,11 +507,13 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
                           "BFH"));
             });
 
+    TestTransaction.start();
     DecisionDTO savedDTO = (DecisionDTO) repository.findById(dto.getId()).get();
     assertThat(savedDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA); // kept old value
     assertThat(savedDTO.getJudicialBody()).isEqualTo("1. Senat"); // kept old value
     assertThat(savedDTO.getCourt().getType())
         .isEqualTo("BFH"); // added court based on docx properties
+    TestTransaction.end();
   }
 
   @Test

@@ -55,6 +55,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigr
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationOfficeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
@@ -84,6 +85,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
@@ -132,6 +134,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -163,6 +166,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentationUnitHistoryLogService.class,
       DocumentationOfficeService.class,
       PostgresDocumentationOfficeRepositoryImpl.class,
+      DocumentationUnitHistoryLogService.class,
+      PostgresDocumentationUnitSearchRepositoryImpl.class
     },
     controllers = {DocumentationUnitController.class})
 @Sql(scripts = {"classpath:courts_init.sql"})
@@ -215,6 +220,7 @@ class DocumentationUnitIntegrationTest {
   @MockitoBean private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
   @MockitoBean private FmxService fmxService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -1612,6 +1618,7 @@ class DocumentationUnitIntegrationTest {
 
   @Nested
   class BulkAssignProcedure {
+    @Transactional
     @Test
     void shouldAssignNewProcedureToMultipleDocUnitsWithInboxStatus() {
       var decisionBuilder1 =
@@ -1653,6 +1660,7 @@ class DocumentationUnitIntegrationTest {
           .containsExactly(null, null);
     }
 
+    @Transactional
     @Test
     void shouldAssignExistingProcedureToSingleDocUnitWithoutInboxStatus() {
       var procedure =
@@ -1689,8 +1697,10 @@ class DocumentationUnitIntegrationTest {
       assertThat(updatedDocUnits.getFirst().getInboxStatus()).isNull();
     }
 
+    @Transactional
     @Test
     void shouldRollbackIfOneUpdateFails() {
+      TestTransaction.end();
       ProcedureDTO procedure =
           ProcedureDTO.builder()
               .documentationOffice(documentationOffice)
@@ -1732,6 +1742,7 @@ class DocumentationUnitIntegrationTest {
           .expectStatus()
           .isBadRequest();
 
+      TestTransaction.start();
       var updatedDocUnits = repository.findAll();
       assertThat(updatedDocUnits)
           .hasSize(3)
@@ -1743,6 +1754,7 @@ class DocumentationUnitIntegrationTest {
       assertThat(updatedDocUnits)
           .map(DocumentationUnitDTO::getInboxStatus)
           .containsExactlyInAnyOrder(InboxStatus.EXTERNAL_HANDOVER, InboxStatus.EU, InboxStatus.EU);
+      TestTransaction.end();
     }
 
     @Test

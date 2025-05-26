@@ -149,7 +149,6 @@ public class DocumentationUnitService {
             .coreData(
                 CoreData.builder()
                     .documentationOffice(params.documentationOffice())
-                    .fileNumbers(params.fileNumber() == null ? null : List.of(params.fileNumber()))
                     .documentType(params.documentType())
                     .decisionDate(params.decisionDate())
                     .court(params.court())
@@ -172,7 +171,8 @@ public class DocumentationUnitService {
             .build();
 
     var newDocumentationUnit =
-        repository.createNewDocumentationUnit(docUnit, status, params.reference(), user);
+        repository.createNewDocumentationUnit(
+            docUnit, status, params.reference(), params.fileNumber(), user);
 
     if (isExternalHandover) {
       String description =

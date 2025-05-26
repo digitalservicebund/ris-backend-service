@@ -68,13 +68,16 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @Include
   private String documentNumber;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "document_type_id")
   private DocumentTypeDTO documentType;
 
   // Aktenzeichen
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "documentationUnit")
   @Builder.Default
   @OrderBy("rank")
   private List<FileNumberDTO> fileNumbers = new ArrayList<>();
@@ -145,7 +148,7 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   private StatusDTO status;
 
   // Gericht
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "court_id", referencedColumnName = "id")
   private CourtDTO court;
 
@@ -167,8 +170,11 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   //  private Set<DeviatingDocumentNumber> deviatingDocumentNumbers = new HashSet<>();
   //
   // Abweichendes Aktenzeichen
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "documentationUnit")
   @Builder.Default
   @OrderBy("rank")
   private List<DeviatingFileNumberDTO> deviatingFileNumbers = new ArrayList<>();
@@ -197,13 +203,21 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   private List<PreviousDecisionDTO> previousDecisions = new ArrayList<>();
 
   // Rechtsprechungsfundstellen
-  @OneToMany(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "documentationUnit",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
   @Builder.Default
   @OrderBy("documentationUnitRank")
   private List<CaselawReferenceDTO> caselawReferences = new ArrayList<>();
 
   // Literaturfundstellen
-  @OneToMany(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "documentationUnit",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
   @Builder.Default
   @OrderBy("documentationUnitRank")
   private List<LiteratureReferenceDTO> literatureReferences = new ArrayList<>();
