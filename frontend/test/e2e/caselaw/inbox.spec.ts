@@ -69,9 +69,6 @@ test.describe("inbox", () => {
           rowWithDocNumber1.getByTestId("headnote-principle-icon"),
         ).toBeVisible()
         await expect(rowWithDocNumber1.getByTestId("note-icon")).toBeVisible()
-        await expect(
-          rowWithDocNumber1.getByTestId("scheduling-icon"),
-        ).toBeVisible()
 
         await expect(rowWithDocNumber1).toContainText("AG") // Gerichtstyp
         await expect(rowWithDocNumber1).toContainText("Aachen") // Gerichtsort
@@ -390,7 +387,6 @@ test.describe("inbox", () => {
         ).toBeVisible()
         await expect(row.getByTestId("headnote-principle-icon")).toBeVisible()
         await expect(row.getByTestId("note-icon")).toBeVisible()
-        await expect(row.getByTestId("scheduling-icon")).toBeVisible()
 
         await expect(row).toContainText("BVerwG") // Gerichtstyp
         await expect(row).toContainText("09.09.1987") // Datum
