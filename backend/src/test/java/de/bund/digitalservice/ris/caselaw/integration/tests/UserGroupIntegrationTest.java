@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedure
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -31,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -60,7 +62,8 @@ import org.testcontainers.junit.jupiter.Container;
       DatabaseDocumentationUnitStatusService.class,
       TestConfig.class,
       PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class
+      DocumentationUnitHistoryLogService.class,
+      PostgresDocumentationUnitSearchRepositoryImpl.class
     },
     controllers = {UserGroupController.class})
 @Sql(scripts = {"classpath:doc_office_init.sql", "classpath:user_group_init.sql"})
@@ -96,6 +99,7 @@ class UserGroupIntegrationTest {
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private FmxService fmxService;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   @MockitoBean private DatabaseUserGroupService databaseUserGroupService;
 

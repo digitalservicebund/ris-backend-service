@@ -101,7 +101,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
   private List<ProcedureDTO> procedureHistory = new ArrayList<>();
 
   // Vorgang
-  @OneToOne(fetch = FetchType.LAZY)
+  @OneToOne()
   @JoinColumn(name = "current_procedure_id")
   private ProcedureDTO procedure;
 

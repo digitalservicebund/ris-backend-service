@@ -1,5 +1,7 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
+package de.bund.digitalservice.ris.caselaw.adapter.database;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.LocalDate;

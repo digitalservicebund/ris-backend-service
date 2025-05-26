@@ -18,9 +18,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeri
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
@@ -38,6 +40,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogServ
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
@@ -90,7 +93,8 @@ import org.testcontainers.junit.jupiter.Container;
       OAuthService.class,
       TestConfig.class,
       PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class
+      DocumentationUnitHistoryLogService.class,
+      PostgresDocumentationUnitSearchRepositoryImpl.class
     },
     controllers = {LegalPeriodicalEditionController.class})
 @Sql(scripts = {"classpath:legal_periodical_init.sql", "classpath:document_types.sql"})
@@ -146,6 +150,7 @@ class LegalPeriodicalEditionIntegrationTest {
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private FmxService fmxService;
   @MockitoBean private ConverterService converterService;
+  @MockitoBean private FeatureToggleService featureToggleService;
 
   private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
   private final DocumentationOffice docOffice = buildDSDocOffice();
@@ -760,9 +765,11 @@ class LegalPeriodicalEditionIntegrationTest {
     referenceRepository.save(reference);
 
     // add status and source
+    FileNumberDTO fileNumber = EntityBuilderTestUtil.createTestFileNumberDTO();
+    fileNumber.setDocumentationUnit(docUnit);
     documentationUnitRepository.save(
         docUnit.toBuilder()
-            .fileNumbers(List.of(EntityBuilderTestUtil.createTestFileNumberDTO()))
+            .fileNumbers(List.of(fileNumber))
             .source(
                 new ArrayList<>(
                     List.of(
