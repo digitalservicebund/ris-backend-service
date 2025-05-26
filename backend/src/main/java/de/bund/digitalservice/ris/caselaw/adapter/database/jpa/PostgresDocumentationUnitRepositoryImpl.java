@@ -83,8 +83,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
-  private final PostgresDocumentationUnitSearchRepositoryImpl
-      postgresDocumentationUnitSearchRepositoryImpl;
+  private final DocumentationUnitSearchRepository docUnitSearchRepo;
   private final FeatureToggleService featureToggleService;
 
   public PostgresDocumentationUnitRepositoryImpl(
@@ -99,7 +98,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       EntityManager entityManager,
       DatabaseReferenceRepository referenceRepository,
       DocumentationUnitHistoryLogService historyLogService,
-      PostgresDocumentationUnitSearchRepositoryImpl criteriaSearchRepo,
+      DocumentationUnitSearchRepository docUnitSearchRepo,
       FeatureToggleService featureToggleService) {
 
     this.repository = repository;
@@ -113,7 +112,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.userService = userService;
     this.entityManager = entityManager;
     this.historyLogService = historyLogService;
-    this.postgresDocumentationUnitSearchRepositoryImpl = criteriaSearchRepo;
+    this.docUnitSearchRepo = docUnitSearchRepo;
     this.featureToggleService = featureToggleService;
   }
 
@@ -682,7 +681,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     if (featureToggleService.isEnabled("neuris.search-criteria-api")) {
       var searchParameters =
-          PostgresDocumentationUnitSearchRepositoryImpl.SearchParameters.builder()
+          DocumentationUnitSearchRepository.SearchParameters.builder()
               .courtType(Optional.ofNullable(courtType))
               .courtLocation(Optional.ofNullable(courtLocation))
               .documentNumber(Optional.ofNullable(documentNumber))
@@ -699,7 +698,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               .documentationOfficeDTO(documentationOfficeDTO)
               .build();
 
-      return postgresDocumentationUnitSearchRepositoryImpl.search(searchParameters, pageable);
+      return docUnitSearchRepo.search(searchParameters, pageable);
     }
 
     if ((fileNumber == null || fileNumber.trim().isEmpty())) {
