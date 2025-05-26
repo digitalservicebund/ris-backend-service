@@ -28,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
@@ -96,8 +97,8 @@ class UserGroupIntegrationTest {
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private FmxService fmxService;
-
   @MockitoBean private DatabaseUserGroupService databaseUserGroupService;
+  @MockitoBean private DocumentationOfficeService documentationOfficeService;
 
   UserGroup internalUserGroup =
       UserGroup.builder()

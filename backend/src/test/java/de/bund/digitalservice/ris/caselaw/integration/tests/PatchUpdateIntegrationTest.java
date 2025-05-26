@@ -58,6 +58,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
@@ -163,6 +164,7 @@ class PatchUpdateIntegrationTest {
   @MockitoBean private FmxService fmxService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
+  @MockitoBean private DocumentationOfficeService documentationOfficeService;
 
   private UUID court1Id;
   private UUID court2Id;

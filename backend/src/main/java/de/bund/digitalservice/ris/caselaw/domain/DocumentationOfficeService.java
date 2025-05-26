@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +27,15 @@ public class DocumentationOfficeService {
     }
 
     return documentationOfficeRepository.findAllOrderByAbbreviationAsc();
+  }
+
+  /**
+   * Find a documentation office by its UUID
+   *
+   * @param uuid the UUID to search for
+   * @return the found documentation office
+   */
+  public DocumentationOffice findByUuid(UUID uuid) throws DocumentationOfficeNotExistsException {
+    return documentationOfficeRepository.findByUuid(uuid);
   }
 }

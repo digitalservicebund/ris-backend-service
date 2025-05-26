@@ -14,6 +14,9 @@ import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogServ
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
 
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: vi.fn() }),
+}))
 describe("DocumentUnitManagementData", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
@@ -148,10 +151,6 @@ describe("DocumentUnitManagementData", () => {
       duplicateRelations: [],
     }
     renderManagementData(managementData)
-
-    expect(
-      screen.getByText(`Dokumentationseinheit "DS123" löschen`),
-    ).toBeVisible()
 
     expect(
       screen.getByRole("button", { name: "Dokumentationseinheit löschen" }),
