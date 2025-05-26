@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -569,6 +570,43 @@ public class DocumentationUnitController {
       return ResponseEntity.status(HttpStatus.OK).body(result);
     } catch (DocumentationUnitNotExistsException | EntityNotFoundException ex) {
       return ResponseEntity.notFound().build();
+    }
+  }
+
+  /**
+   * Assign an existing document to another documentation office
+   *
+   * @param oidcUser the logged-in user
+   * @param documentationUnitId UUID of the documentation unit
+   * @param documentationOfficeId UUID of documentation Office to assign to
+   * @return HTTP 200 with result string for success, 404/400 for client errors, 500 for server
+   *     errors.
+   */
+  @PutMapping(value = "/{documentationUnitId}/assign/{documentationOfficeId}")
+  @PreAuthorize(
+      "isAuthenticated() and @userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#documentationUnitId)")
+  public ResponseEntity<String> assignDocumentationOffice(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable @NonNull UUID documentationUnitId,
+      @PathVariable @NonNull UUID documentationOfficeId) {
+    try {
+      var result =
+          service.assignDocumentationOffice(
+              documentationUnitId, documentationOfficeId, userService.getUser(oidcUser));
+      return ResponseEntity.ok().body(result);
+    } catch (DocumentationUnitNotExistsException e) {
+      log.warn("Documentation unit not found: {}", documentationUnitId, e);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Documentation unit not found");
+    } catch (DocumentationOfficeNotExistsException e) {
+      log.warn("Documentation office not found: {}", documentationOfficeId, e);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Documentation office not found");
+    } catch (DocumentationUnitException e) {
+      log.error(
+          "Error assigning documentation office {} to {}",
+          documentationOfficeId,
+          documentationUnitId,
+          e);
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
   }
 }

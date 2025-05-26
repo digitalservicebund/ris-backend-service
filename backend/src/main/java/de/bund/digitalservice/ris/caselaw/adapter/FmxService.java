@@ -13,6 +13,8 @@ import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.Source;
+import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.TransformationService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -167,6 +169,7 @@ public class FmxService implements TransformationService {
       LongTexts.LongTextsBuilder longTextsBuilder = documentationUnit.longTexts().toBuilder();
       ShortTexts.ShortTextsBuilder shortTextsBuilder = documentationUnit.shortTexts().toBuilder();
 
+      coreDataBuilder.source(Source.builder().value(SourceValue.L).build());
       CoreData coreData =
           transformCoreData(
               coreDataBuilder, rootTag, decisionDate, ecli, fileNumber, celex, author);

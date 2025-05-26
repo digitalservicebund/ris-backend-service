@@ -450,18 +450,14 @@ async function expectDocUnitSummaryInDuplicatesList(
 
 async function expectDuplicateWarning(page: Page) {
   await test.step("Ensure duplicate warning is displayed", async () => {
-    await expect(
-      page.getByText("Dublettenverdacht", { exact: true }),
-    ).toBeVisible()
+    await expect(page.getByTestId("duplicate-icon")).toBeVisible()
     await expect(page.getByRole("link", { name: "Bitte prüfen" })).toBeVisible()
   })
 }
 
 async function expectNoDuplicateWarning(page: Page) {
   await test.step("Ensure no duplicate warning is displayed", async () => {
-    await expect(
-      page.getByText("Dublettenverdacht", { exact: true }),
-    ).toBeHidden()
+    await expect(page.getByTestId("duplicate-icon")).toBeHidden()
     await expect(page.getByRole("link", { name: "Bitte prüfen" })).toBeHidden()
   })
 }

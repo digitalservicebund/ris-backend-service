@@ -4,27 +4,43 @@ import { config } from "@vue/test-utils"
 import InputText from "primevue/inputtext"
 import EURLexSearch from "@/components/eurlex/EURLexSearch.vue"
 import eurlexService from "@/services/eurlexService"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 describe("eurlex search", () => {
   const eurlexMock = vi.spyOn(eurlexService, "get")
-  eurlexMock.mockResolvedValue({
-    data: {
-      content: [],
-      size: 0,
-      number: 0,
-      numberOfElements: 0,
-      first: false,
-      last: false,
-      empty: true,
-    },
-    status: 200,
-  })
+  const user = userEvent.setup()
+
+  function renderComponent() {
+    return render(EURLexSearch, {
+      global: {
+        directives: { "ctrl-enter": onSearchShortcutDirective },
+        stubs: {
+          EURLexSearchForm: {
+            template: `
+                <div>
+                  <button
+                    aria-label="Nach Dokumentationseinheiten suchen"
+                    @click="$emit('update-page', { celex: 'celex' })"
+                  >
+                    Search
+                  </button>
+                  <button
+                    aria-label="Handle service error"
+                    @click="$emit('handle-service-error', { title: 'remote error title', description: [ 'remote error description 1', 'remote error description 2' ] })"
+                  >
+                    Search
+                  </button>
+                </div>
+              `,
+          },
+          InputMask: InputText,
+        },
+      },
+    })
+  }
 
   beforeEach(() => {
     eurlexMock.mockClear()
-    config.global.stubs = {
-      InputMask: InputText,
-    }
   })
 
   afterEach(() => {
@@ -32,8 +48,19 @@ describe("eurlex search", () => {
   })
 
   test("without filled search fields calls the service without query parameter", async () => {
-    render(EURLexSearch)
-    const user = userEvent.setup()
+    renderComponent()
+    eurlexMock.mockResolvedValue({
+      data: {
+        content: [],
+        size: 0,
+        number: 0,
+        numberOfElements: 0,
+        first: false,
+        last: false,
+        empty: true,
+      },
+      status: 200,
+    })
 
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
@@ -42,104 +69,34 @@ describe("eurlex search", () => {
     expect(eurlexMock).toHaveBeenCalledOnce()
   })
 
-  test("with value in file number input calls the service with only file number query parameter", async () => {
-    render(EURLexSearch)
-    const user = userEvent.setup()
+  test("eurlex service returns an error", async () => {
+    renderComponent()
+    eurlexMock.mockResolvedValue({
+      error: {
+        title: "error title",
+        description: ["error description 1", "error description 2"],
+      },
+      status: 500,
+    })
 
-    await user.type(screen.getByLabelText("Aktenzeichen Suche"), "file-number")
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
 
-    expect(eurlexMock).toHaveBeenCalledExactlyOnceWith(
-      0,
-      "file-number",
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-    )
+    expect(screen.getByText("error title")).toBeVisible()
+    expect(screen.getByText("error description 1")).toBeVisible()
+    expect(screen.getByText("error description 2")).toBeVisible()
+    expect(screen.getByText("Laden Sie die Seite bitte neu.")).toBeVisible()
   })
 
-  test("with value in celex input calls the service with only celex query parameter", async () => {
-    render(EURLexSearch)
-    const user = userEvent.setup()
+  test("child component emitted service returns an error", async () => {
+    renderComponent()
 
-    await user.type(screen.getByLabelText("CELEX-Nummer Suche"), "celex")
-    await user.click(
-      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
-    )
+    await user.click(screen.getByLabelText("Handle service error"))
 
-    expect(eurlexMock).toHaveBeenCalledExactlyOnceWith(
-      0,
-      undefined,
-      "celex",
-      undefined,
-      undefined,
-      undefined,
-    )
-  })
-
-  test("with value in court input calls the service with only court query parameter", async () => {
-    render(EURLexSearch)
-    const user = userEvent.setup()
-
-    await user.type(screen.getByLabelText("Gerichtstyp Suche"), "court-type")
-    await user.click(
-      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
-    )
-
-    expect(eurlexMock).toHaveBeenCalledExactlyOnceWith(
-      0,
-      undefined,
-      undefined,
-      "court-type",
-      undefined,
-      undefined,
-    )
-  })
-
-  test("with value in start date input calls the service with only start date query parameter", async () => {
-    render(EURLexSearch)
-    const user = userEvent.setup()
-
-    await user.type(
-      screen.getByLabelText("Entscheidungsdatum Suche Start"),
-      "01.01.2010",
-    )
-    await user.click(
-      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
-    )
-
-    expect(eurlexMock).toHaveBeenCalledExactlyOnceWith(
-      0,
-      undefined,
-      undefined,
-      undefined,
-      "2010-01-01",
-      undefined,
-    )
-  })
-
-  test("with value in end date input calls the service with only end date query parameter", async () => {
-    render(EURLexSearch)
-    const user = userEvent.setup()
-
-    await user.type(
-      screen.getByLabelText("Entscheidungsdatum Suche Ende"),
-      "31.12.2010",
-    )
-    await user.click(
-      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
-    )
-
-    expect(eurlexMock).toHaveBeenCalledExactlyOnceWith(
-      0,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      "2010-12-31",
-    )
+    expect(screen.getByText("remote error title")).toBeVisible()
+    expect(screen.getByText("remote error description 1")).toBeVisible()
+    expect(screen.getByText("remote error description 2")).toBeVisible()
+    expect(screen.getByText("Laden Sie die Seite bitte neu.")).toBeVisible()
   })
 })

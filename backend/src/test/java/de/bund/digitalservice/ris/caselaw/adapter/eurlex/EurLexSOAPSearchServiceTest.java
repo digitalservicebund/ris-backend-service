@@ -2,10 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,9 +14,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -235,65 +230,6 @@ class EurLexSOAPSearchServiceTest {
             eq(Optional.of("EuG")),
             eq(Optional.empty()),
             eq(Optional.empty()));
-  }
-
-  @Test
-  void testGetSearchResults_lastUpdate5MinutesBefore_shouldNotCallRequestNewDecisions() {
-    DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().abbreviation("DS").build();
-    when(repository.findAllNewWithUriBySearchParameters(
-            any(Pageable.class),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Optional.empty())))
-        .thenReturn(Page.empty());
-    Instant fiveMinutesBefore = Instant.now().minus(5, ChronoUnit.MINUTES);
-    EurLexResultDTO lastUpdate = EurLexResultDTO.builder().createdAt(fiveMinutesBefore).build();
-    when(repository.findTopByOrderByCreatedAtDesc()).thenReturn(Optional.of(lastUpdate));
-    doNothing().when(service).requestNewestDecisions(anyInt(), any(LocalDate.class));
-
-    service.getSearchResults(
-        "0",
-        documentationOffice,
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty());
-
-    verify(service, never()).requestNewestDecisions(anyInt(), any(LocalDate.class));
-  }
-
-  @Test
-  void testGetSearchResults_lastUpdate2DaysBefore_shouldCallRequestNewDecisions() {
-    DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().abbreviation("DS").build();
-    when(repository.findAllNewWithUriBySearchParameters(
-            any(Pageable.class),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Optional.empty())))
-        .thenReturn(Page.empty());
-    Instant twoDaysBefore = Instant.now().minus(2, ChronoUnit.DAYS);
-    EurLexResultDTO lastUpdate = EurLexResultDTO.builder().createdAt(twoDaysBefore).build();
-    when(repository.findTopByOrderByCreatedAtDesc()).thenReturn(Optional.of(lastUpdate));
-    doNothing().when(service).requestNewestDecisions(anyInt(), any(LocalDate.class));
-
-    service.getSearchResults(
-        "0",
-        documentationOffice,
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty());
-
-    verify(service, times(1))
-        .requestNewestDecisions(1, LocalDate.ofInstant(twoDaysBefore, ZoneId.of("Europe/Berlin")));
   }
 
   @Test

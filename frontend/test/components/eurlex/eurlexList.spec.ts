@@ -35,6 +35,7 @@ describe("eurlex list", () => {
     data: ["doc-number"],
     status: 200,
   })
+  const user = userEvent.setup()
 
   beforeAll(() => server.listen())
   afterAll(() => server.close())
@@ -65,13 +66,13 @@ describe("eurlex list", () => {
       empty: false,
     })
 
-    expect(await screen.findByText("celex")).toBeInTheDocument()
-    expect(await screen.findByText("court-type")).toBeInTheDocument()
-    expect(await screen.findByText("court-location")).toBeInTheDocument()
-    expect(await screen.findByText("01.05.2000")).toBeInTheDocument()
-    expect(await screen.findByText("file-number")).toBeInTheDocument()
-    expect(await screen.findByText("01.06.2010")).toBeInTheDocument()
-    expect(await screen.findByLabelText("Öffne Vorschau")).toBeVisible()
+    expect(screen.getByText("celex")).toBeVisible()
+    expect(screen.getByText("court-type")).toBeVisible()
+    expect(screen.getByTestId("court-location").innerHTML).toBe("-")
+    expect(screen.getByText("01.05.2000")).toBeVisible()
+    expect(screen.getByText("file-number")).toBeVisible()
+    expect(screen.getByText("01.06.2010")).toBeVisible()
+    expect(screen.getByLabelText("Öffne Vorschau")).toBeVisible()
   })
 
   test("renders entry without html link doesn't show preview button", async () => {
@@ -99,12 +100,12 @@ describe("eurlex list", () => {
       empty: false,
     })
 
-    expect(await screen.findByText("celex")).toBeInTheDocument()
-    expect(await screen.findByText("court-type")).toBeInTheDocument()
-    expect(await screen.findByText("court-location")).toBeInTheDocument()
-    expect(await screen.findByText("01.05.2000")).toBeInTheDocument()
-    expect(await screen.findByText("file-number")).toBeInTheDocument()
-    expect(await screen.findByText("01.06.2010")).toBeInTheDocument()
+    expect(screen.getByText("celex")).toBeVisible()
+    expect(screen.getByText("court-type")).toBeVisible()
+    expect(screen.getByTestId("court-location").innerHTML).toBe("-")
+    expect(screen.getByText("01.05.2000")).toBeVisible()
+    expect(screen.getByText("file-number")).toBeVisible()
+    expect(screen.getByText("01.06.2010")).toBeVisible()
     expect(screen.queryByLabelText("Öffne Vorschau")).not.toBeInTheDocument()
   })
 
@@ -149,6 +150,60 @@ describe("eurlex list", () => {
           abbreviation: "DS",
         },
       })
+
+      // clear earlier service error info modal
+      expect(emitted("handleServiceError")[0]).toStrictEqual([undefined])
+      screen.getAllByRole("checkbox").forEach((checkbox) => {
+        expect(checkbox).not.toBeChecked()
+      })
+
+      expect(emitted()["assign"]).toBeTruthy()
+    },
+  )
+
+  test(
+    "select entry, select a doc office, press Zuweisen and call service throws " +
+      "error should deselect all checkboxes, emit handleServiceError and assign",
+    async () => {
+      const { emitted } = renderComponent({
+        content: [
+          {
+            ecli: "ecli",
+            celex: "celex",
+            courtType: "court-type",
+            courtLocation: "court-location",
+            date: "2000-05-01",
+            title: "title",
+            fileNumber: "file-number",
+            publicationDate: "2010-06-01",
+            uri: "uri",
+          },
+        ],
+        size: 1,
+        number: 1,
+        numberOfElements: 1,
+        totalElements: 1,
+        totalPages: 1,
+        first: true,
+        last: true,
+        empty: false,
+      })
+      documentationUnitServiceMock.mockResolvedValue({
+        error: { title: "error title", description: "error description 1" },
+        status: 500,
+      })
+
+      await user.click(screen.getAllByRole("checkbox")[0])
+      await user.click(screen.getByLabelText("Dokumentationsstelle auswählen"))
+      await user.click(screen.getByText("DS"))
+      await user.click(screen.getByLabelText("Dokumentationsstelle zuweisen"))
+
+      expect(emitted("handleServiceError")[0]).toStrictEqual([
+        {
+          title: "error title",
+          description: "error description 1",
+        },
+      ])
 
       screen.getAllByRole("checkbox").forEach((checkbox) => {
         expect(checkbox).not.toBeChecked()

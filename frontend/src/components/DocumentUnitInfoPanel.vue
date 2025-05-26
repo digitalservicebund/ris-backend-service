@@ -117,6 +117,7 @@ watchEffect(() => {
         background-color="bg-red-300"
         class="ml-12"
         color="text-red-900"
+        data-testid="duplicate-icon"
         :icon="IconError"
         label="Dublettenverdacht"
       />

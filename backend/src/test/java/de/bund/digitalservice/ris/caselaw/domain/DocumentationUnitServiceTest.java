@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import static de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType.ACTIVE_CITATION;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
@@ -24,7 +25,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
@@ -75,6 +78,7 @@ class DocumentationUnitServiceTest {
   @MockitoBean UserService userService;
   @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
   @MockitoBean private FmxService fmxService;
+  @MockitoBean private DocumentationOfficeService documentationOfficeService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
@@ -533,6 +537,128 @@ class DocumentationUnitServiceTest {
     service.setPublicationDateTime(documentationUnit.uuid());
 
     verify(repository, times(1)).saveLastPublicationDateTime(documentationUnit.uuid());
+  }
+
+  @Test
+  void test_assignDocumentationOffice_shouldUnassignProcedures()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    User user = User.builder().build();
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+    UUID documentationOfficeId = UUID.randomUUID();
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().id(documentationOfficeId).build();
+    when(documentationOfficeService.findByUuid(documentationOfficeId))
+        .thenReturn(documentationOffice);
+
+    // Act
+    service.assignDocumentationOffice(documentationUnit.uuid(), documentationOfficeId, user);
+
+    // Assert
+    verify(repository, times(1)).unassignProcedures(documentationUnit.uuid());
+  }
+
+  @Test
+  void test_assignDocumentationOffice_shouldSaveNewDocumentationOffice()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    User user = User.builder().build();
+    UUID documentationOfficeId = UUID.randomUUID();
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().id(documentationOfficeId).build();
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    when(documentationOfficeService.findByUuid(documentationOfficeId))
+        .thenReturn(documentationOffice);
+    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+
+    // Act
+    service.assignDocumentationOffice(documentationUnit.uuid(), documentationOfficeId, user);
+
+    // Assert
+    verify(repository, times(1))
+        .saveDocumentationOffice(documentationUnit.uuid(), documentationOffice, user);
+  }
+
+  @Test
+  void test_assignDocumentationOffice_withPendingProcedure_shouldThrowDocumentationUnitException()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    User user = User.builder().build();
+    UUID documentationOfficeId = UUID.randomUUID();
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().id(documentationOfficeId).build();
+    PendingProceeding documentationUnit = PendingProceeding.builder().build();
+    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+
+    // Assert
+    assertThatThrownBy(
+            () ->
+                // Act
+                service.assignDocumentationOffice(
+                    documentationUnit.uuid(), documentationOfficeId, user))
+        .isInstanceOf(DocumentationUnitException.class)
+        .hasMessageContaining(
+            "The documentation office could not be reassigned: Document is not a decision.");
+
+    verify(repository, never()).unassignProcedures(documentationUnit.uuid());
+    verify(repository, never())
+        .saveDocumentationOffice(documentationUnit.uuid(), documentationOffice, user);
+  }
+
+  @Test
+  void test_assignDocumentationOffice_shouldThrowDocumentationUnitNotExistsException()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    User user = User.builder().build();
+    UUID documentationOfficeId = UUID.randomUUID();
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().id(documentationOfficeId).build();
+    PendingProceeding documentationUnit = PendingProceeding.builder().build();
+    when(repository.findByUuid(documentationUnit.uuid(), user))
+        .thenThrow(new DocumentationUnitNotExistsException());
+
+    // Assert
+    assertThatThrownBy(
+            () ->
+                // Act
+                service.assignDocumentationOffice(
+                    documentationUnit.uuid(), documentationOfficeId, user))
+        .isInstanceOf(DocumentationUnitNotExistsException.class)
+        .hasMessageContaining("Documentation unit does not exist");
+
+    verify(repository, never()).unassignProcedures(documentationUnit.uuid());
+    verify(repository, never())
+        .saveDocumentationOffice(documentationUnit.uuid(), documentationOffice, user);
+  }
+
+  @Test
+  void test_assignDocumentationOffice_shouldThrowDocumentationOfficeNotExistsException()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    User user = User.builder().build();
+    UUID documentationOfficeId = UUID.randomUUID();
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().id(documentationOfficeId).build();
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    var errorMessage =
+        String.format("The documentation office with id %s doesn't exist.", documentationOfficeId);
+    when(documentationOfficeService.findByUuid(documentationOfficeId))
+        .thenThrow(new DocumentationOfficeNotExistsException(errorMessage));
+    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+
+    // Assert
+    assertThatThrownBy(
+            () ->
+                // Act
+                service.assignDocumentationOffice(
+                    documentationUnit.uuid(), documentationOfficeId, user))
+        .isInstanceOf(DocumentationOfficeNotExistsException.class)
+        .hasMessageContaining(errorMessage);
+
+    verify(repository, never()).unassignProcedures(documentationUnit.uuid());
+    verify(repository, never())
+        .saveDocumentationOffice(documentationUnit.uuid(), documentationOffice, user);
   }
 
   static Stream<String> provideDuplicateCheckPaths() {

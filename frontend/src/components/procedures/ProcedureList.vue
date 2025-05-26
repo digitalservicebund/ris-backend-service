@@ -215,7 +215,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
+  <div class="flex h-full flex-col space-y-24 bg-gray-100 p-24">
     <h1 class="ris-heading2-regular">Vorgänge</h1>
     <div class="mt-24 flex flex-row items-center gap-4">
       <div class="w-[480px]" role="search">

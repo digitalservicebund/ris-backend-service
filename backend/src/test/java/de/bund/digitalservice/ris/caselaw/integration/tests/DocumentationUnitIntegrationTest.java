@@ -52,6 +52,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationOfficeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
@@ -73,6 +74,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -120,6 +122,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -161,6 +164,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       KeycloakUserService.class,
       PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
       DocumentationUnitHistoryLogService.class,
+      DocumentationOfficeService.class,
+      PostgresDocumentationOfficeRepositoryImpl.class,
+      DocumentationUnitHistoryLogService.class,
       PostgresDocumentationUnitSearchRepositoryImpl.class
     },
     controllers = {DocumentationUnitController.class})
@@ -200,6 +206,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DocumentationUnitHistoryLogRepository historyLogRepository;
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DocumentationUnitHistoryLogService historyLogService;
+  @Autowired private DocumentationOfficeService documentationOfficeService;
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
   @MockitoBean private ConverterService converterService;
@@ -238,6 +245,7 @@ class DocumentationUnitIntegrationTest {
     repository.deleteAll();
     databaseDocumentTypeRepository.deleteAll();
     databaseDocumentNumberRepository.deleteAll();
+    procedureRepository.deleteAll();
   }
 
   @Test
@@ -1772,5 +1780,132 @@ class DocumentationUnitIntegrationTest {
           .expectStatus()
           .isForbidden();
     }
+  }
+
+  @Test
+  void assignDocumentationOffice_withoutRights_shouldBeForbidden() {
+    // Arrange
+    var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+    var decisionBuilder =
+        DecisionDTO.builder()
+            .documentNumber("DOCNUMBER_001")
+            .documentationOffice(documentationOffice);
+    var documentationUnit =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(repository, decisionBuilder);
+
+    // Act
+    risWebTestClient
+        .withExternalLogin()
+        .put()
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentationUnit.getId()
+                + "/assign/"
+                + bghDocOffice.getId())
+        .exchange()
+        .expectStatus()
+        .isForbidden()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              var documentationUnitDTO = repository.findById(documentationUnit.getId());
+              assertThat(documentationUnitDTO.get().getDocumentationOffice())
+                  .isEqualTo(documentationOffice);
+            });
+  }
+
+  @Test
+  void assignDocumentationOffice_withoutProcedures_shouldSucceed() {
+    // Arrange
+    var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+    var decisionBuilder =
+        DecisionDTO.builder()
+            .documentNumber("DOCNUMBER_001")
+            .documentationOffice(documentationOffice);
+    var documentationUnit =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(repository, decisionBuilder);
+
+    // Act
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentationUnit.getId()
+                + "/assign/"
+                + bghDocOffice.getId())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              assertThat(response.getResponseBody())
+                  .isEqualTo("The documentation office [BGH] has been successfully assigned.");
+              var documentationUnitDTO = repository.findById(documentationUnit.getId());
+              assertThat(documentationUnitDTO.get().getDocumentationOffice().getId())
+                  .isEqualTo(bghDocOffice.getId());
+            });
+  }
+
+  @Transactional
+  @Test
+  void assignDocumentationOffice_withProcedures_shouldSucceedAndRemoveProcedures() {
+    // Arrange
+    var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+    var decisionId = createDecisionWithProcedures();
+
+    // Act
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + decisionId + "/assign/" + bghDocOffice.getId())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              assertThat(response.getResponseBody())
+                  .isEqualTo("The documentation office [BGH] has been successfully assigned.");
+              var docUnitWithoutProcedure = repository.findById(decisionId);
+              assertThat(docUnitWithoutProcedure.get().getProcedure()).isNull();
+              assertThat(docUnitWithoutProcedure.get().getProcedureHistory()).isEmpty();
+              assertThat(docUnitWithoutProcedure.get().getDocumentationOffice().getId())
+                  .isEqualTo(bghDocOffice.getId());
+            });
+  }
+
+  private UUID createDecisionWithProcedures() {
+    List<ProcedureDTO> procedures =
+        List.of(
+            ProcedureDTO.builder()
+                .documentationOffice(documentationOffice)
+                .label("vorgang1")
+                .build(),
+            ProcedureDTO.builder()
+                .documentationOffice(documentationOffice)
+                .label("vorgang2")
+                .build());
+    procedureRepository.saveAll(procedures);
+    String documentNumber =
+        new Random().ints(13, 0, 10).mapToObj(Integer::toString).collect(Collectors.joining());
+    var decision =
+        repository.save(
+            DecisionDTO.builder()
+                .documentNumber(documentNumber)
+                .procedure(procedures.get(0))
+                .procedureHistory(new ArrayList<>(List.of(procedures.get(1))))
+                .documentationOffice(documentationOffice)
+                .build());
+    assertThat(procedureRepository.count()).isEqualTo(2);
+    var docUnitWithProcedure = repository.findById(decision.getId());
+    assertThat(docUnitWithProcedure.get().getProcedure().getLabel()).isEqualTo("vorgang1");
+    assertThat(docUnitWithProcedure.get().getProcedureHistory().get(0).getLabel())
+        .isEqualTo("vorgang2");
+    return decision.getId();
   }
 }

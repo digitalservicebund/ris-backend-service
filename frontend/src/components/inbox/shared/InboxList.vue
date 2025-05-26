@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { useScrollLock } from "@vueuse/core"
 import dayjs from "dayjs"
-import dayjsTimezone from "dayjs/plugin/timezone"
-import dayjsUtc from "dayjs/plugin/utc"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
@@ -24,7 +22,7 @@ import IconSubject from "~icons/ic/baseline-subject"
 import IconNote from "~icons/ic/outline-comment-bank"
 import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
-import IconClock from "~icons/ic/outline-watch-later"
+import IconArrowDown from "~icons/mdi/arrow-down-drop"
 
 const props = defineProps<{
   pageEntries?: Page<DocumentUnitListEntry>
@@ -35,8 +33,6 @@ const emit = defineEmits<{
   deleteDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
   takeOverDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
-dayjs.extend(dayjsUtc)
-dayjs.extend(dayjsTimezone)
 
 const entries = computed(() => props.pageEntries?.content || [])
 
@@ -60,11 +56,6 @@ const trimText = (text: string, length: number = 50) =>
 
 const noteTooltip = (listEntry: DocumentUnitListEntry) =>
   listEntry.note ? trimText(listEntry.note) : "Keine Notiz vorhanden"
-
-const schedulingTooltip = (publicationDate?: string) =>
-  publicationDate
-    ? `Terminierte Übergabe am\n${dayjs.utc(publicationDate).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")}`
-    : "Keine Übergabe terminiert"
 
 /**
  * Clicking on a delete icon of a list entry shows a modal, which asks for user input to proceed
@@ -123,7 +114,7 @@ watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
 
 const rowStyleClass = (rowData: DocumentUnitListEntry) => {
   return selectionErrorDocUnitIds.value.includes(rowData.uuid!)
-    ? "bg-red-300"
+    ? "bg-red-200"
     : ""
 }
 </script>
@@ -147,6 +138,7 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
     />
     <InputErrorMessages
       v-if="selectionErrorMessage"
+      class="pl-16"
       :error-message="selectionErrorMessage"
     />
     <Pagination
@@ -169,21 +161,24 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
         :value="entries"
       >
         <Column
+          header-style="width: 3rem"
           :pt="{
             pcRowCheckbox: {
-              input: {
+              root: {
                 style:
-                  selectionErrorMessage && selectionErrorDocUnitIds.length === 0
-                    ? 'border-color: var(--color-red-800)'
-                    : '',
+                  'height: 100%; display: flex; align-items: center; justify-content: center;',
+              },
+              input: {
+                style: `height: 1.5rem; width: 1.5rem; ${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
               },
             },
             pcHeaderCheckbox: {
-              input: {
+              root: {
                 style:
-                  selectionErrorMessage && selectionErrorDocUnitIds.length === 0
-                    ? 'border-color: var(--color-red-800)'
-                    : '',
+                  'display: flex; align-items: center; justify-content: center;',
+              },
+              input: {
+                style: `height: 1.5rem; width: 1.5rem; ${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
               },
             },
           }"
@@ -230,23 +225,6 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
                     data-testid="note-icon"
                   />
                 </Tooltip>
-
-                <Tooltip
-                  :text="schedulingTooltip(item.scheduledPublicationDateTime)"
-                >
-                  <IconClock
-                    :aria-label="
-                      schedulingTooltip(item.scheduledPublicationDateTime)
-                    "
-                    class="flex-end m-4 flex h-20 w-20"
-                    :class="
-                      item.scheduledPublicationDateTime
-                        ? 'text-blue-800'
-                        : 'text-gray-500'
-                    "
-                    data-testid="scheduling-icon"
-                  />
-                </Tooltip>
               </div>
             </div>
           </template>
@@ -262,11 +240,14 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
           header-class="ris-label3-bold"
         />
 
-        <Column
-          field="decisionDate"
-          header="Datum"
-          header-class="ris-label3-bold"
-        >
+        <Column field="decisionDate" header-class="ris-label3-bold">
+          <template #header>
+            <div class="flex flex-row">
+              Datum
+              <IconArrowDown />
+            </div>
+          </template>
+
           <template #body="{ data: item }">
             {{
               item.decisionDate

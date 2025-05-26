@@ -65,6 +65,11 @@ interface DocumentUnitService {
     duplicateDocNumber: string,
     status: DuplicateRelationStatus,
   ): Promise<{ error: boolean }>
+
+  assignDocumentationOffice(
+    documentUnitId: string,
+    documentationOfficeId: string,
+  ): Promise<ServiceResponse<unknown>>
 }
 
 const service: DocumentUnitService = {
@@ -325,6 +330,29 @@ const service: DocumentUnitService = {
     )
 
     return response.status >= 400 ? { error: true } : { error: false }
+  },
+
+  async assignDocumentationOffice(
+    documentUnitId: string,
+    documentationOfficeId: string,
+  ) {
+    const response = await httpClient.put(
+      `caselaw/documentunits/${documentUnitId}/assign/${documentationOfficeId}`,
+    )
+
+    if (response.status >= 300) {
+      response.error = {
+        title:
+          errorMessages
+            .DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
+            .title,
+        description:
+          errorMessages
+            .DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED
+            .description,
+      }
+    }
+    return response
   },
 }
 
