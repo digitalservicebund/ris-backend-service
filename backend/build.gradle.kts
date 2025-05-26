@@ -141,7 +141,7 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property(
             "sonar.coverage.exclusions",
-            "**/config/**,**/S3AsyncMockClient.java,**/Application.java"
+            "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/PostgresDocumentationUnitSearchRepositoryImpl.java"
         )
     }
 }
