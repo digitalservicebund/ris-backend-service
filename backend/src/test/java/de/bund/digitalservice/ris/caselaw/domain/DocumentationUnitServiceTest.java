@@ -545,9 +545,14 @@ class DocumentationUnitServiceTest {
     User user = User.builder().build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
     when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+    UUID documentationOfficeId = UUID.randomUUID();
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().id(documentationOfficeId).build();
+    when(documentationOfficeService.findByUuid(documentationOfficeId))
+        .thenReturn(documentationOffice);
 
     // Act
-    service.assignDocumentationOffice(documentationUnit.uuid(), UUID.randomUUID(), user);
+    service.assignDocumentationOffice(documentationUnit.uuid(), documentationOfficeId, user);
 
     // Assert
     verify(repository, times(1)).unassignProcedures(documentationUnit.uuid());
