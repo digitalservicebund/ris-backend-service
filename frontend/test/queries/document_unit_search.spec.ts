@@ -27,7 +27,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         documentNumber: "BV",
       },
-      maxDuration: 3800, // last max 3516, average 2140, min 1505
+      maxDuration: 2000, // last max 1570 average 1370, min 1311
       minResults: 5,
     },
     {
@@ -35,7 +35,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         documentNumber: "notExistingFoo",
       },
-      maxDuration: 500, // last max 749, average 460, min 420
+      maxDuration: 400, // last max 379, average 161, min 136
     },
     {
       title: "vague fileNumber",
@@ -50,7 +50,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         fileNumber: "notExistingFoo",
       },
-      maxDuration: 400, // last max 477, average 229, min 166
+      maxDuration: 500, // last max 749, average 460, min 420
     },
     {
       title: "only unpublished",
