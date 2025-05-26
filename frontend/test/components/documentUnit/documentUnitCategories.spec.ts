@@ -25,6 +25,9 @@ function renderComponent() {
       },
       global: {
         directives: { "ctrl-enter": onSearchShortcutDirective },
+        stubs: {
+          FieldsOfLaw: true,
+        },
         plugins: [
           createTestingPinia({
             initialState: {
