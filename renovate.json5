@@ -28,6 +28,11 @@
       "allowedVersions": "3.4.x"
     },
     {
+      // FIXME: Remove this when msw is compatible
+      "matchPackageNames": ['node'],
+      "allowedVersions": "22.15.x"
+    },
+    {
       "groupName": "all-frontend-non-major-dependencies",
       "matchPaths": [
         "frontend/**"
