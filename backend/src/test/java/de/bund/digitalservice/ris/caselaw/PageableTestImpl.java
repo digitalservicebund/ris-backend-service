@@ -12,6 +12,14 @@ public class PageableTestImpl implements Pageable {
   private boolean paged;
   private boolean unpaged;
 
+  public PageableTestImpl() {
+    // no implementation needed. Only for deserialization
+  }
+
+  public PageableTestImpl(String instance) {
+    // no implementation needed. Only for deserialization
+  }
+
   @Override
   public int getPageNumber() {
     return pageNumber;

@@ -109,15 +109,19 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
     predicates.add(builder.like(root.get("status"), "NEW"));
 
     if (fileNumber.isPresent() && Strings.isNotBlank(fileNumber.get())) {
-      predicates.add(builder.like(root.get("fileNumber"), fileNumber.get() + "%"));
+      predicates.add(
+          builder.like(
+              builder.upper(root.get("fileNumber")), fileNumber.get().toUpperCase() + "%"));
     }
 
     if (celex.isPresent() && Strings.isNotBlank(celex.get())) {
-      predicates.add(builder.like(root.get("celex"), celex.get() + "%"));
+      predicates.add(
+          builder.like(builder.upper(root.get("celex")), celex.get().toUpperCase() + "%"));
     }
 
     if (court.isPresent() && Strings.isNotBlank(court.get())) {
-      predicates.add(builder.like(courtJoin.get("type"), court.get() + "%"));
+      predicates.add(
+          builder.equal(builder.upper(courtJoin.get("type")), court.get().toUpperCase()));
     }
 
     startDate.ifPresent(
