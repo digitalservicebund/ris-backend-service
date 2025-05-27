@@ -24,7 +24,7 @@
   "packageRules": [
     {
       // FIXME: Remove this when spring-cloud-kubernetes is compatible, see https://github.com/spring-cloud/spring-cloud-kubernetes/issues/1923
-      "matchPackageNames": ['org.springframework.boot'],
+      "matchPackageNames": ['org.springframework.boot*'],
       "allowedVersions": "3.4.x"
     },
     {
