@@ -61,7 +61,7 @@
   },
   "DOCUMENT_UNIT_TAKEOVER_FAILED": {
     "title": "Dokumentationseinheit konnte nicht übernommen werden.",
-    "description": ""
+    "description": "Bitte versuchen Sie es später erneut."
   },
   "BULK_PROCEDURE_ASSIGNMENT_FAILED": {
     "title": "Vorgang konnte nicht zugewiesen werden.",

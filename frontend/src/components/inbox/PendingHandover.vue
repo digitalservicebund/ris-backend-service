@@ -16,8 +16,7 @@ const pageNumber = ref<number>(0)
 const itemsPerPage = 100
 const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()
-const searchResponseError = ref<ResponseError>()
-const hasTakeOverError = ref(false)
+const serviceError = ref<ResponseError>()
 
 /**
  * Searches all documentation units by given input and updates the local
@@ -28,6 +27,7 @@ const hasTakeOverError = ref(false)
  */
 async function search() {
   isLoading.value = true
+  if (currentPage.value) currentPage.value.content = []
 
   const response = await service.searchByDocumentUnitSearchInput({
     ...(pageNumber.value != undefined
@@ -40,10 +40,10 @@ async function search() {
   })
   if (response.data) {
     currentPage.value = response.data
-    searchResponseError.value = undefined
+    serviceError.value = undefined
   }
   if (response.error) {
-    searchResponseError.value = response.error
+    serviceError.value = response.error
   }
   isLoading.value = false
 }
@@ -77,7 +77,6 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
  * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be updated
  */
 async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
-  hasTakeOverError.value = false
   const { data, error } = await service.takeOver(
     documentUnitListEntry.documentNumber as string,
   )
@@ -91,8 +90,12 @@ async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
       // Replace the old entry with the updated one
       currentPage.value.content[index] = data as DocumentUnitListEntry
     }
+    serviceError.value = undefined
   }
-  hasTakeOverError.value = !!error
+
+  if (error) {
+    serviceError.value = error
+  }
 }
 
 /**
@@ -128,21 +131,17 @@ async function handleReset() {
 
 <template>
   <div class="flex flex-col" data-testId="pending-handover-inbox">
-    <InboxSearch
-      :is-loading="isLoading"
-      @reset-search-results="handleReset"
-      @search="updateQuery"
-    />
+    <InboxSearch @reset-search-results="handleReset" @search="updateQuery" />
     <InfoModal
-      v-if="hasTakeOverError"
+      v-if="serviceError"
       class="my-16"
-      data-testid="take-over-error"
-      description="Bitte laden Sie die Seite neu."
+      data-testid="service-error"
+      :description="serviceError.description"
       :status="InfoStatus.ERROR"
-      title="Die Fremdanlage konnte nicht angenommen werden."
+      :title="serviceError.title"
     />
     <InboxList
-      :error="searchResponseError"
+      :loading="isLoading"
       :page-entries="currentPage"
       @delete-documentation-unit="handleDelete"
       @take-over-documentation-unit="handleTakeOver"
