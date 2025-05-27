@@ -30,7 +30,7 @@
     {
       // FIXME: Remove this when msw is compatible
       "matchPackageNames": ['node'],
-      "allowedVersions": "22.15.x"
+      "allowedVersions": "22.15.0"
     },
     {
       "groupName": "all-frontend-non-major-dependencies",
