@@ -85,6 +85,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
@@ -115,6 +116,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,6 +125,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.Builder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -1816,7 +1819,7 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  void assignDocumentationOffice_withoutProcedures_shouldSucceed() {
+  void assignDocumentationOffice_withoutProcedures_shouldSucceedAndLogChanges() {
     // Arrange
     var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
     var decisionBuilder =
@@ -1847,6 +1850,35 @@ class DocumentationUnitIntegrationTest {
               var documentationUnitDTO = repository.findById(documentationUnit.getId());
               assertThat(documentationUnitDTO.get().getDocumentationOffice().getId())
                   .isEqualTo(bghDocOffice.getId());
+              var historyLogs =
+                  historyLogRepository.findByDocumentationUnitId(
+                      documentationUnit.getId(),
+                      User.builder()
+                          .documentationOffice(
+                              DocumentationOfficeTransformer.transformToDomain(
+                                  documentationUnit.getDocumentationOffice()))
+                          .build());
+              assertThat(historyLogs).hasSize(1);
+              assertThat(historyLogs.get(0).eventType())
+                  .isEqualTo(HistoryLogEventType.DOCUMENTATION_OFFICE);
+              assertThat(
+                      documentationUnitDTO
+                          .get()
+                          .getManagementData()
+                          .getLastUpdatedByDocumentationOffice()
+                          .getId())
+                  .isEqualTo(documentationUnit.getDocumentationOffice().getId());
+              assertThat(
+                      documentationUnitDTO.get().getManagementData().getLastUpdatedBySystemName())
+                  .isNull();
+              assertThat(documentationUnitDTO.get().getManagementData().getLastUpdatedAtDateTime())
+                  .isBetween(Instant.now().minusSeconds(10), Instant.now());
+              assertThat(documentationUnitDTO.get().getManagementData().getLastUpdatedByUserName())
+                  .isEqualTo("testUser");
+              assertThat(documentationUnitDTO.get().getManagementData().getLastUpdatedByUserId())
+                  .isNotNull();
+              assertThat(documentationUnitDTO.get().getInboxStatus())
+                  .isEqualTo(InboxStatus.EXTERNAL_HANDOVER);
             });
   }
 
@@ -1907,5 +1939,40 @@ class DocumentationUnitIntegrationTest {
     assertThat(docUnitWithProcedure.get().getProcedureHistory().get(0).getLabel())
         .isEqualTo("vorgang2");
     return decision.getId();
+  }
+
+  @Builder(toBuilder = true)
+  public record CreationParameters(
+      LocalDateTime lastPublicationDateTime,
+      LocalDateTime scheduledPublicationDateTime,
+      String scheduledByEmail,
+      List<DuplicateRelation> duplicateRelations,
+      List<String> borderNumbers,
+      String createdByDocumentationOffice,
+      UUID createdByUserId,
+      Instant createdAtDateTime,
+      String createdByName,
+      String lastUpdatedByDocumentationOffice,
+      UUID lastUpdatedByUserId,
+      Instant lastUpdatedAtDateTime,
+      String lastUpdatedByName,
+      Instant firstPublishedAtDateTime) {}
+
+  private ManagementData generateManagementData(Optional<CreationParameters> parameters) {
+    return ManagementData.builder()
+        .lastPublicationDateTime(parameters.get().lastPublicationDateTime)
+        .scheduledPublicationDateTime(parameters.get().scheduledPublicationDateTime)
+        .scheduledByEmail(parameters.get().scheduledByEmail)
+        .borderNumbers(Optional.ofNullable(parameters.get().borderNumbers).orElse(List.of()))
+        .duplicateRelations(
+            Optional.ofNullable(parameters.get().duplicateRelations).orElse(List.of()))
+        .lastUpdatedAtDateTime(parameters.get().lastUpdatedAtDateTime)
+        .lastUpdatedByName(parameters.get().lastUpdatedByName)
+        .lastUpdatedByDocOffice(parameters.get().lastUpdatedByDocumentationOffice)
+        .createdAtDateTime(parameters.get().createdAtDateTime)
+        .createdByName(parameters.get().createdByName)
+        .createdByDocOffice(parameters.get().createdByDocumentationOffice)
+        .firstPublishedAtDateTime(parameters.get().firstPublishedAtDateTime)
+        .build();
   }
 }
