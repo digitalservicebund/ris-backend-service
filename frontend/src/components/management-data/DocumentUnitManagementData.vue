@@ -143,7 +143,7 @@ const assignDocumentationOffice = async () => {
             <DocumentationOfficeSelector
               v-model="selectedDocumentationOffice"
               v-model:has-error="hasDocumentationOfficeError"
-              class="min-w-2xs"
+              class="min-w-xs"
               :exclude-office-abbreviations="abbreviationsToExclude"
             />
             <Button

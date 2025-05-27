@@ -4,6 +4,7 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import { ComboboxItem } from "@/components/input/types"
 import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
+import errorMessages from "@/i18n/errors.json"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 type DocumentationOfficeComboboxInputType = {
@@ -80,7 +81,7 @@ const getFilteredItems = (filter: Ref<string | undefined>) => {
 </script>
 
 <template>
-  <div class="ris-body2-regular">
+  <div>
     <ComboboxInput
       id="documentationOfficeSelector"
       aria-label="Dokumentationsstelle auswählen"
@@ -96,10 +97,9 @@ const getFilteredItems = (filter: Ref<string | undefined>) => {
           | undefined
       "
     />
-
     <InputErrorMessages
       v-if="props.hasError"
-      error-message="Wählen Sie eine Dokumentationsstelle aus"
+      :error-message="errorMessages.NO_DOCUMENTATION_OFFICE_SELECTED.title"
     />
   </div>
 </template>

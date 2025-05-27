@@ -255,7 +255,7 @@
   "EURLEX_NO_DECISION_SELECTED": {
     "title": "Wählen Sie mindestens eine Dokumentationsseinheit aus"
   },
-  "EURLEX_NO_DOCUMENTATION_OFFICE_SELECTED": {
+  "NO_DOCUMENTATION_OFFICE_SELECTED": {
     "title": "Wählen Sie eine Dokumentationsstelle aus"
   },
   "DOCUMENTATION_UNIT_DOCUMENTATION_OFFICE_COULD_NOT_BE_ASSIGNED": {
