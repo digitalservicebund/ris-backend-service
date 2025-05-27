@@ -85,7 +85,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
-import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
@@ -116,7 +115,6 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +123,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import lombok.Builder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -1939,40 +1936,5 @@ class DocumentationUnitIntegrationTest {
     assertThat(docUnitWithProcedure.get().getProcedureHistory().get(0).getLabel())
         .isEqualTo("vorgang2");
     return decision.getId();
-  }
-
-  @Builder(toBuilder = true)
-  public record CreationParameters(
-      LocalDateTime lastPublicationDateTime,
-      LocalDateTime scheduledPublicationDateTime,
-      String scheduledByEmail,
-      List<DuplicateRelation> duplicateRelations,
-      List<String> borderNumbers,
-      String createdByDocumentationOffice,
-      UUID createdByUserId,
-      Instant createdAtDateTime,
-      String createdByName,
-      String lastUpdatedByDocumentationOffice,
-      UUID lastUpdatedByUserId,
-      Instant lastUpdatedAtDateTime,
-      String lastUpdatedByName,
-      Instant firstPublishedAtDateTime) {}
-
-  private ManagementData generateManagementData(Optional<CreationParameters> parameters) {
-    return ManagementData.builder()
-        .lastPublicationDateTime(parameters.get().lastPublicationDateTime)
-        .scheduledPublicationDateTime(parameters.get().scheduledPublicationDateTime)
-        .scheduledByEmail(parameters.get().scheduledByEmail)
-        .borderNumbers(Optional.ofNullable(parameters.get().borderNumbers).orElse(List.of()))
-        .duplicateRelations(
-            Optional.ofNullable(parameters.get().duplicateRelations).orElse(List.of()))
-        .lastUpdatedAtDateTime(parameters.get().lastUpdatedAtDateTime)
-        .lastUpdatedByName(parameters.get().lastUpdatedByName)
-        .lastUpdatedByDocOffice(parameters.get().lastUpdatedByDocumentationOffice)
-        .createdAtDateTime(parameters.get().createdAtDateTime)
-        .createdByName(parameters.get().createdByName)
-        .createdByDocOffice(parameters.get().createdByDocumentationOffice)
-        .firstPublishedAtDateTime(parameters.get().firstPublishedAtDateTime)
-        .build();
   }
 }
