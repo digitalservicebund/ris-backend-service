@@ -547,26 +547,21 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         .findById(uuid)
         .ifPresent(
             documentationUnitDTO -> {
+              var previousDocumentationOffice = documentationUnitDTO.getDocumentationOffice();
               documentationUnitDTO.setDocumentationOffice(
                   DocumentationOfficeTransformer.transformToDTO(newDocumentationOffice));
               documentationUnitDTO.setInboxStatus(InboxStatus.EXTERNAL_HANDOVER);
               setLastUpdated(user, documentationUnitDTO);
-              addChangelog(documentationUnitDTO, newDocumentationOffice, user);
+              repository.save(documentationUnitDTO);
+              historyLogService.saveHistoryLog(
+                  documentationUnitDTO.getId(),
+                  user,
+                  HistoryLogEventType.DOCUMENTATION_OFFICE,
+                  "Dokstelle geändert: [%s] → [%s]"
+                      .formatted(
+                          previousDocumentationOffice.getAbbreviation(),
+                          newDocumentationOffice.abbreviation()));
             });
-  }
-
-  private void addChangelog(
-      DocumentationUnitDTO documentationUnitDTO,
-      DocumentationOffice newDocumentationOffice,
-      User user) {
-    var previousDocumentationOffice = documentationUnitDTO.getDocumentationOffice();
-    var description =
-        "Dokstelle geändert: [%s] → [%s]"
-            .formatted(
-                previousDocumentationOffice.getAbbreviation(),
-                newDocumentationOffice.abbreviation());
-    historyLogService.saveHistoryLog(
-        documentationUnitDTO.getId(), user, HistoryLogEventType.DOCUMENTATION_OFFICE, description);
   }
 
   private ProcedureDTO getOrCreateProcedure(

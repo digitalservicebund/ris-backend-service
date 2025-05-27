@@ -1858,6 +1858,8 @@ class DocumentationUnitIntegrationTest {
               assertThat(historyLogs).hasSize(1);
               assertThat(historyLogs.get(0).eventType())
                   .isEqualTo(HistoryLogEventType.DOCUMENTATION_OFFICE);
+              assertThat(historyLogs.get(0).description())
+                  .isEqualTo("Dokstelle geändert: [DS] → [BGH]");
               assertThat(
                       documentationUnitDTO
                           .get()
