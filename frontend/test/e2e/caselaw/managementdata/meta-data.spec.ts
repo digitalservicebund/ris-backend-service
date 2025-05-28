@@ -108,7 +108,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
       ).toBeVisible()
 
       await expect(
-        page.getByLabel("Zuständige Dokumentationsstelle"),
+        page.getByLabel("Dokumentationsstelle auswählen"),
       ).toHaveValue("BGH")
     })
 

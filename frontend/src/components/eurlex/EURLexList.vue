@@ -3,8 +3,8 @@ import dayjs from "dayjs"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
-import Select from "primevue/select"
 import { computed, onMounted, ref } from "vue"
+import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelector.vue"
 import { ComboboxItem } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
@@ -69,6 +69,7 @@ async function handleAssignToDocOffice() {
   }
 
   if (selectedDocumentationOffice.value) {
+    noDocumentationOfficeSelected.value = false
     const params: EurlexParameters = {
       documentationOffice: selectedDocumentationOffice.value,
       celexNumbers: selectedEntries.value.map(({ celex }) => celex),
@@ -91,25 +92,16 @@ async function handleAssignToDocOffice() {
 function selectRow() {
   noDecisionSelected.value = selectedEntries.value.length == 0
 }
-
-function selectDocumentationOffice() {
-  noDocumentationOfficeSelected.value =
-    selectedDocumentationOffice.value == undefined
-}
 </script>
 
 <template>
   <div class="flex flex-col items-start justify-self-end">
     <div class="flex">
-      <Select
+      <DocumentationOfficeSelector
         v-model="selectedDocumentationOffice"
-        aria-label="Dokumentationsstelle auswählen"
-        class="w-2xs"
-        option-label="abbreviation"
-        :options="documentationOffices"
-        placeholder="Dokumentationsstelle auswählen"
-        @change="selectDocumentationOffice"
-      ></Select>
+        v-model:has-error="noDocumentationOfficeSelected"
+        class="min-w-2xs"
+      />
       <Button
         aria-label="Dokumentationsstelle zuweisen"
         class="ml-8"
@@ -118,13 +110,6 @@ function selectDocumentationOffice() {
         @click="handleAssignToDocOffice"
       ></Button>
     </div>
-    <span
-      v-if="noDocumentationOfficeSelected"
-      class="ris-body3-regular mt-8 flex text-red-900"
-    >
-      <IconErrorOutline class="mr-8" />
-      {{ errorMessages.EURLEX_NO_DOCUMENTATION_OFFICE_SELECTED.title }}
-    </span>
   </div>
   <div class="m-24">
     <Pagination

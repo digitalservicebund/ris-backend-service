@@ -2,13 +2,11 @@
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import { useToast } from "primevue/usetoast"
-import { computed, onBeforeMount, Ref, ref, shallowRef, watchEffect } from "vue"
+import { computed, onBeforeMount, ref } from "vue"
 import { useRouter } from "vue-router"
-import ComboboxInput from "@/components/ComboboxInput.vue"
+import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelector.vue"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import { ComboboxItem } from "@/components/input/types"
-import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import DocumentUnitHistoryLog from "@/components/management-data/DocumentUnitHistoryLog.vue"
 import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
 import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
@@ -16,7 +14,6 @@ import TitleElement from "@/components/TitleElement.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentationUnitHistoryLog } from "@/domain/documentationUnitHistoryLog"
 import DocumentUnit from "@/domain/documentUnit"
-import ComboboxItemService from "@/services/comboboxItemService"
 import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
 import DocumentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
@@ -40,8 +37,8 @@ const historyLogResponseError = ref<ResponseError>()
 const assignDocOfficeResponseError = ref<ResponseError>()
 
 const isLoading = ref(true)
-const documentationOffice = ref<DocumentationOffice>()
-const hasNoSelection = ref(false)
+const selectedDocumentationOffice = ref<DocumentationOffice | undefined>()
+const hasDocumentationOfficeError = ref(false)
 
 const loadHistory = async () => {
   isLoading.value = true
@@ -55,28 +52,24 @@ const loadHistory = async () => {
   }
   isLoading.value = false
 }
+const abbreviationsToExclude = computed(() => {
+  const currentOfficeAbbr =
+    documentUnit.value?.coreData.documentationOffice?.abbreviation
+  const exclusions: string[] = []
 
-const documentationOfficeInput = computed({
-  get: () =>
-    documentationOffice.value?.abbreviation
-      ? {
-          label: documentationOffice.value.abbreviation,
-          value: documentationOffice.value,
-        }
-      : undefined,
-  set: (newValue) => {
-    if (newValue) {
-      hasNoSelection.value = false
-    }
-    documentationOffice.value = { ...newValue } as DocumentationOffice
-  },
+  if (currentOfficeAbbr) {
+    exclusions.push(currentOfficeAbbr)
+  }
+
+  return exclusions
 })
+
 const assignDocumentationOffice = async () => {
-  if (documentationOfficeInput.value && documentationOffice.value?.id) {
-    hasNoSelection.value = false
+  if (selectedDocumentationOffice.value?.id) {
+    hasDocumentationOfficeError.value = false
     const response = await DocumentUnitService.assignDocumentationOffice(
       documentUnit.value!.uuid,
-      documentationOffice.value.id,
+      selectedDocumentationOffice.value.id,
     )
     if (response.error) {
       assignDocOfficeResponseError.value = response.error
@@ -86,40 +79,12 @@ const assignDocumentationOffice = async () => {
       toast.add({
         severity: "success",
         summary: "Zuweisen erfolgreich",
-        detail: `Die Dokumentationseinheit ${documentUnit.value!.documentNumber} ist jetzt in der Zuständigkeit der Dokumentationsstelle ${documentationOffice.value?.abbreviation}.`,
+        detail: `Die Dokumentationseinheit ${documentUnit.value!.documentNumber} ist jetzt in der Zuständigkeit der Dokumentationsstelle ${selectedDocumentationOffice.value?.abbreviation}.`,
         life: 5_000,
       })
     }
   } else {
-    hasNoSelection.value = true
-  }
-}
-/**
- * @summary Provides a dynamically filtered list of documentation offices for a combobox.
- * @description
- * Fetches documentation offices and then applies a client-side exclusion
- * based on the current `documentUnit`. It uses `watchEffect` to ensure the returned
- * `data` property reactively updates if the fetched list or exclusion criteria change.
- */
-const getDocumentationOffices = (filter: Ref<string | undefined>) => {
-  const rawFetchResult = ComboboxItemService.getDocumentationOffices(filter)
-  const filteredDataRef = shallowRef<ComboboxItem[] | null>(null)
-
-  watchEffect(() => {
-    const comboboxItems: ComboboxItem[] | null = rawFetchResult.data.value
-    if (comboboxItems) {
-      filteredDataRef.value = comboboxItems.filter(
-        (item) =>
-          item.label !==
-          documentUnit.value?.coreData.documentationOffice?.abbreviation,
-      )
-    } else {
-      filteredDataRef.value = null
-    }
-  })
-  return {
-    ...rawFetchResult,
-    data: filteredDataRef,
+    hasDocumentationOfficeError.value = true
   }
 }
 </script>
@@ -174,23 +139,13 @@ const getDocumentationOffices = (filter: Ref<string | undefined>) => {
           >
             Zuweisen
           </dt>
-          <dd class="ris-body2-regular flex flex-wrap items-start gap-8">
-            <div class="min-w-2xs">
-              <ComboboxInput
-                id="documentationOfficeInput"
-                v-model="documentationOfficeInput"
-                aria-label="Dokumentationsstelle auswählen"
-                data-testid="documentation-office-combobox"
-                :has-error="hasNoSelection"
-                :item-service="getDocumentationOffices"
-                placeholder="Dokumentationsstelle auswählen"
-              />
-              <InputErrorMessages
-                v-if="hasNoSelection"
-                class="ris-body3-regular"
-                error-message="Wählen Sie eine Dokumentationsstelle aus"
-              />
-            </div>
+          <dd class="flex flex-wrap items-start gap-8">
+            <DocumentationOfficeSelector
+              v-model="selectedDocumentationOffice"
+              v-model:has-error="hasDocumentationOfficeError"
+              class="min-w-xs"
+              :exclude-office-abbreviations="abbreviationsToExclude"
+            />
             <Button
               aria-label="Zuweisen"
               label="Zuweisen"

@@ -33,6 +33,7 @@ const assignProcedures = () => {
         :item-service="ComboboxItemService.getProcedures"
         manual-entry
         placeholder="Vorgang auswählen"
+        @focus="() => (hasNoProcedureSelectedError = false)"
       ></ComboboxInput>
       <Button
         aria-label="Zu Vorgang hinzufügen"
