@@ -10,7 +10,6 @@ import IconBadge from "@/components/IconBadge.vue"
 import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
-import Tooltip from "@/components/Tooltip.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { ResponseError } from "@/services/httpClient"
@@ -144,7 +143,6 @@ const emptyText = computed(() => (props.loading ? "" : "Keine Daten vorhanden"))
       :error-message="selectionErrorMessage"
     />
     <Pagination
-      v-else
       navigation-position="bottom"
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
@@ -152,11 +150,6 @@ const emptyText = computed(() => (props.loading ? "" : "Keine Daten vorhanden"))
       <DataTable
         v-model:selection="selectedDocumentationUnits"
         :loading="loading"
-        :pt="{
-          tablecontainer: {
-            style: 'overflow: visible;',
-          },
-        }"
         :row-class="rowStyleClass"
         :value="entries"
       >
@@ -181,38 +174,63 @@ const emptyText = computed(() => (props.loading ? "" : "Keine Daten vorhanden"))
             <div class="flex flex-row items-center gap-8">
               <div>{{ item.documentNumber }}</div>
               <div class="flex flex-row items-center">
-                <Tooltip :text="attachmentText(item)">
-                  <IconAttachedFile
-                    :aria-label="attachmentText(item)"
-                    class="flex-end m-4 h-20 w-20"
-                    :class="
-                      item.hasAttachments ? 'text-blue-800' : 'text-gray-500'
-                    "
-                    data-testid="file-attached-icon"
-                  />
-                </Tooltip>
+                <Button
+                  v-tooltip.bottom="{
+                    value: attachmentText(item),
+                    appendTo: 'body',
+                  }"
+                  :aria-label="attachmentText(item)"
+                  severity="ghost"
+                  size="small"
+                >
+                  <template #icon>
+                    <IconAttachedFile
+                      :class="
+                        item.hasAttachments ? 'text-blue-800' : 'text-gray-500'
+                      "
+                      data-testid="file-attached-icon"
+                    />
+                  </template>
+                </Button>
 
-                <Tooltip :text="headNoteOrPrincipleText(item)">
-                  <IconSubject
-                    :aria-label="headNoteOrPrincipleText(item)"
-                    class="flex-end m-4 flex h-20 w-20"
-                    :class="
-                      item.hasHeadnoteOrPrinciple
-                        ? 'text-blue-800'
-                        : 'text-gray-500'
-                    "
-                    data-testid="headnote-principle-icon"
-                  />
-                </Tooltip>
+                <Button
+                  v-tooltip.bottom="{
+                    value: headNoteOrPrincipleText(item),
+                    appendTo: 'body',
+                  }"
+                  :aria-label="headNoteOrPrincipleText(item)"
+                  severity="ghost"
+                  size="small"
+                >
+                  <template #icon>
+                    <IconSubject
+                      :aria-label="headNoteOrPrincipleText(item)"
+                      :class="
+                        item.hasHeadnoteOrPrinciple
+                          ? 'text-blue-800'
+                          : 'text-gray-500'
+                      "
+                      data-testid="headnote-principle-icon"
+                    />
+                  </template>
+                </Button>
 
-                <Tooltip :text="noteTooltip(item)">
-                  <IconNote
-                    :aria-label="noteTooltip(item)"
-                    class="flex-end m-4 flex h-20 w-20"
-                    :class="!!item.note ? 'text-blue-800' : 'text-gray-500'"
-                    data-testid="note-icon"
-                  />
-                </Tooltip>
+                <Button
+                  v-tooltip.bottom="{
+                    value: noteTooltip(item),
+                    appendTo: 'body',
+                  }"
+                  :aria-label="noteTooltip(item)"
+                  severity="ghost"
+                  size="small"
+                >
+                  <template #icon>
+                    <IconNote
+                      :class="!!item.note ? 'text-blue-800' : 'text-gray-500'"
+                      data-testid="note-icon"
+                    />
+                  </template>
+                </Button>
               </div>
             </div>
           </template>
@@ -269,87 +287,95 @@ const emptyText = computed(() => (props.loading ? "" : "Keine Daten vorhanden"))
         <Column field="actions">
           <template #body="{ data: item }">
             <div class="flex flex-row justify-end -space-x-2">
-              <Tooltip
+              <Button
                 v-if="
                   item.status?.publicationStatus == 'EXTERNAL_HANDOVER_PENDING'
                 "
-                text="Übernehmen"
+                v-tooltip.bottom="{
+                  value: 'Übernehmen',
+                  appendTo: 'body',
+                }"
+                aria-label="Dokumentationseinheit übernehmen"
+                :disabled="!item.isEditable"
+                severity="secondary"
+                size="small"
+                @click="emit('takeOverDocumentationUnit', item)"
+              >
+                <template #icon>
+                  <IconCheck />
+                </template>
+              </Button>
+
+              <router-link
+                v-else
+                target="_blank"
+                :to="{
+                  name: 'caselaw-documentUnit-documentNumber-categories',
+                  params: { documentNumber: item.documentNumber },
+                }"
               >
                 <Button
-                  aria-label="Dokumentationseinheit übernehmen"
-                  class="z-20"
+                  v-tooltip.bottom="{
+                    value: 'Bearbeiten',
+                    appendTo: 'body',
+                  }"
+                  aria-label="Dokumentationseinheit bearbeiten"
                   :disabled="!item.isEditable"
                   severity="secondary"
                   size="small"
-                  @click="emit('takeOverDocumentationUnit', item)"
                 >
                   <template #icon>
-                    <IconCheck />
+                    <IconEdit />
                   </template>
                 </Button>
-              </Tooltip>
-              <Tooltip v-else text="Bearbeiten">
-                <router-link
-                  target="_blank"
-                  :to="{
-                    name: 'caselaw-documentUnit-documentNumber-categories',
-                    params: { documentNumber: item.documentNumber },
-                  }"
-                >
-                  <Button
-                    aria-label="Dokumentationseinheit bearbeiten"
-                    :disabled="!item.isEditable"
-                    severity="secondary"
-                    size="small"
-                  >
-                    <template #icon>
-                      <IconEdit />
-                    </template>
-                  </Button>
-                </router-link>
-              </Tooltip>
-              <Tooltip text="Vorschau">
-                <router-link
-                  target="_blank"
-                  :to="{
-                    name:
-                      item.documentType?.jurisShortcut === 'Anh'
-                        ? 'caselaw-pending-proceeding-documentNumber-preview'
-                        : 'caselaw-documentUnit-documentNumber-preview',
-                    params: { documentNumber: item.documentNumber },
-                  }"
-                >
-                  <Button
-                    aria-label="Dokumentationseinheit ansehen"
-                    class="z-20"
-                    severity="secondary"
-                    size="small"
-                  >
-                    <template #icon>
-                      <IconView />
-                    </template>
-                  </Button>
-                </router-link>
-              </Tooltip>
-              <Tooltip text="Löschen">
+              </router-link>
+
+              <router-link
+                target="_blank"
+                :to="{
+                  name:
+                    item.documentType?.jurisShortcut === 'Anh'
+                      ? 'caselaw-pending-proceeding-documentNumber-preview'
+                      : 'caselaw-documentUnit-documentNumber-preview',
+                  params: { documentNumber: item.documentNumber },
+                }"
+              >
                 <Button
-                  aria-label="Dokumentationseinheit löschen"
-                  :disabled="!item.isDeletable"
+                  v-tooltip.bottom="{
+                    value: 'Vorschau',
+                    appendTo: 'body',
+                  }"
+                  aria-label="Dokumentationseinheit ansehen"
                   severity="secondary"
                   size="small"
-                  @click="
-                    showDeleteConfirmationDialog(
-                      entries.find(
-                        (entry) => entry.uuid === item.uuid,
-                      ) as DocumentUnitListEntry,
-                    )
-                  "
                 >
                   <template #icon>
-                    <IconDelete />
+                    <IconView />
                   </template>
                 </Button>
-              </Tooltip>
+              </router-link>
+
+              <Button
+                v-tooltip.bottom="{
+                  value: 'Löschen',
+                  appendTo: 'body',
+                }"
+                aria-label="Dokumentationseinheit löschen"
+                :disabled="!item.isDeletable"
+                severity="secondary"
+                size="small"
+                @click="
+                  showDeleteConfirmationDialog(
+                    entries.find(
+                      (entry) => entry.uuid === item.uuid,
+                    ) as DocumentUnitListEntry,
+                  )
+                "
+              >
+                <template #icon>
+                  <IconDelete />
+                </template>
+              </Button>
             </div>
           </template>
         </Column>

@@ -7,6 +7,7 @@ import { usePassThrough } from "primevue/passthrough"
 import type { TabPassThroughOptions } from "primevue/tab"
 import type { TabListPassThroughOptions } from "primevue/tablist"
 import type { TabPanelPassThroughOptions } from "primevue/tabpanel"
+import type { TooltipDirectivePassThroughOptions } from "primevue/tooltip"
 
 const tag = (strings: TemplateStringsArray, ...values: unknown[]) =>
   String.raw({ raw: strings }, ...values)
@@ -43,12 +44,23 @@ const tabList: TabListPassThroughOptions = {
   },
 }
 
+// Tooltip config must be inside `directives.tooltip`
+const directives = {
+  tooltip: {
+    root: () =>
+      tw`ris-label3-regular absolute mt-4 z-20 w-max rounded bg-gray-900 px-8 py-4 text-center whitespace-pre-line text-white`,
+    arrow: () => "p-tooltip-arrow",
+    text: () => "p-tooltip-text",
+  } satisfies TooltipDirectivePassThroughOptions,
+}
+
 export default usePassThrough(
   RisUiTheme,
   {
     tab,
     tabPanel,
     tabList,
+    directives,
   },
   { mergeProps: false, mergeSections: true },
 )
