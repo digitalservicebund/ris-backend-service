@@ -101,6 +101,22 @@ describe("EU Rechtsprechung", () => {
     })
   })
 
+  it("should call search endpoint on mounte and show an error on failure", async () => {
+    searchSpy.mockResolvedValue({
+      status: 400,
+      error: {
+        title: "Die Suchergebnisse konnten nicht geladen werden.",
+      },
+    })
+    renderComponent()
+
+    expect(searchSpy).toHaveBeenCalledOnce()
+    const errorModal = await screen.findByTestId("service-error")
+    expect(errorModal).toHaveTextContent(
+      "Die Suchergebnisse konnten nicht geladen werden.",
+    )
+  })
+
   it("should call the service on delete with valid input and not show an error on success", async () => {
     deleteSpy.mockResolvedValue({
       status: 200,

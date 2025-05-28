@@ -120,6 +120,22 @@ describe("Fremdanlagen", () => {
     })
   })
 
+  it("should call search endpoint on mounte and show an error on failure", async () => {
+    searchSpy.mockResolvedValue({
+      status: 400,
+      error: {
+        title: "Die Suchergebnisse konnten nicht geladen werden.",
+      },
+    })
+    renderComponent()
+
+    expect(searchSpy).toHaveBeenCalledOnce()
+    const errorModal = await screen.findByTestId("service-error")
+    expect(errorModal).toHaveTextContent(
+      "Die Suchergebnisse konnten nicht geladen werden.",
+    )
+  })
+
   it("should call the service on takeover with valid input and not show an error on success", async () => {
     takeOverSpy.mockResolvedValue({
       status: 200,
@@ -146,7 +162,7 @@ describe("Fremdanlagen", () => {
   it("should call the service on takeover with valid input and show an error on failure", async () => {
     takeOverSpy.mockResolvedValue({
       status: 400,
-      error: { title: "Fehler" },
+      error: { title: "Die Fremdanlage konnte nicht angenommen werden." },
     })
     const { user } = renderComponent()
     const takeOverButton = screen.getByRole("button", {
@@ -156,7 +172,7 @@ describe("Fremdanlagen", () => {
     await user.click(takeOverButton)
 
     expect(takeOverSpy).toHaveBeenCalledExactlyOnceWith("documentNumber")
-    expect(screen.getByTestId("take-over-error")).toHaveTextContent(
+    expect(screen.getByTestId("service-error")).toHaveTextContent(
       "Die Fremdanlage konnte nicht angenommen werden.",
     )
   })
@@ -182,14 +198,10 @@ describe("Fremdanlagen", () => {
     })
 
     const { user } = renderComponent()
-
-    // Find the "Delete" button from the stub
     const deleteButton = screen.getByLabelText("Dokumentationseinheit löschen")
 
-    // Simulate user clicking it
     await user.click(deleteButton)
 
-    // Now assert that your service.delete was called with the expected uuid
     expect(deleteSpy).toHaveBeenCalledOnce()
     expect(deleteSpy).toHaveBeenCalledWith("123")
 
