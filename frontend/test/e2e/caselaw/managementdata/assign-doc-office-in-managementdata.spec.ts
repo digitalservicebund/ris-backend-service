@@ -46,10 +46,9 @@ test.describe(
       await test.step("Es gibt eine Kategorie 'Zuweisen'", async () => {
         const zuweisenElements = page.getByText("Zuweisen")
         await expect(zuweisenElements).toHaveCount(2)
-        await expect(page.locator("#documentationOfficeInput")).toHaveAttribute(
-          "placeholder",
-          "Dokumentationsstelle auswählen",
-        )
+        await expect(
+          page.locator("#documentationOfficeSelector"),
+        ).toHaveAttribute("placeholder", "Dokumentationsstelle auswählen")
       })
 
       await test.step("Im Dropdown sind alle Dokumentationsstellen, ausgenommen die eigene.", async () => {
@@ -119,6 +118,13 @@ test.describe(
             "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung.",
           ),
         ).toBeHidden()
+      })
+
+      await test.step("Die Änderung der Dokumentationsstelle ist in der Historie sichtbar", async () => {
+        await navigateToManagementData(pageWithBghUser, documentNumber)
+        await expect(
+          pageWithBghUser.getByText("Dokstelle geändert: [DS] → [BGH]"),
+        ).toBeVisible()
       })
     })
   },
