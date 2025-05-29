@@ -117,7 +117,9 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
     : ""
 }
 
-const emptyText = computed(() => (props.loading ? "" : "Keine Daten vorhanden"))
+const emptyText = computed(() =>
+  props.loading ? "" : "Es liegen keine Dokumentationseinheiten vor.",
+)
 </script>
 
 <template>
