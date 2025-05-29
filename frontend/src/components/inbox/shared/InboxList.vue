@@ -7,7 +7,6 @@ import DataTable from "primevue/datatable"
 import { computed, ref, watch } from "vue"
 import BulkAssignProcedure from "@/components/BulkAssignProcedure.vue"
 import IconBadge from "@/components/IconBadge.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
@@ -27,6 +26,7 @@ import IconArrowDown from "~icons/mdi/arrow-down-drop"
 const props = defineProps<{
   pageEntries?: Page<DocumentUnitListEntry>
   error?: ResponseError
+  loading?: boolean
 }>()
 const emit = defineEmits<{
   updatePage: [number]
@@ -117,6 +117,8 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
     ? "bg-red-200"
     : ""
 }
+
+const emptyText = computed(() => (props.loading ? "" : "Keine Daten vorhanden"))
 </script>
 
 <template>
@@ -142,17 +144,15 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
       :error-message="selectionErrorMessage"
     />
     <Pagination
+      v-else
       navigation-position="bottom"
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
     >
       <DataTable
         v-model:selection="selectedDocumentationUnits"
-        class="text-gray-900"
+        :loading="loading"
         :pt="{
-          thead: {
-            style: 'box-shadow: inset 0 -2px #DCE8EF;',
-          },
           tablecontainer: {
             style: 'overflow: visible;',
           },
@@ -164,31 +164,19 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
           header-style="width: 3rem"
           :pt="{
             pcRowCheckbox: {
-              root: {
-                style:
-                  'height: 100%; display: flex; align-items: center; justify-content: center;',
-              },
               input: {
-                style: `height: 1.5rem; width: 1.5rem; ${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
+                style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
               },
             },
             pcHeaderCheckbox: {
-              root: {
-                style:
-                  'display: flex; align-items: center; justify-content: center;',
-              },
               input: {
-                style: `height: 1.5rem; width: 1.5rem; ${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
+                style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
               },
             },
           }"
           selection-mode="multiple"
         />
-        <Column
-          field="documentNumber"
-          header="Dokumentnummer"
-          header-class="ris-label3-bold"
-        >
+        <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
               <div>{{ item.documentNumber }}</div>
@@ -229,18 +217,10 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
             </div>
           </template>
         </Column>
-        <Column
-          field="court.type"
-          header="Gerichtstyp"
-          header-class="ris-label3-bold"
-        />
-        <Column
-          field="court.location"
-          header="Ort"
-          header-class="ris-label3-bold"
-        />
+        <Column field="court.type" header="Gerichtstyp" />
+        <Column field="court.location" header="Ort" />
 
-        <Column field="decisionDate" header-class="ris-label3-bold">
+        <Column field="decisionDate">
           <template #header>
             <div class="flex flex-row">
               Datum
@@ -256,12 +236,8 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
             }}
           </template>
         </Column>
-        <Column
-          field="fileNumber"
-          header="Aktenzeichen"
-          header-class="ris-label3-bold"
-        />
-        <Column field="source" header="Quelle" header-class="ris-label3-bold">
+        <Column field="fileNumber" header="Aktenzeichen" />
+        <Column field="source" header="Quelle">
           <template #body="{ data: item }">
             {{
               item.source
@@ -273,18 +249,14 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
             }}
           </template>
         </Column>
-        <Column
-          field="createdAt"
-          header="Angelegt am"
-          header-class="ris-label3-bold"
-        >
+        <Column field="createdAt" header="Angelegt am">
           <template #body="{ data: item }">
             {{
               item.createdAt ? dayjs(item.createdAt).format("DD.MM.YYYY") : "-"
             }}
           </template>
         </Column>
-        <Column header="Status" header-class="ris-label3-bold">
+        <Column header="Status">
           <template #body="{ data: item }">
             <IconBadge
               v-if="item.status?.publicationStatus"
@@ -381,16 +353,8 @@ const rowStyleClass = (rowData: DocumentUnitListEntry) => {
             </div>
           </template>
         </Column>
-        <template v-if="!error" #empty>
-          <div class="mt-40 grid justify-items-center bg-white">
-            Es liegen keine Dokumentationseinheiten vor.
-          </div>
-        </template>
+        <template #empty> {{ emptyText }} </template>
       </DataTable>
-      <!-- Error State -->
-      <div v-if="error">
-        <InfoModal :description="error.description" :title="error.title" />
-      </div>
     </Pagination>
   </div>
 </template>
