@@ -10,6 +10,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Fetch;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
@@ -57,9 +58,13 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         cb.createQuery(DocumentationUnitListItemDTO.class);
 
     Root<DocumentationUnitDTO> root = cq.from(DocumentationUnitDTO.class);
-    // TODO: Fetch first batch already in paginated main query?
-    root.fetch("managementData", JoinType.LEFT);
-
+    if (featureToggleService.isEnabled("neuris.search-fetch-relationships")) {
+      root.fetch("managementData", JoinType.LEFT);
+      root.fetch("court", JoinType.LEFT);
+      root.fetch("documentType", JoinType.LEFT);
+      root.fetch("status", JoinType.LEFT);
+      root.fetch("documentationOffice", JoinType.LEFT);
+    }
     List<Predicate> predicates = new ArrayList<>();
 
     predicates.addAll(getDocNumberPredicates(parameters, cb, root));
@@ -95,9 +100,8 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
 
     if (featureToggleService.isEnabled("neuris.search-fetch-relationships")) {
       // Fetching relationships
-      // TODO: Find out: Is fetching OneToOne together quicker as with ManyToOne together?
       List<UUID> docUnitIds = resultList.stream().map(DocumentationUnitListItemDTO::getId).toList();
-      fetchRelationships(docUnitIds);
+      fetchFileNumbers(docUnitIds);
       // TODO: Filter for decisions?
       fetchSources(docUnitIds);
       fetchAttachments(docUnitIds);
@@ -114,18 +118,13 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     return cb.function("date", Date.class, dateTimeColumn);
   }
 
-  private void fetchRelationships(Collection<UUID> ids) {
+  private void fetchFileNumbers(Collection<UUID> ids) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<DocumentationUnitListItemDTO> cq =
         cb.createQuery(DocumentationUnitListItemDTO.class);
     Root<DocumentationUnitDTO> root = cq.from(DocumentationUnitDTO.class);
     root.fetch("fileNumbers", JoinType.LEFT);
     // No need to fetch deviating file numbers as we do not display them in the list
-    root.fetch("court", JoinType.LEFT);
-    root.fetch("documentType", JoinType.LEFT);
-    root.fetch("status", JoinType.LEFT);
-    root.fetch("documentationOffice", JoinType.LEFT);
-    root.fetch("managementData", JoinType.LEFT);
 
     cq.select(root).where(root.get("id").in(ids));
 
@@ -137,7 +136,9 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     CriteriaQuery<DocumentationUnitListItemDTO> cq =
         cb.createQuery(DocumentationUnitListItemDTO.class);
     Root<DecisionDTO> root = cq.from(DecisionDTO.class);
-    root.fetch("source", JoinType.LEFT);
+    Fetch<Object, Object> sourceFetch = root.fetch("source", JoinType.LEFT);
+    Fetch<Object, Object> referenceFetch = sourceFetch.fetch("reference", JoinType.LEFT);
+    referenceFetch.fetch("edition", JoinType.LEFT);
     root.fetch("procedure", JoinType.LEFT);
     root.fetch("creatingDocumentationOffice", JoinType.LEFT);
 
