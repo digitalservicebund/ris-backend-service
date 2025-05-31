@@ -10,13 +10,16 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Fetch;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+import jakarta.persistence.metamodel.SingularAttribute;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,16 +27,15 @@ import java.util.Set;
 import java.util.UUID;
 import org.hibernate.query.NullPrecedence;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
+import org.hibernate.query.criteria.JpaPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
-/* S1192: TODO: Use hibernate-jpamodelgen for typesafe criteria queries
-Once we are type-safe, we do not need string constants anymore */
 // S3655: Sonarqube does not understand that Optional.isPresent() is called on params
-@SuppressWarnings({"java:S1192", "java:S3655"})
+@SuppressWarnings({"java:S3655"})
 @Repository
 public class PostgresDocumentationUnitSearchRepositoryImpl
     implements DocumentationUnitSearchRepository {
@@ -47,8 +49,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     this.featureToggleService = featureToggleService;
   }
 
-  // FIXME: Do I need to left join status explicitly? It implicitly joins the status table (inner
-  // join)
   @Override
   public Slice<DocumentationUnitListItemDTO> search(
       SearchParameters parameters, Pageable pageable) {
@@ -57,9 +57,13 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         cb.createQuery(DocumentationUnitListItemDTO.class);
 
     Root<DocumentationUnitDTO> root = cq.from(DocumentationUnitDTO.class);
-    // TODO: Fetch first batch already in paginated main query?
-    root.fetch("managementData", JoinType.LEFT);
-
+    if (featureToggleService.isEnabled("neuris.search-fetch-relationships")) {
+      root.fetch(DocumentationUnitDTO_.managementData, JoinType.LEFT);
+      root.fetch(DocumentationUnitDTO_.court, JoinType.LEFT);
+      root.fetch(DocumentationUnitDTO_.documentType, JoinType.LEFT);
+      root.fetch(DocumentationUnitDTO_.status, JoinType.LEFT);
+      root.fetch(DocumentationUnitDTO_.documentationOffice, JoinType.LEFT);
+    }
     List<Predicate> predicates = new ArrayList<>();
 
     predicates.addAll(getDocNumberPredicates(parameters, cb, root));
@@ -95,9 +99,8 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
 
     if (featureToggleService.isEnabled("neuris.search-fetch-relationships")) {
       // Fetching relationships
-      // TODO: Find out: Is fetching OneToOne together quicker as with ManyToOne together?
       List<UUID> docUnitIds = resultList.stream().map(DocumentationUnitListItemDTO::getId).toList();
-      fetchRelationships(docUnitIds);
+      fetchFileNumbers(docUnitIds);
       // TODO: Filter for decisions?
       fetchSources(docUnitIds);
       fetchAttachments(docUnitIds);
@@ -110,24 +113,20 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
    * We strip of the time part of the timestamp, so that we can search for the date only ignoring
    * the time.
    */
-  private Expression<Date> getDateOnly(HibernateCriteriaBuilder cb, Path<Object> dateTimeColumn) {
+  private Expression<Date> getDateOnly(
+      HibernateCriteriaBuilder cb, Path<LocalDateTime> dateTimeColumn) {
     return cb.function("date", Date.class, dateTimeColumn);
   }
 
-  private void fetchRelationships(Collection<UUID> ids) {
+  private void fetchFileNumbers(Collection<UUID> ids) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<DocumentationUnitListItemDTO> cq =
         cb.createQuery(DocumentationUnitListItemDTO.class);
     Root<DocumentationUnitDTO> root = cq.from(DocumentationUnitDTO.class);
-    root.fetch("fileNumbers", JoinType.LEFT);
+    root.fetch(DocumentationUnitDTO_.fileNumbers, JoinType.LEFT);
     // No need to fetch deviating file numbers as we do not display them in the list
-    root.fetch("court", JoinType.LEFT);
-    root.fetch("documentType", JoinType.LEFT);
-    root.fetch("status", JoinType.LEFT);
-    root.fetch("documentationOffice", JoinType.LEFT);
-    root.fetch("managementData", JoinType.LEFT);
 
-    cq.select(root).where(root.get("id").in(ids));
+    cq.select(root).where(root.get(DocumentationUnitDTO_.id).in(ids));
 
     entityManager.createQuery(cq).getResultList();
   }
@@ -137,11 +136,14 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     CriteriaQuery<DocumentationUnitListItemDTO> cq =
         cb.createQuery(DocumentationUnitListItemDTO.class);
     Root<DecisionDTO> root = cq.from(DecisionDTO.class);
-    root.fetch("source", JoinType.LEFT);
-    root.fetch("procedure", JoinType.LEFT);
-    root.fetch("creatingDocumentationOffice", JoinType.LEFT);
+    Fetch<DecisionDTO, SourceDTO> sourceFetch = root.fetch(DecisionDTO_.source, JoinType.LEFT);
+    Fetch<SourceDTO, ReferenceDTO> referenceFetch =
+        sourceFetch.fetch(SourceDTO_.reference, JoinType.LEFT);
+    referenceFetch.fetch(ReferenceDTO_.edition, JoinType.LEFT);
+    root.fetch(DecisionDTO_.procedure, JoinType.LEFT);
+    root.fetch(DecisionDTO_.creatingDocumentationOffice, JoinType.LEFT);
 
-    cq.select(root).where(root.get("id").in(ids));
+    cq.select(root).where(root.get(DocumentationUnitDTO_.id).in(ids));
 
     entityManager.createQuery(cq).getResultList();
   }
@@ -151,9 +153,9 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     CriteriaQuery<DocumentationUnitListItemDTO> cq =
         cb.createQuery(DocumentationUnitListItemDTO.class);
     Root<DecisionDTO> root = cq.from(DecisionDTO.class);
-    root.fetch("attachments", JoinType.LEFT);
+    root.fetch(DocumentationUnitDTO_.attachments, JoinType.LEFT);
 
-    cq.select(root).where(root.get("id").in(ids));
+    cq.select(root).where(root.get(DocumentationUnitDTO_.id).in(ids));
 
     entityManager.createQuery(cq).getResultList();
   }
@@ -165,7 +167,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         && !parameters.documentNumber().get().trim().isEmpty()) {
       Predicate documentNumberPredicate =
           cb.like(
-              cb.upper(root.get("documentNumber")),
+              cb.upper(root.get(DocumentationUnitDTO_.documentNumber)),
               "%" + parameters.documentNumber().get().trim().toUpperCase() + "%");
       predicates.add(documentNumberPredicate);
     }
@@ -178,7 +180,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     if (parameters.courtType().isPresent() && !parameters.courtType().get().trim().isEmpty()) {
       Predicate courtTypePredicate =
           cb.like(
-              cb.upper(root.get("court").get("type")),
+              cb.upper(root.get(DocumentationUnitDTO_.court).get(CourtDTO_.type)),
               parameters.courtType().get().trim().toUpperCase());
       predicates.add(courtTypePredicate);
     }
@@ -192,7 +194,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         && !parameters.courtLocation().get().trim().isEmpty()) {
       Predicate courtTypePredicate =
           cb.like(
-              cb.upper(root.get("court").get("location")),
+              cb.upper(root.get(DocumentationUnitDTO_.court).get(CourtDTO_.location)),
               parameters.courtLocation().get().trim().toUpperCase());
       predicates.add(courtTypePredicate);
     }
@@ -207,11 +209,12 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       if (parameters.decisionDateEnd().isPresent()) {
         decisionDatePredicate =
             cb.between(
-                root.get("date"),
+                root.get(DocumentationUnitDTO_.date),
                 parameters.decisionDate().get(),
                 parameters.decisionDateEnd().get());
       } else {
-        decisionDatePredicate = cb.equal(root.get("date"), parameters.decisionDate().get());
+        decisionDatePredicate =
+            cb.equal(root.get(DocumentationUnitDTO_.date), parameters.decisionDate().get());
       }
       predicates.add(decisionDatePredicate);
     }
@@ -223,7 +226,9 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     List<Predicate> predicates = new ArrayList<>();
     if (parameters.myDocOfficeOnly()) {
       Predicate myDocOfficePredicate =
-          cb.equal(root.get("documentationOffice"), parameters.documentationOfficeDTO());
+          cb.equal(
+              root.get(DocumentationUnitDTO_.documentationOffice),
+              parameters.documentationOfficeDTO());
       predicates.add(myDocOfficePredicate);
     }
     return predicates;
@@ -234,7 +239,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     List<Predicate> predicates = new ArrayList<>();
     if (parameters.scheduledOnly()) {
       Predicate scheduledPublicationDatePredicate =
-          cb.isNotNull(root.get("scheduledPublicationDateTime"));
+          cb.isNotNull(root.get(DocumentationUnitDTO_.scheduledPublicationDateTime));
       predicates.add(scheduledPublicationDatePredicate);
     }
     return predicates;
@@ -244,11 +249,14 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
     List<Predicate> predicates = new ArrayList<>();
     if (parameters.withError()) {
-      Predicate errorStatusPredicate = cb.equal(root.get("status").get("withError"), true);
+      Predicate errorStatusPredicate =
+          cb.equal(root.get(DocumentationUnitDTO_.status).get(StatusDTO_.withError), true);
       predicates.add(errorStatusPredicate);
       if (!parameters.myDocOfficeOnly()) {
         Predicate myDocOfficePredicate =
-            cb.equal(root.get("documentationOffice"), parameters.documentationOfficeDTO());
+            cb.equal(
+                root.get(DocumentationUnitDTO_.documentationOffice),
+                parameters.documentationOfficeDTO());
         predicates.add(myDocOfficePredicate);
       }
     }
@@ -261,22 +269,29 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     if (parameters.publicationStatus().isPresent()) {
       Predicate publicationStatusPredicate =
           cb.equal(
-              root.get("status").get("publicationStatus"), parameters.publicationStatus().get());
+              root.get(DocumentationUnitDTO_.status).get(StatusDTO_.publicationStatus),
+              parameters.publicationStatus().get());
       predicates.add(publicationStatusPredicate);
       if (!parameters.myDocOfficeOnly()
           && !PublicStatusSet.contains(parameters.publicationStatus().get())) {
         // If user selects a non-public status, we will only show documents from the user's doc
         // office
         Predicate myDocOfficePredicate =
-            cb.equal(root.get("documentationOffice"), parameters.documentationOfficeDTO());
+            cb.equal(
+                root.get(DocumentationUnitDTO_.documentationOffice),
+                parameters.documentationOfficeDTO());
         predicates.add(myDocOfficePredicate);
       }
     } else if (!parameters.myDocOfficeOnly()) {
       // User may only see published documents from other doc offices
       Predicate publicationStatusPredicate =
-          cb.in(root.get("status").get("publicationStatus"), PublicStatusSet);
+          cb.in(
+              root.get(DocumentationUnitDTO_.status).get(StatusDTO_.publicationStatus),
+              PublicStatusSet);
       Predicate myDocOfficePredicate =
-          cb.equal(root.get("documentationOffice"), parameters.documentationOfficeDTO());
+          cb.equal(
+              root.get(DocumentationUnitDTO_.documentationOffice),
+              parameters.documentationOfficeDTO());
       predicates.add(cb.or(publicationStatusPredicate, myDocOfficePredicate));
     }
     return predicates;
@@ -287,12 +302,12 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     List<Predicate> predicates = new ArrayList<>();
     if (parameters.publicationDate().isPresent()) {
       Expression<Date> scheduledPublicationDateTime =
-          getDateOnly(cb, root.get("scheduledPublicationDateTime"));
+          getDateOnly(cb, root.get(DocumentationUnitDTO_.scheduledPublicationDateTime));
       Predicate scheduledDatePredicate =
           cb.equal(scheduledPublicationDateTime, parameters.publicationDate().get());
 
       Expression<Date> lastPublicationDateTime =
-          getDateOnly(cb, root.get("lastPublicationDateTime"));
+          getDateOnly(cb, root.get(DocumentationUnitDTO_.lastPublicationDateTime));
       Predicate lastDatePredicate =
           cb.equal(lastPublicationDateTime, parameters.publicationDate().get());
 
@@ -307,7 +322,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     List<Predicate> predicates = new ArrayList<>();
     if (parameters.inboxStatus().isPresent()) {
       Predicate inboxStatusPredicate =
-          cb.equal(root.get("inboxStatus"), parameters.inboxStatus().get());
+          cb.equal(root.get(DocumentationUnitDTO_.inboxStatus), parameters.inboxStatus().get());
       predicates.add(inboxStatusPredicate);
     }
     return predicates;
@@ -320,19 +335,37 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       Root<DocumentationUnitDTO> root) {
     List<Predicate> predicates = new ArrayList<>();
     if (parameters.withDuplicateWarning()) {
-      // FIXME: Do two separate exists queries -> much quicker
-      Subquery<Integer> subquery = cq.subquery(Integer.class);
-      Root<DuplicateRelationDTO> subRoot = subquery.from(DuplicateRelationDTO.class);
-      subquery.select(cb.literal(1));
-      subquery.where(
-          cb.or(
-              cb.equal(subRoot.get("documentationUnit1").get("id"), root.get("id")),
-              cb.equal(subRoot.get("documentationUnit2").get("id"), root.get("id"))),
-          cb.equal(subRoot.get("relationStatus"), DuplicateRelationStatus.PENDING));
-      Predicate withDuplicateWarningPredicate = cb.exists(subquery);
-      predicates.add(withDuplicateWarningPredicate);
+      Predicate matchLeft =
+          getDuplicateRelationPredicate(cq, cb, root, DuplicateRelationDTO_.documentationUnit1);
+      Predicate matchRight =
+          getDuplicateRelationPredicate(cq, cb, root, DuplicateRelationDTO_.documentationUnit2);
+      predicates.add(cb.or(matchLeft, matchRight));
     }
     return predicates;
+  }
+
+  /**
+   * Duplicate relations are between two doc units. This produces a predicate that finds pending
+   * duplicate relations where the given doc unit (root) matches the given side of the relationship
+   * (targetColumn).
+   */
+  private Predicate getDuplicateRelationPredicate(
+      CriteriaQuery<DocumentationUnitListItemDTO> cq,
+      HibernateCriteriaBuilder cb,
+      Root<DocumentationUnitDTO> root,
+      SingularAttribute<DuplicateRelationDTO, DecisionDTO> targetColumn) {
+    Subquery<Integer> subquery = cq.subquery(Integer.class);
+    Root<DuplicateRelationDTO> subRoot = subquery.from(DuplicateRelationDTO.class);
+    subquery.select(cb.literal(1));
+    JpaPredicate docUnitMatch =
+        cb.equal(
+            subRoot.get(targetColumn).get(DocumentationUnitDTO_.id),
+            root.get(DocumentationUnitDTO_.id));
+    JpaPredicate statusMatch =
+        cb.equal(
+            subRoot.get(DuplicateRelationDTO_.relationStatus), DuplicateRelationStatus.PENDING);
+    subquery.where(docUnitMatch, statusMatch);
+    return cb.exists(subquery);
   }
 
   private List<Predicate> getFileNumberPredicates(
@@ -345,18 +378,25 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       String fileNumberLike = parameters.fileNumber().get().trim().toUpperCase() + "%";
       Subquery<UUID> subqueryFileNumber = cq.subquery(UUID.class);
       Root<FileNumberDTO> subRootFileNumber = subqueryFileNumber.from(FileNumberDTO.class);
-      subqueryFileNumber.select(subRootFileNumber.get("documentationUnit").get("id"));
-      subqueryFileNumber.where(cb.like(cb.upper(subRootFileNumber.get("value")), fileNumberLike));
+      subqueryFileNumber.select(
+          subRootFileNumber.get(FileNumberDTO_.documentationUnit).get(DocumentationUnitDTO_.id));
+      subqueryFileNumber.where(
+          cb.like(cb.upper(subRootFileNumber.get(FileNumberDTO_.value)), fileNumberLike));
 
       Subquery<UUID> subqueryDeviatingFileNumber = cq.subquery(UUID.class);
       Root<DeviatingFileNumberDTO> subRootDeviatingFileNumber =
           subqueryDeviatingFileNumber.from(DeviatingFileNumberDTO.class);
       subqueryDeviatingFileNumber.select(
-          subRootDeviatingFileNumber.get("documentationUnit").get("id"));
+          subRootDeviatingFileNumber
+              .get(DeviatingFileNumberDTO_.documentationUnit)
+              .get(DocumentationUnitDTO_.id));
       subqueryDeviatingFileNumber.where(
-          cb.like(cb.upper(subRootDeviatingFileNumber.get("value")), fileNumberLike));
-      Predicate fileNumberPredicate = root.get("id").in(subqueryFileNumber);
-      Predicate deviatingFileNumberPredicate = root.get("id").in(subqueryDeviatingFileNumber);
+          cb.like(
+              cb.upper(subRootDeviatingFileNumber.get(DeviatingFileNumberDTO_.value)),
+              fileNumberLike));
+      Predicate fileNumberPredicate = root.get(DocumentationUnitDTO_.id).in(subqueryFileNumber);
+      Predicate deviatingFileNumberPredicate =
+          root.get(DocumentationUnitDTO_.id).in(subqueryDeviatingFileNumber);
       Predicate anyFileNumberPredicate = cb.or(fileNumberPredicate, deviatingFileNumberPredicate);
       predicates.add(anyFileNumberPredicate);
     }
@@ -369,13 +409,16 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     List<Order> orderCriteria = new ArrayList<>();
     if (parameters.scheduledOnly() || parameters.publicationDate().isPresent()) {
       orderCriteria.add(
-          cb.desc(root.get("scheduledPublicationDateTime")).nullPrecedence(NullPrecedence.LAST));
+          cb.desc(root.get(DocumentationUnitDTO_.scheduledPublicationDateTime))
+              .nullPrecedence(NullPrecedence.LAST));
       orderCriteria.add(
-          cb.desc(root.get("lastPublicationDateTime")).nullPrecedence(NullPrecedence.LAST));
+          cb.desc(root.get(DocumentationUnitDTO_.lastPublicationDateTime))
+              .nullPrecedence(NullPrecedence.LAST));
     }
 
-    orderCriteria.add(cb.desc(root.get("date")).nullPrecedence(NullPrecedence.LAST));
-    orderCriteria.add(cb.desc(root.get("documentNumber")));
+    orderCriteria.add(
+        cb.desc(root.get(DocumentationUnitDTO_.date)).nullPrecedence(NullPrecedence.LAST));
+    orderCriteria.add(cb.desc(root.get(DocumentationUnitDTO_.documentNumber)));
     return orderCriteria;
   }
 }
