@@ -87,10 +87,19 @@ watch(
  * Propagates delete event to parent and closes modal again
  */
 function onDelete() {
+  updateSelectionErrors(undefined, [])
   if (selectedDocumentUnitListEntry.value) {
     emit("deleteDocumentationUnit", selectedDocumentUnitListEntry.value)
     showDeleteModal.value = false
   }
+}
+
+/**
+ * Propagates takeover event to parent and resets error messages
+ */
+function onTakeOver(item: DocumentUnitListEntry) {
+  updateSelectionErrors(undefined, [])
+  emit("takeOverDocumentationUnit", item)
 }
 
 const selectedDocumentationUnits = ref<DocumentUnitListEntry[]>([])
@@ -303,7 +312,7 @@ const emptyText = computed(() =>
                 :disabled="!item.isEditable"
                 severity="secondary"
                 size="small"
-                @click="emit('takeOverDocumentationUnit', item)"
+                @click="onTakeOver(item)"
               >
                 <template #icon>
                   <IconCheck />
