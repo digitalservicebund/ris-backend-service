@@ -1,8 +1,9 @@
-import { expect, test, Page, TestInfo } from "@playwright/test"
+import { expect, Page, TestInfo } from "@playwright/test"
 import DocumentUnit, {
   DocumentUnitSearchParameter,
 } from "@/domain/documentUnit"
 import { getRequest } from "~/e2e/caselaw/e2e-utils"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
 // This is a performance test for the backend search endpoint
 // We run it sequentially not to skew the results
@@ -12,6 +13,7 @@ test.describe("document unit search queries", () => {
     parameter: { [K in DocumentUnitSearchParameter]?: string }
     maxDuration: number
     minResults?: number
+    isRelevantForExternalUser?: boolean
   }[] = [
     {
       title: "documentNumber and courtType",
@@ -44,6 +46,7 @@ test.describe("document unit search queries", () => {
       },
       maxDuration: 2000, // last max 3546, average 1003, min 352
       minResults: 5,
+      isRelevantForExternalUser: true,
     },
     {
       title: "not existing fileNumber",
@@ -68,6 +71,7 @@ test.describe("document unit search queries", () => {
       },
       maxDuration: 500, // last max 590, average 336, min 270
       minResults: 5,
+      isRelevantForExternalUser: true,
     },
     {
       title: "one day",
@@ -130,10 +134,20 @@ test.describe("document unit search queries", () => {
     },
   ]
 
+  const externalConfigurations = testConfigurations.filter(
+    (config) => config.isRelevantForExternalUser,
+  )
+
   testConfigurations.forEach((search) =>
     test(search.title, async ({ page }, testInfo) =>
       runTestMultipleTimes(10, search, page, testInfo),
     ),
+  )
+  externalConfigurations.forEach((search) =>
+    test(`${search.title} (external user)`, async ({
+      pageWithExternalUser,
+    }, testInfo) =>
+      runTestMultipleTimes(10, search, pageWithExternalUser, testInfo)),
   )
 })
 
