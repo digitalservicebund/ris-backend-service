@@ -111,7 +111,7 @@ function selectRow() {
       ></Button>
     </div>
   </div>
-  <div class="m-24">
+  <div>
     <Pagination
       navigation-position="bottom"
       :page="pageEntries"

@@ -58,13 +58,13 @@ watch(serviceError, () => {
 
 <template>
   <EURLexSearchForm
-    class="pyb-24 mb-32 flex flex-col bg-blue-200"
+    class="pyb-24 mb-16 flex flex-col bg-blue-200"
     @handle-service-error="handleServiceError"
     @update-page="updatePage"
   ></EURLexSearchForm>
   <InfoModal
     v-if="serviceError"
-    class="mb-32"
+    class="my-16"
     :description="serviceErrorDescription"
     :title="serviceError.title"
   ></InfoModal>
