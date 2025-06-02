@@ -9,10 +9,6 @@ import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
 
-defineProps<{
-  isLoading?: boolean
-}>()
-
 const emit = defineEmits<{
   search: [value: Query<DocumentUnitSearchParameter>]
   resetSearchResults: [void]
@@ -287,7 +283,6 @@ watch(
             aria-label="Nach Dokumentationseinheiten suchen"
             class="self-start"
             label="Ergebnisse anzeigen"
-            :loading="isLoading"
             size="small"
             @click="handleSearchButtonClicked"
           ></Button>

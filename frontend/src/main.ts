@@ -4,6 +4,7 @@ import { createHead } from "@unhead/vue/client"
 import { createPinia } from "pinia"
 import PrimeVue from "primevue/config"
 import ToastService from "primevue/toastservice"
+import Tooltip from "primevue/tooltip"
 import { createApp } from "vue"
 import "@/styles/global.css"
 import App from "./App.vue"
@@ -22,6 +23,7 @@ const app = createApp(App).use(PrimeVue, {
   locale: RisUiLocale.deDE,
 })
 app.directive("ctrl-enter", onSearchShortcutDirective)
+app.directive("tooltip", Tooltip)
 app.use(createHead())
 app.use(ToastService)
 

@@ -64,6 +64,9 @@ function renderComponent(props = {}) {
         ...props,
       },
       global: {
+        directives: {
+          tooltip: {},
+        },
         plugins: [[router]],
       },
     }),

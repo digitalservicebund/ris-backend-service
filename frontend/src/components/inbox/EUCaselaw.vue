@@ -2,6 +2,8 @@
 import { ref } from "vue"
 import InboxList from "./shared/InboxList.vue"
 import InboxSearch from "./shared/InboxSearch.vue"
+import { InfoStatus } from "@/components/enumInfoStatus"
+import InfoModal from "@/components/InfoModal.vue"
 import { Page } from "@/components/Pagination.vue"
 import { Query } from "@/composables/useQueryFromRoute"
 import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
@@ -14,7 +16,7 @@ const pageNumber = ref<number>(0)
 const itemsPerPage = 100
 const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()
-const searchResponseError = ref<ResponseError>()
+const serviceError = ref<ResponseError>()
 
 /**
  * Searches all documentation units by given input and updates the local
@@ -25,6 +27,7 @@ const searchResponseError = ref<ResponseError>()
  */
 async function search() {
   isLoading.value = true
+  if (currentPage.value) currentPage.value.content = []
 
   const response = await service.searchByDocumentUnitSearchInput({
     ...(pageNumber.value != undefined
@@ -37,10 +40,10 @@ async function search() {
   })
   if (response.data) {
     currentPage.value = response.data
-    searchResponseError.value = undefined
+    serviceError.value = undefined
   }
   if (response.error) {
-    searchResponseError.value = response.error
+    serviceError.value = response.error
   }
   isLoading.value = false
 }
@@ -102,13 +105,17 @@ async function handleReset() {
 
 <template>
   <div class="flex flex-col" data-testId="eu-inbox">
-    <InboxSearch
-      :is-loading="isLoading"
-      @reset-search-results="handleReset"
-      @search="updateQuery"
+    <InboxSearch @reset-search-results="handleReset" @search="updateQuery" />
+    <InfoModal
+      v-if="serviceError"
+      class="my-16"
+      data-testid="service-error"
+      :description="serviceError.description"
+      :status="InfoStatus.ERROR"
+      :title="serviceError.title"
     />
     <InboxList
-      :error="searchResponseError"
+      :loading="isLoading"
       :page-entries="currentPage"
       @delete-documentation-unit="handleDelete"
       @update-page="updatePage"

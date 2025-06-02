@@ -213,6 +213,7 @@ const service: DocumentUnitService = {
     if (response.status >= 300) {
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_TAKEOVER_FAILED.title,
+        description: errorMessages.DOCUMENT_UNIT_TAKEOVER_FAILED.description,
       }
     }
     return response
