@@ -46,7 +46,7 @@ const modelValueAdapter = computed({
  * @summary Provides a dynamically filtered list of documentation offices for a combobox.
  * @description
  * Fetches documentation offices and then applies a client-side exclusion
- * based on the current `documentUnit`. It uses `watchEffect` to ensure the returned
+ * based on the provided exclusion list. It uses `watchEffect` to ensure the returned
  * `data` property reactively updates if the fetched list or exclusion criteria change.
  */
 const getFilteredItems = (filter: Ref<string | undefined>) => {
