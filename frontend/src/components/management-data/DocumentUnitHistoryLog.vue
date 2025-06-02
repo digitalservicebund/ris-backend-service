@@ -19,13 +19,10 @@ const columns = [
   { field: "createdBy", header: "Von" },
   { field: "description", header: "Was" },
 ]
-const rowClass = () => {
-  return "bg-blue-100"
-}
 
 const getColumnWidth = (field: string) => {
   if (field === "createdAt") {
-    return { width: "200px" }
+    return { width: "250px" }
   } else if (field === "createdBy" || field === "description") {
     return { width: "fit-content" }
   }
@@ -61,10 +58,9 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
       :pt="{
         thead: {
           style:
-            'position: sticky; top: 0; z-index: 10; background: white; box-shadow: inset 0 -2px #DCE8EF;',
+            'position: sticky; top: 0; z-index: 10; background: white; box-shadow: inset 0 -2px #DCE8EF;', // -> RIS-UI PR for global sticky header style in scrollable tables: https://github.com/digitalservicebund/ris-ui/pull/243
         },
       }"
-      :row-class="rowClass"
       scroll-height="315px"
       scrollable
       :value="formattedData"
@@ -74,7 +70,6 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
         :key="col.field"
         :field="col.field"
         :header="col.header"
-        header-class="ris-label2-bold text-gray-900 w-64"
         :style="getColumnWidth(col.field)"
       />
     </DataTable>
