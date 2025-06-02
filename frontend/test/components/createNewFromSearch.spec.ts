@@ -59,7 +59,7 @@ describe("Create new documentation unit from search", () => {
   it("renders empty responsible docoffice combobox when no docOffice is given", async () => {
     renderComponent()
 
-    const combobox = screen.getByLabelText("Zuständige Dokumentationsstelle")
+    const combobox = screen.getByLabelText("Dokumentationsstelle auswählen")
     expect(combobox).toBeInTheDocument()
     expect(combobox).toHaveValue("")
   })
@@ -71,7 +71,7 @@ describe("Create new documentation unit from search", () => {
       },
     })
 
-    const combobox = screen.getByLabelText("Zuständige Dokumentationsstelle")
+    const combobox = screen.getByLabelText("Dokumentationsstelle auswählen")
     expect(combobox).toHaveValue(docOffice.abbreviation)
   })
 
@@ -221,7 +221,7 @@ describe("Create new documentation unit from search", () => {
     await renderComponent({ parameters, isValid: true })
 
     await fireEvent.focus(
-      await screen.findByLabelText("Zuständige Dokumentationsstelle"),
+      await screen.findByLabelText("Dokumentationsstelle auswählen"),
     )
 
     // The Combobox requests are debounced

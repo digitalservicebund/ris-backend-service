@@ -1,15 +1,14 @@
 <script lang="ts" setup>
 import Button from "primevue/button"
-import { computed, ref, watch } from "vue"
+import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
-import ComboboxInput from "@/components/ComboboxInput.vue"
+import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelector.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
 import DocumentUnit, {
   DocumentationUnitParameters,
 } from "@/domain/documentUnit"
-import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 
@@ -33,25 +32,9 @@ const createNewFromSearchResponseError = ref<ResponseError | undefined>()
  * Reference to the currently selected responsible documentation office.
  * If passed through props, it initializes with the responsible office from the parameters.
  */
-const docOffice = ref<DocumentationOffice | undefined>(
+const selectedDocumentationOffice = ref<DocumentationOffice | undefined>(
   props.parameters?.court?.responsibleDocOffice,
 )
-
-/**
- * Computed property to handle the responsible documentation office selection for the combobox input.
- */
-const responsibleDocOffice = computed({
-  get: () =>
-    docOffice.value
-      ? {
-          label: docOffice.value.abbreviation,
-          value: docOffice.value,
-        }
-      : undefined,
-  set: (newValue) => {
-    docOffice.value = { ...newValue } as DocumentationOffice
-  },
-})
 
 /**
  * Handles creating a new documentation unit.
@@ -71,7 +54,7 @@ async function createNewFromSearch(openDocunit: boolean = false) {
 
   const createResponse = await documentUnitService.createNew({
     ...props.parameters,
-    documentationOffice: docOffice.value,
+    documentationOffice: selectedDocumentationOffice.value,
   })
   if (createResponse.error) {
     createNewFromSearchResponseError.value = createResponse.error
@@ -95,7 +78,8 @@ async function createNewFromSearch(openDocunit: boolean = false) {
 watch(
   () => props.parameters?.court,
   () => {
-    docOffice.value = props.parameters?.court?.responsibleDocOffice
+    selectedDocumentationOffice.value =
+      props.parameters?.court?.responsibleDocOffice
   },
   { immediate: true },
 )
@@ -113,20 +97,14 @@ watch(
       id="responsibleDocOffice"
       label="Dokumentationsstelle zuweisen *"
     >
-      <ComboboxInput
-        id="responsibleDocOffice"
-        v-model="responsibleDocOffice"
-        aria-label="Zuständige Dokumentationsstelle"
-        class="flex-shrink flex-grow-0 basis-1/2"
-        data-testid="documentation-office-combobox"
-        :item-service="ComboboxItemService.getDocumentationOffices"
-      />
+      <div class="w-1/2 flex-shrink flex-grow-0">
+        <DocumentationOfficeSelector v-model="selectedDocumentationOffice" />
+      </div>
     </InputField>
-
     <div class="flex flex-row gap-8">
       <Button
         aria-label="Dokumentationseinheit erstellen"
-        :disabled="!responsibleDocOffice"
+        :disabled="!selectedDocumentationOffice"
         label="Übernehmen"
         size="small"
         @click="() => createNewFromSearch()"
@@ -134,7 +112,7 @@ watch(
       </Button>
       <Button
         aria-label="Dokumentationseinheit erstellen und direkt bearbeiten"
-        :disabled="!responsibleDocOffice"
+        :disabled="!selectedDocumentationOffice"
         label="Übernehmen und weiter bearbeiten"
         severity="secondary"
         size="small"
