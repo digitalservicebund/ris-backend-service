@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="TDocument, TError extends ResponseError">
 import { useHead } from "@unhead/vue"
-import { Ref, ref, onMounted, onBeforeUnmount, provide } from "vue"
+import { Ref, ref, onMounted, onBeforeUnmount } from "vue"
 import { LocationQuery, useRoute } from "vue-router"
 
 import DocumentInfoPanel from "@/components/DocumentInfoPanel.vue"
@@ -158,14 +158,6 @@ onMounted(async () => {
   window.addEventListener("keydown", handleKeyDown)
   await requestDocumentFromServer()
 })
-
-provide("document", document as TDocument)
-provide("registerTextEditorRef", registerTextEditorRef)
-provide("jumpToMatch", jumpToMatch)
-provide("attachmentIndexSelected", attachmentIndexSelected)
-provide("attachmentIndexDeleted", attachmentIndexDeleted)
-provide("attachmentsUploaded", attachmentsUploaded)
-provide("extraContentSidePanelStore", extraContentSidePanelStore)
 </script>
 
 <template>
