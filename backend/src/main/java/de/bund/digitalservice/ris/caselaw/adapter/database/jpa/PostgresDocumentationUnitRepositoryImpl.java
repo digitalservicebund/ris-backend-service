@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.DocumentationUnitSearchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -727,28 +726,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       InboxStatus inboxStatus,
       DocumentationOfficeDTO documentationOfficeDTO) {
 
-    if (featureToggleService.isEnabled("neuris.search-criteria-api")) {
-      var searchParameters =
-          DocumentationUnitSearchRepository.SearchParameters.builder()
-              .courtType(Optional.ofNullable(courtType))
-              .courtLocation(Optional.ofNullable(courtLocation))
-              .documentNumber(Optional.ofNullable(documentNumber))
-              .fileNumber(Optional.ofNullable(fileNumber))
-              .decisionDate(Optional.ofNullable(decisionDate))
-              .decisionDateEnd(Optional.ofNullable(decisionDateEnd))
-              .publicationDate(Optional.ofNullable(publicationDate))
-              .publicationStatus(Optional.ofNullable(status))
-              .scheduledOnly(scheduledOnly)
-              .withError(withError)
-              .myDocOfficeOnly(myDocOfficeOnly)
-              .withDuplicateWarning(withDuplicateWarning)
-              .inboxStatus(Optional.ofNullable(inboxStatus))
-              .documentationOfficeDTO(documentationOfficeDTO)
-              .build();
-
-      return docUnitSearchRepo.search(searchParameters, pageable);
-    }
-
     if ((fileNumber == null || fileNumber.trim().isEmpty())) {
       return repository.searchByDocumentationUnitSearchInput(
           documentationOfficeDTO.getId(),
@@ -776,46 +753,41 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // This approach could even be better if we replace the next/previous with a "load more" button
     Pageable fixedPageRequest = PageRequest.of(0, maxResultsUpToCurrentPage);
 
-    Slice<DocumentationUnitListItemDTO> fileNumberResults = new SliceImpl<>(List.of());
-    Slice<DocumentationUnitListItemDTO> deviatingFileNumberResults = new SliceImpl<>(List.of());
+    Slice<DocumentationUnitListItemDTO> fileNumberResults =
+        repository.searchByDocumentationUnitSearchInputFileNumber(
+            documentationOfficeDTO.getId(),
+            documentNumber,
+            fileNumber.trim(),
+            courtType,
+            courtLocation,
+            decisionDate,
+            decisionDateEnd,
+            publicationDate,
+            scheduledOnly,
+            status,
+            withError,
+            myDocOfficeOnly,
+            withDuplicateWarning,
+            inboxStatus,
+            fixedPageRequest);
 
-    if (!fileNumber.trim().isEmpty()) {
-      fileNumberResults =
-          repository.searchByDocumentationUnitSearchInputFileNumber(
-              documentationOfficeDTO.getId(),
-              documentNumber,
-              fileNumber.trim(),
-              courtType,
-              courtLocation,
-              decisionDate,
-              decisionDateEnd,
-              publicationDate,
-              scheduledOnly,
-              status,
-              withError,
-              myDocOfficeOnly,
-              withDuplicateWarning,
-              inboxStatus,
-              fixedPageRequest);
-
-      deviatingFileNumberResults =
-          repository.searchByDocumentationUnitSearchInputDeviatingFileNumber(
-              documentationOfficeDTO.getId(),
-              documentNumber,
-              fileNumber.trim(),
-              courtType,
-              courtLocation,
-              decisionDate,
-              decisionDateEnd,
-              publicationDate,
-              scheduledOnly,
-              status,
-              withError,
-              myDocOfficeOnly,
-              withDuplicateWarning,
-              inboxStatus,
-              fixedPageRequest);
-    }
+    Slice<DocumentationUnitListItemDTO> deviatingFileNumberResults =
+        repository.searchByDocumentationUnitSearchInputDeviatingFileNumber(
+            documentationOfficeDTO.getId(),
+            documentNumber,
+            fileNumber.trim(),
+            courtType,
+            courtLocation,
+            decisionDate,
+            decisionDateEnd,
+            publicationDate,
+            scheduledOnly,
+            status,
+            withError,
+            myDocOfficeOnly,
+            withDuplicateWarning,
+            inboxStatus,
+            fixedPageRequest);
 
     Set<DocumentationUnitListItemDTO> allResults = new HashSet<>();
 
@@ -852,6 +824,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Pageable pageable,
       OidcUser oidcUser,
       @Param("searchInput") DocumentationUnitSearchInput searchInput) {
+    if (featureToggleService.isEnabled("neuris.search-criteria-api")) {
+      return docUnitSearchRepo.searchByDocumentationUnitSearchInput(
+          searchInput, pageable, oidcUser);
+    }
 
     DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
     log.debug("Find by overview search: {}, {}", documentationOffice.abbreviation(), searchInput);
