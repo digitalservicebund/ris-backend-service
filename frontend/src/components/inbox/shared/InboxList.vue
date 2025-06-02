@@ -262,9 +262,11 @@ const emptyText = computed(() =>
             {{
               item.source
                 ? item.source +
-                  " (" +
-                  item.creatingDocumentationOffice?.abbreviation +
-                  ")"
+                  (item.creatingDocumentationOffice
+                    ? " (" +
+                      item.creatingDocumentationOffice?.abbreviation +
+                      ")"
+                    : "")
                 : ""
             }}
           </template>

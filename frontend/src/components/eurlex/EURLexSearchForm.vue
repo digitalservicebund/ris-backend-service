@@ -4,11 +4,9 @@ import InputText from "primevue/inputtext"
 import { ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import { ResponseError } from "@/services/httpClient"
 
 const emit = defineEmits<{
   updatePage: [number, string?, string?, string?, string?, string?]
-  handleServiceError: [ResponseError?]
 }>()
 
 const isEmptySearch = ref<boolean>(true)

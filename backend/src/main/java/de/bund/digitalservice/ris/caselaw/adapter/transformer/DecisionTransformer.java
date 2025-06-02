@@ -80,6 +80,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       builder
           .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
           .date(coreData.decisionDate())
+          .celexNumber(coreData.celexNumber())
           .documentType(
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
@@ -571,6 +572,7 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     coreDataBuilder
         .ecli(decisionDTO.getEcli())
+        .celexNumber(decisionDTO.getCelexNumber())
         .legalEffect(legalEffect == null ? null : legalEffect.getLabel());
 
     addInputTypesToDomain(decisionDTO, coreDataBuilder);

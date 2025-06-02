@@ -10,6 +10,10 @@ describe("eurlex search", () => {
   const eurlexMock = vi.spyOn(eurlexService, "get")
   const user = userEvent.setup()
 
+  vi.mock("primevue/usetoast", () => ({
+    useToast: () => ({ add: vi.fn() }),
+  }))
+
   function renderComponent() {
     return render(EURLexSearch, {
       global: {
@@ -66,7 +70,7 @@ describe("eurlex search", () => {
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
 
-    expect(eurlexMock).toHaveBeenCalledOnce()
+    expect(eurlexMock).toHaveBeenCalledTimes(2)
   })
 
   test("eurlex service returns an error", async () => {

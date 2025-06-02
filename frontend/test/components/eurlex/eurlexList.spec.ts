@@ -8,6 +8,11 @@ import DocumentationOffice from "@/domain/documentationOffice"
 import EURLexResult from "@/domain/eurlex"
 import service from "@/services/documentUnitService"
 
+const addToastMock = vi.fn()
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: addToastMock }),
+}))
+
 function renderComponent(entries: Page<EURLexResult>) {
   return render(EURLexList, {
     props: {
@@ -33,7 +38,7 @@ describe("eurlex list", () => {
   )
   documentationUnitServiceMock.mockResolvedValue({
     data: ["doc-number"],
-    status: 200,
+    status: 201,
   })
   const user = userEvent.setup()
 
@@ -111,7 +116,7 @@ describe("eurlex list", () => {
 
   test(
     "select entry, select a doc office and press Zuweisen should call service to generate " +
-      "documentation out out of eurlex decisions, deselect all checkboxes and emit assignment",
+      "documentation out out of eurlex decisions, deselect all checkboxes, emit assignment and show toast",
     async () => {
       const { emitted } = renderComponent({
         content: [
@@ -157,13 +162,21 @@ describe("eurlex list", () => {
         expect(checkbox).not.toBeChecked()
       })
 
+      expect(addToastMock).toHaveBeenCalledExactlyOnceWith({
+        detail:
+          "Die Dokumentationseinheit wurde der Dokumentationsstelle DS zugewiesen.",
+        life: 5000,
+        severity: "success",
+        summary: "Zuweisen erfolgreich",
+      })
+
       expect(emitted()["assign"]).toBeTruthy()
     },
   )
 
   test(
     "select entry, select a doc office, press Zuweisen and call service throws " +
-      "error should deselect all checkboxes, emit handleServiceError and assign",
+      "error should deselect all checkboxes, emit handleServiceError",
     async () => {
       const { emitted } = renderComponent({
         content: [
@@ -208,8 +221,6 @@ describe("eurlex list", () => {
       screen.getAllByRole("checkbox").forEach((checkbox) => {
         expect(checkbox).not.toBeChecked()
       })
-
-      expect(emitted()["assign"]).toBeTruthy()
     },
   )
 })

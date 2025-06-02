@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
+import { useToast } from "primevue/usetoast"
 import { computed, onMounted, ref } from "vue"
 import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelector.vue"
 import { ComboboxItem } from "@/components/input/types"
@@ -33,6 +34,8 @@ const selectedDocumentationOffice = ref<DocumentationOffice>()
 const noDocumentationOfficeSelected = ref<boolean>(false)
 const documentationOffices = ref<DocumentationOffice[]>()
 const currentPage = ref<number>(props.pageEntries?.number ?? 0)
+
+const toast = useToast()
 
 const entries = computed(() => {
   return props.pageEntries?.content || []
@@ -67,25 +70,31 @@ async function handleAssignToDocOffice() {
   if (!selectedDocumentationOffice.value) {
     noDocumentationOfficeSelected.value = true
   }
-
-  if (selectedDocumentationOffice.value) {
+  if (selectedDocumentationOffice.value && selectedEntries.value.length > 0) {
     noDocumentationOfficeSelected.value = false
+
     const params: EurlexParameters = {
       documentationOffice: selectedDocumentationOffice.value,
       celexNumbers: selectedEntries.value.map(({ celex }) => celex),
     }
-
     const response =
       await documentationUnitService.createNewOutOfEurlexDecision(params)
     if (response.status == 201) {
-      emit("handleServiceError")
+      emit("handleServiceError", undefined)
+      emit("assign", currentPage.value)
+      const isPlural = selectedEntries.value.length > 1
+      const verb = isPlural ? "en wurden" : " wurde"
+      toast.add({
+        severity: "success",
+        summary: "Zuweisen erfolgreich",
+        detail: `Die Dokumentationseinheit${verb} der Dokumentationsstelle ${selectedDocumentationOffice.value.abbreviation} zugewiesen.`,
+        life: 5_000,
+      })
     } else {
       emit("handleServiceError", response.error)
     }
 
     selectedEntries.value = []
-
-    emit("assign", currentPage.value)
   }
 }
 

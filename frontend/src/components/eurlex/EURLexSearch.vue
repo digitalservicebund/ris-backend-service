@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue"
+import { onMounted, ref, watch } from "vue"
 import EURLexList from "@/components/eurlex/EURLexList.vue"
 import EURLexSearchForm from "@/components/eurlex/EURLexSearchForm.vue"
 import InfoModal from "@/components/InfoModal.vue"
@@ -10,7 +10,6 @@ import { ResponseError } from "@/services/httpClient"
 
 const searchResults = ref<Page<EURLexResult>>()
 const serviceError = ref<ResponseError | undefined>(undefined)
-const serviceErrorDescription = ref<string | string[] | undefined>(undefined)
 
 async function updatePage(
   pageNumber: number,
@@ -46,13 +45,21 @@ function handleServiceError(error?: ResponseError) {
 }
 
 watch(serviceError, () => {
-  serviceErrorDescription.value = "Laden Sie die Seite bitte neu."
-  if (serviceError.value?.description) {
-    serviceErrorDescription.value = [
-      ...serviceError.value.description,
-      serviceErrorDescription.value,
-    ]
+  const defaultDescription = "Laden Sie die Seite bitte neu."
+  if (serviceError.value) {
+    if (!serviceError.value?.description) {
+      serviceError.value.description = defaultDescription
+    } else if (serviceError.value?.description != defaultDescription) {
+      serviceError.value.description = [
+        ...serviceError.value.description,
+        defaultDescription,
+      ]
+    }
   }
+})
+
+onMounted(async () => {
+  await updatePage(0)
 })
 </script>
 
@@ -65,7 +72,7 @@ watch(serviceError, () => {
   <InfoModal
     v-if="serviceError"
     class="my-16"
-    :description="serviceErrorDescription"
+    :description="serviceError.description"
     :title="serviceError.title"
   ></InfoModal>
   <EURLexList
