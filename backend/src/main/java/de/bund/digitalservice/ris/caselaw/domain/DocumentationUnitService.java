@@ -281,7 +281,7 @@ public class DocumentationUnitService {
         .isDeletable(hasWriteAccess && isInternalUser)
         .isEditable(
             (hasWriteAccess
-                && (isInternalUser || authService.isAssignedViaProcedure().apply(listItem.uuid()))))
+                && (isInternalUser || authService.isDocUnitAssignedViaProcedure(listItem))))
         .build();
   }
 
