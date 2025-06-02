@@ -45,14 +45,6 @@ describe("eurlex search", () => {
 
   beforeEach(() => {
     eurlexMock.mockClear()
-  })
-
-  afterEach(() => {
-    config.global.stubs = {}
-  })
-
-  test("without filled search fields calls the service without query parameter", async () => {
-    renderComponent()
     eurlexMock.mockResolvedValue({
       data: {
         content: [],
@@ -65,6 +57,20 @@ describe("eurlex search", () => {
       },
       status: 200,
     })
+  })
+
+  afterEach(() => {
+    config.global.stubs = {}
+  })
+
+  test("rendering calls the service without query parameter", async () => {
+    renderComponent()
+
+    expect(eurlexMock).toHaveBeenCalledTimes(1)
+  })
+
+  test("without filled search fields calls the service without query parameter", async () => {
+    renderComponent()
 
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
