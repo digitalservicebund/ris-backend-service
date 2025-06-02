@@ -294,18 +294,31 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException {
     var documentable =
         repository.findByDocumentNumber(documentNumber, userService.getUser(oidcUser));
-    if (documentable instanceof DocumentationUnit documentationUnit) {
-      return documentationUnit.toBuilder()
-          .isEditable(
-              authService.userHasWriteAccess(
-                  oidcUser,
-                  documentationUnit.coreData().creatingDocOffice(),
-                  documentationUnit.coreData().documentationOffice(),
-                  documentationUnit.status()))
-          .build();
-    } else {
-      log.info("Documentable type not supported: {}", documentable.getClass().getName());
-      return documentable;
+    switch (documentable) {
+      case DocumentationUnit documentationUnit -> {
+        return documentationUnit.toBuilder()
+            .isEditable(
+                authService.userHasWriteAccess(
+                    oidcUser,
+                    documentationUnit.coreData().creatingDocOffice(),
+                    documentationUnit.coreData().documentationOffice(),
+                    documentationUnit.status()))
+            .build();
+      }
+      case PendingProceeding pendingProceeding -> {
+        return pendingProceeding.toBuilder()
+            .isEditable(
+                authService.userHasWriteAccess(
+                    oidcUser,
+                    pendingProceeding.coreData().creatingDocOffice(),
+                    pendingProceeding.coreData().documentationOffice(),
+                    pendingProceeding.status()))
+            .build();
+      }
+      default -> {
+        log.info("Documentable type not supported: {}", documentable.getClass().getName());
+        return documentable;
+      }
     }
   }
 

@@ -4,12 +4,13 @@ import { LabelPosition } from "@/components/input/InputField.vue"
 import { CitationType } from "@/domain/citationType"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
-import { Court } from "@/domain/documentUnit"
+import DocumentUnit, { Court } from "@/domain/documentUnit"
 
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
+import PendingProceeding from "@/domain/pendingProceeding"
 import { Procedure } from "@/domain/procedure"
 
 export enum InputType {
@@ -225,3 +226,4 @@ export type ValidationError = {
   message: string
   instance: string
 }
+export type Documentable = DocumentUnit | PendingProceeding

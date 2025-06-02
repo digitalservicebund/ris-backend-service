@@ -291,7 +291,7 @@ public class DocumentationUnitController {
 
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
-  public ResponseEntity<DocumentationUnit> getByDocumentNumber(
+  public ResponseEntity<Documentable> getByDocumentNumber(
       @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String documentNumber) {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
@@ -302,11 +302,11 @@ public class DocumentationUnitController {
       // Duplicate check must happen before getting the doc unit, otherwise new ones won't be shown
       checkDuplicates(documentNumber);
       Documentable documentable = service.getByDocumentNumberWithUser(documentNumber, oidcUser);
-      return ResponseEntity.ok((DocumentationUnit) documentable);
+      return ResponseEntity.ok(documentable);
 
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);
-      return ResponseEntity.ok(DocumentationUnit.builder().build());
+      return ResponseEntity.notFound().build();
     }
   }
 

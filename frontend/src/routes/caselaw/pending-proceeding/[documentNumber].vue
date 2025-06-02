@@ -3,38 +3,41 @@ import { computed } from "vue"
 import { LocationQuery, useRoute } from "vue-router"
 import DocumentInfoPanel from "@/components/DocumentInfoPanel.vue"
 import DocumentViewer from "@/components/DocumentViewer.vue"
-import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
-import DocumentUnit from "@/domain/documentUnit"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { usePendingProceedingMenuItems } from "@/composables/usePendingProceedingMenuItems"
+import PendingProceeding from "@/domain/pendingProceeding"
+import { usePendingProceedingStore } from "@/stores/pendingProceedingStore"
 
 const props = defineProps<{
   documentNumber: string
 }>()
 
-const store = useDocumentUnitStore()
+const store = usePendingProceedingStore()
 const route = useRoute()
 
-const loadDocumentUnit = async (documentNumber: string) => {
-  return await store.loadDocumentUnit(documentNumber)
+const loadPendingProceeding = async (documentNumber: string) => {
+  return await store.loadPendingProceeding(documentNumber)
 }
 
+const getHeading = (doc: PendingProceeding) => doc.documentNumber || ""
+
 const getMenuItems = (documentNumber: string, query: LocationQuery) => {
-  return useCaseLawMenuItems(documentNumber, query)
+  return usePendingProceedingMenuItems(documentNumber, query)
 }
 
 const hasPendingDuplicateWarning = computed(
-  () =>
-    store.documentUnit &&
-    (store.documentUnit.managementData.duplicateRelations ?? []).some(
-      (warning) => warning.status === "PENDING",
-    ),
+  () => false,
+  // Todo
+  //  store.pendingProceeding &&
+  //  (store.pendingProceeding.managementData.duplicateRelations ?? []).some(
+  //      (warning) => warning.status === "PENDING",
+  //  ),
 )
 
 const managementDataRoute = computed(() => {
-  if (!store.documentUnit?.documentNumber) return undefined
+  if (!store.pendingProceeding?.documentNumber) return undefined
   return {
     name: "caselaw-documentUnit-documentNumber-managementdata",
-    params: { documentNumber: store.documentUnit.documentNumber },
+    params: { documentNumber: store.pendingProceeding.documentNumber },
   }
 })
 
@@ -47,15 +50,16 @@ const isRouteWithSaveButton = computed(
 )
 
 const handleDocumentUnitSave = async () => {
-  await store.updateDocumentUnit()
+  // Todo
 }
 </script>
 
 <template>
   <DocumentViewer
     :document-number="props.documentNumber"
+    :get-document-heading="getHeading"
     :get-menu-items="getMenuItems"
-    :load-document="loadDocumentUnit"
+    :load-document="loadPendingProceeding"
   >
     <template
       #main-content="{
@@ -78,9 +82,10 @@ const handleDocumentUnitSave = async () => {
     <template #info-panel="{ document }">
       <DocumentInfoPanel
         v-if="document && !route.path.includes('preview')"
-        :document="document as DocumentUnit"
+        :document="document as PendingProceeding"
         :duplicate-management-route="managementDataRoute"
         :has-pending-duplicate-warning="hasPendingDuplicateWarning"
+        :heading="getHeading(document as PendingProceeding)"
         :on-save="handleDocumentUnitSave"
         :show-save-button="isRouteWithSaveButton"
       />
