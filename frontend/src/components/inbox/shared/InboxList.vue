@@ -154,6 +154,7 @@ const emptyText = computed(() =>
       :error-message="selectionErrorMessage"
     />
     <Pagination
+      :is-loading="loading"
       navigation-position="bottom"
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
