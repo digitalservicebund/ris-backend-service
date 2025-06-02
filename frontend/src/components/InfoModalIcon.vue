@@ -7,6 +7,7 @@ import IconInfo from "~icons/ic/baseline-info"
 
 const props = defineProps<{
   status?: InfoStatus
+  ariaLabel?: string
 }>()
 
 const iconClass = computed(() => {
@@ -31,7 +32,7 @@ const icon = computed(() => {
 </script>
 
 <template>
-  <div :class="iconClass">
+  <div :aria-label="ariaLabel" :class="iconClass">
     <component :is="icon" />
   </div>
 </template>
