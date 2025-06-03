@@ -184,10 +184,13 @@ async function runTestMultipleTimes(
 
   const duration = request.timing().responseStart
   expect(duration).not.toBe(-1)
+
+  const response = await request.response()
+  expect(response?.ok()).toBe(true)
+
   if (search.minResults) {
     const documentUnits =
-      ((await (await request.response())?.json())?.content as DocumentUnit[]) ||
-      []
+      ((await response?.json())?.content as DocumentUnit[]) || []
     expect(documentUnits.length).toBeGreaterThanOrEqual(search.minResults)
   }
 
