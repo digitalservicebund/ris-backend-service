@@ -1,7 +1,5 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
+package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.NoRepositoryBean;
