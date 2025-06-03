@@ -6,7 +6,9 @@ import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import { Procedure } from "@/domain/procedure"
 import ComboboxItemService from "@/services/comboboxItemService"
 
-const emit = defineEmits<{ assignProcedure: [procedure: Procedure] }>()
+const emit = defineEmits<{
+  assignProcedure: [procedure: Procedure | undefined]
+}>()
 
 const procedure = ref<Procedure | undefined>(undefined)
 const hasNoProcedureSelectedError = ref(false)
@@ -16,8 +18,9 @@ const assignProcedures = () => {
     hasNoProcedureSelectedError.value = true
   } else {
     hasNoProcedureSelectedError.value = false
-    emit("assignProcedure", procedure.value)
   }
+
+  emit("assignProcedure", procedure.value)
 }
 </script>
 

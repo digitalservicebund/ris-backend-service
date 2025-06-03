@@ -140,7 +140,22 @@ function selectRow() {
         :value="entries"
         @row-select="selectRow"
       >
-        <Column header-style="width: 3rem" selection-mode="multiple"></Column>
+        <Column
+          header-style="width: 3rem"
+          :pt="{
+            pcRowCheckbox: {
+              input: {
+                style: `${noDecisionSelected || noDocumentationOfficeSelected ? 'border-color: var(--color-red-800);' : ''}`,
+              },
+            },
+            pcHeaderCheckbox: {
+              input: {
+                style: `${noDecisionSelected || noDocumentationOfficeSelected ? 'border-color: var(--color-red-800);' : ''}`,
+              },
+            },
+          }"
+          selection-mode="multiple"
+        />
         <Column field="celex" header="CELEX"></Column>
         <Column field="courtType" header="Gerichtstyp"></Column>
         <Column header="Ort"
