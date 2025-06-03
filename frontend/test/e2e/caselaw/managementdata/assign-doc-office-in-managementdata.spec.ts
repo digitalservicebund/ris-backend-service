@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import {
   navigateToCategories,
+  navigateToInbox,
   navigateToManagementData,
   navigateToSearch,
   save,
@@ -125,6 +126,12 @@ test.describe(
         await expect(
           pageWithBghUser.getByText("Dokstelle geändert: [DS] → [BGH]"),
         ).toBeVisible()
+      })
+
+      await test.step("Die Dokumentationseinheit erscheint bei der Zieldokstelle im Eingang 'Fremdanlagen'", async () => {
+        await navigateToInbox(pageWithBghUser)
+        await expect(pageWithBghUser.getByText(documentNumber)).toBeVisible()
+        await expect(pageWithBghUser.getByText(fileNumber)).toBeVisible()
       })
     })
   },

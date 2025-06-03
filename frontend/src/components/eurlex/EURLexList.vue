@@ -109,7 +109,7 @@ function selectRow() {
       <DocumentationOfficeSelector
         v-model="selectedDocumentationOffice"
         v-model:has-error="noDocumentationOfficeSelected"
-        class="min-w-2xs"
+        class="min-w-xs"
       />
       <Button
         aria-label="Dokumentationsstelle zuweisen"

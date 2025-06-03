@@ -85,11 +85,19 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
   }
 
   private JaxbHtml buildHeader(DocumentationUnit documentationUnit) throws ValidationException {
-    // Case law handover : define what the title should be if headline is null
+    validateCoreData(documentationUnit);
+    var coreData = documentationUnit.coreData();
+    String fallbackTitle =
+        "<p>"
+            + coreData.court().label()
+            + ", "
+            + DateUtils.toFormattedDateString(coreData.decisionDate())
+            + ", "
+            + coreData.fileNumbers().getFirst()
+            + "</p>";
     String title =
         ObjectUtils.defaultIfNull(
-            nullSafeGet(documentationUnit.shortTexts(), ShortTexts::headline),
-            "<p>" + documentationUnit.documentNumber() + "</p>");
+            nullSafeGet(documentationUnit.shortTexts(), ShortTexts::headline), fallbackTitle);
 
     validateNotNull(title, "Title missing");
     return JaxbHtml.build(htmlStringToObjectList(title));
@@ -315,9 +323,11 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
       validateNotNull(documentationUnit.coreData().court(), "Court missing");
       if (documentationUnit.coreData().court() != null) {
         validateNotNull(documentationUnit.coreData().court().type(), "CourtType missing");
+        validateNotNull(documentationUnit.coreData().court().type(), "CourtLabel missing");
       }
       validateNotNull(documentationUnit.coreData().documentType(), "DocumentType missing");
       validate(!documentationUnit.coreData().fileNumbers().isEmpty(), "FileNumber missing");
+      validateNotNull(documentationUnit.coreData().decisionDate(), "DecisionDate missing");
     } else {
       throw new ValidationException("Core data is null");
     }

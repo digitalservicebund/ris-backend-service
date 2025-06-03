@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.context.annotation.Lazy;
@@ -276,12 +277,16 @@ public class DocumentationUnitService {
                 listItem.documentationOffice(),
                 listItem.status());
     boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
-
+    BooleanSupplier isAssignedViaGroup =
+        () ->
+            listItem.assignedUserGroup() != null
+                && listItem
+                    .assignedUserGroup()
+                    .id()
+                    .equals(userService.getUserGroup(oidcUser).map(UserGroup::id).orElse(null));
     return listItem.toBuilder()
         .isDeletable(hasWriteAccess && isInternalUser)
-        .isEditable(
-            (hasWriteAccess
-                && (isInternalUser || authService.isDocUnitAssignedViaProcedure(listItem))))
+        .isEditable((hasWriteAccess && (isInternalUser || isAssignedViaGroup.getAsBoolean())))
         .build();
   }
 
