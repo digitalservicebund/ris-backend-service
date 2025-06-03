@@ -22,9 +22,9 @@ import org.apache.commons.lang3.StringUtils;
  * specific meta-data mapping for public access.
  */
 @Slf4j
-public class PublicPortalTransformer extends CommonPortalTransformer {
+public class PrototypePortalTransformer extends CommonPortalTransformer {
 
-  public PublicPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public PrototypePortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 

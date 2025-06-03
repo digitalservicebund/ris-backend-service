@@ -51,19 +51,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class InternalPortalTransformerTest {
+class PortalTransformerTest {
 
   private static DocumentationUnit testDocumentUnit;
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
 
-  private static InternalPortalTransformer subject;
+  private static PortalTransformer subject;
   private static UUID documentationUnitId;
 
   @BeforeAll
   static void setUpBeforeClass() {
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-    subject = new InternalPortalTransformer(documentBuilderFactory);
+    subject = new PortalTransformer(documentBuilderFactory);
 
     documentationUnitId = UUID.randomUUID();
 
@@ -85,7 +85,11 @@ class InternalPortalTransformerTest {
                 CoreData.builder()
                     .ecli("testecli")
                     .court(
-                        Court.builder().type("testCourtType").location("testCourtLocation").build())
+                        Court.builder()
+                            .type("testCourtType")
+                            .location("testCourtLocation")
+                            .label("Type Location")
+                            .build())
                     .documentType(
                         DocumentType.builder().label("testDocumentTypeAbbreviation").build())
                     .legalEffect("ja")
@@ -105,7 +109,7 @@ class InternalPortalTransformerTest {
     String expected =
         """
       <akn:header>
-         <akn:p>testDocumentNumber</akn:p>
+         <akn:p>Type Location, 01.01.2020, testFileNumber</akn:p>
       </akn:header>
      """;
     CaseLawLdml ldml = subject.transformToLdml(testDocumentUnit);
