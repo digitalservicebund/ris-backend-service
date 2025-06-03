@@ -88,7 +88,7 @@ test.describe(
           await page.getByText("AG Aachen").click()
           await page.getByLabel("Nach Entscheidung suchen").click()
           await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
+            page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("BGH")
 
           // Verwaltungsgericht Aarau is a BVerwG court
@@ -96,7 +96,7 @@ test.describe(
           await page.getByText("Verwaltungsgericht Aarau").click()
           await page.getByText("Suchen").click()
           await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
+            page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("BVerwG")
         })
 
@@ -119,7 +119,7 @@ test.describe(
 
           await expect(page.getByLabel("Gericht")).toHaveValue("")
           await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
+            page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("")
         })
 
@@ -132,7 +132,7 @@ test.describe(
           await requestFinishedPromise
 
           await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
+            page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("")
         })
 
@@ -152,9 +152,9 @@ test.describe(
           await expect(page.getByText("BAG", { exact: true })).toBeVisible()
           await expect(page.getByText("BFH", { exact: true })).toBeVisible()
 
-          await fillInput(page, "Zuständige Dokumentationsstelle", "bv")
+          await fillInput(page, "Dokumentationsstelle auswählen", "bv")
           await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
+            page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("bv")
 
           await expect(page.getByText("BAG", { exact: true })).toBeHidden()
@@ -167,7 +167,7 @@ test.describe(
           await page.locator("button").filter({ hasText: "BVerfG" }).click()
 
           await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
+            page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("BVerfG")
 
           await expect(
@@ -205,15 +205,15 @@ test.describe(
           ).toBeVisible()
 
           await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
+            page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("")
         })
 
         await test.step("Responsible doc office can be updated manually", async () => {
-          await fillInput(page, "Zuständige Dokumentationsstelle", "DS")
+          await fillInput(page, "Dokumentationsstelle auswählen", "DS")
 
           await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
+            page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("DS")
           await page.getByText("DS", { exact: true }).click()
           await expect(
@@ -224,7 +224,7 @@ test.describe(
         await test.step("Changing other inputs does not reset the doc office | RISDEV-5946", async () => {
           await fillInput(page, "Aktenzeichen", "some new value")
           await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
+            page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("DS")
         })
 
@@ -349,7 +349,7 @@ test.describe(
             ).toBeVisible()
 
             await expect(
-              pageWithBghUser.getByLabel("Zuständige Dokumentationsstelle"),
+              pageWithBghUser.getByLabel("Dokumentationsstelle auswählen"),
             ).toHaveValue("BGH")
           })
 
@@ -572,7 +572,7 @@ test.describe(
           ).toBeVisible()
 
           await expect(
-            page.getByLabel("Zuständige Dokumentationsstelle"),
+            page.getByLabel("Dokumentationsstelle auswählen"),
           ).toHaveValue("BGH")
         })
 

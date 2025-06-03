@@ -154,7 +154,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:e215cd0c42f2e9d79443b45616197f120d366bde6913546e96b784ca6548243d
+    image: cgr.dev/chainguard/redis@sha256:090c0d2f101a5e7c20a1cfc5ebccf22dda6720d59169f17a917cd93c3bd3f88d
     extra_hosts:
       - localhost:host-gateway
     container_name: redis
@@ -179,7 +179,7 @@ services:
       timeout: 5s
 
   languagetool:
-    image: ghcr.io/digitalservicebund/neuris-languagetool:29e51a7d8af96b3aba73513b1aae396c0780c6be
+    image: ghcr.io/digitalservicebund/neuris-languagetool:17fcf6c89d542fdc39c5fa98e983c5713c3495ff
     extra_hosts:
       - localhost:host-gateway
     ports:

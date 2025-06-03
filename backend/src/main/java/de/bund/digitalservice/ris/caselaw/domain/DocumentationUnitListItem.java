@@ -46,6 +46,7 @@ public record DocumentationUnitListItem(
     String source,
     DocumentationOffice creatingDocumentationOffice,
     DocumentationOffice documentationOffice,
+    Procedure procedure,
     String note,
     Boolean isDeletable,
     Boolean isEditable) {}

@@ -54,6 +54,7 @@ watch(value, async (newVal) => {
           documentationOfficeAbbreviation === 'BGH' ||
           documentationOfficeAbbreviation === 'DS'
         "
+        data-testid="eurlex-tab"
         value="2"
         >EUR-Lex</Tab
       >

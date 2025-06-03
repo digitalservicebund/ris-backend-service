@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-import { computed, h } from "vue"
+import { computed, ref, watch } from "vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
-import IconDone from "~icons/ic/baseline-done"
-import IconErrorOutline from "~icons/ic/baseline-error-outline"
-import IconInfo from "~icons/ic/baseline-info"
+import InfoModalIcon from "@/components/InfoModalIcon.vue"
 
 const props = withDefaults(
   defineProps<{
@@ -18,6 +16,11 @@ const props = withDefaults(
     status: InfoStatus.ERROR,
   },
 )
+
+const titleRef = ref(props.title)
+const descriptionRef = ref<string | string[]>(props.description ?? "")
+const statusRef = ref(props.status ?? InfoStatus.ERROR)
+
 type ModalAttribute = {
   borderClass: string
   backgroundColorClass: string
@@ -25,12 +28,12 @@ type ModalAttribute = {
 const staticContainerClass =
   "border-l-[0.125rem] flex gap-[0.625rem] px-[1.25rem] py-[1.125rem] w-full"
 const modalAttribute = computed((): ModalAttribute => {
-  if (props.status === InfoStatus.SUCCEED) {
+  if (statusRef.value === InfoStatus.SUCCEED) {
     return {
       borderClass: "border-l-green-700",
       backgroundColorClass: "bg-white",
     }
-  } else if (props.status === InfoStatus.INFO) {
+  } else if (statusRef.value === InfoStatus.INFO) {
     return {
       borderClass: "border-l-blue-800",
       backgroundColorClass: "bg-white",
@@ -42,26 +45,20 @@ const modalAttribute = computed((): ModalAttribute => {
   }
 })
 
-const ModalIcon = computed(() => {
-  if (props.status === InfoStatus.SUCCEED) {
-    return h(h(IconDone), {
-      class: ["text-green-700"],
-    })
-  } else if (props.status === InfoStatus.INFO) {
-    return h(h(IconInfo), {
-      class: ["text-blue-800"],
-    })
-  }
-  return h(h(IconErrorOutline), {
-    class: ["text-red-800"],
-  })
-})
-
 const isArray = computed(() => {
   return Array.isArray(props.description)
 })
 
 const ariaLabelIcon = props.title + " icon"
+
+watch(
+  props,
+  () => {
+    titleRef.value = props.title
+    descriptionRef.value = props.description ?? ""
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <template>
@@ -74,20 +71,22 @@ const ariaLabelIcon = props.title + " icon"
       modalAttribute.backgroundColorClass,
     ]"
   >
-    <ModalIcon :aria-label="ariaLabelIcon" />
+    <InfoModalIcon :aria-label="ariaLabelIcon" :status="statusRef" />
 
     <div class="flex flex-col">
-      <span class="ris-label2-bold">{{ title }}</span>
+      <span class="ris-label2-bold">{{ titleRef }}</span>
       <div
-        v-if="isArray && props.description.length > 1"
+        v-if="isArray && descriptionRef.length > 1"
         class="ris-label2-regular"
       >
         <ul class="m-0 list-disc ps-20">
-          <li v-for="(desc, index) in description" :key="index">{{ desc }}</li>
+          <li v-for="(desc, index) in descriptionRef" :key="index">
+            {{ desc }}
+          </li>
         </ul>
       </div>
       <span v-else class="ris-label2-regular">{{
-        isArray ? description[0] : description
+        isArray ? descriptionRef[0] : descriptionRef
       }}</span>
     </div>
   </div>

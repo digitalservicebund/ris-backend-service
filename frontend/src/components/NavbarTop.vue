@@ -67,7 +67,7 @@ const badge = computed(() => {
       <router-link
         class="ris-label1-regular p-8 hover:bg-yellow-500 hover:underline"
         :class="{
-          underline: route.path === 'inbox',
+          underline: route.path.includes('inbox'),
         }"
         data-testid="inbox-navbar-button"
         :to="{ name: 'caselaw-inbox' }"

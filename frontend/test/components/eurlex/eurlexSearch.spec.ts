@@ -10,6 +10,10 @@ describe("eurlex search", () => {
   const eurlexMock = vi.spyOn(eurlexService, "get")
   const user = userEvent.setup()
 
+  vi.mock("primevue/usetoast", () => ({
+    useToast: () => ({ add: vi.fn() }),
+  }))
+
   function renderComponent() {
     return render(EURLexSearch, {
       global: {
@@ -41,14 +45,6 @@ describe("eurlex search", () => {
 
   beforeEach(() => {
     eurlexMock.mockClear()
-  })
-
-  afterEach(() => {
-    config.global.stubs = {}
-  })
-
-  test("without filled search fields calls the service without query parameter", async () => {
-    renderComponent()
     eurlexMock.mockResolvedValue({
       data: {
         content: [],
@@ -61,12 +57,26 @@ describe("eurlex search", () => {
       },
       status: 200,
     })
+  })
+
+  afterEach(() => {
+    config.global.stubs = {}
+  })
+
+  test("rendering calls the service without query parameter", async () => {
+    renderComponent()
+
+    expect(eurlexMock).toHaveBeenCalledTimes(1)
+  })
+
+  test("without filled search fields calls the service without query parameter", async () => {
+    renderComponent()
 
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
 
-    expect(eurlexMock).toHaveBeenCalledOnce()
+    expect(eurlexMock).toHaveBeenCalledTimes(2)
   })
 
   test("eurlex service returns an error", async () => {

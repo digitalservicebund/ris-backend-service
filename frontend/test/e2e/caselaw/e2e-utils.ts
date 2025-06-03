@@ -784,7 +784,7 @@ export async function createPendingHandoverDecisionForBGH(
 
   await expect(page.getByText("Übernehmen und weiter bearbeiten")).toBeVisible()
 
-  await expect(page.getByLabel("Zuständige Dokumentationsstelle")).toHaveValue(
+  await expect(page.getByLabel("Dokumentationsstelle auswählen")).toHaveValue(
     "BGH",
   )
 

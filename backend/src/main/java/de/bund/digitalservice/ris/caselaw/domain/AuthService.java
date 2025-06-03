@@ -20,4 +20,6 @@ public interface AuthService {
       DocumentationOffice creatingDocOffice,
       DocumentationOffice documentationOffice,
       Status status);
+
+  boolean isDocUnitAssignedViaProcedure(DocumentationUnitListItem documentationUnit);
 }

@@ -64,6 +64,8 @@ public class DocumentationUnitListItemTransformer {
         .documentationOffice(
             DocumentationOfficeTransformer.transformToDomain(
                 documentationUnitListItemDTO.getDocumentationOffice()))
+        .procedure(
+            ProcedureTransformer.transformToDomain(documentationUnitListItemDTO.getProcedure()))
         .source(
             documentationUnitListItemDTO.getSource().stream()
                 .map(
