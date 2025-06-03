@@ -282,6 +282,8 @@ public class DocumentationUnitService {
         .isEditable(
             (hasWriteAccess
                 && (isInternalUser || authService.isDocUnitAssignedViaProcedure(listItem))))
+        // Procedure not needed for lists in UI, only needed for right check.
+        .procedure(null)
         .build();
   }
 
