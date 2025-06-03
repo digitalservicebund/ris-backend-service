@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitL
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;

@@ -83,7 +83,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
-  private final DocumentationUnitSearchRepository docUnitSearchRepo;
+  private final PostgresDocumentationUnitSearchRepositoryImpl docUnitSearchRepo;
   private final FeatureToggleService featureToggleService;
 
   public PostgresDocumentationUnitRepositoryImpl(
@@ -98,7 +98,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       EntityManager entityManager,
       DatabaseReferenceRepository referenceRepository,
       DocumentationUnitHistoryLogService historyLogService,
-      DocumentationUnitSearchRepository docUnitSearchRepo,
+      PostgresDocumentationUnitSearchRepositoryImpl docUnitSearchRepo,
       FeatureToggleService featureToggleService) {
 
     this.repository = repository;
