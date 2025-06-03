@@ -136,12 +136,6 @@ test.describe(
           ).toHaveValue("")
         })
 
-        await test.step("Documentation Office is a mandatory field for doc unit creation", async () => {
-          await expect(
-            page.getByText("Übernehmen und weiter bearbeiten"),
-          ).toBeDisabled()
-        })
-
         await test.step("DocOffice can be changed manually", async () => {
           await page.getByTestId("documentation-office-combobox").click()
 

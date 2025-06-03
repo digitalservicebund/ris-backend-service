@@ -32,7 +32,7 @@ const icon = computed(() => {
 </script>
 
 <template>
-  <div :aria-label="ariaLabel" :class="iconClass">
-    <component :is="icon" />
+  <div :class="iconClass">
+    <component :is="icon" :aria-label="ariaLabel" />
   </div>
 </template>
