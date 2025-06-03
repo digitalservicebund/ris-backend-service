@@ -20,13 +20,13 @@ public interface DatabaseDuplicateCheckRepository
     -- They lead to explosion of duplicate relationships
     WITH filtered_file_numbers AS (
         SELECT value FROM (
-            SELECT upper(trim(value)) AS value
+            SELECT upper(value) AS value
             FROM incremental_migration.file_number
-            WHERE upper(trim(value)) IN (:allFileNumbers)
+            WHERE upper(value) IN (:allFileNumbers)
             UNION ALL
-            SELECT upper(trim(value)) AS value
+            SELECT upper(value) AS value
             FROM incremental_migration.deviating_file_number
-            WHERE upper(trim(value)) IN (:allFileNumbers)) as regular_and_deviating_file_numbers
+            WHERE upper(value) IN (:allFileNumbers)) as regular_and_deviating_file_numbers
         GROUP BY value
         HAVING COUNT(*) <= 50
     )
