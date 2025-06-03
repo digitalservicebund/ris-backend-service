@@ -46,8 +46,8 @@ public record DocumentationUnitListItem(
     String source,
     DocumentationOffice creatingDocumentationOffice,
     DocumentationOffice documentationOffice,
-    // Procedure is not sent to the UI, only needed for rights check
-    Procedure procedure,
+    // Needed for rights check for external users
+    UserGroup assignedUserGroup,
     String note,
     Boolean isDeletable,
     Boolean isEditable) {}

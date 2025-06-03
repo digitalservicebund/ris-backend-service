@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit.RelatedDocumentationUnitBuilder;
@@ -64,8 +65,11 @@ public class DocumentationUnitListItemTransformer {
         .documentationOffice(
             DocumentationOfficeTransformer.transformToDomain(
                 documentationUnitListItemDTO.getDocumentationOffice()))
-        .procedure(
-            ProcedureTransformer.transformToDomain(documentationUnitListItemDTO.getProcedure()))
+        .assignedUserGroup(
+            Optional.ofNullable(documentationUnitListItemDTO.getProcedure())
+                .map(ProcedureDTO::getUserGroupDTO)
+                .map(UserGroupTransformer::transformToDomain)
+                .orElse(null))
         .source(
             documentationUnitListItemDTO.getSource().stream()
                 .map(
