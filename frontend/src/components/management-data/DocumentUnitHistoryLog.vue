@@ -55,12 +55,6 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
     <DataTable
       v-if="formattedData.length > 0 && !loading"
       data-testid="document-unit-history-log"
-      :pt="{
-        thead: {
-          style:
-            'position: sticky; top: 0; z-index: 10; background: white; box-shadow: inset 0 -2px #DCE8EF;', // -> RIS-UI PR for global sticky header style in scrollable tables: https://github.com/digitalservicebund/ris-ui/pull/243
-        },
-      }"
       scroll-height="315px"
       scrollable
       :value="formattedData"
