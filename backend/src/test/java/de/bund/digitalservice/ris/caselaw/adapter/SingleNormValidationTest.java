@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DeltaMigrationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;

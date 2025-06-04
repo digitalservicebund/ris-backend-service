@@ -18,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
@@ -40,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;

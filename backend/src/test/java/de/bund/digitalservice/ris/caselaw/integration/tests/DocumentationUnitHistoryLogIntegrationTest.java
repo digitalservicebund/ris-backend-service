@@ -12,7 +12,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclin
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitHistoryLogController;
-import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -24,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;

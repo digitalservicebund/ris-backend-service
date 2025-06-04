@@ -24,7 +24,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
@@ -51,6 +50,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedDocumentationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;

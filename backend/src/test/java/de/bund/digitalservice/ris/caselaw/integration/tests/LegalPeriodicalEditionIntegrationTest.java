@@ -8,7 +8,6 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
@@ -27,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLa
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;

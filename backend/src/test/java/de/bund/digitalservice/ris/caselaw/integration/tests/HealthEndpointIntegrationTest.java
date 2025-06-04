@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.bund.digitalservice.ris.caselaw.adapter.EnvironmentService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.HttpEurlexRetrievalService;
 import de.bund.digitalservice.ris.caselaw.config.EnvironmentConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
@@ -69,6 +70,7 @@ class HealthEndpointIntegrationTest {
   @MockitoBean EnvironmentService environmentService;
   @MockitoBean FeatureToggleService featureToggleService;
   @MockitoBean DocumentationOfficeService documentationOfficeService;
+  @MockitoBean HttpEurlexRetrievalService httpEurlexRetrievalService;
 
   @Test
   void shouldExposeHealthEndpoint() throws Exception {
