@@ -113,7 +113,7 @@ jobs:
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run tests and scan with SonarQube
-        run: ./gradlew sonar --info
+        run: ./gradlew sonar
         working-directory: ./backend
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
