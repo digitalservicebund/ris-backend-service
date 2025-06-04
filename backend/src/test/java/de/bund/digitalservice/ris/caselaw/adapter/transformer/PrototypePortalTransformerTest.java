@@ -48,19 +48,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class PublicPortalTransformerTest {
+class PrototypePortalTransformerTest {
 
   private static DocumentationUnit testDocumentUnit;
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
 
-  private static PublicPortalTransformer subject;
+  private static PrototypePortalTransformer subject;
   private static UUID documentationUnitId;
 
   @BeforeAll
   static void setUpBeforeClass() {
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-    subject = new PublicPortalTransformer(documentBuilderFactory);
+    subject = new PrototypePortalTransformer(documentBuilderFactory);
     documentationUnitId = UUID.randomUUID();
     createTestDocumentationUnit();
   }

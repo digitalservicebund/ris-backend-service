@@ -45,7 +45,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.PublicPortalTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.PrototypePortalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -94,7 +94,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @RISIntegrationTest(
     imports = {
       PrototypePortalPublicationService.class,
-      PublicPortalTransformer.class,
+      PrototypePortalTransformer.class,
       XmlUtilService.class,
       ConverterConfig.class,
       PrototypePortalBucket.class,

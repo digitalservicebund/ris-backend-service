@@ -34,9 +34,9 @@ import org.apache.commons.lang3.StringUtils;
  * additional metadata like classification and keywords for internal processing.
  */
 @Slf4j
-public class InternalPortalTransformer extends CommonPortalTransformer {
+public class PortalTransformer extends CommonPortalTransformer {
 
-  public InternalPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public PortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 

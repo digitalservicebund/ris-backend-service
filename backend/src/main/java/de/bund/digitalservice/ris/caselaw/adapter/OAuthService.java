@@ -11,7 +11,6 @@ import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -273,14 +272,6 @@ public class OAuthService implements AuthService {
         return false;
       }
     };
-  }
-
-  public boolean isDocUnitAssignedViaProcedure(DocumentationUnitListItem documentationUnit) {
-    Procedure procedure = documentationUnit.procedure();
-    Optional<OidcUser> user = getOidcUser();
-    return procedure != null
-        && user.isPresent()
-        && isProcedureAssignedToUser(procedure, user.get());
   }
 
   /**
