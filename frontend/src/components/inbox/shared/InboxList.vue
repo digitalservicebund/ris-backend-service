@@ -120,6 +120,11 @@ function reloadList() {
   emit("updatePage", 0)
 }
 
+function resetErrorMessages() {
+  selectionErrorMessage.value = undefined
+  selectionErrorDocUnitIds.value = []
+}
+
 watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
 
 const rowStyleClass = (rowData: DocumentUnitListEntry) => {
@@ -173,13 +178,13 @@ const emptyText = computed(() =>
             pcRowCheckbox: {
               input: {
                 style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
-                onClick: () => (selectionErrorMessage = undefined),
+                onClick: () => resetErrorMessages(),
               },
             },
             pcHeaderCheckbox: {
               input: {
                 style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
-                onClick: () => (selectionErrorMessage = undefined),
+                onClick: () => resetErrorMessages(),
               },
             },
           }"
