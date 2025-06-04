@@ -11,6 +11,7 @@ import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
+import { InboxType } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { ResponseError } from "@/services/httpClient"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
@@ -26,6 +27,7 @@ const props = defineProps<{
   pageEntries?: Page<DocumentUnitListEntry>
   error?: ResponseError
   loading?: boolean
+  inboxType: InboxType
 }>()
 const emit = defineEmits<{
   updatePage: [number]
@@ -288,7 +290,7 @@ const emptyText = computed(() =>
             }}
           </template>
         </Column>
-        <Column header="Status">
+        <Column v-if="inboxType != InboxType.EU" header="Status">
           <template #body="{ data: item }">
             <IconBadge
               v-if="item.status?.publicationStatus"

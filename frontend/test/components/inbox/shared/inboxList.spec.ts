@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import InboxList from "@/components/inbox/shared/InboxList.vue"
 import { Page } from "@/components/Pagination.vue"
+import { InboxType } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
 import routes from "~/test-helper/routes"
@@ -61,6 +62,7 @@ function renderComponent(props = {}) {
     ...render(InboxList, {
       props: {
         pageEntries,
+        inboxType: InboxType.EU,
         ...props,
       },
       global: {
