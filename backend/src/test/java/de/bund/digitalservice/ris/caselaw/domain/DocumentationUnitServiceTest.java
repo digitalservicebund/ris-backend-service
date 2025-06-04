@@ -531,12 +531,12 @@ class DocumentationUnitServiceTest {
   }
 
   @Test
-  void test_setPublicationDateTime_shouldSaveLastPublicationDateTime() {
+  void test_saveSuccessfulPublicationDateTime_shouldSaveLastPublication() {
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    service.setPublicationDateTime(documentationUnit.uuid());
+    service.saveSuccessfulPublication(documentationUnit.uuid());
 
-    verify(repository, times(1)).saveLastPublicationDateTime(documentationUnit.uuid());
+    verify(repository, times(1)).saveSuccessfulPublication(documentationUnit.uuid());
   }
 
   @Test
