@@ -44,7 +44,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PrototypePortalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -153,7 +153,7 @@ class PrototypePortalPublicationJobIntegrationTest {
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
-  @MockitoBean private FmxService fmxService;
+  @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
   @MockitoBean private FeatureToggleService featureToggleService;

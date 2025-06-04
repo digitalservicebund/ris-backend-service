@@ -21,7 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroup
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -99,7 +99,7 @@ class UserGroupIntegrationTest {
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private ProcedureService procedureService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
-  @MockitoBean private FmxService fmxService;
+  @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private FeatureToggleService featureToggleService;
   @MockitoBean private DatabaseUserGroupService databaseUserGroupService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;

@@ -28,7 +28,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresIgnoredTextCheckWordRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -123,7 +123,7 @@ class TextCheckIntegrationTest {
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private FeatureToggleService featureToggleService;
-  @MockitoBean private FmxService fmxService;
+  @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
 

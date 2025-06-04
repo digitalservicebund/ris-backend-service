@@ -6,7 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentReposit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
 
 @Service
 @Slf4j
-public class FmxService implements TransformationService {
+public class FmxImportService implements TransformationService {
 
   public static final String FILE_NUMBER_XPATH = "//REF.CASE/NO.CASE";
   public static final String ECLI_XPATH = "//NO.ECLI/@ECLI";
@@ -91,7 +91,7 @@ public class FmxService implements TransformationService {
 
   private final XPath xPath;
 
-  public FmxService(
+  public FmxImportService(
       DocumentationUnitRepository documentationUnitRepository,
       CourtRepository courtRepository,
       DocumentTypeRepository documentTypeRepository,
@@ -119,7 +119,7 @@ public class FmxService implements TransformationService {
     Optional<EurLexResultDTO> eurLexResultDTO =
         eurLexResultRepository.findByCelexNumber(celexNumber);
     if (eurLexResultDTO.isEmpty()) {
-      throw new FmxTransformationException(
+      throw new FmxImporterException(
           "Could not find matching Eurlex Result for Celex Number " + celexNumber);
     }
     String sourceUrl = eurLexResultDTO.get().getUri();
@@ -129,7 +129,7 @@ public class FmxService implements TransformationService {
       attachFmxToDocumentationUnit(documentationUnit.uuid(), fmxFileContent, sourceUrl);
       extractMetaDataFromFmx(fmxFileContent, documentationUnit, user);
     } else {
-      throw new FmxTransformationException("FMX file has no content.");
+      throw new FmxImporterException("FMX file has no content.");
     }
   }
 
@@ -210,7 +210,7 @@ public class FmxService implements TransformationService {
           "EU-Entscheidung angelegt für "
               + documentationUnit.coreData().documentationOffice().abbreviation());
     } catch (XPathExpressionException exception) {
-      throw new FmxTransformationException("Failed to extract data from FMX file.", exception);
+      throw new FmxImporterException("Failed to extract data from FMX file.", exception);
     }
   }
 
@@ -219,7 +219,7 @@ public class FmxService implements TransformationService {
       Templates fmxToHtml = xmlUtilService.getTemplates("xml/fmxToHtml.xslt");
       return fmxToHtml.newTransformer();
     } catch (TransformerConfigurationException e) {
-      throw new FmxTransformationException("Failed to initialise XSLT transformer.", e);
+      throw new FmxImporterException("Failed to initialise XSLT transformer.", e);
     }
   }
 
@@ -231,7 +231,7 @@ public class FmxService implements TransformationService {
       factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
       return factory.newDocumentBuilder();
     } catch (ParserConfigurationException e) {
-      throw new FmxTransformationException("Failed to initialise document builder.", e);
+      throw new FmxImporterException("Failed to initialise document builder.", e);
     }
   }
 
@@ -243,7 +243,7 @@ public class FmxService implements TransformationService {
       doc.getDocumentElement().normalize();
       return doc;
     } catch (SAXException | IOException e) {
-      throw new FmxTransformationException("Failed to parse FMX file content.", e);
+      throw new FmxImporterException("Failed to parse FMX file content.", e);
     }
   }
 

@@ -26,7 +26,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLa
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -149,7 +149,7 @@ class LegalPeriodicalEditionIntegrationTest {
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
-  @MockitoBean private FmxService fmxService;
+  @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private FeatureToggleService featureToggleService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;

@@ -23,7 +23,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -117,7 +117,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private FmxService fmxService;
+  @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private FeatureToggleService featureToggleService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;

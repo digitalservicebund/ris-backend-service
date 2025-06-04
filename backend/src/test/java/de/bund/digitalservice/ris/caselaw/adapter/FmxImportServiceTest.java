@@ -15,9 +15,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.HttpEurlexRetrievalService;
-import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -59,7 +59,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @Import({
-  FmxService.class,
+  FmxImportService.class,
   DocumentationUnitRepository.class,
   CourtRepository.class,
   DocumentTypeRepository.class,
@@ -69,9 +69,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
   HttpEurlexRetrievalService.class,
   XmlUtilService.class
 })
-class FmxServiceTest {
+class FmxImportServiceTest {
 
-  @Autowired private FmxService service;
+  @Autowired private FmxImportService service;
 
   @MockitoBean DocumentationUnitRepository documentationUnitRepository;
   @MockitoBean CourtRepository courtRepository;
@@ -456,7 +456,7 @@ class FmxServiceTest {
         .requestSingleEurlexDocument(
             "https://publications.europa.eu/resource/celex/" + celexNumber);
 
-    assertThatExceptionOfType(FmxTransformationException.class)
+    assertThatExceptionOfType(FmxImporterException.class)
         .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
         .withMessageContaining("FMX file has no content.");
   }
@@ -489,7 +489,7 @@ class FmxServiceTest {
     when(databaseDocumentationUnitRepository.findById(id))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    assertThatExceptionOfType(FmxTransformationException.class)
+    assertThatExceptionOfType(FmxImporterException.class)
         .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
         .withMessageContaining("Failed to parse FMX file content.");
   }
@@ -514,7 +514,7 @@ class FmxServiceTest {
         .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
     when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.empty());
 
-    assertThatExceptionOfType(FmxTransformationException.class)
+    assertThatExceptionOfType(FmxImporterException.class)
         .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
         .withMessageContaining(
             "Could not find matching Eurlex Result for Celex Number " + celexNumber);

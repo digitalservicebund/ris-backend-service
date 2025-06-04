@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 
-import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -67,7 +67,7 @@ public class HttpEurlexRetrievalService implements EurlexRetrievalService {
         }
       }
     } catch (IOException | InterruptedException | URISyntaxException ex) {
-      throw new FmxTransformationException("Downloading FMX file from Eurlex Database failed.", ex);
+      throw new FmxImporterException("Downloading FMX file from Eurlex Database failed.", ex);
     }
 
     if (fmxFileContent != null && !fmxFileContent.isBlank()) {
