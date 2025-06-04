@@ -173,11 +173,13 @@ const emptyText = computed(() =>
             pcRowCheckbox: {
               input: {
                 style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
+                onClick: () => (selectionErrorMessage = undefined),
               },
             },
             pcHeaderCheckbox: {
               input: {
                 style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
+                onClick: () => (selectionErrorMessage = undefined),
               },
             },
           }"

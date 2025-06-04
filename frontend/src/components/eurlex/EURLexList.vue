@@ -146,11 +146,13 @@ function selectRow() {
             pcRowCheckbox: {
               input: {
                 style: `${noDecisionSelected || noDocumentationOfficeSelected ? 'border-color: var(--color-red-800);' : ''}`,
+                onClick: () => (noDecisionSelected = false),
               },
             },
             pcHeaderCheckbox: {
               input: {
                 style: `${noDecisionSelected || noDocumentationOfficeSelected ? 'border-color: var(--color-red-800);' : ''}`,
+                onClick: () => (noDecisionSelected = false),
               },
             },
           }"
