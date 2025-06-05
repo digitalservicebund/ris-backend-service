@@ -3,7 +3,7 @@ import { useHead } from "@unhead/vue"
 import { storeToRefs } from "pinia"
 import { onBeforeUnmount, onMounted, Ref, ref } from "vue"
 import { useRoute } from "vue-router"
-import DocumentInfoPanel from "@/components/DocumentInfoPanel.vue"
+import DocumentableInfoPanel from "@/components/DocumentableInfoPanel.vue"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
@@ -186,9 +186,9 @@ onMounted(async () => {
       </SideToggle>
     </div>
     <div v-if="documentUnit" class="flex w-full min-w-0 flex-col bg-gray-100">
-      <DocumentInfoPanel
+      <DocumentableInfoPanel
         v-if="documentUnit && !route.path.includes('preview')"
-        :document="documentUnit"
+        :document="documentUnit!"
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer
@@ -209,7 +209,7 @@ onMounted(async () => {
               )
             "
             v-bind="{ jumpToMatch }"
-            :document-unit="documentUnit"
+            :document="documentUnit"
           ></ExtraContentSidePanel>
           <router-view
             v-bind="{ registerTextEditorRef }"

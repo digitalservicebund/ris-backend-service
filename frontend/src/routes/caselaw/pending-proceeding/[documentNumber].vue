@@ -3,7 +3,7 @@ import { useHead } from "@unhead/vue"
 import { storeToRefs } from "pinia"
 import { onBeforeUnmount, onMounted, Ref, ref } from "vue"
 import { useRoute } from "vue-router"
-import DocumentInfoPanel from "@/components/DocumentInfoPanel.vue"
+import DocumentableInfoPanel from "@/components/DocumentableInfoPanel.vue"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
@@ -144,7 +144,7 @@ onMounted(async () => {
       v-if="pendingProceeding"
       class="flex w-full min-w-0 flex-col bg-gray-100"
     >
-      <DocumentInfoPanel
+      <DocumentableInfoPanel
         v-if="pendingProceeding && !route.path.includes('preview')"
         :document="pendingProceeding"
       />
@@ -160,7 +160,7 @@ onMounted(async () => {
         >
           <ExtraContentSidePanel
             v-if="pendingProceeding && !route.path.includes('preview')"
-            :document-unit="pendingProceeding"
+            :document="pendingProceeding!"
             side-panel-mode="preview"
           ></ExtraContentSidePanel>
           <router-view v-bind="{ registerTextEditorRef }"> </router-view>

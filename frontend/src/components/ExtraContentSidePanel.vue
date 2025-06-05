@@ -9,6 +9,7 @@ import ExtraContentExtraContentSidePanelMenu from "@/components/ExtraContentSide
 import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
+import { Documentable } from "@/components/input/types"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
@@ -21,7 +22,7 @@ import { SelectablePanelContent } from "@/types/panelContentMode"
 import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
-  documentUnit?: DocumentUnit | PendingProceeding
+  document: Documentable
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   sidePanelMode?: SelectablePanelContent
@@ -40,20 +41,18 @@ const route = useRoute()
 const textCheckAll = useFeatureToggle("neuris.text-side-panel")
 
 const hasNote = computed(() => {
-  const isDocumentUnit = props.documentUnit instanceof DocumentUnit
+  const isDocumentUnit = props.document instanceof DocumentUnit
   return (
-    isDocumentUnit &&
-    !!props.documentUnit!.note &&
-    props.documentUnit!.note.length > 0
+    isDocumentUnit && !!props.document!.note && props.document!.note.length > 0
   )
 })
 
 const hasAttachments = computed(() => {
-  const isDocumentUnit = props.documentUnit instanceof DocumentUnit
+  const isDocumentUnit = props.document instanceof DocumentUnit
   return (
     isDocumentUnit &&
-    !!props.documentUnit!.attachments &&
-    props.documentUnit!.attachments.length > 0
+    !!props.document!.attachments &&
+    props.document!.attachments.length > 0
   )
 })
 
@@ -96,13 +95,13 @@ function togglePanel(expand?: boolean): boolean {
 }
 
 function setDefaultState() {
-  const isDocumentUnit = props.documentUnit instanceof DocumentUnit
+  const isDocumentUnit = props.document instanceof DocumentUnit
   if (props.sidePanelMode) {
     store.setSidePanelMode(props.sidePanelMode)
   } else if (
     isDocumentUnit &&
-    !props.documentUnit!.note &&
-    props.documentUnit!.hasAttachments
+    !props.document!.note &&
+    props.document!.hasAttachments
   ) {
     selectAttachments()
   } else {
@@ -147,7 +146,7 @@ onMounted(() => {
     >
       <ExtraContentExtraContentSidePanelMenu
         :current-attachment-index="currentAttachmentIndex"
-        :document-unit="props.documentUnit"
+        :document="props.document"
         :hide-panel-mode-bar="props.hidePanelModeBar"
         :panel-mode="panelMode"
         :show-edit-button="props.showEditButton"
@@ -156,14 +155,12 @@ onMounted(() => {
       />
       <div class="m-24">
         <div
-          v-if="
-            panelMode === 'note' && props.documentUnit instanceof DocumentUnit
-          "
+          v-if="panelMode === 'note' && props.document instanceof DocumentUnit"
         >
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
-              v-model="props.documentUnit!.note"
+              v-model="props.document!.note"
               aria-label="Notiz Eingabefeld"
               autosize
               class="w-full"
@@ -174,22 +171,18 @@ onMounted(() => {
         <div
           v-else-if="
             panelMode === 'attachments' &&
-            props.documentUnit instanceof DocumentUnit
+            props.document instanceof DocumentUnit
           "
         >
           <AttachmentView
             v-if="
-              props.documentUnit!.uuid &&
-              props.documentUnit!.attachments &&
-              props.documentUnit!.attachments[currentAttachmentIndex]?.format
+              props.document.uuid &&
+              props.document.attachments &&
+              props.document.attachments[currentAttachmentIndex]?.format
             "
-            :document-unit-uuid="props.documentUnit!.uuid"
-            :format="
-              props.documentUnit!.attachments[currentAttachmentIndex].format
-            "
-            :s3-path="
-              props.documentUnit!.attachments[currentAttachmentIndex].s3path
-            "
+            :document-unit-uuid="props.document.uuid"
+            :format="props.document.attachments[currentAttachmentIndex].format"
+            :s3-path="props.document.attachments[currentAttachmentIndex].s3path"
           />
           <div v-else class="ris-label1-regular">
             Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.
@@ -201,14 +194,14 @@ onMounted(() => {
           class="flex max-h-[70vh] overflow-auto"
         >
           <DocumentUnitPreview
-            v-if="props.documentUnit instanceof DocumentUnit"
-            :document-unit="props.documentUnit!"
+            v-if="props.document instanceof DocumentUnit"
+            :document-unit="props.document"
             layout="narrow"
           />
           <PendingProceedingPreview
-            v-if="props.documentUnit instanceof PendingProceeding"
-            :document-number="props.documentUnit!.documentNumber"
-            :document-unit="props.documentUnit!"
+            v-if="props.document instanceof PendingProceeding"
+            :document-number="props.document.documentNumber"
+            :document-unit="props.document"
             layout="narrow"
           />
         </div>
@@ -216,7 +209,7 @@ onMounted(() => {
         <CategoryImport
           v-else-if="
             panelMode === 'category-import' &&
-            props.documentUnit instanceof DocumentUnit
+            props.document instanceof DocumentUnit
           "
           :document-number="importDocumentNumber"
         />
@@ -225,7 +218,7 @@ onMounted(() => {
           v-else-if="
             panelMode === 'text-check' &&
             textCheckAll &&
-            props.documentUnit instanceof DocumentUnit
+            props.document instanceof DocumentUnit
           "
           v-bind="{ jumpToMatch }"
         />

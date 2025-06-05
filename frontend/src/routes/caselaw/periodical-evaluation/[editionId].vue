@@ -152,7 +152,7 @@ onMounted(async () => {
         <router-view class="flex-1" />
         <ExtraContentSidePanel
           v-if="showSidePanel"
-          :document-unit="documentUnit"
+          :document="documentUnit!"
           hide-panel-mode-bar
           :icon="IconClear"
           show-edit-button
