@@ -7,13 +7,13 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import YearInput from "@/components/input/YearInput.vue"
-import { useInjectCourtType } from "@/composables/useCourtType"
 import { useValidationStore } from "@/composables/useValidationStore"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import LegalForce from "@/domain/legalForce"
 import SingleNorm, { SingleNormValidationInfo } from "@/domain/singleNorm"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconClear from "~icons/material-symbols/close-small"
 
 const props = defineProps<{
@@ -28,12 +28,11 @@ const emit = defineEmits<{
   "update:validationError": [value?: ValidationError, field?: string]
 }>()
 
+const store = useDocumentUnitStore()
 const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
 const legalForceValidationStore =
   useValidationStore<(typeof LegalForce.fields)[number]>()
 const singleNormInput = ref<InstanceType<typeof InputText> | null>(null)
-
-const courtTypeRef = useInjectCourtType()
 
 const singleNorm = computed({
   get: () => {
@@ -105,7 +104,9 @@ const legalForceRegion = computed({
 })
 
 const isCourtWithLegalForce = computed(() => {
-  return constitutionalCourtTypes.items.includes(courtTypeRef.value)
+  return constitutionalCourtTypes.items.includes(
+    store.documentUnit?.coreData.court?.type ?? "",
+  )
 })
 
 /**

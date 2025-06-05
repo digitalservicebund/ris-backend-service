@@ -8,7 +8,6 @@ import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategor
 import FlexItem from "@/components/FlexItem.vue"
 
 import PendingProceedingTexts from "@/components/texts/PendingProceedingTexts.vue"
-import { useProvideCourtType } from "@/composables/useCourtType"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
 import { usePendingProceedingStore } from "@/stores/pendingProceedingStore"
@@ -41,8 +40,6 @@ watch(
   },
   { immediate: true },
 )
-
-useProvideCourtType(courtTypeRef)
 
 const isInternalUser = useInternalUser()
 </script>
