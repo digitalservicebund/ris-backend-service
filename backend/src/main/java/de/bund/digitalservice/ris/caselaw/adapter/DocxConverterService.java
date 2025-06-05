@@ -198,7 +198,9 @@ public class DocxConverterService {
     List<UnhandledElement> unhandledElements = new ArrayList<>();
 
     converter.setStyles(readStyles(mlPackage));
-    converter.setImages(readImages(mlPackage));
+    var images = readImages(mlPackage);
+    // TODO process images: save to DB with bytes and path
+    converter.setImages(images);
     converter.setFooters(readFooters(mlPackage, converter, unhandledElements));
     converter.setListNumberingDefinitions(readListNumberingDefinitions(mlPackage));
 
@@ -439,28 +441,38 @@ public class DocxConverterService {
                         relationship ->
                             images.put(
                                 relationship.getId(),
-                                new DocxImagePart(jpegPart.getContentType(), jpegPart.getBytes())));
+                                new DocxImagePart(
+                                    jpegPart.getContentType(),
+                                    jpegPart.getBytes(),
+                                    jpegPart.getPartName().getName())));
               } else if (part instanceof MetafileEmfPart emfPart) {
                 part.getSourceRelationships()
                     .forEach(
                         relationship ->
                             images.put(
                                 relationship.getId(),
-                                new DocxImagePart(emfPart.getContentType(), emfPart.getBytes())));
+                                new DocxImagePart(
+                                    emfPart.getContentType(),
+                                    emfPart.getBytes(),
+                                    emfPart.getPartName().getName())));
               } else if (part instanceof ImagePngPart pngPart) {
                 part.getSourceRelationships()
                     .forEach(
                         relationship ->
                             images.put(
                                 relationship.getId(),
-                                new DocxImagePart(pngPart.getContentType(), pngPart.getBytes())));
+                                new DocxImagePart(
+                                    pngPart.getContentType(),
+                                    pngPart.getBytes(),
+                                    pngPart.getPartName().getName())));
               } else if (part instanceof BinaryPartAbstractImage imagePart) {
                 part.getSourceRelationships()
                     .forEach(
                         relationship ->
                             images.put(
                                 relationship.getId(),
-                                new DocxImagePart("image/unknown", new byte[] {})));
+                                new DocxImagePart(
+                                    "image/unknown", new byte[] {}, part.getPartName().getName())));
                 log.warn("unknown image file format: " + imagePart.getClass().getName());
               }
             });
