@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import InputSelect from "primevue/select"
 import { computed, toRefs, watch, ref, onMounted, onBeforeUnmount } from "vue"
@@ -8,7 +9,7 @@ import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import ChipsYearInput from "@/components/input/ChipsYearInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
-import InputField from "@/components/input/InputField.vue"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -247,7 +248,26 @@ onBeforeUnmount(() => {
         />
       </InputField>
 
-      <InputField id="documentType" class="flex-col" label="Dokumenttyp *">
+      <InputField
+        v-if="isPendingProceeding"
+        id="resolutionDate"
+        v-slot="slotProps"
+        label="Erledigunsmitteilung"
+      >
+        <DateInput
+          id="resolutionDate"
+          aria-label="Erledigungsmitteilung"
+          :has-error="slotProps.hasError"
+          @update:validation-error="slotProps.updateValidationError"
+        ></DateInput>
+      </InputField>
+
+      <InputField
+        v-if="!isPendingProceeding"
+        id="documentType"
+        class="flex-col"
+        label="Dokumenttyp *"
+      >
         <ComboboxInput
           id="documentType"
           v-model="modelValue.documentType"
@@ -257,7 +277,7 @@ onBeforeUnmount(() => {
       </InputField>
     </div>
 
-    <div :class="layoutClass">
+    <div v-if="!isPendingProceeding" :class="layoutClass">
       <NestedComponent
         aria-label="Abweichender ECLI"
         class="w-full"
@@ -313,7 +333,7 @@ onBeforeUnmount(() => {
       </NestedComponent>
     </div>
 
-    <div :class="layoutClass">
+    <div v-if="!isPendingProceeding" :class="layoutClass">
       <InputField id="legalEffect" v-slot="{ id }" label="Rechtskraft *">
         <InputSelect
           :id="id"
@@ -344,7 +364,7 @@ onBeforeUnmount(() => {
         ></ChipsYearInput>
       </InputField>
     </div>
-    <div :class="layoutClass">
+    <div v-if="!isPendingProceeding" :class="layoutClass">
       <InputField
         id="source"
         v-slot="slotProps"
@@ -392,8 +412,27 @@ onBeforeUnmount(() => {
         />
       </InputField>
     </div>
+    <InputField
+      v-if="isPendingProceeding"
+      id="isResolved"
+      v-slot="{ id }"
+      label="Erledigt"
+      label-class="ris-label1-regular"
+      :label-position="LabelPosition.RIGHT"
+    >
+      <Checkbox
+        aria-label="Erledigt"
+        binary
+        data-testid="is-resolved"
+        :input-id="id"
+        size="large"
+      />
+    </InputField>
 
-    <div v-if="modelValue.court?.label === 'BGH'" class="flex flex-row gap-24">
+    <div
+      v-if="modelValue.court?.label === 'BGH' && !isPendingProceeding"
+      class="flex flex-row gap-24"
+    >
       <InputField
         id="leadingDecisionNormReferences"
         label="BGH Nachschlagewerk"
