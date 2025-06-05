@@ -3,54 +3,36 @@ package de.bund.digitalservice.ris.caselaw.domain.docx;
 import java.awt.Dimension;
 
 public class InlineImageElement extends StyledElement implements RunElement {
+  private String path;
   private String contentType;
-  private String base64Representation;
   private String alternateText;
   private Dimension size;
 
-  public String getContentType() {
-    return contentType;
-  }
-
   public void setContentType(String contentType) {
     this.contentType = contentType;
-  }
-
-  public String getBase64Representation() {
-    return base64Representation;
-  }
-
-  public void setBase64Representation(String base64Representation) {
-    this.base64Representation = base64Representation;
-  }
-
-  public String getAlternateText() {
-    return alternateText;
   }
 
   public void setAlternateText(String alternateText) {
     this.alternateText = alternateText;
   }
 
-  public Dimension getSize() {
-    return size;
-  }
-
   public void setSize(Dimension size) {
     this.size = size;
   }
 
+  public void setPath(String path) {
+    this.path = path;
+  }
+
   @Override
   public String toHtmlString() {
-    if (contentType == null || base64Representation == null) {
+    if (contentType == null || path == null) {
       return "<span style=\"color: #FF0000;\">no image information</span>";
     }
 
     String html =
-        "<img src=\"data:"
-            + contentType
-            + ";base64, "
-            + base64Representation
+        "<img src=\""
+            + path
             + "\""
             + (alternateText != null ? " alt=\"" + alternateText + "\"" : "");
 

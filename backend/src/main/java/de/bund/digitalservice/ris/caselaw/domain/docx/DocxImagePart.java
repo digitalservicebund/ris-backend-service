@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain.docx;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record DocxImagePart(String contentType, byte[] bytes) {
+public record DocxImagePart(String contentType, byte[] bytes, String path) {
   @Override
   public boolean equals(Object o) {
     if (this == o) {
