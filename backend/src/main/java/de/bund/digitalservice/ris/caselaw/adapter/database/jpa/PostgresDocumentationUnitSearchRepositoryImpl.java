@@ -360,6 +360,14 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       Predicate matchRight =
           getDuplicateRelationPredicate(cq, cb, root, DuplicateRelationDTO_.documentationUnit2);
       predicates.add(cb.or(matchLeft, matchRight));
+      if (!parameters.myDocOfficeOnly()) {
+        // If not already explicitly filtered by user, we will add it.
+        Predicate myDocOfficePredicate =
+            cb.equal(
+                root.get(DocumentationUnitDTO_.documentationOffice),
+                parameters.documentationOfficeDTO());
+        predicates.add(myDocOfficePredicate);
+      }
     }
     return predicates;
   }

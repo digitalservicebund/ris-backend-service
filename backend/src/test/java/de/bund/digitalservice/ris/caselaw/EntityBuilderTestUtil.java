@@ -169,15 +169,15 @@ public class EntityBuilderTestUtil {
     // FileNumbers need back reference to docUnit -> needs to be saved first without them
     var fileNumbers = dtoBeforeSave.getFileNumbers();
     dtoBeforeSave.setFileNumbers(null);
-    var devatingFileNumbers = dtoBeforeSave.getDeviatingFileNumbers();
+    var deviatingFileNumbers = dtoBeforeSave.getDeviatingFileNumbers();
     dtoBeforeSave.setDeviatingFileNumbers(null);
 
     DecisionDTO dto = repository.save(dtoBeforeSave);
 
     fileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
-    devatingFileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
+    deviatingFileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
     dto.setFileNumbers(fileNumbers);
-    dto.setDeviatingFileNumbers(devatingFileNumbers);
+    dto.setDeviatingFileNumbers(deviatingFileNumbers);
 
     return repository.save(
         dto.toBuilder()
