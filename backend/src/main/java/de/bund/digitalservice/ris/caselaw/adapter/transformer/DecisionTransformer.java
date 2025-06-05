@@ -528,6 +528,7 @@ public class DecisionTransformer extends DocumentableTransformer {
         .attachments(buildOriginalFileDocuments(decisionDTO))
         .ensuingDecisions(buildEnsuingDecisions(decisionDTO))
         .status(getStatus(decisionDTO))
+        .inboxStatus(decisionDTO.getInboxStatus())
         .build();
   }
 
