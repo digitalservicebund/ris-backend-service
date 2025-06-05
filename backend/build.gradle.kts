@@ -195,11 +195,11 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.3")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.33") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.36") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.32.jar"))
+//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.36.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
