@@ -85,3 +85,18 @@ where juris_id < 0;
 delete
 from incremental_migration.ignored_text_check_word
 where word LIKE 'etoe%';
+
+-- EURLEX Decisions
+delete
+from incremental_migration.attachment using
+    incremental_migration.documentation_unit d
+where d.celex_number = '62023CJ0697' or d.celex_number = '62023TJ1088';
+
+delete
+from incremental_migration.decision using
+    incremental_migration.documentation_unit d
+where d.celex_number = '62023CJ0697' or d.celex_number = '62023TJ1088';
+
+delete
+from incremental_migration.documentation_unit
+where celex_number = '62023CJ0697' or celex_number = '62023TJ1088';

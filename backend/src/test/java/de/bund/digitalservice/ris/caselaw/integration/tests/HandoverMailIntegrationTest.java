@@ -16,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.HandoverMailService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
@@ -50,6 +49,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresIgnoredTe
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.RelatedDocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -191,7 +191,7 @@ class HandoverMailIntegrationTest {
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private FeatureToggleService featureToggleService;
-  @MockitoBean private FmxService fmxService;
+  @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;

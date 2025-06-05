@@ -11,4 +11,8 @@ public interface DatabaseEurLexResultRepository extends JpaRepository<EurLexResu
   Optional<EurLexResultDTO> findTopByOrderByCreatedAtDesc();
 
   List<EurLexResultDTO> findAllByCelexIn(List<String> celexNumbers);
+
+  List<EurLexResultDTO> deleteAllByCelexIn(List<String> celexNumbers);
+
+  Optional<EurLexResultDTO> findByCelex(String celexNumber);
 }

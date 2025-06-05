@@ -22,5 +22,9 @@ public interface EurLexResultRepository {
 
   List<EurLexResultDTO> findAllByCelexNumbers(List<String> celexNumbers);
 
+  List<EurLexResultDTO> deleteAllByCelexNumbers(List<String> celexNumbers);
+
+  Optional<EurLexResultDTO> findByCelexNumber(String celexNumbers);
+
   void saveAll(List<EurLexResultDTO> transformedList);
 }

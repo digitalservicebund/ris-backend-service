@@ -7,6 +7,8 @@ import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.SearchResult.SearchResultBuilder;
 import jakarta.transaction.TransactionalException;
 import java.io.StringWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
@@ -48,14 +50,12 @@ public class EurLexSearchResultTransformer {
       return null;
     }
 
-    String fileNumber = parseFileNumberFromTitle(eurLexResultDTO.getFileNumber());
-
     SearchResultBuilder builder =
         SearchResult.builder()
             .celex(eurLexResultDTO.getCelex())
             .ecli(eurLexResultDTO.getEcli())
             .date(eurLexResultDTO.getDate())
-            .fileNumber(fileNumber)
+            .fileNumber(eurLexResultDTO.getFileNumber())
             .fileNumber(eurLexResultDTO.getFileNumber())
             .htmlLink(eurLexResultDTO.getHtmlLink())
             .uri(eurLexResultDTO.getUri());
@@ -231,7 +231,10 @@ public class EurLexSearchResultTransformer {
                   .compile("./content//MANIFESTATION/SAMEAS/URI/VALUE")
                   .evaluate(result, XPathConstants.NODESET);
       for (int i = 0; i < manifestations.getLength(); i++) {
-        if (manifestations.item(i).getTextContent().contains("/celex/" + celex + ".DEU.fmx4")) {
+        if (manifestations
+            .item(i)
+            .getTextContent()
+            .contains("/celex/" + URLEncoder.encode(celex, StandardCharsets.UTF_8) + ".DEU.fmx4")) {
           builder.uri(manifestations.item(i).getTextContent());
         }
       }

@@ -1,10 +1,12 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 
+import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -23,8 +25,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
 
 @Service
 @Slf4j
-public class FmxService implements TransformationService {
+public class FmxImportService implements TransformationService {
 
   public static final String FILE_NUMBER_XPATH = "//REF.CASE/NO.CASE";
   public static final String ECLI_XPATH = "//NO.ECLI/@ECLI";
@@ -83,6 +83,7 @@ public class FmxService implements TransformationService {
   private final FmxRepository fmxRepository;
   private final AttachmentRepository attachmentRepository;
   private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
+  private final EurLexResultRepository eurLexResultRepository;
   private final EurlexRetrievalService eurlexRetrievalService;
   private final XmlUtilService xmlUtilService;
 
@@ -90,13 +91,14 @@ public class FmxService implements TransformationService {
 
   private final XPath xPath;
 
-  public FmxService(
+  public FmxImportService(
       DocumentationUnitRepository documentationUnitRepository,
       CourtRepository courtRepository,
       DocumentTypeRepository documentTypeRepository,
       FmxRepository fmxRepository,
       AttachmentRepository attachmentRepository,
       DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository,
+      EurLexResultRepository eurLexResultRepository,
       EurlexRetrievalService eurlexRetrievalService,
       XmlUtilService xmlUtilService) {
     this.documentationUnitRepository = documentationUnitRepository;
@@ -105,6 +107,7 @@ public class FmxService implements TransformationService {
     this.fmxRepository = fmxRepository;
     this.attachmentRepository = attachmentRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
+    this.eurLexResultRepository = eurLexResultRepository;
     this.eurlexRetrievalService = eurlexRetrievalService;
     this.xmlUtilService = xmlUtilService;
 
@@ -113,16 +116,20 @@ public class FmxService implements TransformationService {
 
   public void getDataFromEurlex(
       String celexNumber, DocumentationUnit documentationUnit, User user) {
-    String sourceUrl =
-        "https://publications.europa.eu/resource/celex/"
-            + URLEncoder.encode(celexNumber, StandardCharsets.UTF_8);
-    String fmxFileContent = eurlexRetrievalService.getDocumentFromEurlex(sourceUrl);
+    Optional<EurLexResultDTO> eurLexResultDTO =
+        eurLexResultRepository.findByCelexNumber(celexNumber);
+    if (eurLexResultDTO.isEmpty()) {
+      throw new FmxImporterException(
+          "Could not find matching Eurlex Result for Celex Number " + celexNumber);
+    }
+    String sourceUrl = eurLexResultDTO.get().getUri();
+    String fmxFileContent = eurlexRetrievalService.requestSingleEurlexDocument(sourceUrl);
 
     if (Strings.isNotBlank(fmxFileContent)) {
       attachFmxToDocumentationUnit(documentationUnit.uuid(), fmxFileContent, sourceUrl);
       extractMetaDataFromFmx(fmxFileContent, documentationUnit, user);
     } else {
-      throw new FmxTransformationException("FMX file has no content.");
+      throw new FmxImporterException("FMX file has no content.");
     }
   }
 
@@ -203,7 +210,7 @@ public class FmxService implements TransformationService {
           "EU-Entscheidung angelegt für "
               + documentationUnit.coreData().documentationOffice().abbreviation());
     } catch (XPathExpressionException exception) {
-      throw new FmxTransformationException("Failed to extract data from FMX file.", exception);
+      throw new FmxImporterException("Failed to extract data from FMX file.", exception);
     }
   }
 
@@ -212,7 +219,7 @@ public class FmxService implements TransformationService {
       Templates fmxToHtml = xmlUtilService.getTemplates("xml/fmxToHtml.xslt");
       return fmxToHtml.newTransformer();
     } catch (TransformerConfigurationException e) {
-      throw new FmxTransformationException("Failed to initialise XSLT transformer.", e);
+      throw new FmxImporterException("Failed to initialise XSLT transformer.", e);
     }
   }
 
@@ -224,7 +231,7 @@ public class FmxService implements TransformationService {
       factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
       return factory.newDocumentBuilder();
     } catch (ParserConfigurationException e) {
-      throw new FmxTransformationException("Failed to initialise document builder.", e);
+      throw new FmxImporterException("Failed to initialise document builder.", e);
     }
   }
 
@@ -236,7 +243,7 @@ public class FmxService implements TransformationService {
       doc.getDocumentElement().normalize();
       return doc;
     } catch (SAXException | IOException e) {
-      throw new FmxTransformationException("Failed to parse FMX file content.", e);
+      throw new FmxImporterException("Failed to parse FMX file content.", e);
     }
   }
 
