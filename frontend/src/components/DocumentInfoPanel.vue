@@ -132,7 +132,7 @@ watchEffect(() => {
       v-if="isRouteWithSaveButton"
       aria-label="Speichern Button"
       data-testid="document-unit-save-button"
-      @click="props.onSave && props.onSave()"
+      @click="props.onSave"
     />
   </div>
 </template>
