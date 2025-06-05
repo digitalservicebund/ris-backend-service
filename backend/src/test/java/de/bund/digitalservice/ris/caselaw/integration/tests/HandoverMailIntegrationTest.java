@@ -71,6 +71,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
@@ -89,6 +90,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -324,6 +326,7 @@ class HandoverMailIntegrationTest {
             DecisionDTO.builder()
                 .documentationOffice(docOffice)
                 .documentNumber(identifier)
+                .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
                 .headnote("xml")
                 .date(LocalDate.now()));
     UUID entityId = savedDocumentationUnitDTO.getId();
@@ -432,9 +435,14 @@ class HandoverMailIntegrationTest {
         .isEqualTo(expectedHandoverMailDTO);
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
-    var logs = docUnitHistoryLogService.getHistoryLogs(entityId, user);
 
     if (entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)) {
+      var docUnit = repository.findById(entityId).orElseThrow();
+      assertThat(docUnit.getLastPublicationDateTime())
+          .isCloseTo(LocalDateTime.now(), within(5, ChronoUnit.SECONDS));
+      assertThat(docUnit.getInboxStatus()).isNull();
+
+      var logs = docUnitHistoryLogService.getHistoryLogs(entityId, user);
       assertThat(logs).hasSize(1);
       assertThat(logs.getFirst().description()).isEqualTo("Dokeinheit an jDV übergeben");
       assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");

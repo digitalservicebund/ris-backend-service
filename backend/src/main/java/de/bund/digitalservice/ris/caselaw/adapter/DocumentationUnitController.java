@@ -409,7 +409,7 @@ public class DocumentationUnitController {
         log.warn("Failed to send mail for documentation unit {}", uuid);
         return ResponseEntity.unprocessableEntity().body(handoverMail);
       }
-      service.setPublicationDateTime(uuid);
+      service.saveSuccessfulPublication(uuid);
       return ResponseEntity.ok(handoverMail);
     } catch (DocumentationUnitNotExistsException | HandoverException e) {
       log.error("Error handing over documentation unit '{}' as email", uuid, e);

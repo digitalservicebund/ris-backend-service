@@ -108,11 +108,12 @@ public interface DocumentationUnitRepository {
   void unassignProcedures(UUID documentationUnitId);
 
   /**
-   * Save lastPublicationDateTime of a documentation unit
+   * When a documentation unit is successfully published, it leaves the inbox and gets an updated
+   * publication timestamp.
    *
-   * @param uuid the UUID of the documentation unit to save the date for
+   * @param uuid the UUID of the documentation unit to update
    */
-  void saveLastPublicationDateTime(UUID uuid);
+  void saveSuccessfulPublication(UUID uuid);
 
   /**
    * Save the newly assigned documentation office of a documentation unit
