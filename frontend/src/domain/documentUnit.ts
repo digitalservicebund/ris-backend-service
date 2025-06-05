@@ -51,6 +51,11 @@ export type Source = {
   sourceRawValue?: string
 }
 
+export enum InboxType {
+  EXTERNAL_HANDOVER,
+  EU,
+}
+
 export type ContentRelatedIndexing = {
   collectiveAgreements?: string[]
   dismissalTypes?: string[]
