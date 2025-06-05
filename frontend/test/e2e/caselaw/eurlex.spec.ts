@@ -50,7 +50,7 @@ test.describe("eurlex", () => {
         await expect(rowWithCelexNumber2).toContainText("C-538/23") // Aktenzeichen
         await expect(
           rowWithCelexNumber2.getByLabel("Öffne Vorschau"),
-        ).toBeHidden()
+        ).toBeHidden() //this entry does not have an HTML link
 
         const rowWithCelexNumber3 = rows.filter({ hasText: celexNumber3 })
         await expect(rowWithCelexNumber3).toHaveCount(1)
@@ -59,7 +59,6 @@ test.describe("eurlex", () => {
         await expect(rowWithCelexNumber3).toContainText("EuGH") // Gerichtstyp
         await expect(rowWithCelexNumber3).toContainText("-") // Gerichtsort
         await expect(rowWithCelexNumber3).toContainText("06.10.2021") // Datum
-        //    await expect(rowWithCelexNumber3).toContainText("Avis 1/19") // Aktenzeichen
         await expect(
           rowWithCelexNumber3.getByLabel("Öffne Vorschau"),
         ).toBeVisible()
@@ -86,15 +85,16 @@ test.describe("eurlex", () => {
         await expect(page.getByLabel("CELEX-Nummer Suche")).toHaveText("")
       })
 
-      await test.step("Eine Entscheidung kann an eine andere Dok-Stelle zugewiesen werden", async () => {
+      await test.step("Eine Entscheidung kann einer anderen Dok-Stelle zugewiesen werden", async () => {
         const rows = page.locator("tr")
-        const row1 = rows.filter({ hasText: celexNumber1 })
+        const row3 = rows.filter({ hasText: celexNumber3 })
 
         // all eurlex test entries are visible
         await expect(page.getByText(celexNumber1)).toBeVisible()
         await expect(page.getByText(celexNumber2)).toBeVisible()
+        await expect(page.getByText(celexNumber3)).toBeVisible()
 
-        await row1.getByRole("checkbox").click()
+        await row3.getByRole("checkbox").click()
 
         await page.locator("#documentationOfficeSelector").click()
         await page.getByText("BGH").click()
@@ -107,9 +107,9 @@ test.describe("eurlex", () => {
         ).toBeVisible()
 
         // the assigned entry is not visible anymore
-        await expect(page.getByText(celexNumber1)).toBeHidden()
+        await expect(page.getByText(celexNumber3)).toBeHidden()
+        await expect(page.getByText(celexNumber1)).toBeVisible()
         await expect(page.getByText(celexNumber2)).toBeVisible()
-        await expect(page.getByText(celexNumber3)).toBeVisible()
       })
 
       await test.step("Alle verbleibenden Entscheidungen können an meine Dok-Stelle zugewiesen werden", async () => {
@@ -118,6 +118,9 @@ test.describe("eurlex", () => {
         await page.waitForFunction(() => {
           return window.location.href.includes("eur-lex")
         })
+
+        //all remaining entries are visible
+        await expect(page.getByText(celexNumber1)).toBeVisible()
         await expect(page.getByText(celexNumber2)).toBeVisible()
 
         await page
@@ -142,9 +145,9 @@ test.describe("eurlex", () => {
           ),
         ).toBeVisible()
 
-        // the assigned entry is not visible anymore
+        // the assigned entries are not visible anymore
+        await expect(page.getByText(celexNumber1)).toBeHidden()
         await expect(page.getByText(celexNumber2)).toBeHidden()
-        await expect(page.getByText(celexNumber3)).toBeHidden()
 
         await page.getByTestId("eu-tab").click()
 
@@ -156,11 +159,78 @@ test.describe("eurlex", () => {
         await expect(page.getByText("Ergebnisse anzeigen")).toBeEnabled()
 
         await expect(
+          page.getByRole("cell", { name: "C-878/24" }).first(),
+        ).toBeVisible()
+
+        await expect(
           page.getByRole("cell", { name: "C-538/23" }).first(),
         ).toBeVisible()
       })
 
-      await cleanUpEurlexDecisions(page)
+      await test.step("Stammdaten und Textrubriken wurden automatisch befüllt", async () => {
+        //look at judgment and check all data is there
+        const pagePromise = page.context().waitForEvent("page")
+        const rows = page.locator("tr")
+        const row = rows.filter({ hasText: "C-878/24" }).first()
+        const previewButton = row.getByRole("button", {
+          name: "Dokumentationseinheit ansehen",
+        })
+
+        await previewButton.click()
+
+        const newTab = await pagePromise
+
+        await expect(newTab).toHaveURL(
+          /\/caselaw\/documentunit\/[A-Za-z0-9]{13}\/preview$/,
+        )
+
+        await expect(newTab.getByText("GerichtEuGH")).toBeVisible()
+        await expect(newTab.getByText("AktenzeichenC-878/24")).toBeVisible()
+        await expect(
+          newTab.getByText("Entscheidungsdatum09.04.2025"),
+        ).toBeVisible()
+        await expect(newTab.getByText("DokumenttypBeschluss")).toBeVisible()
+        await expect(newTab.getByText("ECLIECLI:EU:C:2025:256")).toBeVisible()
+        await expect(newTab.getByText("RechtskraftKeine Angabe")).toBeVisible()
+        await expect(newTab.getByText("QuelleL")).toBeVisible()
+        await expect(
+          newTab.getByText("GerichtsbarkeitBesondere Gerichtsbarkeit"),
+        ).toBeVisible()
+        await expect(newTab.getByText("RegionEU")).toBeVisible()
+        await expect(
+          newTab.getByText("OrientierungssatzCELEX Nummer: 62024CO0878"),
+        ).toBeVisible()
+        await expect(
+          newTab.getByText("TenorAus diesen Gründen hat"),
+        ).toBeVisible()
+        await expect(newTab.getByText("GründeBeschluss")).toBeVisible()
+      })
+
+      await test.step("Originaltext wird im Seitenpanel angezeigt", async () => {
+        const pagePromise = page.context().waitForEvent("page")
+        const rows = page.locator("tr")
+        const row = rows.filter({ hasText: "C-538/23" }).first()
+        const editButton = row.getByRole("button", {
+          name: "Dokumentationseinheit bearbeiten",
+        })
+
+        await editButton.click()
+
+        const newTab = await pagePromise
+
+        await expect(newTab).toHaveURL(
+          /\/caselaw\/documentunit\/[A-Za-z0-9]{13}\/categories$/,
+        )
+
+        await expect(newTab.locator("#attachment-view")).toBeVisible()
+        await expect(
+          newTab.getByText("Urteil des Gerichtshofs (Zweite Kammer)"),
+        ).toBeVisible()
+      })
     },
   )
+
+  test.afterEach("Clean up test data", async ({ page }) => {
+    await cleanUpEurlexDecisions(page)
+  })
 })
