@@ -464,7 +464,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         Optional.ofNullable(searchInput.status()).map(Status::withError).orElse(false);
     return SearchParameters.builder()
         .courtType(Optional.ofNullable(searchInput.courtType()))
-        .courtLocation(Optional.ofNullable(searchInput.courtType()))
+        .courtLocation(Optional.ofNullable(searchInput.courtLocation()))
         .documentNumber(Optional.ofNullable(searchInput.documentNumber()))
         .fileNumber(Optional.ofNullable(searchInput.fileNumber()))
         .decisionDate(Optional.ofNullable(searchInput.decisionDate()))
