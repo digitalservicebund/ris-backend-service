@@ -1,0 +1,10 @@
+{
+  "items": [
+    { "label": "Steuerpflichtiger", "value": "Steuerpflichtiger" },
+    { "label": "Verwaltung", "value": "Verwaltung" },
+    {
+      "label": "Steuerpflichtiger und Behörde",
+      "value": "Steuerpflichtiger und Behörde"
+    }
+  ]
+}
