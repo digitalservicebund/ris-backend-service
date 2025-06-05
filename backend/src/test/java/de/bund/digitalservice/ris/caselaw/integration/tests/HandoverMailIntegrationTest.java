@@ -16,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.HandoverMailService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
@@ -50,6 +49,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresIgnoredTe
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.RelatedDocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -71,6 +71,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
@@ -89,6 +90,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -191,7 +193,7 @@ class HandoverMailIntegrationTest {
   @MockitoBean private UserGroupService userGroupService;
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private FeatureToggleService featureToggleService;
-  @MockitoBean private FmxService fmxService;
+  @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
@@ -324,6 +326,7 @@ class HandoverMailIntegrationTest {
             DecisionDTO.builder()
                 .documentationOffice(docOffice)
                 .documentNumber(identifier)
+                .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
                 .headnote("xml")
                 .date(LocalDate.now()));
     UUID entityId = savedDocumentationUnitDTO.getId();
@@ -432,9 +435,14 @@ class HandoverMailIntegrationTest {
         .isEqualTo(expectedHandoverMailDTO);
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
-    var logs = docUnitHistoryLogService.getHistoryLogs(entityId, user);
 
     if (entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)) {
+      var docUnit = repository.findById(entityId).orElseThrow();
+      assertThat(docUnit.getLastPublicationDateTime())
+          .isCloseTo(LocalDateTime.now(), within(5, ChronoUnit.SECONDS));
+      assertThat(docUnit.getInboxStatus()).isNull();
+
+      var logs = docUnitHistoryLogService.getHistoryLogs(entityId, user);
       assertThat(logs).hasSize(1);
       assertThat(logs.getFirst().description()).isEqualTo("Dokeinheit an jDV übergeben");
       assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");

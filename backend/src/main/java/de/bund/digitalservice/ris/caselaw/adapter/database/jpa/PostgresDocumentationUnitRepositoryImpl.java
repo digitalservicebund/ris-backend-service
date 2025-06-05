@@ -502,7 +502,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void saveLastPublicationDateTime(UUID uuid) {
+  public void saveSuccessfulPublication(UUID uuid) {
     if (uuid == null) {
       return;
     }
@@ -513,6 +513,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
     var documentationUnitDTO = documentationUnitDTOOptional.get();
     documentationUnitDTO.setLastPublicationDateTime(LocalDateTime.now());
+    documentationUnitDTO.setInboxStatus(null);
     repository.save(documentationUnitDTO);
   }
 

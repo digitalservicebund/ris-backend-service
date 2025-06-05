@@ -19,9 +19,9 @@ import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.adapter.FmxService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
@@ -77,7 +77,7 @@ class DocumentationUnitServiceTest {
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean UserService userService;
   @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
-  @MockitoBean private FmxService fmxService;
+  @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
@@ -531,12 +531,12 @@ class DocumentationUnitServiceTest {
   }
 
   @Test
-  void test_setPublicationDateTime_shouldSaveLastPublicationDateTime() {
+  void test_saveSuccessfulPublicationDateTime_shouldSaveLastPublication() {
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    service.setPublicationDateTime(documentationUnit.uuid());
+    service.saveSuccessfulPublication(documentationUnit.uuid());
 
-    verify(repository, times(1)).saveLastPublicationDateTime(documentationUnit.uuid());
+    verify(repository, times(1)).saveSuccessfulPublication(documentationUnit.uuid());
   }
 
   @Test

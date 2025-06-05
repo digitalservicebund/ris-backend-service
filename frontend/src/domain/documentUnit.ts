@@ -51,6 +51,11 @@ export type Source = {
   sourceRawValue?: string
 }
 
+export enum InboxStatus {
+  EXTERNAL_HANDOVER,
+  EU,
+}
+
 export type ContentRelatedIndexing = {
   collectiveAgreements?: string[]
   dismissalTypes?: string[]
@@ -193,6 +198,7 @@ export default class DocumentUnit {
     borderNumbers: [],
     duplicateRelations: [],
   }
+  public inboxStatus?: InboxStatus
 
   static readonly requiredFields = [
     "fileNumbers",

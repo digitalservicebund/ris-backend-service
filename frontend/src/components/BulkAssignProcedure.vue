@@ -24,12 +24,15 @@ const emit = defineEmits<{
 const hasBulkAssignError = ref(false)
 const toast = useToast()
 
-const assignProcedure = async (procedure: Procedure) => {
+const assignProcedure = async (procedure?: Procedure) => {
   hasBulkAssignError.value = false
   if (!areSelectedDocUnitsValid()) {
     return
   }
 
+  if (!procedure) {
+    return
+  }
   const documentationUnitIds =
     props.documentationUnits?.map((docUnit) => docUnit.uuid!) ?? []
   const { error } = await DocumentUnitService.bulkAssignProcedure(

@@ -11,6 +11,7 @@ import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
+import { InboxStatus } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { ResponseError } from "@/services/httpClient"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
@@ -26,6 +27,7 @@ const props = defineProps<{
   pageEntries?: Page<DocumentUnitListEntry>
   error?: ResponseError
   loading?: boolean
+  inboxStatus: InboxStatus
 }>()
 const emit = defineEmits<{
   updatePage: [number]
@@ -87,10 +89,19 @@ watch(
  * Propagates delete event to parent and closes modal again
  */
 function onDelete() {
+  updateSelectionErrors(undefined, [])
   if (selectedDocumentUnitListEntry.value) {
     emit("deleteDocumentationUnit", selectedDocumentUnitListEntry.value)
     showDeleteModal.value = false
   }
+}
+
+/**
+ * Propagates takeover event to parent and resets error messages
+ */
+function onTakeOver(item: DocumentUnitListEntry) {
+  updateSelectionErrors(undefined, [])
+  emit("takeOverDocumentationUnit", item)
 }
 
 const selectedDocumentationUnits = ref<DocumentUnitListEntry[]>([])
@@ -107,6 +118,11 @@ function updateSelectionErrors(
 function reloadList() {
   selectedDocumentationUnits.value = []
   emit("updatePage", 0)
+}
+
+function resetErrorMessages() {
+  selectionErrorMessage.value = undefined
+  selectionErrorDocUnitIds.value = []
 }
 
 watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
@@ -145,6 +161,7 @@ const emptyText = computed(() =>
       :error-message="selectionErrorMessage"
     />
     <Pagination
+      :is-loading="loading"
       navigation-position="bottom"
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
@@ -161,11 +178,13 @@ const emptyText = computed(() =>
             pcRowCheckbox: {
               input: {
                 style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
+                onClick: () => resetErrorMessages(),
               },
             },
             pcHeaderCheckbox: {
               input: {
                 style: `${selectionErrorMessage && selectionErrorDocUnitIds.length === 0 ? 'border-color: var(--color-red-800);' : ''}`,
+                onClick: () => resetErrorMessages(),
               },
             },
           }"
@@ -278,7 +297,7 @@ const emptyText = computed(() =>
             }}
           </template>
         </Column>
-        <Column header="Status">
+        <Column v-if="inboxStatus != InboxStatus.EU" header="Status">
           <template #body="{ data: item }">
             <IconBadge
               v-if="item.status?.publicationStatus"
@@ -303,7 +322,7 @@ const emptyText = computed(() =>
                 :disabled="!item.isEditable"
                 severity="secondary"
                 size="small"
-                @click="emit('takeOverDocumentationUnit', item)"
+                @click="onTakeOver(item)"
               >
                 <template #icon>
                   <IconCheck />

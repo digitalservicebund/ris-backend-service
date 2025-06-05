@@ -2,13 +2,15 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class NoOpPortalPublicationService extends CommonPortalPublicationService {
+public class NoOpPortalPublicationService implements PortalPublicationService {
 
-  public NoOpPortalPublicationService() {
-    super(null, null, null, null, null);
+  @Override
+  public void publishDocumentationUnitWithChangelog(UUID documentationUnitId) {
+    // no-op
   }
 
   @Override

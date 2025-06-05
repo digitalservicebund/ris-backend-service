@@ -391,7 +391,6 @@ test.describe("inbox", () => {
         await expect(row).toContainText("BVerwG") // Gerichtstyp
         await expect(row).toContainText("09.09.1987") // Datum
         await expect(row).toContainText("fileNumber4") // Aktenzeichen
-        await expect(row).toContainText("Veröffentlicht") // Status
       })
 
       await test.step("user can filter eu documentation units", async () => {
