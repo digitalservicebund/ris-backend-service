@@ -1,94 +1,177 @@
 <script lang="ts" setup>
-import { computed } from "vue"
-import { LocationQuery, useRoute } from "vue-router"
+import { useHead } from "@unhead/vue"
+import { storeToRefs } from "pinia"
+import { onBeforeUnmount, onMounted, Ref, ref } from "vue"
+import { useRoute } from "vue-router"
 import DocumentInfoPanel from "@/components/DocumentInfoPanel.vue"
-import DocumentViewer from "@/components/DocumentViewer.vue"
+import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
+import TextEditor from "@/components/input/TextEditor.vue"
+import NavbarSide from "@/components/NavbarSide.vue"
+import ErrorPage from "@/components/PageError.vue"
+import SideToggle from "@/components/SideToggle.vue"
 import { usePendingProceedingMenuItems } from "@/composables/usePendingProceedingMenuItems"
+import useQuery from "@/composables/useQueryFromRoute"
 import PendingProceeding from "@/domain/pendingProceeding"
+import { ResponseError } from "@/services/httpClient"
+import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { usePendingProceedingStore } from "@/stores/pendingProceedingStore"
 
 const props = defineProps<{
   documentNumber: string
 }>()
 
-const store = usePendingProceedingStore()
-const route = useRoute()
-
-const loadPendingProceeding = async (documentNumber: string) => {
-  return await store.loadPendingProceeding(documentNumber)
-}
-
-const getHeading = (doc: PendingProceeding) => doc.documentNumber || ""
-
-const getMenuItems = (documentNumber: string, query: LocationQuery) => {
-  return usePendingProceedingMenuItems(documentNumber, query)
-}
-
-const hasPendingDuplicateWarning = computed(
-  () => false,
-  // Todo
-  //  store.pendingProceeding &&
-  //  (store.pendingProceeding.managementData.duplicateRelations ?? []).some(
-  //      (warning) => warning.status === "PENDING",
-  //  ),
-)
-
-const managementDataRoute = computed(() => {
-  if (!store.pendingProceeding?.documentNumber) return undefined
-  return {
-    name: "caselaw-documentUnit-documentNumber-managementdata",
-    params: { documentNumber: store.pendingProceeding.documentNumber },
-  }
+useHead({
+  title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
 })
 
-const isRouteWithSaveButton = computed(
-  () =>
-    route.path.includes("categories") ||
-    route.path.includes("attachments") ||
-    route.path.includes("references") ||
-    route.path.includes("managementdata"),
+const store = usePendingProceedingStore()
+const extraContentSidePanelStore = useExtraContentSidePanelStore()
+
+const { pendingProceeding } = storeToRefs(store) as {
+  pendingProceeding: Ref<PendingProceeding | undefined>
+}
+const route = useRoute()
+const menuItems = usePendingProceedingMenuItems(
+  props.documentNumber,
+  route.query,
+)
+const { pushQueryToRoute } = useQuery()
+
+const showNavigationPanelRef: Ref<boolean> = ref(
+  route.query.showNavigationPanel !== "false",
 )
 
-const handleDocumentUnitSave = async () => {
-  // Todo
+const responseError = ref<ResponseError>()
+
+function toggleNavigationPanel(expand?: boolean) {
+  showNavigationPanelRef.value =
+    expand === undefined ? !showNavigationPanelRef.value : expand
+  pushQueryToRoute({
+    ...route.query,
+    showNavigationPanel: showNavigationPanelRef.value.toString(),
+  })
 }
+
+async function requestDocumentFromServer() {
+  const response = await store.loadPendingProceeding(props.documentNumber)
+
+  if (!response.data) {
+    responseError.value = response.error
+  }
+}
+
+const textEditorRefs = ref<Record<string, typeof TextEditor | null>>({})
+
+/**
+ * Gets text category as a key and add its text editor ref to the ref list
+ * @param textCategory
+ * @param textEditorComponent
+ */
+const registerTextEditorRef = (
+  textCategory: string,
+  textEditorComponent: typeof TextEditor,
+) => {
+  textEditorRefs.value[textCategory] = textEditorComponent
+}
+
+const handleKeyDown = (event: KeyboardEvent) => {
+  // List of tag names where shortcuts should be disabled
+  const tagName = (event.target as HTMLElement).tagName.toLowerCase()
+
+  // Check if the active element is an input, textarea, or any element with contenteditable
+  if (
+    ["input", "textarea", "select"].includes(tagName) ||
+    (event.target as HTMLElement).isContentEditable
+  ) {
+    if (event.key === "Escape") (event.target as HTMLElement).blur() // Remove focus from the input field
+    return // Do nothing if the user is typing in an input field or editable area
+  }
+
+  switch (event.key) {
+    case "<":
+      event.preventDefault()
+      toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
+      break
+    case "n":
+      event.preventDefault()
+      extraContentSidePanelStore.togglePanel(true)
+      extraContentSidePanelStore.setSidePanelMode("note")
+      break
+    case "v":
+      extraContentSidePanelStore.togglePanel(true)
+      extraContentSidePanelStore.setSidePanelMode("preview")
+      break
+    case "r":
+      extraContentSidePanelStore.togglePanel(true)
+      extraContentSidePanelStore.setSidePanelMode("category-import")
+      break
+    default:
+      break
+  }
+}
+
+onBeforeUnmount(() => {
+  // Remove the event listener when the component is unmounted
+  window.removeEventListener("keydown", handleKeyDown)
+})
+
+onMounted(async () => {
+  window.addEventListener("keydown", handleKeyDown)
+  await requestDocumentFromServer()
+})
 </script>
 
 <template>
-  <DocumentViewer
-    :document-number="props.documentNumber"
-    :get-document-heading="getHeading"
-    :get-menu-items="getMenuItems"
-    :load-document="loadPendingProceeding"
-  >
-    <template
-      #main-content="{
-        registerTextEditorRef,
-        attachmentIndexDeleted,
-        attachmentIndexSelected,
-        attachmentsUploaded,
-        document,
-      }"
+  <div class="flex w-screen grow">
+    <div
+      v-if="!route.path.includes('preview') && pendingProceeding"
+      class="sticky top-0 z-50 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
-      <router-view
-        v-bind="{ registerTextEditorRef, document }"
-        @attachment-index-deleted="attachmentIndexDeleted"
-        @attachment-index-selected="attachmentIndexSelected"
-        @attachments-uploaded="attachmentsUploaded"
+      <SideToggle
+        class="sticky top-0 z-20"
+        data-testid="side-toggle-navigation"
+        :is-expanded="showNavigationPanelRef"
+        label="Navigation"
+        tabindex="0"
+        test-id="side-toggle-navigation"
+        @update:is-expanded="toggleNavigationPanel"
       >
-      </router-view>
-    </template>
-
-    <template #info-panel="{ document }">
+        <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
+      </SideToggle>
+    </div>
+    <div
+      v-if="pendingProceeding"
+      class="flex w-full min-w-0 flex-col bg-gray-100"
+    >
       <DocumentInfoPanel
-        v-if="document && !route.path.includes('preview')"
-        :document="document as PendingProceeding"
-        :duplicate-management-route="managementDataRoute"
-        :has-pending-duplicate-warning="hasPendingDuplicateWarning"
-        :heading="getHeading(document as PendingProceeding)"
-        :on-save="handleDocumentUnitSave"
-        :show-save-button="isRouteWithSaveButton"
+        v-if="pendingProceeding && !route.path.includes('preview')"
+        :document="pendingProceeding"
+        show-save-button
       />
-    </template>
-  </DocumentViewer>
+      <div class="flex grow flex-col items-start">
+        <FlexContainer
+          v-if="pendingProceeding"
+          class="h-full w-full flex-grow"
+          :class="
+            route.path.includes('preview')
+              ? 'flex-row bg-white'
+              : 'flex-row-reverse'
+          "
+        >
+          <ExtraContentSidePanel
+            v-if="pendingProceeding && !route.path.includes('preview')"
+            :document-unit="pendingProceeding"
+            side-panel-mode="preview"
+          ></ExtraContentSidePanel>
+          <router-view v-bind="{ registerTextEditorRef }"> </router-view>
+        </FlexContainer>
+      </div>
+    </div>
+    <ErrorPage
+      v-if="responseError"
+      :error="responseError"
+      :title="responseError?.title"
+    />
+  </div>
 </template>

@@ -18,7 +18,7 @@ export function usePendingProceedingMenuItems(
     {
       label: "Rubriken",
       route: {
-        name: "caselaw-documentUnit-documentNumber-categories",
+        name: "caselaw-pending-proceeding-documentNumber-categories",
         ...baseRoute,
       },
       children: [
@@ -28,7 +28,7 @@ export function usePendingProceedingMenuItems(
                 label: "Stammdaten",
                 route: {
                   ...baseRoute,
-                  name: "caselaw-documentUnit-documentNumber-categories",
+                  name: "caselaw-pending-proceeding-documentNumber-categories",
                   hash: "#coreData",
                 },
               },
@@ -38,7 +38,7 @@ export function usePendingProceedingMenuItems(
           label: "Rechtszug",
           route: {
             ...baseRoute,
-            name: "caselaw-documentUnit-documentNumber-categories",
+            name: "caselaw-pending-proceeding-documentNumber-categories",
             hash: "#proceedingDecisions",
           },
         },
@@ -46,15 +46,15 @@ export function usePendingProceedingMenuItems(
           label: "Inhaltliche Erschließung",
           route: {
             ...baseRoute,
-            name: "caselaw-documentUnit-documentNumber-categories",
+            name: "caselaw-pending-proceeding-documentNumber-categories",
             hash: "#contentRelatedIndexing",
           },
         },
         {
-          label: "Kurz- & Langtexte",
+          label: "Kurztexte",
           route: {
             ...baseRoute,
-            name: "caselaw-documentUnit-documentNumber-categories",
+            name: "caselaw-pending-proceeding-documentNumber-categories",
             hash: "#texts",
           },
         },

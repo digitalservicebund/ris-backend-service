@@ -18,12 +18,9 @@ import ComboboxItemService from "@/services/comboboxItemService"
 
 interface Props {
   modelValue: CoreData
-  isPendingProceeding?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  isPendingProceeding: false,
-})
+const props = defineProps<Props>()
 const emit = defineEmits<{
   "update:modelValue": [value: CoreData]
 }>()
@@ -194,9 +191,7 @@ onBeforeUnmount(() => {
         <InputField
           id="decisionDate"
           v-slot="slotProps"
-          :label="
-            isPendingProceeding ? 'Mitteilungsdatum *' : 'Entscheidungsdatum *'
-          "
+          label="Entscheidungsdatum *"
           :validation-error="validationStore.getByField('decisionDate')"
         >
           <DateInput

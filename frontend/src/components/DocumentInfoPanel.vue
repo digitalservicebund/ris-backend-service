@@ -14,7 +14,6 @@ interface Props<T extends Documentable> {
   document: T
   hasPendingDuplicateWarning?: boolean
   duplicateManagementRoute?: RouteLocationRaw
-  showSaveButton?: boolean
   onSave?: () => Promise<void>
 }
 
@@ -26,10 +25,6 @@ const props = withDefaults(defineProps<Props<Documentable>>(), {
 })
 
 const isInternalUser = useInternalUser()
-
-const isDocumentUnit = (doc: Documentable | undefined): doc is DocumentUnit => {
-  return doc instanceof DocumentUnit
-}
 
 const fileNumberInfo = computed(() => {
   return props.document.coreData.fileNumbers?.[0] || ""
@@ -59,7 +54,7 @@ const statusBadge = ref(useStatusBadge(props.document.status).value)
 const hasErrorStatus = computed(() => props.document.status?.withError)
 
 const effectiveHasPendingDuplicateWarning = computed(() => {
-  if (isDocumentUnit(props.document)) {
+  if (props.document instanceof DocumentUnit) {
     return (props.document.managementData.duplicateRelations ?? []).some(
       (warning) => warning.status === "PENDING",
     )
@@ -122,11 +117,10 @@ watchEffect(() => {
       >
         Bitte prüfen</RouterLink
       >
-      <span v-if="props.showSaveButton && isInternalUser">|</span>
+      <span v-if="isInternalUser">|</span>
     </div>
 
     <SaveButton
-      v-if="props.showSaveButton"
       aria-label="Speichern Button"
       data-testid="document-unit-save-button"
       @click="props.onSave && props.onSave()"

@@ -3,23 +3,35 @@ import EnsuingDecision from "./ensuingDecision"
 import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
 import ActiveCitation from "@/domain/activeCitation"
-import {
-  ContentRelatedIndexing,
-  CoreData,
-  ShortTexts,
-} from "@/domain/documentUnit"
+import { ContentRelatedIndexing, CoreData } from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import { PublicationStatus } from "@/domain/publicationStatus"
 import SingleNorm from "@/domain/singleNorm"
 
+export type PendingDecisionShortTexts = {
+  headline?: string
+  legalIssue?: string
+  appellant?: string
+  admissionOfAppeal?: string
+  resolutionNote?: string
+}
+export const pendingProceedingShortTextLabels: {
+  [shortTextKey in keyof Required<PendingDecisionShortTexts>]: string
+} = {
+  headline: "Titelzeile",
+  legalIssue: "Rechtsfrage",
+  appellant: "Rechtsmittelführer",
+  admissionOfAppeal: "Rechtsmittelzulassung",
+  resolutionNote: "Erledigungsvermerk",
+}
 export default class PendingProceeding {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber: string = ""
   readonly status?: PublicationStatus
   public coreData: CoreData = {}
-  public shortTexts: ShortTexts = {}
+  public shortTexts: PendingDecisionShortTexts = {}
   public previousDecisions?: PreviousDecision[]
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
@@ -30,6 +42,7 @@ export default class PendingProceeding {
   public legalIssue?: string = ""
   public admissionOfAppeal?: string = ""
   public appellant?: string = ""
+  public isEditable?: boolean
 
   static readonly requiredFields = [
     "fileNumbers",
@@ -50,7 +63,7 @@ export default class PendingProceeding {
       if (data.coreData && data.coreData[coreDataField] === null)
         delete data.coreData[coreDataField]
     }
-    let shortTextsField: keyof ShortTexts
+    let shortTextsField: keyof PendingDecisionShortTexts
     for (shortTextsField in data.shortTexts) {
       if (data.shortTexts && data.shortTexts[shortTextsField] === null)
         delete data.shortTexts[shortTextsField]

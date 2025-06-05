@@ -10,16 +10,18 @@ import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
+import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import DocumentationUnitTextCheckSummary from "@/components/text-check/DocumentationUnitTextCheckSummary.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import DocumentUnit from "@/domain/documentUnit"
+import PendingProceeding from "@/domain/pendingProceeding"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
-  documentUnit?: DocumentUnit
+  documentUnit?: DocumentUnit | PendingProceeding
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   sidePanelMode?: SelectablePanelContent
@@ -38,11 +40,18 @@ const route = useRoute()
 const textCheckAll = useFeatureToggle("neuris.text-side-panel")
 
 const hasNote = computed(() => {
-  return !!props.documentUnit!.note && props.documentUnit!.note.length > 0
+  const isDocumentUnit = props.documentUnit instanceof DocumentUnit
+  return (
+    isDocumentUnit &&
+    !!props.documentUnit!.note &&
+    props.documentUnit!.note.length > 0
+  )
 })
 
 const hasAttachments = computed(() => {
+  const isDocumentUnit = props.documentUnit instanceof DocumentUnit
   return (
+    isDocumentUnit &&
     !!props.documentUnit!.attachments &&
     props.documentUnit!.attachments.length > 0
   )
@@ -87,9 +96,14 @@ function togglePanel(expand?: boolean): boolean {
 }
 
 function setDefaultState() {
+  const isDocumentUnit = props.documentUnit instanceof DocumentUnit
   if (props.sidePanelMode) {
     store.setSidePanelMode(props.sidePanelMode)
-  } else if (!props.documentUnit!.note && props.documentUnit!.hasAttachments) {
+  } else if (
+    isDocumentUnit &&
+    !props.documentUnit!.note &&
+    props.documentUnit!.hasAttachments
+  ) {
     selectAttachments()
   } else {
     setSidePanelMode("note")
@@ -141,7 +155,11 @@ onMounted(() => {
         @panel-mode:update="setSidePanelMode"
       />
       <div class="m-24">
-        <div v-if="panelMode === 'note'">
+        <div
+          v-if="
+            panelMode === 'note' && props.documentUnit instanceof DocumentUnit
+          "
+        >
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
@@ -153,7 +171,12 @@ onMounted(() => {
             />
           </InputField>
         </div>
-        <div v-else-if="panelMode === 'attachments'">
+        <div
+          v-else-if="
+            panelMode === 'attachments' &&
+            props.documentUnit instanceof DocumentUnit
+          "
+        >
           <AttachmentView
             v-if="
               props.documentUnit!.uuid &&
@@ -178,18 +201,32 @@ onMounted(() => {
           class="flex max-h-[70vh] overflow-auto"
         >
           <DocumentUnitPreview
+            v-if="props.documentUnit instanceof DocumentUnit"
+            :document-unit="props.documentUnit!"
+            layout="narrow"
+          />
+          <PendingProceedingPreview
+            v-if="props.documentUnit instanceof PendingProceeding"
+            :document-number="props.documentUnit!.documentNumber"
             :document-unit="props.documentUnit!"
             layout="narrow"
           />
         </div>
 
         <CategoryImport
-          v-else-if="panelMode === 'category-import'"
+          v-else-if="
+            panelMode === 'category-import' &&
+            props.documentUnit instanceof DocumentUnit
+          "
           :document-number="importDocumentNumber"
         />
 
         <DocumentationUnitTextCheckSummary
-          v-else-if="panelMode === 'text-check' && textCheckAll"
+          v-else-if="
+            panelMode === 'text-check' &&
+            textCheckAll &&
+            props.documentUnit instanceof DocumentUnit
+          "
           v-bind="{ jumpToMatch }"
         />
       </div>
