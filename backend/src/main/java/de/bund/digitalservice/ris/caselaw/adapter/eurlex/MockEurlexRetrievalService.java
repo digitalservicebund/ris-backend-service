@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 
+import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
@@ -14,7 +15,7 @@ public class MockEurlexRetrievalService implements EurlexRetrievalService {
       ClassPathResource xsltResource = new ClassPathResource("testdata/eurlex.xml");
       return IOUtils.toString(xsltResource.getInputStream(), StandardCharsets.UTF_8);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new EurLexSearchException(e);
     }
   }
 
@@ -33,7 +34,7 @@ public class MockEurlexRetrievalService implements EurlexRetrievalService {
       ClassPathResource xsltResource = new ClassPathResource(path);
       return IOUtils.toString(xsltResource.getInputStream(), StandardCharsets.UTF_8);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new FmxImporterException("Downloading FMX file from Eurlex Database failed.", e);
     }
   }
 }
