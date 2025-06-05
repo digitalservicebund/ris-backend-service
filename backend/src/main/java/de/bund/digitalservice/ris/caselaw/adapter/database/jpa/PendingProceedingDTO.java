@@ -46,6 +46,9 @@ public class PendingProceedingDTO extends DocumentationUnitDTO {
   // Rechtsmittelführer
   @Column String appellant;
 
+  // TODO: Erledigungsmitteilung (Datum, an dem Erledigung=ja eingetragen wird)
+  // TODO: Passivzitierung Verwaltungsvorschriften
+
   @Override
   public String getHeadnote() {
     return "";

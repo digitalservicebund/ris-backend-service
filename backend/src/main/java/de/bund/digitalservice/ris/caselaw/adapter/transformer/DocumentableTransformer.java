@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
@@ -183,7 +182,7 @@ public class DocumentableTransformer {
   static void addDeviatingFileNumbers(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder,
       CoreData coreData,
-      DecisionDTO currentDto) {
+      DocumentationUnitDTO currentDto) {
     if (coreData.deviatingFileNumbers() == null) {
       return;
     }
@@ -243,7 +242,7 @@ public class DocumentableTransformer {
   static void addFileNumbers(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder,
       CoreData coreData,
-      DecisionDTO currentDto) {
+      DocumentationUnitDTO currentDto) {
     if (coreData.fileNumbers() == null) {
       return;
     }
