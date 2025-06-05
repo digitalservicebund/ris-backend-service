@@ -34,7 +34,6 @@ import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
@@ -137,6 +136,7 @@ class FmxImportServiceTest {
   @Test
   void judgment_shouldExtractMetadata() {
     String celexNumber = "62022CJ0303";
+    String uri = "https://publications.europa.eu/resource/celex/" + celexNumber;
     UUID id = UUID.randomUUID();
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -150,14 +150,10 @@ class FmxImportServiceTest {
             .build();
 
     EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
-    when(eurLexResultDTO.getUri())
-        .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
+    when(eurLexResultDTO.getUri()).thenReturn(uri);
     when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
 
-    doReturn(judgment)
-        .when(retrievalService)
-        .requestSingleEurlexDocument(
-            "https://publications.europa.eu/resource/celex/" + celexNumber);
+    doReturn(judgment).when(retrievalService).requestSingleEurlexDocument(uri);
     ArgumentCaptor<DocumentationUnit> docUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
@@ -188,6 +184,7 @@ class FmxImportServiceTest {
   @Test
   void order_shouldExtractMetadata() {
     String celexNumber = "62018TO0235(04)";
+    String uri = "https://publications.europa.eu/resource/celex/" + celexNumber;
     UUID id = UUID.randomUUID();
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -201,15 +198,10 @@ class FmxImportServiceTest {
             .build();
 
     EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
-    when(eurLexResultDTO.getUri())
-        .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
+    when(eurLexResultDTO.getUri()).thenReturn(uri);
     when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
 
-    doReturn(order)
-        .when(retrievalService)
-        .requestSingleEurlexDocument(
-            "https://publications.europa.eu/resource/celex/"
-                + URLEncoder.encode(celexNumber, StandardCharsets.UTF_8));
+    doReturn(order).when(retrievalService).requestSingleEurlexDocument(uri);
     ArgumentCaptor<DocumentationUnit> docUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
@@ -240,6 +232,7 @@ class FmxImportServiceTest {
   @Test
   void opinion_shouldExtractMetadata() {
     String celexNumber = "62013CV0001";
+    String uri = "https://publications.europa.eu/resource/celex/" + celexNumber;
     UUID id = UUID.randomUUID();
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -253,14 +246,10 @@ class FmxImportServiceTest {
             .build();
 
     EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
-    when(eurLexResultDTO.getUri())
-        .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
+    when(eurLexResultDTO.getUri()).thenReturn(uri);
     when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
 
-    doReturn(opinion)
-        .when(retrievalService)
-        .requestSingleEurlexDocument(
-            "https://publications.europa.eu/resource/celex/" + celexNumber);
+    doReturn(opinion).when(retrievalService).requestSingleEurlexDocument(uri);
     ArgumentCaptor<DocumentationUnit> docUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);

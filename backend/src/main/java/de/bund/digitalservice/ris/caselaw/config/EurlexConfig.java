@@ -5,12 +5,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.eurlex.HttpEurlexRetrievalServ
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.MockEurlexRetrievalService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class EurlexConfig {
 
   @Bean
+  @Primary
   @Profile({"production", "uat"})
   public EurlexRetrievalService httpEurlexRetrievalService() {
     return new HttpEurlexRetrievalService();
