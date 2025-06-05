@@ -145,8 +145,9 @@ onMounted(() => {
       @update:is-expanded="togglePanel"
     >
       <ExtraContentExtraContentSidePanelMenu
+        v-if="props.document instanceof DocumentUnit"
         :current-attachment-index="currentAttachmentIndex"
-        :document="props.document"
+        :document-unit="props.document"
         :hide-panel-mode-bar="props.hidePanelModeBar"
         :panel-mode="panelMode"
         :show-edit-button="props.showEditButton"
@@ -195,13 +196,11 @@ onMounted(() => {
         >
           <DocumentUnitPreview
             v-if="props.document instanceof DocumentUnit"
-            :document-unit="props.document"
             layout="narrow"
           />
           <PendingProceedingPreview
             v-if="props.document instanceof PendingProceeding"
             :document-number="props.document.documentNumber"
-            :document-unit="props.document"
             layout="narrow"
           />
         </div>

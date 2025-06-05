@@ -2,6 +2,7 @@
 import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
 import { Editor } from "@tiptap/vue-3"
 import { computed, ref } from "vue"
+import { useRoute } from "vue-router"
 import TextEditorButton, {
   EditorButton,
 } from "@/components/input/TextEditorButton.vue"
@@ -45,7 +46,10 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{ onEditorExpandedChanged: [boolean] }>()
-
+const route = useRoute()
+const isPendingProceeding = computed(() =>
+  route.path.includes("pending-proceeding"),
+)
 const borderNumberCategories = [
   longTextLabels.reasons,
   longTextLabels.caseFacts,
@@ -273,7 +277,7 @@ const buttons = computed(() => {
     },
   ]
 
-  if (shouldShowAddBorderNumbersButton.value) {
+  if (shouldShowAddBorderNumbersButton.value && !isPendingProceeding.value) {
     buttons.push({
       type: "addBorderNumbers",
       icon: IcSharpAddBox,
@@ -284,15 +288,17 @@ const buttons = computed(() => {
       callback: () => props.editor.chain().focus().addBorderNumbers().run(),
     })
   }
-  buttons.push({
-    type: "removeBorderNumbers",
-    icon: MaterialSymbolsDeleteSweepOutline,
-    ariaLabel: "Randnummern entfernen",
-    shortcut: "Strg + Alt + -",
-    group: "borderNumber",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
-  })
+  if (!isPendingProceeding.value) {
+    buttons.push({
+      type: "removeBorderNumbers",
+      icon: MaterialSymbolsDeleteSweepOutline,
+      ariaLabel: "Randnummern entfernen",
+      shortcut: "Strg + Alt + -",
+      group: "borderNumber",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
+    })
+  }
 
   buttons.push({
     type: "textCheck",

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { Component } from "vue"
-import { computed } from "vue"
-import TextInputCategory from "@/components/texts/TextInputCategory.vue"
+import { Component, computed } from "vue"
+import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
+import { shortTextLabels } from "@/domain/documentUnit"
 import { pendingProceedingShortTextLabels } from "@/domain/pendingProceeding"
 import { usePendingProceedingStore } from "@/stores/pendingProceedingStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
@@ -57,31 +57,37 @@ const resolutionNote = computed({
   <div aria-label="Kurztexte">
     <h2 class="ris-label1-bold mb-16">Kurztexte</h2>
     <div class="flex flex-col gap-24">
-      <TextInputCategory
+      <TextEditorCategory
         id="headline"
+        v-bind="{ registerTextEditorRef }"
         v-model="headline"
         :data-testid="pendingProceedingShortTextLabels.headline"
         editable
-        :label="pendingProceedingShortTextLabels.headline"
+        field-size="small"
+        :label="shortTextLabels.headline"
         :should-show-button="
-          !store.pendingProceeding?.shortTexts.headline?.length
+          !store.pendingProceeding?.shortTexts?.headline?.length
         "
       />
 
-      <TextInputCategory
+      <TextEditorCategory
         id="legalIssue"
         v-model="legalIssue"
+        v-bind="{ registerTextEditorRef }"
         :data-testid="pendingProceedingShortTextLabels.legalIssue"
         editable
+        field-size="small"
         :label="pendingProceedingShortTextLabels.legalIssue"
         :should-show-button="!store.pendingProceeding?.legalIssue?.length"
       />
 
-      <TextInputCategory
+      <TextEditorCategory
         id="resolutionNote"
         v-model="resolutionNote"
+        v-bind="{ registerTextEditorRef }"
         :data-testid="pendingProceedingShortTextLabels.resolutionNote"
         editable
+        field-size="small"
         :label="pendingProceedingShortTextLabels.resolutionNote"
         :should-show-button="!store.pendingProceeding?.resolutionNote?.length"
       />

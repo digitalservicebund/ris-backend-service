@@ -17,7 +17,9 @@ import PreviewLiteratureReferences from "@/components/preview/PreviewLiteratureR
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
-import PendingProceeding from "@/domain/pendingProceeding"
+import PendingProceeding, {
+  pendingProceedingShortTextLabels,
+} from "@/domain/pendingProceeding"
 import Reference from "@/domain/reference"
 import documentUnitService from "@/services/documentUnitService"
 import { ServiceResponse } from "@/services/httpClient"
@@ -66,7 +68,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
         <PreviewContent>
           <TextEditor
             id="previewResolutionNote"
-            aria-label="Erledigungsvermerk"
+            :aria-label="pendingProceedingShortTextLabels.resolutionNote"
             field-size="max"
             preview
             :value="pendingProceedingResponse.data.resolutionNote"
@@ -80,11 +82,13 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
         </PreviewContent>
       </PreviewRow>
       <PreviewRow v-if="pendingProceedingResponse.data.legalIssue">
-        <PreviewCategory>Rechtsfrage</PreviewCategory>
+        <PreviewCategory>{{
+          pendingProceedingShortTextLabels.legalIssue
+        }}</PreviewCategory>
         <PreviewContent>
           <TextEditor
             id="previewLegalIssue"
-            aria-label="Rechtsfrage"
+            :aria-label="pendingProceedingShortTextLabels.legalIssue"
             field-size="max"
             preview
             :value="pendingProceedingResponse.data.legalIssue"
@@ -92,13 +96,17 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
         </PreviewContent>
       </PreviewRow>
       <PreviewRow v-if="pendingProceedingResponse.data.admissionOfAppeal">
-        <PreviewCategory>Rechtsmittelzulassung</PreviewCategory>
+        <PreviewCategory>{{
+          pendingProceedingShortTextLabels.admissionOfAppeal
+        }}</PreviewCategory>
         <PreviewContent>
           {{ pendingProceedingResponse.data.admissionOfAppeal }}
         </PreviewContent>
       </PreviewRow>
       <PreviewRow v-if="pendingProceedingResponse.data.appellant">
-        <PreviewCategory>Rechtsmittelführer</PreviewCategory>
+        <PreviewCategory>{{
+          pendingProceedingShortTextLabels.appellant
+        }}</PreviewCategory>
         <PreviewContent>
           {{ pendingProceedingResponse.data.appellant }}
         </PreviewContent>

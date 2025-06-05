@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Button from "primevue/button"
 import FileNavigator from "@/components/FileNavigator.vue"
-import { Documentable } from "@/components/input/types"
 import Tooltip from "@/components/Tooltip.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import DocumentUnit from "@/domain/documentUnit"
@@ -16,7 +15,7 @@ import IconImportCategories from "~icons/material-symbols/text-select-move-back-
 
 const props = defineProps<{
   panelMode?: SelectablePanelContent
-  document: Documentable
+  documentUnit: DocumentUnit
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   currentAttachmentIndex: number
@@ -41,11 +40,7 @@ function emitAttachmentIndex(value: number) {
 <template>
   <div class="m-24 flex flex-row justify-between">
     <div v-if="!hidePanelModeBar" class="flex flex-row -space-x-2">
-      <Tooltip
-        v-if="props.document instanceof DocumentUnit"
-        shortcut="n"
-        text="Notiz"
-      >
+      <Tooltip shortcut="n" text="Notiz">
         <Button
           id="note"
           aria-label="Notiz anzeigen"
@@ -60,11 +55,7 @@ function emitAttachmentIndex(value: number) {
           </template>
         </Button>
       </Tooltip>
-      <Tooltip
-        v-if="props.document instanceof DocumentUnit"
-        shortcut="d"
-        text="Datei"
-      >
+      <Tooltip shortcut="d" text="Datei">
         <Button
           id="attachments"
           aria-label="Dokumente anzeigen"
@@ -96,11 +87,7 @@ function emitAttachmentIndex(value: number) {
         </Button>
       </Tooltip>
 
-      <Tooltip
-        v-if="props.document instanceof DocumentUnit"
-        shortcut="r"
-        text="Rubriken-Import"
-      >
+      <Tooltip shortcut="r" text="Rubriken-Import">
         <Button
           id="category-import"
           aria-label="Rubriken-Import anzeigen"
@@ -115,11 +102,7 @@ function emitAttachmentIndex(value: number) {
           </template>
         </Button>
       </Tooltip>
-      <Tooltip
-        v-if="textCheckAll && props.document instanceof DocumentUnit"
-        shortcut="t"
-        text="Rechtschreibprüfung"
-      >
+      <Tooltip v-if="textCheckAll" shortcut="t" text="Rechtschreibprüfung">
         <Button
           id="text-check"
           aria-label="Rechtschreibprüfung"
@@ -137,16 +120,14 @@ function emitAttachmentIndex(value: number) {
     </div>
 
     <FileNavigator
-      v-if="
-        panelMode === 'attachments' && props.document instanceof DocumentUnit
-      "
-      :attachments="props.document!.attachments"
+      v-if="panelMode === 'attachments'"
+      :attachments="props.documentUnit!.attachments"
       :current-index="currentAttachmentIndex"
       @select="emitAttachmentIndex"
     ></FileNavigator>
     <div v-if="panelMode === 'preview'" class="ml-auto flex flex-row">
       <Tooltip
-        v-if="props.document.isEditable && showEditButton"
+        v-if="props.documentUnit!.isEditable && showEditButton"
         shortcut="b"
         text="Bearbeiten"
       >
@@ -156,7 +137,7 @@ function emitAttachmentIndex(value: number) {
           :to="{
             name: 'caselaw-documentUnit-documentNumber-categories',
             params: {
-              documentNumber: props.document.documentNumber,
+              documentNumber: props.documentUnit.documentNumber,
             },
           }"
         >
@@ -174,7 +155,7 @@ function emitAttachmentIndex(value: number) {
           :to="{
             name: 'caselaw-documentUnit-documentNumber-preview',
             params: {
-              documentNumber: props.document.documentNumber,
+              documentNumber: props.documentUnit.documentNumber,
             },
           }"
         >

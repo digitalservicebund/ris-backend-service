@@ -93,18 +93,9 @@ const handleKeyDown = (event: KeyboardEvent) => {
       event.preventDefault()
       toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
       break
-    case "n":
-      event.preventDefault()
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("note")
-      break
     case "v":
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("preview")
-      break
-    case "r":
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("category-import")
       break
     default:
       break
@@ -160,10 +151,10 @@ onMounted(async () => {
         >
           <ExtraContentSidePanel
             v-if="pendingProceeding && !route.path.includes('preview')"
-            :document="pendingProceeding!"
+            :document="pendingProceeding"
             side-panel-mode="preview"
           ></ExtraContentSidePanel>
-          <router-view v-bind="{ registerTextEditorRef }"> </router-view>
+          <router-view v-bind="{ registerTextEditorRef }" />
         </FlexContainer>
       </div>
     </div>
