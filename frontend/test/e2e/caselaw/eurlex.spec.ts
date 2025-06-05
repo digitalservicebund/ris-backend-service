@@ -8,7 +8,7 @@ import {
 
 test.describe("eurlex", () => {
   test(
-    "Eurlex Entscheidungen können im EURLEX Postfach gesehen werden",
+    "Eurlex Entscheidungen können in NeuRIS übernommen werden",
     { tag: ["@RISDEV-7376", "@RISDEV-7578"] },
     async ({ page }) => {
       const celexNumber1 = "62024CO0878"
