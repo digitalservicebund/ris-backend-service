@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="TDocument">
 import dayjs from "dayjs"
 import { computed, ref, toRaw, watchEffect } from "vue"
-import { RouteLocationRaw } from "vue-router"
+import { RouteLocationRaw, useRoute } from "vue-router"
 import IconBadge from "@/components/IconBadge.vue"
 import { Documentable } from "@/components/input/types"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
@@ -12,17 +12,18 @@ import IconError from "~icons/ic/baseline-error"
 
 interface Props<T extends Documentable> {
   document: T
-  hasPendingDuplicateWarning?: boolean
   duplicateManagementRoute?: RouteLocationRaw
+  showSaveButton?: boolean
   onSave?: () => Promise<void>
 }
 
 const props = withDefaults(defineProps<Props<Documentable>>(), {
-  hasPendingDuplicateWarning: false,
   duplicateManagementRoute: "",
   showSaveButton: false,
   onSave: async () => {},
 })
+
+const route = useRoute()
 
 const isInternalUser = useInternalUser()
 
@@ -34,6 +35,15 @@ const decisionDateInfo = computed(() => {
   return props.document.coreData.decisionDate
     ? dayjs(props.document.coreData.decisionDate).format("DD.MM.YYYY")
     : ""
+})
+
+const hasPendingDuplicateWarning = computed(() => {
+  if (props.document instanceof DocumentUnit) {
+    return (props.document.managementData.duplicateRelations ?? []).some(
+      (warning) => warning.status === "PENDING",
+    )
+  }
+  return false
 })
 
 const courtInfo = computed(() => {
@@ -51,16 +61,16 @@ const formattedInfo = computed(() => {
 
 const statusBadge = ref(useStatusBadge(props.document.status).value)
 
+const isRouteWithSaveButton = computed(
+  () =>
+    route.path.includes("categories") ||
+    route.path.includes("attachments") ||
+    route.path.includes("references") ||
+    route.path.includes("managementdata"),
+)
+
 const hasErrorStatus = computed(() => props.document.status?.withError)
 
-const effectiveHasPendingDuplicateWarning = computed(() => {
-  if (props.document instanceof DocumentUnit) {
-    return (props.document.managementData.duplicateRelations ?? []).some(
-      (warning) => warning.status === "PENDING",
-    )
-  }
-  return props.hasPendingDuplicateWarning
-})
 watchEffect(() => {
   statusBadge.value = useStatusBadge(props.document.status).value
 })
@@ -97,9 +107,8 @@ watchEffect(() => {
     />
 
     <span class="flex-grow"></span>
-
     <div
-      v-if="effectiveHasPendingDuplicateWarning"
+      v-if="hasPendingDuplicateWarning"
       class="flex items-center gap-12 whitespace-nowrap"
     >
       <IconBadge
@@ -117,10 +126,10 @@ watchEffect(() => {
       >
         Bitte prüfen</RouterLink
       >
-      <span v-if="isInternalUser">|</span>
+      <span v-if="isRouteWithSaveButton && isInternalUser">|</span>
     </div>
-
     <SaveButton
+      v-if="isRouteWithSaveButton"
       aria-label="Speichern Button"
       data-testid="document-unit-save-button"
       @click="props.onSave && props.onSave()"
