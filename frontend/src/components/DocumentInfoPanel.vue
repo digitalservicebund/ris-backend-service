@@ -13,13 +13,11 @@ import IconError from "~icons/ic/baseline-error"
 interface Props<T extends Documentable> {
   document: T
   duplicateManagementRoute?: RouteLocationRaw
-  showSaveButton?: boolean
   onSave?: () => Promise<void>
 }
 
 const props = withDefaults(defineProps<Props<Documentable>>(), {
   duplicateManagementRoute: "",
-  showSaveButton: false,
   onSave: async () => {},
 })
 

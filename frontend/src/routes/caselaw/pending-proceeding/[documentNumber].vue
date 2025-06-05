@@ -147,7 +147,6 @@ onMounted(async () => {
       <DocumentInfoPanel
         v-if="pendingProceeding && !route.path.includes('preview')"
         :document="pendingProceeding"
-        show-save-button
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer
