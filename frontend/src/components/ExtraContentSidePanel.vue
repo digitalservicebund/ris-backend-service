@@ -24,6 +24,7 @@ const props = defineProps<{
   document: DocumentUnit | PendingProceeding
   showEditButton?: boolean
   hidePanelModeBar?: boolean
+  hidePreviewInNewTab?: boolean
   sidePanelMode?: SelectablePanelContent
   sidePanelShortcut?: string
   icon?: Component
@@ -148,6 +149,7 @@ onMounted(() => {
         :current-attachment-index="currentAttachmentIndex"
         :document-unit="props.document"
         :hide-panel-mode-bar="props.hidePanelModeBar"
+        :hide-preview-in-new-tab="props.hidePreviewInNewTab"
         :panel-mode="panelMode"
         :show-edit-button="props.showEditButton"
         @attachment-index:update="handleOnSelectAttachment"

@@ -149,6 +149,8 @@ onMounted(async () => {
           <ExtraContentSidePanel
             v-if="documentUnit && !route.path.includes('preview')"
             :document="documentUnit"
+            hide-panel-mode-bar
+            hide-preview-in-new-tab
             side-panel-mode="preview"
           ></ExtraContentSidePanel>
           <router-view v-bind="{ registerTextEditorRef }" />

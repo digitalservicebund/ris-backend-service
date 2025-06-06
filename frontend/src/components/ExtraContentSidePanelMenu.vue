@@ -19,6 +19,7 @@ const props = defineProps<{
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   currentAttachmentIndex: number
+  hidePreviewInNewTab?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -148,7 +149,7 @@ function emitAttachmentIndex(value: number) {
           </Button>
         </router-link>
       </Tooltip>
-      <Tooltip text="In neuem Tab öffnen">
+      <Tooltip v-if="!props.hidePreviewInNewTab" text="In neuem Tab öffnen">
         <router-link
           aria-label="Vorschau in neuem Tab öffnen"
           target="_blank"
