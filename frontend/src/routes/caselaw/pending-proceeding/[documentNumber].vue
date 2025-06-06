@@ -3,7 +3,7 @@ import { useHead } from "@unhead/vue"
 import { storeToRefs } from "pinia"
 import { onBeforeUnmount, onMounted, Ref, ref } from "vue"
 import { useRoute } from "vue-router"
-import DocumentableInfoPanel from "@/components/DocumentableInfoPanel.vue"
+import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
@@ -132,7 +132,7 @@ onMounted(async () => {
       </SideToggle>
     </div>
     <div v-if="documentUnit" class="flex w-full min-w-0 flex-col bg-gray-100">
-      <DocumentableInfoPanel
+      <DocumentUnitInfoPanel
         v-if="documentUnit && !route.path.includes('preview')"
         :document="documentUnit"
       />

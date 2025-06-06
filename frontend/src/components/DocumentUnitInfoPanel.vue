@@ -3,23 +3,26 @@ import dayjs from "dayjs"
 import { computed, ref, toRaw, watchEffect } from "vue"
 import { RouteLocationRaw, useRoute } from "vue-router"
 import IconBadge from "@/components/IconBadge.vue"
-import { Documentable } from "@/components/input/types"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import DocumentUnit from "@/domain/documentUnit"
+import PendingProceeding from "@/domain/pendingProceeding"
 import IconError from "~icons/ic/baseline-error"
 
-interface Props<T extends Documentable> {
+interface Props<T extends DocumentUnit | PendingProceeding> {
   document: T
   duplicateManagementRoute?: RouteLocationRaw
   onSave?: () => Promise<void>
 }
 
-const props = withDefaults(defineProps<Props<Documentable>>(), {
-  duplicateManagementRoute: "",
-  onSave: async () => {},
-})
+const props = withDefaults(
+  defineProps<Props<DocumentUnit | PendingProceeding>>(),
+  {
+    duplicateManagementRoute: "",
+    onSave: async () => {},
+  },
+)
 
 const route = useRoute()
 

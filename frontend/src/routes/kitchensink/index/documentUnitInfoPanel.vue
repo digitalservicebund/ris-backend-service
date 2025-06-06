@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import DocumentableInfoPanel from "@/components/DocumentableInfoPanel.vue"
+import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 
@@ -22,6 +22,6 @@ const documentUnit = new DocumentUnit("foo", {
 
 <template>
   <KitchensinkPage name="Document unit info panel">
-    <DocumentableInfoPanel :document="documentUnit" />
+    <DocumentUnitInfoPanel :document="documentUnit" />
   </KitchensinkPage>
 </template>

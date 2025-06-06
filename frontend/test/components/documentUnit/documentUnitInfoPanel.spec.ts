@@ -1,7 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentableInfoPanel from "@/components/DocumentableInfoPanel.vue"
+import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import DocumentUnit, {
   CoreData,
   DuplicateRelation,
@@ -34,7 +34,7 @@ function renderComponent(options?: {
     },
   })
   return {
-    ...render(DocumentableInfoPanel, {
+    ...render(DocumentUnitInfoPanel, {
       props: { document: documentUnit },
       global: {
         plugins: [
@@ -57,7 +57,7 @@ function renderComponent(options?: {
   }
 }
 
-describe("documentable InfoPanel", () => {
+describe("documentUnit InfoPanel", () => {
   it("renders documentNumber as heading", async () => {
     renderComponent({ documentNumber: "test heading" })
 

@@ -9,7 +9,6 @@ import ExtraContentExtraContentSidePanelMenu from "@/components/ExtraContentSide
 import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
-import { Documentable } from "@/components/input/types"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
