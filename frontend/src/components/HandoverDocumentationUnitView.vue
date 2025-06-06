@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted, Ref, ref } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
@@ -15,7 +15,7 @@ import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
-import {
+import DocumentUnit, {
   DuplicateRelationStatus,
   longTextLabels,
   shortTextLabels,
@@ -53,12 +53,15 @@ const emits = defineEmits<{
 }>()
 
 const store = useDocumentUnitStore()
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 const sessionStore = useSessionStore()
 const { env } = storeToRefs(sessionStore)
 
 const categoriesRoute = computed(() => ({
   name: "caselaw-documentUnit-documentNumber-categories",
-  params: { documentNumber: store.documentUnit!.documentNumber },
+  params: { documentNumber: documentUnit.value!.documentNumber },
 }))
 const isFirstTimeHandover = computed(() => {
   return !props.eventLog || props.eventLog.length === 0
@@ -90,7 +93,7 @@ async function fetchPreview() {
     return
 
   const previewResponse = await handoverDocumentationUnitService.getPreview(
-    store.documentUnit!.uuid,
+    documentUnit.value!.uuid,
   )
   if (previewResponse.error) {
     previewError.value = previewResponse.error
@@ -140,19 +143,19 @@ function handoverDocumentUnit() {
 
 //Required Core Data fields
 const missingCoreDataFields = ref(
-  store.documentUnit!.missingRequiredFields.map((field) => fieldLabels[field]),
+  documentUnit.value!.missingRequiredFields.map((field) => fieldLabels[field]),
 )
 
 const pendingDuplicates = ref(
-  store.documentUnit!.managementData.duplicateRelations.filter(
+  documentUnit.value!.managementData.duplicateRelations.filter(
     (relation) => relation.status === DuplicateRelationStatus.PENDING,
   ),
 )
 
 //Required Previous Decision fields
 const missingPreviousDecisionFields = ref(
-  store.documentUnit && store.documentUnit.previousDecisions
-    ? store.documentUnit.previousDecisions
+  documentUnit.value && documentUnit.value.previousDecisions
+    ? documentUnit.value.previousDecisions
         .filter((previousDecision) => {
           return (
             getMissingPreviousDecisionFields(
@@ -179,7 +182,7 @@ function getMissingPreviousDecisionFields(previousDecision: PreviousDecision) {
 
 //Required Ensuing Decision fields
 const missingEnsuingDecisionFields = ref(
-  store.documentUnit && store.documentUnit.ensuingDecisions
+  documentUnit.value && documentUnit.value.ensuingDecisions
     ? store
         .documentUnit!.ensuingDecisions?.filter((ensuingDecision) => {
           return (
@@ -274,9 +277,9 @@ async function recalculateBorderNumbers() {
 
 //Required Active Citation fields
 const missingActiveCitationFields = ref(
-  store.documentUnit &&
-    store.documentUnit.contentRelatedIndexing &&
-    store.documentUnit.contentRelatedIndexing.activeCitations
+  documentUnit.value &&
+    documentUnit.value.contentRelatedIndexing &&
+    documentUnit.value.contentRelatedIndexing.activeCitations
     ? store
         .documentUnit!.contentRelatedIndexing?.activeCitations?.filter(
           (activeCitation) => {
@@ -316,23 +319,23 @@ const fieldsMissing = computed(() => {
 const isOutlineInvalid = computed<boolean>(
   () =>
     // Outline is written into otherHeadnote in jdv -> Only one of the fields may be filled at the same time
-    !!store.documentUnit?.longTexts.outline &&
-    !!store.documentUnit.shortTexts.otherHeadnote,
+    !!documentUnit.value?.longTexts.outline &&
+    !!documentUnit.value.shortTexts.otherHeadnote,
 )
 
 const isCaseFactsInvalid = computed<boolean>(
   () =>
-    !!store.documentUnit?.longTexts.reasons &&
-    !!store.documentUnit?.longTexts.caseFacts,
+    !!documentUnit.value?.longTexts.reasons &&
+    !!documentUnit.value?.longTexts.caseFacts,
 )
 const isDecisionReasonsInvalid = computed<boolean>(
   () =>
-    !!store.documentUnit?.longTexts.reasons &&
-    !!store.documentUnit?.longTexts.decisionReasons,
+    !!documentUnit.value?.longTexts.reasons &&
+    !!documentUnit.value?.longTexts.decisionReasons,
 )
 
 const isScheduled = computed<boolean>(
-  () => !!store.documentUnit!.managementData.scheduledPublicationDateTime,
+  () => !!documentUnit.value!.managementData.scheduledPublicationDateTime,
 )
 
 const isPublishable = computed<boolean>(
@@ -346,7 +349,7 @@ const isPublishable = computed<boolean>(
 </script>
 
 <template>
-  <div v-if="store.documentUnit">
+  <div v-if="documentUnit">
     <div class="flex flex-col gap-24 bg-white p-24">
       <TitleElement>Übergabe an jDV</TitleElement>
 
@@ -606,14 +609,14 @@ const isPublishable = computed<boolean>(
         </div>
       </div>
       <HandoverDuplicateCheckView
-        :document-number="store.documentUnit!.documentNumber"
+        :document-number="documentUnit!.documentNumber"
         :pending-duplicates="pendingDuplicates"
       />
 
       <HandoverTextCheckView
         v-if="textCheckAllToggle"
-        :document-id="store.documentUnit!.uuid"
-        :document-number="store.documentUnit!.documentNumber"
+        :document-id="documentUnit!.uuid"
+        :document-number="documentUnit!.documentNumber"
       />
 
       <div class="border-b-1 border-b-gray-400"></div>

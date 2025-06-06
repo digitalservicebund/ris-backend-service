@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-import { type Component, computed } from "vue"
+import { storeToRefs } from "pinia"
+import { type Component, computed, Ref } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import ParticipatingJudges from "@/components/ParticipatingJudges.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
+import DocumentUnit from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
@@ -13,47 +15,50 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 
 const isInternalUser = useInternalUser()
 
 const otherLongText = computed({
   get: () =>
-    store.documentUnit?.longTexts.otherLongText
+    documentUnit.value?.longTexts.otherLongText
       ? useValidBorderNumberLinks(
-          store.documentUnit?.longTexts.otherLongText,
-          store.documentUnit.managementData.borderNumbers,
+          documentUnit.value?.longTexts.otherLongText,
+          documentUnit.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    store.documentUnit!.longTexts.otherLongText =
+    documentUnit.value!.longTexts.otherLongText =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const dissentingOpinion = computed({
   get: () =>
-    store.documentUnit?.longTexts.dissentingOpinion
+    documentUnit.value?.longTexts.dissentingOpinion
       ? useValidBorderNumberLinks(
-          store.documentUnit?.longTexts.dissentingOpinion,
-          store.documentUnit.managementData.borderNumbers,
+          documentUnit.value?.longTexts.dissentingOpinion,
+          documentUnit.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    store.documentUnit!.longTexts.dissentingOpinion =
+    documentUnit.value!.longTexts.dissentingOpinion =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const outline = computed({
   get: () =>
-    store.documentUnit?.longTexts.outline
+    documentUnit.value?.longTexts.outline
       ? useValidBorderNumberLinks(
-          store.documentUnit?.longTexts.outline,
-          store.documentUnit.managementData.borderNumbers,
+          documentUnit.value?.longTexts.outline,
+          documentUnit.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    store.documentUnit!.longTexts.outline =
+    documentUnit.value!.longTexts.outline =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
@@ -70,9 +75,7 @@ const outline = computed({
         data-testid="otherLongText"
         :editable="isInternalUser"
         label="Sonstiger Langtext"
-        :should-show-button="
-          !store.documentUnit?.longTexts?.otherLongText?.length
-        "
+        :should-show-button="!documentUnit?.longTexts?.otherLongText?.length"
       />
 
       <TextEditorCategory
@@ -83,14 +86,14 @@ const outline = computed({
         :editable="isInternalUser"
         label="Abweichende Meinung"
         :should-show-button="
-          !store.documentUnit?.longTexts?.dissentingOpinion?.length
+          !documentUnit?.longTexts?.dissentingOpinion?.length
         "
       />
 
       <CategoryWrapper
         label="Mitwirkende Richter"
         :should-show-button="
-          !store.documentUnit?.longTexts?.participatingJudges?.length
+          !documentUnit?.longTexts?.participatingJudges?.length
         "
       >
         <ParticipatingJudges label="Mitwirkende Richter" />
@@ -104,7 +107,7 @@ const outline = computed({
           data-testid="outline"
           :editable="isInternalUser"
           label="Gliederung"
-          :should-show-button="!store.documentUnit?.longTexts?.outline?.length"
+          :should-show-button="!documentUnit?.longTexts?.outline?.length"
         />
       </div>
     </div>

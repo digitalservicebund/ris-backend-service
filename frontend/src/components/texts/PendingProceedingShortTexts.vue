@@ -1,12 +1,15 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia"
 import InputSelect from "primevue/select"
-import { Component, computed } from "vue"
+import { Component, computed, Ref } from "vue"
 import InputField from "@/components/input/InputField.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import admissionOfAppealTypes from "@/data/admissionOfAppealTypes.json"
 import appellantTypes from "@/data/appellantTypes.json"
 import { shortTextLabels } from "@/domain/documentUnit"
-import { pendingProceedingShortTextLabels } from "@/domain/pendingProceeding"
+import PendingProceeding, {
+  pendingProceedingShortTextLabels,
+} from "@/domain/pendingProceeding"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
@@ -15,7 +18,9 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
-
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<PendingProceeding | undefined>
+}
 const headline = computed({
   get: () => store.documentUnit?.shortTexts.headline,
   set: (newValue) => {
@@ -25,33 +30,33 @@ const headline = computed({
 })
 
 const legalIssue = computed({
-  get: () => store.documentUnit?.legalIssue,
+  get: () => documentUnit.value?.legalIssue,
   set: (newValue) => {
-    store.documentUnit!.legalIssue =
+    documentUnit.value!.legalIssue =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const resolutionNote = computed({
-  get: () => store.documentUnit?.resolutionNote,
+  get: () => documentUnit.value?.resolutionNote,
   set: (newValue) => {
-    store.documentUnit!.resolutionNote =
+    documentUnit.value!.resolutionNote =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const appellant = computed({
-  get: () => store.documentUnit?.appellant,
+  get: () => documentUnit.value?.appellant,
   set: (newValue) => {
-    store.documentUnit!.appellant =
+    documentUnit.value!.appellant =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const admissionOfAppeal = computed({
-  get: () => store.documentUnit?.admissionOfAppeal,
+  get: () => documentUnit.value?.admissionOfAppeal,
   set: (newValue) => {
-    store.documentUnit!.admissionOfAppeal =
+    documentUnit.value!.admissionOfAppeal =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
@@ -69,7 +74,7 @@ const admissionOfAppeal = computed({
         editable
         field-size="small"
         :label="shortTextLabels.headline"
-        :should-show-button="!store.documentUnit?.shortTexts?.headline?.length"
+        :should-show-button="!documentUnit?.shortTexts?.headline?.length"
       />
 
       <TextEditorCategory
@@ -80,7 +85,7 @@ const admissionOfAppeal = computed({
         editable
         field-size="small"
         :label="pendingProceedingShortTextLabels.legalIssue"
-        :should-show-button="!store.documentUnit?.legalIssue?.length"
+        :should-show-button="!documentUnit?.legalIssue?.length"
       />
       <div class="flex flex-row gap-24">
         <InputField
@@ -123,7 +128,7 @@ const admissionOfAppeal = computed({
         editable
         field-size="small"
         :label="pendingProceedingShortTextLabels.resolutionNote"
-        :should-show-button="!store.documentUnit?.resolutionNote?.length"
+        :should-show-button="!documentUnit?.resolutionNote?.length"
       />
     </div>
   </div>

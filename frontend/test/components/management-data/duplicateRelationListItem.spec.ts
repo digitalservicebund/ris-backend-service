@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { fireEvent, render, screen } from "@testing-library/vue"
-import { setActivePinia } from "pinia"
+import { setActivePinia, Store } from "pinia"
+import { Ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
 import DocumentUnit, {
@@ -354,6 +355,11 @@ describe("DuplicateRelationListItem", () => {
         plugins: [router],
       },
     })
-    return store
+    return store as Store<
+      "docunitStore",
+      {
+        documentUnit: Ref<DocumentUnit>
+      }
+    >
   }
 })

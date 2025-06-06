@@ -178,12 +178,17 @@ export type EurlexParameters = {
   documentationOffice: DocumentationOffice
   celexNumbers: string[]
 }
+export enum Kind {
+  DOCUMENT_UNIT = "DOCUMENT_UNIT",
+  PENDING_PROCEEDING = "PENDING_PROCEEDING",
+}
 
 export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber: string = ""
   readonly status?: PublicationStatus
+  readonly kind = Kind.DOCUMENT_UNIT
   public version: number = 0
   public attachments: Attachment[] = []
   public coreData: CoreData = {}

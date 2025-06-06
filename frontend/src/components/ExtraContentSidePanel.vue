@@ -14,7 +14,7 @@ import PendingProceedingPreview from "@/components/preview/PendingProceedingPrev
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import DocumentationUnitTextCheckSummary from "@/components/text-check/DocumentationUnitTextCheckSummary.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
-import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnit, { Kind } from "@/domain/documentUnit"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
@@ -39,16 +39,15 @@ const { panelMode, currentAttachmentIndex, importDocumentNumber } =
 const route = useRoute()
 
 const textCheckAll = useFeatureToggle("neuris.text-side-panel")
+const isDocumentUnit = props.document.kind === Kind.DOCUMENT_UNIT
 
 const hasNote = computed(() => {
-  const isDocumentUnit = props.document instanceof DocumentUnit
   return (
     isDocumentUnit && !!props.document!.note && props.document!.note.length > 0
   )
 })
 
 const hasAttachments = computed(() => {
-  const isDocumentUnit = props.document instanceof DocumentUnit
   return (
     isDocumentUnit &&
     !!props.document!.attachments &&
@@ -95,7 +94,6 @@ function togglePanel(expand?: boolean): boolean {
 }
 
 function setDefaultState() {
-  const isDocumentUnit = props.document instanceof DocumentUnit
   if (props.sidePanelMode) {
     store.setSidePanelMode(props.sidePanelMode)
   } else if (
@@ -145,7 +143,7 @@ onMounted(() => {
       @update:is-expanded="togglePanel"
     >
       <ExtraContentExtraContentSidePanelMenu
-        v-if="props.document instanceof DocumentUnit"
+        v-if="props.document.kind === Kind.DOCUMENT_UNIT"
         :current-attachment-index="currentAttachmentIndex"
         :document-unit="props.document"
         :hide-panel-mode-bar="props.hidePanelModeBar"
@@ -157,7 +155,9 @@ onMounted(() => {
       />
       <div class="m-24">
         <div
-          v-if="panelMode === 'note' && props.document instanceof DocumentUnit"
+          v-if="
+            panelMode === 'note' && props.document.kind === Kind.DOCUMENT_UNIT
+          "
         >
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
@@ -173,7 +173,7 @@ onMounted(() => {
         <div
           v-else-if="
             panelMode === 'attachments' &&
-            props.document instanceof DocumentUnit
+            props.document.kind === Kind.DOCUMENT_UNIT
           "
         >
           <AttachmentView
@@ -195,30 +195,22 @@ onMounted(() => {
           id="preview-container"
           class="flex max-h-[70vh] overflow-auto"
         >
-          <DocumentUnitPreview
-            v-if="props.document instanceof DocumentUnit"
-            layout="narrow"
-          />
+          <DocumentUnitPreview v-if="isDocumentUnit" layout="narrow" />
           <PendingProceedingPreview
-            v-if="props.document instanceof PendingProceeding"
+            v-if="props.document.kind === Kind.PENDING_PROCEEDING"
             :document-number="props.document.documentNumber"
             layout="narrow"
           />
         </div>
 
         <CategoryImport
-          v-else-if="
-            panelMode === 'category-import' &&
-            props.document instanceof DocumentUnit
-          "
+          v-else-if="panelMode === 'category-import' && isDocumentUnit"
           :document-number="importDocumentNumber"
         />
 
         <DocumentationUnitTextCheckSummary
           v-else-if="
-            panelMode === 'text-check' &&
-            textCheckAll &&
-            props.document instanceof DocumentUnit
+            panelMode === 'text-check' && textCheckAll && isDocumentUnit
           "
           v-bind="{ jumpToMatch }"
         />

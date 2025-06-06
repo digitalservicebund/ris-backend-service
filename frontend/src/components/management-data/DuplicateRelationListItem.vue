@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
 import Checkbox from "primevue/checkbox"
-import { computed, ref } from "vue"
+import { computed, Ref, ref } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import {
+import DocumentUnit, {
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"
@@ -20,7 +20,9 @@ const { duplicateRelation } = defineProps<{
   duplicateRelation: DuplicateRelation
 }>()
 
-const { documentUnit } = storeToRefs(useDocumentUnitStore())
+const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 
 const hasSetStateError = ref(false)
 

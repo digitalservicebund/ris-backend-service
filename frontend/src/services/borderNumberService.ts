@@ -1,4 +1,5 @@
 import { storeToRefs } from "pinia"
+import { Ref } from "vue"
 import DocumentUnit, { LongTexts, ShortTexts } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -234,7 +235,9 @@ const borderNumberService = {
    */
   makeBorderNumbersSequential: () => {
     try {
-      const { documentUnit } = storeToRefs(useDocumentUnitStore())
+      const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
+        documentUnit: Ref<DocumentUnit | undefined>
+      }
       let nextBorderNumberCount = 1
       // key: original border number  -> value: new border number
       let allUpdatedBorderNumbers = new Map<string, number>()
@@ -275,7 +278,9 @@ const borderNumberService = {
    */
   validateBorderNumbers: (): BorderNumberValidationResult => {
     try {
-      const { documentUnit } = storeToRefs(useDocumentUnitStore())
+      const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
+        documentUnit: Ref<DocumentUnit | undefined>
+      }
       let nextExpectedBorderNumber = 1
       for (const category of orderedCategoriesWithBorderNumbers) {
         const longText = documentUnit.value!.longTexts[category]

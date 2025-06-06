@@ -3,7 +3,7 @@ import EnsuingDecision from "./ensuingDecision"
 import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
 import ActiveCitation from "@/domain/activeCitation"
-import { ContentRelatedIndexing, CoreData } from "@/domain/documentUnit"
+import { ContentRelatedIndexing, CoreData, Kind } from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import { PublicationStatus } from "@/domain/publicationStatus"
@@ -34,6 +34,7 @@ export default class PendingProceeding {
   readonly id?: string
   readonly documentNumber: string = ""
   readonly status?: PublicationStatus
+  readonly kind = Kind.PENDING_PROCEEDING
   public version: number = 0
   public coreData: CoreData = {}
   public shortTexts: PendingDecisionShortTexts = {}

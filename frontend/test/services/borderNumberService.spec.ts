@@ -1,5 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
-import { setActivePinia } from "pinia"
+import { setActivePinia, Store } from "pinia"
+import { Ref } from "vue"
 import DocumentUnit, {
   longTextLabels,
   LongTexts,
@@ -22,7 +23,12 @@ function mockDocUnitStore({
     longTexts,
   })
 
-  return mockedSessionStore
+  return mockedSessionStore as Store<
+    "docunitStore",
+    {
+      documentUnit: Ref<DocumentUnit>
+    }
+  >
 }
 
 function borderNumber(number: number | string) {

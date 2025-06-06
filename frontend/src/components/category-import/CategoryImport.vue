@@ -10,6 +10,7 @@ import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
 import DocumentUnit, {
+  Kind,
   longTextLabels,
   shortTextLabels,
 } from "@/domain/documentUnit"
@@ -43,7 +44,7 @@ async function searchForDocumentUnit() {
   const response = await documentUnitService.getByDocumentNumber(
     documentNumber.value,
   )
-  if (response.data instanceof DocumentUnit) {
+  if (response.data?.kind === Kind.DOCUMENT_UNIT) {
     documentUnitToImport.value = response.data
     errorMessage.value = undefined
   } else {
