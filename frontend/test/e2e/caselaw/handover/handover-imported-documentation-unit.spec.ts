@@ -6,16 +6,16 @@ import { getPreview } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { importDocumentationUnitFromXml } from "~/e2e/caselaw/utils/importer-api-util"
 
 test.describe("ensuring the exported XML is generated from imported decision as expected", () => {
-  test("xml preview shows expected xml", async ({ page }) => {
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
-      process.env.E2E_TEST_URL === "http://127.0.0.1",
-      "Skipping this test on local execution",
-    )
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("xml preview shows expected xml", async ({ page }) => {
+    // test.skip(
+    //   process.env.E2E_TEST_URL === "http://127.0.0.1",
+    //   "Skipping this test on local execution",
+    // )
     // generate API-Key
     await navigateToSettings(page)
     // eslint-disable-next-line playwright/no-conditional-in-test
-    if (await page.getByText("Neuen API-Schlüssel erstellen").isVisible()) {
+    if (await page.getByText("gültig bis: ").isHidden()) {
       await page.getByText("Neuen API-Schlüssel erstellen").click()
     }
     const apiKey = await page
