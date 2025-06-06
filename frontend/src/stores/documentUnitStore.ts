@@ -2,6 +2,7 @@ import * as jsonpatch from "fast-json-patch"
 import { Operation } from "fast-json-patch"
 import { defineStore } from "pinia"
 import { ref } from "vue"
+import { Documentable } from "@/components/input/types"
 import fields from "@/data/fieldNames.json"
 import DocumentUnit from "@/domain/documentUnit"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
@@ -13,12 +14,12 @@ import {
 } from "@/services/httpClient"
 
 export const useDocumentUnitStore = defineStore("docunitStore", () => {
-  const documentUnit = ref<DocumentUnit | undefined>(undefined)
-  const originalDocumentUnit = ref<DocumentUnit | undefined>(undefined)
+  const documentUnit = ref<Documentable | undefined>(undefined)
+  const originalDocumentUnit = ref<Documentable | undefined>(undefined)
 
   async function loadDocumentUnit(
     documentNumber: string,
-  ): Promise<ServiceResponse<DocumentUnit>> {
+  ): Promise<ServiceResponse<Documentable>> {
     const response =
       await documentUnitService.getByDocumentNumber(documentNumber)
     if (response.data) {

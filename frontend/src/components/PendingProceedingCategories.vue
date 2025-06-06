@@ -10,7 +10,7 @@ import FlexItem from "@/components/FlexItem.vue"
 import PendingProceedingTexts from "@/components/texts/PendingProceedingTexts.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
-import { usePendingProceedingStore } from "@/stores/pendingProceedingStore"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 defineProps<{
   registerTextEditorRef: (key: string, el: Component | null) => void
@@ -18,18 +18,16 @@ defineProps<{
 
 const route = useRoute()
 const { hash: routeHash } = toRefs(route)
-const store = usePendingProceedingStore()
-const { pendingProceeding } = storeToRefs(store)
-const courtTypeRef = ref<string>(
-  pendingProceeding.value!.coreData.court?.type ?? "",
-)
+const store = useDocumentUnitStore()
+const { documentUnit } = storeToRefs(store)
+const courtTypeRef = ref<string>(documentUnit.value!.coreData.court?.type ?? "")
 const { scrollIntoViewportById } = useScroll()
 
 const coreData = computed({
-  get: () => store.pendingProceeding!.coreData,
+  get: () => store.documentUnit!.coreData,
   set: async (newValues) => {
-    store.pendingProceeding!.coreData = newValues
-    courtTypeRef.value = store.pendingProceeding!.coreData.court?.type ?? ""
+    store.documentUnit!.coreData = newValues
+    courtTypeRef.value = store.documentUnit!.coreData.court?.type ?? ""
   },
 })
 

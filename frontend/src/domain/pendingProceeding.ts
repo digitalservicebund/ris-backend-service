@@ -34,6 +34,7 @@ export default class PendingProceeding {
   readonly id?: string
   readonly documentNumber: string = ""
   readonly status?: PublicationStatus
+  public version: number = 0
   public coreData: CoreData = {}
   public shortTexts: PendingDecisionShortTexts = {}
   public previousDecisions?: PreviousDecision[]

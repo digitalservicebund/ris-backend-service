@@ -16,7 +16,6 @@ import PendingProceeding from "@/domain/pendingProceeding"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
-import { usePendingProceedingStore } from "@/stores/pendingProceedingStore"
 
 const props = defineProps<{
   documentNumber: string
@@ -29,8 +28,8 @@ useHead({
 const store = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
-const { documentationUnit } = storeToRefs(store) as {
-  documentationUnit: Ref<PendingProceeding | undefined>
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<PendingProceeding | undefined>
 }
 const route = useRoute()
 const menuItems = usePendingProceedingMenuItems(
@@ -117,7 +116,7 @@ onMounted(async () => {
 <template>
   <div class="flex w-screen grow">
     <div
-      v-if="!route.path.includes('preview') && pendingProceeding"
+      v-if="!route.path.includes('preview') && documentUnit"
       class="sticky top-0 z-50 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
       <SideToggle
@@ -132,17 +131,14 @@ onMounted(async () => {
         <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
       </SideToggle>
     </div>
-    <div
-      v-if="pendingProceeding"
-      class="flex w-full min-w-0 flex-col bg-gray-100"
-    >
+    <div v-if="documentUnit" class="flex w-full min-w-0 flex-col bg-gray-100">
       <DocumentableInfoPanel
-        v-if="pendingProceeding && !route.path.includes('preview')"
-        :document="pendingProceeding"
+        v-if="documentUnit && !route.path.includes('preview')"
+        :document="documentUnit"
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer
-          v-if="pendingProceeding"
+          v-if="documentUnit"
           class="h-full w-full flex-grow"
           :class="
             route.path.includes('preview')
@@ -151,8 +147,8 @@ onMounted(async () => {
           "
         >
           <ExtraContentSidePanel
-            v-if="pendingProceeding && !route.path.includes('preview')"
-            :document="pendingProceeding"
+            v-if="documentUnit && !route.path.includes('preview')"
+            :document="documentUnit"
             side-panel-mode="preview"
           ></ExtraContentSidePanel>
           <router-view v-bind="{ registerTextEditorRef }" />

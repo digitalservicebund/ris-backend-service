@@ -4,14 +4,14 @@ import PreviousDecisionInputGroup from "./PreviousDecisionInputGroup.vue"
 import DocumentationUnitSummary from "@/components/DocumentationUnitSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import PreviousDecision from "@/domain/previousDecision"
-import { usePendingProceedingStore } from "@/stores/pendingProceedingStore"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const store = usePendingProceedingStore()
+const store = useDocumentUnitStore()
 
 const previousDecisions = computed({
-  get: () => store.pendingProceeding!.previousDecisions as PreviousDecision[],
+  get: () => store.documentUnit!.previousDecisions as PreviousDecision[],
   set: (newValues) => {
-    store.pendingProceeding!.previousDecisions = newValues
+    store.documentUnit!.previousDecisions = newValues
   },
 })
 </script>

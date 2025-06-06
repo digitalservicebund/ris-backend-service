@@ -2,6 +2,7 @@ import httpClient, {
   FailedValidationServerResponse,
   ServiceResponse,
 } from "./httpClient"
+import { Documentable } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
 import DocumentUnit, {
   DocumentUnitSearchParameter,
@@ -19,7 +20,7 @@ import errorMessages from "@/i18n/errors.json"
 interface DocumentUnitService {
   getByDocumentNumber(
     documentNumber: string,
-  ): Promise<ServiceResponse<DocumentUnit>>
+  ): Promise<ServiceResponse<Documentable>>
 
   getPendingProceedingByDocumentNumber(
     documentNumber: string,

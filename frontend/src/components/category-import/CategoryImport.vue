@@ -1,17 +1,20 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import InputText from "primevue/inputtext"
-import { onMounted, ref, watch } from "vue"
+import { onMounted, Ref, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
+import ActiveCitation from "@/domain/activeCitation"
 import DocumentUnit, {
   longTextLabels,
   shortTextLabels,
 } from "@/domain/documentUnit"
 import NormReference from "@/domain/normReference"
+import ParticipatingJudge from "@/domain/participatingJudge"
 import Reference from "@/domain/reference"
 import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
@@ -22,6 +25,9 @@ const props = defineProps<{
   documentNumber?: string
 }>()
 const store = useDocumentUnitStore()
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 const validationStore = useValidationStore<keyof typeof labels>()
 
 const documentNumber = ref<string>(props.documentNumber ?? "")
@@ -37,7 +43,7 @@ async function searchForDocumentUnit() {
   const response = await documentUnitService.getByDocumentNumber(
     documentNumber.value,
   )
-  if (response.data) {
+  if (response.data instanceof DocumentUnit) {
     documentUnitToImport.value = response.data
     errorMessage.value = undefined
   } else {
@@ -90,12 +96,12 @@ const hasContent = (key: keyof typeof labels): boolean => {
 const isImportable = (key: keyof typeof labels): boolean => {
   if (documentUnitToImport.value)
     if (key in documentUnitToImport.value.shortTexts) {
-      return !store.documentUnit!.shortTexts[
+      return !documentUnit.value!.shortTexts[
         key as keyof typeof documentUnitToImport.value.shortTexts
       ]
     } else if (key in documentUnitToImport.value.longTexts) {
       const targetLongText =
-        store.documentUnit!.longTexts[
+        documentUnit.value!.longTexts[
           key as keyof typeof documentUnitToImport.value.longTexts
         ]
 
@@ -165,7 +171,7 @@ function importReferences(key: "caselawReferences" | "literatureReferences") {
   const source = documentUnitToImport.value?.[key]
   if (!source) return
 
-  const targetReferences = store.documentUnit![key]
+  const targetReferences = documentUnit.value![key]
 
   if (targetReferences) {
     const isDuplicate = (
@@ -209,7 +215,7 @@ function importReferences(key: "caselawReferences" | "literatureReferences") {
 
     targetReferences.push(...uniqueImportableReferences)
   } else {
-    store.documentUnit![key] = source.map(
+    documentUnit.value![key] = source.map(
       (reference) =>
         new Reference({
           ...reference,
@@ -223,7 +229,7 @@ function importKeywords() {
   const source = documentUnitToImport.value?.contentRelatedIndexing.keywords
   if (!source) return
 
-  const targetKeywords = store.documentUnit!.contentRelatedIndexing.keywords
+  const targetKeywords = documentUnit.value!.contentRelatedIndexing.keywords
 
   if (targetKeywords) {
     const uniqueImportableKeywords = source.filter(
@@ -231,7 +237,7 @@ function importKeywords() {
     )
     targetKeywords.push(...uniqueImportableKeywords)
   } else {
-    store.documentUnit!.contentRelatedIndexing.keywords = [...source]
+    documentUnit.value!.contentRelatedIndexing.keywords = [...source]
   }
 }
 
@@ -240,7 +246,7 @@ function importFieldsOfLaw() {
   if (!source) return
 
   const targetFieldsOfLaw =
-    store.documentUnit!.contentRelatedIndexing.fieldsOfLaw
+    documentUnit.value!.contentRelatedIndexing.fieldsOfLaw
   if (targetFieldsOfLaw) {
     const uniqueImportableFieldsOfLaw = source.filter(
       (fieldOfLaw) =>
@@ -250,7 +256,7 @@ function importFieldsOfLaw() {
     )
     targetFieldsOfLaw.push(...uniqueImportableFieldsOfLaw)
   } else {
-    store.documentUnit!.contentRelatedIndexing.fieldsOfLaw = [...source]
+    documentUnit.value!.contentRelatedIndexing.fieldsOfLaw = [...source]
   }
 }
 
@@ -258,7 +264,7 @@ function importNorms() {
   const source = documentUnitToImport.value?.contentRelatedIndexing.norms
   if (!source) return
 
-  const targetNorms = store.documentUnit!.contentRelatedIndexing.norms
+  const targetNorms = documentUnit.value!.contentRelatedIndexing.norms
   if (targetNorms) {
     source.forEach((importableNorm) => {
       // first check for abbreviation, then for raw value
@@ -309,7 +315,7 @@ function importActiveCitations() {
   if (!source) return
 
   const targetActiveCitations =
-    store.documentUnit!.contentRelatedIndexing.activeCitations ?? []
+    documentUnit.value!.contentRelatedIndexing.activeCitations ?? []
 
   const uniqueImportableFieldsOfLaw = source
     .filter(
@@ -326,10 +332,10 @@ function importActiveCitations() {
       newEntry: true,
     }))
 
-  store.documentUnit!.contentRelatedIndexing.activeCitations = [
+  documentUnit.value!.contentRelatedIndexing.activeCitations = [
     ...targetActiveCitations,
     ...uniqueImportableFieldsOfLaw,
-  ]
+  ] as ActiveCitation[]
 }
 
 function importParticipatingJudges() {
@@ -338,7 +344,9 @@ function importParticipatingJudges() {
 
   source.forEach((judge) => (judge.id = undefined))
 
-  store.documentUnit!.longTexts["participatingJudges"] = [...source]
+  documentUnit.value!.longTexts["participatingJudges"] = [
+    ...source,
+  ] as ParticipatingJudge[]
 }
 
 function importShortTexts(key: string) {
@@ -347,13 +355,13 @@ function importShortTexts(key: string) {
       key as keyof typeof documentUnitToImport.value.shortTexts
     ]
 
-  if (store.documentUnit)
-    store.documentUnit.shortTexts[
-      key as keyof typeof store.documentUnit.shortTexts
+  if (documentUnit.value)
+    documentUnit.value.shortTexts[
+      key as keyof typeof documentUnit.value.shortTexts
     ] = source
 }
 
-// By narrowing the type of key to exclude "participatingJudges", TypeScript no longer considers the possibility of assigning a non-string value to store.documentUnit.longTexts[key].
+// By narrowing the type of key to exclude "participatingJudges", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.longTexts[key].
 type StringKeys =
   | "tenor"
   | "reasons"
@@ -366,8 +374,8 @@ type StringKeys =
 function importLongTexts(key: StringKeys) {
   const source = documentUnitToImport.value?.longTexts[key]
 
-  if (store.documentUnit) {
-    store.documentUnit.longTexts[key] = source as string
+  if (documentUnit.value) {
+    documentUnit.value.longTexts[key] = source as string
   }
 }
 
