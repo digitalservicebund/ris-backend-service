@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
@@ -11,14 +12,17 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.DuplicateRelationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
@@ -46,7 +50,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataIn
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
@@ -90,6 +93,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresJPAConfig.class,
       FlywayConfig.class,
       SecurityConfig.class,
+      DatabaseDuplicateCheckService.class,
+      DuplicateRelationService.class,
       OAuthService.class,
       TestConfig.class,
       DocumentNumberPatternConfig.class,
@@ -99,6 +104,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresDocumentationUnitSearchRepositoryImpl.class
     },
     controllers = {DocumentationUnitController.class, ProcedureController.class})
+@Sql(scripts = {"classpath:courts_init.sql"})
+@Sql(
+    scripts = {"classpath:courts_cleanup.sql"},
+    executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class DocumentationUnitSearchIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -118,6 +127,7 @@ class DocumentationUnitSearchIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
+  @Autowired private DatabaseDuplicateCheckService duplicateCheckService;
 
   @MockitoBean S3AsyncClient s3AsyncClient;
   @MockitoBean MailService mailService;
@@ -128,7 +138,6 @@ class DocumentationUnitSearchIntegrationTest {
   @MockitoBean private PatchMapperService patchMapperService;
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
@@ -139,11 +148,19 @@ class DocumentationUnitSearchIntegrationTest {
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
+  private static final CourtDTO courtAgAachen =
+      CourtDTO.builder().id(UUID.fromString("46301f85-9bd2-4690-a67f-f9fdfe725de3")).build();
+  private static final CourtDTO courtOlgDresden =
+      CourtDTO.builder().id(UUID.fromString("12e9f671-6a5c-4ec7-9b57-3fafdefd7a49")).build();
   private DocumentationOfficeDTO docOfficeDTO;
+  private DocumentationOfficeDTO bghOfficeDTO;
 
   @BeforeEach
   void setUp() {
     docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
+    bghOfficeDTO = documentationOfficeRepository.findByAbbreviation("BGH");
+    when(featureToggleService.isEnabled("neuris.search-criteria-api")).thenReturn(true);
+    when(featureToggleService.isEnabled("neuris.search-fetch-relationships")).thenReturn(true);
     mockUserGroups(userGroupService);
   }
 
@@ -184,12 +201,12 @@ class DocumentationUnitSearchIntegrationTest {
         .extracting("documentNumber", "fileNumber", "status")
         .containsExactly(
             tuple(
-                "MIGR202200012",
-                "AkteM",
-                Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build()),
-            tuple(
                 "NEUR202300008",
                 "AkteY",
+                Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build()),
+            tuple(
+                "MIGR202200012",
+                "AkteM",
                 Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build()));
     assertThat(responseBody.getNumberOfElements()).isEqualTo(2);
   }
@@ -231,7 +248,7 @@ class DocumentationUnitSearchIntegrationTest {
     assertThat(responseBodyWithoutFilter.getNumberOfElements()).isEqualTo(3);
     assertThat(responseBodyWithoutFilter)
         .map(DocumentationUnitListItem::documentNumber)
-        .containsExactly("ABCD202200001", "ABCD202200002", "ABCD202200003");
+        .containsExactly("ABCD202200003", "ABCD202200002", "ABCD202200001");
 
     Slice<DocumentationUnitListItem> responseBodyWithEUFilter =
         risWebTestClient
@@ -280,7 +297,7 @@ class DocumentationUnitSearchIntegrationTest {
       EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
           repository,
           DecisionDTO.builder()
-              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .documentNumber(RandomStringUtils.randomAlphabetic(13).toUpperCase())
               .date(date)
               .documentationOffice(docOfficeDTO));
     }
@@ -305,6 +322,13 @@ class DocumentationUnitSearchIntegrationTest {
             LocalDate.of(2022, 1, 23),
             LocalDate.of(2022, 1, 23),
             null);
+    var docUnitWithSameDates =
+        responseBody.getContent().stream()
+            .filter(docUnit -> LocalDate.of(2022, 1, 23).equals(docUnit.decisionDate()))
+            .toList();
+    // For the same date, the document numbers should be in descending order
+    assertThat(docUnitWithSameDates.getFirst().documentNumber())
+        .isGreaterThan(docUnitWithSameDates.getLast().documentNumber());
   }
 
   @Test
@@ -490,11 +514,31 @@ class DocumentationUnitSearchIntegrationTest {
         .expectStatus()
         .isOk()
         .expectBody(new TypeReference<SliceTestImpl<?>>() {})
-        .consumeWith(response -> assertThat(response.getResponseBody().isLast()).isFalse());
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().isFirst()).isTrue();
+              assertThat(response.getResponseBody().isLast()).isFalse();
+              assertThat(response.getResponseBody().getNumberOfElements()).isEqualTo(1);
+            });
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=1&sz=1")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<?>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().isFirst()).isFalse();
+              assertThat(response.getResponseBody().isLast()).isTrue();
+              assertThat(response.getResponseBody().getNumberOfElements()).isEqualTo(1);
+            });
   }
 
   @Test
-  void testForCompleteResultListWhenSearchingForFileNumberOrDocumentNumber() {
+  void testForCompleteResultListWhenSearchingForFileNumber() {
     for (int i = 0; i < 10; i++) {
       EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
           repository,
@@ -504,21 +548,32 @@ class DocumentationUnitSearchIntegrationTest {
               .documentationOffice(docOfficeDTO)
               .fileNumbers(
                   // even indices get a fileNumber
-                  i % 2 == 1
-                      ? List.of()
-                      : List.of(FileNumberDTO.builder().value("AB 34/" + i).rank(0L).build()))
-              // index 4+ get a deviating fileNumber
+                  i % 2 == 0
+                      ? List.of(FileNumberDTO.builder().value("AB 34/" + i).rank(0L).build())
+                      : List.of())
+              // odd indices a deviating fileNumber
               .deviatingFileNumbers(
-                  i < 4
-                      ? List.of()
-                      : List.of(
-                          DeviatingFileNumberDTO.builder().value("ABC 34/" + i).rank(0L).build())));
+                  i % 2 == 1
+                      ? List.of(
+                          DeviatingFileNumberDTO.builder().value("AbC 34/" + i).rank(0L).build(),
+                          DeviatingFileNumberDTO.builder().value("NoMatch" + i).rank(1L).build())
+                      : List.of()));
     }
+
+    // Doc unit with different file numbers will not match the search criteria
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .documentNumber("NE1234567800")
+            .documentationOffice(docOfficeDTO)
+            .fileNumbers(List.of(FileNumberDTO.builder().value("BB 34/").rank(0L).build()))
+            .deviatingFileNumbers(
+                List.of(DeviatingFileNumberDTO.builder().value("BBC 34/").rank(0L).build())));
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=4&documentNumberOrFileNumber=" + "AB")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=4&fileNumber=AB")
         .exchange()
         .expectStatus()
         .isOk()
@@ -527,19 +582,17 @@ class DocumentationUnitSearchIntegrationTest {
             response -> {
               Slice<DocumentationUnitListItem> responseBodyFirstPage = response.getResponseBody();
               assertThat(responseBodyFirstPage.getNumberOfElements()).isEqualTo(4);
-              // not to be the last page
               assertThat(responseBodyFirstPage.isFirst()).isTrue();
               assertThat(responseBodyFirstPage.isLast()).isFalse();
-              // to have docNumbers "AB1234567800", "AB1234567801", "AB1234567802", "AB1234567803"
               assertThat(responseBodyFirstPage.getContent())
                   .extracting("documentNumber")
-                  .containsExactly("AB1234567800", "AB1234567801", "AB1234567802", "AB1234567803");
+                  .containsExactly("GE1234567809", "GE1234567808", "GE1234567807", "GE1234567806");
             });
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/search?pg=1&sz=4&documentNumberOrFileNumber=" + "AB")
+        .uri("/api/v1/caselaw/documentunits/search?pg=1&sz=4&fileNumber=  AB   ")
         .exchange()
         .expectStatus()
         .isOk()
@@ -548,21 +601,18 @@ class DocumentationUnitSearchIntegrationTest {
             response -> {
               // expect second page...
               Slice<DocumentationUnitListItem> responseBodySecondPage = response.getResponseBody();
-              // to have 4 results
               assertThat(responseBodySecondPage.getNumberOfElements()).isEqualTo(4);
-              // not to be the last or first page
               assertThat(responseBodySecondPage.isFirst()).isFalse();
               assertThat(responseBodySecondPage.isLast()).isFalse();
-              // to have docNumbers "AB1234567804", "GE1234567805", "GE1234567806", "GE1234567807"
               assertThat(responseBodySecondPage.getContent())
                   .extracting("documentNumber")
-                  .containsExactly("AB1234567804", "GE1234567805", "GE1234567806", "GE1234567807");
+                  .containsExactly("GE1234567805", "AB1234567804", "AB1234567803", "AB1234567802");
             });
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/search?pg=2&sz=4&documentNumberOrFileNumber=" + "AB")
+        .uri("/api/v1/caselaw/documentunits/search?pg=2&sz=4&fileNumber=AB")
         .exchange()
         .expectStatus()
         .isOk()
@@ -571,15 +621,12 @@ class DocumentationUnitSearchIntegrationTest {
             response -> {
               // expect third page...
               Slice<DocumentationUnitListItem> responseBodyThirdPage = response.getResponseBody();
-              // to have 2 results
               assertThat(responseBodyThirdPage.getNumberOfElements()).isEqualTo(2);
-              // not to be the first but to be the last page
               assertThat(responseBodyThirdPage.isFirst()).isFalse();
               assertThat(responseBodyThirdPage.isLast()).isTrue();
-              // to have docNumbers "GE1234567808", "GE1234567809"
               assertThat(responseBodyThirdPage.getContent())
                   .extracting("documentNumber")
-                  .containsExactly("GE1234567808", "GE1234567809");
+                  .containsExactly("AB1234567801", "AB1234567800");
             });
   }
 
@@ -591,7 +638,7 @@ class DocumentationUnitSearchIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumberOrFileNumber=+++AB++")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumber=   AB  ")
         .exchange()
         .expectStatus()
         .isOk()
@@ -611,8 +658,7 @@ class DocumentationUnitSearchIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri(
-            "/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumberOrFileNumber=AB1234567802")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumber=AB1234567802")
         .exchange()
         .expectStatus()
         .isOk()
@@ -623,9 +669,244 @@ class DocumentationUnitSearchIntegrationTest {
                   .extracting("documentNumber")
                   .containsExactly("AB1234567802");
               assertThat(response.getResponseBody().getContent()).hasSize(1);
-              assertThat(response.getResponseBody().getContent().get(0).isEditable()).isTrue();
-              assertThat(response.getResponseBody().getContent().get(0).isDeletable()).isTrue();
+              assertThat(response.getResponseBody().getContent().getFirst().isEditable()).isTrue();
+              assertThat(response.getResponseBody().getContent().getFirst().isDeletable()).isTrue();
             });
+  }
+
+  @Test
+  void shouldFilterOutUnpublishedDocUnitsOfOtherDocOffices() {
+    // Published doc unit of BGH office should be returned
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, bghOfficeDTO, "AB1234567800");
+    // Published doc unit of own office should be returned
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "AB1234567801");
+    // Published doc unit of own office should be returned
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder().documentNumber("AB1234567802").documentationOffice(docOfficeDTO),
+        PublicationStatus.UNPUBLISHED);
+    // Publishing doc unit of BGH office should be returned
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder().documentNumber("AB1234567803").documentationOffice(bghOfficeDTO),
+        PublicationStatus.PUBLISHING);
+    // Unpublished doc unit of BGH office should not be returned
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder().documentNumber("XX1234567801").documentationOffice(bghOfficeDTO),
+        PublicationStatus.UNPUBLISHED);
+
+    risWebTestClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().getContent())
+                    .extracting("documentNumber")
+                    .containsExactly(
+                        "AB1234567803", "AB1234567802", "AB1234567801", "AB1234567800"));
+  }
+
+  @Test
+  void shouldFilterByPublicationStatus() {
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "AB1234567800");
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder().documentNumber("AB1234567801").documentationOffice(docOfficeDTO),
+        PublicationStatus.UNPUBLISHED);
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder().documentNumber("AB1234567802").documentationOffice(docOfficeDTO),
+        PublicationStatus.PUBLISHING);
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder().documentNumber("AB1234567803").documentationOffice(bghOfficeDTO),
+        PublicationStatus.UNPUBLISHED);
+
+    risWebTestClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&publicationStatus=UNPUBLISHED")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().getContent())
+                    .extracting("documentNumber")
+                    .containsExactly("AB1234567801"));
+  }
+
+  @Test
+  void shouldFilterByErrorStatus() {
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "AB1234567800");
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder().documentNumber("AB1234567801").documentationOffice(docOfficeDTO),
+        PublicationStatus.UNPUBLISHED,
+        true);
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder().documentNumber("AB1234567802").documentationOffice(docOfficeDTO),
+        PublicationStatus.PUBLISHING,
+        true);
+    // Error filtering only works for own doc office -> published bgh decision with error will not
+    // be returned
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder().documentNumber("AB1234567803").documentationOffice(bghOfficeDTO),
+        PublicationStatus.PUBLISHED,
+        true);
+
+    risWebTestClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&withError=true")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().getContent())
+                    .extracting("documentNumber")
+                    .containsExactly("AB1234567802", "AB1234567801"));
+  }
+
+  @Test
+  void shouldFilterByDuplicateWarning() {
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "AB1234567800");
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .ecli("same")
+            .documentNumber("AB1234567801")
+            .documentationOffice(docOfficeDTO));
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .ecli("same")
+            .documentNumber("AB1234567802")
+            .documentationOffice(docOfficeDTO));
+    // Duplicate filtering only works for own doc office -> published bgh decision with duplicate
+    // will not be returned
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .ecli("same")
+            .documentNumber("AB1234567803")
+            .documentationOffice(bghOfficeDTO));
+
+    duplicateCheckService.checkDuplicates("AB1234567801");
+
+    risWebTestClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&withDuplicateWarning=true")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().getContent())
+                    .extracting("documentNumber")
+                    .containsExactly("AB1234567802", "AB1234567801"));
+  }
+
+  @Test
+  void shouldFilterForOwnDocOffice() {
+    // Published doc unit of BGH office should not be returned
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, bghOfficeDTO, "AB1234567800");
+    // Published doc unit of own office should be returned
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "AB1234567801");
+
+    risWebTestClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&myDocOfficeOnly=true")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().getContent())
+                    .extracting("documentNumber")
+                    .containsExactly("AB1234567801"));
+  }
+
+  @Test
+  void shouldFilterForCourtType() {
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .court(courtAgAachen)
+            .documentNumber("AB1234567800")
+            .documentationOffice(docOfficeDTO));
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .court(courtOlgDresden)
+            .documentNumber("AB1234567801")
+            .documentationOffice(docOfficeDTO));
+
+    risWebTestClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&courtType=AG")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().getContent())
+                    .extracting("documentNumber")
+                    .containsExactly("AB1234567800"));
+  }
+
+  @Test
+  void shouldFilterForCourtLocation() {
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .court(courtAgAachen)
+            .documentNumber("AB1234567800")
+            .documentationOffice(docOfficeDTO));
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder()
+            .court(courtOlgDresden)
+            .documentNumber("AB1234567801")
+            .documentationOffice(docOfficeDTO));
+
+    risWebTestClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&courtLocation=Dresden")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().getContent())
+                    .extracting("documentNumber")
+                    .containsExactly("AB1234567801"));
   }
 
   @Test
@@ -633,12 +914,14 @@ class DocumentationUnitSearchIntegrationTest {
       testSearch_withExternalUnassignedUser_shouldReturnNotEditableAndNotDeletableDocumentationUnit() {
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository, docOfficeDTO, "AB1234567802");
+    // Second doc unit won't match
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "XX1234567802");
 
     risWebTestClient
         .withExternalLogin()
         .get()
-        .uri(
-            "/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumberOrFileNumber=AB1234567802")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumber=AB1234567802")
         .exchange()
         .expectStatus()
         .isOk()
@@ -648,9 +931,9 @@ class DocumentationUnitSearchIntegrationTest {
               assertThat(response.getResponseBody().getContent())
                   .extracting("documentNumber")
                   .containsExactly("AB1234567802");
-              assertThat(response.getResponseBody().getContent()).hasSize(1);
-              assertThat(response.getResponseBody().getContent().get(0).isEditable()).isFalse();
-              assertThat(response.getResponseBody().getContent().get(0).isDeletable()).isFalse();
+              assertThat(response.getResponseBody().getContent().getFirst().isEditable()).isFalse();
+              assertThat(response.getResponseBody().getContent().getFirst().isDeletable())
+                  .isFalse();
             });
   }
 
@@ -700,8 +983,9 @@ class DocumentationUnitSearchIntegrationTest {
                   .extracting("documentNumber")
                   .containsExactly(documentationUnitDTO.getDocumentNumber());
               assertThat(response.getResponseBody().getContent()).hasSize(1);
-              assertThat(response.getResponseBody().getContent().get(0).isEditable()).isTrue();
-              assertThat(response.getResponseBody().getContent().get(0).isDeletable()).isFalse();
+              assertThat(response.getResponseBody().getContent().getFirst().isEditable()).isTrue();
+              assertThat(response.getResponseBody().getContent().getFirst().isDeletable())
+                  .isFalse();
             });
   }
 }
