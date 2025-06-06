@@ -22,7 +22,7 @@ import { SelectablePanelContent } from "@/types/panelContentMode"
 import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
-  document: Documentable
+  document: DocumentUnit | PendingProceeding
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   sidePanelMode?: SelectablePanelContent

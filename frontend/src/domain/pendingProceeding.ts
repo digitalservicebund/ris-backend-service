@@ -14,7 +14,9 @@ export type PendingDecisionShortTexts = {
   legalIssue?: string
   appellant?: string
   admissionOfAppeal?: string
+  isResolved?: string
   resolutionNote?: string
+  resolutionDate?: string
 }
 export const pendingProceedingShortTextLabels: {
   [shortTextKey in keyof Required<PendingDecisionShortTexts>]: string
@@ -23,7 +25,9 @@ export const pendingProceedingShortTextLabels: {
   legalIssue: "Rechtsfrage",
   appellant: "Rechtsmittelführer",
   admissionOfAppeal: "Rechtsmittelzulassung",
+  isResolved: "Erledigt",
   resolutionNote: "Erledigungsvermerk",
+  resolutionDate: "Erledigungsmitteilung",
 }
 export default class PendingProceeding {
   readonly uuid: string
@@ -38,7 +42,6 @@ export default class PendingProceeding {
   public caselawReferences?: Reference[]
   public literatureReferences?: Reference[]
   public resolutionNote?: string = ""
-  public isResolved: boolean = false
   public legalIssue?: string = ""
   public admissionOfAppeal?: string = ""
   public appellant?: string = ""

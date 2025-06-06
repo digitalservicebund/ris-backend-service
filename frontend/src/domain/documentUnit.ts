@@ -34,6 +34,8 @@ export type CoreData = {
   yearsOfDispute?: string[]
   leadingDecisionNormReferences?: string[]
   source?: Source
+  isResolved?: boolean
+  resolutionDate?: string
 }
 
 export enum SourceValue {

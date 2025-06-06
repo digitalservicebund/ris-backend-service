@@ -45,7 +45,9 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
                   : null)
-          .court(CourtTransformer.transformToDTO(coreData.court()));
+          .court(CourtTransformer.transformToDTO(coreData.court()))
+          .isResolved(coreData.isResolved())
+          .resolutionDate(coreData.resolutionDate());
 
       addFileNumbers(builder, coreData, currentDto);
       addDeviationCourts(builder, coreData);
@@ -68,11 +70,9 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
 
     builder
         .resolutionNote(pendingProceeding.resolutionNote())
-        .isResolved(pendingProceeding.isResolved())
         .legalIssue(pendingProceeding.legalIssue())
         .admissionOfAppeal(pendingProceeding.admissionOfAppeal())
         .appellant(pendingProceeding.appellant());
-    // TODO: Erledigungsmitteilung
 
     if (pendingProceeding.shortTexts() != null) {
       ShortTexts shortTexts = pendingProceeding.shortTexts();
@@ -148,7 +148,6 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
         .status(getStatus(pendingProceedingDTO))
         .previousDecisions(getPreviousDecisions(pendingProceedingDTO))
         .resolutionNote(pendingProceedingDTO.getResolutionNote())
-        .isResolved(pendingProceedingDTO.isResolved())
         .legalIssue(pendingProceedingDTO.getLegalIssue())
         .admissionOfAppeal(pendingProceedingDTO.getAdmissionOfAppeal())
         .appellant(pendingProceedingDTO.getAppellant())

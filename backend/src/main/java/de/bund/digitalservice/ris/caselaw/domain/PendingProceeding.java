@@ -23,7 +23,6 @@ import lombok.Builder;
  * @param literatureReferences a list of legal periodical literature references
  *     (Literaturfundstellen)
  * @param resolutionNote the resolution note (Erledigungsvermerk)
- * @param isResolved the resolution status (Erledigung)
  * @param legalIssue the legal issue (Rechtsfrage)
  * @param admissionOfAppeal the admission of appeal (Rechtsmittelzulassung)
  * @param appellant the appellant (Rechtsmittelführer)
@@ -43,7 +42,6 @@ public record PendingProceeding(
     List<Reference> literatureReferences,
     List<String> documentalists,
     String resolutionNote,
-    boolean isResolved,
     String legalIssue,
     String admissionOfAppeal,
     String appellant,

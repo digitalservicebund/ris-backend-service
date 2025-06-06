@@ -14,6 +14,7 @@ import { usePendingProceedingMenuItems } from "@/composables/usePendingProceedin
 import useQuery from "@/composables/useQueryFromRoute"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { usePendingProceedingStore } from "@/stores/pendingProceedingStore"
 
@@ -25,11 +26,11 @@ useHead({
   title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
 })
 
-const store = usePendingProceedingStore()
+const store = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
-const { pendingProceeding } = storeToRefs(store) as {
-  pendingProceeding: Ref<PendingProceeding | undefined>
+const { documentationUnit } = storeToRefs(store) as {
+  documentationUnit: Ref<PendingProceeding | undefined>
 }
 const route = useRoute()
 const menuItems = usePendingProceedingMenuItems(
@@ -54,7 +55,7 @@ function toggleNavigationPanel(expand?: boolean) {
 }
 
 async function requestDocumentFromServer() {
-  const response = await store.loadPendingProceeding(props.documentNumber)
+  const response = await store.loadDocumentUnit(props.documentNumber)
 
   if (!response.data) {
     responseError.value = response.error

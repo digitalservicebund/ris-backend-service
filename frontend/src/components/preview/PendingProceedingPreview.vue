@@ -75,12 +75,6 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
           />
         </PreviewContent>
       </PreviewRow>
-      <PreviewRow>
-        <PreviewCategory>Erledigung</PreviewCategory>
-        <PreviewContent>
-          {{ pendingProceedingResponse.data.isResolved ? "Ja" : "Nein" }}
-        </PreviewContent>
-      </PreviewRow>
       <PreviewRow v-if="pendingProceedingResponse.data.legalIssue">
         <PreviewCategory>{{
           pendingProceedingShortTextLabels.legalIssue

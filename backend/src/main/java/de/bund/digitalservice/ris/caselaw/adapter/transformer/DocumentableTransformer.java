@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
@@ -11,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -280,6 +282,7 @@ public class DocumentableTransformer {
             .decisionDate(decisionDTO.getDate())
             .appraisalBody(decisionDTO.getJudicialBody());
 
+    addResolutionDateToDomain(decisionDTO, coreDataBuilder);
     addFileNumbersToDomain(decisionDTO, coreDataBuilder);
     addDeviatingFileNumbersToDomain(decisionDTO, coreDataBuilder);
     addDeviatingCourtsToDomain(decisionDTO, coreDataBuilder);
@@ -480,6 +483,16 @@ public class DocumentableTransformer {
     List<String> fileNumbers =
         decisionDTO.getFileNumbers().stream().map(FileNumberDTO::getValue).toList();
     coreDataBuilder.fileNumbers(fileNumbers);
+  }
+
+  static void addResolutionDateToDomain(
+      DocumentationUnitDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
+    if (documentationUnitDTO instanceof DecisionDTO) {
+      return;
+    }
+    coreDataBuilder.isResolved(((PendingProceedingDTO) documentationUnitDTO).isResolved());
+    coreDataBuilder.resolutionDate(
+        ((PendingProceedingDTO) documentationUnitDTO).getResolutionDate());
   }
 
   static void handleEnsuingDecisionsWithoutRank(
