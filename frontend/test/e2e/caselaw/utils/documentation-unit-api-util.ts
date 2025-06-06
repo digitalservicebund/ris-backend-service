@@ -105,3 +105,17 @@ export async function cleanUpEurlexDecisions(page: Page) {
   )
   expect(response.ok()).toBeTruthy()
 }
+
+export async function getPreview(
+    page: Page,
+    documentUnitId: string,
+): Promise<APIResponse> {
+  const cookies = await page.context().cookies()
+  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+  return await page.request.get(
+      `/api/v1/caselaw/documentunits/${documentUnitId}/preview-xml`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+  )
+}
