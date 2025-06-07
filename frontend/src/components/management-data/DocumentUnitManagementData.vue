@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import { useToast } from "primevue/usetoast"
-import { computed, onBeforeMount, ref } from "vue"
+import { computed, onBeforeMount, Ref, ref } from "vue"
 import { useRouter } from "vue-router"
 import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelector.vue"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
@@ -20,7 +20,9 @@ import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 
-const { documentUnit } = storeToRefs(useDocumentUnitStore())
+const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 const { updateDocumentUnit } = useDocumentUnitStore()
 const router = useRouter()
 const toast = useToast()

@@ -19,7 +19,7 @@ import errorMessages from "@/i18n/errors.json"
 interface DocumentUnitService {
   getByDocumentNumber(
     documentNumber: string,
-  ): Promise<ServiceResponse<DocumentUnit>>
+  ): Promise<ServiceResponse<DocumentUnit | PendingProceeding>>
 
   getPendingProceedingByDocumentNumber(
     documentNumber: string,
@@ -93,7 +93,7 @@ const service: DocumentUnitService = {
 
   async getPendingProceedingByDocumentNumber(documentNumber: string) {
     const response = await httpClient.get<PendingProceeding>(
-      `caselaw/pendingproceeding/${documentNumber}`,
+      `caselaw/documentunits/${documentNumber}`,
     )
     if (response.status >= 300 || response.error) {
       response.data = undefined

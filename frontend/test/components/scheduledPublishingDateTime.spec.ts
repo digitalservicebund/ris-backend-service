@@ -1,8 +1,9 @@
 import { createTestingPinia } from "@pinia/testing"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { config } from "@vue/test-utils"
-import { setActivePinia } from "pinia"
+import { setActivePinia, Store } from "pinia"
 import InputText from "primevue/inputtext"
+import { Ref } from "vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
@@ -34,7 +35,12 @@ function mockDocUnitStore({
     response as ServiceResponse<RisJsonPatch>,
   )
 
-  return mockedSessionStore
+  return mockedSessionStore as Store<
+    "docunitStore",
+    {
+      documentUnit: Ref<DocumentUnit>
+    }
+  >
 }
 
 describe("ScheduledPublishingDateTime", () => {

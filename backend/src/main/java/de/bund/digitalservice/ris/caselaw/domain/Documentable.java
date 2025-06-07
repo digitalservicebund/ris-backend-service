@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,9 +10,16 @@ import java.util.UUID;
  * de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit} and a pending proceeding {@link
  * de.bund.digitalservice.ris.caselaw.domain.PendingProceeding}.
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+  @JsonSubTypes.Type(value = DocumentationUnit.class, name = "documentationUnit"),
+  @JsonSubTypes.Type(value = PendingProceeding.class, name = "pendingProceeding")
+})
 public interface Documentable {
 
   UUID uuid();
+
+  Long version();
 
   String documentNumber();
 

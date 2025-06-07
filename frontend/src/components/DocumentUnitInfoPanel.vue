@@ -1,51 +1,55 @@
-<script lang="ts" setup>
+<script setup lang="ts" generic="TDocument">
 import dayjs from "dayjs"
 import { computed, ref, toRaw, watchEffect } from "vue"
-import { useRoute } from "vue-router"
+import { RouteLocationRaw, useRoute } from "vue-router"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import DocumentUnit from "@/domain/documentUnit"
+import PendingProceeding from "@/domain/pendingProceeding"
 import IconError from "~icons/ic/baseline-error"
 
-interface Props {
-  heading?: string
+interface Props<T extends DocumentUnit | PendingProceeding> {
+  document: T
+  duplicateManagementRoute?: RouteLocationRaw
+  onSave?: () => Promise<void>
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  heading: "",
-})
+const props = withDefaults(
+  defineProps<Props<DocumentUnit | PendingProceeding>>(),
+  {
+    duplicateManagementRoute: "",
+    onSave: async () => {},
+  },
+)
 
 const route = useRoute()
 
-const documentUnitStore = useDocumentUnitStore()
-
 const isInternalUser = useInternalUser()
 
-const fileNumberInfo = computed(
-  () => documentUnitStore.documentUnit?.coreData.fileNumbers?.[0] || "",
-)
+const fileNumberInfo = computed(() => {
+  return props.document.coreData.fileNumbers?.[0] || ""
+})
 
-const decisionDateInfo = computed(() =>
-  documentUnitStore.documentUnit?.coreData.decisionDate
-    ? dayjs(documentUnitStore.documentUnit.coreData.decisionDate).format(
-        "DD.MM.YYYY",
-      )
-    : "",
-)
+const decisionDateInfo = computed(() => {
+  return props.document.coreData.decisionDate
+    ? dayjs(props.document.coreData.decisionDate).format("DD.MM.YYYY")
+    : ""
+})
 
-const hasPendingDuplicateWarning = computed(
-  () =>
-    documentUnitStore.documentUnit &&
-    (
-      documentUnitStore.documentUnit.managementData.duplicateRelations ?? []
-    ).some((warning) => warning.status === "PENDING"),
-)
+const hasPendingDuplicateWarning = computed(() => {
+  if (props.document instanceof DocumentUnit) {
+    return (props.document.managementData.duplicateRelations ?? []).some(
+      (warning) => warning.status === "PENDING",
+    )
+  }
+  return false
+})
 
-const courtInfo = computed(
-  () => documentUnitStore.documentUnit?.coreData.court?.label || "",
-)
+const courtInfo = computed(() => {
+  return props.document.coreData.court?.label || ""
+})
 
 const formattedInfo = computed(() => {
   const parts = [
@@ -56,6 +60,8 @@ const formattedInfo = computed(() => {
   return parts.join(", ")
 })
 
+const statusBadge = ref(useStatusBadge(props.document.status).value)
+
 const isRouteWithSaveButton = computed(
   () =>
     route.path.includes("categories") ||
@@ -64,27 +70,19 @@ const isRouteWithSaveButton = computed(
     route.path.includes("managementdata"),
 )
 
-const managementDataRoute = computed(() => ({
-  name: "caselaw-documentUnit-documentNumber-managementdata",
-  params: { documentNumber: documentUnitStore.documentUnit!.documentNumber },
-}))
-
-const statusBadge = ref(
-  useStatusBadge(documentUnitStore.documentUnit?.status).value,
-)
+const hasErrorStatus = computed(() => props.document.status?.withError)
 
 watchEffect(() => {
-  statusBadge.value = useStatusBadge(
-    documentUnitStore.documentUnit?.status,
-  ).value
+  statusBadge.value = useStatusBadge(props.document.status).value
 })
 </script>
 
 <template>
   <div
     class="sticky top-0 z-30 flex h-[64px] flex-row items-center border-b border-solid border-gray-400 bg-blue-100 px-24 py-12"
+    data-testid="document-unit-info-panel"
   >
-    <h1 class="ris-body1-bold">{{ props.heading }}</h1>
+    <h1 class="ris-body1-bold">{{ props.document.documentNumber }}</h1>
     <span v-if="formattedInfo.length > 0" class="m-4"> | </span>
     <span
       class="overflow-hidden text-ellipsis whitespace-nowrap"
@@ -93,6 +91,7 @@ watchEffect(() => {
       {{ formattedInfo }}</span
     >
     <IconBadge
+      v-if="statusBadge"
       :background-color="statusBadge.backgroundColor"
       class="ml-12"
       :color="statusBadge.color"
@@ -100,7 +99,7 @@ watchEffect(() => {
       :label="statusBadge.label"
     />
     <IconBadge
-      v-if="documentUnitStore.documentUnit?.status?.withError"
+      v-if="hasErrorStatus"
       background-color="bg-red-300"
       class="ml-12"
       color="text-red-900"
@@ -124,7 +123,7 @@ watchEffect(() => {
       <RouterLink
         v-if="isInternalUser"
         class="ris-link1-bold text-red-900"
-        :to="managementDataRoute"
+        :to="props.duplicateManagementRoute"
       >
         Bitte prüfen</RouterLink
       >

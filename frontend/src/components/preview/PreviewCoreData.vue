@@ -129,6 +129,18 @@ const sourceValue = computed(() =>
         {{ sourceValue }}
       </PreviewContent>
     </PreviewRow>
+    <PreviewRow v-if="coreData.isResolved">
+      <PreviewCategory>Erledigung</PreviewCategory>
+      <PreviewContent>
+        {{ coreData.isResolved ? "Ja" : "Nein" }}
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.resolutionDate">
+      <PreviewCategory>Erledigungsmitteilung</PreviewCategory>
+      <PreviewContent>
+        {{ coreData.resolutionDate }}
+      </PreviewContent>
+    </PreviewRow>
     <PreviewRow v-if="coreData.court?.jurisdictionType">
       <PreviewCategory>Gerichtsbarkeit</PreviewCategory>
       <PreviewContent>

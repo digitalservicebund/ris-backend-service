@@ -43,7 +43,7 @@ function renderComponent(
       props: {
         sidePanelMode: options.sidePanelMode || undefined,
         showEditButton: options.showEditButton,
-        documentUnit: documentUnit,
+        document: documentUnit,
         hidePanelModeBar: options.hidePanelModeBar ?? false,
       },
       global: {

@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { config } from "@vue/test-utils"
@@ -5,8 +6,8 @@ import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
 import { beforeEach, vi } from "vitest"
-import { ref } from "vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
+import DocumentUnit from "@/domain/documentUnit"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
@@ -36,6 +37,25 @@ function renderComponent(options?: { modelValue?: NormReference }) {
   const user = userEvent.setup()
   const props = {
     modelValue: new NormReference({ ...options?.modelValue }),
+    plugins: [
+      [
+        createTestingPinia({
+          initialState: {
+            docunitStore: {
+              documentUnit: new DocumentUnit("foo", {
+                documentNumber: "1234567891234",
+                coreData: {
+                  court: {
+                    label: "VerfG",
+                    type: "VerfG",
+                  },
+                },
+              }),
+            },
+          },
+        }),
+      ],
+    ],
   }
   const utils = render(NormReferenceInput, { props })
   return { user, props, ...utils }
@@ -488,11 +508,6 @@ describe("NormReferenceEntry", () => {
   })
 
   describe("legal force", () => {
-    vi.mock("@/composables/useCourtType", () => ({
-      useInjectCourtType: vi.fn(() => {
-        return ref("VerfG")
-      }),
-    }))
     it("legal force checkbox toggles comboboxes", async () => {
       const { user } = renderComponent()
       const abbreviationField = screen.getByLabelText("RIS-Abkürzung")

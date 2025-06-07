@@ -3,13 +3,15 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
+import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import InputMask from "primevue/inputmask"
-import { computed, ref } from "vue"
+import { computed, Ref, ref } from "vue"
 import { ValidationError } from "./input/types"
 import InfoModal from "@/components/InfoModal.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
+import DocumentUnit from "@/domain/documentUnit"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import useSessionStore from "@/stores/sessionStore"
@@ -21,15 +23,16 @@ dayjs.extend(dayjsUtc)
 dayjs.extend(dayjsTimezone)
 dayjs.extend(customParseFormat)
 
-const documentUnitStore = useDocumentUnitStore()
+const store = useDocumentUnitStore()
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 const sessionStore = useSessionStore()
 
 const storedScheduledPublicationDateTime = computed({
-  get: () =>
-    documentUnitStore.documentUnit!.managementData.scheduledPublicationDateTime,
+  get: () => documentUnit.value!.managementData.scheduledPublicationDateTime,
   set: (newDate?: string) =>
-    (documentUnitStore.documentUnit!.managementData.scheduledPublicationDateTime =
-      newDate),
+    (documentUnit.value!.managementData.scheduledPublicationDateTime = newDate),
 })
 
 // initialize local values with stored date-time
@@ -103,10 +106,9 @@ const saveScheduling = async () => {
   storedScheduledPublicationDateTime.value =
     scheduledDateTimeInput.value?.toISOString()
 
-  documentUnitStore.documentUnit!.managementData.scheduledByEmail =
-    sessionStore.user?.email
+  documentUnit.value!.managementData.scheduledByEmail = sessionStore.user?.email
 
-  const { error } = await documentUnitStore.updateDocumentUnit()
+  const { error } = await store.updateDocumentUnit()
   isSaving.value = false
 
   if (error) {
@@ -126,9 +128,9 @@ const removeScheduling = async () => {
   docUnitSaveError.value = null
   const previousDate = storedScheduledPublicationDateTime.value
   storedScheduledPublicationDateTime.value = undefined
-  documentUnitStore.documentUnit!.managementData.scheduledByEmail = undefined
+  documentUnit.value!.managementData.scheduledByEmail = undefined
 
-  const { error } = await documentUnitStore.updateDocumentUnit()
+  const { error } = await store.updateDocumentUnit()
   isSaving.value = false
 
   if (error) {

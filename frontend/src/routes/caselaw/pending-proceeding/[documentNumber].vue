@@ -10,14 +10,12 @@ import TextEditor from "@/components/input/TextEditor.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import SideToggle from "@/components/SideToggle.vue"
-import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
+import { usePendingProceedingMenuItems } from "@/composables/usePendingProceedingMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
-import DocumentUnit from "@/domain/documentUnit"
+import PendingProceeding from "@/domain/pendingProceeding"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
-import { Match } from "@/types/textCheck"
 
 const props = defineProps<{
   documentNumber: string
@@ -27,16 +25,17 @@ useHead({
   title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
 })
 
-const textCheck = useFeatureToggle("neuris.text-check-side-panel")
-
 const store = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<PendingProceeding | undefined>
 }
 const route = useRoute()
-const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
+const menuItems = usePendingProceedingMenuItems(
+  props.documentNumber,
+  route.query,
+)
 const { pushQueryToRoute } = useQuery()
 
 const showNavigationPanelRef: Ref<boolean> = ref(
@@ -54,34 +53,11 @@ function toggleNavigationPanel(expand?: boolean) {
   })
 }
 
-async function requestDocumentUnitFromServer() {
+async function requestDocumentFromServer() {
   const response = await store.loadDocumentUnit(props.documentNumber)
 
   if (!response.data) {
     responseError.value = response.error
-  }
-}
-
-async function attachmentIndexSelected(index: number) {
-  extraContentSidePanelStore.togglePanel(true)
-  extraContentSidePanelStore.selectAttachments(index)
-}
-
-async function attachmentIndexDeleted(index: number) {
-  await requestDocumentUnitFromServer()
-  extraContentSidePanelStore.onAttachmentDeleted(
-    index,
-    documentUnit.value ? documentUnit.value.attachments.length - 1 : 0,
-  )
-}
-
-async function attachmentsUploaded(anySuccessful: boolean) {
-  if (anySuccessful) {
-    await requestDocumentUnitFromServer()
-    extraContentSidePanelStore.togglePanel(true)
-    extraContentSidePanelStore.selectAttachments(
-      documentUnit.value ? documentUnit.value.attachments.length - 1 : 0,
-    )
   }
 }
 
@@ -117,42 +93,12 @@ const handleKeyDown = (event: KeyboardEvent) => {
       event.preventDefault()
       toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
       break
-    case "n":
-      event.preventDefault()
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("note")
-      break
-    case "d":
-      event.preventDefault()
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("attachments")
-      break
     case "v":
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("preview")
       break
-    case "r":
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("category-import")
-      break
-    case "t":
-      if (!textCheck.value) break
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("text-check")
-      break
     default:
       break
-  }
-}
-
-/**
- * Jump to the corresponding text editor and opens the match menu
- * @param match
- */
-function jumpToMatch(match: Match) {
-  const textEditor = textEditorRefs.value[match.category]
-  if (textEditor) {
-    textEditor.jumpToMatch(match)
   }
 }
 
@@ -163,7 +109,7 @@ onBeforeUnmount(() => {
 
 onMounted(async () => {
   window.addEventListener("keydown", handleKeyDown)
-  await requestDocumentUnitFromServer()
+  await requestDocumentFromServer()
 })
 </script>
 
@@ -188,7 +134,7 @@ onMounted(async () => {
     <div v-if="documentUnit" class="flex w-full min-w-0 flex-col bg-gray-100">
       <DocumentUnitInfoPanel
         v-if="documentUnit && !route.path.includes('preview')"
-        :document="documentUnit!"
+        :document="documentUnit"
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer
@@ -201,23 +147,13 @@ onMounted(async () => {
           "
         >
           <ExtraContentSidePanel
-            v-if="
-              documentUnit &&
-              !(
-                route.path.includes('handover') ||
-                route.path.includes('preview')
-              )
-            "
-            v-bind="{ jumpToMatch }"
+            v-if="documentUnit && !route.path.includes('preview')"
             :document="documentUnit"
+            hide-panel-mode-bar
+            hide-preview-in-new-tab
+            side-panel-mode="preview"
           ></ExtraContentSidePanel>
-          <router-view
-            v-bind="{ registerTextEditorRef }"
-            @attachment-index-deleted="attachmentIndexDeleted"
-            @attachment-index-selected="attachmentIndexSelected"
-            @attachments-uploaded="attachmentsUploaded"
-          >
-          </router-view>
+          <router-view v-bind="{ registerTextEditorRef }" />
         </FlexContainer>
       </div>
     </div>

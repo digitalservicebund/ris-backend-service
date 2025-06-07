@@ -15,7 +15,7 @@ import com.gravity9.jsonpatch.ReplaceOperation;
 import com.gravity9.jsonpatch.diff.JsonDiff;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -47,13 +47,13 @@ public class DatabasePatchMapperService implements PatchMapperService {
   }
 
   @Override
-  public DocumentationUnit applyPatchToEntity(JsonPatch patch, DocumentationUnit targetEntity) {
-    DocumentationUnit documentationUnit;
+  public Documentable applyPatchToEntity(JsonPatch patch, Documentable targetEntity) {
+    Documentable documentationUnit;
 
     try {
       JsonNode jsonNode = objectMapper.convertValue(targetEntity, JsonNode.class);
       JsonNode updatedNode = patch.apply(jsonNode);
-      documentationUnit = objectMapper.treeToValue(updatedNode, DocumentationUnit.class);
+      documentationUnit = objectMapper.treeToValue(updatedNode, Documentable.class);
     } catch (JsonProcessingException | JsonPatchException e) {
       throw new DocumentationUnitPatchException("Couldn't apply patch", e);
     }
@@ -62,7 +62,7 @@ public class DatabasePatchMapperService implements PatchMapperService {
   }
 
   @Override
-  public JsonPatch getDiffPatch(DocumentationUnit existed, DocumentationUnit updated) {
+  public JsonPatch getDiffPatch(Documentable existed, Documentable updated) {
     return JsonDiff.asJsonPatch(
         objectMapper.convertValue(existed, JsonNode.class),
         objectMapper.convertValue(updated, JsonNode.class));
@@ -140,7 +140,7 @@ public class DatabasePatchMapperService implements PatchMapperService {
 
   @Override
   public RisJsonPatch handlePatchForSamePath(
-      DocumentationUnit existingDocumentationUnit,
+      Documentable existingDocumentationUnit,
       JsonPatch patch1,
       JsonPatch patch2,
       JsonPatch patch3) {
