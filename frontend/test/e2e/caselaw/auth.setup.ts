@@ -7,8 +7,8 @@ function authenticateUser(user: {
 }) {
   setup(`authenticate ${user.name}`, async ({ page }) => {
     await page.goto("/")
-    await page.getByLabel("E-Mailadresse").fill(user.email)
-    await page.getByLabel("Passwort", { exact: true }).fill(user.password)
+    await page.fill("#username", user.email)
+    await page.fill("#password", user.password)
     await page.locator("input#kc-login").click()
 
     await page.goto(process.env.E2E_BASE_URL ?? "http://127.0.0.1")

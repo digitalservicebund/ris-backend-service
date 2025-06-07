@@ -29,7 +29,7 @@ test.describe("authentication", () => {
 
     await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
     await expect(page.getByText("Spruchkörper")).toBeHidden()
-    await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
+    await expect(page.getByText("E-Mailadresse")).toBeVisible()
   })
 
   test("should get new session ID without new login", async ({
@@ -51,7 +51,7 @@ test.describe("authentication", () => {
 
     await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
     await expect(page.getByText("Spruchkörper")).toBeHidden()
-    await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
+    await expect(page.getByText("E-Mailadresse")).toBeVisible()
   })
 
   test("should remember location after new login", async ({
@@ -72,7 +72,7 @@ test.describe("authentication", () => {
 
     // expect to be on login page
     await expect(page.getByText("Spruchkörper")).toBeHidden()
-    await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
+    await expect(page.getByText("E-Mailadresse")).toBeVisible()
 
     // login
     await page.context().addCookies(validCookies)
