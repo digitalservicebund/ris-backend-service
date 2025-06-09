@@ -20,7 +20,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.8.2"
+    id("org.flywaydb.flyway") version "11.9.1"
     id("io.sentry.jvm.gradle") version "5.7.0"
 }
 
@@ -171,7 +171,7 @@ dependencies {
     implementation("net.minidev:json-smart:2.5.2")
 
     // CVE-2025-24970
-    implementation("io.netty:netty-handler:4.2.1.Final")
+    implementation("io.netty:netty-handler:4.2.2.Final")
 
     implementation("org.postgresql:postgresql:42.7.6")
 
@@ -223,16 +223,16 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.13.1")
     implementation("org.jsoup:jsoup:1.20.1")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.8.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.8.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.12.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.9.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.9.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.9.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.9.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
