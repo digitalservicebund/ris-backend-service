@@ -44,8 +44,6 @@ public class HandoverMailService implements MailService {
 
   private final HandoverRepository repository;
 
-  private final TextCheckService textCheckService;
-
   private final Environment env;
 
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
