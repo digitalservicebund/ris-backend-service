@@ -308,6 +308,7 @@ public class DocumentationUnitService {
                     documentationUnit.coreData().creatingDocOffice(),
                     documentationUnit.coreData().documentationOffice(),
                     documentationUnit.status()))
+            .kind(Kind.DOCUMENT_UNIT)
             .build();
       }
       case PendingProceeding pendingProceeding -> {
@@ -318,6 +319,7 @@ public class DocumentationUnitService {
                     pendingProceeding.coreData().creatingDocOffice(),
                     pendingProceeding.coreData().documentationOffice(),
                     pendingProceeding.status()))
+            .kind(Kind.PENDING_PROCEEDING)
             .build();
       }
       default -> {

@@ -48,5 +48,6 @@ public record DocumentationUnit(
     List<String> documentalists,
     InboxStatus inboxStatus,
     boolean isEditable,
-    boolean isDeletable)
+    boolean isDeletable,
+    Kind kind)
     implements Documentable {}

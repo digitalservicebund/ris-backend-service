@@ -44,4 +44,6 @@ public interface Documentable {
   boolean isEditable();
 
   boolean isDeletable();
+
+  Kind kind();
 }

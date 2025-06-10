@@ -47,5 +47,6 @@ public record PendingProceeding(
     String admissionOfAppeal,
     String appellant,
     boolean isEditable,
-    boolean isDeletable)
+    boolean isDeletable,
+    Kind kind)
     implements Documentable {}

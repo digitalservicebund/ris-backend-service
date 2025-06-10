@@ -3,9 +3,10 @@ import Button from "primevue/button"
 import FileNavigator from "@/components/FileNavigator.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
-import DocumentUnit, { Kind } from "@/domain/documentUnit"
+import DocumentUnit from "@/domain/documentUnit"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { SelectablePanelContent } from "@/types/panelContentMode"
+import { isDocumentUnit } from "@/utils/typeGuards"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
 import IconEdit from "~icons/ic/outline-edit"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
@@ -122,10 +123,7 @@ function emitAttachmentIndex(value: number) {
     </div>
 
     <FileNavigator
-      v-if="
-        panelMode === 'attachments' &&
-        props.documentUnit.kind === Kind.DOCUMENT_UNIT
-      "
+      v-if="panelMode === 'attachments' && isDocumentUnit(props.documentUnit)"
       :attachments="props.documentUnit!.attachments"
       :current-index="currentAttachmentIndex"
       @select="emitAttachmentIndex"

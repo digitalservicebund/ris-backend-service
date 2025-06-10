@@ -11,6 +11,7 @@ import { CoreData } from "@/domain/documentUnit"
 const props = defineProps<{
   coreData: CoreData
   dateLabel: string
+  isPendingProceeding?: boolean
 }>()
 
 const sourceValue = computed(() =>
@@ -129,7 +130,7 @@ const sourceValue = computed(() =>
         {{ sourceValue }}
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="coreData.isResolved">
+    <PreviewRow v-if="props.isPendingProceeding">
       <PreviewCategory>Erledigung</PreviewCategory>
       <PreviewContent>
         {{ coreData.isResolved ? "Ja" : "Nein" }}
