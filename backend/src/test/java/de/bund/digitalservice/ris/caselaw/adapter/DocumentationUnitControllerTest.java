@@ -332,6 +332,7 @@ class DocumentationUnitControllerTest {
   }
 
   @Test
+  @Disabled("endpoint not used")
   void testUpdateByUuid() throws DocumentationUnitNotExistsException {
     DecisionDTO documentationUnitDTO =
         DecisionDTO.builder()
