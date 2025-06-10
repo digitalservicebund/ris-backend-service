@@ -423,7 +423,8 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     },
   )
 
-  test(
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
     "handover wraps <noindex> on ignored words in preview and publication",
     {
       tag: ["@RISDEV-254", "@RISDEV-6205", "@RISDEV-7394"],
