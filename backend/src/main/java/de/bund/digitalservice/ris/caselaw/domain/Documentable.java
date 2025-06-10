@@ -10,10 +10,10 @@ import java.util.UUID;
  * de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit} and a pending proceeding {@link
  * de.bund.digitalservice.ris.caselaw.domain.PendingProceeding}.
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kind")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = DocumentationUnit.class, name = "documentationUnit"),
-  @JsonSubTypes.Type(value = PendingProceeding.class, name = "pendingProceeding")
+  @JsonSubTypes.Type(value = DocumentationUnit.class, name = "DOCUMENT_UNIT"),
+  @JsonSubTypes.Type(value = PendingProceeding.class, name = "PENDING_PROCEEDING")
 })
 public interface Documentable {
 
