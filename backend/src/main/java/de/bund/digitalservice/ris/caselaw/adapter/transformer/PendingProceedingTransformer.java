@@ -32,7 +32,10 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
 
     final var builder = currentDto.toBuilder();
 
-    builder.id(pendingProceeding.uuid()).documentNumber(pendingProceeding.documentNumber());
+    builder
+        .id(pendingProceeding.uuid())
+        .documentNumber(pendingProceeding.documentNumber())
+        .version(pendingProceeding.version());
     addPreviousDecisions(pendingProceeding, builder);
 
     if (pendingProceeding.coreData() != null) {
@@ -118,6 +121,7 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
 
     return PendingProceeding.builder()
         .uuid(pendingProceedingDTO.getId())
+        .version(pendingProceedingDTO.getVersion())
         .documentNumber(pendingProceedingDTO.getDocumentNumber())
         .coreData(buildCoreData(pendingProceedingDTO))
         .shortTexts(

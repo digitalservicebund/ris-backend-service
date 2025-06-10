@@ -442,12 +442,15 @@ public class DocumentationUnitService {
 
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
+        Documentable updatedDocumentationUnit = null;
         if (patchedDocumentationUnit instanceof DocumentationUnit docUnit) {
-          patchedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
+          updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
+        } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
+          updatedDocumentationUnit = updatePendingProceeding(pendingProceeding, user);
         }
 
         toFrontendJsonPatch =
-            patchMapperService.getDiffPatch(patchedDocumentationUnit, patchedDocumentationUnit);
+            patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
 
         log.debug(
             "version {} - raw to frontend patch: {}",
@@ -520,6 +523,16 @@ public class DocumentationUnitService {
     }
 
     return (DocumentationUnit) repository.findByUuid(documentationUnit.uuid(), user);
+  }
+
+  public PendingProceeding updatePendingProceeding(PendingProceeding pendingProceeding, User user)
+      throws DocumentationUnitNotExistsException {
+    repository.saveKeywords(pendingProceeding);
+    repository.saveFieldsOfLaw(pendingProceeding);
+
+    repository.save(pendingProceeding, user);
+
+    return (PendingProceeding) repository.findByUuid(pendingProceeding.uuid(), user);
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
