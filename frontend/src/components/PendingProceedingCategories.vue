@@ -3,10 +3,12 @@ import { storeToRefs } from "pinia"
 import type { Component } from "vue"
 import { computed, ref, toRefs, watch } from "vue"
 import { useRoute } from "vue-router"
+import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import FlexItem from "@/components/FlexItem.vue"
 
+import ProceedingDecisions from "@/components/ProceedingDecisions.vue"
 import PendingProceedingTexts from "@/components/texts/PendingProceedingTexts.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
@@ -50,12 +52,12 @@ const isInternalUser = useInternalUser()
       v-model="coreData"
       is-pending-proceeding
     />
-    <!--&lt;!&ndash;    <PendingProceedingProceedingDecisions-->
-    <!--      :id="DocumentUnitCategoriesEnum.PROCEEDINGS_DECISIONS"-->
-    <!--    />&ndash;&gt;-->
-    <!--&lt;!&ndash;    <DocumentUnitContentRelatedIndexing-->
-    <!--      :id="DocumentUnitCategoriesEnum.CONTENT_RELATED_INDEXING"-->
-    <!--    />&ndash;&gt;-->
+    <ProceedingDecisions
+      :id="DocumentUnitCategoriesEnum.PROCEEDINGS_DECISIONS"
+    />
+    <DocumentUnitContentRelatedIndexing
+      :id="DocumentUnitCategoriesEnum.CONTENT_RELATED_INDEXING"
+    />
     <PendingProceedingTexts
       v-bind="{ registerTextEditorRef }"
       :id="DocumentUnitCategoriesEnum.TEXTS"
