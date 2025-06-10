@@ -99,8 +99,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     predicates.addAll(getDuplicateWarningPredicates(parameters, cq, cb, root));
     predicates.addAll(getFileNumberPredicates(parameters, cq, cb, root));
 
-    // TODO: Use cb.construct() to actually only select the DTO projection instead of the full
-    // entity
+    // Use cb.construct() to only select the DTO projection instead of the full entity
     cq.select(root).where(predicates.toArray(new Predicate[0]));
 
     List<Order> orderCriteria = getOrderCriteria(parameters, cb, root);
@@ -396,6 +395,12 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     return cb.exists(subquery);
   }
 
+  /*
+   * Postgres cannot properly optimize the IN subquery.
+   * It would be more performant to use ANY(ARRAY(subquery)) instead of IN(subquery). (600ms -> 20ms)
+   * However, this is currently not possible with the JPA Criteria API,
+   * see https://discourse.hibernate.org/t/using-any-array-with-hibernate-6-4-4-on-postgresql-16/10977
+   */
   private List<Predicate> getFileNumberPredicates(
       SearchParameters parameters,
       CriteriaQuery<DocumentationUnitListItemDTO> cq,
