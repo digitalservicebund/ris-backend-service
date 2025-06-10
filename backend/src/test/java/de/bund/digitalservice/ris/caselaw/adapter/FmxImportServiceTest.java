@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -12,7 +13,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.HttpEurlexRetrievalService;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -29,7 +34,6 @@ import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
@@ -54,19 +58,19 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @Import({
-  FmxService.class,
+  FmxImportService.class,
   DocumentationUnitRepository.class,
   CourtRepository.class,
   DocumentTypeRepository.class,
   FmxRepository.class,
   AttachmentRepository.class,
   DatabaseDocumentationUnitRepository.class,
-  EurlexRetrievalService.class,
+  HttpEurlexRetrievalService.class,
   XmlUtilService.class
 })
-class FmxServiceTest {
+class FmxImportServiceTest {
 
-  @Autowired private FmxService service;
+  @Autowired private FmxImportService service;
 
   @MockitoBean DocumentationUnitRepository documentationUnitRepository;
   @MockitoBean CourtRepository courtRepository;
@@ -74,7 +78,8 @@ class FmxServiceTest {
   @MockitoBean FmxRepository fmxRepository;
   @MockitoBean AttachmentRepository attachmentRepository;
   @MockitoBean DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
-  @MockitoBean EurlexRetrievalService retrievalService;
+  @MockitoBean EurLexResultRepository eurLexResultRepository;
+  @MockitoBean HttpEurlexRetrievalService retrievalService;
   @MockitoBean XmlUtilService xmlUtilService;
 
   @Mock User user;
@@ -105,9 +110,15 @@ class FmxServiceTest {
             .shortTexts(ShortTexts.builder().build())
             .build();
 
+    EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
+    when(eurLexResultDTO.getUri())
+        .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
+    when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
+
     doReturn(judgment)
         .when(retrievalService)
-        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+        .requestSingleEurlexDocument(
+            "https://publications.europa.eu/resource/celex/" + celexNumber);
     ArgumentCaptor<AttachmentDTO> attachmentCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
     doReturn(Optional.of(documentationUnitDTO))
@@ -125,6 +136,7 @@ class FmxServiceTest {
   @Test
   void judgment_shouldExtractMetadata() {
     String celexNumber = "62022CJ0303";
+    String uri = "https://publications.europa.eu/resource/celex/" + celexNumber;
     UUID id = UUID.randomUUID();
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -137,9 +149,11 @@ class FmxServiceTest {
             .shortTexts(ShortTexts.builder().build())
             .build();
 
-    doReturn(judgment)
-        .when(retrievalService)
-        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+    EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
+    when(eurLexResultDTO.getUri()).thenReturn(uri);
+    when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
+
+    doReturn(judgment).when(retrievalService).requestSingleEurlexDocument(uri);
     ArgumentCaptor<DocumentationUnit> docUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
@@ -170,6 +184,7 @@ class FmxServiceTest {
   @Test
   void order_shouldExtractMetadata() {
     String celexNumber = "62018TO0235(04)";
+    String uri = "https://publications.europa.eu/resource/celex/" + celexNumber;
     UUID id = UUID.randomUUID();
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -181,11 +196,12 @@ class FmxServiceTest {
             .longTexts(LongTexts.builder().build())
             .shortTexts(ShortTexts.builder().build())
             .build();
-    doReturn(order)
-        .when(retrievalService)
-        .getDocumentFromEurlex(
-            "https://publications.europa.eu/resource/celex/"
-                + URLEncoder.encode(celexNumber, StandardCharsets.UTF_8));
+
+    EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
+    when(eurLexResultDTO.getUri()).thenReturn(uri);
+    when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
+
+    doReturn(order).when(retrievalService).requestSingleEurlexDocument(uri);
     ArgumentCaptor<DocumentationUnit> docUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
@@ -216,6 +232,7 @@ class FmxServiceTest {
   @Test
   void opinion_shouldExtractMetadata() {
     String celexNumber = "62013CV0001";
+    String uri = "https://publications.europa.eu/resource/celex/" + celexNumber;
     UUID id = UUID.randomUUID();
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -227,9 +244,12 @@ class FmxServiceTest {
             .longTexts(LongTexts.builder().build())
             .shortTexts(ShortTexts.builder().build())
             .build();
-    doReturn(opinion)
-        .when(retrievalService)
-        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+
+    EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
+    when(eurLexResultDTO.getUri()).thenReturn(uri);
+    when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
+
+    doReturn(opinion).when(retrievalService).requestSingleEurlexDocument(uri);
     ArgumentCaptor<DocumentationUnit> docUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
@@ -271,9 +291,16 @@ class FmxServiceTest {
             .longTexts(LongTexts.builder().build())
             .shortTexts(ShortTexts.builder().build())
             .build();
+
+    EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
+    when(eurLexResultDTO.getUri())
+        .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
+    when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
+
     doReturn(judgment)
         .when(retrievalService)
-        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+        .requestSingleEurlexDocument(
+            "https://publications.europa.eu/resource/celex/" + celexNumber);
     ArgumentCaptor<DocumentationUnit> docUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
@@ -311,9 +338,16 @@ class FmxServiceTest {
             .longTexts(LongTexts.builder().build())
             .shortTexts(ShortTexts.builder().build())
             .build();
+
+    EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
+    when(eurLexResultDTO.getUri())
+        .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
+    when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
+
     doReturn(order)
         .when(retrievalService)
-        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+        .requestSingleEurlexDocument(
+            "https://publications.europa.eu/resource/celex/" + celexNumber);
     ArgumentCaptor<DocumentationUnit> docUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
@@ -352,9 +386,16 @@ class FmxServiceTest {
             .longTexts(LongTexts.builder().build())
             .shortTexts(ShortTexts.builder().build())
             .build();
+
+    EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
+    when(eurLexResultDTO.getUri())
+        .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
+    when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
+
     doReturn(opinion)
         .when(retrievalService)
-        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+        .requestSingleEurlexDocument(
+            "https://publications.europa.eu/resource/celex/" + celexNumber);
     ArgumentCaptor<DocumentationUnit> docUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
@@ -393,11 +434,18 @@ class FmxServiceTest {
             .longTexts(LongTexts.builder().build())
             .shortTexts(ShortTexts.builder().build())
             .build();
+
+    EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
+    when(eurLexResultDTO.getUri())
+        .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
+    when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
+
     doReturn("")
         .when(retrievalService)
-        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+        .requestSingleEurlexDocument(
+            "https://publications.europa.eu/resource/celex/" + celexNumber);
 
-    assertThatExceptionOfType(FmxTransformationException.class)
+    assertThatExceptionOfType(FmxImporterException.class)
         .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
         .withMessageContaining("FMX file has no content.");
   }
@@ -416,16 +464,49 @@ class FmxServiceTest {
             .longTexts(LongTexts.builder().build())
             .shortTexts(ShortTexts.builder().build())
             .build();
+
+    EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
+    when(eurLexResultDTO.getUri())
+        .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
+    when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
+
     doReturn("lorem ipsum")
         .when(retrievalService)
-        .getDocumentFromEurlex("https://publications.europa.eu/resource/celex/" + celexNumber);
+        .requestSingleEurlexDocument(
+            "https://publications.europa.eu/resource/celex/" + celexNumber);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
     when(databaseDocumentationUnitRepository.findById(id))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    assertThatExceptionOfType(FmxTransformationException.class)
+    assertThatExceptionOfType(FmxImporterException.class)
         .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
         .withMessageContaining("Failed to parse FMX file content.");
+  }
+
+  @Test
+  void missingEurlexResult_shouldThrowTransformationException() {
+    String celexNumber = "CELEX1234";
+    UUID id = UUID.randomUUID();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(id)
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
+            .longTexts(LongTexts.builder().build())
+            .shortTexts(ShortTexts.builder().build())
+            .build();
+
+    EurLexResultDTO eurLexResultDTO = mock(EurLexResultDTO.class);
+    when(eurLexResultDTO.getUri())
+        .thenReturn("https://publications.europa.eu/resource/celex/" + celexNumber);
+    when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.empty());
+
+    assertThatExceptionOfType(FmxImporterException.class)
+        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
+        .withMessageContaining(
+            "Could not find matching Eurlex Result for Celex Number " + celexNumber);
   }
 
   private final String judgment =

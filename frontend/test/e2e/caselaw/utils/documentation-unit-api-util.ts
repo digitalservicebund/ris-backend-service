@@ -81,3 +81,41 @@ export async function deleteAllProcedures(
     await deleteProcedure(page, uuid)
   }
 }
+
+export async function addEurlexDecisions(page: Page) {
+  const cookies = await page.context().cookies()
+  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+  const response = await page.request.post(
+    `/api/v1/caselaw/eurlex/testdata/seed`,
+    {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    },
+  )
+  expect(response.ok()).toBeTruthy()
+}
+
+export async function cleanUpEurlexDecisions(page: Page) {
+  const cookies = await page.context().cookies()
+  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+  const response = await page.request.post(
+    `/api/v1/caselaw/eurlex/testdata/cleanup`,
+    {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    },
+  )
+  expect(response.ok()).toBeTruthy()
+}
+
+export async function getPreview(
+  page: Page,
+  documentUnitId: string,
+): Promise<APIResponse> {
+  const cookies = await page.context().cookies()
+  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+  return await page.request.get(
+    `/api/v1/caselaw/documentunits/${documentUnitId}/preview-xml`,
+    {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    },
+  )
+}

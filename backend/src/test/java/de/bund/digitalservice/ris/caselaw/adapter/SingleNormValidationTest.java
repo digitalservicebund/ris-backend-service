@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DeltaMigrationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
@@ -60,7 +61,7 @@ class SingleNormValidationTest {
   @MockitoBean PatchMapperService patchMapperService;
   @MockitoBean DuplicateCheckService duplicateCheckService;
   @MockitoBean UserService userService;
-  @MockitoBean FmxService fmxService;
+  @MockitoBean FmxImportService fmxImportService;
   @MockitoBean DocumentationUnitHistoryLogService logService;
   @MockitoBean DocumentationOfficeService documentationOfficeService;
 

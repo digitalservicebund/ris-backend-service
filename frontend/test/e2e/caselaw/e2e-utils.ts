@@ -209,6 +209,13 @@ export const navigateToHandover = async (
   })
 }
 
+export const navigateToSettings = async (page: Page) => {
+  await test.step("Navigate to Einstellungen'", async () => {
+    await page.goto(`/settings`)
+    await expect(page.locator("h3:has-text('Einstellungen')")).toBeVisible()
+  })
+}
+
 export const handoverDocumentationUnit = async (
   page: Page,
   documentNumber: string,

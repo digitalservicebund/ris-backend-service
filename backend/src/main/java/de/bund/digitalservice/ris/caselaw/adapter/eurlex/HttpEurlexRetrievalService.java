@@ -1,6 +1,6 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.adapter.eurlex;
 
-import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -12,14 +12,34 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
-@Service
 @Slf4j
-public class EurlexRetrievalService {
+public class HttpEurlexRetrievalService implements EurlexRetrievalService {
+
+  @SuppressWarnings("java:S2142")
+  @Override
+  public String requestEurlexResultList(String url, String payload) {
+    try {
+      HttpClient client = HttpClient.newBuilder().build();
+
+      HttpRequest request =
+          HttpRequest.newBuilder()
+              .uri(new URI(url))
+              .POST(HttpRequest.BodyPublishers.ofString(payload))
+              .header("Content-Type", "application/soap+xml")
+              .build();
+
+      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      return response.body();
+    } catch (IOException | InterruptedException | URISyntaxException ex) {
+      log.error("Can't get search results from EUR-Lex webservice.", ex);
+      throw new EurLexSearchException(ex);
+    }
+  }
 
   @SuppressWarnings({"java:S2142", "java:S5042"})
-  public String getDocumentFromEurlex(String sourceUrl) {
+  @Override
+  public String requestSingleEurlexDocument(String sourceUrl) {
     String fmxFileContent = null;
 
     try {
@@ -47,7 +67,7 @@ public class EurlexRetrievalService {
         }
       }
     } catch (IOException | InterruptedException | URISyntaxException ex) {
-      throw new FmxTransformationException("Downloading FMX file from Eurlex Database failed.", ex);
+      throw new FmxImporterException("Downloading FMX file from Eurlex Database failed.", ex);
     }
 
     if (fmxFileContent != null && !fmxFileContent.isBlank()) {

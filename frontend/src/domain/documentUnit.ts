@@ -53,7 +53,7 @@ export type Source = {
   sourceRawValue?: string
 }
 
-export enum InboxType {
+export enum InboxStatus {
   EXTERNAL_HANDOVER,
   EU,
 }
@@ -205,6 +205,7 @@ export default class DocumentUnit {
     borderNumbers: [],
     duplicateRelations: [],
   }
+  public inboxStatus?: InboxStatus
 
   static readonly requiredFields = [
     "fileNumbers",

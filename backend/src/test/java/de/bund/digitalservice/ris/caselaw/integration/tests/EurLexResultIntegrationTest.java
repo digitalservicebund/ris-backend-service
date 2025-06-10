@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresEurLexResultRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexController;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.MockEurlexRetrievalService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -49,6 +50,7 @@ import org.testcontainers.junit.jupiter.Container;
       KeycloakUserService.class,
       EurLexSOAPSearchService.class,
       PostgresEurLexResultRepositoryImpl.class,
+      MockEurlexRetrievalService.class,
     },
     controllers = {EurLexController.class})
 @Sql(

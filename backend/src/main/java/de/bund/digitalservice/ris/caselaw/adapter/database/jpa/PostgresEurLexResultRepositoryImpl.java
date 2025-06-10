@@ -92,6 +92,16 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
     return repository.findAllByCelexIn(celexNumbers);
   }
 
+  @Override
+  public List<EurLexResultDTO> deleteAllByCelexNumbers(List<String> celexNumbers) {
+    return repository.deleteAllByCelexIn(celexNumbers);
+  }
+
+  @Override
+  public Optional<EurLexResultDTO> findByCelexNumber(String celexNumber) {
+    return repository.findByCelex(celexNumber);
+  }
+
   @SuppressWarnings("java:S107")
   private List<Predicate> generatePredicates(
       CriteriaBuilder builder,

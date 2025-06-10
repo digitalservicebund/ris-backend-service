@@ -6,7 +6,7 @@ import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import { Page } from "@/components/Pagination.vue"
 import { Query } from "@/composables/useQueryFromRoute"
-import { DocumentUnitSearchParameter, InboxType } from "@/domain/documentUnit"
+import { DocumentUnitSearchParameter, InboxStatus } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
@@ -141,7 +141,7 @@ async function handleReset() {
       :title="serviceError.title"
     />
     <InboxList
-      :inbox-type="InboxType.EXTERNAL_HANDOVER"
+      :inbox-status="InboxStatus.EXTERNAL_HANDOVER"
       :loading="isLoading"
       :page-entries="currentPage"
       @delete-documentation-unit="handleDelete"

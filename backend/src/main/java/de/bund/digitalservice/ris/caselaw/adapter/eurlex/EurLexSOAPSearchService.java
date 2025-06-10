@@ -8,13 +8,6 @@ import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.SearchService;
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -32,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -55,11 +49,15 @@ public class EurLexSOAPSearchService implements SearchService {
 
   private final EurLexResultRepository repository;
   private final DatabaseCourtRepository courtRepository;
+  private final EurlexRetrievalService eurlexRetrievalService;
 
   public EurLexSOAPSearchService(
-      EurLexResultRepository repository, DatabaseCourtRepository courtRepository) {
+      EurLexResultRepository repository,
+      DatabaseCourtRepository courtRepository,
+      EurlexRetrievalService eurlexRetrievalService) {
     this.repository = repository;
     this.courtRepository = courtRepository;
+    this.eurlexRetrievalService = eurlexRetrievalService;
   }
 
   /**
@@ -149,23 +147,10 @@ public class EurLexSOAPSearchService implements SearchService {
   private void requestNewestDecisions(int pageNumber, LocalDate lastUpdate) {
     Element searchResults;
 
-    try {
-      HttpClient client = HttpClient.newBuilder().build();
-
-      HttpRequest request =
-          HttpRequest.newBuilder()
-              .uri(new URI(url))
-              .POST(BodyPublishers.ofString(generatePayload(pageNumber, lastUpdate)))
-              .header("Content-Type", "application/soap+xml")
-              .build();
-
-      HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-
-      searchResults = extractSearchResultsFromResponse(response);
-    } catch (IOException | InterruptedException | URISyntaxException ex) {
-      log.error("Can't get search results from EUR-Lex webservice.", ex);
-      throw new EurLexSearchException(ex);
-    }
+    String response =
+        eurlexRetrievalService.requestEurlexResultList(
+            url, generatePayload(pageNumber, lastUpdate));
+    searchResults = extractSearchResultsFromResponse(response);
 
     if (searchResults != null) {
       Map<String, CourtDTO> courts = new HashMap<>();
@@ -183,13 +168,13 @@ public class EurLexSOAPSearchService implements SearchService {
     }
   }
 
-  private Element extractSearchResultsFromResponse(HttpResponse<String> response) {
+  private Element extractSearchResultsFromResponse(String response) {
     try {
       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
       Document doc =
           documentBuilderFactory
               .newDocumentBuilder()
-              .parse(new InputSource(new StringReader(response.body())));
+              .parse(new InputSource(new StringReader(response)));
 
       NodeList searchResultsList = doc.getElementsByTagName("searchResults");
 
@@ -239,5 +224,15 @@ public class EurLexSOAPSearchService implements SearchService {
         + "</sear:searchRequest>"
         + "</soap:Body>"
         + "</soap:Envelope>";
+  }
+
+  /**
+   * Clean up the data that has been added for e2e tests, so that each e2e test-suite can run with a
+   * clean slate state of the system.
+   */
+  @Override
+  @Transactional
+  public void cleanUpTestdata() {
+    repository.deleteAllByCelexNumbers(List.of("62024CO0878", "62023CJ0538", "62019CV0001(02)"));
   }
 }

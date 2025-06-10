@@ -16,4 +16,8 @@ public interface SearchService {
       Optional<LocalDate> endDate);
 
   void updateResultStatus(List<String> celexNumbers);
+
+  void requestNewestDecisions();
+
+  void cleanUpTestdata();
 }

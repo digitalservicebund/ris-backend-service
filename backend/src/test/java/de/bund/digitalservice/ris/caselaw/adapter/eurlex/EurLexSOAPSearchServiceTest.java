@@ -39,6 +39,8 @@ class EurLexSOAPSearchServiceTest {
 
   @MockitoBean private DatabaseCourtRepository courtRepository;
 
+  @MockitoBean private HttpEurlexRetrievalService httpEurlexRetrievalService;
+
   @MockitoSpyBean private EurLexSOAPSearchService service;
 
   @Test
