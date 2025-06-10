@@ -47,6 +47,11 @@ public record PendingProceeding(
     String admissionOfAppeal,
     String appellant,
     boolean isEditable,
-    boolean isDeletable,
-    Kind kind)
-    implements Documentable {}
+    boolean isDeletable)
+    implements Documentable {
+
+  @Override
+  public Kind kind() {
+    return Kind.PENDING_PROCEEDING;
+  }
+}

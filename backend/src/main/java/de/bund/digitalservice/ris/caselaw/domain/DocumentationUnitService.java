@@ -319,7 +319,6 @@ public class DocumentationUnitService {
                     pendingProceeding.coreData().creatingDocOffice(),
                     pendingProceeding.coreData().documentationOffice(),
                     pendingProceeding.status()))
-            .kind(Kind.PENDING_PROCEEDING)
             .build();
       }
       default -> {

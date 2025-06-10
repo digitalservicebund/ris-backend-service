@@ -50,4 +50,10 @@ public record DocumentationUnit(
     boolean isEditable,
     boolean isDeletable,
     Kind kind)
-    implements Documentable {}
+    implements Documentable {
+
+  @Override
+  public Kind kind() {
+    return Kind.DOCUMENT_UNIT;
+  }
+}
