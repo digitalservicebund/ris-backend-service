@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
-import type { Component } from "vue"
 import { computed, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import AttachmentView from "@/components/AttachmentView.vue"
@@ -9,28 +8,17 @@ import ExtraContentExtraContentSidePanelMenu from "@/components/ExtraContentSide
 import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
+import { ExtraContentSidePanelProps } from "@/components/input/types"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import DocumentationUnitTextCheckSummary from "@/components/text-check/DocumentationUnitTextCheckSummary.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
-import DocumentUnit from "@/domain/documentUnit"
-import PendingProceeding from "@/domain/pendingProceeding"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
-import { Match } from "@/types/textCheck"
 import { isDocumentUnit, isPendingProceeding } from "@/utils/typeGuards"
 
-const props = defineProps<{
-  document: DocumentUnit | PendingProceeding
-  showEditButton?: boolean
-  hidePanelModeBar?: boolean
-  hidePreviewInNewTab?: boolean
-  sidePanelMode?: SelectablePanelContent
-  sidePanelShortcut?: string
-  icon?: Component
-  jumpToMatch?: (match: Match) => void
-}>()
+const props = defineProps<ExtraContentSidePanelProps>()
 
 const store = useExtraContentSidePanelStore()
 
