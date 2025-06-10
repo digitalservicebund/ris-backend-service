@@ -56,12 +56,10 @@ public class HandoverMailService implements MailService {
       XmlExporter xmlExporter,
       HttpMailSender mailSender,
       HandoverRepository repository,
-      TextCheckService textCheckService,
       Environment env) {
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
-    this.textCheckService = textCheckService;
     this.env = env;
   }
 
