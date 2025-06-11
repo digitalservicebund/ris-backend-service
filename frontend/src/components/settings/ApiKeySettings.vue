@@ -6,7 +6,7 @@ import CopyableLabel from "@/components/CopyableLabel.vue"
 import { ApiKey } from "@/domain/apiKey"
 import authService from "@/services/authService"
 
-const apiKey = ref<ApiKey>()
+const apiKey = ref<ApiKey | null>(null)
 
 async function generateApiKey() {
   const response = await authService.generateImportApiKey()
