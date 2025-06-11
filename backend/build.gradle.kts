@@ -173,7 +173,7 @@ dependencies {
     // CVE-2025-24970
     implementation("io.netty:netty-handler:4.2.2.Final")
 
-    implementation("org.postgresql:postgresql:42.7.6")
+    implementation("org.postgresql:postgresql:42.7.7")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
