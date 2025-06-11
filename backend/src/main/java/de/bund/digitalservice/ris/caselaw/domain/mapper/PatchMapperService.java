@@ -52,10 +52,10 @@ public interface PatchMapperService {
    * Apply the patch to the existing documentation unit.
    *
    * @param patch patch to apply
-   * @param targetEntity existing documentatable
-   * @return result of the existing documentable and the applied patch
+   * @param existingDocumentationUnit existing documentation unit
+   * @return result of the existing documentation and the applied patch
    */
-  Documentable applyPatchToEntity(JsonPatch patch, Documentable targetEntity);
+  Documentable applyPatchToEntity(JsonPatch patch, Documentable existingDocumentationUnit);
 
   /**
    * Generate a patch between the two documentation units.

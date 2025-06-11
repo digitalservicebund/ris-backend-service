@@ -398,16 +398,16 @@ public class DocumentationUnitService {
        * handle unique following operation (sometimes by add and remove operations at the same time)
     */
 
-    Documentable existingDocumentable = getByUuid(documentationUnitId, user);
+    Documentable existingDocumentationUnit = getByUuid(documentationUnitId, user);
 
     long newVersion = 1L;
-    if (existingDocumentable.version() != null) {
-      newVersion = existingDocumentable.version() + 1;
+    if (existingDocumentationUnit.version() != null) {
+      newVersion = existingDocumentationUnit.version() + 1;
     }
 
     JsonPatch newPatch =
         patchMapperService.calculatePatch(
-            existingDocumentable.uuid(), patch.documentationUnitVersion());
+            existingDocumentationUnit.uuid(), patch.documentationUnitVersion());
 
     if (!patch.patch().getOperations().isEmpty() || !newPatch.getOperations().isEmpty()) {
       log.debug(
@@ -430,26 +430,26 @@ public class DocumentationUnitService {
       if (!toUpdate.getOperations().isEmpty()) {
         toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
 
-        Documentable patchedDocumentable =
-            patchMapperService.applyPatchToEntity(toUpdate, existingDocumentable);
+        Documentable patchedDocumentationUnit =
+            patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
 
-        if (patchedDocumentable instanceof DocumentationUnit docUnit) {
-          patchedDocumentable = docUnit.toBuilder().version(newVersion).build();
-        } else if (patchedDocumentable instanceof PendingProceeding pendingProceeding) {
-          patchedDocumentable = pendingProceeding.toBuilder().version(newVersion).build();
+        if (patchedDocumentationUnit instanceof DocumentationUnit docUnit) {
+          patchedDocumentationUnit = docUnit.toBuilder().version(newVersion).build();
+        } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
+          patchedDocumentationUnit = pendingProceeding.toBuilder().version(newVersion).build();
         }
 
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
-        Documentable updatedDocumentable = null;
-        if (patchedDocumentable instanceof DocumentationUnit docUnit) {
-          updatedDocumentable = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
-        } else if (patchedDocumentable instanceof PendingProceeding pendingProceeding) {
-          updatedDocumentable = updatePendingProceeding(pendingProceeding, user);
+        Documentable updatedDocumentationUnit = null;
+        if (patchedDocumentationUnit instanceof DocumentationUnit docUnit) {
+          updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
+        } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
+          updatedDocumentationUnit = updatePendingProceeding(pendingProceeding, user);
         }
 
         toFrontendJsonPatch =
-            patchMapperService.getDiffPatch(patchedDocumentable, updatedDocumentable);
+            patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
 
         log.debug(
             "version {} - raw to frontend patch: {}",
@@ -463,12 +463,12 @@ public class DocumentationUnitService {
             "version {} - to save patch: {}", patch.documentationUnitVersion(), toSaveJsonPatch);
 
         patchMapperService.savePatch(
-            toSaveJsonPatch, existingDocumentable.uuid(), existingDocumentable.version());
+            toSaveJsonPatch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version());
       }
 
       toFrontend =
           patchMapperService.handlePatchForSamePath(
-              existingDocumentable, toFrontendJsonPatch, patch.patch(), newPatch);
+              existingDocumentationUnit, toFrontendJsonPatch, patch.patch(), newPatch);
 
       log.debug(
           "version {} - cleaned to frontend patch: {}",
@@ -479,7 +479,9 @@ public class DocumentationUnitService {
         toFrontend = toFrontend.toBuilder().documentationUnitVersion(newVersion).build();
       } else {
         toFrontend =
-            toFrontend.toBuilder().documentationUnitVersion(existingDocumentable.version()).build();
+            toFrontend.toBuilder()
+                .documentationUnitVersion(existingDocumentationUnit.version())
+                .build();
       }
 
       log.debug(
@@ -491,7 +493,7 @@ public class DocumentationUnitService {
         newPatch = new JsonPatch(Collections.emptyList());
       }
       toFrontend =
-          new RisJsonPatch(existingDocumentable.version(), newPatch, Collections.emptyList());
+          new RisJsonPatch(existingDocumentationUnit.version(), newPatch, Collections.emptyList());
     }
 
     return toFrontend;
