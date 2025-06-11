@@ -332,7 +332,6 @@ class DocumentationUnitControllerTest {
   }
 
   @Test
-  @Disabled("endpoint not used")
   void testUpdateByUuid() throws DocumentationUnitNotExistsException {
     DecisionDTO documentationUnitDTO =
         DecisionDTO.builder()
@@ -341,7 +340,7 @@ class DocumentationUnitControllerTest {
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .build();
     DocumentationUnit documentationUnit =
-        DecisionTransformer.transformToDomain(documentationUnitDTO);
+        DecisionTransformer.transformToDomain(documentationUnitDTO).toBuilder().build();
 
     when(service.updateDocumentationUnit(documentationUnit)).thenReturn(null);
 

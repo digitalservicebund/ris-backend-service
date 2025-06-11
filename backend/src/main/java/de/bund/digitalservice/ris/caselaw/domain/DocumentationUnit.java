@@ -48,8 +48,7 @@ public record DocumentationUnit(
     List<String> documentalists,
     InboxStatus inboxStatus,
     boolean isEditable,
-    boolean isDeletable,
-    Kind kind)
+    boolean isDeletable)
     implements Documentable {
 
   @Override

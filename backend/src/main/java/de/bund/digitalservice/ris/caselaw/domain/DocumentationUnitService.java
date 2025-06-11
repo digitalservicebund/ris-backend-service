@@ -303,7 +303,6 @@ public class DocumentationUnitService {
                     documentationUnit.coreData().creatingDocOffice(),
                     documentationUnit.coreData().documentationOffice(),
                     documentationUnit.status()))
-            .kind(Kind.DOCUMENT_UNIT)
             .build();
       }
       case PendingProceeding pendingProceeding -> {
