@@ -12,6 +12,7 @@ import ProceedingDecisions from "@/components/ProceedingDecisions.vue"
 import PendingProceedingTexts from "@/components/texts/PendingProceedingTexts.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
+import { Kind } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 defineProps<{
@@ -50,7 +51,7 @@ const isInternalUser = useInternalUser()
       v-if="isInternalUser"
       :id="DocumentUnitCategoriesEnum.CORE_DATA"
       v-model="coreData"
-      is-pending-proceeding
+      :kind="Kind.PENDING_PROCEEDING"
     />
     <ProceedingDecisions
       :id="DocumentUnitCategoriesEnum.PROCEEDINGS_DECISIONS"

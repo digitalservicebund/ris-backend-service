@@ -13,6 +13,7 @@ import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
+import { Kind } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 defineProps<{
@@ -81,6 +82,7 @@ const isInternalUser = useInternalUser()
       v-if="isInternalUser"
       :id="DocumentUnitCategoriesEnum.CORE_DATA"
       v-model="coreData"
+      :kind="Kind.DOCUMENT_UNIT"
     />
     <ProceedingDecisions
       :id="DocumentUnitCategoriesEnum.PROCEEDINGS_DECISIONS"

@@ -17,6 +17,7 @@ import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDe
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
 import DocumentUnit, {
   ContentRelatedIndexing,
+  Kind,
   LongTexts,
 } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -52,6 +53,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewCoreData
       :core-data="documentUnit.coreData"
       date-label="Entscheidungsdatum"
+      :kind="Kind.DOCUMENT_UNIT"
     />
     <PreviewNote :note="documentUnit.note" />
     <PreviewCaselawReferences

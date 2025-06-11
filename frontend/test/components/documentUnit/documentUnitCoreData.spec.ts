@@ -4,7 +4,11 @@ import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import DocumentUnit, { CoreData, SourceValue } from "@/domain/documentUnit"
+import DocumentUnit, {
+  CoreData,
+  Kind,
+  SourceValue,
+} from "@/domain/documentUnit"
 
 type CoreDataProps = InstanceType<typeof DocumentUnitCoreData>["$props"]
 
@@ -18,6 +22,7 @@ function renderComponent(props?: Partial<CoreDataProps>) {
     "onUpdate:modelValue":
       props?.["onUpdate:modelValue"] ??
       ((val: CoreData | undefined) => (modelValue = val)),
+    kind: Kind.DOCUMENT_UNIT,
   }
 
   return { user, ...render(DocumentUnitCoreData, { props: effectiveProps }) }

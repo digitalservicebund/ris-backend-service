@@ -1,13 +1,14 @@
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
-import { CoreData, SourceValue } from "@/domain/documentUnit"
+import { CoreData, Kind, SourceValue } from "@/domain/documentUnit"
 
 function renderComponent(coreData: CoreData) {
   return render(PreviewCoreData, {
     props: {
       coreData: coreData,
       dateLabel: "Entscheidungsdatum",
+      kind: Kind.DOCUMENT_UNIT,
     },
     global: {
       provide: {

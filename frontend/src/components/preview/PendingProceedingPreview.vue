@@ -17,6 +17,7 @@ import PreviewLiteratureReferences from "@/components/preview/PreviewLiteratureR
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
+import { Kind } from "@/domain/documentUnit"
 import PendingProceeding, {
   pendingProceedingShortTextLabels,
 } from "@/domain/pendingProceeding"
@@ -53,6 +54,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
       :core-data="documentUnit.coreData"
       date-label="Mitteilungsdatum"
       is-pending-proceeding
+      :kind="Kind.PENDING_PROCEEDING"
     />
     <PreviewCaselawReferences
       :caselaw-references="documentUnit.caselawReferences as Reference[]"

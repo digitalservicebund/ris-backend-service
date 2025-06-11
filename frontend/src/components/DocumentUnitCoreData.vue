@@ -2,7 +2,7 @@
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import InputSelect from "primevue/select"
-import { computed, toRefs, watch, ref, onMounted, onBeforeUnmount } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue"
 import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
@@ -14,21 +14,18 @@ import NestedComponent from "@/components/NestedComponents.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
-import { CoreData, SourceValue } from "@/domain/documentUnit"
+import { CoreData, Kind, SourceValue } from "@/domain/documentUnit"
 import { pendingProceedingShortTextLabels } from "@/domain/pendingProceeding"
 import ComboboxItemService from "@/services/comboboxItemService"
 
-interface Props {
+const props = defineProps<{
   modelValue: CoreData
-  isPendingProceeding?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  isPendingProceeding: false,
-})
+  kind: Kind
+}>()
 const emit = defineEmits<{
   "update:modelValue": [value: CoreData]
 }>()
+const isPendingProceeding = props.kind === Kind.PENDING_PROCEEDING
 const { modelValue } = toRefs(props)
 const validationStore =
   useValidationStore<
