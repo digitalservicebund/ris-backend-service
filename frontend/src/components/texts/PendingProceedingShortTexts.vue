@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import InputSelect from "primevue/select"
-import { Component, computed, Ref } from "vue"
+import { Component, computed, Ref, watch } from "vue"
 import InputField from "@/components/input/InputField.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import admissionOfAppealTypes from "@/data/admissionOfAppealTypes.json"
@@ -60,6 +60,15 @@ const admissionOfAppeal = computed({
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
+watch(
+  () => documentUnit.value?.coreData.court?.label,
+  (newCourtLabel, oldCourtLabel) => {
+    if (newCourtLabel && newCourtLabel !== oldCourtLabel) {
+      store.documentUnit!.shortTexts.headline =
+        "Anhängiges Verfahren beim " + newCourtLabel
+    }
+  },
+)
 </script>
 
 <template>
