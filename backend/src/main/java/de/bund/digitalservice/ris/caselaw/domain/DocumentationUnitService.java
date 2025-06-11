@@ -267,10 +267,10 @@ public class DocumentationUnitService {
 
     boolean hasWriteAccess =
         authService.userHasWriteAccess(
-                oidcUser,
-                listItem.creatingDocumentationOffice(),
-                listItem.documentationOffice(),
-                listItem.status());
+            oidcUser,
+            listItem.creatingDocumentationOffice(),
+            listItem.documentationOffice(),
+            listItem.status());
     boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
     BooleanSupplier isAssignedViaGroup =
         () ->
