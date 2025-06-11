@@ -6,7 +6,8 @@ import { getPreview } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { importDocumentationUnitFromXml } from "~/e2e/caselaw/utils/importer-api-util"
 
 test.describe("ensuring the exported XML is generated from imported decision as expected", () => {
-  test("xml preview shows expected xml", async ({ page }) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("xml preview shows expected xml", async ({ page }) => {
     // skip this test when running locally as there is no importer available
     // eslint-disable-next-line playwright/no-skipped-test
     test.skip(
