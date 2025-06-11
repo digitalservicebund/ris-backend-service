@@ -53,11 +53,11 @@ async function attachmentsUploaded(
       #default="{
         registerTextEditorRef,
         requestDocumentUnitFromServer,
-        jumpToMatch: jumpToMatchFromBase,
+        jumpToMatch: jumpToMatch,
       }"
     >
       <router-view
-        v-bind="{ registerTextEditorRef, jumpToMatch: jumpToMatchFromBase }"
+        v-bind="{ registerTextEditorRef, jumpToMatch: jumpToMatch }"
         @attachment-index-deleted="
           ($event: number) =>
             attachmentIndexDeleted($event, requestDocumentUnitFromServer)

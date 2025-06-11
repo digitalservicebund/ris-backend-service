@@ -17,12 +17,8 @@ defineProps<{
     }"
     :kind="Kind.PENDING_PROCEEDING"
   >
-    <template
-      #default="{ registerTextEditorRef, jumpToMatch: jumpToMatchFromBase }"
-    >
-      <router-view
-        v-bind="{ registerTextEditorRef, jumpToMatch: jumpToMatchFromBase }"
-      >
+    <template #default="{ registerTextEditorRef, jumpToMatch: jumpToMatch }">
+      <router-view v-bind="{ registerTextEditorRef, jumpToMatch: jumpToMatch }">
       </router-view>
     </template>
   </DocumentViewer>
