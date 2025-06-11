@@ -48,17 +48,17 @@ public class DatabasePatchMapperService implements PatchMapperService {
 
   @Override
   public Documentable applyPatchToEntity(JsonPatch patch, Documentable targetEntity) {
-    Documentable documentationUnit;
+    Documentable documentable;
 
     try {
       JsonNode jsonNode = objectMapper.convertValue(targetEntity, JsonNode.class);
       JsonNode updatedNode = patch.apply(jsonNode);
-      documentationUnit = objectMapper.treeToValue(updatedNode, Documentable.class);
+      documentable = objectMapper.treeToValue(updatedNode, Documentable.class);
     } catch (JsonProcessingException | JsonPatchException e) {
       throw new DocumentationUnitPatchException("Couldn't apply patch", e);
     }
 
-    return documentationUnit;
+    return documentable;
   }
 
   @Override

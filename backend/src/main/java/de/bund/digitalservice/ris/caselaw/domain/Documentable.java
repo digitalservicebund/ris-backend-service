@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * The shared domain model interface for a caselaw decision {@link
- * de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit} and a pending proceeding {@link
- * de.bund.digitalservice.ris.caselaw.domain.PendingProceeding}.
+ * The shared domain model interface for a caselaw decision {@link DocumentationUnit} and a pending
+ * proceeding {@link PendingProceeding}.
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kind")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = DocumentationUnit.class, name = "DOCUMENT_UNIT"),
   @JsonSubTypes.Type(value = PendingProceeding.class, name = "PENDING_PROCEEDING")
