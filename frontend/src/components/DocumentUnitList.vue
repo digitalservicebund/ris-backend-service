@@ -294,10 +294,17 @@ function onDelete() {
             <Tooltip text="Bearbeiten">
               <router-link
                 target="_blank"
-                :to="{
-                  name: 'caselaw-documentUnit-documentNumber-categories',
-                  params: { documentNumber: listEntry.documentNumber },
-                }"
+                :to="
+                  listEntry.documentType?.jurisShortcut === 'Anh'
+                    ? {
+                        name: 'caselaw-pending-proceeding-documentNumber-categories',
+                        params: { documentNumber: listEntry.documentNumber },
+                      }
+                    : {
+                        name: 'caselaw-documentUnit-documentNumber-categories',
+                        params: { documentNumber: listEntry.documentNumber },
+                      }
+                "
               >
                 <Button
                   aria-label="Dokumentationseinheit bearbeiten"
