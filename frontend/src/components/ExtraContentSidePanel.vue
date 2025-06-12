@@ -31,17 +31,17 @@ const textCheckAll = useFeatureToggle("neuris.text-side-panel")
 
 const hasNote = computed(() => {
   return (
-    isDocumentUnit(props.document) &&
-    !!props.document!.note &&
-    props.document!.note.length > 0
+    isDocumentUnit(props.documentUnit) &&
+    !!props.documentUnit!.note &&
+    props.documentUnit!.note.length > 0
   )
 })
 
 const hasAttachments = computed(() => {
   return (
-    isDocumentUnit(props.document) &&
-    !!props.document!.attachments &&
-    props.document!.attachments.length > 0
+    isDocumentUnit(props.documentUnit) &&
+    !!props.documentUnit!.attachments &&
+    props.documentUnit!.attachments.length > 0
   )
 })
 
@@ -87,9 +87,9 @@ function setDefaultState() {
   if (props.sidePanelMode) {
     store.setSidePanelMode(props.sidePanelMode)
   } else if (
-    isDocumentUnit(props.document) &&
-    !props.document!.note &&
-    props.document!.hasAttachments
+    isDocumentUnit(props.documentUnit) &&
+    !props.documentUnit!.note &&
+    props.documentUnit!.hasAttachments
   ) {
     selectAttachments()
   } else {
@@ -133,9 +133,9 @@ onMounted(() => {
       @update:is-expanded="togglePanel"
     >
       <ExtraContentExtraContentSidePanelMenu
-        v-if="isDocumentUnit(props.document)"
+        v-if="isDocumentUnit(props.documentUnit)"
         :current-attachment-index="currentAttachmentIndex"
-        :document-unit="props.document"
+        :document-unit="props.documentUnit"
         :hide-panel-mode-bar="props.hidePanelModeBar"
         :hide-preview-in-new-tab="props.hidePreviewInNewTab"
         :panel-mode="panelMode"
@@ -144,11 +144,11 @@ onMounted(() => {
         @panel-mode:update="setSidePanelMode"
       />
       <div class="m-24">
-        <div v-if="panelMode === 'note' && isDocumentUnit(props.document)">
+        <div v-if="panelMode === 'note' && isDocumentUnit(props.documentUnit)">
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
-              v-model="props.document!.note"
+              v-model="props.documentUnit!.note"
               aria-label="Notiz Eingabefeld"
               autosize
               class="w-full"
@@ -158,18 +158,22 @@ onMounted(() => {
         </div>
         <div
           v-else-if="
-            panelMode === 'attachments' && isDocumentUnit(props.document)
+            panelMode === 'attachments' && isDocumentUnit(props.documentUnit)
           "
         >
           <AttachmentView
             v-if="
-              props.document.uuid &&
-              props.document.attachments &&
-              props.document.attachments[currentAttachmentIndex]?.format
+              props.documentUnit.uuid &&
+              props.documentUnit.attachments &&
+              props.documentUnit.attachments[currentAttachmentIndex]?.format
             "
-            :document-unit-uuid="props.document.uuid"
-            :format="props.document.attachments[currentAttachmentIndex].format"
-            :s3-path="props.document.attachments[currentAttachmentIndex].s3path"
+            :document-unit-uuid="props.documentUnit.uuid"
+            :format="
+              props.documentUnit.attachments[currentAttachmentIndex].format
+            "
+            :s3-path="
+              props.documentUnit.attachments[currentAttachmentIndex].s3path
+            "
           />
           <div v-else class="ris-label1-regular">
             Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.
@@ -181,19 +185,20 @@ onMounted(() => {
           class="flex max-h-[70vh] overflow-auto"
         >
           <DocumentUnitPreview
-            v-if="isDocumentUnit(props.document)"
+            v-if="isDocumentUnit(props.documentUnit)"
             layout="narrow"
           />
           <PendingProceedingPreview
-            v-if="isPendingProceeding(props.document)"
-            :document-number="props.document.documentNumber"
+            v-if="isPendingProceeding(props.documentUnit)"
+            :document-number="props.documentUnit.documentNumber"
             layout="narrow"
           />
         </div>
 
         <CategoryImport
           v-else-if="
-            panelMode === 'category-import' && isDocumentUnit(props.document)
+            panelMode === 'category-import' &&
+            isDocumentUnit(props.documentUnit)
           "
           :document-number="importDocumentNumber"
         />
@@ -202,7 +207,7 @@ onMounted(() => {
           v-else-if="
             panelMode === 'text-check' &&
             textCheckAll &&
-            isDocumentUnit(props.document)
+            isDocumentUnit(props.documentUnit)
           "
           v-bind="{ jumpToMatch }"
         />

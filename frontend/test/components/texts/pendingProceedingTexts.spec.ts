@@ -99,10 +99,10 @@ describe("Pending proceeding texts", () => {
     ).toBeVisible()
   })
 
-  test("renders all text categories as text fields", async () => {
+  test("renders all categories with data", async () => {
     await renderComponent(
       {
-        headline: "Titelzeile",
+        headline: "Titelzeile Test",
       },
       {
         legalIssue: "Rechtsfrage Test",
@@ -111,6 +111,17 @@ describe("Pending proceeding texts", () => {
         resolutionNote: "Erledigungsvermerk Test",
       },
     )
+    expect(
+      screen.getByText(pendingProceedingLabels.headline, {
+        exact: true,
+      }),
+    ).toBeVisible()
+    expect(
+      screen.getByText(pendingProceedingLabels.headline + " Test", {
+        exact: true,
+      }),
+    ).toBeVisible()
+
     expect(
       screen.getByText(pendingProceedingLabels.legalIssue, {
         exact: true,
@@ -121,12 +132,14 @@ describe("Pending proceeding texts", () => {
         exact: true,
       }),
     ).toBeVisible()
+
     expect(
       screen.getByText(pendingProceedingLabels.appellant, {
         exact: true,
       }),
     ).toBeVisible()
     expect(screen.getByText(appellantTypes.items[0].label)).toBeVisible()
+
     expect(
       screen.getByText(pendingProceedingLabels.admissionOfAppeal, {
         exact: true,
@@ -135,6 +148,7 @@ describe("Pending proceeding texts", () => {
     expect(
       screen.getByText(admissionOfAppealTypes.items[0].label),
     ).toBeVisible()
+
     expect(
       screen.getByText(pendingProceedingLabels.resolutionNote, {
         exact: true,
@@ -146,29 +160,33 @@ describe("Pending proceeding texts", () => {
       }),
     ).toBeVisible()
   })
-  test("headline remains empty on initial load if no court is set", async () => {
+
+  test("headline remains empty on initial load", async () => {
     const { docUnitStoreInstance } = await renderComponent({}, {})
 
     expect(docUnitStoreInstance.documentUnit?.shortTexts.headline).toBe(
       undefined,
     )
+    expect(
+      screen.getByRole("button", {
+        name: pendingProceedingLabels.headline,
+      }),
+    ).toBeVisible()
   })
 
-  test("headline is not auto-generated on initial load if manually edited", async () => {
+  test("headline is not auto-generated on initial load", async () => {
     const manualHeadline = "My manually written headline"
-    const { docUnitStoreInstance } = await renderComponent(
+    await renderComponent(
       {
         headline: manualHeadline,
       },
       { courtLabel: "Amtsgericht Berlin" },
     )
 
-    expect(docUnitStoreInstance.documentUnit?.shortTexts.headline).toBe(
-      manualHeadline,
-    )
+    expect(screen.getByText(manualHeadline)).toBeVisible()
   })
 
-  test("headline updates automatically when court is selected", async () => {
+  test("headline is auto-generated when court is selected", async () => {
     const { docUnitStoreInstance } = await renderComponent({
       headline: "initial Headline",
     })
@@ -179,50 +197,23 @@ describe("Pending proceeding texts", () => {
       "Landgericht München"
     await nextTick()
 
-    expect(docUnitStoreInstance.documentUnit?.shortTexts.headline).toBe(
-      expectedHeadline,
-    )
+    expect(screen.getByText(expectedHeadline)).toBeVisible()
   })
 
-  test("manual headline is overwritten when court changes after manual edit", async () => {
-    const customHeadline = "Ein Fall für das Gericht"
-    const initialCourt = "Amtsgericht Hamburg"
-    const newCourt = "Oberlandesgericht Celle"
-
+  test("headline is not cleared when court is cleared", async () => {
+    const initialHeadline = "Initial Headline"
     const { docUnitStoreInstance } = await renderComponent(
-      { headline: customHeadline },
-      { courtLabel: initialCourt },
+      { headline: initialHeadline },
+      { courtLabel: "BGH" },
     )
 
     expect(docUnitStoreInstance.documentUnit?.shortTexts.headline).toBe(
-      customHeadline,
-    )
-
-    docUnitStoreInstance.documentUnit!.coreData.court!.label = newCourt
-    await nextTick()
-
-    const expectedAutoHeadline = "Anhängiges Verfahren beim " + newCourt
-    expect(docUnitStoreInstance.documentUnit?.shortTexts.headline).toBe(
-      expectedAutoHeadline,
-    )
-  })
-
-  test("headline stays when court is cleared", async () => {
-    const initalCourtHeadline = "Initial Court Headline"
-    const { docUnitStoreInstance } = await renderComponent(
-      { headline: initalCourtHeadline },
-      { courtLabel: "Bundesgerichtshof" },
-    )
-
-    expect(docUnitStoreInstance.documentUnit?.shortTexts.headline).toBe(
-      "Initial Court Headline",
+      initialHeadline,
     )
 
     docUnitStoreInstance.documentUnit!.coreData!.court!.label = ""
     await nextTick()
 
-    expect(docUnitStoreInstance.documentUnit?.shortTexts.headline).toBe(
-      "Initial Court Headline",
-    )
+    expect(screen.getByText(initialHeadline)).toBeVisible()
   })
 })

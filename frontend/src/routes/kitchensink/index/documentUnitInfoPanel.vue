@@ -22,6 +22,6 @@ const documentUnit = new DocumentUnit("foo", {
 
 <template>
   <KitchensinkPage name="Document unit info panel">
-    <DocumentUnitInfoPanel :document="documentUnit" />
+    <DocumentUnitInfoPanel :document-unit="documentUnit" />
   </KitchensinkPage>
 </template>

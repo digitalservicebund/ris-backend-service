@@ -230,7 +230,7 @@ export type ValidationError = {
 }
 
 export type ExtraContentSidePanelProps = {
-  document?: DocumentUnit | PendingProceeding
+  documentUnit?: DocumentUnit | PendingProceeding
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   hidePreviewInNewTab?: boolean

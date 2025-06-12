@@ -35,7 +35,7 @@ function renderComponent(options?: {
   })
   return {
     ...render(DocumentUnitInfoPanel, {
-      props: { document: documentUnit },
+      props: { documentUnit: documentUnit },
       global: {
         plugins: [
           router,

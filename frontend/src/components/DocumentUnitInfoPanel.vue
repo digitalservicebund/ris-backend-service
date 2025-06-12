@@ -12,7 +12,7 @@ import { isDocumentUnit } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
 
 const props = defineProps<{
-  document: DocumentUnit | PendingProceeding
+  documentUnit: DocumentUnit | PendingProceeding
 }>()
 
 const route = useRoute()
@@ -20,18 +20,18 @@ const route = useRoute()
 const isInternalUser = useInternalUser()
 
 const fileNumberInfo = computed(() => {
-  return props.document.coreData.fileNumbers?.[0] || ""
+  return props.documentUnit.coreData.fileNumbers?.[0] || ""
 })
 
 const decisionDateInfo = computed(() => {
-  return props.document.coreData.decisionDate
-    ? dayjs(props.document.coreData.decisionDate).format("DD.MM.YYYY")
+  return props.documentUnit.coreData.decisionDate
+    ? dayjs(props.documentUnit.coreData.decisionDate).format("DD.MM.YYYY")
     : ""
 })
 
 const hasPendingDuplicateWarning = computed(() => {
-  if (isDocumentUnit(props.document)) {
-    return (props.document.managementData.duplicateRelations ?? []).some(
+  if (isDocumentUnit(props.documentUnit)) {
+    return (props.documentUnit.managementData.duplicateRelations ?? []).some(
       (warning) => warning.status === "PENDING",
     )
   }
@@ -39,7 +39,7 @@ const hasPendingDuplicateWarning = computed(() => {
 })
 
 const courtInfo = computed(() => {
-  return props.document.coreData.court?.label || ""
+  return props.documentUnit.coreData.court?.label || ""
 })
 
 const formattedInfo = computed(() => {
@@ -51,7 +51,7 @@ const formattedInfo = computed(() => {
   return parts.join(", ")
 })
 
-const statusBadge = ref(useStatusBadge(props.document.status).value)
+const statusBadge = ref(useStatusBadge(props.documentUnit.status).value)
 
 const isRouteWithSaveButton = computed(
   () =>
@@ -61,14 +61,14 @@ const isRouteWithSaveButton = computed(
     route.path.includes("managementdata"),
 )
 
-const hasErrorStatus = computed(() => props.document.status?.withError)
+const hasErrorStatus = computed(() => props.documentUnit.status?.withError)
 const managementDataRoute = computed(() => ({
   name: "caselaw-documentUnit-documentNumber-managementdata",
-  params: { documentNumber: props.document.documentNumber },
+  params: { documentNumber: props.documentUnit.documentNumber },
 }))
 
 watchEffect(() => {
-  statusBadge.value = useStatusBadge(props.document.status).value
+  statusBadge.value = useStatusBadge(props.documentUnit.status).value
 })
 </script>
 
@@ -77,7 +77,7 @@ watchEffect(() => {
     class="sticky top-0 z-30 flex h-[64px] flex-row items-center border-b border-solid border-gray-400 bg-blue-100 px-24 py-12"
     data-testid="document-unit-info-panel"
   >
-    <h1 class="ris-body1-bold">{{ props.document.documentNumber }}</h1>
+    <h1 class="ris-body1-bold">{{ props.documentUnit.documentNumber }}</h1>
     <span v-if="formattedInfo.length > 0" class="m-4"> | </span>
     <span
       class="overflow-hidden text-ellipsis whitespace-nowrap"

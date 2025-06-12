@@ -124,25 +124,31 @@ const handleKeyDown = (event: KeyboardEvent) => {
       toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
       break
     case "n":
-      event.preventDefault()
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("note")
+      if (props.kind === Kind.DOCUMENT_UNIT) {
+        event.preventDefault()
+        extraContentSidePanelStore.togglePanel(true)
+        extraContentSidePanelStore.setSidePanelMode("note")
+      }
       break
     case "d":
-      event.preventDefault()
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("attachments")
+      if (props.kind === Kind.DOCUMENT_UNIT) {
+        event.preventDefault()
+        extraContentSidePanelStore.togglePanel(true)
+        extraContentSidePanelStore.setSidePanelMode("attachments")
+      }
       break
     case "v":
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("preview")
       break
     case "r":
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("category-import")
+      if (props.kind === Kind.DOCUMENT_UNIT) {
+        extraContentSidePanelStore.togglePanel(true)
+        extraContentSidePanelStore.setSidePanelMode("category-import")
+      }
       break
     case "t":
-      if (!textCheck.value) break
+      if (!textCheck.value && props.kind === Kind.DOCUMENT_UNIT) break
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("text-check")
       break
@@ -195,7 +201,7 @@ onMounted(async () => {
     <div v-if="documentUnit" class="flex w-full min-w-0 flex-col bg-gray-100">
       <DocumentUnitInfoPanel
         v-if="documentUnit && !route.path.includes('preview')"
-        :document="documentUnit"
+        :document-unit="documentUnit"
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer
@@ -214,7 +220,7 @@ onMounted(async () => {
               !route.path.includes('preview')
             "
             v-bind="{ jumpToMatch, ...extraContentSidePanelProps }"
-            :document="documentUnit"
+            :document-unit="documentUnit"
           />
           <slot
             :document-unit="documentUnit"
