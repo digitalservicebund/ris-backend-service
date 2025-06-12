@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.gravity9.jsonpatch.AddOperation;
 import com.gravity9.jsonpatch.JsonPatch;
@@ -38,9 +39,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRelatedDocumentationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
@@ -77,15 +80,18 @@ import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.groups.Tuple;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -4371,6 +4377,109 @@ class PatchUpdateIntegrationTest {
           Map.of(
               "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
+    }
+  }
+
+  @Nested
+  class PendingProceedingPatchUpdate {
+    @Test
+    @Transactional
+    void
+        testPartialUpdateByUuid_withUserAddPendingProceedingRelatedFieldInput_shouldApplyChangesToPendingProceeding()
+            throws JsonProcessingException {
+      TestTransaction.flagForCommit();
+      TestTransaction.end();
+
+      DocumentationOfficeDTO documentationOffice =
+          documentationOfficeRepository.findByAbbreviation(buildDSDocOffice().abbreviation());
+
+      // Arrange
+      PendingProceedingDTO pendingProceedingDTO =
+          repository.save(
+              PendingProceedingDTO.builder()
+                  .documentationOffice(documentationOffice)
+                  .documentNumber("DocumentNumb1")
+                  .build());
+
+      RisJsonPatch patchUser1 = getRisJsonPatchForPendingProceedingFields();
+
+      risWebTestClient
+          .withDefaultLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/" + pendingProceedingDTO.getId())
+          .bodyValue(patchUser1)
+          .exchange()
+          .expectStatus()
+          .is2xxSuccessful()
+          .expectBody(RisJsonPatch.class)
+          .consumeWith(
+              response -> {
+                RisJsonPatch responsePatch = response.getResponseBody();
+                assertThat(responsePatch).isNotNull();
+                assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
+                assertThat(responsePatch.patch().getOperations())
+                    .hasSize(0); // because no management data in dto object yet
+                assertThat(responsePatch.errorPaths()).isEmpty();
+              });
+
+      TestTransaction.start();
+
+      // Retrieve the updated DTO from the repository
+      Optional<DocumentationUnitDTO> optionalUpdatedDto =
+          repository.findById(pendingProceedingDTO.getId());
+      assertThat(optionalUpdatedDto).isPresent();
+      PendingProceedingDTO updatedDto = (PendingProceedingDTO) optionalUpdatedDto.get();
+
+      assertThat(updatedDto.getDocumentNumber())
+          .isEqualTo(pendingProceedingDTO.getDocumentNumber());
+      assertThat(updatedDto.getResolutionDate()).isEqualTo(LocalDate.of(2021, 2, 1));
+      Assertions.assertTrue(updatedDto.isResolved());
+
+      // Short Texts
+      assertThat(updatedDto.getHeadline()).isEqualTo("Titelzeile");
+      assertThat(updatedDto.getLegalIssue()).isEqualTo("Rechtsfrage");
+      assertThat(updatedDto.getAppellant()).isEqualTo("Rechtsmittelführer");
+      assertThat(updatedDto.getAdmissionOfAppeal()).isEqualTo("Rechtsmittelzulassung");
+      assertThat(updatedDto.getResolutionNote()).isEqualTo("Erledigungsvermerk");
+
+      List<DocumentationUnitPatchDTO> patches =
+          patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
+              pendingProceedingDTO.getId(), 0L);
+      assertThat(patches).hasSize(1);
+      assertThat(patches.getFirst().getDocumentationUnitVersion()).isZero();
+      assertOnSavedPatchEntry(
+          patches.getFirst().getPatch(),
+          Map.of("op", "add", "path", "/coreData/resolutionDate", "value", "2021-02-01"),
+          Map.of("op", "add", "path", "/coreData/isResolved", "value", "true"),
+          Map.of("op", "add", "path", "/shortTexts/headline", "value", "Titelzeile"),
+          Map.of("op", "add", "path", "/legalIssue", "value", "Rechtsfrage"),
+          Map.of("op", "add", "path", "/appellant", "value", "Rechtsmittelführer"),
+          Map.of("op", "add", "path", "/admissionOfAppeal", "value", "Rechtsmittelzulassung"),
+          Map.of("op", "add", "path", "/resolutionNote", "value", "Erledigungsvermerk"));
+
+      TestTransaction.end();
+    }
+
+    private static @NotNull RisJsonPatch getRisJsonPatchForPendingProceedingFields() {
+      JsonNode resolutionDate = new TextNode("2021-02-01");
+      JsonNode isResolved = BooleanNode.TRUE;
+      JsonNode headline = new TextNode("Titelzeile");
+      JsonNode legalIssue = new TextNode("Rechtsfrage");
+      JsonNode appellant = new TextNode("Rechtsmittelführer");
+      JsonNode admissionOfAppeal = new TextNode("Rechtsmittelzulassung");
+      JsonNode resolutionNote = new TextNode("Erledigungsvermerk");
+
+      List<JsonPatchOperation> operationsUser1 =
+          List.of(
+              new AddOperation("/coreData/resolutionDate", resolutionDate),
+              new AddOperation("/coreData/isResolved", isResolved),
+              new AddOperation("/shortTexts/headline", headline),
+              new AddOperation("/legalIssue", legalIssue),
+              new AddOperation("/appellant", appellant),
+              new AddOperation("/admissionOfAppeal", admissionOfAppeal),
+              new AddOperation("/resolutionNote", resolutionNote));
+
+      return new RisJsonPatch(0L, new JsonPatch(operationsUser1), Collections.emptyList());
     }
   }
 

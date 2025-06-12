@@ -14,7 +14,6 @@ import lombok.Builder;
  *     KORE00012024
  * @param coreData the core data (e.g. file number, decision date)
  * @param previousDecisions a list of previous decisions (Vorinstanz)
- * @param ensuingDecisions a list of ensuing decisions
  * @param shortTexts the short texts (Kurztexte)
  * @param status the current status including publication and error status
  * @param contentRelatedIndexing the content related indexing data (Inhaltliche Erschließung)
@@ -35,7 +34,6 @@ public record PendingProceeding(
         String documentNumber,
     @Valid CoreData coreData,
     List<PreviousDecision> previousDecisions,
-    List<EnsuingDecision> ensuingDecisions,
     ShortTexts shortTexts,
     Status status,
     ContentRelatedIndexing contentRelatedIndexing,

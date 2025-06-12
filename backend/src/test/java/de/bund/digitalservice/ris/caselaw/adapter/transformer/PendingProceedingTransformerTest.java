@@ -2,11 +2,24 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class PendingProceedingTransformerTest {
@@ -20,7 +33,7 @@ class PendingProceedingTransformerTest {
 
   @Test
   void testTransformToDomain_withPendingProceedingFields() {
-    PendingProceedingDTO decisionDTO =
+    PendingProceedingDTO pendingProceedingDTO =
         generateSimpleDTOBuilder()
             .appellant("appellant")
             .admissionOfAppeal("admission of appeal")
@@ -30,7 +43,7 @@ class PendingProceedingTransformerTest {
             .resolutionDate(LocalDate.now())
             .build();
     PendingProceeding pendingProceeding =
-        PendingProceedingTransformer.transformToDomain(decisionDTO);
+        PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
 
     assertThat(pendingProceeding.appellant()).isEqualTo("appellant");
     assertThat(pendingProceeding.admissionOfAppeal()).isEqualTo("admission of appeal");
@@ -38,6 +51,192 @@ class PendingProceedingTransformerTest {
     assertThat(pendingProceeding.resolutionNote()).isEqualTo("resolution note");
     assertThat(pendingProceeding.coreData().isResolved()).isTrue();
     assertThat(pendingProceeding.coreData().resolutionDate()).isToday();
+  }
+
+  @Test
+  void testTransformToDTO_withoutCoreData() {
+    PendingProceedingDTO currentDto = PendingProceedingDTO.builder().build();
+    PendingProceeding pendingProceeding = PendingProceeding.builder().build();
+
+    PendingProceedingDTO resultDto =
+        PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);
+
+    assertNull(resultDto.getJudicialBody());
+    assertNull(resultDto.getDate());
+    assertNull(resultDto.getDocumentType());
+    assertNull(resultDto.getCourt());
+    assertFalse(resultDto.isResolved());
+    assertNull(resultDto.getResolutionDate());
+  }
+
+  @Test
+  void testTransformToDTO_withCoreData() {
+    PendingProceedingDTO currentDto = PendingProceedingDTO.builder().build();
+    CoreData coreData =
+        CoreData.builder()
+            .appraisalBody("Test Body")
+            .decisionDate(LocalDate.of(2023, 1, 15))
+            .documentType(DocumentType.builder().uuid(UUID.randomUUID()).build())
+            .court(Court.builder().id(UUID.randomUUID()).build())
+            .isResolved(true) // Set to true here
+            .resolutionDate(LocalDate.of(2023, 2, 1))
+            .build();
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder()
+            .uuid(UUID.randomUUID())
+            .documentNumber("DN-123")
+            .version(1L)
+            .coreData(coreData)
+            .build();
+
+    PendingProceedingDTO resultDto =
+        PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);
+
+    assertThat(resultDto.getId()).isEqualTo(pendingProceeding.uuid());
+    assertThat(resultDto.getDocumentNumber()).isEqualTo(pendingProceeding.documentNumber());
+    assertThat(resultDto.getVersion()).isEqualTo(pendingProceeding.version());
+    assertThat(resultDto.getJudicialBody()).isEqualTo(coreData.appraisalBody());
+    assertThat(resultDto.getDate()).isEqualTo(coreData.decisionDate());
+    assertThat(resultDto.getDocumentType().getId()).isEqualTo(coreData.documentType().uuid());
+    assertThat(resultDto.getCourt().getId()).isEqualTo(coreData.court().id());
+    assertThat(resultDto.isResolved()).isTrue(); // CORRECTED: Use isResolved()
+    assertThat(resultDto.getResolutionDate()).isEqualTo(coreData.resolutionDate());
+  }
+
+  @Test
+  void testTransformToDTO_withShortTexts() {
+    PendingProceedingDTO currentDto = PendingProceedingDTO.builder().build();
+    ShortTexts shortTexts = ShortTexts.builder().headline("Test Headline").build();
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder().shortTexts(shortTexts).build();
+
+    PendingProceedingDTO resultDto =
+        PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);
+
+    assertThat(resultDto.getHeadline()).isEqualTo(shortTexts.headline());
+  }
+
+  @Test
+  void testTransformToDTO_withoutShortTexts() {
+    PendingProceedingDTO currentDto = PendingProceedingDTO.builder().build();
+    PendingProceeding pendingProceeding = PendingProceeding.builder().build();
+
+    PendingProceedingDTO resultDto =
+        PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);
+
+    assertNull(resultDto.getHeadline());
+  }
+
+  @Test
+  void testTransformToDTO_withNullPendingProceeding_shouldThrowException() {
+    PendingProceedingDTO currentDto = PendingProceedingDTO.builder().build();
+
+    assertThatThrownBy(() -> PendingProceedingTransformer.transformToDTO(currentDto, null))
+        .isInstanceOf(DocumentationUnitTransformerException.class)
+        .hasMessageContaining("Pending proceeding is null and won't transform");
+  }
+
+  @Test
+  void testTransformToDTO_withResolutionNoteLegalIssueAdmissionOfAppealAppellant() {
+    PendingProceedingDTO currentDto = PendingProceedingDTO.builder().build();
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder()
+            .resolutionNote("Resolution Note")
+            .legalIssue("Legal Issue")
+            .admissionOfAppeal("Admission of Appeal")
+            .appellant("Appellant Name")
+            .build();
+
+    PendingProceedingDTO resultDto =
+        PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);
+
+    assertThat(resultDto.getResolutionNote()).isEqualTo("Resolution Note");
+    assertThat(resultDto.getLegalIssue()).isEqualTo("Legal Issue");
+    assertThat(resultDto.getAdmissionOfAppeal()).isEqualTo("Admission of Appeal");
+    assertThat(resultDto.getAppellant()).isEqualTo("Appellant Name");
+  }
+
+  @Test
+  void testTransformToDTO_withCaselawReferences() {
+    var uuid = UUID.randomUUID();
+    PendingProceedingDTO currentDto =
+        PendingProceedingDTO.builder()
+            .caselawReferences(
+                List.of(CaselawReferenceDTO.builder().id(uuid).documentationUnitRank(3).build()))
+            .build();
+
+    var updatedReferences =
+        List.of(
+            Reference.builder()
+                .id(uuid)
+                .referenceType(ReferenceType.CASELAW)
+                .primaryReference(true)
+                .build());
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder().caselawReferences(updatedReferences).build();
+
+    PendingProceedingDTO resultDto =
+        PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);
+
+    assertThat(resultDto.getCaselawReferences()).hasSize(1);
+    assertThat(resultDto.getCaselawReferences().getFirst().getDocumentationUnitRank()).isOne();
+    assertThat(resultDto.getCaselawReferences().getFirst().getId()).isEqualTo(uuid);
+  }
+
+  @Test
+  void testTransformToDTO_withLiteratureReferences() {
+    var uuid = UUID.randomUUID();
+    PendingProceedingDTO currentDto =
+        PendingProceedingDTO.builder()
+            .literatureReferences(
+                List.of(LiteratureReferenceDTO.builder().id(uuid).documentationUnitRank(3).build()))
+            .build();
+
+    var updatedReferences =
+        List.of(Reference.builder().id(uuid).referenceType(ReferenceType.LITERATURE).build());
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder().literatureReferences(updatedReferences).build();
+
+    PendingProceedingDTO resultDto =
+        PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);
+
+    assertThat(resultDto.getLiteratureReferences()).hasSize(1);
+    assertThat(resultDto.getLiteratureReferences().getFirst().getDocumentationUnitRank()).isOne();
+    assertThat(resultDto.getLiteratureReferences().getFirst().getId()).isEqualTo(uuid);
+  }
+
+  @Test
+  void testTransformToDTO_addPreviousDecisions() {
+    PendingProceedingDTO currentDto = PendingProceedingDTO.builder().build();
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder()
+            .previousDecisions(
+                List.of(
+                    de.bund.digitalservice.ris.caselaw.domain.PreviousDecision.builder()
+                        .fileNumber("PrevFile1")
+                        .build()))
+            .build();
+
+    PendingProceedingDTO resultDto =
+        PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);
+
+    assertThat(resultDto.getPreviousDecisions()).hasSize(1);
+    assertThat(resultDto.getPreviousDecisions().getFirst().getFileNumber()).isEqualTo("PrevFile1");
+  }
+
+  @Test
+  void testTransformToDTO_removePreviousDecisions() {
+    PendingProceedingDTO currentDto =
+        PendingProceedingDTO.builder()
+            .previousDecisions(List.of(PreviousDecisionDTO.builder().fileNumber("OldPrev").build()))
+            .build();
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder().previousDecisions(List.of()).build();
+
+    PendingProceedingDTO resultDto =
+        PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);
+
+    assertThat(resultDto.getPreviousDecisions()).isEmpty();
   }
 
   private PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> generateSimpleDTOBuilder() {

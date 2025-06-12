@@ -26,8 +26,6 @@ public interface Documentable {
 
   List<PreviousDecision> previousDecisions();
 
-  List<EnsuingDecision> ensuingDecisions();
-
   ShortTexts shortTexts();
 
   Status status();
