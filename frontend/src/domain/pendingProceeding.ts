@@ -3,24 +3,18 @@ import EnsuingDecision from "./ensuingDecision"
 import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
 import ActiveCitation from "@/domain/activeCitation"
-import { ContentRelatedIndexing, CoreData, Kind } from "@/domain/documentUnit"
+import {
+  ContentRelatedIndexing,
+  CoreData,
+  Kind,
+  ShortTexts,
+} from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import { PublicationStatus } from "@/domain/publicationStatus"
 import SingleNorm from "@/domain/singleNorm"
 
-export type PendingDecisionShortTexts = {
-  headline?: string
-  legalIssue?: string
-  appellant?: string
-  admissionOfAppeal?: string
-  isResolved?: string
-  resolutionNote?: string
-  resolutionDate?: string
-}
-export const pendingProceedingShortTextLabels: {
-  [shortTextKey in keyof Required<PendingDecisionShortTexts>]: string
-} = {
+export const pendingProceedingLabels = {
   headline: "Titelzeile",
   legalIssue: "Rechtsfrage",
   appellant: "Rechtsmittelführer",
@@ -37,7 +31,7 @@ export default class PendingProceeding {
   readonly kind = Kind.PENDING_PROCEEDING
   public version: number = 0
   public coreData: CoreData = {}
-  public shortTexts: PendingDecisionShortTexts = {}
+  public shortTexts: ShortTexts = {}
   public previousDecisions?: PreviousDecision[]
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
@@ -68,7 +62,7 @@ export default class PendingProceeding {
       if (data.coreData && data.coreData[coreDataField] === null)
         delete data.coreData[coreDataField]
     }
-    let shortTextsField: keyof PendingDecisionShortTexts
+    let shortTextsField: keyof ShortTexts
     for (shortTextsField in data.shortTexts) {
       if (data.shortTexts && data.shortTexts[shortTextsField] === null)
         delete data.shortTexts[shortTextsField]

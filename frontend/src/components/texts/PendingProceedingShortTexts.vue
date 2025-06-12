@@ -6,9 +6,8 @@ import InputField from "@/components/input/InputField.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import admissionOfAppealTypes from "@/data/admissionOfAppealTypes.json"
 import appellantTypes from "@/data/appellantTypes.json"
-import { shortTextLabels } from "@/domain/documentUnit"
 import PendingProceeding, {
-  pendingProceedingShortTextLabels,
+  pendingProceedingLabels,
 } from "@/domain/pendingProceeding"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
@@ -79,10 +78,10 @@ watch(
         id="headline"
         v-bind="{ registerTextEditorRef }"
         v-model="headline"
-        :data-testid="pendingProceedingShortTextLabels.headline"
+        :data-testid="pendingProceedingLabels.headline"
         editable
         field-size="small"
-        :label="shortTextLabels.headline"
+        :label="pendingProceedingLabels.headline"
         :should-show-button="!documentUnit?.shortTexts?.headline?.length"
       />
 
@@ -90,22 +89,22 @@ watch(
         id="legalIssue"
         v-model="legalIssue"
         v-bind="{ registerTextEditorRef }"
-        :data-testid="pendingProceedingShortTextLabels.legalIssue"
+        :data-testid="pendingProceedingLabels.legalIssue"
         editable
         field-size="small"
-        :label="pendingProceedingShortTextLabels.legalIssue"
+        :label="pendingProceedingLabels.legalIssue"
         :should-show-button="!documentUnit?.legalIssue?.length"
       />
       <div class="flex flex-row gap-24">
         <InputField
           id="appellant"
           v-slot="{ id }"
-          :label="pendingProceedingShortTextLabels.appellant"
+          :label="pendingProceedingLabels.appellant"
         >
           <InputSelect
             :id="id"
             v-model="appellant"
-            :aria-label="pendingProceedingShortTextLabels.appellant"
+            :aria-label="pendingProceedingLabels.appellant"
             fluid
             option-label="label"
             option-value="value"
@@ -115,12 +114,12 @@ watch(
         <InputField
           id="admissionOfAppeal"
           v-slot="{ id }"
-          :label="pendingProceedingShortTextLabels.admissionOfAppeal"
+          :label="pendingProceedingLabels.admissionOfAppeal"
         >
           <InputSelect
             :id="id"
             v-model="admissionOfAppeal"
-            :aria-label="pendingProceedingShortTextLabels.admissionOfAppeal"
+            :aria-label="pendingProceedingLabels.admissionOfAppeal"
             fluid
             option-label="label"
             option-value="value"
@@ -133,10 +132,10 @@ watch(
         id="resolutionNote"
         v-model="resolutionNote"
         v-bind="{ registerTextEditorRef }"
-        :data-testid="pendingProceedingShortTextLabels.resolutionNote"
+        :data-testid="pendingProceedingLabels.resolutionNote"
         editable
         field-size="small"
-        :label="pendingProceedingShortTextLabels.resolutionNote"
+        :label="pendingProceedingLabels.resolutionNote"
         :should-show-button="!documentUnit?.resolutionNote?.length"
       />
     </div>

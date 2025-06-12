@@ -19,7 +19,7 @@ import PreviewRow from "@/components/preview/PreviewRow.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
 import { Kind } from "@/domain/documentUnit"
 import PendingProceeding, {
-  pendingProceedingShortTextLabels,
+  pendingProceedingLabels,
 } from "@/domain/pendingProceeding"
 import Reference from "@/domain/reference"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -75,12 +75,12 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     />
     <PreviewRow v-if="documentUnit.legalIssue">
       <PreviewCategory>{{
-        pendingProceedingShortTextLabels.legalIssue
+        pendingProceedingLabels.legalIssue
       }}</PreviewCategory>
       <PreviewContent>
         <TextEditor
           id="previewLegalIssue"
-          :aria-label="pendingProceedingShortTextLabels.legalIssue"
+          :aria-label="pendingProceedingLabels.legalIssue"
           field-size="max"
           preview
           :value="documentUnit.legalIssue"
@@ -89,16 +89,14 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     </PreviewRow>
     <PreviewRow v-if="documentUnit.admissionOfAppeal">
       <PreviewCategory>{{
-        pendingProceedingShortTextLabels.admissionOfAppeal
+        pendingProceedingLabels.admissionOfAppeal
       }}</PreviewCategory>
       <PreviewContent>
         {{ documentUnit.admissionOfAppeal }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="documentUnit.appellant">
-      <PreviewCategory>{{
-        pendingProceedingShortTextLabels.appellant
-      }}</PreviewCategory>
+      <PreviewCategory>{{ pendingProceedingLabels.appellant }}</PreviewCategory>
       <PreviewContent>
         {{ documentUnit.appellant }}
       </PreviewContent>
@@ -108,7 +106,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
       <PreviewContent>
         <TextEditor
           id="previewResolutionNote"
-          :aria-label="pendingProceedingShortTextLabels.resolutionNote"
+          :aria-label="pendingProceedingLabels.resolutionNote"
           field-size="max"
           preview
           :value="documentUnit.resolutionNote"

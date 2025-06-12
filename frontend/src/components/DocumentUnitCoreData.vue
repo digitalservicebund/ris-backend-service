@@ -15,7 +15,7 @@ import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import { CoreData, Kind, SourceValue } from "@/domain/documentUnit"
-import { pendingProceedingShortTextLabels } from "@/domain/pendingProceeding"
+import { pendingProceedingLabels } from "@/domain/pendingProceeding"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 const props = defineProps<{
@@ -250,12 +250,12 @@ onBeforeUnmount(() => {
         v-if="isPendingProceeding"
         id="resolutionDate"
         v-slot="slotProps"
-        :label="pendingProceedingShortTextLabels.resolutionDate"
+        :label="pendingProceedingLabels.resolutionDate"
       >
         <DateInput
           id="resolutionDate"
           v-model="modelValue.resolutionDate"
-          :aria-label="pendingProceedingShortTextLabels.resolutionDate"
+          :aria-label="pendingProceedingLabels.resolutionDate"
           :has-error="slotProps.hasError"
           @update:validation-error="slotProps.updateValidationError"
         ></DateInput>
@@ -415,13 +415,13 @@ onBeforeUnmount(() => {
       v-if="isPendingProceeding"
       id="isResolved"
       v-slot="{ id }"
-      :label="pendingProceedingShortTextLabels.isResolved"
+      :label="pendingProceedingLabels.isResolved"
       label-class="ris-label1-regular"
       :label-position="LabelPosition.RIGHT"
     >
       <Checkbox
         v-model="modelValue.isResolved"
-        :aria-label="pendingProceedingShortTextLabels.isResolved"
+        :aria-label="pendingProceedingLabels.isResolved"
         binary
         data-testid="is-resolved"
         :input-id="id"
