@@ -1,28 +1,19 @@
 <script setup lang="ts" generic="TDocument">
 import dayjs from "dayjs"
 import { computed, ref, toRaw, watchEffect } from "vue"
-import { RouteLocationRaw, useRoute } from "vue-router"
+import { useRoute } from "vue-router"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import DocumentUnit from "@/domain/documentUnit"
 import PendingProceeding from "@/domain/pendingProceeding"
+import { isDocumentUnit } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
 
-interface Props<T extends DocumentUnit | PendingProceeding> {
-  document: T
-  duplicateManagementRoute?: RouteLocationRaw
-  onSave?: () => Promise<void>
-}
-
-const props = withDefaults(
-  defineProps<Props<DocumentUnit | PendingProceeding>>(),
-  {
-    duplicateManagementRoute: "",
-    onSave: async () => {},
-  },
-)
+const props = defineProps<{
+  document: DocumentUnit | PendingProceeding
+}>()
 
 const route = useRoute()
 
@@ -39,7 +30,7 @@ const decisionDateInfo = computed(() => {
 })
 
 const hasPendingDuplicateWarning = computed(() => {
-  if (props.document instanceof DocumentUnit) {
+  if (isDocumentUnit(props.document)) {
     return (props.document.managementData.duplicateRelations ?? []).some(
       (warning) => warning.status === "PENDING",
     )
@@ -71,6 +62,10 @@ const isRouteWithSaveButton = computed(
 )
 
 const hasErrorStatus = computed(() => props.document.status?.withError)
+const managementDataRoute = computed(() => ({
+  name: "caselaw-documentUnit-documentNumber-managementdata",
+  params: { documentNumber: props.document.documentNumber },
+}))
 
 watchEffect(() => {
   statusBadge.value = useStatusBadge(props.document.status).value
@@ -123,7 +118,7 @@ watchEffect(() => {
       <RouterLink
         v-if="isInternalUser"
         class="ris-link1-bold text-red-900"
-        :to="props.duplicateManagementRoute"
+        :to="managementDataRoute"
       >
         Bitte prüfen</RouterLink
       >
