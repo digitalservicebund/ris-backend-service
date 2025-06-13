@@ -7,22 +7,17 @@ import { createRouter, createWebHistory } from "vue-router"
 import PendingProceedingTexts from "@/components/texts/PendingProceedingTexts.vue"
 import admissionOfAppealTypes from "@/data/admissionOfAppealTypes.json"
 import appellantTypes from "@/data/appellantTypes.json"
-import { ShortTexts } from "@/domain/documentUnit"
+import { Court } from "@/domain/documentUnit"
 import PendingProceeding, {
   pendingProceedingLabels,
+  PendingProceedingShortTexts,
 } from "@/domain/pendingProceeding"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
 
 async function renderComponent(
-  shortTexts?: ShortTexts,
-  otherTexts?: {
-    legalIssue?: string
-    appellant?: string
-    admissionOfAppeal?: string
-    resolutionNote?: string
-    courtLabel?: string
-  },
+  shortTexts?: PendingProceedingShortTexts,
+  court?: Court,
 ) {
   const router = createRouter({
     history: createWebHistory(),
@@ -50,12 +45,8 @@ async function renderComponent(
                 documentUnit: new PendingProceeding("foo", {
                   documentNumber: "1234567891234",
                   shortTexts: shortTexts ?? {},
-                  legalIssue: otherTexts?.legalIssue,
-                  appellant: otherTexts?.appellant,
-                  admissionOfAppeal: otherTexts?.admissionOfAppeal,
-                  resolutionNote: otherTexts?.resolutionNote,
                   coreData: {
-                    court: { label: otherTexts?.courtLabel ?? "" },
+                    court: court ?? { label: "" },
                   },
                 }),
               },
@@ -100,17 +91,13 @@ describe("Pending proceeding texts", () => {
   })
 
   test("renders all categories with data", async () => {
-    await renderComponent(
-      {
-        headline: "Titelzeile Test",
-      },
-      {
-        legalIssue: "Rechtsfrage Test",
-        appellant: appellantTypes.items[0].label,
-        admissionOfAppeal: admissionOfAppealTypes.items[0].label,
-        resolutionNote: "Erledigungsvermerk Test",
-      },
-    )
+    await renderComponent({
+      headline: "Titelzeile Test",
+      legalIssue: "Rechtsfrage Test",
+      appellant: appellantTypes.items[0].label,
+      admissionOfAppeal: admissionOfAppealTypes.items[0].label,
+      resolutionNote: "Erledigungsvermerk Test",
+    })
     expect(
       screen.getByText(pendingProceedingLabels.headline, {
         exact: true,
@@ -162,7 +149,7 @@ describe("Pending proceeding texts", () => {
   })
 
   test("headline remains empty on initial load", async () => {
-    const { docUnitStoreInstance } = await renderComponent({}, {})
+    const { docUnitStoreInstance } = await renderComponent({})
 
     expect(docUnitStoreInstance.documentUnit?.shortTexts.headline).toBe(
       undefined,
@@ -180,7 +167,7 @@ describe("Pending proceeding texts", () => {
       {
         headline: manualHeadline,
       },
-      { courtLabel: "Amtsgericht Berlin" },
+      { label: "Amtsgericht Berlin" },
     )
 
     expect(screen.getByText(manualHeadline)).toBeVisible()
@@ -204,7 +191,7 @@ describe("Pending proceeding texts", () => {
     const initialHeadline = "Initial Headline"
     const { docUnitStoreInstance } = await renderComponent(
       { headline: initialHeadline },
-      { courtLabel: "BGH" },
+      { label: "BGH" },
     )
 
     expect(docUnitStoreInstance.documentUnit?.shortTexts.headline).toBe(

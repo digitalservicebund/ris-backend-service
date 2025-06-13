@@ -21,10 +21,6 @@ import lombok.Builder;
  *     (Rechtsprechungsfundstellen)
  * @param literatureReferences a list of legal periodical literature references
  *     (Literaturfundstellen)
- * @param resolutionNote the resolution note (Erledigungsvermerk)
- * @param legalIssue the legal issue (Rechtsfrage)
- * @param admissionOfAppeal the admission of appeal (Rechtsmittelzulassung)
- * @param appellant the appellant (Rechtsmittelführer)
  */
 @Builder(toBuilder = true)
 public record PendingProceeding(
@@ -34,16 +30,12 @@ public record PendingProceeding(
         String documentNumber,
     @Valid CoreData coreData,
     List<PreviousDecision> previousDecisions,
-    ShortTexts shortTexts,
+    PendingProceedingShortTexts shortTexts,
     Status status,
     ContentRelatedIndexing contentRelatedIndexing,
     List<Reference> caselawReferences,
     List<Reference> literatureReferences,
     List<String> documentalists,
-    String resolutionNote,
-    String legalIssue,
-    String admissionOfAppeal,
-    String appellant,
     boolean isEditable,
     boolean isDeletable)
     implements Documentable {

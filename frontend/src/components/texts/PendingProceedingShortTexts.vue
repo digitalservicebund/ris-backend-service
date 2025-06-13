@@ -29,33 +29,33 @@ const headline = computed({
 })
 
 const legalIssue = computed({
-  get: () => documentUnit.value?.legalIssue,
+  get: () => documentUnit.value?.shortTexts.legalIssue,
   set: (newValue) => {
-    documentUnit.value!.legalIssue =
+    documentUnit.value!.shortTexts.legalIssue =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const resolutionNote = computed({
-  get: () => documentUnit.value?.resolutionNote,
+  get: () => documentUnit.value?.shortTexts.resolutionNote,
   set: (newValue) => {
-    documentUnit.value!.resolutionNote =
+    documentUnit.value!.shortTexts.resolutionNote =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const appellant = computed({
-  get: () => documentUnit.value?.appellant,
+  get: () => documentUnit.value?.shortTexts.appellant,
   set: (newValue) => {
-    documentUnit.value!.appellant =
+    documentUnit.value!.shortTexts.appellant =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const admissionOfAppeal = computed({
-  get: () => documentUnit.value?.admissionOfAppeal,
+  get: () => documentUnit.value?.shortTexts.admissionOfAppeal,
   set: (newValue) => {
-    documentUnit.value!.admissionOfAppeal =
+    documentUnit.value!.shortTexts.admissionOfAppeal =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
@@ -93,7 +93,7 @@ watch(
         editable
         field-size="small"
         :label="pendingProceedingLabels.legalIssue"
-        :should-show-button="!documentUnit?.legalIssue?.length"
+        :should-show-button="!documentUnit?.shortTexts.legalIssue?.length"
       />
       <div class="flex flex-row gap-24">
         <InputField
@@ -136,7 +136,7 @@ watch(
         editable
         field-size="small"
         :label="pendingProceedingLabels.resolutionNote"
-        :should-show-button="!documentUnit?.resolutionNote?.length"
+        :should-show-button="!documentUnit?.shortTexts.resolutionNote?.length"
       />
     </div>
   </div>

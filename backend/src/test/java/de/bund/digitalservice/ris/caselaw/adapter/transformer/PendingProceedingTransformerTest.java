@@ -12,9 +12,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceeding
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
-import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
@@ -45,12 +45,13 @@ class PendingProceedingTransformerTest {
     PendingProceeding pendingProceeding =
         PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
 
-    assertThat(pendingProceeding.appellant()).isEqualTo("appellant");
-    assertThat(pendingProceeding.admissionOfAppeal()).isEqualTo("admission of appeal");
-    assertThat(pendingProceeding.legalIssue()).isEqualTo("legal issue");
-    assertThat(pendingProceeding.resolutionNote()).isEqualTo("resolution note");
     assertThat(pendingProceeding.coreData().isResolved()).isTrue();
     assertThat(pendingProceeding.coreData().resolutionDate()).isToday();
+
+    assertThat(pendingProceeding.shortTexts().appellant()).isEqualTo("appellant");
+    assertThat(pendingProceeding.shortTexts().admissionOfAppeal()).isEqualTo("admission of appeal");
+    assertThat(pendingProceeding.shortTexts().legalIssue()).isEqualTo("legal issue");
+    assertThat(pendingProceeding.shortTexts().resolutionNote()).isEqualTo("resolution note");
   }
 
   @Test
@@ -106,7 +107,8 @@ class PendingProceedingTransformerTest {
   @Test
   void testTransformToDTO_withShortTexts() {
     PendingProceedingDTO currentDto = PendingProceedingDTO.builder().build();
-    ShortTexts shortTexts = ShortTexts.builder().headline("Test Headline").build();
+    PendingProceedingShortTexts shortTexts =
+        PendingProceedingShortTexts.builder().headline("Test Headline").build();
     PendingProceeding pendingProceeding =
         PendingProceeding.builder().shortTexts(shortTexts).build();
 
@@ -139,13 +141,16 @@ class PendingProceedingTransformerTest {
   @Test
   void testTransformToDTO_withResolutionNoteLegalIssueAdmissionOfAppealAppellant() {
     PendingProceedingDTO currentDto = PendingProceedingDTO.builder().build();
-    PendingProceeding pendingProceeding =
-        PendingProceeding.builder()
+    PendingProceedingShortTexts shortTexts =
+        PendingProceedingShortTexts.builder()
+            .headline("Test Headline")
             .resolutionNote("Resolution Note")
             .legalIssue("Legal Issue")
             .admissionOfAppeal("Admission of Appeal")
             .appellant("Appellant Name")
             .build();
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder().shortTexts(shortTexts).build();
 
     PendingProceedingDTO resultDto =
         PendingProceedingTransformer.transformToDTO(currentDto, pendingProceeding);

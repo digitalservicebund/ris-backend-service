@@ -73,7 +73,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
       :short-texts="documentUnit.shortTexts"
       :valid-border-numbers="[]"
     />
-    <PreviewRow v-if="documentUnit.legalIssue">
+    <PreviewRow v-if="documentUnit.shortTexts.legalIssue">
       <PreviewCategory>{{
         pendingProceedingLabels.legalIssue
       }}</PreviewCategory>
@@ -83,25 +83,25 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
           :aria-label="pendingProceedingLabels.legalIssue"
           field-size="max"
           preview
-          :value="documentUnit.legalIssue"
+          :value="documentUnit.shortTexts.legalIssue"
         />
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="documentUnit.admissionOfAppeal">
+    <PreviewRow v-if="documentUnit.shortTexts.admissionOfAppeal">
       <PreviewCategory>{{
         pendingProceedingLabels.admissionOfAppeal
       }}</PreviewCategory>
       <PreviewContent>
-        {{ documentUnit.admissionOfAppeal }}
+        {{ documentUnit.shortTexts.admissionOfAppeal }}
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="documentUnit.appellant">
+    <PreviewRow v-if="documentUnit.shortTexts.appellant">
       <PreviewCategory>{{ pendingProceedingLabels.appellant }}</PreviewCategory>
       <PreviewContent>
-        {{ documentUnit.appellant }}
+        {{ documentUnit.shortTexts.appellant }}
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="documentUnit.resolutionNote">
+    <PreviewRow v-if="documentUnit.shortTexts.resolutionNote">
       <PreviewCategory>Erledigungsvermerk</PreviewCategory>
       <PreviewContent>
         <TextEditor
@@ -109,7 +109,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
           :aria-label="pendingProceedingLabels.resolutionNote"
           field-size="max"
           preview
-          :value="documentUnit.resolutionNote"
+          :value="documentUnit.shortTexts.resolutionNote"
         />
       </PreviewContent>
     </PreviewRow>

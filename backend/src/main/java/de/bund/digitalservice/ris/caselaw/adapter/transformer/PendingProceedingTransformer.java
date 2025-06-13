@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
-import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
@@ -71,26 +71,17 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
       // TODO: Passivzitierung Verwaltungsvorschriften
     }
 
-    builder
-        .resolutionNote(pendingProceeding.resolutionNote())
-        .legalIssue(pendingProceeding.legalIssue())
-        .admissionOfAppeal(pendingProceeding.admissionOfAppeal())
-        .appellant(pendingProceeding.appellant());
-
     if (pendingProceeding.shortTexts() != null) {
-      ShortTexts shortTexts = pendingProceeding.shortTexts();
-      builder.headline(shortTexts.headline());
+      PendingProceedingShortTexts shortTexts = pendingProceeding.shortTexts();
+      builder
+          .headline(shortTexts.headline())
+          .resolutionNote(shortTexts.resolutionNote())
+          .legalIssue(shortTexts.legalIssue())
+          .admissionOfAppeal(shortTexts.admissionOfAppeal())
+          .appellant(shortTexts.appellant());
     } else {
       builder.headline(null);
     }
-
-    // TODO: move managementData from decision to documentation unit
-    //    if (pendingProceeding.managementData() != null) {
-    //      var managementData = updatedDomainObject.managementData();
-    //      builder.scheduledPublicationDateTime(managementData.scheduledPublicationDateTime());
-    //      builder.lastPublicationDateTime(managementData.lastPublicationDateTime());
-    //      builder.scheduledByEmail(managementData.scheduledByEmail());
-    //    }
 
     addCaselawReferences(pendingProceeding, builder, currentDto);
     addLiteratureReferences(pendingProceeding, builder, currentDto);
@@ -125,10 +116,12 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
         .documentNumber(pendingProceedingDTO.getDocumentNumber())
         .coreData(buildCoreData(pendingProceedingDTO))
         .shortTexts(
-            ShortTexts.builder()
+            PendingProceedingShortTexts.builder()
                 .headline(pendingProceedingDTO.getHeadline())
-                .guidingPrinciple(pendingProceedingDTO.getGuidingPrinciple())
-                .headnote(pendingProceedingDTO.getHeadnote())
+                .resolutionNote(pendingProceedingDTO.getResolutionNote())
+                .legalIssue(pendingProceedingDTO.getLegalIssue())
+                .admissionOfAppeal(pendingProceedingDTO.getAdmissionOfAppeal())
+                .appellant(pendingProceedingDTO.getAppellant())
                 .build())
         .contentRelatedIndexing(buildContentRelatedIndexing(pendingProceedingDTO))
         .caselawReferences(
@@ -151,10 +144,6 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
                     .toList())
         .status(getStatus(pendingProceedingDTO))
         .previousDecisions(getPreviousDecisions(pendingProceedingDTO))
-        .resolutionNote(pendingProceedingDTO.getResolutionNote())
-        .legalIssue(pendingProceedingDTO.getLegalIssue())
-        .admissionOfAppeal(pendingProceedingDTO.getAdmissionOfAppeal())
-        .appellant(pendingProceedingDTO.getAppellant())
         .isDeletable(false)
         .isEditable(false)
         .build();

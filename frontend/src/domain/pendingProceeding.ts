@@ -3,12 +3,7 @@ import EnsuingDecision from "./ensuingDecision"
 import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
 import ActiveCitation from "@/domain/activeCitation"
-import {
-  ContentRelatedIndexing,
-  CoreData,
-  Kind,
-  ShortTexts,
-} from "@/domain/documentUnit"
+import { ContentRelatedIndexing, CoreData, Kind } from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import { PublicationStatus } from "@/domain/publicationStatus"
@@ -23,6 +18,15 @@ export const pendingProceedingLabels = {
   resolutionNote: "Erledigungsvermerk",
   resolutionDate: "Erledigungsmitteilung",
 }
+
+export type PendingProceedingShortTexts = {
+  headline?: string
+  resolutionNote?: string
+  legalIssue?: string
+  admissionOfAppeal?: string
+  appellant?: string
+}
+
 export default class PendingProceeding {
   readonly uuid: string
   readonly id?: string
@@ -31,16 +35,13 @@ export default class PendingProceeding {
   readonly kind = Kind.PENDING_PROCEEDING
   public version: number = 0
   public coreData: CoreData = {}
-  public shortTexts: ShortTexts = {}
+  public shortTexts: PendingProceedingShortTexts = {}
   public previousDecisions?: PreviousDecision[]
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
   public caselawReferences?: Reference[]
   public literatureReferences?: Reference[]
-  public resolutionNote?: string = ""
-  public legalIssue?: string = ""
-  public admissionOfAppeal?: string = ""
-  public appellant?: string = ""
+
   public isEditable?: boolean
 
   static readonly requiredFields = [
@@ -62,7 +63,7 @@ export default class PendingProceeding {
       if (data.coreData && data.coreData[coreDataField] === null)
         delete data.coreData[coreDataField]
     }
-    let shortTextsField: keyof ShortTexts
+    let shortTextsField: keyof PendingProceedingShortTexts
     for (shortTextsField in data.shortTexts) {
       if (data.shortTexts && data.shortTexts[shortTextsField] === null)
         delete data.shortTexts[shortTextsField]
