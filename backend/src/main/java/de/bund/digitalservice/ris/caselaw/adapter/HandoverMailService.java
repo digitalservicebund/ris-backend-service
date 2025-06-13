@@ -10,7 +10,6 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
-import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -44,8 +43,6 @@ public class HandoverMailService implements MailService {
 
   private final HandoverRepository repository;
 
-  private final TextCheckService textCheckService;
-
   private final Environment env;
 
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
@@ -58,12 +55,10 @@ public class HandoverMailService implements MailService {
       XmlExporter xmlExporter,
       HttpMailSender mailSender,
       HandoverRepository repository,
-      TextCheckService textCheckService,
       Environment env) {
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
-    this.textCheckService = textCheckService;
     this.env = env;
   }
 
@@ -81,11 +76,7 @@ public class HandoverMailService implements MailService {
       DocumentationUnit documentationUnit, String receiverAddress, String issuerAddress) {
     XmlTransformationResult xml;
     try {
-      xml =
-          xmlExporter.transformToXml(
-              getTestDocumentationUnit(
-                  textCheckService.addNoIndexTagsForHandOver(documentationUnit)),
-              false);
+      xml = xmlExporter.transformToXml(getTestDocumentationUnit(documentationUnit), false);
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new HandoverException("Couldn't generate xml for documentationUnit.", ex);
     }
@@ -165,8 +156,7 @@ public class HandoverMailService implements MailService {
   @Override
   public XmlTransformationResult getXmlPreview(DocumentationUnit documentationUnit) {
     try {
-      return xmlExporter.transformToXml(
-          textCheckService.addNoIndexTagsForHandOver(documentationUnit), true);
+      return xmlExporter.transformToXml(documentationUnit, true);
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new HandoverException("Couldn't generate xml for documentation unit.", ex);
     }

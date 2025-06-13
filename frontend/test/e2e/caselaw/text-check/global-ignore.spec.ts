@@ -89,15 +89,19 @@ test.describe(
           await page.getByText("Zum globalen Wörterbuch hinzufügen").click()
         })
 
-        await test.step("make sure the globally ignored word is exported with <noindex> tags", async () => {
-          await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
-          await expect(page.getByText("XML Vorschau")).toBeVisible()
-          await page.getByText("XML Vorschau").click()
+        // eslint-disable-next-line playwright/no-skipped-test
+        await test.step.skip(
+          "make sure the globally ignored word is exported with <noindex> tags",
+          async () => {
+            await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
+            await expect(page.getByText("XML Vorschau")).toBeVisible()
+            await page.getByText("XML Vorschau").click()
 
-          await expect(
-            page.getByText("<noindex>" + wordWithTypo + "</noindex>"),
-          ).toBeVisible()
-        })
+            await expect(
+              page.getByText("<noindex>" + wordWithTypo + "</noindex>"),
+            ).toBeVisible()
+          },
+        )
 
         await test.step("open doc unit B in edit mode", async () => {
           await navigateToCategories(

@@ -106,7 +106,6 @@ neuris:
     BFH: STREYYYY2****
     BPatG: MPRE6******YY
     BAG: KARE7****YYYY
-    # TODO: other docoffices
 
 languagetool:
   url: http://languagetool:8181/v2/check

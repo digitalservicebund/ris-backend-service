@@ -75,7 +75,9 @@ describe("Core Data", () => {
     })
 
     await screen.findByLabelText("Abweichendes Entscheidungsdatum anzeigen")
-    screen.getByLabelText("Abweichendes Entscheidungsdatum anzeigen").click()
+    await user.click(
+      screen.getByLabelText("Abweichendes Entscheidungsdatum anzeigen"),
+    )
     await user.type(
       screen.getByLabelText("Abweichendes Entscheidungsdatum"),
       "02.02.2022{enter}",

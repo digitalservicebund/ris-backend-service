@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import { config } from "@vue/test-utils"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
@@ -290,7 +290,7 @@ describe("NormReferenceEntry", () => {
     expect(singleNormInput).toHaveValue("12")
 
     await screen.findByText(/Inhalt nicht valide/)
-    screen.getByLabelText("Norm speichern").click()
+    await fireEvent.click(screen.getByLabelText("Norm speichern"))
     expect(singleNormInput).toBeVisible()
   })
 
@@ -307,7 +307,7 @@ describe("NormReferenceEntry", () => {
     await user.type(dateInput, "00.00.0231")
 
     await screen.findByText(/Kein valides Datum/)
-    screen.getByLabelText("Norm speichern").click()
+    await fireEvent.click(screen.getByLabelText("Norm speichern"))
     expect(dateInput).toBeVisible()
   })
 
@@ -325,7 +325,7 @@ describe("NormReferenceEntry", () => {
     await user.tab()
 
     await screen.findByText(/Unvollständiges Datum/)
-    screen.getByLabelText("Norm speichern").click()
+    await fireEvent.click(screen.getByLabelText("Norm speichern"))
     expect(dateInput).toBeVisible()
   })
 
@@ -343,7 +343,7 @@ describe("NormReferenceEntry", () => {
     await user.tab()
 
     await screen.findByText(/Kein valides Jahr/)
-    screen.getByLabelText("Norm speichern").click()
+    await fireEvent.click(screen.getByLabelText("Norm speichern"))
     expect(yearInput).toBeVisible()
   })
 

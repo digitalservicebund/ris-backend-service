@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<juris-r datenpool="" doknr="YYTestDoc0019" langtext="ja" randnummer="ja" rdlink="ja" vorab="ja">
+<juris-r datenpool="" doknr="IITestDoc0019" langtext="ja" randnummer="ja" rdlink="ja" vorab="ja">
     <metadaten>
         <gericht>
             <gertyp>BVerwG</gertyp>
@@ -63,8 +63,7 @@
                     <p>
                         <rd nr="8"/>Die Entscheidung ergeht gemäß § 10 Abs. 2 Satz 1 GDS durch den Senat in der Besetzung von drei Berufsrichtern.</p>
                     <p>
-                        <rd nr="9"/>2. Die Kostenentscheidung beruht (BVerwG, Beschluss vom 1. März 2025 - 6 GH 7 - <noindex>juris</noindex>
-                        <noindex>Rn</noindex>. 9), da auch kein Fall des sofortigen Anerkenntnisses nach § 150 ABC vorlag.</p>
+                        <rd nr="9"/>2. Die Kostenentscheidung beruht (BVerwG, Beschluss vom 1. März 2025 - 6 GH 7 - juris Rn. 9), da auch kein Fall des sofortigen Anerkenntnisses nach § 150 ABC vorlag.</p>
                     <p>
                         <rd nr="10"/>4. Die Streitwertfestsetzung folgt.</p>
                 </div>

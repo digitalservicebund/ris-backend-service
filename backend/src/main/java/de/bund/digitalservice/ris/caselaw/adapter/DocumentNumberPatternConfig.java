@@ -27,18 +27,19 @@ public class DocumentNumberPatternConfig {
    */
   public boolean hasValidPattern(
       String documentationOfficeAbbreviation, String documentationUnitNumber) {
+    var pattern = documentNumberPatterns.get(documentationOfficeAbbreviation);
+
     try {
       if (StringUtils.returnTrueIfNullOrBlank(documentationUnitNumber)) {
         throw new DocumentNumberPatternException("Document unit number is null or blank");
       }
 
-      var pattern = documentNumberPatterns.get(documentationOfficeAbbreviation);
-
       if (pattern == null)
         throw new DocumentNumberPatternException(
             documentationOfficeAbbreviation + " is not included in pattern");
 
-      if (!documentationUnitNumber.contains(DocumentNumberFormatter.extractPrefix(pattern))) {
+      if (!documentationUnitNumber.contains(DocumentNumberFormatter.extractPrefix(pattern))
+          && !documentationOfficeAbbreviation.equals("BFH")) {
         throw new DocumentNumberPatternException(
             String.format(
                 "Invalid pattern %s: the prefix must appear before the sequence part (****).",
@@ -46,7 +47,7 @@ public class DocumentNumberPatternConfig {
       }
       return true;
     } catch (Exception e) {
-      throw new DocumentNumberPatternException("Pattern is invalid cause: ", e);
+      throw new DocumentNumberPatternException("Pattern: " + pattern + "is invalid cause: ", e);
     }
   }
 }

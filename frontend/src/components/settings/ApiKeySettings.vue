@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
 import Button from "primevue/button"
-import { ref, onMounted } from "vue"
+import { onMounted, ref } from "vue"
 import CopyableLabel from "@/components/CopyableLabel.vue"
 import { ApiKey } from "@/domain/apiKey"
 import authService from "@/services/authService"
 
-const apiKey = ref<ApiKey>()
+const apiKey = ref<ApiKey | null>(null)
 
 async function generateApiKey() {
   const response = await authService.generateImportApiKey()

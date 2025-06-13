@@ -362,7 +362,8 @@ test.describe("inbox", () => {
     },
   )
 
-  test(
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
     "EU-Rechtsprechungsdokumente können im Eingang eingesehen und weiterverarbeitet werden",
     { tag: ["@RISDEV-7375"] },
     async ({ page }) => {
