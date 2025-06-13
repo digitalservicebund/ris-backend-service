@@ -90,6 +90,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
@@ -1938,5 +1939,28 @@ class DocumentationUnitIntegrationTest {
     assertThat(docUnitWithProcedure.get().getProcedureHistory().get(0).getLabel())
         .isEqualTo("vorgang2");
     return decision.getId();
+  }
+
+  @Test
+  void test_getDocumentationUnitImage_shouldSucceed() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice, "TEST123456789");
+
+    when(attachmentService.findByDocumentationUnitIdAndFileName(dto.getId(), "image.png"))
+        .thenReturn(Optional.of(new Image(new byte[] {1, 2, 3}, "png", "image.png")));
+
+    byte[] imageBytes =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/TEST123456789/image/image.png")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(byte[].class)
+            .returnResult()
+            .getResponseBody();
+    assertThat(imageBytes).isEqualTo(new byte[] {1, 2, 3});
   }
 }
