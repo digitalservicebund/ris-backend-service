@@ -440,6 +440,9 @@ public class DocumentationUnitService {
           updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
         } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
           updatedDocumentationUnit = updatePendingProceeding(pendingProceeding, user);
+        } else {
+          throw new UnsupportedOperationException(
+              "Update not supported for Documentable type: " + patchedDocumentationUnit.getClass());
         }
 
         toFrontendJsonPatch =

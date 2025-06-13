@@ -363,7 +363,7 @@ class DocumentationUnitControllerTest {
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .build();
     DocumentationUnit documentationUnit =
-        DecisionTransformer.transformToDomain(documentationUnitDTO).toBuilder().build();
+        DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     when(service.updateDocumentationUnit(documentationUnit)).thenReturn(null);
 
