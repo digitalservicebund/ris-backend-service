@@ -4452,10 +4452,16 @@ class PatchUpdateIntegrationTest {
           Map.of("op", "add", "path", "/coreData/resolutionDate", "value", "2021-02-01"),
           Map.of("op", "add", "path", "/coreData/isResolved", "value", "true"),
           Map.of("op", "add", "path", "/shortTexts/headline", "value", "Titelzeile"),
-          Map.of("op", "add", "path", "/legalIssue", "value", "Rechtsfrage"),
-          Map.of("op", "add", "path", "/appellant", "value", "Rechtsmittelführer"),
-          Map.of("op", "add", "path", "/admissionOfAppeal", "value", "Rechtsmittelzulassung"),
-          Map.of("op", "add", "path", "/resolutionNote", "value", "Erledigungsvermerk"));
+          Map.of("op", "add", "path", "/shortTexts/legalIssue", "value", "Rechtsfrage"),
+          Map.of("op", "add", "path", "/shortTexts/appellant", "value", "Rechtsmittelführer"),
+          Map.of(
+              "op",
+              "add",
+              "path",
+              "/shortTexts/admissionOfAppeal",
+              "value",
+              "Rechtsmittelzulassung"),
+          Map.of("op", "add", "path", "/shortTexts/resolutionNote", "value", "Erledigungsvermerk"));
 
       TestTransaction.end();
     }
@@ -4474,10 +4480,10 @@ class PatchUpdateIntegrationTest {
               new AddOperation("/coreData/resolutionDate", resolutionDate),
               new AddOperation("/coreData/isResolved", isResolved),
               new AddOperation("/shortTexts/headline", headline),
-              new AddOperation("/legalIssue", legalIssue),
-              new AddOperation("/appellant", appellant),
-              new AddOperation("/admissionOfAppeal", admissionOfAppeal),
-              new AddOperation("/resolutionNote", resolutionNote));
+              new AddOperation("/shortTexts/legalIssue", legalIssue),
+              new AddOperation("/shortTexts/appellant", appellant),
+              new AddOperation("/shortTexts/admissionOfAppeal", admissionOfAppeal),
+              new AddOperation("/shortTexts/resolutionNote", resolutionNote));
 
       return new RisJsonPatch(0L, new JsonPatch(operationsUser1), Collections.emptyList());
     }
