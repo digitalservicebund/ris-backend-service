@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
@@ -24,14 +25,18 @@ import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.Source;
+import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -80,7 +85,6 @@ public class DecisionTransformer extends DocumentableTransformer {
       builder
           .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
           .date(coreData.decisionDate())
-          .celexNumber(coreData.celexNumber())
           .documentType(
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
@@ -565,7 +569,7 @@ public class DecisionTransformer extends DocumentableTransformer {
 
   private static CoreData buildCoreData(DecisionDTO decisionDTO) {
     CoreDataBuilder coreDataBuilder =
-        DocumentableTransformer.buildCoreData(decisionDTO).toBuilder();
+        DocumentableTransformer.buildMutualCoreData(decisionDTO).toBuilder();
 
     // decision specific fields
     LegalEffect legalEffect =
@@ -574,7 +578,15 @@ public class DecisionTransformer extends DocumentableTransformer {
     coreDataBuilder
         .ecli(decisionDTO.getEcli())
         .celexNumber(decisionDTO.getCelexNumber())
-        .legalEffect(legalEffect == null ? null : legalEffect.getLabel());
+        .legalEffect(legalEffect == null ? null : legalEffect.getLabel())
+        .procedure(ProcedureTransformer.transformToDomain(decisionDTO.getProcedure(), false))
+        .previousProcedures(
+            ProcedureTransformer.transformPreviousProceduresToLabel(
+                decisionDTO.getProcedureHistory()))
+        .creatingDocOffice(
+            DocumentationOfficeTransformer.transformToDomain(
+                decisionDTO.getCreatingDocumentationOffice()))
+        .source(getSource(decisionDTO));
 
     addInputTypesToDomain(decisionDTO, coreDataBuilder);
     addLeadingDecisionNormReferencesToDomain(decisionDTO, coreDataBuilder);
@@ -709,5 +721,27 @@ public class DecisionTransformer extends DocumentableTransformer {
         currentDto.getYearsOfDispute().stream()
             .map(YearOfDisputeTransformer::transformToDomain)
             .toList());
+  }
+
+  static Source getSource(DocumentationUnitDTO decisionDTO) {
+    return decisionDTO.getSource().stream()
+        .max(Comparator.comparing(SourceDTO::getRank)) // Find the highest-ranked item
+        .map(
+            sourceDTO -> {
+              SourceValue sourceValue = null;
+              if (sourceDTO.getValue() != null) {
+                sourceValue = sourceDTO.getValue();
+              }
+              var reference =
+                  Optional.ofNullable(sourceDTO.getReference())
+                      .map(ReferenceTransformer::transformToDomain)
+                      .orElse(null);
+              return Source.builder()
+                  .value(sourceValue)
+                  .sourceRawValue(sourceDTO.getSourceRawValue())
+                  .reference(reference)
+                  .build();
+            })
+        .orElse(null);
   }
 }

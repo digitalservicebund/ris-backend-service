@@ -3,9 +3,11 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 
@@ -146,6 +148,16 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
         .previousDecisions(getPreviousDecisions(pendingProceedingDTO))
         .isDeletable(false)
         .isEditable(false)
+        .build();
+  }
+
+  private static @Valid CoreData buildCoreData(PendingProceedingDTO pendingProceedingDTO) {
+    CoreData mutualCoreData = buildMutualCoreData(pendingProceedingDTO);
+
+    // transform pending proceeding specific core data fields
+    return mutualCoreData.toBuilder()
+        .isResolved(pendingProceedingDTO.isResolved())
+        .resolutionDate(pendingProceedingDTO.getResolutionDate())
         .build();
   }
 }

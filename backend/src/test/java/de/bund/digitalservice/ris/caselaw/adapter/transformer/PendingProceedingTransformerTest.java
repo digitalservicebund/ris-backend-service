@@ -6,6 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
@@ -100,8 +104,93 @@ class PendingProceedingTransformerTest {
     assertThat(resultDto.getDate()).isEqualTo(coreData.decisionDate());
     assertThat(resultDto.getDocumentType().getId()).isEqualTo(coreData.documentType().uuid());
     assertThat(resultDto.getCourt().getId()).isEqualTo(coreData.court().id());
-    assertThat(resultDto.isResolved()).isTrue(); // CORRECTED: Use isResolved()
-    assertThat(resultDto.getResolutionDate()).isEqualTo(coreData.resolutionDate());
+  }
+
+  @Test
+  void testTransformToDomain_withCoreData_shouldTransformAllCoreDataRelevantForPendingProceeding() {
+    // Arrange
+    UUID decisionId = UUID.randomUUID();
+    UUID documentTypeId = UUID.randomUUID();
+    UUID courtId = UUID.randomUUID();
+    UUID docOfficeId = UUID.randomUUID();
+    String documentNumber = "DOCNUMBER1234";
+
+    LocalDate decisionDate = LocalDate.of(2024, 5, 10);
+    LocalDate deviatingDecisionDate = LocalDate.of(2024, 5, 10);
+    String celexNumber = "CELEX-XYZ";
+    String judicialBody = "Bundesverfassungsgericht";
+    String fileNumber = "AZ-456";
+    String deviatingFileNumber = "1B23/24";
+    String courtLabel = "LG Berlin";
+
+    PendingProceedingDTO pendingProceedingDTO =
+        PendingProceedingDTO.builder()
+            // --- fields from DocumentationUnitDTO parent (for builder) ---
+            .id(decisionId)
+            .documentNumber(documentNumber)
+            .version(1L)
+            .date(decisionDate)
+            .documentType(DocumentTypeDTO.builder().id(documentTypeId).abbreviation("Urt").build())
+            .court(CourtDTO.builder().id(courtId).type("BVerfG").build())
+            .celexNumber(celexNumber)
+            .judicialBody(judicialBody) // Mapped to coreData.appraisalBody
+            .fileNumbers(
+                List.of(
+                    de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO.builder()
+                        .rank(0L)
+                        .value(fileNumber)
+                        .build()))
+            .deviatingFileNumbers(
+                List.of(
+                    DeviatingFileNumberDTO.builder().rank(0L).value(deviatingFileNumber).build()))
+            .deviatingDates(
+                List.of(DeviatingDateDTO.builder().rank(0L).value(deviatingDecisionDate).build()))
+            .deviatingCourts(
+                List.of(
+                    de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO
+                        .builder()
+                        .rank(0L)
+                        .value(courtLabel)
+                        .build()))
+            .documentationOffice(
+                DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation("DS").build())
+
+            // --- Fields specifically from PendingProceedingDTO that contribute to CoreData ---
+            .isResolved(true)
+            .resolutionDate(LocalDate.of(2024, 5, 10))
+            .build();
+
+    // Act
+    PendingProceeding pendingProceeding =
+        PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
+
+    // Assert general DocumentationUnit fields
+    assertThat(pendingProceeding).isNotNull();
+    assertThat(pendingProceeding.uuid()).isEqualTo(decisionId);
+    assertThat(pendingProceeding.documentNumber()).isEqualTo(documentNumber);
+    assertThat(pendingProceeding.version()).isEqualTo(1L);
+
+    // Assert CoreData object itself
+    CoreData coreData = pendingProceeding.coreData();
+    assertThat(coreData).isNotNull();
+
+    // --- Assert mutual CoreData fields that are transformed from DocumentableTransformer ---
+    assertThat(coreData.celexNumber()).isEqualTo(celexNumber);
+    assertThat(coreData.appraisalBody()).isEqualTo(judicialBody);
+    assertThat(coreData.decisionDate()).isEqualTo(decisionDate);
+    assertThat(coreData.documentType().jurisShortcut()).isEqualTo("Urt");
+    assertThat(coreData.court().label()).isEqualTo("BVerfG");
+    assertThat(coreData.fileNumbers().getFirst()).isEqualTo(fileNumber);
+    assertThat(coreData.deviatingFileNumbers().getFirst()).isEqualTo(deviatingFileNumber);
+    assertThat(coreData.deviatingCourts().getFirst()).isEqualTo(courtLabel);
+    assertThat(coreData.deviatingDecisionDates().getFirst()).isEqualTo(deviatingDecisionDate);
+    assertThat(coreData.documentationOffice()).isNotNull();
+    assertThat(coreData.documentationOffice().id()).isEqualTo(docOfficeId);
+    assertThat(coreData.documentationOffice().abbreviation()).isEqualTo("DS");
+
+    // --- Assert CoreData fields that are transformed from PendingProceedingTransformer ---
+    assertThat(coreData.isResolved()).isTrue();
+    assertThat(coreData.resolutionDate()).isEqualTo("2024-05-10");
   }
 
   @Test
