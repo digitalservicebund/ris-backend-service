@@ -24,6 +24,12 @@ test.describe("eurlex", () => {
 
       await test.step("Entscheidungen werden mit Metadaten angezeigt", async () => {
         const rows = page.locator("tr")
+        await page.waitForResponse(
+          (response) =>
+            response.url().includes("/api/v1/caselaw/eurlex") &&
+            response.request().method() === "GET" &&
+            response.status() === 200,
+        )
         // all eurlex test entries are visible
         await expect(page.getByText(celexNumber1)).toBeVisible()
         await expect(page.getByText(celexNumber2)).toBeVisible()
