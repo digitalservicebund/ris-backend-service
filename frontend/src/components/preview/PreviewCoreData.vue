@@ -6,13 +6,15 @@ import FlexItem from "@/components/FlexItem.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { CoreData } from "@/domain/documentUnit"
+import { CoreData, Kind } from "@/domain/documentUnit"
 
 const props = defineProps<{
   coreData: CoreData
   dateLabel: string
+  kind: Kind
 }>()
 
+const isPendingProceeding = props.kind === Kind.PENDING_PROCEEDING
 const sourceValue = computed(() =>
   props.coreData.source
     ? (props.coreData.source.value ?? props.coreData.source.sourceRawValue)
@@ -127,6 +129,18 @@ const sourceValue = computed(() =>
       <PreviewCategory>Quelle</PreviewCategory>
       <PreviewContent>
         {{ sourceValue }}
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="isPendingProceeding">
+      <PreviewCategory>Erledigung</PreviewCategory>
+      <PreviewContent>
+        {{ coreData.isResolved ? "Ja" : "Nein" }}
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.resolutionDate">
+      <PreviewCategory>Erledigungsmitteilung</PreviewCategory>
+      <PreviewContent>
+        {{ coreData.resolutionDate }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.court?.jurisdictionType">

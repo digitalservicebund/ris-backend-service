@@ -2,8 +2,12 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
-import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,8 +20,85 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
   private PendingProceedingTransformer() {}
 
   /**
-   * /** Transforms a pending proceeding object from its database representation into a domain
-   * object that is suitable to be consumed by clients of the REST service.
+   * Transforms a pending proceeding domain object into its database representation.
+   *
+   * @param pendingProceeding the domain object
+   * @return a transformed database pending proceeding object
+   */
+  public static PendingProceedingDTO transformToDTO(
+      PendingProceedingDTO currentDto, PendingProceeding pendingProceeding) {
+    if (pendingProceeding == null) {
+      throw new DocumentationUnitTransformerException(
+          "Pending proceeding is null and won't transform");
+    }
+
+    final var builder = currentDto.toBuilder();
+
+    builder
+        .id(pendingProceeding.uuid())
+        .documentNumber(pendingProceeding.documentNumber())
+        .version(pendingProceeding.version());
+    addPreviousDecisions(pendingProceeding, builder);
+
+    if (pendingProceeding.coreData() != null) {
+      var coreData = pendingProceeding.coreData();
+
+      builder
+          .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
+          .date(coreData.decisionDate()) // Mitteilungsdatum
+          .documentType(
+              coreData.documentType() != null
+                  ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
+                  : null)
+          .court(CourtTransformer.transformToDTO(coreData.court()))
+          .isResolved(coreData.isResolved())
+          .resolutionDate(coreData.resolutionDate());
+
+      addFileNumbers(builder, coreData, currentDto);
+      addDeviationCourts(builder, coreData);
+      addDeviatingDecisionDates(builder, coreData);
+      addDeviatingFileNumbers(builder, coreData, currentDto);
+    } else {
+      builder
+          .judicialBody(null)
+          .date(null)
+          .court(null)
+          .documentType(null)
+          .documentationOffice(null);
+    }
+
+    if (pendingProceeding.contentRelatedIndexing() != null) {
+      ContentRelatedIndexing contentRelatedIndexing = pendingProceeding.contentRelatedIndexing();
+      addNormReferences(builder, contentRelatedIndexing);
+      // TODO: Passivzitierung Verwaltungsvorschriften
+    }
+
+    if (pendingProceeding.shortTexts() != null) {
+      PendingProceedingShortTexts shortTexts = pendingProceeding.shortTexts();
+      builder
+          .headline(shortTexts.headline())
+          .resolutionNote(shortTexts.resolutionNote())
+          .legalIssue(shortTexts.legalIssue())
+          .admissionOfAppeal(shortTexts.admissionOfAppeal())
+          .appellant(shortTexts.appellant());
+    } else {
+      builder.headline(null);
+    }
+
+    addCaselawReferences(pendingProceeding, builder, currentDto);
+    addLiteratureReferences(pendingProceeding, builder, currentDto);
+
+    PendingProceedingDTO result = builder.build();
+    if (currentDto.getManagementData() != null) {
+      currentDto.getManagementData().setDocumentationUnit(result);
+      result.setManagementData(currentDto.getManagementData());
+    }
+    return result;
+  }
+
+  /**
+   * Transforms a pending proceeding object from its database representation into a domain object
+   * that is suitable to be consumed by clients of the REST service.
    *
    * @param pendingProceedingDTO the database pending proceeding object
    * @return a transformed domain object, or an empty domain object if the input is null
@@ -33,13 +114,16 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
 
     return PendingProceeding.builder()
         .uuid(pendingProceedingDTO.getId())
+        .version(pendingProceedingDTO.getVersion())
         .documentNumber(pendingProceedingDTO.getDocumentNumber())
         .coreData(buildCoreData(pendingProceedingDTO))
         .shortTexts(
-            ShortTexts.builder()
+            PendingProceedingShortTexts.builder()
                 .headline(pendingProceedingDTO.getHeadline())
-                .guidingPrinciple(pendingProceedingDTO.getGuidingPrinciple())
-                .headnote(pendingProceedingDTO.getHeadnote())
+                .resolutionNote(pendingProceedingDTO.getResolutionNote())
+                .legalIssue(pendingProceedingDTO.getLegalIssue())
+                .admissionOfAppeal(pendingProceedingDTO.getAdmissionOfAppeal())
+                .appellant(pendingProceedingDTO.getAppellant())
                 .build())
         .contentRelatedIndexing(buildContentRelatedIndexing(pendingProceedingDTO))
         .caselawReferences(
@@ -62,13 +146,18 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
                     .toList())
         .status(getStatus(pendingProceedingDTO))
         .previousDecisions(getPreviousDecisions(pendingProceedingDTO))
-        .resolutionNote(pendingProceedingDTO.getResolutionNote())
-        .isResolved(pendingProceedingDTO.isResolved())
-        .legalIssue(pendingProceedingDTO.getLegalIssue())
-        .admissionOfAppeal(pendingProceedingDTO.getAdmissionOfAppeal())
-        .appellant(pendingProceedingDTO.getAppellant())
         .isDeletable(false)
         .isEditable(false)
+        .build();
+  }
+
+  private static @Valid CoreData buildCoreData(PendingProceedingDTO pendingProceedingDTO) {
+    CoreData mutualCoreData = buildMutualCoreData(pendingProceedingDTO);
+
+    // transform pending proceeding specific core data fields
+    return mutualCoreData.toBuilder()
+        .isResolved(pendingProceedingDTO.isResolved())
+        .resolutionDate(pendingProceedingDTO.getResolutionDate())
         .build();
   }
 }

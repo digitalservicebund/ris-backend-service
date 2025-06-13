@@ -10,7 +10,7 @@ import DocumentUnit, {
 import routes from "~/test-helper/routes"
 
 function renderComponent(options?: {
-  heading?: string
+  documentNumber?: string
   coreData?: CoreData
   duplicateRelations?: DuplicateRelation[]
   isExternalUser?: boolean
@@ -19,9 +19,23 @@ function renderComponent(options?: {
     history: createWebHistory(),
     routes: routes,
   })
+  const documentUnit = new DocumentUnit("foo", {
+    documentNumber: options?.documentNumber ?? "1234567891234",
+    coreData: options?.coreData ?? {
+      court: {
+        type: "AG",
+        location: "Test",
+        label: "AG Test",
+      },
+    },
+    managementData: {
+      borderNumbers: [],
+      duplicateRelations: options?.duplicateRelations ?? [],
+    },
+  })
   return {
     ...render(DocumentUnitInfoPanel, {
-      props: { heading: options?.heading ?? "" },
+      props: { documentUnit: documentUnit },
       global: {
         plugins: [
           router,
@@ -33,20 +47,7 @@ function renderComponent(options?: {
                 },
               },
               docunitStore: {
-                documentUnit: new DocumentUnit("foo", {
-                  documentNumber: "1234567891234",
-                  coreData: options?.coreData ?? {
-                    court: {
-                      type: "AG",
-                      location: "Test",
-                      label: "AG Test",
-                    },
-                  },
-                  managementData: {
-                    borderNumbers: [],
-                    duplicateRelations: options?.duplicateRelations ?? [],
-                  },
-                }),
+                documentUnit: documentUnit,
               },
             },
           }),
@@ -57,8 +58,8 @@ function renderComponent(options?: {
 }
 
 describe("documentUnit InfoPanel", () => {
-  it("renders heading if given", async () => {
-    renderComponent({ heading: "test heading" })
+  it("renders documentNumber as heading", async () => {
+    renderComponent({ documentNumber: "test heading" })
 
     screen.getAllByText("test heading")
   })

@@ -8,6 +8,7 @@ import FlexItem from "@/components/FlexItem.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import DocumentUnit from "@/domain/documentUnit"
 import attachmentService from "@/services/attachmentService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -18,8 +19,9 @@ const emit = defineEmits<{
 }>()
 
 const store = useDocumentUnitStore()
-const { documentUnit } = storeToRefs(store)
-
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 const errors = ref<string[]>([])
 const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
@@ -118,13 +120,13 @@ function closeDeleteModal() {
 }
 
 const hasAttachments = computed<boolean>(() => {
-  return store.documentUnit!.attachments.length > 0
+  return documentUnit.value!.attachments.length > 0
 })
 
 const attachments = computed({
-  get: () => store.documentUnit!.attachments,
+  get: () => documentUnit.value!.attachments,
   set: (newValues) => {
-    store.documentUnit!.attachments = newValues
+    documentUnit.value!.attachments = newValues
   },
 })
 </script>

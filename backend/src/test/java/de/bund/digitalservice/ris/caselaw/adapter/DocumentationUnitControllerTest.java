@@ -47,6 +47,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -267,6 +268,28 @@ class DocumentationUnitControllerTest {
     // once by the AuthService and once by the controller asking the service
     verify(service, times(1)).getByDocumentNumber("ABCD202200001");
     verify(duplicateCheckService, times(1)).checkDuplicates("ABCD202200001");
+  }
+
+  @Test
+  void testGetPendingProceedingByDocumentnumber() throws DocumentationUnitNotExistsException {
+    when(service.getByDocumentNumber("ABCD202200001"))
+        .thenReturn(
+            PendingProceeding.builder()
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+                .build());
+
+    risWebClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/ABCD202200001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(PendingProceeding.class);
+
+    // once by the AuthService and once by the controller asking the service
+    verify(service, times(1)).getByDocumentNumber("ABCD202200001");
   }
 
   @Test

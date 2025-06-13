@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
 import { storeToRefs } from "pinia"
-import { provide } from "vue"
+import { provide, Ref } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import {
   PreviewLayout,
@@ -15,7 +15,11 @@ import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
-import { ContentRelatedIndexing, LongTexts } from "@/domain/documentUnit"
+import DocumentUnit, {
+  ContentRelatedIndexing,
+  Kind,
+  LongTexts,
+} from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 import Reference from "@/domain/reference"
@@ -25,7 +29,9 @@ const props = defineProps<{
   layout?: PreviewLayout
 }>()
 
-const { documentUnit } = storeToRefs(useDocumentUnitStore())
+const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 
 provide(previewLayoutInjectionKey, props.layout || "wide")
 </script>
@@ -47,6 +53,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewCoreData
       :core-data="documentUnit.coreData"
       date-label="Entscheidungsdatum"
+      :kind="Kind.DOCUMENTION_UNIT"
     />
     <PreviewNote :note="documentUnit.note" />
     <PreviewCaselawReferences

@@ -7,6 +7,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
+import routes from "~pages"
 
 beforeAll(() => {
   mockDocumentForProsemirror()
@@ -36,18 +37,7 @@ describe("text editor toolbar", async () => {
 
   const router = createRouter({
     history: createWebHistory(),
-    routes: [
-      {
-        path: "/",
-        name: "home",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/categories#coreData",
-        name: "caselaw-documentUnit-documentNumber-categories#coreData",
-        component: {},
-      },
-    ],
+    routes: routes,
   })
 
   describe("keyboard navigation", () => {
@@ -152,6 +142,34 @@ describe("text editor toolbar", async () => {
       await userEvent.tab({ shift: true })
       const firstButton = screen.getByLabelText("Erweitern")
       expect(firstButton).toHaveFocus()
+    })
+  })
+
+  describe("border number options", () => {
+    test("should display border number options", async () => {
+      await renderComponent()
+      await router.push({
+        name: "caselaw-documentUnit-documentNumber-categories",
+        params: { documentNumber: "documentNumber" },
+      })
+      expect(
+        screen.getByLabelText("Randnummern neu erstellen"),
+      ).toBeInTheDocument()
+      expect(screen.getByLabelText("Randnummern entfernen")).toBeInTheDocument()
+    })
+
+    test("should hide border number options for pending proceedings", async () => {
+      await renderComponent()
+      await router.push({
+        name: "caselaw-pending-proceeding-documentNumber-categories",
+        params: { documentNumber: "documentNumber" },
+      })
+      expect(
+        screen.queryByLabelText("Randnummern neu erstellen"),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByLabelText("Randnummern entfernen"),
+      ).not.toBeInTheDocument()
     })
   })
 })

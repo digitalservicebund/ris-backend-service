@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { storeToRefs } from "pinia"
+import { computed, Ref } from "vue"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
@@ -8,9 +9,15 @@ import KeyWords from "@/components/KeyWords.vue"
 import Norms from "@/components/NormReferences.vue"
 import OtherCategories from "@/components/OtherCategories.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import DocumentUnit from "@/domain/documentUnit"
+import PendingProceeding from "@/domain/pendingProceeding"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { isDocumentUnit } from "@/utils/typeGuards"
 
 const store = useDocumentUnitStore()
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentUnit | PendingProceeding | undefined>
+}
 
 const hasKeywords = computed(
   () =>
@@ -32,7 +39,10 @@ const hasKeywords = computed(
     </CategoryWrapper>
     <FieldsOfLaw data-testid="fieldsOfLaw" />
     <Norms data-testid="norms" />
-    <ActiveCitations data-testid="activeCitations" />
-    <OtherCategories />
+    <ActiveCitations
+      v-if="isDocumentUnit(documentUnit)"
+      data-testid="activeCitations"
+    />
+    <OtherCategories v-if="isDocumentUnit(documentUnit)" />
   </div>
 </template>

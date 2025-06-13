@@ -5,7 +5,7 @@ import MenuItem from "@/domain/menuItem"
 
 export function useCaseLawMenuItems(
   documentNumber: string | undefined,
-  routeQuery: LocationQuery, // Replace with the appropriate type for route query
+  routeQuery: LocationQuery,
 ): Ref<MenuItem[]> {
   const baseRoute = {
     params: { documentNumber },

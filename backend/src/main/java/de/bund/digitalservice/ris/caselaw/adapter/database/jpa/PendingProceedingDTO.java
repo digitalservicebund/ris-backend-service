@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -45,6 +46,12 @@ public class PendingProceedingDTO extends DocumentationUnitDTO {
 
   // Rechtsmittelführer
   @Column String appellant;
+
+  // Erledigungsmitteilung
+  @Column(name = "resolution_date")
+  LocalDate resolutionDate;
+
+  // TODO: Passivzitierung Verwaltungsvorschriften
 
   @Override
   public String getHeadnote() {

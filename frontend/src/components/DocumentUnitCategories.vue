@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
 import type { Component } from "vue"
-import { computed, ref, toRefs, watch } from "vue"
+import { computed, toRefs, watch } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
@@ -10,10 +10,10 @@ import FlexItem from "@/components/FlexItem.vue"
 import ProceedingDecisions from "@/components/ProceedingDecisions.vue"
 import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
 
-import { useProvideCourtType } from "@/composables/useCourtType"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
+import { Kind } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 defineProps<{
@@ -24,7 +24,6 @@ const route = useRoute()
 const { hash: routeHash } = toRefs(route)
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store)
-const courtTypeRef = ref<string>(documentUnit.value!.coreData.court?.type ?? "")
 const { scrollIntoViewportById } = useScroll()
 
 /**
@@ -33,8 +32,9 @@ const { scrollIntoViewportById } = useScroll()
  */
 const shouldDeleteLegalForces = computed(() => {
   return (
-    !constitutionalCourtTypes.items.includes(courtTypeRef.value) ||
-    !documentUnit.value!.coreData.court
+    !constitutionalCourtTypes.items.includes(
+      documentUnit.value!.coreData.court?.type ?? "",
+    ) || !documentUnit.value!.coreData.court
   )
 })
 
@@ -58,7 +58,6 @@ const coreData = computed({
   get: () => store.documentUnit!.coreData,
   set: async (newValues) => {
     store.documentUnit!.coreData = newValues
-    courtTypeRef.value = store.documentUnit!.coreData.court?.type ?? ""
     // When the user changes the court to one that doesn't allow "Gesetzeskraft" all existing legal forces are deleted
     if (shouldDeleteLegalForces.value) {
       deleteLegalForces()
@@ -74,8 +73,6 @@ watch(
   { immediate: true },
 )
 
-useProvideCourtType(courtTypeRef)
-
 const isInternalUser = useInternalUser()
 </script>
 
@@ -85,6 +82,7 @@ const isInternalUser = useInternalUser()
       v-if="isInternalUser"
       :id="DocumentUnitCategoriesEnum.CORE_DATA"
       v-model="coreData"
+      :kind="Kind.DOCUMENTION_UNIT"
     />
     <ProceedingDecisions
       :id="DocumentUnitCategoriesEnum.PROCEEDINGS_DECISIONS"

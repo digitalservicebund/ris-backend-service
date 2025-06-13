@@ -2,21 +2,23 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { vi } from "vitest"
-import { ref, Ref } from "vue"
 import OtherCategories from "@/components/OtherCategories.vue"
 import DocumentUnit, { ContentRelatedIndexing } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-let courtTypeRef: Ref | undefined = undefined
-vi.mock("@/composables/useCourtType", () => {
-  return {
-    useInjectCourtType: () => courtTypeRef,
-  }
-})
-function mockSessionStore(contentRelatedIndexing: ContentRelatedIndexing) {
+function mockSessionStore(
+  contentRelatedIndexing: ContentRelatedIndexing,
+  courtType: string = "",
+) {
   const mockedSessionStore = useDocumentUnitStore()
   mockedSessionStore.documentUnit = new DocumentUnit("q834", {
-    contentRelatedIndexing,
+    contentRelatedIndexing: contentRelatedIndexing,
+    coreData: {
+      court: {
+        label: courtType,
+        type: courtType,
+      },
+    },
   })
 
   return mockedSessionStore
@@ -30,8 +32,7 @@ describe("other categories", () => {
   describe("LegislativeMandate", () => {
     test("should not display legislative mandate when it is false and courtType is non-constitutional", async () => {
       // Arrange
-      courtTypeRef = ref("BAG")
-      mockSessionStore({ hasLegislativeMandate: false })
+      mockSessionStore({ hasLegislativeMandate: false }, "BAG")
 
       // Act
       render(OtherCategories)
@@ -46,8 +47,7 @@ describe("other categories", () => {
 
     test("should display legislative mandate button when it is false and courtType is constitutional", async () => {
       // Arrange
-      courtTypeRef = ref("BVerfG")
-      mockSessionStore({ hasLegislativeMandate: false })
+      mockSessionStore({ hasLegislativeMandate: false }, "BVerfG")
 
       // Act
       render(OtherCategories)
@@ -62,8 +62,7 @@ describe("other categories", () => {
 
     test("should display checked legislative mandate when it is true and has constitutional courtType", async () => {
       // Arrange
-      courtTypeRef = ref("BVerfG")
-      mockSessionStore({ hasLegislativeMandate: true })
+      mockSessionStore({ hasLegislativeMandate: true }, "BVerfG")
 
       // Act
       render(OtherCategories)
@@ -78,8 +77,7 @@ describe("other categories", () => {
 
     test("should display checked legislative mandate when it is true and has non-constitutional courtType", async () => {
       // Arrange
-      courtTypeRef = ref("BAG")
-      mockSessionStore({ hasLegislativeMandate: true })
+      mockSessionStore({ hasLegislativeMandate: true }, "BAG")
 
       // Act
       render(OtherCategories)
@@ -96,8 +94,7 @@ describe("other categories", () => {
   describe("Dismissal Inputs", () => {
     test("should not display dismissal inputs/button when inputs are empty and courtType is non-labor", async () => {
       // Arrange
-      courtTypeRef = ref("BGH")
-      mockSessionStore({ dismissalGrounds: [], dismissalTypes: [] })
+      mockSessionStore({ dismissalGrounds: [], dismissalTypes: [] }, "BGH")
 
       // Act
       render(OtherCategories)
@@ -110,8 +107,7 @@ describe("other categories", () => {
 
     test("should display dismissal button when inputs are empty and courtType is labor", async () => {
       // Arrange
-      courtTypeRef = ref("BAG")
-      mockSessionStore({ dismissalGrounds: [], dismissalTypes: [] })
+      mockSessionStore({ dismissalGrounds: [], dismissalTypes: [] }, "BAG")
 
       // Act
       render(OtherCategories)
@@ -124,8 +120,10 @@ describe("other categories", () => {
 
     test("should display dismissal inputs when ground is non-empty and courtType is non-labor", async () => {
       // Arrange
-      courtTypeRef = ref("BGH")
-      mockSessionStore({ dismissalGrounds: ["ground"], dismissalTypes: [] })
+      mockSessionStore(
+        { dismissalGrounds: ["ground"], dismissalTypes: [] },
+        "BGH",
+      )
 
       // Act
       render(OtherCategories)
@@ -138,8 +136,10 @@ describe("other categories", () => {
 
     test("should display dismissal inputs when ground is non-empty and courtType is non-labor", async () => {
       // Arrange
-      courtTypeRef = ref("BGH")
-      mockSessionStore({ dismissalGrounds: [], dismissalTypes: ["type"] })
+      mockSessionStore(
+        { dismissalGrounds: [], dismissalTypes: ["type"] },
+        "BGH",
+      )
 
       // Act
       render(OtherCategories)
@@ -152,11 +152,13 @@ describe("other categories", () => {
 
     test("should display dismissal inputs when inputs are non-empty and courtType is labor", async () => {
       // Arrange
-      courtTypeRef = ref("BAG")
-      mockSessionStore({
-        dismissalGrounds: ["ground"],
-        dismissalTypes: ["type"],
-      })
+      mockSessionStore(
+        {
+          dismissalGrounds: ["ground"],
+          dismissalTypes: ["type"],
+        },
+        "BAG",
+      )
 
       // Act
       render(OtherCategories)
@@ -171,8 +173,7 @@ describe("other categories", () => {
   describe("CollectiveAgreements", () => {
     test("should not display collective agreements button when it is empty and not a labor court", async () => {
       // Arrange
-      courtTypeRef = ref("BVerfG")
-      mockSessionStore({ collectiveAgreements: [] })
+      mockSessionStore({ collectiveAgreements: [] }, "BVerfG")
 
       // Act
       render(OtherCategories)
@@ -188,8 +189,7 @@ describe("other categories", () => {
 
     test("should display collective agreements button when it is empty and labor court", async () => {
       // Arrange
-      courtTypeRef = ref("LArbG")
-      mockSessionStore({ collectiveAgreements: [] })
+      mockSessionStore({ collectiveAgreements: [] }, "LArbG")
 
       // Act
       render(OtherCategories)
@@ -205,8 +205,7 @@ describe("other categories", () => {
 
     test("should display collective agreements when it is not empty without labor court", async () => {
       // Arrange
-      courtTypeRef = ref("BVerfG")
-      mockSessionStore({ collectiveAgreements: ["Stehende Bühnen"] })
+      mockSessionStore({ collectiveAgreements: ["Stehende Bühnen"] }, "BVerfG")
 
       // Act
       render(OtherCategories)

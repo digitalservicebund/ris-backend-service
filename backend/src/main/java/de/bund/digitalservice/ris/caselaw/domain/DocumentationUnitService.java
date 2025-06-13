@@ -266,16 +266,11 @@ public class DocumentationUnitService {
       OidcUser oidcUser, DocumentationUnitListItem listItem) {
 
     boolean hasWriteAccess =
-        !(listItem.documentType() != null
-                && listItem
-                    .documentType()
-                    .jurisShortcut()
-                    .equals("Anh")) // pending proceedings are not to be edited or deleted yet
-            && authService.userHasWriteAccess(
-                oidcUser,
-                listItem.creatingDocumentationOffice(),
-                listItem.documentationOffice(),
-                listItem.status());
+        authService.userHasWriteAccess(
+            oidcUser,
+            listItem.creatingDocumentationOffice(),
+            listItem.documentationOffice(),
+            listItem.status());
     boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
     BooleanSupplier isAssignedViaGroup =
         () ->
@@ -299,18 +294,31 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException {
     var documentable =
         repository.findByDocumentNumber(documentNumber, userService.getUser(oidcUser));
-    if (documentable instanceof DocumentationUnit documentationUnit) {
-      return documentationUnit.toBuilder()
-          .isEditable(
-              authService.userHasWriteAccess(
-                  oidcUser,
-                  documentationUnit.coreData().creatingDocOffice(),
-                  documentationUnit.coreData().documentationOffice(),
-                  documentationUnit.status()))
-          .build();
-    } else {
-      log.info("Documentable type not supported: {}", documentable.getClass().getName());
-      return documentable;
+    switch (documentable) {
+      case DocumentationUnit documentationUnit -> {
+        return documentationUnit.toBuilder()
+            .isEditable(
+                authService.userHasWriteAccess(
+                    oidcUser,
+                    documentationUnit.coreData().creatingDocOffice(),
+                    documentationUnit.coreData().documentationOffice(),
+                    documentationUnit.status()))
+            .build();
+      }
+      case PendingProceeding pendingProceeding -> {
+        return pendingProceeding.toBuilder()
+            .isEditable(
+                authService.userHasWriteAccess(
+                    oidcUser,
+                    pendingProceeding.coreData().creatingDocOffice(),
+                    pendingProceeding.coreData().documentationOffice(),
+                    pendingProceeding.status()))
+            .build();
+      }
+      default -> {
+        log.info("Documentable type not supported: {}", documentable.getClass().getName());
+        return documentable;
+      }
     }
   }
 
@@ -384,12 +392,7 @@ public class DocumentationUnitService {
        * handle unique following operation (sometimes by add and remove operations at the same time)
     */
 
-    Documentable documentable = getByUuid(documentationUnitId, user);
-
-    if (!(documentable instanceof DocumentationUnit existingDocumentationUnit)) {
-      throw new UnsupportedOperationException(
-          "Update not supported for Documentable type: " + documentable.getClass());
-    }
+    Documentable existingDocumentationUnit = getByUuid(documentationUnitId, user);
 
     long newVersion = 1L;
     if (existingDocumentationUnit.version() != null) {
@@ -421,14 +424,26 @@ public class DocumentationUnitService {
       if (!toUpdate.getOperations().isEmpty()) {
         toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
 
-        DocumentationUnit patchedDocumentationUnit =
+        Documentable patchedDocumentationUnit =
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
-        patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
+
+        if (patchedDocumentationUnit instanceof DocumentationUnit docUnit) {
+          patchedDocumentationUnit = docUnit.toBuilder().version(newVersion).build();
+        } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
+          patchedDocumentationUnit = pendingProceeding.toBuilder().version(newVersion).build();
+        }
 
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
-        DocumentationUnit updatedDocumentationUnit =
-            updateDocumentationUnit(patchedDocumentationUnit, duplicateCheckStatus, user);
+        Documentable updatedDocumentationUnit = null;
+        if (patchedDocumentationUnit instanceof DocumentationUnit docUnit) {
+          updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
+        } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
+          updatedDocumentationUnit = updatePendingProceeding(pendingProceeding, user);
+        } else {
+          throw new UnsupportedOperationException(
+              "Update not supported for Documentable type: " + patchedDocumentationUnit.getClass());
+        }
 
         toFrontendJsonPatch =
             patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
@@ -504,6 +519,16 @@ public class DocumentationUnitService {
     }
 
     return (DocumentationUnit) repository.findByUuid(documentationUnit.uuid(), user);
+  }
+
+  public PendingProceeding updatePendingProceeding(PendingProceeding pendingProceeding, User user)
+      throws DocumentationUnitNotExistsException {
+    repository.saveKeywords(pendingProceeding);
+    repository.saveFieldsOfLaw(pendingProceeding);
+
+    repository.save(pendingProceeding, user);
+
+    return (PendingProceeding) repository.findByUuid(pendingProceeding.uuid(), user);
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(

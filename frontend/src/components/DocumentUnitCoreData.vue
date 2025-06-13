@@ -1,29 +1,31 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import InputSelect from "primevue/select"
-import { computed, toRefs, watch, ref, onMounted, onBeforeUnmount } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue"
 import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import ChipsYearInput from "@/components/input/ChipsYearInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
-import InputField from "@/components/input/InputField.vue"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
-import { CoreData, SourceValue } from "@/domain/documentUnit"
+import { CoreData, Kind, SourceValue } from "@/domain/documentUnit"
+import { pendingProceedingLabels } from "@/domain/pendingProceeding"
 import ComboboxItemService from "@/services/comboboxItemService"
 
-interface Props {
+const props = defineProps<{
   modelValue: CoreData
-}
-
-const props = defineProps<Props>()
+  kind: Kind
+}>()
 const emit = defineEmits<{
   "update:modelValue": [value: CoreData]
 }>()
+const isPendingProceeding = props.kind === Kind.PENDING_PROCEEDING
 const { modelValue } = toRefs(props)
 const validationStore =
   useValidationStore<
@@ -191,7 +193,9 @@ onBeforeUnmount(() => {
         <InputField
           id="decisionDate"
           v-slot="slotProps"
-          label="Entscheidungsdatum *"
+          :label="
+            isPendingProceeding ? 'Mitteilungsdatum *' : 'Entscheidungsdatum *'
+          "
           :validation-error="validationStore.getByField('decisionDate')"
         >
           <DateInput
@@ -242,7 +246,27 @@ onBeforeUnmount(() => {
         />
       </InputField>
 
-      <InputField id="documentType" class="flex-col" label="Dokumenttyp *">
+      <InputField
+        v-if="isPendingProceeding"
+        id="resolutionDate"
+        v-slot="slotProps"
+        :label="pendingProceedingLabels.resolutionDate"
+      >
+        <DateInput
+          id="resolutionDate"
+          v-model="modelValue.resolutionDate"
+          :aria-label="pendingProceedingLabels.resolutionDate"
+          :has-error="slotProps.hasError"
+          @update:validation-error="slotProps.updateValidationError"
+        ></DateInput>
+      </InputField>
+
+      <InputField
+        v-if="!isPendingProceeding"
+        id="documentType"
+        class="flex-col"
+        label="Dokumenttyp *"
+      >
         <ComboboxInput
           id="documentType"
           v-model="modelValue.documentType"
@@ -252,7 +276,7 @@ onBeforeUnmount(() => {
       </InputField>
     </div>
 
-    <div :class="layoutClass">
+    <div v-if="!isPendingProceeding" :class="layoutClass">
       <NestedComponent
         aria-label="Abweichender ECLI"
         class="w-full"
@@ -308,7 +332,7 @@ onBeforeUnmount(() => {
       </NestedComponent>
     </div>
 
-    <div :class="layoutClass">
+    <div v-if="!isPendingProceeding" :class="layoutClass">
       <InputField id="legalEffect" v-slot="{ id }" label="Rechtskraft *">
         <InputSelect
           :id="id"
@@ -339,7 +363,7 @@ onBeforeUnmount(() => {
         ></ChipsYearInput>
       </InputField>
     </div>
-    <div :class="layoutClass">
+    <div v-if="!isPendingProceeding" :class="layoutClass">
       <InputField
         id="source"
         v-slot="slotProps"
@@ -387,8 +411,28 @@ onBeforeUnmount(() => {
         />
       </InputField>
     </div>
+    <InputField
+      v-if="isPendingProceeding"
+      id="isResolved"
+      v-slot="{ id }"
+      :label="pendingProceedingLabels.isResolved"
+      label-class="ris-label1-regular"
+      :label-position="LabelPosition.RIGHT"
+    >
+      <Checkbox
+        v-model="modelValue.isResolved"
+        :aria-label="pendingProceedingLabels.isResolved"
+        binary
+        data-testid="is-resolved"
+        :input-id="id"
+        size="large"
+      />
+    </InputField>
 
-    <div v-if="modelValue.court?.label === 'BGH'" class="flex flex-row gap-24">
+    <div
+      v-if="modelValue.court?.label === 'BGH' && !isPendingProceeding"
+      class="flex flex-row gap-24"
+    >
       <InputField
         id="leadingDecisionNormReferences"
         label="BGH Nachschlagewerk"

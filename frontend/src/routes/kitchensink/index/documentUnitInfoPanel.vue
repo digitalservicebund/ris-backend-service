@@ -4,7 +4,7 @@ import DocumentUnit from "@/domain/documentUnit"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 
 const documentUnit = new DocumentUnit("foo", {
-  documentNumber: "1234567891234",
+  documentNumber: "XXRE202300002",
   coreData: {
     court: {
       type: "AG",
@@ -22,9 +22,6 @@ const documentUnit = new DocumentUnit("foo", {
 
 <template>
   <KitchensinkPage name="Document unit info panel">
-    <DocumentUnitInfoPanel
-      :document-unit="documentUnit"
-      heading="XXRE202300002"
-    />
+    <DocumentUnitInfoPanel :document-unit="documentUnit" />
   </KitchensinkPage>
 </template>

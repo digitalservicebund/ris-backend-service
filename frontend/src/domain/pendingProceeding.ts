@@ -3,33 +3,46 @@ import EnsuingDecision from "./ensuingDecision"
 import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
 import ActiveCitation from "@/domain/activeCitation"
-import {
-  ContentRelatedIndexing,
-  CoreData,
-  ShortTexts,
-} from "@/domain/documentUnit"
+import { ContentRelatedIndexing, CoreData, Kind } from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import { PublicationStatus } from "@/domain/publicationStatus"
 import SingleNorm from "@/domain/singleNorm"
+
+export const pendingProceedingLabels = {
+  headline: "Titelzeile",
+  legalIssue: "Rechtsfrage",
+  appellant: "Rechtsmittelführer",
+  admissionOfAppeal: "Rechtsmittelzulassung",
+  isResolved: "Erledigt",
+  resolutionNote: "Erledigungsvermerk",
+  resolutionDate: "Erledigungsmitteilung",
+}
+
+export type PendingProceedingShortTexts = {
+  headline?: string
+  resolutionNote?: string
+  legalIssue?: string
+  admissionOfAppeal?: string
+  appellant?: string
+}
 
 export default class PendingProceeding {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber: string = ""
   readonly status?: PublicationStatus
+  readonly kind = Kind.PENDING_PROCEEDING
+  public version: number = 0
   public coreData: CoreData = {}
-  public shortTexts: ShortTexts = {}
+  public shortTexts: PendingProceedingShortTexts = {}
   public previousDecisions?: PreviousDecision[]
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
   public caselawReferences?: Reference[]
   public literatureReferences?: Reference[]
-  public resolutionNote?: string = ""
-  public isResolved: boolean = false
-  public legalIssue?: string = ""
-  public admissionOfAppeal?: string = ""
-  public appellant?: string = ""
+
+  public isEditable?: boolean
 
   static readonly requiredFields = [
     "fileNumbers",
@@ -50,7 +63,7 @@ export default class PendingProceeding {
       if (data.coreData && data.coreData[coreDataField] === null)
         delete data.coreData[coreDataField]
     }
-    let shortTextsField: keyof ShortTexts
+    let shortTextsField: keyof PendingProceedingShortTexts
     for (shortTextsField in data.shortTexts) {
       if (data.shortTexts && data.shortTexts[shortTextsField] === null)
         delete data.shortTexts[shortTextsField]

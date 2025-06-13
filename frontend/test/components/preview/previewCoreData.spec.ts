@@ -1,13 +1,14 @@
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
-import { CoreData, SourceValue } from "@/domain/documentUnit"
+import { CoreData, Kind, SourceValue } from "@/domain/documentUnit"
 
-function renderComponent(coreData: CoreData) {
+function renderComponent(coreData: CoreData, kind?: Kind) {
   return render(PreviewCoreData, {
     props: {
       coreData: coreData,
       dateLabel: "Entscheidungsdatum",
+      kind: kind ?? Kind.DOCUMENTION_UNIT,
     },
     global: {
       provide: {
@@ -47,6 +48,8 @@ describe("preview core data", () => {
       legalEffect: "Ja",
       yearsOfDispute: ["2023"],
       source: { value: SourceValue.Zeitschrift },
+      isResolved: true,
+      resolutionDate: "2025-06-12",
     })
 
     expect(await screen.findByText("Gericht")).toBeInTheDocument()
@@ -78,6 +81,28 @@ describe("preview core data", () => {
     ).toBeInTheDocument()
     expect(await screen.findByText("Region")).toBeInTheDocument()
     expect(await screen.findByText("DEU")).toBeInTheDocument()
+    expect(
+      screen.queryByText("Erledigung", { exact: true }),
+    ).not.toBeInTheDocument()
+    expect(await screen.findByText("Erledigungsmitteilung")).toBeInTheDocument()
+  })
+
+  test("renders 'Erledigung' for pending Proceeding", async () => {
+    renderComponent(
+      {
+        court: {
+          label: "BVerfG",
+        },
+        isResolved: true,
+        resolutionDate: "2025-06-12",
+      },
+      Kind.PENDING_PROCEEDING,
+    )
+
+    expect(
+      await screen.findByText("Erledigung", { exact: true }),
+    ).toBeInTheDocument()
+    expect(await screen.findByText("Erledigungsmitteilung")).toBeInTheDocument()
   })
 
   test("do not render empty list", async () => {

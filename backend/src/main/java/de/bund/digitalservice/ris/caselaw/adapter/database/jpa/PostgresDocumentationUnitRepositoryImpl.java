@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -335,7 +336,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);
       repository.save(documentationUnitDTO);
     }
-    // TODO pending proceeding
+    if (documentationUnitDTO instanceof PendingProceedingDTO pendingProceedingDTO) {
+      documentationUnitDTO =
+          PendingProceedingTransformer.transformToDTO(
+              pendingProceedingDTO, (PendingProceeding) documentable);
+      repository.save(documentationUnitDTO);
+    }
   }
 
   private void setLastUpdated(User currentUser, DocumentationUnitDTO docUnitDTO) {

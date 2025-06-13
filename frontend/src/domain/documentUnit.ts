@@ -34,6 +34,8 @@ export type CoreData = {
   yearsOfDispute?: string[]
   leadingDecisionNormReferences?: string[]
   source?: Source
+  isResolved?: boolean
+  resolutionDate?: string
 }
 
 export enum SourceValue {
@@ -176,12 +178,17 @@ export type EurlexParameters = {
   documentationOffice: DocumentationOffice
   celexNumbers: string[]
 }
+export enum Kind {
+  DOCUMENTION_UNIT = "DOCUMENTION_UNIT",
+  PENDING_PROCEEDING = "PENDING_PROCEEDING",
+}
 
 export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber: string = ""
   readonly status?: PublicationStatus
+  readonly kind = Kind.DOCUMENTION_UNIT
   public version: number = 0
   public attachments: Attachment[] = []
   public coreData: CoreData = {}
