@@ -15,4 +15,7 @@ public interface AttachmentRepository extends JpaRepository<AttachmentDTO, UUID>
   Optional<AttachmentDTO> findByS3ObjectPath(String s3ObjectPath);
 
   List<AttachmentDTO> findAllByDocumentationUnitId(UUID documentationUnitId);
+
+  Optional<AttachmentDTO> findByDocumentationUnitIdAndFilename(
+      UUID documentationUnitId, String fileName);
 }

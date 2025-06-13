@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.io.ByteArrayInputStream;
@@ -21,6 +22,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -116,6 +118,19 @@ public class S3AttachmentService implements AttachmentService {
         .map(AttachmentDTO::getS3ObjectPath)
         .filter(Objects::nonNull)
         .forEach(this::deleteObjectFromBucket);
+  }
+
+  @Override
+  public Optional<Image> findByDocumentationUnitIdAndFileName(
+      UUID documentationUnitId, String imageName) {
+    return repository
+        .findByDocumentationUnitIdAndFilename(documentationUnitId, imageName)
+        .map(
+            attachmentDTO ->
+                new Image(
+                    attachmentDTO.getContent(),
+                    attachmentDTO.getFormat(),
+                    attachmentDTO.getFilename()));
   }
 
   void checkDocx(ByteBuffer byteBuffer) {
