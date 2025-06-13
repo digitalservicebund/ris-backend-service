@@ -1,5 +1,5 @@
 import { userEvent } from "@testing-library/user-event"
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import ApiKeySettings from "@/components/settings/ApiKeySettings.vue"
 import authService from "@/services/authService"
 
@@ -55,7 +55,7 @@ describe("api key settings", () => {
       name: "Neuen API-Schlüssel erstellen",
     })
     expect(createButton).toBeInTheDocument()
-    await fireEvent.click(createButton)
+    createButton.click()
     await screen.findByText("fooKey")
   })
 
@@ -74,7 +74,7 @@ describe("api key settings", () => {
     const invalidateButton = await screen.findByRole("button", {
       name: "Sperren",
     })
-    await fireEvent.click(invalidateButton)
+    invalidateButton.click()
     await screen.findByText("API-Key ist abgelaufen!")
     expect(
       screen.getByText("Neuen API-Schlüssel erstellen"),

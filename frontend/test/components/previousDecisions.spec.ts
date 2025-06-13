@@ -435,7 +435,7 @@ describe("PreviousDecisions", () => {
     await user.type(dateInput, "00.00.0231")
 
     await screen.findByText(/Kein valides Datum/)
-    await user.click(screen.getByLabelText("Vorgehende Entscheidung speichern"))
+    screen.getByLabelText("Vorgehende Entscheidung speichern").click()
     expect(dateInput).toBeVisible()
   })
 
@@ -451,7 +451,7 @@ describe("PreviousDecisions", () => {
     await user.tab()
 
     await screen.findByText(/Unvollständiges Datum/)
-    await user.click(screen.getByLabelText("Vorgehende Entscheidung speichern"))
+    screen.getByLabelText("Vorgehende Entscheidung speichern").click()
     expect(dateInput).toBeVisible()
   })
 
@@ -467,7 +467,7 @@ describe("PreviousDecisions", () => {
     await user.tab()
 
     await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
-    await user.click(screen.getByLabelText("Vorgehende Entscheidung speichern"))
+    screen.getByLabelText("Vorgehende Entscheidung speichern").click()
     expect(dateInput).toBeVisible()
   })
 })

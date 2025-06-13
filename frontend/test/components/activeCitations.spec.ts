@@ -495,7 +495,7 @@ describe("active citations", () => {
     await user.type(dateInput, "00.00.0231")
 
     await screen.findByText(/Kein valides Datum/)
-    await user.click(screen.getByLabelText("Aktivzitierung speichern"))
+    screen.getByLabelText("Aktivzitierung speichern").click()
     expect(dateInput).toBeVisible()
   })
 
@@ -511,7 +511,7 @@ describe("active citations", () => {
     await user.tab()
 
     await screen.findByText(/Unvollständiges Datum/)
-    await user.click(screen.getByLabelText("Aktivzitierung speichern"))
+    screen.getByLabelText("Aktivzitierung speichern").click()
     expect(dateInput).toBeVisible()
   })
 
@@ -527,7 +527,7 @@ describe("active citations", () => {
     await user.tab()
 
     await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
-    await user.click(screen.getByLabelText("Aktivzitierung speichern"))
+    screen.getByLabelText("Aktivzitierung speichern").click()
     expect(dateInput).toBeVisible()
   })
 

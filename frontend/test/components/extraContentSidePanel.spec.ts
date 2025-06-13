@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import { beforeAll, describe } from "vitest"
 import { createRouter, createWebHistory, Router } from "vue-router"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
@@ -211,18 +211,18 @@ describe("ExtraContentSidePanel", () => {
     expect(await screen.findByLabelText("Seitenpanel öffnen")).toBeVisible()
 
     // Opening side panel
-    await fireEvent.click(screen.getByLabelText("Seitenpanel öffnen"))
+    screen.getByLabelText("Seitenpanel öffnen").click()
     expect(await screen.findByLabelText("Seitenpanel schließen")).toBeVisible()
 
     // Closing side panel
-    await fireEvent.click(screen.getByLabelText("Seitenpanel schließen"))
+    screen.getByLabelText("Seitenpanel schließen").click()
     expect(await screen.findByLabelText("Seitenpanel öffnen")).toBeVisible()
   })
 
   describe("Select panel content", () => {
     test("initially open note without note and no attachments", async () => {
       renderComponent()
-      await fireEvent.click(screen.getByLabelText("Seitenpanel öffnen"))
+      screen.getByLabelText("Seitenpanel öffnen").click()
 
       expect(await screen.findByLabelText("Notiz Eingabefeld")).toBeVisible()
     })
@@ -263,9 +263,9 @@ describe("ExtraContentSidePanel", () => {
       })
 
       expect(await screen.findByText("foo.docx")).toBeVisible()
-      await fireEvent.click(screen.getByLabelText("Nächstes Dokument anzeigen"))
+      screen.getByLabelText("Nächstes Dokument anzeigen").click()
       expect(await screen.findByText("bar.docx")).toBeVisible()
-      await fireEvent.click(screen.getByLabelText("Nächstes Dokument anzeigen"))
+      screen.getByLabelText("Nächstes Dokument anzeigen").click()
       expect(await screen.findByText("foo.docx")).toBeVisible()
     })
 
@@ -276,20 +276,20 @@ describe("ExtraContentSidePanel", () => {
       })
 
       expect(await screen.findByDisplayValue("some note")).toBeVisible()
-      await fireEvent.click(screen.getByLabelText("Dokumente anzeigen"))
+      screen.getByLabelText("Dokumente anzeigen").click()
       expect(
         await screen.findByText(
           "Wenn eine Datei hochgeladen ist, können Sie die Datei hier sehen.",
         ),
       ).toBeVisible()
 
-      await fireEvent.click(screen.getByLabelText("Vorschau anzeigen"))
+      screen.getByLabelText("Vorschau anzeigen").click()
       expect(await screen.findByTestId("preview")).toBeVisible()
       expect(
         await screen.findByLabelText("Vorschau in neuem Tab öffnen"),
       ).toBeVisible()
 
-      await fireEvent.click(screen.getByLabelText("Notiz anzeigen"))
+      screen.getByLabelText("Notiz anzeigen").click()
       expect(await screen.findByDisplayValue("some note")).toBeVisible()
     })
 
@@ -321,7 +321,7 @@ describe("ExtraContentSidePanel", () => {
             hidePanelModeBar: true,
           })
 
-          await fireEvent.click(screen.getByLabelText("Seitenpanel öffnen"))
+          screen.getByLabelText("Seitenpanel öffnen").click()
 
           for (const contentType of expectedHidden) {
             expect(
