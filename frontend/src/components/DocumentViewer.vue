@@ -43,7 +43,7 @@ const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
 const documentUnit = computed<DocumentUnit | PendingProceeding | undefined>(
   () => {
-    if (props.kind === Kind.DOCUMENT_UNIT) {
+    if (props.kind === Kind.DOCUMENTION_UNIT) {
       return store.documentUnit as DocumentUnit
     } else if (props.kind === Kind.PENDING_PROCEEDING) {
       return store.documentUnit as PendingProceeding
@@ -58,7 +58,7 @@ const { pushQueryToRoute } = useQuery()
 
 const menuItems = computed<MenuItem[]>(() => {
   let itemsRef
-  if (props.kind === Kind.DOCUMENT_UNIT) {
+  if (props.kind === Kind.DOCUMENTION_UNIT) {
     itemsRef = useCaseLawMenuItems(props.documentNumber!, route.query)
   } else if (props.kind === Kind.PENDING_PROCEEDING) {
     itemsRef = usePendingProceedingMenuItems(props.documentNumber!, route.query)
@@ -124,14 +124,14 @@ const handleKeyDown = (event: KeyboardEvent) => {
       toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
       break
     case "n":
-      if (props.kind === Kind.DOCUMENT_UNIT) {
+      if (props.kind === Kind.DOCUMENTION_UNIT) {
         event.preventDefault()
         extraContentSidePanelStore.togglePanel(true)
         extraContentSidePanelStore.setSidePanelMode("note")
       }
       break
     case "d":
-      if (props.kind === Kind.DOCUMENT_UNIT) {
+      if (props.kind === Kind.DOCUMENTION_UNIT) {
         event.preventDefault()
         extraContentSidePanelStore.togglePanel(true)
         extraContentSidePanelStore.setSidePanelMode("attachments")
@@ -142,13 +142,13 @@ const handleKeyDown = (event: KeyboardEvent) => {
       extraContentSidePanelStore.setSidePanelMode("preview")
       break
     case "r":
-      if (props.kind === Kind.DOCUMENT_UNIT) {
+      if (props.kind === Kind.DOCUMENTION_UNIT) {
         extraContentSidePanelStore.togglePanel(true)
         extraContentSidePanelStore.setSidePanelMode("category-import")
       }
       break
     case "t":
-      if (!textCheck.value && props.kind === Kind.DOCUMENT_UNIT) break
+      if (!textCheck.value && props.kind === Kind.DOCUMENTION_UNIT) break
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("text-check")
       break

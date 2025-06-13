@@ -9,7 +9,7 @@ import PendingProceeding from "@/domain/pendingProceeding"
 export function isDocumentUnit(
   doc: DocumentUnit | PendingProceeding | undefined | null,
 ): doc is DocumentUnit {
-  return doc?.kind === Kind.DOCUMENT_UNIT
+  return doc?.kind === Kind.DOCUMENTION_UNIT
 }
 
 /**

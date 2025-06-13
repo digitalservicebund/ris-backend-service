@@ -22,7 +22,7 @@ function renderComponent(props?: Partial<CoreDataProps>) {
     "onUpdate:modelValue":
       props?.["onUpdate:modelValue"] ??
       ((val: CoreData | undefined) => (modelValue = val)),
-    kind: Kind.DOCUMENT_UNIT,
+    kind: Kind.DOCUMENTION_UNIT,
   }
 
   return { user, ...render(DocumentUnitCoreData, { props: effectiveProps }) }

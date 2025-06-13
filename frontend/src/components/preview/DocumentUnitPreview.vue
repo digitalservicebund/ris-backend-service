@@ -53,7 +53,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewCoreData
       :core-data="documentUnit.coreData"
       date-label="Entscheidungsdatum"
-      :kind="Kind.DOCUMENT_UNIT"
+      :kind="Kind.DOCUMENTION_UNIT"
     />
     <PreviewNote :note="documentUnit.note" />
     <PreviewCaselawReferences

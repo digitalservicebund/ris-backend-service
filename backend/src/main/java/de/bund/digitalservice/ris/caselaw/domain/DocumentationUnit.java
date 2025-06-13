@@ -53,6 +53,6 @@ public record DocumentationUnit(
 
   @Override
   public Kind kind() {
-    return Kind.DOCUMENT_UNIT;
+    return Kind.DOCUMENTION_UNIT;
   }
 }

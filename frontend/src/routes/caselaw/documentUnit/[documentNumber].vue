@@ -48,7 +48,10 @@ async function attachmentsUploaded(
 </script>
 
 <template>
-  <DocumentViewer :document-number="documentNumber" :kind="Kind.DOCUMENT_UNIT">
+  <DocumentViewer
+    :document-number="documentNumber"
+    :kind="Kind.DOCUMENTION_UNIT"
+  >
     <template
       #default="{
         registerTextEditorRef,

@@ -8,7 +8,7 @@ function renderComponent(coreData: CoreData, kind?: Kind) {
     props: {
       coreData: coreData,
       dateLabel: "Entscheidungsdatum",
-      kind: kind ?? Kind.DOCUMENT_UNIT,
+      kind: kind ?? Kind.DOCUMENTION_UNIT,
     },
     global: {
       provide: {

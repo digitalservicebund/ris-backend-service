@@ -11,7 +11,7 @@ import java.util.UUID;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = DocumentationUnit.class, name = "DOCUMENT_UNIT"),
+  @JsonSubTypes.Type(value = DocumentationUnit.class, name = "DOCUMENTION_UNIT"),
   @JsonSubTypes.Type(value = PendingProceeding.class, name = "PENDING_PROCEEDING")
 })
 public interface Documentable {
