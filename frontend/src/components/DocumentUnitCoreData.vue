@@ -2,7 +2,7 @@
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import InputSelect from "primevue/select"
-import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
@@ -22,11 +22,21 @@ const props = defineProps<{
   modelValue: CoreData
   kind: Kind
 }>()
-const emit = defineEmits<{
-  "update:modelValue": [value: CoreData]
-}>()
+
 const isPendingProceeding = props.kind === Kind.PENDING_PROCEEDING
-const { modelValue } = toRefs(props)
+const coreDataModel = defineModel<CoreData>({ required: true })
+
+watch(
+  () => coreDataModel.value.resolutionDate,
+  (newDate) => {
+    if (newDate && !coreDataModel.value.isResolved) {
+      coreDataModel.value.isResolved = true
+    } else if (!newDate && coreDataModel.value.isResolved) {
+      coreDataModel.value.isResolved = false
+    }
+  },
+  { deep: false },
+)
 const validationStore =
   useValidationStore<
     [
@@ -53,17 +63,17 @@ const layoutClass = computed(() =>
  * Our UI turns the chronological order of the list, so the latest previous procedure is first.
  */
 const descendingPreviousProcedures = computed(() =>
-  modelValue.value.previousProcedures
-    ? modelValue.value.previousProcedures.toReversed()
+  coreDataModel.value.previousProcedures
+    ? coreDataModel.value.previousProcedures.toReversed()
     : undefined,
 )
 
 const jurisdictionType = computed(() =>
-  modelValue.value.court ? modelValue.value.court.jurisdictionType : "",
+  coreDataModel.value.court ? coreDataModel.value.court.jurisdictionType : "",
 )
 
 const region = computed(() =>
-  modelValue.value.court ? modelValue.value.court.region : "",
+  coreDataModel.value.court ? coreDataModel.value.court.region : "",
 )
 
 const sourceItems: DropdownItem[] = [
@@ -90,27 +100,19 @@ const sourceItems: DropdownItem[] = [
 
 const source = computed({
   get: () =>
-    props.modelValue.source
-      ? (props.modelValue.source.value ??
-        props.modelValue.source?.sourceRawValue)
+    coreDataModel.value.source
+      ? (coreDataModel.value.source.value ??
+        coreDataModel.value.source?.sourceRawValue)
       : undefined,
   set: (newValue) => {
     if (Object.values(SourceValue).includes(newValue as SourceValue)) {
-      modelValue.value.source = {
-        ...modelValue.value.source,
+      coreDataModel.value.source = {
+        ...coreDataModel.value.source,
         value: newValue as SourceValue,
       }
     }
   },
 })
-
-watch(
-  modelValue,
-  () => {
-    emit("update:modelValue", modelValue.value)
-  },
-  { deep: true },
-)
 
 onMounted(() => {
   if (!parentRef.value) return
@@ -134,12 +136,12 @@ onBeforeUnmount(() => {
     <NestedComponent
       aria-label="Fehlerhaftes Gericht"
       class="w-full"
-      :is-open="!!modelValue.deviatingCourts?.length"
+      :is-open="!!coreDataModel.deviatingCourts?.length"
     >
       <InputField id="court" v-slot="slotProps" label="Gericht *">
         <ComboboxInput
           id="court"
-          v-model="modelValue.court"
+          v-model="coreDataModel.court"
           aria-label="Gericht"
           clear-on-choosing-item
           :has-error="slotProps.hasError"
@@ -151,7 +153,7 @@ onBeforeUnmount(() => {
         <InputField id="deviatingCourt" label="Fehlerhaftes Gericht">
           <ChipsInput
             id="deviatingCourt"
-            v-model="modelValue.deviatingCourts"
+            v-model="coreDataModel.deviatingCourts"
             aria-label="Fehlerhaftes Gericht"
           ></ChipsInput>
         </InputField>
@@ -162,12 +164,12 @@ onBeforeUnmount(() => {
       <NestedComponent
         aria-label="Abweichendes Aktenzeichen"
         class="w-full min-w-0"
-        :is-open="!!modelValue.deviatingFileNumbers?.length"
+        :is-open="!!coreDataModel.deviatingFileNumbers?.length"
       >
         <InputField id="fileNumber" label="Aktenzeichen *">
           <ChipsInput
             id="fileNumber"
-            v-model="modelValue.fileNumbers"
+            v-model="coreDataModel.fileNumbers"
             aria-label="Aktenzeichen"
           ></ChipsInput>
         </InputField>
@@ -179,7 +181,7 @@ onBeforeUnmount(() => {
           >
             <ChipsInput
               id="deviatingFileNumber"
-              v-model="modelValue.deviatingFileNumbers"
+              v-model="coreDataModel.deviatingFileNumbers"
               aria-label="Abweichendes Aktenzeichen"
             ></ChipsInput>
           </InputField>
@@ -188,7 +190,7 @@ onBeforeUnmount(() => {
       <NestedComponent
         aria-label="Abweichendes Entscheidungsdatum"
         class="w-full"
-        :is-open="!!modelValue.deviatingDecisionDates?.length"
+        :is-open="!!coreDataModel.deviatingDecisionDates?.length"
       >
         <InputField
           id="decisionDate"
@@ -200,7 +202,7 @@ onBeforeUnmount(() => {
         >
           <DateInput
             id="decisionDate"
-            v-model="modelValue.decisionDate"
+            v-model="coreDataModel.decisionDate"
             aria-label="Entscheidungsdatum"
             :has-error="slotProps.hasError"
             @focus="validationStore.remove('decisionDate')"
@@ -219,7 +221,7 @@ onBeforeUnmount(() => {
           >
             <ChipsDateInput
               id="deviatingDecisionDates"
-              v-model="modelValue.deviatingDecisionDates"
+              v-model="coreDataModel.deviatingDecisionDates"
               aria-label="Abweichendes Entscheidungsdatum"
               :has-error="slotProps.hasError"
               @focus="validationStore.remove('deviatingDecisionDates')"
@@ -238,7 +240,7 @@ onBeforeUnmount(() => {
       >
         <InputText
           id="appraisalBody"
-          v-model="modelValue.appraisalBody"
+          v-model="coreDataModel.appraisalBody"
           aria-label="Spruchkörper"
           fluid
           :invalid="slotProps.hasError"
@@ -254,7 +256,7 @@ onBeforeUnmount(() => {
       >
         <DateInput
           id="resolutionDate"
-          v-model="modelValue.resolutionDate"
+          v-model="coreDataModel.resolutionDate"
           :aria-label="pendingProceedingLabels.resolutionDate"
           :has-error="slotProps.hasError"
           @update:validation-error="slotProps.updateValidationError"
@@ -269,7 +271,7 @@ onBeforeUnmount(() => {
       >
         <ComboboxInput
           id="documentType"
-          v-model="modelValue.documentType"
+          v-model="coreDataModel.documentType"
           aria-label="Dokumenttyp"
           :item-service="ComboboxItemService.getDocumentTypes"
         ></ComboboxInput>
@@ -280,12 +282,12 @@ onBeforeUnmount(() => {
       <NestedComponent
         aria-label="Abweichender ECLI"
         class="w-full"
-        :is-open="!!modelValue.deviatingEclis?.length"
+        :is-open="!!coreDataModel.deviatingEclis?.length"
       >
         <InputField id="ecli" class="flex-col" label="ECLI">
           <InputText
             id="ecli"
-            v-model="modelValue.ecli"
+            v-model="coreDataModel.ecli"
             aria-label="ECLI"
             fluid
             size="small"
@@ -296,7 +298,7 @@ onBeforeUnmount(() => {
           <InputField id="deviatingEclis" label="Abweichender ECLI">
             <ChipsInput
               id="deviatingEclis"
-              v-model="modelValue.deviatingEclis"
+              v-model="coreDataModel.deviatingEclis"
               aria-label="Abweichender ECLI"
             ></ChipsInput>
           </InputField>
@@ -311,7 +313,7 @@ onBeforeUnmount(() => {
         <InputField id="procedure" class="flex-col" label="Vorgang">
           <ComboboxInput
             id="procedure"
-            v-model="modelValue.procedure"
+            v-model="coreDataModel.procedure"
             aria-label="Vorgang"
             :item-service="ComboboxItemService.getProcedures"
             manual-entry
@@ -336,7 +338,7 @@ onBeforeUnmount(() => {
       <InputField id="legalEffect" v-slot="{ id }" label="Rechtskraft *">
         <InputSelect
           :id="id"
-          v-model="modelValue.legalEffect"
+          v-model="coreDataModel.legalEffect"
           aria-label="Rechtskraft"
           fluid
           option-label="label"
@@ -354,7 +356,7 @@ onBeforeUnmount(() => {
       >
         <ChipsYearInput
           id="yearOfDispute"
-          v-model="modelValue.yearsOfDispute"
+          v-model="coreDataModel.yearsOfDispute"
           aria-label="Streitjahr"
           data-testid="year-of-dispute"
           :has-error="slotProps.hasError"
@@ -420,7 +422,7 @@ onBeforeUnmount(() => {
       :label-position="LabelPosition.RIGHT"
     >
       <Checkbox
-        v-model="modelValue.isResolved"
+        v-model="coreDataModel.isResolved"
         :aria-label="pendingProceedingLabels.isResolved"
         binary
         data-testid="is-resolved"
@@ -430,7 +432,7 @@ onBeforeUnmount(() => {
     </InputField>
 
     <div
-      v-if="modelValue.court?.label === 'BGH' && !isPendingProceeding"
+      v-if="coreDataModel.court?.label === 'BGH' && !isPendingProceeding"
       class="flex flex-row gap-24"
     >
       <InputField
@@ -439,7 +441,7 @@ onBeforeUnmount(() => {
       >
         <ChipsInput
           id="leadingDecisionNormReferences"
-          v-model="modelValue.leadingDecisionNormReferences"
+          v-model="coreDataModel.leadingDecisionNormReferences"
           aria-label="BGH Nachschlagewerk"
         ></ChipsInput>
       </InputField>
