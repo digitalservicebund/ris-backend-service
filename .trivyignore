@@ -1,1 +1,4 @@
-
+// Reason: CVE-2025-22874 affects crypto/x509 in Go stdlib.
+// Spring Cloud Kubernetes is already at latest version (3.3.0), waiting for upstream fix.
+// Our application does not utilize certificate chains with policy graphs that would trigger this vulnerability.
+CVE-2025-22874
