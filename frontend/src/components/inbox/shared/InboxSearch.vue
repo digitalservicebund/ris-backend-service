@@ -9,6 +9,10 @@ import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
 
+const props = defineProps<{
+  isLoading?: boolean
+}>()
+
 const emit = defineEmits<{
   search: [value: Query<DocumentUnitSearchParameter>]
   resetSearchResults: [void]
@@ -279,10 +283,12 @@ watch(
 
       <div class="flex flex-row [grid-area:search-button]">
         <div class="flex flex-col gap-8">
+          <!-- ":loading" disables button while request is running. Needed as long as we cannot cancel requests -->
           <Button
             aria-label="Nach Dokumentationseinheiten suchen"
             class="self-start"
             label="Ergebnisse anzeigen"
+            :loading="props.isLoading"
             size="small"
             @click="handleSearchButtonClicked"
           ></Button>

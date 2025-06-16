@@ -362,8 +362,7 @@ test.describe("inbox", () => {
     },
   )
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip(
+  test(
     "EU-Rechtsprechungsdokumente können im Eingang eingesehen und weiterverarbeitet werden",
     { tag: ["@RISDEV-7375"] },
     async ({ page }) => {
@@ -375,23 +374,6 @@ test.describe("inbox", () => {
         await expect(tab).toBeVisible()
         await tab.click()
         await expect(page.getByTestId("inbox-list")).toBeVisible()
-      })
-
-      await test.step("shows all eu documentation units for docoffice", async () => {
-        const rows = page.locator("tr")
-        const row = rows.filter({ hasText: documentNumber })
-        await expect(row).toHaveCount(1)
-
-        // Icons
-        await expect(
-          row.locator('[data-testid="file-attached-icon"]'),
-        ).toBeVisible()
-        await expect(row.getByTestId("headnote-principle-icon")).toBeVisible()
-        await expect(row.getByTestId("note-icon")).toBeVisible()
-
-        await expect(row).toContainText("BVerwG") // Gerichtstyp
-        await expect(row).toContainText("09.09.1987") // Datum
-        await expect(row).toContainText("fileNumber4") // Aktenzeichen
       })
 
       await test.step("user can filter eu documentation units", async () => {
@@ -433,6 +415,45 @@ test.describe("inbox", () => {
         await expect(page.locator("tr")).toHaveCount(2)
       })
 
+      await test.step("doc unit row data is displayed", async () => {
+        const rows = page.locator("tr")
+        const row = rows.filter({ hasText: documentNumber })
+        await expect(row).toHaveCount(1)
+
+        // Icons
+        await expect(
+          row.locator('[data-testid="file-attached-icon"]'),
+        ).toBeVisible()
+        await expect(row.getByTestId("headnote-principle-icon")).toBeVisible()
+        await expect(row.getByTestId("note-icon")).toBeVisible()
+
+        await expect(row).toContainText("BVerwG") // Gerichtstyp
+        await expect(row).toContainText("09.09.1987") // Datum
+        await expect(row).toContainText("fileNumber4") // Aktenzeichen
+      })
+
+      await test.step("eu documentation units can be edited and deleted", async () => {
+        const pagePromise = page.context().waitForEvent("page")
+        const rows = page.locator("tr")
+        const row = rows.filter({ hasText: documentNumber })
+        const editButton = row.getByRole("button", {
+          name: "Dokumentationseinheit bearbeiten",
+        })
+
+        await editButton.click()
+
+        const newTab = await pagePromise
+
+        await expect(newTab).toHaveURL(
+          /\/caselaw\/documentunit\/[A-Za-z0-9]{13}\/categories$/,
+        )
+
+        await row
+          .getByRole("button", { name: "Dokumentationseinheit löschen" })
+          .click()
+        await page.getByRole("button", { name: "Abbrechen" }).click()
+      })
+
       await test.step("switching tabs, resets the search form", async () => {
         // Wait for queries in url to be resetted
         await page.waitForFunction(() => {
@@ -465,29 +486,6 @@ test.describe("inbox", () => {
             .getByTestId("decision-date-input")
             .getByLabel("Entscheidungsdatum Suche"),
         ).toHaveValue("")
-      })
-
-      await test.step("eu documentation units can be edited and deleted", async () => {
-        const pagePromise = page.context().waitForEvent("page")
-        const rows = page.locator("tr")
-        const row = rows.filter({ hasText: documentNumber })
-        const editButton = row.getByRole("button", {
-          name: "Dokumentationseinheit bearbeiten",
-        })
-
-        await editButton.click()
-
-        const newTab = await pagePromise
-
-        await expect(newTab).toHaveURL(
-          /\/caselaw\/documentunit\/[A-Za-z0-9]{13}\/categories$/,
-        )
-
-        await row
-          .getByRole("button", {
-            name: "Dokumentationseinheit löschen",
-          })
-          .click()
       })
     },
   )
