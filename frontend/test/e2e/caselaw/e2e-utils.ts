@@ -70,22 +70,25 @@ export const navigateToCategories = async (
   options?: {
     category?: DocumentUnitCategoriesEnum
     skipAssert?: boolean
+    type?: "pending-proceeding" | "documentunit"
   },
 ) => {
   await test.step("Navigate to 'Rubriken'", async () => {
+    const documentType = options?.type ?? "documentunit"
     const queryParams = getAllQueryParamsFromUrl(page)
     const baseUrl =
-      `/caselaw/documentunit/${documentNumber}/categories${queryParams}` +
+      `/caselaw/${documentType}/${documentNumber}/categories${queryParams}` +
       scrollToID(options?.category)
 
     await page.goto(baseUrl)
 
     if (options?.skipAssert) return
 
-    await expect(page.getByText("Entscheidungsname")).toBeVisible({
+    await expect(
+      page.getByRole("heading", { name: documentNumber }),
+    ).toBeVisible({
       timeout: 15000, // for backend warm up
     })
-    await expect(page.getByText(documentNumber)).toBeVisible()
   })
 }
 
