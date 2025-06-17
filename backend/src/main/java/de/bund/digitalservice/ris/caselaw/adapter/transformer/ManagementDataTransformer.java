@@ -47,28 +47,33 @@ public class ManagementDataTransformer {
    * @param user the currently authenticated user, can be {@code null}
    * @return a {@link ManagementData} domain object built from the input DTO
    */
-  public static ManagementData transformToDomain(DecisionDTO decisionDTO, @Nullable User user) {
-    List<String> borderNumbers =
-        extractBorderNumbers(
-            decisionDTO.getTenor(),
-            decisionDTO.getGrounds(),
-            decisionDTO.getCaseFacts(),
-            decisionDTO.getDecisionGrounds(),
-            decisionDTO.getOtherLongText(),
-            decisionDTO.getDissentingOpinion());
+  public static ManagementData transformToDomain(
+      DocumentationUnitDTO documentationUnitDTO, @Nullable User user) {
+
+    List<String> borderNumbers = new ArrayList<>();
+    if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
+      borderNumbers =
+          extractBorderNumbers(
+              decisionDTO.getTenor(),
+              decisionDTO.getGrounds(),
+              decisionDTO.getCaseFacts(),
+              decisionDTO.getDecisionGrounds(),
+              decisionDTO.getOtherLongText(),
+              decisionDTO.getDissentingOpinion());
+    }
 
     DocumentationOffice userDocumentationOffice =
         Optional.ofNullable(user).map(User::documentationOffice).orElse(null);
 
     Optional<ManagementDataDTO> managementDataOptional =
-        Optional.ofNullable(decisionDTO.getManagementData());
+        Optional.ofNullable(documentationUnitDTO.getManagementData());
 
     return ManagementData.builder()
-        .lastPublicationDateTime(decisionDTO.getLastPublicationDateTime())
-        .scheduledPublicationDateTime(decisionDTO.getScheduledPublicationDateTime())
-        .scheduledByEmail(decisionDTO.getScheduledByEmail())
+        .lastPublicationDateTime(documentationUnitDTO.getLastPublicationDateTime())
+        .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
+        .scheduledByEmail(documentationUnitDTO.getScheduledByEmail())
         .borderNumbers(borderNumbers)
-        .duplicateRelations(transformDuplicateRelations(decisionDTO))
+        .duplicateRelations(transformDuplicateRelations(documentationUnitDTO))
         .lastUpdatedAtDateTime(
             managementDataOptional.map(ManagementDataDTO::getLastUpdatedAtDateTime).orElse(null))
         .lastUpdatedByName(

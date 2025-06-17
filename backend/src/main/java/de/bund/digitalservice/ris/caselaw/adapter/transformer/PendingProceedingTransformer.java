@@ -7,8 +7,10 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -95,6 +97,10 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
     return DocumentableTransformer.postProcessRelationships(result, currentDto);
   }
 
+  public static PendingProceeding transformToDomain(PendingProceedingDTO pendingProceedingDTO) {
+    return transformToDomain(pendingProceedingDTO, null);
+  }
+
   /**
    * Transforms a pending proceeding object from its database representation into a domain object
    * that is suitable to be consumed by clients of the REST service.
@@ -102,7 +108,8 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
    * @param pendingProceedingDTO the database pending proceeding object
    * @return a transformed domain object, or an empty domain object if the input is null
    */
-  public static PendingProceeding transformToDomain(PendingProceedingDTO pendingProceedingDTO) {
+  public static PendingProceeding transformToDomain(
+      PendingProceedingDTO pendingProceedingDTO, @Nullable User user) {
     if (pendingProceedingDTO == null) {
       throw new DocumentationUnitTransformerException(
           "Pending proceeding is null and won't transform");
@@ -125,6 +132,7 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
                 .appellant(pendingProceedingDTO.getAppellant())
                 .build())
         .contentRelatedIndexing(buildContentRelatedIndexing(pendingProceedingDTO))
+        .managementData(ManagementDataTransformer.transformToDomain(pendingProceedingDTO, user))
         .caselawReferences(
             pendingProceedingDTO.getCaselawReferences() == null
                 ? new ArrayList<>()
