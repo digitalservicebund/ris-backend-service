@@ -4418,7 +4418,7 @@ class PatchUpdateIntegrationTest {
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
                 assertThat(responsePatch.patch().getOperations())
-                    .hasSize(0); // because no management data in dto object yet
+                    .isEmpty(); // because no management data in dto object yet
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 

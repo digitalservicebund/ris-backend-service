@@ -13,7 +13,7 @@ import { NormAbbreviation } from "@/domain/normAbbreviation"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { Procedure } from "@/domain/procedure"
 import { SelectablePanelContent } from "@/types/panelContentMode"
-import { Match } from "@/types/textCheck"
+import { Match } from "@/types/textCheck" // NOSONAR // This import causes circularity, but only in type files
 
 export enum InputType {
   TEXT = "text",
