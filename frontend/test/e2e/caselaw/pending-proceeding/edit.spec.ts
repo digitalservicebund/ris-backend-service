@@ -105,7 +105,7 @@ test.describe("edit pending proceeding", () => {
       })
 
       // Rechtsfrage
-      await test.step("user can edit legal issue, is prefilled by court", async () => {
+      await test.step("user can edit legal issue", async () => {
         const headline = page.locator("#legalIssue")
         await expect(
           headline.getByText("Unveröffentlichtes anhängiges Verfahren"),

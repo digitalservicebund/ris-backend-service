@@ -19,7 +19,6 @@ import { pendingProceedingLabels } from "@/domain/pendingProceeding"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 const props = defineProps<{
-  modelValue: CoreData
   kind: Kind
 }>()
 
@@ -31,8 +30,6 @@ watch(
   (newDate) => {
     if (newDate && !coreDataModel.value.isResolved) {
       coreDataModel.value.isResolved = true
-    } else if (!newDate && coreDataModel.value.isResolved) {
-      coreDataModel.value.isResolved = false
     }
   },
   { deep: false },

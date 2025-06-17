@@ -1,9 +1,9 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue" // Import fireEvent for select dropdown
+import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
-import { ref } from "vue" // Import ref and Ref type
+import { ref } from "vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnit, {
   CoreData,
