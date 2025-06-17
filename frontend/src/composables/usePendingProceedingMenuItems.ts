@@ -60,5 +60,16 @@ export function usePendingProceedingMenuItems(
         },
       ],
     },
+    ...(isInternalUser.value
+      ? [
+          {
+            label: "Fundstellen",
+            route: {
+              ...baseRoute,
+              name: "caselaw-pending-proceeding-documentNumber-references",
+            },
+          },
+        ]
+      : []),
   ])
 }
