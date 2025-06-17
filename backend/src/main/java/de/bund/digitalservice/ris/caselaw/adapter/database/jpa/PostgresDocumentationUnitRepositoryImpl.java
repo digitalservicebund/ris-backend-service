@@ -297,30 +297,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return;
     }
 
-    // ---
     // Doing database-related (pre) transformation
-
     if (documentable.coreData() != null) {
-      documentationUnitDTO.getRegions().clear();
-      if (documentable.coreData().court() != null && documentable.coreData().court().id() != null) {
-        Optional<CourtDTO> court =
-            databaseCourtRepository.findById(documentable.coreData().court().id());
-        if (court.isPresent() && court.get().getRegion() != null) {
-          documentationUnitDTO.getRegions().add(court.get().getRegion());
-        }
-        // delete leading decision norm references if court is not BGH
-        if (documentable instanceof DocumentationUnit documentationUnit
-            && court.isPresent()
-            && !court.get().getType().equals("BGH")) {
-          documentable =
-              documentationUnit.toBuilder()
-                  .coreData(
-                      documentationUnit.coreData().toBuilder()
-                          .leadingDecisionNormReferences(List.of())
-                          .build())
-                  .build();
-        }
-      }
+      documentable = processCoreData(documentable, documentationUnitDTO);
     }
 
     setLastUpdated(currentUser, documentationUnitDTO);
@@ -342,6 +321,31 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               pendingProceedingDTO, (PendingProceeding) documentable);
       repository.save(documentationUnitDTO);
     }
+  }
+
+  private Documentable processCoreData(
+      Documentable documentable, DocumentationUnitDTO documentationUnitDTO) {
+    documentationUnitDTO.getRegions().clear();
+    if (documentable.coreData().court() != null && documentable.coreData().court().id() != null) {
+      Optional<CourtDTO> court =
+          databaseCourtRepository.findById(documentable.coreData().court().id());
+      if (court.isPresent() && court.get().getRegion() != null) {
+        documentationUnitDTO.getRegions().add(court.get().getRegion());
+      }
+      // delete leading decision norm references if court is not BGH
+      if (documentable instanceof DocumentationUnit documentationUnit
+          && court.isPresent()
+          && !court.get().getType().equals("BGH")) {
+        documentable =
+            documentationUnit.toBuilder()
+                .coreData(
+                    documentationUnit.coreData().toBuilder()
+                        .leadingDecisionNormReferences(List.of())
+                        .build())
+                .build();
+      }
+    }
+    return documentable;
   }
 
   private void setLastUpdated(User currentUser, DocumentationUnitDTO docUnitDTO) {
