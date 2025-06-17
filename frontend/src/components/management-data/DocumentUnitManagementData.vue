@@ -13,7 +13,7 @@ import ManagementDataMetadata from "@/components/management-data/ManagementDataM
 import TitleElement from "@/components/TitleElement.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentationUnitHistoryLog } from "@/domain/documentationUnitHistoryLog"
-import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnit, { Kind } from "@/domain/documentUnit"
 import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
 import DocumentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
@@ -37,6 +37,9 @@ onBeforeMount(async () => {
 const historyLogs = ref<DocumentationUnitHistoryLog[]>()
 const historyLogResponseError = ref<ResponseError>()
 const assignDocOfficeResponseError = ref<ResponseError>()
+const isPendingProceeding = computed(
+  () => (documentUnit.value?.kind as Kind) === Kind.PENDING_PROCEEDING,
+)
 
 const isLoading = ref(true)
 const selectedDocumentationOffice = ref<DocumentationOffice | undefined>()
@@ -104,7 +107,7 @@ const assignDocumentationOffice = async () => {
         :error="historyLogResponseError"
         :loading="isLoading"
       />
-      <dl>
+      <dl v-if="!isPendingProceeding">
         <div class="flex gap-24 px-0 py-16">
           <dt class="ris-body1-bold shrink-0 grow-0 basis-160">
             Dublettenverdacht
@@ -133,7 +136,7 @@ const assignDocumentationOffice = async () => {
           :title="assignDocOfficeResponseError.title"
         />
       </div>
-      <dl>
+      <dl v-if="!isPendingProceeding">
         <div class="flex gap-24">
           <dt
             class="ris-body1-bold min-w-160"
