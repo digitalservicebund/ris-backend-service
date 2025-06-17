@@ -5,13 +5,11 @@ import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
-import { useInjectCourtType } from "@/composables/useCourtType"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import laborCourtTypes from "@/data/laborCourtTypes.json"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
-const courtTypeRef = useInjectCourtType()
 
 const contentRelatedIndexing = computed({
   get: () => store.documentUnit!.contentRelatedIndexing,
@@ -43,13 +41,16 @@ const hasLegislativeMandate = computed(() => {
 
 const shouldDisplayLegislativeMandateCategory = computed(() => {
   return (
-    constitutionalCourtTypes.items.includes(courtTypeRef.value) ||
-    hasLegislativeMandate.value
+    constitutionalCourtTypes.items.includes(
+      store.documentUnit?.coreData.court?.type ?? "",
+    ) || hasLegislativeMandate.value
   )
 })
 
 const isLaborCourt = computed(() =>
-  laborCourtTypes.items.includes(courtTypeRef.value),
+  laborCourtTypes.items.includes(
+    store.documentUnit?.coreData.court?.type ?? "",
+  ),
 )
 
 const shouldDisplayDismissalAttributes = computed(

@@ -12,10 +12,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreeme
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
@@ -29,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
@@ -54,10 +57,12 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -820,6 +825,129 @@ class DecisionTransformerTest {
     assertThat(decisionDTO.getSource().getLast().getValue()).isEqualTo(SourceValue.Z);
     assertThat(decisionDTO.getSource().getLast().getSourceRawValue()).isEqualTo("z");
     assertThat(decisionDTO.getSource().getLast().getReference()).isEqualTo(reference);
+  }
+
+  @Test
+  void testTransformToDomain_shouldTransformAllCoreDataRelevantForDecision() {
+    // Arrange
+    UUID decisionId = UUID.randomUUID();
+    UUID documentTypeId = UUID.randomUUID();
+    UUID courtId = UUID.randomUUID();
+    UUID docOfficeId = UUID.randomUUID();
+    UUID creatingDocOfficeId = UUID.randomUUID();
+    UUID procedureId = UUID.randomUUID();
+    String documentNumber = "DOCNUMBER1234";
+
+    LocalDate decisionDate = LocalDate.of(2024, 5, 10);
+    LocalDate deviatingDecisionDate = LocalDate.of(2024, 5, 10);
+    String celexNumber = "CELEX-XYZ";
+    String ecli = "ECLI:DE:BVerfG:2024:051024u100124";
+    String deviatingEcli = "ECLI:DE:BVerfG:2024:051024u100125";
+    String judicialBody = "Bundesverfassungsgericht";
+    String fileNumber = "AZ-456";
+    String deviatingFileNumber = "1B23/24";
+    String courtLabel = "LG Berlin";
+
+    DecisionDTO decisionDTO =
+        DecisionDTO.builder()
+            // --- fields from DocumentationUnitDTO parent (for builder) ---
+            .id(decisionId)
+            .documentNumber(documentNumber)
+            .version(1L)
+            .date(decisionDate)
+            .documentType(DocumentTypeDTO.builder().id(documentTypeId).abbreviation("Urt").build())
+            .court(CourtDTO.builder().id(courtId).type("BVerfG").build())
+            .celexNumber(celexNumber)
+            .judicialBody(judicialBody) // Mapped to coreData.appraisalBody
+            .fileNumbers(
+                List.of(
+                    de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO.builder()
+                        .rank(0L)
+                        .value(fileNumber)
+                        .build()))
+            .deviatingFileNumbers(
+                List.of(
+                    DeviatingFileNumberDTO.builder().rank(0L).value(deviatingFileNumber).build()))
+            .deviatingDates(
+                List.of(DeviatingDateDTO.builder().rank(0L).value(deviatingDecisionDate).build()))
+            .deviatingCourts(
+                List.of(
+                    de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO
+                        .builder()
+                        .rank(0L)
+                        .value(courtLabel)
+                        .build()))
+            .documentationOffice(
+                DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation("DS").build())
+
+            // --- Fields specifically from DecisionDTO that contribute to CoreData ---
+            .procedure(ProcedureDTO.builder().id(procedureId).label("Vorgang").build())
+            .ecli(ecli)
+            .source(
+                List.of(
+                    SourceDTO.builder().rank(1).value(SourceValue.E).sourceRawValue("E").build()))
+            .legalEffect(LegalEffectDTO.JA)
+            .inputTypes(List.of(InputTypeDTO.builder().rank(1L).value("Email").build()))
+            .leadingDecisionNormReferences(
+                List.of(
+                    LeadingDecisionNormReferenceDTO.builder()
+                        .rank(0)
+                        .normReference("NormAbk")
+                        .build()))
+            .yearsOfDispute(Set.of(YearOfDisputeDTO.builder().value("2022").rank(0).build()))
+            .deviatingEclis(
+                List.of(DeviatingEcliDTO.builder().value(deviatingEcli).rank(1L).build()))
+            .creatingDocumentationOffice(
+                DocumentationOfficeDTO.builder()
+                    .id(creatingDocOfficeId)
+                    .abbreviation("BGH")
+                    .build())
+            .build();
+
+    // Act
+    DocumentationUnit domainObject = DecisionTransformer.transformToDomain(decisionDTO);
+
+    // Assert general DocumentationUnit fields
+    assertThat(domainObject).isNotNull();
+    assertThat(domainObject.uuid()).isEqualTo(decisionId);
+    assertThat(domainObject.documentNumber()).isEqualTo(documentNumber);
+    assertThat(domainObject.version()).isEqualTo(1L);
+
+    // Assert CoreData object itself
+    CoreData coreData = domainObject.coreData();
+    assertThat(coreData).isNotNull();
+
+    // --- Assert mutual CoreData fields that are transformed from DocumentableTransformer ---
+    assertThat(coreData.celexNumber()).isEqualTo(celexNumber);
+    assertThat(coreData.appraisalBody()).isEqualTo(judicialBody);
+    assertThat(coreData.decisionDate()).isEqualTo(decisionDate);
+    assertThat(coreData.documentType().jurisShortcut()).isEqualTo("Urt");
+    assertThat(coreData.court().label()).isEqualTo("BVerfG");
+    assertThat(coreData.fileNumbers().getFirst()).isEqualTo(fileNumber);
+    assertThat(coreData.deviatingFileNumbers().getFirst()).isEqualTo(deviatingFileNumber);
+    assertThat(coreData.deviatingCourts().getFirst()).isEqualTo(courtLabel);
+    assertThat(coreData.deviatingDecisionDates().getFirst()).isEqualTo(deviatingDecisionDate);
+    assertThat(coreData.documentationOffice()).isNotNull();
+    assertThat(coreData.documentationOffice().id()).isEqualTo(docOfficeId);
+    assertThat(coreData.documentationOffice().abbreviation()).isEqualTo("DS");
+
+    // --- Assert CoreData fields that are transformed from DecisionTransformer ---
+    assertThat(coreData.ecli()).isEqualTo(ecli);
+    assertThat(coreData.source()).isNotNull();
+    assertThat(coreData.source().value()).isEqualTo(SourceValue.E);
+    assertThat(coreData.source().sourceRawValue()).isEqualTo("E");
+    assertThat(coreData.source().reference()).isNull();
+    assertThat(coreData.legalEffect()).isEqualTo("Ja");
+    assertThat(coreData.inputTypes()).containsExactly("Email");
+    assertThat(coreData.leadingDecisionNormReferences()).containsExactly("NormAbk");
+    assertThat(coreData.yearsOfDispute()).containsExactly(Year.of(2022));
+    assertThat(coreData.deviatingEclis()).containsExactly(deviatingEcli);
+    assertThat(coreData.procedure()).isNotNull();
+    assertThat(coreData.procedure().id()).isEqualTo(procedureId);
+    assertThat(coreData.procedure().label()).isEqualTo("Vorgang");
+    assertThat(coreData.creatingDocOffice()).isNotNull();
+    assertThat(coreData.creatingDocOffice().id()).isEqualTo(creatingDocOfficeId);
+    assertThat(coreData.creatingDocOffice().abbreviation()).isEqualTo("BGH");
   }
 
   @Test

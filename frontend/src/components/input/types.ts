@@ -1,16 +1,19 @@
 import { UseFetchReturn } from "@vueuse/core"
-import { Ref } from "vue"
+import { Component, Ref } from "vue"
 import { LabelPosition } from "@/components/input/InputField.vue"
 import { CitationType } from "@/domain/citationType"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
-import { Court } from "@/domain/documentUnit"
+import DocumentUnit, { Court } from "@/domain/documentUnit"
 
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
+import PendingProceeding from "@/domain/pendingProceeding"
 import { Procedure } from "@/domain/procedure"
+import { SelectablePanelContent } from "@/types/panelContentMode"
+import { Match } from "@/types/textCheck"
 
 export enum InputType {
   TEXT = "text",
@@ -224,4 +227,15 @@ export type ValidationError = {
   code?: string
   message: string
   instance: string
+}
+
+export type ExtraContentSidePanelProps = {
+  documentUnit?: DocumentUnit | PendingProceeding
+  showEditButton?: boolean
+  hidePanelModeBar?: boolean
+  hidePreviewInNewTab?: boolean
+  sidePanelMode?: SelectablePanelContent
+  sidePanelShortcut?: string
+  icon?: Component
+  jumpToMatch?: (match: Match) => void
 }

@@ -15,8 +15,18 @@ const routes = [
     component: {},
   },
   {
+    path: "/caselaw/pendingProceeding/:documentNumber/categories",
+    name: "caselaw-pending-proceeding-documentNumber-categories",
+    component: {},
+  },
+  {
     path: "/caselaw/documentUnit/:documentNumber/preview",
     name: "caselaw-documentUnit-documentNumber-preview",
+    component: {},
+  },
+  {
+    path: "/caselaw/pendingProceeding/:documentNumber/preview",
+    name: "caselaw-pending-proceeding-documentNumber-preview",
     component: {},
   },
   {

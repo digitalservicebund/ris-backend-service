@@ -30,4 +30,6 @@ public record CoreData(
     DocumentationOffice creatingDocOffice,
     @UniqueElements List<String> leadingDecisionNormReferences,
     List<@PastOrPresent Year> yearsOfDispute,
+    boolean isResolved,
+    @PastOrPresent LocalDate resolutionDate,
     Source source) {}

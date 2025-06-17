@@ -49,4 +49,10 @@ public record DocumentationUnit(
     InboxStatus inboxStatus,
     boolean isEditable,
     boolean isDeletable)
-    implements Documentable {}
+    implements Documentable {
+
+  @Override
+  public Kind kind() {
+    return Kind.DOCUMENTION_UNIT;
+  }
+}

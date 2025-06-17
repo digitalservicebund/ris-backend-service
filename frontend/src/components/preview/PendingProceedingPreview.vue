@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
-import { provide } from "vue"
+import { storeToRefs } from "pinia"
+import { provide, Ref } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
-import ErrorPage from "@/components/PageError.vue"
 import {
   PreviewLayout,
   previewLayoutInjectionKey,
@@ -17,26 +17,20 @@ import PreviewLiteratureReferences from "@/components/preview/PreviewLiteratureR
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
-import PendingProceeding from "@/domain/pendingProceeding"
+import { Kind } from "@/domain/documentUnit"
+import PendingProceeding, {
+  pendingProceedingLabels,
+} from "@/domain/pendingProceeding"
 import Reference from "@/domain/reference"
-import documentUnitService from "@/services/documentUnitService"
-import { ServiceResponse } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
   layout?: PreviewLayout
   documentNumber: string
 }>()
 
-const pendingProceedingResponse = await loadPendingProceeding(
-  props.documentNumber,
-)
-
-async function loadPendingProceeding(
-  documentNumber: string,
-): Promise<ServiceResponse<PendingProceeding>> {
-  return await documentUnitService.getPendingProceedingByDocumentNumber(
-    documentNumber,
-  )
+const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
+  documentUnit: Ref<PendingProceeding | undefined>
 }
 
 provide(previewLayoutInjectionKey, props.layout || "wide")
@@ -44,94 +38,80 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
 
 <template>
   <FlexContainer
-    v-if="pendingProceedingResponse.data"
+    v-if="documentUnit"
     class="max-w-screen-xl"
     data-testid="preview"
     flex-direction="flex-col"
   >
     <h1 class="ris-heading3-bold mt-16 px-16">
-      {{ pendingProceedingResponse.data.documentNumber }}
+      {{ documentUnit.documentNumber }}
     </h1>
     <p class="ris-label3-regular mb-16 px-16">
       Vorschau erstellt am {{ dayjs(new Date()).format("DD.MM.YYYY") }} um
       {{ dayjs(new Date()).format("HH:mm:ss") }}
     </p>
     <PreviewCoreData
-      :core-data="pendingProceedingResponse.data.coreData"
+      :core-data="documentUnit.coreData"
       date-label="Mitteilungsdatum"
+      is-pending-proceeding
+      :kind="Kind.PENDING_PROCEEDING"
     />
-    <FlexContainer flex-direction="flex-col">
-      <PreviewRow v-if="pendingProceedingResponse.data.resolutionNote">
-        <PreviewCategory>Erledigungsvermerk</PreviewCategory>
-        <PreviewContent>
-          <TextEditor
-            id="previewResolutionNote"
-            aria-label="Erledigungsvermerk"
-            field-size="max"
-            preview
-            :value="pendingProceedingResponse.data.resolutionNote"
-          />
-        </PreviewContent>
-      </PreviewRow>
-      <PreviewRow>
-        <PreviewCategory>Erledigung</PreviewCategory>
-        <PreviewContent>
-          {{ pendingProceedingResponse.data.isResolved ? "Ja" : "Nein" }}
-        </PreviewContent>
-      </PreviewRow>
-      <PreviewRow v-if="pendingProceedingResponse.data.legalIssue">
-        <PreviewCategory>Rechtsfrage</PreviewCategory>
-        <PreviewContent>
-          <TextEditor
-            id="previewLegalIssue"
-            aria-label="Rechtsfrage"
-            field-size="max"
-            preview
-            :value="pendingProceedingResponse.data.legalIssue"
-          />
-        </PreviewContent>
-      </PreviewRow>
-      <PreviewRow v-if="pendingProceedingResponse.data.admissionOfAppeal">
-        <PreviewCategory>Rechtsmittelzulassung</PreviewCategory>
-        <PreviewContent>
-          {{ pendingProceedingResponse.data.admissionOfAppeal }}
-        </PreviewContent>
-      </PreviewRow>
-      <PreviewRow v-if="pendingProceedingResponse.data.appellant">
-        <PreviewCategory>Rechtsmittelführer</PreviewCategory>
-        <PreviewContent>
-          {{ pendingProceedingResponse.data.appellant }}
-        </PreviewContent>
-      </PreviewRow>
-    </FlexContainer>
     <PreviewCaselawReferences
-      :caselaw-references="
-        pendingProceedingResponse.data.caselawReferences as Reference[]
-      "
+      :caselaw-references="documentUnit.caselawReferences as Reference[]"
     />
     <PreviewLiteratureReferences
-      :literature-references="
-        pendingProceedingResponse.data.literatureReferences as Reference[]
-      "
+      :literature-references="documentUnit.literatureReferences as Reference[]"
     />
     <PreviewProceedingDecisions
-      :ensuing-decisions="pendingProceedingResponse.data.ensuingDecisions"
-      :previous-decisions="pendingProceedingResponse.data.previousDecisions"
+      :ensuing-decisions="documentUnit.ensuingDecisions"
+      :previous-decisions="documentUnit.previousDecisions"
     />
     <PreviewContentRelatedIndexing
-      :content-related-indexing="
-        pendingProceedingResponse.data.contentRelatedIndexing
-      "
+      :content-related-indexing="documentUnit.contentRelatedIndexing"
     />
-
     <PreviewShortTexts
-      :short-texts="pendingProceedingResponse.data.shortTexts"
+      :short-texts="documentUnit.shortTexts"
       :valid-border-numbers="[]"
     />
+    <PreviewRow v-if="documentUnit.shortTexts.legalIssue">
+      <PreviewCategory>{{
+        pendingProceedingLabels.legalIssue
+      }}</PreviewCategory>
+      <PreviewContent>
+        <TextEditor
+          id="previewLegalIssue"
+          :aria-label="pendingProceedingLabels.legalIssue"
+          field-size="max"
+          preview
+          :value="documentUnit.shortTexts.legalIssue"
+        />
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="documentUnit.shortTexts.admissionOfAppeal">
+      <PreviewCategory>{{
+        pendingProceedingLabels.admissionOfAppeal
+      }}</PreviewCategory>
+      <PreviewContent>
+        {{ documentUnit.shortTexts.admissionOfAppeal }}
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="documentUnit.shortTexts.appellant">
+      <PreviewCategory>{{ pendingProceedingLabels.appellant }}</PreviewCategory>
+      <PreviewContent>
+        {{ documentUnit.shortTexts.appellant }}
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="documentUnit.shortTexts.resolutionNote">
+      <PreviewCategory>Erledigungsvermerk</PreviewCategory>
+      <PreviewContent>
+        <TextEditor
+          id="previewResolutionNote"
+          :aria-label="pendingProceedingLabels.resolutionNote"
+          field-size="max"
+          preview
+          :value="documentUnit.shortTexts.resolutionNote"
+        />
+      </PreviewContent>
+    </PreviewRow>
   </FlexContainer>
-  <ErrorPage
-    v-if="pendingProceedingResponse.error"
-    :error="pendingProceedingResponse.error"
-    :title="pendingProceedingResponse.error?.title"
-  />
 </template>

@@ -1,4 +1,6 @@
-import { DuplicateRelationStatus } from "@/domain/documentUnit"
+import DocumentUnit, { DuplicateRelationStatus } from "@/domain/documentUnit"
+import PendingProceeding from "@/domain/pendingProceeding"
+import errorMessages from "@/i18n/errors.json"
 import service from "@/services/documentUnitService"
 import HttpClient from "@/services/httpClient"
 
@@ -109,6 +111,88 @@ describe("documentUnitService", () => {
 
       expect(httpMock).toHaveBeenCalledWith(
         `caselaw/documentunits/documentationUnitId/assign/documentationOfficeId`,
+      )
+    })
+  })
+
+  describe("get by document number", () => {
+    it("should return error with could not be loaded", async () => {
+      const httpMock = vi.spyOn(HttpClient, "get").mockResolvedValue({
+        status: 400,
+        data: "error",
+      })
+
+      const response = await service.getByDocumentNumber("documentNumber")
+
+      expect(response).toEqual({
+        data: undefined,
+        error: {
+          title: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED.title,
+        },
+        status: 400,
+      })
+
+      expect(httpMock).toHaveBeenCalledWith(
+        `caselaw/documentunits/documentNumber`,
+      )
+    })
+
+    it("should return error with not allowed", async () => {
+      const httpMock = vi.spyOn(HttpClient, "get").mockResolvedValue({
+        status: 403,
+        data: "error",
+      })
+
+      const response = await service.getByDocumentNumber("documentNumber")
+
+      expect(response).toEqual({
+        data: undefined,
+        error: {
+          title: errorMessages.DOCUMENT_UNIT_NOT_ALLOWED.title,
+        },
+        status: 403,
+      })
+
+      expect(httpMock).toHaveBeenCalledWith(
+        `caselaw/documentunits/documentNumber`,
+      )
+    })
+
+    it("should return document unit on success", async () => {
+      const data = new DocumentUnit("uuid")
+      const httpMock = vi.spyOn(HttpClient, "get").mockResolvedValue({
+        status: 200,
+        data: data,
+      })
+
+      const response = await service.getByDocumentNumber("documentNumber")
+
+      expect(response).toEqual({
+        data: data,
+        status: 200,
+      })
+
+      expect(httpMock).toHaveBeenCalledWith(
+        `caselaw/documentunits/documentNumber`,
+      )
+    })
+
+    it("should return pending proceeding on success", async () => {
+      const data = new PendingProceeding("uuid")
+      const httpMock = vi.spyOn(HttpClient, "get").mockResolvedValue({
+        status: 200,
+        data: data,
+      })
+
+      const response = await service.getByDocumentNumber("documentNumber")
+
+      expect(response).toEqual({
+        data: data,
+        status: 200,
+      })
+
+      expect(httpMock).toHaveBeenCalledWith(
+        `caselaw/documentunits/documentNumber`,
       )
     })
   })

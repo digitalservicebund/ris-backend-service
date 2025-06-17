@@ -4,7 +4,9 @@ import FileNavigator from "@/components/FileNavigator.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import DocumentUnit from "@/domain/documentUnit"
+import PendingProceeding from "@/domain/pendingProceeding"
 import { SelectablePanelContent } from "@/types/panelContentMode"
+import { isDocumentUnit } from "@/utils/typeGuards"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
 import IconEdit from "~icons/ic/outline-edit"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
@@ -15,10 +17,11 @@ import IconImportCategories from "~icons/material-symbols/text-select-move-back-
 
 const props = defineProps<{
   panelMode?: SelectablePanelContent
-  documentUnit?: DocumentUnit
+  documentUnit: DocumentUnit | PendingProceeding
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   currentAttachmentIndex: number
+  hidePreviewInNewTab?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -120,7 +123,7 @@ function emitAttachmentIndex(value: number) {
     </div>
 
     <FileNavigator
-      v-if="panelMode === 'attachments'"
+      v-if="panelMode === 'attachments' && isDocumentUnit(props.documentUnit)"
       :attachments="props.documentUnit!.attachments"
       :current-index="currentAttachmentIndex"
       @select="emitAttachmentIndex"
@@ -137,7 +140,7 @@ function emitAttachmentIndex(value: number) {
           :to="{
             name: 'caselaw-documentUnit-documentNumber-categories',
             params: {
-              documentNumber: props.documentUnit!.documentNumber,
+              documentNumber: props.documentUnit.documentNumber,
             },
           }"
         >
@@ -148,14 +151,14 @@ function emitAttachmentIndex(value: number) {
           </Button>
         </router-link>
       </Tooltip>
-      <Tooltip text="In neuem Tab öffnen">
+      <Tooltip v-if="!props.hidePreviewInNewTab" text="In neuem Tab öffnen">
         <router-link
           aria-label="Vorschau in neuem Tab öffnen"
           target="_blank"
           :to="{
             name: 'caselaw-documentUnit-documentNumber-preview',
             params: {
-              documentNumber: props.documentUnit!.documentNumber,
+              documentNumber: props.documentUnit.documentNumber,
             },
           }"
         >

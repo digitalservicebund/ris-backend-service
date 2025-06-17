@@ -3,30 +3,49 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
+import { ref } from "vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import DocumentUnit, { CoreData, SourceValue } from "@/domain/documentUnit"
+import DocumentUnit, {
+  CoreData,
+  Kind,
+  SourceValue,
+} from "@/domain/documentUnit"
 
-type CoreDataProps = InstanceType<typeof DocumentUnitCoreData>["$props"]
+interface RenderProps {
+  initialModelValue?: CoreData
+  kind?: Kind
+}
 
-function renderComponent(props?: Partial<CoreDataProps>) {
+function renderComponent(props: RenderProps = {}) {
+  const model = ref<CoreData>(props.initialModelValue || {})
+
   const user = userEvent.setup()
 
-  let modelValue: CoreData | undefined = props?.modelValue ?? {}
-
-  const effectiveProps: CoreDataProps = {
-    modelValue,
-    "onUpdate:modelValue":
-      props?.["onUpdate:modelValue"] ??
-      ((val: CoreData | undefined) => (modelValue = val)),
+  const effectiveProps = {
+    modelValue: model.value,
+    kind: props.kind || Kind.DOCUMENTION_UNIT,
   }
 
-  return { user, ...render(DocumentUnitCoreData, { props: effectiveProps }) }
+  const view = render(DocumentUnitCoreData, {
+    props: effectiveProps,
+    global: {
+      provide: {
+        modelValue: model.value,
+        "onUpdate:modelValue": (val: CoreData) => {
+          model.value = val
+        },
+      },
+    },
+  })
+
+  return { user, model, ...view }
 }
 
 describe("Core Data", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
   })
+
   test("renders correctly with given documentUnitId", async () => {
     const documentUnit = new DocumentUnit("1", {
       coreData: {
@@ -36,7 +55,7 @@ describe("Core Data", () => {
       documentNumber: "ABCD2022000001",
     })
 
-    renderComponent({ modelValue: documentUnit.coreData })
+    renderComponent({ initialModelValue: documentUnit.coreData })
 
     const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
@@ -54,7 +73,7 @@ describe("Core Data", () => {
       documentNumber: "ABCD2022000001",
     })
 
-    renderComponent({ modelValue: documentUnit.coreData })
+    renderComponent({ initialModelValue: documentUnit.coreData })
     expect(await screen.findByTestId("deviating-decision-dates")).toBeVisible()
 
     const chipList = screen.getAllByRole("listitem")
@@ -64,22 +83,21 @@ describe("Core Data", () => {
   })
 
   test("updates deviating decision date", async () => {
-    const onUpdate = vi.fn()
-    const { user } = renderComponent({
-      "onUpdate:modelValue": onUpdate,
+    const { user, model } = renderComponent({
+      initialModelValue: { deviatingDecisionDates: [] },
     })
 
     await screen.findByLabelText("Abweichendes Entscheidungsdatum anzeigen")
     await user.click(
       screen.getByLabelText("Abweichendes Entscheidungsdatum anzeigen"),
     )
-    await user.type(
-      screen.getByLabelText("Abweichendes Entscheidungsdatum"),
-      "02.02.2022{enter}",
+
+    const input = await screen.findByLabelText(
+      "Abweichendes Entscheidungsdatum",
     )
-    expect(onUpdate).toHaveBeenCalledWith({
-      deviatingDecisionDates: ["2022-02-02"],
-    })
+    await user.type(input, "02.02.2022{enter}")
+
+    expect(model.value.deviatingDecisionDates).toEqual(["2022-02-02"])
   })
 
   test("renders year of dispute", async () => {
@@ -90,7 +108,7 @@ describe("Core Data", () => {
       documentNumber: "ABCD2022000001",
     })
 
-    renderComponent({ modelValue: documentUnit.coreData })
+    renderComponent({ initialModelValue: documentUnit.coreData })
     await screen.findByText("Streitjahr")
     expect(screen.getByTestId("year-of-dispute")).toBeVisible()
 
@@ -101,14 +119,15 @@ describe("Core Data", () => {
   })
 
   test("updates year of dispute", async () => {
-    const onUpdate = vi.fn()
-    const { user } = renderComponent({
-      "onUpdate:modelValue": onUpdate,
+    const { user, model } = renderComponent({
+      initialModelValue: { yearsOfDispute: [] },
     })
 
     await screen.findByText("Streitjahr")
-    await user.type(screen.getByLabelText("Streitjahr"), "2023{enter}")
-    expect(onUpdate).toHaveBeenCalledWith({ yearsOfDispute: ["2023"] })
+    const input = screen.getByLabelText("Streitjahr")
+    await user.type(input, "2023{enter}")
+
+    expect(model.value.yearsOfDispute).toEqual(["2023"])
   })
 
   test("renders jurisdiction type", async () => {
@@ -119,7 +138,7 @@ describe("Core Data", () => {
       },
     }
 
-    renderComponent({ modelValue: coreData })
+    renderComponent({ initialModelValue: coreData })
     expect(screen.getByTestId("jurisdiction-type")).toBeVisible()
     expect(screen.getByLabelText("Gerichtsbarkeit")).toHaveValue(
       "Ordentliche Gerichtsbarkeit",
@@ -133,32 +152,30 @@ describe("Core Data", () => {
       },
     }
 
-    renderComponent({ modelValue: coreData })
-    expect(screen.getByLabelText("Quelle Input")).toHaveTextContent(
-      SourceValue.AngefordertesOriginal,
-    )
+    renderComponent({ initialModelValue: coreData })
+
+    const sourceSelect = screen.getByLabelText("Quelle Input")
+    expect(sourceSelect).toHaveTextContent(SourceValue.AngefordertesOriginal)
   })
 
   test("updates source", async () => {
-    const onUpdate = vi.fn()
-    const { user } = renderComponent({
-      "onUpdate:modelValue": onUpdate,
+    const { user, model } = renderComponent({
+      initialModelValue: { source: undefined },
     })
 
     const dropdown = await screen.findByLabelText("Quelle Input")
     await user.click(dropdown)
 
-    const options = screen.getAllByRole("option")
+    const options = await screen.findAllByRole("option")
     expect(options.length).toBe(6)
     expect(options[0]).toHaveTextContent(
       "unaufgefordert eingesandtes Original (O)",
     )
+
     await user.click(options[0])
 
-    expect(onUpdate).toHaveBeenCalledWith({
-      source: {
-        value: SourceValue.UnaufgefordertesOriginal,
-      },
+    expect(model.value.source).toEqual({
+      value: SourceValue.UnaufgefordertesOriginal,
     })
   })
 })

@@ -282,6 +282,56 @@ class DocumentationUnitServiceTest {
   }
 
   @Test
+  void testUpdatePendingProceeding() throws DocumentationUnitNotExistsException {
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder().uuid(UUID.randomUUID()).documentNumber("ABCDE20220001").build();
+    when(repository.findByUuid(pendingProceeding.uuid(), null)).thenReturn(pendingProceeding);
+
+    var du = service.updatePendingProceeding(pendingProceeding, null);
+    assertEquals(du, pendingProceeding);
+
+    verify(repository).save(pendingProceeding, null);
+  }
+
+  @Test
+  void testPatchUpdatePendingProceeding_shouldTriggerUpdatePendingProceeding()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder()
+            .uuid(UUID.randomUUID())
+            .documentNumber("ABCDE20220001")
+            .version(0L)
+            .build();
+
+    JsonNode valueToAdd = new TextNode("2021-02-03");
+    JsonPatchOperation addOperation = new AddOperation("/coreData/resolutionDate", valueToAdd);
+    JsonPatch patch = new JsonPatch(List.of(addOperation));
+    User user = User.builder().build();
+
+    when(repository.findByUuid(pendingProceeding.uuid(), user)).thenReturn(pendingProceeding);
+    when(patchMapperService.calculatePatch(any(), any())).thenReturn(new JsonPatch(List.of()));
+    when(patchMapperService.removePatchForSamePath(any(), any())).thenReturn(patch);
+    when(patchMapperService.applyPatchToEntity(any(), any())).thenReturn(pendingProceeding);
+    when(patchMapperService.handlePatchForSamePath(any(), any(), any(), any()))
+        .thenReturn(
+            RisJsonPatch.builder()
+                .patch(new JsonPatch(List.of()))
+                .documentationUnitVersion(1L)
+                .errorPaths(Collections.emptyList())
+                .build());
+
+    var risJsonPatch = RisJsonPatch.builder().patch(patch).build();
+
+    // Act
+    service.updateDocumentationUnit(pendingProceeding.uuid(), risJsonPatch, user);
+    PendingProceeding patchedPendingProceeding = pendingProceeding.toBuilder().version(1L).build();
+
+    // Assert
+    verify(service).updatePendingProceeding(patchedPendingProceeding, user);
+  }
+
+  @Test
   void testPatchUpdateWithOnlyVersion_shouldNotIncrementVersion()
       throws DocumentationUnitNotExistsException {
     DocumentationUnit documentationUnit =

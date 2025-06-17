@@ -67,13 +67,6 @@ test.describe("ensuring the authorization works as expected", () => {
             "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
         },
         {
-          description: "can't be accessed as decision preview",
-          page: page,
-          documentNumber: "YYTestDoc0018",
-          type: "documentunit",
-          error: "Dokumentationseinheit konnte nicht geladen werden",
-        },
-        {
           description: "can't be accessed when document number is wrong",
           page: page,
           documentNumber: "YYTestDoc9999",

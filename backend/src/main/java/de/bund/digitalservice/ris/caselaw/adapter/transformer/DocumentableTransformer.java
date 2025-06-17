@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
@@ -12,7 +11,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -21,18 +19,14 @@ import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
-import de.bund.digitalservice.ris.caselaw.domain.Source;
-import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
@@ -183,7 +177,7 @@ public class DocumentableTransformer {
   static void addDeviatingFileNumbers(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder,
       CoreData coreData,
-      DecisionDTO currentDto) {
+      DocumentationUnitDTO currentDto) {
     if (coreData.deviatingFileNumbers() == null) {
       return;
     }
@@ -243,7 +237,7 @@ public class DocumentableTransformer {
   static void addFileNumbers(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder,
       CoreData coreData,
-      DecisionDTO currentDto) {
+      DocumentationUnitDTO currentDto) {
     if (coreData.fileNumbers() == null) {
       return;
     }
@@ -263,56 +257,27 @@ public class DocumentableTransformer {
     builder.fileNumbers(fileNumberDTOs);
   }
 
-  static CoreData buildCoreData(DocumentationUnitDTO decisionDTO) {
+  static CoreData buildMutualCoreData(DocumentationUnitDTO documentationUnitDTO) {
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
-            .court(CourtTransformer.transformToDomain(decisionDTO.getCourt()))
-            .procedure(ProcedureTransformer.transformToDomain(decisionDTO.getProcedure(), false))
-            .previousProcedures(
-                ProcedureTransformer.transformPreviousProceduresToLabel(
-                    decisionDTO.getProcedureHistory()))
+            .court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()))
             .documentationOffice(
                 DocumentationOfficeTransformer.transformToDomain(
-                    decisionDTO.getDocumentationOffice()))
-            .creatingDocOffice(
-                DocumentationOfficeTransformer.transformToDomain(
-                    decisionDTO.getCreatingDocumentationOffice()))
-            .source(getSource(decisionDTO))
-            .decisionDate(decisionDTO.getDate())
-            .appraisalBody(decisionDTO.getJudicialBody());
+                    documentationUnitDTO.getDocumentationOffice()))
+            .decisionDate(documentationUnitDTO.getDate())
+            .celexNumber(documentationUnitDTO.getCelexNumber())
+            .appraisalBody(documentationUnitDTO.getJudicialBody());
 
-    addFileNumbersToDomain(decisionDTO, coreDataBuilder);
-    addDeviatingFileNumbersToDomain(decisionDTO, coreDataBuilder);
-    addDeviatingCourtsToDomain(decisionDTO, coreDataBuilder);
-    addDeviatingDecisionDatesToDomain(decisionDTO, coreDataBuilder);
+    addFileNumbersToDomain(documentationUnitDTO, coreDataBuilder);
+    addDeviatingFileNumbersToDomain(documentationUnitDTO, coreDataBuilder);
+    addDeviatingCourtsToDomain(documentationUnitDTO, coreDataBuilder);
+    addDeviatingDecisionDatesToDomain(documentationUnitDTO, coreDataBuilder);
 
-    DocumentTypeDTO documentTypeDTO = decisionDTO.getDocumentType();
+    DocumentTypeDTO documentTypeDTO = documentationUnitDTO.getDocumentType();
     if (documentTypeDTO != null) {
       coreDataBuilder.documentType(DocumentTypeTransformer.transformToDomain(documentTypeDTO));
     }
     return coreDataBuilder.build();
-  }
-
-  static Source getSource(DocumentationUnitDTO decisionDTO) {
-    return decisionDTO.getSource().stream()
-        .max(Comparator.comparing(SourceDTO::getRank)) // Find the highest-ranked item
-        .map(
-            sourceDTO -> {
-              SourceValue sourceValue = null;
-              if (sourceDTO.getValue() != null) {
-                sourceValue = sourceDTO.getValue();
-              }
-              var reference =
-                  Optional.ofNullable(sourceDTO.getReference())
-                      .map(ReferenceTransformer::transformToDomain)
-                      .orElse(null);
-              return Source.builder()
-                  .value(sourceValue)
-                  .sourceRawValue(sourceDTO.getSourceRawValue())
-                  .reference(reference)
-                  .build();
-            })
-        .orElse(null);
   }
 
   static ContentRelatedIndexing buildContentRelatedIndexing(DocumentationUnitDTO decisionDTO) {

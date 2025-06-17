@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { type Component, computed } from "vue"
+import { storeToRefs } from "pinia"
+import { type Component, computed, Ref } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
-import { longTextLabels } from "@/domain/documentUnit"
+import DocumentUnit, { longTextLabels } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
@@ -11,59 +12,62 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 
 const tenor = computed({
   get: () =>
-    store.documentUnit?.longTexts.tenor
+    documentUnit.value?.longTexts.tenor
       ? useValidBorderNumberLinks(
-          store.documentUnit?.longTexts.tenor,
-          store.documentUnit.managementData.borderNumbers,
+          documentUnit.value?.longTexts.tenor,
+          documentUnit.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    store.documentUnit!.longTexts.tenor =
+    documentUnit.value!.longTexts.tenor =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const reasons = computed({
   get: () =>
-    store.documentUnit?.longTexts.reasons
+    documentUnit.value?.longTexts.reasons
       ? useValidBorderNumberLinks(
-          store.documentUnit?.longTexts.reasons,
-          store.documentUnit.managementData.borderNumbers,
+          documentUnit.value?.longTexts.reasons,
+          documentUnit.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    store.documentUnit!.longTexts.reasons =
+    documentUnit.value!.longTexts.reasons =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const caseFacts = computed({
   get: () =>
-    store.documentUnit?.longTexts.caseFacts
+    documentUnit.value?.longTexts.caseFacts
       ? useValidBorderNumberLinks(
-          store.documentUnit?.longTexts.caseFacts,
-          store.documentUnit.managementData.borderNumbers,
+          documentUnit.value?.longTexts.caseFacts,
+          documentUnit.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    store.documentUnit!.longTexts.caseFacts =
+    documentUnit.value!.longTexts.caseFacts =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const decisionReasons = computed({
   get: () =>
-    store.documentUnit?.longTexts.decisionReasons
+    documentUnit.value?.longTexts.decisionReasons
       ? useValidBorderNumberLinks(
-          store.documentUnit?.longTexts.decisionReasons,
-          store.documentUnit.managementData.borderNumbers,
+          documentUnit.value?.longTexts.decisionReasons,
+          documentUnit.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    store.documentUnit!.longTexts.decisionReasons =
+    documentUnit.value!.longTexts.decisionReasons =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
@@ -79,7 +83,7 @@ const decisionReasons = computed({
         v-model="tenor"
         data-testid="tenor"
         :label="longTextLabels.tenor"
-        :should-show-button="!store.documentUnit?.longTexts?.tenor?.length"
+        :should-show-button="!documentUnit?.longTexts?.tenor?.length"
       />
 
       <TextEditorCategory
@@ -88,7 +92,7 @@ const decisionReasons = computed({
         v-model="reasons"
         data-testid="reasons"
         :label="longTextLabels.reasons"
-        :should-show-button="!store.documentUnit?.longTexts?.reasons?.length"
+        :should-show-button="!documentUnit?.longTexts?.reasons?.length"
       />
 
       <TextEditorCategory
@@ -97,7 +101,7 @@ const decisionReasons = computed({
         v-model="caseFacts"
         data-testid="caseFacts"
         :label="longTextLabels.caseFacts"
-        :should-show-button="!store.documentUnit?.longTexts?.caseFacts?.length"
+        :should-show-button="!documentUnit?.longTexts?.caseFacts?.length"
       />
 
       <TextEditorCategory
@@ -106,9 +110,7 @@ const decisionReasons = computed({
         v-model="decisionReasons"
         data-testid="decisionReasons"
         :label="longTextLabels.decisionReasons"
-        :should-show-button="
-          !store.documentUnit?.longTexts?.decisionReasons?.length
-        "
+        :should-show-button="!documentUnit?.longTexts?.decisionReasons?.length"
       />
     </div>
   </div>
