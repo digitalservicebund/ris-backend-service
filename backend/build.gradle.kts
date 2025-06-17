@@ -207,10 +207,10 @@ dependencies {
     // for local development:
 //    implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.67.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.19.0")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.0")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.0")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.19.1")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.1")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.1")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
@@ -219,7 +219,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
-    implementation("io.getunleash:unleash-client-java:9.3.2")
+    implementation("io.getunleash:unleash-client-java:11.0.0")
     implementation("org.apache.commons:commons-text:1.13.1")
     implementation("org.jsoup:jsoup:1.20.1")
 
@@ -227,7 +227,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.0")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.12.0")
+    implementation("com.squareup.okio:okio-jvm:3.13.0")
 
     val flywayCore = "org.flywaydb:flyway-core:11.9.1"
     implementation(flywayCore)
@@ -249,7 +249,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.17.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.18.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

@@ -20,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
@@ -43,6 +44,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.CacheControl;
@@ -486,6 +488,51 @@ public class DocumentationUnitController {
     } catch (Exception ex) {
       log.error("Error by getting docx for documentation unit {}", uuid, ex);
       return ResponseEntity.internalServerError().build();
+    }
+  }
+
+  @GetMapping(
+      value = "/{documentNumber}/image/{imageName}",
+      produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
+  public ResponseEntity<byte[]> getImage(
+      @PathVariable String documentNumber, @PathVariable String imageName) {
+
+    try {
+      Image imageResult = service.getImageBytes(documentNumber, imageName);
+
+      if (imageResult == null || imageResult.content() == null) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+
+      byte[] imageBytes = imageResult.content();
+      String contentType = imageResult.contentType();
+
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(getMediaType(contentType));
+      headers.setContentLength(imageBytes.length);
+
+      return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+
+    } catch (Exception e) {
+      log.error("Error fetching image: {}", e.getMessage());
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Validate and parse the given content type
+   *
+   * @param contentType the content type string to parse
+   * @return the MediaType object representing the content type, or a default type if parsing fails
+   */
+  @NotNull
+  private static MediaType getMediaType(String contentType) {
+    try {
+      return MediaType.parseMediaType(contentType);
+    } catch (IllegalArgumentException e) {
+      log.error("Invalid content type retrieved from service: {}", contentType);
+      return MediaType.APPLICATION_OCTET_STREAM;
     }
   }
 

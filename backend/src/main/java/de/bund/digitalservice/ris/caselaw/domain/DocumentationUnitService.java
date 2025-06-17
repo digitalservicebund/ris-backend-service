@@ -613,6 +613,20 @@ public class DocumentationUnitService {
     }
   }
 
+  public Image getImageBytes(String documentNumber, String imageName)
+      throws BadRequestException, DocumentationUnitNotExistsException {
+    var docUnit = getByDocumentNumber(documentNumber);
+    return attachmentService
+        .findByDocumentationUnitIdAndFileName(docUnit.uuid(), imageName)
+        .orElseThrow(
+            () ->
+                new BadRequestException(
+                    "Image not found for documentation unit: "
+                        + docUnit.uuid()
+                        + " and image name: "
+                        + imageName));
+  }
+
   public enum DuplicateCheckStatus {
     ENABLED,
     DISABLED

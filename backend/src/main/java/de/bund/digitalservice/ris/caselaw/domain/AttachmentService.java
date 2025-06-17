@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.nio.ByteBuffer;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 
@@ -11,4 +12,6 @@ public interface AttachmentService {
   void deleteByS3Path(String s3Path, UUID documentationUnitId, User user);
 
   void deleteAllObjectsFromBucketForDocumentationUnit(UUID documentationUnitId);
+
+  Optional<Image> findByDocumentationUnitIdAndFileName(UUID documentationUnitId, String imageName);
 }

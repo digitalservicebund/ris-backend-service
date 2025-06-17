@@ -40,4 +40,6 @@ public class AttachmentDTO {
   @ManyToOne
   @JoinColumn(name = "documentation_unit_id")
   private DocumentationUnitDTO documentationUnit;
+
+  @Column private byte[] content;
 }

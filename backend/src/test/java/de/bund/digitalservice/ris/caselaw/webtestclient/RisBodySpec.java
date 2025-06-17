@@ -40,11 +40,14 @@ public class RisBodySpec<T> {
 
   private RisEntityExchangeResult<T> getExchangeResult() {
     try {
-      String response =
-          resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+      var rawResponse = resultActions.andReturn().getResponse();
+      String response = rawResponse.getContentAsString(StandardCharsets.UTF_8);
       if (clazz != null) {
         if (clazz == String.class) {
           return (RisEntityExchangeResult<T>) new RisEntityExchangeResult<>(response);
+        } else if (clazz == byte[].class) {
+          return (RisEntityExchangeResult<T>)
+              new RisEntityExchangeResult<>(rawResponse.getContentAsByteArray());
         } else {
           return new RisEntityExchangeResult<>(objectMapper.readValue(response, clazz));
         }
