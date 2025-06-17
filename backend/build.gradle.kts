@@ -179,6 +179,9 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
+    // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.42")
+
     implementation(platform("software.amazon.awssdk:bom:2.29.51"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
