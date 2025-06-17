@@ -3,7 +3,9 @@ import { caselawTest as test } from "../fixtures"
 import { navigateToCategories, save } from "~/e2e/caselaw/e2e-utils"
 
 test.describe("edit pending proceeding", () => {
-  test(
+  // skip until API has new endpoint to add a more robust fixture for pending proceeding
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
     "user can edit and save pending proceeding documents",
     { tag: ["@RISDEV-7774"] },
     async ({ page }) => {
