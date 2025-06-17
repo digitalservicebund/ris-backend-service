@@ -31,6 +31,7 @@ public record PendingProceeding(
     @Valid CoreData coreData,
     List<PreviousDecision> previousDecisions,
     PendingProceedingShortTexts shortTexts,
+    @Valid ManagementData managementData,
     Status status,
     ContentRelatedIndexing contentRelatedIndexing,
     List<Reference> caselawReferences,

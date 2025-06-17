@@ -34,6 +34,8 @@ public interface Documentable {
 
   List<Reference> literatureReferences();
 
+  ManagementData managementData();
+
   List<String> documentalists();
 
   boolean isEditable();
