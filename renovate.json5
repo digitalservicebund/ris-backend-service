@@ -28,6 +28,11 @@
       "allowedVersions": "22.15.0"
     },
     {
+      "matchPackageNames": ['@playwright/test', 'playwright'],
+      "rangeStrategy": "pin",
+      "allowedVersions": "1.52.0" // 1.53.0 breaks border-number, border-number-link and text-check e2e in chrome
+    },
+    {
       "groupName": "all-frontend-non-major-dependencies",
       "matchPaths": [
         "frontend/**"
