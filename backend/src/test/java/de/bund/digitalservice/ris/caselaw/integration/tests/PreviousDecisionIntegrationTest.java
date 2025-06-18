@@ -46,9 +46,9 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -215,10 +215,10 @@ class PreviousDecisionIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
-              DocumentationUnit responseBody = response.getResponseBody();
+              Decision responseBody = response.getResponseBody();
               assertThat(responseBody.previousDecisions())
                   .extracting("fileNumber")
                   .containsExactly("test");
@@ -234,8 +234,8 @@ class PreviousDecisionIntegrationTest {
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, documentationOfficeDTO, "documntnumber");
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(parentDocumentationUnitDTO.getId())
             .documentNumber("docnr12345678")
             .previousDecisions(List.of(PreviousDecision.builder().fileNumber("test").build()))
@@ -246,11 +246,11 @@ class PreviousDecisionIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + parentDocumentationUnitDTO.getId())
-        .bodyValue(documentationUnit)
+        .bodyValue(decision)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(Objects.requireNonNull(response.getResponseBody()).previousDecisions())
@@ -272,8 +272,8 @@ class PreviousDecisionIntegrationTest {
                 .documentationOffice(documentationOfficeDTO)
                 .build());
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(parentDocumentationUnitDTO.getId())
             .documentNumber("docnr12345678")
             .previousDecisions(
@@ -289,11 +289,11 @@ class PreviousDecisionIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + parentDocumentationUnitDTO.getId())
-        .bodyValue(documentationUnit)
+        .bodyValue(decision)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().previousDecisions())
@@ -316,8 +316,8 @@ class PreviousDecisionIntegrationTest {
                 .previousDecisions(
                     List.of(PreviousDecisionDTO.builder().fileNumber("test").rank(1).build())));
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(parentDocumentationUnitDTO.getId())
             .documentNumber("docnr12345678")
             .previousDecisions(Collections.emptyList())
@@ -328,11 +328,11 @@ class PreviousDecisionIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + parentDocumentationUnitDTO.getId())
-        .bodyValue(documentationUnit)
+        .bodyValue(decision)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().previousDecisions()).isEmpty());
   }
@@ -343,8 +343,8 @@ class PreviousDecisionIntegrationTest {
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, documentationOfficeDTO, "1234567890123");
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(parentDocumentationUnitDTO.getId())
             .documentNumber("docnr12345678")
             .previousDecisions(
@@ -358,11 +358,11 @@ class PreviousDecisionIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + parentDocumentationUnitDTO.getId())
-        .bodyValue(documentationUnit)
+        .bodyValue(decision)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().previousDecisions()).hasSize(2);

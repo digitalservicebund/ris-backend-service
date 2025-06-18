@@ -53,10 +53,8 @@ class OAuthServiceTest {
       throws DocumentationUnitNotExistsException {
     // Arrange
     String documentNumber = "DOC12345";
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder().documentNumber(documentNumber).build();
-    when(documentationUnitService.getByDocumentNumber(documentNumber))
-        .thenReturn(documentationUnit);
+    Decision decision = Decision.builder().documentNumber(documentNumber).build();
+    when(documentationUnitService.getByDocumentNumber(documentNumber)).thenReturn(decision);
 
     // Act
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
@@ -71,13 +69,12 @@ class OAuthServiceTest {
 
     // Arrange
     String documentNumber = "DOC12345";
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(documentNumber)
             .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
             .build();
-    when(documentationUnitService.getByDocumentNumber(documentNumber))
-        .thenReturn(documentationUnit);
+    when(documentationUnitService.getByDocumentNumber(documentNumber)).thenReturn(decision);
 
     // Act
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
@@ -96,14 +93,13 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     String documentNumber = "DOC12345";
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(documentNumber)
             .status(Status.builder().publicationStatus(PublicationStatus.DUPLICATED).build())
             .coreData(CoreData.builder().documentationOffice(office).build())
             .build();
-    when(documentationUnitService.getByDocumentNumber(documentNumber))
-        .thenReturn(documentationUnit);
+    when(documentationUnitService.getByDocumentNumber(documentNumber)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     // Act
@@ -122,8 +118,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     String documentNumber = "DOC12345";
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(documentNumber)
             .status(
                 Status.builder()
@@ -131,8 +127,7 @@ class OAuthServiceTest {
                     .build())
             .coreData(CoreData.builder().documentationOffice(office).build())
             .build();
-    when(documentationUnitService.getByDocumentNumber(documentNumber))
-        .thenReturn(documentationUnit);
+    when(documentationUnitService.getByDocumentNumber(documentNumber)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
@@ -149,8 +144,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     String documentNumber = "DOC12345";
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(documentNumber)
             .status(
                 Status.builder()
@@ -161,8 +156,7 @@ class OAuthServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .build();
-    when(documentationUnitService.getByDocumentNumber(documentNumber))
-        .thenReturn(documentationUnit);
+    when(documentationUnitService.getByDocumentNumber(documentNumber)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
@@ -180,8 +174,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     String documentNumber = "DOC12345";
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(documentNumber)
             .status(
                 Status.builder()
@@ -193,8 +187,7 @@ class OAuthServiceTest {
                     .creatingDocOffice(DocumentationOffice.builder().abbreviation("BGH").build())
                     .build())
             .build();
-    when(documentationUnitService.getByDocumentNumber(documentNumber))
-        .thenReturn(documentationUnit);
+    when(documentationUnitService.getByDocumentNumber(documentNumber)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
@@ -212,8 +205,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     String documentNumber = "DOC12345";
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(documentNumber)
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
             .coreData(
@@ -221,8 +214,7 @@ class OAuthServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .build();
-    when(documentationUnitService.getByDocumentNumber(documentNumber))
-        .thenReturn(documentationUnit);
+    when(documentationUnitService.getByDocumentNumber(documentNumber)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
@@ -235,8 +227,8 @@ class OAuthServiceTest {
       throws DocumentationUnitNotExistsException {
     // Arrange
     UUID testUUID = UUID.randomUUID();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().uuid(testUUID).build();
-    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    Decision decision = Decision.builder().uuid(testUUID).build();
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(decision);
 
     // Act
     Function<UUID, Boolean> result = service.userHasReadAccessByDocumentationUnitId();
@@ -255,8 +247,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
 
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(testUUID)
             .status(Status.builder().publicationStatus(PublicationStatus.DUPLICATED).build())
             .coreData(
@@ -266,7 +258,7 @@ class OAuthServiceTest {
             .build();
 
     when(userService.getDocumentationOffice(any())).thenReturn(office);
-    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(decision);
 
     // Act
     Function<UUID, Boolean> result = service.userHasReadAccessByDocumentationUnitId();
@@ -387,7 +379,7 @@ class OAuthServiceTest {
     SecurityContextHolder.setContext(securityContext);
     when(documentationUnitService.getByUuid(uuid))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
                 .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
@@ -412,12 +404,12 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     UUID testUUID = UUID.randomUUID();
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(testUUID)
             .coreData(CoreData.builder().documentationOffice(office).build())
             .build();
-    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     // Act
@@ -438,8 +430,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     UUID testUUID = UUID.randomUUID();
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(testUUID)
             .status(
                 Status.builder()
@@ -447,7 +439,7 @@ class OAuthServiceTest {
                     .build())
             .coreData(CoreData.builder().documentationOffice(office).build())
             .build();
-    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     // Act
@@ -467,8 +459,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     UUID testUUID = UUID.randomUUID();
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(testUUID)
             .status(
                 Status.builder()
@@ -479,7 +471,7 @@ class OAuthServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .build();
-    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     // Act
@@ -500,8 +492,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     UUID testUUID = UUID.randomUUID();
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(testUUID)
             .status(
                 Status.builder()
@@ -513,7 +505,7 @@ class OAuthServiceTest {
                     .creatingDocOffice(DocumentationOffice.builder().abbreviation("BGH").build())
                     .build())
             .build();
-    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     // Act
@@ -534,8 +526,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     UUID testUUID = UUID.randomUUID();
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(testUUID)
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
             .coreData(
@@ -544,7 +536,7 @@ class OAuthServiceTest {
                     .creatingDocOffice(DocumentationOffice.builder().abbreviation("BGH").build())
                     .build())
             .build();
-    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     // Act
@@ -693,8 +685,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     String documentNumber = "DOC12345";
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(documentNumber)
             .status(
                 Status.builder()
@@ -702,8 +694,7 @@ class OAuthServiceTest {
                     .build())
             .coreData(CoreData.builder().documentationOffice(office).build())
             .build();
-    when(documentationUnitService.getByDocumentNumber(documentNumber))
-        .thenReturn(documentationUnit);
+    when(documentationUnitService.getByDocumentNumber(documentNumber)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     Function<String, Boolean> result = service.userHasSameDocOfficeAsDocument();
@@ -720,8 +711,8 @@ class OAuthServiceTest {
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     String documentNumber = "DOC12345";
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(documentNumber)
             .status(
                 Status.builder()
@@ -732,8 +723,7 @@ class OAuthServiceTest {
                     .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .build())
             .build();
-    when(documentationUnitService.getByDocumentNumber(documentNumber))
-        .thenReturn(documentationUnit);
+    when(documentationUnitService.getByDocumentNumber(documentNumber)).thenReturn(decision);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
     Function<String, Boolean> result = service.userHasSameDocOfficeAsDocument();
@@ -766,7 +756,7 @@ class OAuthServiceTest {
     SecurityContextHolder.setContext(securityContext);
     when(documentationUnitService.getByUuid(documentationUnitId))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .coreData(
                     CoreData.builder()
                         .procedure(Procedure.builder().userGroupId(userGroupId).build())
@@ -794,7 +784,7 @@ class OAuthServiceTest {
     SecurityContextHolder.setContext(securityContext);
     when(documentationUnitService.getByUuid(documentationUnitId))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .coreData(
                     CoreData.builder()
                         .procedure(Procedure.builder().userGroupId(null).build())

@@ -6,8 +6,8 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
@@ -116,7 +116,7 @@ public class DocumentationUnitController {
    */
   @PutMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
-  public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
+  public ResponseEntity<Decision> generateNewDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody(required = false) Optional<DocumentationUnitCreationParameters> parameters) {
     try {
@@ -125,7 +125,7 @@ public class DocumentationUnitController {
       return ResponseEntity.status(HttpStatus.CREATED).body(documentationUnit);
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
-      return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
+      return ResponseEntity.internalServerError().body(Decision.builder().build());
     }
   }
 
@@ -214,7 +214,7 @@ public class DocumentationUnitController {
       UUID uuid, Attachment2Html attachment2Html, User user) {
     try {
       Documentable documentable = service.getByUuid(uuid);
-      if (documentable instanceof DocumentationUnit docUnit) {
+      if (documentable instanceof Decision docUnit) {
         documentationUnitDocxMetadataInitializationService.initializeCoreData(
             docUnit, attachment2Html, user);
         checkDuplicates(docUnit.documentNumber());
@@ -330,22 +330,22 @@ public class DocumentationUnitController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
-  public ResponseEntity<DocumentationUnit> updateByUuid(
+  public ResponseEntity<Decision> updateByUuid(
       @PathVariable UUID uuid,
-      @Valid @RequestBody DocumentationUnit documentationUnit,
+      @Valid @RequestBody Decision decision,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
-    if (!uuid.equals(documentationUnit.uuid())) {
-      return ResponseEntity.unprocessableEntity().body(DocumentationUnit.builder().build());
+    if (!uuid.equals(decision.uuid())) {
+      return ResponseEntity.unprocessableEntity().body(Decision.builder().build());
     }
     try {
-      var du = service.updateDocumentationUnit(documentationUnit);
+      var du = service.updateDocumentationUnit(decision);
       return ResponseEntity.status(HttpStatus.OK).body(du);
     } catch (DocumentationUnitNotExistsException
         | DocumentationUnitException
         | DocumentationUnitTransformerException e) {
-      log.error("Error by updating documentation unit '{}'", documentationUnit.documentNumber(), e);
-      return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
+      log.error("Error by updating documentation unit '{}'", decision.documentNumber(), e);
+      return ResponseEntity.internalServerError().body(Decision.builder().build());
     }
   }
 

@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
@@ -24,7 +24,7 @@ class NormReferenceTransformerTest {
 
   @Test
   void testTransformToDTO_addingANewSingleNormToTheExistingNormAbbreviation() {
-    DocumentationUnit documentationUnit = generateDocumentationUnit();
+    Decision decision = generateDocumentationUnit();
     DecisionDTO documentationUnitDTO =
         DecisionDTO.builder().normReferences(new ArrayList<>()).build();
     NormReferenceDTO normReferenceDTO1 =
@@ -39,12 +39,11 @@ class NormReferenceTransformerTest {
             .singleNorm("single norm 2")
             .rank(2)
             .build();
-    addNormReferenceToDomain(
-        documentationUnit, NORM_ABBREVIATION_UUID_1, "single norm 1", "single norm 2");
+    addNormReferenceToDomain(decision, NORM_ABBREVIATION_UUID_1, "single norm 1", "single norm 2");
     addNormReferenceToDTO(documentationUnitDTO, NORM_ABBREVIATION_UUID_1, 1, "single norm 1");
 
     DocumentationUnitDTO result =
-        DecisionTransformer.transformToDTO(documentationUnitDTO, documentationUnit);
+        DecisionTransformer.transformToDTO(documentationUnitDTO, decision);
 
     assertThat(result.getNormReferences())
         .usingRecursiveFieldByFieldElementComparator()
@@ -53,7 +52,7 @@ class NormReferenceTransformerTest {
 
   @Test
   void testTransformToDTO_addingANewSingleNormWithANewNormAbbreviation() {
-    DocumentationUnit documentationUnit = generateDocumentationUnit();
+    Decision decision = generateDocumentationUnit();
     DecisionDTO documentationUnitDTO =
         DecisionDTO.builder().normReferences(new ArrayList<>()).build();
     NormReferenceDTO normReferenceDTO1 =
@@ -68,12 +67,12 @@ class NormReferenceTransformerTest {
             .singleNorm("single norm 2")
             .rank(2)
             .build();
-    addNormReferenceToDomain(documentationUnit, NORM_ABBREVIATION_UUID_1, "single norm 1");
-    addNormReferenceToDomain(documentationUnit, NORM_ABBREVIATION_UUID_2, "single norm 2");
+    addNormReferenceToDomain(decision, NORM_ABBREVIATION_UUID_1, "single norm 1");
+    addNormReferenceToDomain(decision, NORM_ABBREVIATION_UUID_2, "single norm 2");
     addNormReferenceToDTO(documentationUnitDTO, NORM_ABBREVIATION_UUID_1, 1, "single norm 1");
 
     DocumentationUnitDTO result =
-        DecisionTransformer.transformToDTO(documentationUnitDTO, documentationUnit);
+        DecisionTransformer.transformToDTO(documentationUnitDTO, decision);
 
     assertThat(result.getNormReferences())
         .usingRecursiveFieldByFieldElementComparator()
@@ -83,7 +82,7 @@ class NormReferenceTransformerTest {
   @Test
   void
       testTransformToDTO_withTwoNormReferencesWithDifferentNormAbbreviationAddingANewSingleNormToTheFirstNormAbbreviation() {
-    DocumentationUnit documentationUnit = generateDocumentationUnit();
+    Decision decision = generateDocumentationUnit();
     DecisionDTO documentationUnitDTO =
         DecisionDTO.builder().normReferences(new ArrayList<>()).build();
     NormReferenceDTO normReferenceDTO1 =
@@ -105,14 +104,13 @@ class NormReferenceTransformerTest {
             .singleNorm("single norm 3")
             .rank(2)
             .build();
-    addNormReferenceToDomain(
-        documentationUnit, NORM_ABBREVIATION_UUID_1, "single norm 1", "single norm 3");
-    addNormReferenceToDomain(documentationUnit, NORM_ABBREVIATION_UUID_2, "single norm 2");
+    addNormReferenceToDomain(decision, NORM_ABBREVIATION_UUID_1, "single norm 1", "single norm 3");
+    addNormReferenceToDomain(decision, NORM_ABBREVIATION_UUID_2, "single norm 2");
     addNormReferenceToDTO(documentationUnitDTO, NORM_ABBREVIATION_UUID_1, 1, "single norm 1");
     addNormReferenceToDTO(documentationUnitDTO, NORM_ABBREVIATION_UUID_2, 2, "single norm 2");
 
     DocumentationUnitDTO result =
-        DecisionTransformer.transformToDTO(documentationUnitDTO, documentationUnit);
+        DecisionTransformer.transformToDTO(documentationUnitDTO, decision);
 
     // sequence change. second norm go to the end
     assertThat(result.getNormReferences())
@@ -122,7 +120,7 @@ class NormReferenceTransformerTest {
 
   @Test
   void testTransformToDTO_removeAExistingSingleNorm() {
-    DocumentationUnit documentationUnit = generateDocumentationUnit();
+    Decision decision = generateDocumentationUnit();
     DecisionDTO documentationUnitDTO =
         DecisionDTO.builder().normReferences(new ArrayList<>()).build();
     NormReferenceDTO normReferenceDTO1 =
@@ -131,12 +129,12 @@ class NormReferenceTransformerTest {
             .singleNorm("single norm 1")
             .rank(1)
             .build();
-    addNormReferenceToDomain(documentationUnit, NORM_ABBREVIATION_UUID_1, "single norm 1");
+    addNormReferenceToDomain(decision, NORM_ABBREVIATION_UUID_1, "single norm 1");
     addNormReferenceToDTO(
         documentationUnitDTO, NORM_ABBREVIATION_UUID_1, 1, "single norm 1", "single norm 2");
 
     DocumentationUnitDTO result =
-        DecisionTransformer.transformToDTO(documentationUnitDTO, documentationUnit);
+        DecisionTransformer.transformToDTO(documentationUnitDTO, decision);
 
     assertThat(result.getNormReferences())
         .usingRecursiveFieldByFieldElementComparator()
@@ -145,7 +143,7 @@ class NormReferenceTransformerTest {
 
   @Test
   void testTransformToDTO_removeAllExistingSingleNorm() {
-    DocumentationUnit documentationUnit = generateDocumentationUnit();
+    Decision decision = generateDocumentationUnit();
     DecisionDTO documentationUnitDTO =
         DecisionDTO.builder().normReferences(new ArrayList<>()).build();
     NormReferenceDTO normReferenceDTO1 =
@@ -154,12 +152,12 @@ class NormReferenceTransformerTest {
             .singleNorm(null)
             .rank(1)
             .build();
-    addNormReferenceToDomain(documentationUnit, NORM_ABBREVIATION_UUID_1);
+    addNormReferenceToDomain(decision, NORM_ABBREVIATION_UUID_1);
     addNormReferenceToDTO(
         documentationUnitDTO, NORM_ABBREVIATION_UUID_1, 1, "single norm 1", "single norm 2");
 
     DocumentationUnitDTO result =
-        DecisionTransformer.transformToDTO(documentationUnitDTO, documentationUnit);
+        DecisionTransformer.transformToDTO(documentationUnitDTO, decision);
 
     assertThat(result.getNormReferences())
         .usingRecursiveFieldByFieldElementComparator()
@@ -168,14 +166,14 @@ class NormReferenceTransformerTest {
 
   @Test
   void testTransformToDTO_removeExistingNormAbbreviation() {
-    DocumentationUnit documentationUnit = generateDocumentationUnit();
+    Decision decision = generateDocumentationUnit();
     DecisionDTO documentationUnitDTO =
         DecisionDTO.builder().normReferences(new ArrayList<>()).build();
     addNormReferenceToDTO(
         documentationUnitDTO, NORM_ABBREVIATION_UUID_1, 1, "single norm 1", "single norm 2");
 
     DocumentationUnitDTO result =
-        DecisionTransformer.transformToDTO(documentationUnitDTO, documentationUnit);
+        DecisionTransformer.transformToDTO(documentationUnitDTO, decision);
 
     assertThat(result.getNormReferences()).isEmpty();
   }
@@ -204,16 +202,16 @@ class NormReferenceTransformerTest {
             .singleNorms(List.of(SingleNorm.builder().singleNorm("single norm 2").build()))
             .build();
 
-    DocumentationUnit result = DecisionTransformer.transformToDomain(documentationUnitDTO);
+    Decision result = DecisionTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(result.contentRelatedIndexing().norms())
         .containsExactly(normReference1, normReference2);
   }
 
-  private DocumentationUnit generateDocumentationUnit() {
+  private Decision generateDocumentationUnit() {
     ContentRelatedIndexing contentRelatedIndexing =
         ContentRelatedIndexing.builder().norms(new ArrayList<>()).build();
-    return DocumentationUnit.builder().contentRelatedIndexing(contentRelatedIndexing).build();
+    return Decision.builder().contentRelatedIndexing(contentRelatedIndexing).build();
   }
 
   private DecisionDTO generateDocumentationUnitDTO() {
@@ -224,7 +222,7 @@ class NormReferenceTransformerTest {
   }
 
   private void addNormReferenceToDomain(
-      DocumentationUnit documentationUnit, UUID normAbbreviationId, String... singleNormTexts) {
+      Decision decision, UUID normAbbreviationId, String... singleNormTexts) {
 
     NormAbbreviation normAbbreviation = NormAbbreviation.builder().id(normAbbreviationId).build();
     List<SingleNorm> singleNorms = new ArrayList<>();
@@ -233,7 +231,7 @@ class NormReferenceTransformerTest {
     }
     NormReference normReference =
         NormReference.builder().normAbbreviation(normAbbreviation).singleNorms(singleNorms).build();
-    documentationUnit.contentRelatedIndexing().norms().add(normReference);
+    decision.contentRelatedIndexing().norms().add(normReference);
   }
 
   private void addNormReferenceToDTO(

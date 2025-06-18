@@ -35,9 +35,9 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -155,7 +155,7 @@ class DocumentationUnitFieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())
@@ -189,7 +189,7 @@ class DocumentationUnitFieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())
@@ -251,7 +251,7 @@ class DocumentationUnitFieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())
@@ -265,8 +265,8 @@ class DocumentationUnitFieldOfLawIntegrationTest {
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(documentationUnitDTO.getId())
             .documentNumber("docnr12345678")
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
@@ -289,11 +289,11 @@ class DocumentationUnitFieldOfLawIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
-        .bodyValue(documentationUnit)
+        .bodyValue(decision)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())
@@ -308,8 +308,8 @@ class DocumentationUnitFieldOfLawIntegrationTest {
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(documentationUnitDTO.getId())
             .documentNumber("docnr12345678")
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
@@ -329,7 +329,7 @@ class DocumentationUnitFieldOfLawIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
-        .bodyValue(documentationUnit)
+        .bodyValue(decision)
         .exchange()
         .expectStatus()
         .is5xxServerError();
@@ -353,8 +353,8 @@ class DocumentationUnitFieldOfLawIntegrationTest {
 
     documentationUnitRepository.save(documentationUnitDTO);
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(documentationUnitDTO.getId())
             .documentNumber("docnr12345678")
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
@@ -368,11 +368,11 @@ class DocumentationUnitFieldOfLawIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
-        .bodyValue(documentationUnit)
+        .bodyValue(decision)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())

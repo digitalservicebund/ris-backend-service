@@ -93,7 +93,7 @@ public class DocumentationUnitService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public DocumentationUnit generateNewDocumentationUnit(
+  public Decision generateNewDocumentationUnit(
       User user, Optional<DocumentationUnitCreationParameters> parameters)
       throws DocumentationUnitException {
 
@@ -124,7 +124,7 @@ public class DocumentationUnitService {
     return documentNumbers;
   }
 
-  private DocumentationUnit generateNewDocumentationUnit(
+  private Decision generateNewDocumentationUnit(
       User user, Optional<DocumentationUnitCreationParameters> parameters, String celexNumber) {
     var userDocOffice = user.documentationOffice();
     // default office is user office
@@ -143,8 +143,8 @@ public class DocumentationUnitService {
             && !userDocOffice.id().equals(params.documentationOffice().id())
             && celexNumber == null;
 
-    DocumentationUnit docUnit =
-        DocumentationUnit.builder()
+    Decision docUnit =
+        Decision.builder()
             .version(0L)
             .documentNumber(generateDocumentNumber(params.documentationOffice()))
             .coreData(
@@ -295,14 +295,14 @@ public class DocumentationUnitService {
     var documentable =
         repository.findByDocumentNumber(documentNumber, userService.getUser(oidcUser));
     switch (documentable) {
-      case DocumentationUnit documentationUnit -> {
-        return documentationUnit.toBuilder()
+      case Decision decision -> {
+        return decision.toBuilder()
             .isEditable(
                 authService.userHasWriteAccess(
                     oidcUser,
-                    documentationUnit.coreData().creatingDocOffice(),
-                    documentationUnit.coreData().documentationOffice(),
-                    documentationUnit.status()))
+                    decision.coreData().creatingDocOffice(),
+                    decision.coreData().documentationOffice(),
+                    decision.status()))
             .build();
       }
       case PendingProceeding pendingProceeding -> {
@@ -354,7 +354,7 @@ public class DocumentationUnitService {
 
     log.debug("Deleting DocumentationUnitDTO " + documentationUnitId);
 
-    if (docUnit instanceof DocumentationUnit decision
+    if (docUnit instanceof Decision decision
         && decision.attachments() != null
         && !decision.attachments().isEmpty())
       attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentationUnitId);
@@ -427,7 +427,7 @@ public class DocumentationUnitService {
         Documentable patchedDocumentationUnit =
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
 
-        if (patchedDocumentationUnit instanceof DocumentationUnit docUnit) {
+        if (patchedDocumentationUnit instanceof Decision docUnit) {
           patchedDocumentationUnit = docUnit.toBuilder().version(newVersion).build();
         } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
           patchedDocumentationUnit = pendingProceeding.toBuilder().version(newVersion).build();
@@ -436,7 +436,7 @@ public class DocumentationUnitService {
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
         Documentable updatedDocumentationUnit = null;
-        if (patchedDocumentationUnit instanceof DocumentationUnit docUnit) {
+        if (patchedDocumentationUnit instanceof Decision docUnit) {
           updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
         } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
           updatedDocumentationUnit = updatePendingProceeding(pendingProceeding, user);
@@ -496,29 +496,29 @@ public class DocumentationUnitService {
     return toFrontend;
   }
 
-  public DocumentationUnit updateDocumentationUnit(DocumentationUnit documentationUnit)
+  public Decision updateDocumentationUnit(Decision decision)
       throws DocumentationUnitNotExistsException {
-    return this.updateDocumentationUnit(documentationUnit, DuplicateCheckStatus.DISABLED, null);
+    return this.updateDocumentationUnit(decision, DuplicateCheckStatus.DISABLED, null);
   }
 
-  public DocumentationUnit updateDocumentationUnit(
-      DocumentationUnit documentationUnit, DuplicateCheckStatus duplicateCheckStatus, User user)
+  public Decision updateDocumentationUnit(
+      Decision decision, DuplicateCheckStatus duplicateCheckStatus, User user)
       throws DocumentationUnitNotExistsException {
-    repository.saveKeywords(documentationUnit);
-    repository.saveFieldsOfLaw(documentationUnit);
-    repository.saveProcedures(documentationUnit, user);
+    repository.saveKeywords(decision);
+    repository.saveFieldsOfLaw(decision);
+    repository.saveProcedures(decision, user);
 
-    repository.save(documentationUnit, user);
+    repository.save(decision, user);
 
     if (duplicateCheckStatus == DuplicateCheckStatus.ENABLED) {
       try {
-        duplicateCheckService.checkDuplicates(documentationUnit.documentNumber());
+        duplicateCheckService.checkDuplicates(decision.documentNumber());
       } catch (Exception e) {
         // Errors in duplicate check should not affect saving, logging in service
       }
     }
 
-    return (DocumentationUnit) repository.findByUuid(documentationUnit.uuid(), user);
+    return (Decision) repository.findByUuid(decision.uuid(), user);
   }
 
   public PendingProceeding updatePendingProceeding(PendingProceeding pendingProceeding, User user)
@@ -563,9 +563,9 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException, DocumentationOfficeNotExistsException {
     Documentable documentable = repository.findByUuid(documentationUnitId, user);
     var documentationOffice = documentationOfficeService.findByUuid(documentationOfficeId);
-    if (documentable instanceof DocumentationUnit documentationUnit) {
+    if (documentable instanceof Decision decision) {
       // Procedures need to be unassigned as they are linked to the previous documentation Office
-      repository.unassignProcedures(documentationUnit.uuid());
+      repository.unassignProcedures(decision.uuid());
       repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
       return "The documentation office [%s] has been successfully assigned."
           .formatted(documentationOffice.abbreviation());
@@ -596,8 +596,8 @@ public class DocumentationUnitService {
     Procedure procedure = Procedure.builder().label(procedureLabel).build();
     for (UUID documentationUnitId : documentationUnitIds) {
       Documentable documentable = repository.findByUuid(documentationUnitId, user);
-      if (documentable instanceof DocumentationUnit docUnit) {
-        DocumentationUnit updatedDocUnit =
+      if (documentable instanceof Decision docUnit) {
+        Decision updatedDocUnit =
             docUnit.toBuilder()
                 .coreData(docUnit.coreData().toBuilder().procedure(procedure).build())
                 // When a procedure is assigned, the doc unit is removed from the inbox

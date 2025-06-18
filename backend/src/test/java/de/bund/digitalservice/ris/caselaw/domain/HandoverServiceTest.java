@@ -54,7 +54,7 @@ class HandoverServiceTest {
 
   @Test
   void testHandoverByEmail() throws DocumentationUnitNotExistsException {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentationUnit.builder().build());
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Decision.builder().build());
     HandoverMail handoverMail =
         HandoverMail.builder()
             .entityId(TEST_UUID)
@@ -67,12 +67,12 @@ class HandoverServiceTest {
             .statusMessages(List.of("status messages"))
             .handoverDate(Instant.now())
             .build();
-    when(mailService.handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString()))
+    when(mailService.handOver(eq(Decision.builder().build()), anyString(), anyString()))
         .thenReturn(handoverMail);
     var mailResponse = service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null);
     assertThat(mailResponse).usingRecursiveComparison().isEqualTo(handoverMail);
     verify(repository).findByUuid(TEST_UUID);
-    verify(mailService).handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString());
+    verify(mailService).handOver(eq(Decision.builder().build()), anyString(), anyString());
   }
 
   @Test
@@ -113,8 +113,7 @@ class HandoverServiceTest {
         DocumentationUnitNotExistsException.class,
         () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null));
     verify(repository).findByUuid(TEST_UUID);
-    verify(mailService, never())
-        .handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString());
+    verify(mailService, never()).handOver(eq(Decision.builder().build()), anyString(), anyString());
   }
 
   @Test
@@ -304,11 +303,11 @@ class HandoverServiceTest {
 
   @Test
   void testPreviewXml() throws DocumentationUnitNotExistsException {
-    DocumentationUnit testDocumentationUnit = DocumentationUnit.builder().build();
+    Decision testDecision = Decision.builder().build();
     XmlTransformationResult mockXmlTransformationResult =
         new XmlTransformationResult("some xml", true, List.of("success"), "foo.xml", Instant.now());
-    when(repository.findByUuid(TEST_UUID)).thenReturn(testDocumentationUnit);
-    when(mailService.getXmlPreview(testDocumentationUnit)).thenReturn(mockXmlTransformationResult);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(testDecision);
+    when(mailService.getXmlPreview(testDecision)).thenReturn(mockXmlTransformationResult);
 
     Assertions.assertEquals(mockXmlTransformationResult, service.createPreviewXml(TEST_UUID));
   }

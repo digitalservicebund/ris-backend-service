@@ -66,11 +66,11 @@ public class HandoverService {
 
     Documentable documentable = repository.findByUuid(documentationUnitId);
 
-    if (documentable instanceof DocumentationUnit documentationUnit) {
+    if (documentable instanceof Decision decision) {
       String description = "Dokeinheit an jDV übergeben";
       historyLogService.saveHistoryLog(
-          documentationUnit.uuid(), user, HistoryLogEventType.HANDOVER, description);
-      return mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
+          decision.uuid(), user, HistoryLogEventType.HANDOVER, description);
+      return mailService.handOver(decision, recipientAddress, issuerAddress);
     } else {
       log.info("Documentable type not supported: {}", documentable.getClass().getName());
       return null;
@@ -110,8 +110,8 @@ public class HandoverService {
 
     Documentable documentable = repository.findByUuid(documentUuid);
 
-    if (documentable instanceof DocumentationUnit documentationUnit) {
-      return mailService.getXmlPreview(documentationUnit);
+    if (documentable instanceof Decision decision) {
+      return mailService.getXmlPreview(decision);
     } else {
       log.info("Documentable type not supported: {}", documentable.getClass().getName());
     }

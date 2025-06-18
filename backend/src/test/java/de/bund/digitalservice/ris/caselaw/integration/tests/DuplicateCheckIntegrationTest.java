@@ -54,9 +54,9 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -229,7 +229,7 @@ class DuplicateCheckIntegrationTest {
       duplicateCheckService.checkDuplicates(docUnitWithoutFileNumbers.getDocumentNumber());
 
       var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitWithoutFileNumbers.getId());
+          (Decision) documentationUnitService.getByUuid(docUnitWithoutFileNumbers.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -251,7 +251,7 @@ class DuplicateCheckIntegrationTest {
       duplicateCheckService.checkDuplicates(docUnitWithoutFileNumbers.getDocumentNumber());
 
       var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitWithoutFileNumbers.getId());
+          (Decision) documentationUnitService.getByUuid(docUnitWithoutFileNumbers.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -293,8 +293,7 @@ class DuplicateCheckIntegrationTest {
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) initialDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(((Decision) initialDocUnit).managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -328,8 +327,7 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -369,8 +367,7 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -412,8 +409,7 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -456,8 +452,7 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -500,8 +495,7 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -543,8 +537,7 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -585,7 +578,7 @@ class DuplicateCheckIntegrationTest {
       // Create duplicate with pending status
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+              ((Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations()
                   .getFirst()
@@ -598,8 +591,7 @@ class DuplicateCheckIntegrationTest {
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -647,7 +639,7 @@ class DuplicateCheckIntegrationTest {
       // Create duplicates
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+              ((Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations()
                   .getFirst()
@@ -661,8 +653,7 @@ class DuplicateCheckIntegrationTest {
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -700,7 +691,7 @@ class DuplicateCheckIntegrationTest {
       // Create duplicates
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+              ((Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations())
           .hasSize(1);
@@ -712,7 +703,7 @@ class DuplicateCheckIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+              ((Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations())
           .isEmpty();
@@ -758,7 +749,7 @@ class DuplicateCheckIntegrationTest {
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       // ... it won't be sent to the frontend
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+              ((Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations())
           .isEmpty();
@@ -800,7 +791,7 @@ class DuplicateCheckIntegrationTest {
               .exchange()
               .expectStatus()
               .isOk()
-              .expectBody(DocumentationUnit.class)
+              .expectBody(Decision.class)
               .returnResult()
               .getResponseBody();
 
@@ -853,7 +844,7 @@ class DuplicateCheckIntegrationTest {
 
       // Assert
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(original.getId()))
+              ((Decision) documentationUnitService.getByUuid(original.getId()))
                   .managementData()
                   .duplicateRelations()
                   .getFirst()
@@ -905,8 +896,7 @@ class DuplicateCheckIntegrationTest {
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -925,8 +915,7 @@ class DuplicateCheckIntegrationTest {
 
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -971,7 +960,7 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates("DocumentNumb2");
 
-      var foundDocUnit = (DocumentationUnit) documentationUnitService.getByUuid(decision.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(decision.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -1020,7 +1009,7 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates("DocumentNumb2");
 
-      var foundDocUnit = (DocumentationUnit) documentationUnitService.getByUuid(decision.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(decision.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -1068,7 +1057,7 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates("DocumentNumb2");
 
-      var foundDocUnit = (DocumentationUnit) documentationUnitService.getByUuid(decision.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(decision.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -1118,7 +1107,7 @@ class DuplicateCheckIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates("DocumentNumb2");
 
-      var foundDocUnit = (DocumentationUnit) documentationUnitService.getByUuid(decision.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(decision.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -1431,8 +1420,8 @@ class DuplicateCheckIntegrationTest {
       params = params.toBuilder().documentationOffice(userDocOffice).build();
     }
 
-    DocumentationUnit docUnit =
-        DocumentationUnit.builder()
+    Decision docUnit =
+        Decision.builder()
             .version(0L)
             .documentNumber(params.documentNumber())
             .coreData(

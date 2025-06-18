@@ -8,9 +8,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ApiKeyTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -39,24 +39,23 @@ import org.springframework.stereotype.Service;
  * Service responsible for handling authorization checks for users.
  *
  * <p>This service provides functionality to verify user access rights to various resources,
- * including {@link DocumentationUnit}s and {@link Procedure}s, based on user roles and assigned
- * permissions.
+ * including {@link Decision}s and {@link Procedure}s, based on user roles and assigned permissions.
  *
  * <p>Key methods include:
  *
  * <ul>
  *   <li>{@link #userHasReadAccessByDocumentNumber()}: Checks if a user has read access to a {@link
- *       DocumentationUnit} by its {@link DocumentationUnit#documentNumber() documentNumber}.
+ *       Decision} by its {@link Decision#documentNumber() documentNumber}.
  *   <li>{@link #userHasReadAccessByDocumentationUnitId()}: Checks if a user has read access to a
- *       {@link DocumentationUnit} by its {@link UUID}.
+ *       {@link Decision} by its {@link UUID}.
  *   <li>{@link #userIsInternal()}: Determines if a user is an internal user based on their {@link
  *       OidcUser} roles.
  *   <li>{@link #userHasWriteAccessByProcedureId()}: Checks if a user has write access to a {@link
  *       Procedure} by its {@link UUID}.
  *   <li>{@link #userHasWriteAccess()}: Checks if a user has the same {@link DocumentationOffice} as
- *       the {@link DocumentationUnit} by its {@link UUID}
+ *       the {@link Decision} by its {@link UUID}
  *   <li>{@link #isAssignedViaProcedure()}: Checks if a {@link Procedure} associated with a {@link
- *       DocumentationUnit} is assigned to the current {@link OidcUser}
+ *       Decision} is assigned to the current {@link OidcUser}
  *   <li>{@link #isPatchAllowedForExternalUsers()}: Checks if a {@link RisJsonPatch} operation is
  *       permitted for external users.
  * </ul>
@@ -106,16 +105,16 @@ public class OAuthService implements AuthService {
   }
 
   /**
-   * Creates a Spring bean that checks if a user has read access to a {@link DocumentationUnit} by
-   * its {@link DocumentationUnit#documentNumber() documentNumber}.
+   * Creates a Spring bean that checks if a user has read access to a {@link Decision} by its {@link
+   * Decision#documentNumber() documentNumber}.
    *
-   * <p>The function retrieves the {@link DocumentationUnit} using the {@link
-   * DocumentationUnit#documentNumber() documentNumber} and checks if the user has read access.
-   * Returns {@link Boolean#FALSE false} if the {@link DocumentationUnit} is not found.
+   * <p>The function retrieves the {@link Decision} using the {@link Decision#documentNumber()
+   * documentNumber} and checks if the user has read access. Returns {@link Boolean#FALSE false} if
+   * the {@link Decision} is not found.
    *
-   * @return a {@link Function} that accepts a {@link DocumentationUnit#documentNumber()
-   *     documentNumber} as {@link String} and returns {@link Boolean#TRUE true} if the user has
-   *     read access, otherwise {@link Boolean#FALSE false}.
+   * @return a {@link Function} that accepts a {@link Decision#documentNumber() documentNumber} as
+   *     {@link String} and returns {@link Boolean#TRUE true} if the user has read access, otherwise
+   *     {@link Boolean#FALSE false}.
    */
   @Bean
   public Function<String, Boolean> userHasReadAccessByDocumentNumber() {
@@ -131,11 +130,11 @@ public class OAuthService implements AuthService {
   }
 
   /**
-   * Creates a Spring bean that checks if a user has read access to a {@link DocumentationUnit} by
-   * its {@link UUID}.
+   * Creates a Spring bean that checks if a user has read access to a {@link Decision} by its {@link
+   * UUID}.
    *
-   * <p>The function retrieves the {@link DocumentationUnit} and checks if the user has read access.
-   * Returns {@link Boolean#FALSE false} if the {@link DocumentationUnit} is not found.
+   * <p>The function retrieves the {@link Decision} and checks if the user has read access. Returns
+   * {@link Boolean#FALSE false} if the {@link Decision} is not found.
    *
    * @return a {@link Function} that accepts a {@link UUID} and returns {@link Boolean#TRUE true} if
    *     the user has read access, otherwise {@link Boolean#FALSE false}.
@@ -189,11 +188,11 @@ public class OAuthService implements AuthService {
 
   /**
    * Creates a Spring bean that checks if a user has the same {@link DocumentationOffice} as the
-   * {@link DocumentationUnit} by its {@link UUID}.
+   * {@link Decision} by its {@link UUID}.
    *
-   * <p>The function retrieves the {@link DocumentationUnit} by its {@link UUID} and verifies if the
-   * user has the same {@link DocumentationOffice}. Returns {@link Boolean#FALSE false} if the
-   * {@link DocumentationUnit} is not found.
+   * <p>The function retrieves the {@link Decision} by its {@link UUID} and verifies if the user has
+   * the same {@link DocumentationOffice}. Returns {@link Boolean#FALSE false} if the {@link
+   * Decision} is not found.
    *
    * @return a {@link Function} that accepts a {@link UUID} and returns {@link Boolean#TRUE true} if
    *     the user has the same {@link DocumentationOffice}, otherwise {@link Boolean#FALSE false}.
@@ -244,12 +243,12 @@ public class OAuthService implements AuthService {
   }
 
   /**
-   * Creates a Spring bean that checks if a {@link Procedure} associated with a {@link
-   * DocumentationUnit} is assigned to the current {@link OidcUser}.
+   * Creates a Spring bean that checks if a {@link Procedure} associated with a {@link Decision} is
+   * assigned to the current {@link OidcUser}.
    *
-   * <p>The function retrieves the {@link Procedure} of the {@link DocumentationUnit} by the given
-   * {@link UUID} and verifies if it is assigned to the current {@link OidcUser}. Returns {@link
-   * Boolean#FALSE false} if no {@link DocumentationUnit} or {@link Procedure} is found.
+   * <p>The function retrieves the {@link Procedure} of the {@link Decision} by the given {@link
+   * UUID} and verifies if it is assigned to the current {@link OidcUser}. Returns {@link
+   * Boolean#FALSE false} if no {@link Decision} or {@link Procedure} is found.
    *
    * @return a {@link Function} that accepts a {@link UUID} and returns {@link Boolean#TRUE true} if
    *     the {@link Procedure} is assigned to the current user, otherwise {@link Boolean#FALSE

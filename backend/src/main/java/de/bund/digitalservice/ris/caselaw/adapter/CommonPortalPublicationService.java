@@ -6,8 +6,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Documentable;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
@@ -83,11 +83,11 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
   }
 
   private void publishToBucket(Documentable documentable) {
-    if (!(documentable instanceof DocumentationUnit documentationUnit)) {
+    if (!(documentable instanceof Decision decision)) {
       // for now pending proceedings can not be transformed to LDML, so they are ignored.
       return;
     }
-    CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
+    CaseLawLdml ldml = ldmlTransformer.transformToLdml(decision);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);

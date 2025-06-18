@@ -28,7 +28,7 @@ import lombok.Builder;
  * @param isEditable a flag indicating if the documentation unit is editable by the user
  */
 @Builder(toBuilder = true)
-public record DocumentationUnit(
+public record Decision(
     UUID uuid,
     Long version,
     @Size(min = 13, max = 14, message = "documentNumber has to be 13 or 14 characters long")

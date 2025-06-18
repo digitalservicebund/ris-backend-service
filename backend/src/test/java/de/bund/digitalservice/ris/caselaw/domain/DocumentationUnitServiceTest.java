@@ -90,10 +90,10 @@ class DocumentationUnitServiceTest {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    Decision decision = Decision.builder().build();
 
     when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
-        .thenReturn(documentationUnit);
+        .thenReturn(decision);
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
     // Can we use a captor to check if the document number was correctly created?
@@ -106,7 +106,7 @@ class DocumentationUnitServiceTest {
     verify(duplicateCheckService, times(1)).checkDuplicates("nextDocumentNumber");
     verify(repository)
         .createNewDocumentationUnit(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .version(0L)
                 .documentNumber("nextDocumentNumber")
                 .coreData(
@@ -134,7 +134,7 @@ class DocumentationUnitServiceTest {
     User user = User.builder().documentationOffice(userDocumentationOffice).build();
     DocumentationOffice designatedDocumentationOffice =
         DocumentationOffice.builder().abbreviation("BGH").id(UUID.randomUUID()).build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    Decision decision = Decision.builder().build();
     DocumentationUnitCreationParameters parameters =
         DocumentationUnitCreationParameters.builder()
             .documentationOffice(designatedDocumentationOffice)
@@ -150,7 +150,7 @@ class DocumentationUnitServiceTest {
             .build();
 
     when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
-        .thenReturn(documentationUnit);
+        .thenReturn(decision);
 
     when(documentNumberService.generateDocumentNumber(designatedDocumentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
@@ -164,7 +164,7 @@ class DocumentationUnitServiceTest {
         .generateDocumentNumber(designatedDocumentationOffice.abbreviation());
     verify(repository)
         .createNewDocumentationUnit(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .version(0L)
                 .documentNumber("nextDocumentNumber")
                 .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
@@ -189,10 +189,9 @@ class DocumentationUnitServiceTest {
 
   @Test
   void testGetByDocumentnumber() throws DocumentationUnitNotExistsException {
-    when(repository.findByDocumentNumber("ABCDE20220001"))
-        .thenReturn(DocumentationUnit.builder().build());
+    when(repository.findByDocumentNumber("ABCDE20220001")).thenReturn(Decision.builder().build());
     var documentationUnit = service.getByDocumentNumber("ABCDE20220001");
-    assertEquals(DocumentationUnit.class, documentationUnit.getClass());
+    assertEquals(Decision.class, documentationUnit.getClass());
 
     verify(repository).findByDocumentNumber("ABCDE20220001");
   }
@@ -202,9 +201,9 @@ class DocumentationUnitServiceTest {
     // I think I shouldn't have to insert a specific DocumentationUnit object here?
     // But if I don't, the test by itself succeeds, but fails if all tests in this class run
     // something flaky with the repository mock? Investigate this later
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().uuid(TEST_UUID).build();
+    Decision decision = Decision.builder().uuid(TEST_UUID).build();
     // can we also test that the fileUuid from the DocumentationUnit is used? with a captor somehow?
-    when(repository.findByUuid(TEST_UUID, null)).thenReturn(documentationUnit);
+    when(repository.findByUuid(TEST_UUID, null)).thenReturn(decision);
 
     var string = service.deleteByUuid(TEST_UUID);
     assertNotNull(string);
@@ -215,15 +214,15 @@ class DocumentationUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withFileAttached() throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(TEST_UUID)
             .attachments(
                 Collections.singletonList(
                     Attachment.builder().s3path(TEST_UUID.toString()).build()))
             .build();
 
-    when(repository.findByUuid(TEST_UUID, null)).thenReturn(documentationUnit);
+    when(repository.findByUuid(TEST_UUID, null)).thenReturn(decision);
 
     var string = service.deleteByUuid(TEST_UUID);
     assertNotNull(string);
@@ -236,10 +235,8 @@ class DocumentationUnitServiceTest {
   void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository()
       throws DocumentationUnitNotExistsException {
 
-    when(repository.findByUuid(TEST_UUID, null)).thenReturn(DocumentationUnit.builder().build());
-    doThrow(new IllegalArgumentException())
-        .when(repository)
-        .delete(DocumentationUnit.builder().build());
+    when(repository.findByUuid(TEST_UUID, null)).thenReturn(Decision.builder().build());
+    doThrow(new IllegalArgumentException()).when(repository).delete(Decision.builder().build());
 
     Assertions.assertThrows(
         DocumentationUnitDeletionException.class, () -> service.deleteByUuid(TEST_UUID));
@@ -250,7 +247,7 @@ class DocumentationUnitServiceTest {
   @Test
   void testDeleteByUuid_withLinks() throws DocumentationUnitNotExistsException {
     when(repository.findByUuid(TEST_UUID, null))
-        .thenReturn(DocumentationUnit.builder().documentNumber("foo").build());
+        .thenReturn(Decision.builder().documentNumber("foo").build());
     when(repository.getAllRelatedDocumentationUnitsByDocumentNumber(any(String.class)))
         .thenReturn(Map.of(ACTIVE_CITATION, 2L));
     DocumentationUnitDeletionException throwable =
@@ -265,20 +262,20 @@ class DocumentationUnitServiceTest {
 
   @Test
   void testUpdateDocumentationUnit() throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
             .attachments(
                 Collections.singletonList(
                     Attachment.builder().uploadTimestamp(Instant.now()).build()))
             .build();
-    when(repository.findByUuid(documentationUnit.uuid(), null)).thenReturn(documentationUnit);
+    when(repository.findByUuid(decision.uuid(), null)).thenReturn(decision);
 
-    var du = service.updateDocumentationUnit(documentationUnit);
-    assertEquals(du, documentationUnit);
+    var du = service.updateDocumentationUnit(decision);
+    assertEquals(du, decision);
 
-    verify(repository).save(documentationUnit, null);
+    verify(repository).save(decision, null);
   }
 
   @Test
@@ -334,8 +331,8 @@ class DocumentationUnitServiceTest {
   @Test
   void testPatchUpdateWithOnlyVersion_shouldNotIncrementVersion()
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
             .attachments(
@@ -344,7 +341,7 @@ class DocumentationUnitServiceTest {
             .version(0L)
             .build();
     User user = User.builder().build();
-    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+    when(repository.findByUuid(decision.uuid(), user)).thenReturn(decision);
     when(patchMapperService.calculatePatch(any(), any())).thenReturn(new JsonPatch(List.of()));
     when(patchMapperService.removePatchForSamePath(any(), any()))
         .thenReturn(new JsonPatch(List.of()));
@@ -361,7 +358,7 @@ class DocumentationUnitServiceTest {
     JsonPatch patch = new JsonPatch(List.of(replaceOp));
     var risJsonPatch = RisJsonPatch.builder().documentationUnitVersion(1L).patch(patch).build();
 
-    var response = service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch, user);
+    var response = service.updateDocumentationUnit(decision.uuid(), risJsonPatch, user);
     assertEquals(0L, response.documentationUnitVersion());
   }
 
@@ -370,8 +367,8 @@ class DocumentationUnitServiceTest {
   void testPatchUpdateWithCoreData_shouldTriggerDuplicateCheck(String path)
       throws DocumentationUnitNotExistsException {
     // Arrange
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
             .attachments(
@@ -385,10 +382,10 @@ class DocumentationUnitServiceTest {
     JsonPatch patch = new JsonPatch(List.of(addOperation));
     User user = User.builder().build();
 
-    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+    when(repository.findByUuid(decision.uuid(), user)).thenReturn(decision);
     when(patchMapperService.calculatePatch(any(), any())).thenReturn(new JsonPatch(List.of()));
     when(patchMapperService.removePatchForSamePath(any(), any())).thenReturn(patch);
-    when(patchMapperService.applyPatchToEntity(any(), any())).thenReturn(documentationUnit);
+    when(patchMapperService.applyPatchToEntity(any(), any())).thenReturn(decision);
     when(patchMapperService.handlePatchForSamePath(any(), any(), any(), any()))
         .thenReturn(
             RisJsonPatch.builder()
@@ -403,7 +400,7 @@ class DocumentationUnitServiceTest {
     var risJsonPatch = RisJsonPatch.builder().patch(jsonPatch).build();
 
     // Act
-    service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch, user);
+    service.updateDocumentationUnit(decision.uuid(), risJsonPatch, user);
 
     // Assert
     verify(duplicateCheckService, times(1)).checkDuplicates("ABCDE20220001");
@@ -414,8 +411,8 @@ class DocumentationUnitServiceTest {
   void testPatchUpdateWithoutCoreData_shouldNotTriggerDuplicateCheck(String path)
       throws DocumentationUnitNotExistsException {
     // Arrange
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
             .attachments(
@@ -429,10 +426,10 @@ class DocumentationUnitServiceTest {
     JsonPatch patch = new JsonPatch(List.of(addOperation));
     User user = User.builder().build();
 
-    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+    when(repository.findByUuid(decision.uuid(), user)).thenReturn(decision);
     when(patchMapperService.calculatePatch(any(), any())).thenReturn(new JsonPatch(List.of()));
     when(patchMapperService.removePatchForSamePath(any(), any())).thenReturn(patch);
-    when(patchMapperService.applyPatchToEntity(any(), any())).thenReturn(documentationUnit);
+    when(patchMapperService.applyPatchToEntity(any(), any())).thenReturn(decision);
     when(patchMapperService.handlePatchForSamePath(any(), any(), any(), any()))
         .thenReturn(
             RisJsonPatch.builder()
@@ -447,7 +444,7 @@ class DocumentationUnitServiceTest {
     var risJsonPatch = RisJsonPatch.builder().patch(jsonPatch).build();
 
     // Act
-    service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch, user);
+    service.updateDocumentationUnit(decision.uuid(), risJsonPatch, user);
 
     // Assert
     verify(duplicateCheckService, never()).checkDuplicates("ABCDE20220001");
@@ -463,7 +460,7 @@ class DocumentationUnitServiceTest {
     when(authService.userIsInternal()).thenReturn(user -> true);
     when(authService.isAssignedViaProcedure()).thenReturn(user -> true);
     when(repository.findByDocumentNumber(any()))
-        .thenReturn(DocumentationUnit.builder().uuid(UUID.randomUUID()).build());
+        .thenReturn(Decision.builder().uuid(UUID.randomUUID()).build());
     when(repository.searchByDocumentationUnitSearchInput(
             pageRequest, oidcUser, documentationUnitSearchInput))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
@@ -497,7 +494,7 @@ class DocumentationUnitServiceTest {
     when(authService.userIsInternal()).thenReturn(user -> true);
     when(authService.isAssignedViaProcedure()).thenReturn(user -> true);
     when(repository.findByDocumentNumber(any()))
-        .thenReturn(DocumentationUnit.builder().uuid(UUID.randomUUID()).build());
+        .thenReturn(Decision.builder().uuid(UUID.randomUUID()).build());
     when(repository.searchByDocumentationUnitSearchInput(
             any(PageRequest.class), any(OidcUser.class), any(DocumentationUnitSearchInput.class)))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
@@ -582,11 +579,11 @@ class DocumentationUnitServiceTest {
 
   @Test
   void test_saveSuccessfulPublicationDateTime_shouldSaveLastPublication() {
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    Decision decision = Decision.builder().build();
 
-    service.saveSuccessfulPublication(documentationUnit.uuid());
+    service.saveSuccessfulPublication(decision.uuid());
 
-    verify(repository, times(1)).saveSuccessfulPublication(documentationUnit.uuid());
+    verify(repository, times(1)).saveSuccessfulPublication(decision.uuid());
   }
 
   @Test
@@ -594,8 +591,8 @@ class DocumentationUnitServiceTest {
       throws DocumentationUnitNotExistsException {
     // Arrange
     User user = User.builder().build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
-    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+    Decision decision = Decision.builder().build();
+    when(repository.findByUuid(decision.uuid(), user)).thenReturn(decision);
     UUID documentationOfficeId = UUID.randomUUID();
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().id(documentationOfficeId).build();
@@ -603,10 +600,10 @@ class DocumentationUnitServiceTest {
         .thenReturn(documentationOffice);
 
     // Act
-    service.assignDocumentationOffice(documentationUnit.uuid(), documentationOfficeId, user);
+    service.assignDocumentationOffice(decision.uuid(), documentationOfficeId, user);
 
     // Assert
-    verify(repository, times(1)).unassignProcedures(documentationUnit.uuid());
+    verify(repository, times(1)).unassignProcedures(decision.uuid());
   }
 
   @Test
@@ -617,17 +614,17 @@ class DocumentationUnitServiceTest {
     UUID documentationOfficeId = UUID.randomUUID();
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().id(documentationOfficeId).build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    Decision decision = Decision.builder().build();
     when(documentationOfficeService.findByUuid(documentationOfficeId))
         .thenReturn(documentationOffice);
-    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+    when(repository.findByUuid(decision.uuid(), user)).thenReturn(decision);
 
     // Act
-    service.assignDocumentationOffice(documentationUnit.uuid(), documentationOfficeId, user);
+    service.assignDocumentationOffice(decision.uuid(), documentationOfficeId, user);
 
     // Assert
     verify(repository, times(1))
-        .saveDocumentationOffice(documentationUnit.uuid(), documentationOffice, user);
+        .saveDocumentationOffice(decision.uuid(), documentationOffice, user);
   }
 
   @Test
@@ -690,25 +687,23 @@ class DocumentationUnitServiceTest {
     UUID documentationOfficeId = UUID.randomUUID();
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().id(documentationOfficeId).build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    Decision decision = Decision.builder().build();
     var errorMessage =
         String.format("The documentation office with id %s doesn't exist.", documentationOfficeId);
     when(documentationOfficeService.findByUuid(documentationOfficeId))
         .thenThrow(new DocumentationOfficeNotExistsException(errorMessage));
-    when(repository.findByUuid(documentationUnit.uuid(), user)).thenReturn(documentationUnit);
+    when(repository.findByUuid(decision.uuid(), user)).thenReturn(decision);
 
     // Assert
     assertThatThrownBy(
             () ->
                 // Act
-                service.assignDocumentationOffice(
-                    documentationUnit.uuid(), documentationOfficeId, user))
+                service.assignDocumentationOffice(decision.uuid(), documentationOfficeId, user))
         .isInstanceOf(DocumentationOfficeNotExistsException.class)
         .hasMessageContaining(errorMessage);
 
-    verify(repository, never()).unassignProcedures(documentationUnit.uuid());
-    verify(repository, never())
-        .saveDocumentationOffice(documentationUnit.uuid(), documentationOffice, user);
+    verify(repository, never()).unassignProcedures(decision.uuid());
+    verify(repository, never()).saveDocumentationOffice(decision.uuid(), documentationOffice, user);
   }
 
   static Stream<String> provideDuplicateCheckPaths() {

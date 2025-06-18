@@ -5,8 +5,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -50,7 +50,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class PrototypePortalTransformerTest {
 
-  private static DocumentationUnit testDocumentUnit;
+  private static Decision testDocumentUnit;
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
 
   private static PrototypePortalTransformer subject;
@@ -258,7 +258,7 @@ class PrototypePortalTransformerTest {
         ensuingDecision1.toBuilder().documentNumber("previous decision document number 2").build();
 
     testDocumentUnit =
-        DocumentationUnit.builder()
+        Decision.builder()
             .uuid(documentationUnitId)
             .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
             .note("note test")

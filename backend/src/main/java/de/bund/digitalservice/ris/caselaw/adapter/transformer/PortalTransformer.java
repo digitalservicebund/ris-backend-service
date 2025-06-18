@@ -12,8 +12,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -41,39 +41,37 @@ public class PortalTransformer extends CommonPortalTransformer {
   }
 
   @Override
-  protected Meta buildMeta(DocumentationUnit documentationUnit) throws ValidationException {
-    validateCoreData(documentationUnit);
+  protected Meta buildMeta(Decision decision) throws ValidationException {
+    validateCoreData(decision);
 
     Meta.MetaBuilder builder = Meta.builder();
 
     List<AknKeyword> keywords =
-        documentationUnit.contentRelatedIndexing() == null
+        decision.contentRelatedIndexing() == null
             ? Collections.emptyList()
-            : documentationUnit.contentRelatedIndexing().keywords().stream()
-                .map(AknKeyword::new)
-                .toList();
+            : decision.contentRelatedIndexing().keywords().stream().map(AknKeyword::new).toList();
 
     if (!keywords.isEmpty()) {
       builder.classification(Classification.builder().keyword(keywords).build());
     }
 
     return builder
-        .identification(buildIdentification(documentationUnit))
-        .proprietary(Proprietary.builder().meta(buildRisMeta(documentationUnit)).build())
+        .identification(buildIdentification(decision))
+        .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .build();
   }
 
-  private RisMeta buildRisMeta(DocumentationUnit documentationUnit) {
-    var builder = buildCommonRisMeta(documentationUnit);
+  private RisMeta buildRisMeta(Decision decision) {
+    var builder = buildCommonRisMeta(decision);
 
-    var contentRelatedIndexing = documentationUnit.contentRelatedIndexing();
+    var contentRelatedIndexing = decision.contentRelatedIndexing();
     if (contentRelatedIndexing != null && contentRelatedIndexing.fieldsOfLaw() != null) {
       applyIfNotEmpty(
           contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
           builder::fieldOfLaw);
     }
 
-    var coreData = documentationUnit.coreData();
+    var coreData = decision.coreData();
     if (coreData != null) {
       if (coreData.deviatingDecisionDates() != null) {
         applyIfNotEmpty(
@@ -88,7 +86,7 @@ public class PortalTransformer extends CommonPortalTransformer {
         applyIfNotEmpty(
             Stream.of(coreData.procedure())
                 .map(Procedure::label)
-                .flatMap(it -> documentationUnit.coreData().previousProcedures().stream())
+                .flatMap(it -> decision.coreData().previousProcedures().stream())
                 .toList(),
             builder::procedure);
       }
@@ -106,12 +104,12 @@ public class PortalTransformer extends CommonPortalTransformer {
               nullSafeGet(coreData.documentationOffice(), DocumentationOffice::abbreviation));
     }
 
-    var decisionName = nullSafeGet(documentationUnit.shortTexts(), ShortTexts::decisionName);
+    var decisionName = nullSafeGet(decision.shortTexts(), ShortTexts::decisionName);
     if (StringUtils.isNotEmpty(decisionName)) {
       builder.decisionName(List.of(decisionName));
     }
 
-    Status lastStatus = documentationUnit.status();
+    Status lastStatus = decision.status();
 
     return builder
         .publicationStatus(
@@ -122,13 +120,13 @@ public class PortalTransformer extends CommonPortalTransformer {
   }
 
   @Override
-  protected AknMultipleBlock buildIntroduction(DocumentationUnit documentationUnit) {
-    var shortTexts = documentationUnit.shortTexts();
+  protected AknMultipleBlock buildIntroduction(Decision decision) {
+    var shortTexts = decision.shortTexts();
 
     var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
     var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
-    var outline = nullSafeGet(documentationUnit.longTexts(), LongTexts::outline);
-    var tenor = nullSafeGet(documentationUnit.longTexts(), LongTexts::tenor);
+    var outline = nullSafeGet(decision.longTexts(), LongTexts::outline);
+    var tenor = nullSafeGet(decision.longTexts(), LongTexts::tenor);
 
     if (StringUtils.isNotEmpty(headnote)
         || StringUtils.isNotEmpty(otherHeadnote)

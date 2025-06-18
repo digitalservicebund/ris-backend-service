@@ -54,15 +54,15 @@ public interface DocumentationUnitRepository {
   /**
    * Create a new documentation unit with the given document number and documentation office
    *
-   * @param documentationUnit the documentation unit to create
+   * @param decision the documentation unit to create
    * @param status the status of the new documentation unit
    * @param createdFromReference the reference the documentation unit is created from
    * @param fileNumber Aktenzeichen
    * @param user the {@link User}
    * @return the new documentation unit
    */
-  DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit documentationUnit,
+  Decision createNewDocumentationUnit(
+      Decision decision,
       Status status,
       Reference createdFromReference,
       String fileNumber,
@@ -172,7 +172,7 @@ public interface DocumentationUnitRepository {
   List<UUID> getRandomDocumentationUnitIds();
 
   /** Returns doc units with a scheduled publication date that is in the past. */
-  List<DocumentationUnit> getScheduledDocumentationUnitsDueNow();
+  List<Decision> getScheduledDocumentationUnitsDueNow();
 
   List<String> findAllDocumentNumbersByMatchingPublishCriteria();
 }

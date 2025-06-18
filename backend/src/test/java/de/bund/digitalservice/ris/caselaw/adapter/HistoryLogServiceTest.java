@@ -16,7 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRelatedDo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
@@ -72,15 +72,15 @@ class HistoryLogServiceTest {
   void testScheduledPublicationDate_createDate_shouldLogSetDate() {
     UUID documentationUnitId = UUID.randomUUID();
     DecisionDTO dto = DecisionDTO.builder().id(documentationUnitId).build();
-    DocumentationUnit updatedDocumentationUnit =
-        DocumentationUnit.builder()
+    Decision updatedDecision =
+        Decision.builder()
             .uuid(documentationUnitId)
             .managementData(
                 ManagementData.builder().scheduledPublicationDateTime(NEW_SCHEDULED_DATE).build())
             .build();
     when(documentationUnitRepository.findById(documentationUnitId)).thenReturn(Optional.of(dto));
 
-    repository.save(updatedDocumentationUnit, null, null);
+    repository.save(updatedDecision, null, null);
 
     verify(historyLogService, times(2)).saveHistoryLog(any(), any(), any(), any());
     verify(historyLogService)
@@ -102,15 +102,15 @@ class HistoryLogServiceTest {
             .id(documentationUnitId)
             .scheduledPublicationDateTime(OLD_SCHEDULED_DATE)
             .build();
-    DocumentationUnit updatedDocumentationUnit =
-        DocumentationUnit.builder()
+    Decision updatedDecision =
+        Decision.builder()
             .uuid(documentationUnitId)
             .managementData(
                 ManagementData.builder().scheduledPublicationDateTime(OLD_SCHEDULED_DATE).build())
             .build();
     when(documentationUnitRepository.findById(documentationUnitId)).thenReturn(Optional.of(dto));
 
-    repository.save(updatedDocumentationUnit, null, null);
+    repository.save(updatedDecision, null, null);
 
     verify(historyLogService, times(1)).saveHistoryLog(any(), any(), any(), any());
     verify(historyLogService)
@@ -122,11 +122,10 @@ class HistoryLogServiceTest {
   void testScheduledPublicationDate_noDateSet_shouldLogNothing() {
     UUID documentationUnitId = UUID.randomUUID();
     DecisionDTO dto = DecisionDTO.builder().id(documentationUnitId).build();
-    DocumentationUnit updatedDocumentationUnit =
-        DocumentationUnit.builder().uuid(documentationUnitId).build();
+    Decision updatedDecision = Decision.builder().uuid(documentationUnitId).build();
     when(documentationUnitRepository.findById(documentationUnitId)).thenReturn(Optional.of(dto));
 
-    repository.save(updatedDocumentationUnit, null, null);
+    repository.save(updatedDecision, null, null);
 
     verify(historyLogService, times(1)).saveHistoryLog(any(), any(), any(), any());
     verify(historyLogService)
@@ -142,15 +141,15 @@ class HistoryLogServiceTest {
             .id(documentationUnitId)
             .scheduledPublicationDateTime(OLD_SCHEDULED_DATE)
             .build();
-    DocumentationUnit updatedDocumentationUnit =
-        DocumentationUnit.builder()
+    Decision updatedDecision =
+        Decision.builder()
             .uuid(documentationUnitId)
             .managementData(
                 ManagementData.builder().scheduledPublicationDateTime(NEW_SCHEDULED_DATE).build())
             .build();
     when(documentationUnitRepository.findById(documentationUnitId)).thenReturn(Optional.of(dto));
 
-    repository.save(updatedDocumentationUnit, null, null);
+    repository.save(updatedDecision, null, null);
 
     verify(historyLogService, times(2)).saveHistoryLog(any(), any(), any(), any());
     verify(historyLogService)
@@ -172,11 +171,10 @@ class HistoryLogServiceTest {
             .id(documentationUnitId)
             .scheduledPublicationDateTime(OLD_SCHEDULED_DATE)
             .build();
-    DocumentationUnit updatedDocumentationUnit =
-        DocumentationUnit.builder().uuid(documentationUnitId).build();
+    Decision updatedDecision = Decision.builder().uuid(documentationUnitId).build();
     when(documentationUnitRepository.findById(documentationUnitId)).thenReturn(Optional.of(dto));
 
-    repository.save(updatedDocumentationUnit, null, null);
+    repository.save(updatedDecision, null, null);
 
     verify(historyLogService, times(2)).saveHistoryLog(any(), any(), any(), any());
     verify(historyLogService)

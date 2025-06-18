@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
@@ -16,25 +16,23 @@ public class MockXmlExporter implements XmlExporter {
   /**
    * Generates a mock XML export result.
    *
-   * @param documentationUnit the document unit
+   * @param decision the document unit
    * @return the XML export result
    */
   @Override
-  public XmlTransformationResult transformToXml(
-      DocumentationUnit documentationUnit, boolean prettyPrint) {
+  public XmlTransformationResult transformToXml(Decision decision, boolean prettyPrint) {
     return new XmlTransformationResult(
-        (documentationUnit.shortTexts() != null
-                && documentationUnit.shortTexts().headnote() != null)
-            ? documentationUnit.shortTexts().headnote()
+        (decision.shortTexts() != null && decision.shortTexts().headnote() != null)
+            ? decision.shortTexts().headnote()
             : "xml",
-        documentationUnit.coreData().decisionDate() != null,
+        decision.coreData().decisionDate() != null,
         List.of("message 1", "message 2"),
         "test.xml",
         Instant.now());
   }
 
   @Override
-  public String generateEncryptedXMLString(DocumentationUnit documentationUnit) {
+  public String generateEncryptedXMLString(Decision decision) {
     return "";
   }
 

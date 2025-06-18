@@ -7,8 +7,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -53,7 +53,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class PortalTransformerTest {
 
-  private static DocumentationUnit testDocumentUnit;
+  private static Decision testDocumentUnit;
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
 
   private static PortalTransformer subject;
@@ -79,7 +79,7 @@ class PortalTransformerTest {
         related1.toBuilder().documentNumber("Test document number 2").build();
 
     testDocumentUnit =
-        DocumentationUnit.builder()
+        Decision.builder()
             .uuid(UUID.randomUUID())
             .coreData(
                 CoreData.builder()
@@ -134,7 +134,7 @@ class PortalTransformerTest {
               </akn:opinion>
            </akn:block>
            """;
-    DocumentationUnit dissentingCaseLaw =
+    Decision dissentingCaseLaw =
         testDocumentUnit.toBuilder()
             .longTexts(
                 testDocumentUnit.longTexts().toBuilder()
@@ -161,7 +161,7 @@ class PortalTransformerTest {
                </akn:embeddedStructure>
             </akn:block>
            """;
-    DocumentationUnit headnoteCaseLaw =
+    Decision headnoteCaseLaw =
         testDocumentUnit.toBuilder()
             .shortTexts(
                 testDocumentUnit.shortTexts().toBuilder().headnote("<p>headnote test</p>").build())
@@ -186,7 +186,7 @@ class PortalTransformerTest {
                </akn:embeddedStructure>
             </akn:block>
            """;
-    DocumentationUnit otherHeadnoteCaseLaw =
+    Decision otherHeadnoteCaseLaw =
         testDocumentUnit.toBuilder()
             .shortTexts(
                 testDocumentUnit.shortTexts().toBuilder()
@@ -213,7 +213,7 @@ class PortalTransformerTest {
                </akn:embeddedStructure>
             </akn:block>
            """;
-    DocumentationUnit groundsCaseLaw =
+    Decision groundsCaseLaw =
         testDocumentUnit.toBuilder()
             .longTexts(
                 testDocumentUnit.longTexts().toBuilder().reasons("<p>grounds test</p>").build())
@@ -240,7 +240,7 @@ class PortalTransformerTest {
             </akn:block>
          </akn:decision>
          """;
-    DocumentationUnit otherLongTextCaseLaw =
+    Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .longTexts(
                 testDocumentUnit.longTexts().toBuilder()
@@ -269,7 +269,7 @@ class PortalTransformerTest {
             </akn:block>
          </akn:decision>
          """;
-    DocumentationUnit otherLongTextCaseLaw =
+    Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .longTexts(
                 LongTexts.builder()
@@ -297,7 +297,7 @@ class PortalTransformerTest {
                                    </akn:content>
                                 </akn:hcontainer>
                                 """;
-    DocumentationUnit otherLongTextCaseLaw =
+    Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .longTexts(
                 LongTexts.builder()
@@ -333,7 +333,7 @@ class PortalTransformerTest {
                                   <akn:p alternativeTo="textWrapper"> world!</akn:p>
                                 </akn:header>
                                 """;
-    DocumentationUnit otherLongTextCaseLaw =
+    Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .shortTexts(ShortTexts.builder().headline("Hello<p> paragraph</p> world!").build())
             .build();
@@ -354,7 +354,7 @@ class PortalTransformerTest {
         """
                                 <akn:keyworddictionary="attributsemantik-noch-undefiniert"showAs="attributsemantik-noch-undefiniert"value="keyword1"/>
                                 """;
-    DocumentationUnit otherLongTextCaseLaw =
+    Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .contentRelatedIndexing(
                 ContentRelatedIndexing.builder().keywords(List.of("keyword 1")).build())
@@ -397,7 +397,7 @@ class PortalTransformerTest {
   @MethodSource("provideTagFormattingTestCases")
   @DisplayName("Transform self closing HTML tags to LDML")
   void testTransformTags(String inputHtml, String expectedFragment) {
-    DocumentationUnit otherLongTextCaseLaw =
+    Decision otherLongTextCaseLaw =
         testDocumentUnit.toBuilder()
             .longTexts(LongTexts.builder().reasons(inputHtml).build())
             .build();
@@ -587,7 +587,7 @@ class PortalTransformerTest {
     Assertions.assertEquals(expected, fileContent.get());
   }
 
-  DocumentationUnit getEntireDocumentationUnit() {
+  Decision getEntireDocumentationUnit() {
     PreviousDecision previousDecision1 =
         PreviousDecision.builder()
             .decisionDate(LocalDate.of(2020, 1, 1))
@@ -610,7 +610,7 @@ class PortalTransformerTest {
     EnsuingDecision ensuingDecision2 =
         ensuingDecision1.toBuilder().documentNumber("previous decision document number 2").build();
 
-    return DocumentationUnit.builder()
+    return Decision.builder()
         .uuid(documentationUnitId)
         .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
         .note("note test")

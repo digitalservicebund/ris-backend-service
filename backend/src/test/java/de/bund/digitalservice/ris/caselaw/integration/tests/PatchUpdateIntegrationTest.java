@@ -61,9 +61,9 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -240,7 +240,7 @@ class PatchUpdateIntegrationTest {
     TestTransaction.flagForCommit();
     TestTransaction.end();
 
-    DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+    Decision decision = generateEmptyDocumentationUnit();
 
     RisJsonPatch patch =
         new RisJsonPatch(0L, new JsonPatch(Collections.emptyList()), Collections.emptyList());
@@ -248,7 +248,7 @@ class PatchUpdateIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .patch()
-        .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+        .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch)
         .exchange()
         .expectStatus()
@@ -269,7 +269,7 @@ class PatchUpdateIntegrationTest {
     DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
     assertThat(documentationUnitDTO)
         .extracting("id", "documentNumber", "ecli")
-        .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber(), null);
+        .containsExactly(decision.uuid(), decision.documentNumber(), null);
     assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
     TestTransaction.end();
   }
@@ -280,7 +280,7 @@ class PatchUpdateIntegrationTest {
     TestTransaction.flagForCommit();
     TestTransaction.end();
 
-    DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+    Decision decision = generateEmptyDocumentationUnit();
 
     var procedure1AsNode =
         objectMapper.convertValue(Procedure.builder().label("Vorgang1").build(), JsonNode.class);
@@ -291,14 +291,14 @@ class PatchUpdateIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .patch()
-        .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+        .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch1)
         .exchange()
         .expectStatus()
         .is2xxSuccessful();
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
-    var logs = documentationUnitHistoryLogService.getHistoryLogs(documentationUnit.uuid(), user);
+    var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
     assertThat(logs).hasSize(3);
     assertThat(logs)
         .map(HistoryLog::eventType)
@@ -319,14 +319,14 @@ class PatchUpdateIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .patch()
-        .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+        .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch2)
         .exchange()
         .expectStatus()
         .is2xxSuccessful();
 
     // Existing update event will be updated
-    var logs2 = documentationUnitHistoryLogService.getHistoryLogs(documentationUnit.uuid(), user);
+    var logs2 = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
     assertThat(logs2).hasSize(4);
     assertThat(logs2)
         .map(HistoryLog::eventType)
@@ -354,7 +354,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/ecli", new TextNode("ecliUser1")));
@@ -364,7 +364,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -385,13 +385,12 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
           Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser1"),
@@ -407,7 +406,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -433,13 +432,12 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
           Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser1"),
@@ -458,7 +456,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/ecli", new TextNode("ecliUser1")));
@@ -468,7 +466,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -489,12 +487,11 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -515,7 +512,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -541,15 +538,14 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser2");
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -572,7 +568,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(emptyPatchUser1)
           .exchange()
           .expectStatus()
@@ -598,15 +594,14 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser2");
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
           Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser1"),
@@ -630,7 +625,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/ecli", new TextNode("ecliUser1")));
@@ -640,7 +635,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -661,13 +656,12 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -688,7 +682,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -721,13 +715,12 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -751,10 +744,10 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DecisionDTO dto = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
+      DecisionDTO dto = (DecisionDTO) repository.findById(decision.uuid()).get();
       dto.setEcli("initialEcli");
       repository.save(dto);
       TestTransaction.end();
@@ -767,7 +760,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -788,13 +781,12 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
           Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
@@ -810,7 +802,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -836,13 +828,12 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
           Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
@@ -861,10 +852,10 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DecisionDTO dto = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
+      DecisionDTO dto = (DecisionDTO) repository.findById(decision.uuid()).get();
       dto.setEcli("initialEcli");
       repository.save(dto);
       TestTransaction.end();
@@ -877,7 +868,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -898,12 +889,11 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -924,7 +914,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -950,15 +940,14 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser2");
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -980,7 +969,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(emptyPatchUser1)
           .exchange()
           .expectStatus()
@@ -1014,15 +1003,14 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser2");
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
           Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
@@ -1046,10 +1034,10 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DecisionDTO dto = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
+      DecisionDTO dto = (DecisionDTO) repository.findById(decision.uuid()).get();
       dto.setEcli("initialEcli");
       repository.save(dto);
       TestTransaction.end();
@@ -1062,7 +1050,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -1083,13 +1071,12 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
           Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
@@ -1108,7 +1095,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -1157,13 +1144,12 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser1");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser1");
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
           Map.of("op", "replace", "path", "/coreData/ecli", "value", "ecliUser1"),
@@ -1187,7 +1173,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/fileNumbers/0", new TextNode("fileNumberUser1")));
@@ -1197,7 +1183,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -1218,14 +1204,14 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser1");
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -1243,7 +1229,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -1269,14 +1255,14 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser1");
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
           Map.of("op", "add", "path", "/coreData/fileNumbers/0", "value", "fileNumberUser1"),
@@ -1295,7 +1281,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/fileNumbers/0", new TextNode("fileNumberUser1")));
@@ -1305,7 +1291,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -1326,14 +1312,14 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser1");
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.getFirst().getPatch(),
@@ -1353,7 +1339,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -1380,15 +1366,14 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser2");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser2");
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser1");
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -1411,7 +1396,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(emptyPatchUser1)
           .exchange()
           .expectStatus()
@@ -1446,15 +1431,14 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser2");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser2");
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser1");
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -1479,7 +1463,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/fileNumbers/0", new TextNode("fileNumberUser1")));
@@ -1489,7 +1473,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -1510,14 +1494,14 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser1");
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -1537,7 +1521,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -1570,14 +1554,14 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getFileNumbers())
           .extracting("value")
           .containsExactly("fileNumberUser1");
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -1601,10 +1585,10 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO dto = repository.findById(decision.uuid()).get();
       dto.getFileNumbers().add(FileNumberDTO.builder().value("initialFileNumber").build());
       repository.save(dto);
       TestTransaction.end();
@@ -1617,7 +1601,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -1638,12 +1622,12 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -1661,7 +1645,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -1710,12 +1694,12 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -1735,10 +1719,10 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO dto = repository.findById(decision.uuid()).get();
       dto.getFileNumbers().add(FileNumberDTO.builder().value("initialFileNumber").build());
       repository.save(dto);
       TestTransaction.end();
@@ -1751,7 +1735,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -1772,12 +1756,12 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -1796,7 +1780,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -1821,13 +1805,12 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser2");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser2");
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -1850,7 +1833,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(emptyPatchUser1)
           .exchange()
           .expectStatus()
@@ -1876,13 +1859,12 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser2");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser2");
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -1907,10 +1889,10 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO dto = repository.findById(decision.uuid()).get();
       dto.getFileNumbers().add(FileNumberDTO.builder().value("initialFileNumber").build());
       repository.save(dto);
       TestTransaction.end();
@@ -1923,7 +1905,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -1944,12 +1926,12 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
@@ -1972,7 +1954,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -2005,12 +1987,12 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.getFirst().getPatch(),
           Map.of("op", "remove", "path", "/coreData/fileNumbers/0"),
@@ -2034,7 +2016,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       JsonNode courtAsNode =
           objectMapper.convertValue(
@@ -2055,7 +2037,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -2076,7 +2058,7 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt())
           .extracting("id", "type", "location")
           .containsExactly(court1Id, "LG", "Detmold");
@@ -2086,7 +2068,7 @@ class PatchUpdateIntegrationTest {
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
           .containsExactly(0L);
@@ -2100,7 +2082,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -2148,7 +2130,7 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt())
           .extracting("id", "type", "location")
           .containsExactly(court1Id, "LG", "Detmold");
@@ -2158,7 +2140,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertCourt(patches);
 
@@ -2173,7 +2155,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       JsonNode courtAsNode =
           objectMapper.convertValue(
@@ -2194,7 +2176,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -2216,7 +2198,7 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt())
           .extracting("id", "type", "location")
           .containsExactly(court1Id, "LG", "Detmold");
@@ -2226,7 +2208,7 @@ class PatchUpdateIntegrationTest {
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertCourt(patches);
       TestTransaction.end();
 
@@ -2238,7 +2220,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -2294,8 +2276,7 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser2");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser2");
       assertThat(documentationUnitDTO.getCourt())
           .extracting("id", "type", "location")
           .containsExactly(court1Id, "LG", "Detmold");
@@ -2305,7 +2286,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertCourt(patches);
 
@@ -2322,7 +2303,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(emptyPatchUser1)
           .exchange()
           .expectStatus()
@@ -2357,8 +2338,7 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser2");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser2");
       assertThat(documentationUnitDTO.getCourt())
           .extracting("id", "type", "location")
           .containsExactly(court1Id, "LG", "Detmold");
@@ -2368,7 +2348,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertCourt(patches);
 
@@ -2388,7 +2368,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       JsonNode court1AsNode =
           objectMapper.convertValue(
@@ -2409,7 +2389,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -2430,7 +2410,7 @@ class PatchUpdateIntegrationTest {
       DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt())
           .extracting("id", "type", "location")
           .containsExactly(court1Id, "LG", "Detmold");
@@ -2440,7 +2420,7 @@ class PatchUpdateIntegrationTest {
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
@@ -2460,7 +2440,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -2513,7 +2493,7 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt())
           .extracting("id", "type", "location")
           .containsExactly(court1Id, "LG", "Detmold");
@@ -2523,7 +2503,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
           .containsExactly(0L);
@@ -2542,11 +2522,10 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO documentationUnitDTO = repository.findById(decision.uuid()).get();
       documentationUnitDTO.setCourt(courtRepository.findById(court1Id).get());
       documentationUnitDTO.getRegions().add(regionRepository.findById(region1Id).get());
       repository.save(documentationUnitDTO);
@@ -2560,7 +2539,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -2581,13 +2560,13 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt()).isNull();
       assertThat(documentationUnitDTO.getRegions()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
           .containsExactly(0L);
@@ -2607,7 +2586,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -2641,13 +2620,13 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt()).isNull();
       assertThat(documentationUnitDTO.getRegions()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -2668,11 +2647,10 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO documentationUnitDTO = repository.findById(decision.uuid()).get();
       documentationUnitDTO.setCourt(courtRepository.findById(court1Id).get());
       documentationUnitDTO.getRegions().add(regionRepository.findById(region1Id).get());
       repository.save(documentationUnitDTO);
@@ -2686,7 +2664,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -2707,13 +2685,13 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt()).isNull();
       assertThat(documentationUnitDTO.getRegions()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -2732,7 +2710,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -2759,14 +2737,13 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser2");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser2");
       assertThat(documentationUnitDTO.getCourt()).isNull();
       assertThat(documentationUnitDTO.getRegions()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -2788,7 +2765,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(emptyPatchUser1)
           .exchange()
           .expectStatus()
@@ -2816,14 +2793,13 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber", "ecli")
-          .containsExactly(
-              documentationUnit.uuid(), documentationUnit.documentNumber(), "ecliUser2");
+          .containsExactly(decision.uuid(), decision.documentNumber(), "ecliUser2");
       assertThat(documentationUnitDTO.getCourt()).isNull();
       assertThat(documentationUnitDTO.getRegions()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -2848,11 +2824,10 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO documentationUnitDTO = repository.findById(decision.uuid()).get();
       documentationUnitDTO.setCourt(courtRepository.findById(court1Id).get());
       documentationUnitDTO.getRegions().add(regionRepository.findById(region1Id).get());
       repository.save(documentationUnitDTO);
@@ -2866,7 +2841,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -2887,13 +2862,13 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt()).isNull();
       assertThat(documentationUnitDTO.getRegions()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -2912,7 +2887,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -2946,13 +2921,13 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt()).isNull();
       assertThat(documentationUnitDTO.getRegions()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -2972,11 +2947,10 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO documentationUnitDTO = repository.findById(decision.uuid()).get();
       documentationUnitDTO.setCourt(courtRepository.findById(court1Id).get());
       documentationUnitDTO.getRegions().add(regionRepository.findById(region1Id).get());
       repository.save(documentationUnitDTO);
@@ -2990,7 +2964,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -3011,13 +2985,13 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt()).isNull();
       assertThat(documentationUnitDTO.getRegions()).isEmpty();
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
           .containsExactly(0L);
@@ -3041,7 +3015,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -3080,13 +3054,13 @@ class PatchUpdateIntegrationTest {
       documentationUnitDTO = allDocumentationUnits.get(0);
       assertThat(documentationUnitDTO)
           .extracting("id", "documentNumber")
-          .containsExactly(documentationUnit.uuid(), documentationUnit.documentNumber());
+          .containsExactly(decision.uuid(), decision.documentNumber());
       assertThat(documentationUnitDTO.getCourt()).isNull();
       assertThat(documentationUnitDTO.getRegions()).isEmpty();
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertOnSavedPatchEntry(
           patches.get(0).getPatch(),
@@ -3109,8 +3083,8 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentationUnit previousDecision = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
+      Decision previousDecision = generateEmptyDocumentationUnit();
 
       JsonNode previousDecisionAsNode =
           objectMapper.convertValue(
@@ -3127,7 +3101,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -3157,10 +3131,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      DocumentationUnitDTO documentationUnitDTO = repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions())
           .extracting("documentNumber")
           .containsExactly(previousDecision.documentNumber());
@@ -3176,7 +3148,7 @@ class PatchUpdateIntegrationTest {
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertPreviousDecision(patches, relatedDocument);
 
       TestTransaction.end();
@@ -3187,7 +3159,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -3244,9 +3216,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      documentationUnitDTO = repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions())
           .extracting("documentNumber")
           .containsExactly(previousDecision.documentNumber());
@@ -3262,7 +3233,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertPreviousDecision(patches, relatedDocument);
 
@@ -3277,8 +3248,8 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentationUnit previousDecision = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
+      Decision previousDecision = generateEmptyDocumentationUnit();
 
       JsonNode previousDecisionAsNode =
           objectMapper.convertValue(
@@ -3295,7 +3266,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -3325,10 +3296,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      DecisionDTO documentationUnitDTO =
-          (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      DecisionDTO documentationUnitDTO = (DecisionDTO) repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isNull();
       assertThat(documentationUnitDTO.getPreviousDecisions())
           .extracting("documentNumber")
@@ -3345,7 +3314,7 @@ class PatchUpdateIntegrationTest {
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertPreviousDecision(patches, relatedDocument);
 
@@ -3359,7 +3328,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -3423,9 +3392,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      documentationUnitDTO = (DecisionDTO) repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isEqualTo("ecliUser2");
       assertThat(documentationUnitDTO.getPreviousDecisions())
           .extracting("documentNumber")
@@ -3442,7 +3410,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertPreviousDecision(patches, relatedDocument);
       TestTransaction.end();
 
@@ -3452,7 +3420,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(emptyPatchUser1)
           .exchange()
           .expectStatus()
@@ -3522,9 +3490,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      documentationUnitDTO = (DecisionDTO) repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isEqualTo("ecliUser2");
       assertThat(documentationUnitDTO.getPreviousDecisions())
           .extracting("documentNumber")
@@ -3541,7 +3508,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertPreviousDecision(patches, relatedDocument);
       TestTransaction.end();
     }
@@ -3554,9 +3521,9 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentationUnit previousDecision1 = generateEmptyDocumentationUnit();
-      DocumentationUnit previousDecision2 = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
+      Decision previousDecision1 = generateEmptyDocumentationUnit();
+      Decision previousDecision2 = generateEmptyDocumentationUnit();
 
       JsonNode previousDecision1AsNode =
           objectMapper.convertValue(
@@ -3573,7 +3540,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -3603,10 +3570,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(3);
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      DocumentationUnitDTO documentationUnitDTO = repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions())
           .extracting("documentNumber")
           .containsExactly(previousDecision1.documentNumber());
@@ -3626,7 +3591,7 @@ class PatchUpdateIntegrationTest {
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertPreviousDecision(patches, relatedDocument);
 
@@ -3647,7 +3612,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -3708,9 +3673,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(3);
-      documentationUnitDTO = repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      documentationUnitDTO = repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions())
           .extracting("documentNumber")
           .containsExactly(previousDecision1.documentNumber());
@@ -3730,7 +3694,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertPreviousDecision(patches, relatedDocument);
 
@@ -3748,12 +3712,12 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentationUnit previousDecision = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
+      Decision previousDecision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       TestTransaction.flagForCommit();
-      DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO dto = repository.findById(decision.uuid()).get();
       dto.getPreviousDecisions()
           .add(
               PreviousDecisionDTO.builder()
@@ -3770,7 +3734,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -3788,10 +3752,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      DocumentationUnitDTO documentationUnitDTO = repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
       documentationUnitDTO = repository.findById(previousDecision.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
@@ -3803,7 +3765,7 @@ class PatchUpdateIntegrationTest {
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertThat(patches).hasSize(1);
       assertThat(patches.getFirst().getDocumentationUnitVersion()).isZero();
       assertOnSavedPatchEntry(
@@ -3822,7 +3784,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -3845,9 +3807,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      documentationUnitDTO = repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
       documentationUnitDTO = repository.findById(previousDecision.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
@@ -3859,7 +3820,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertThat(patches).hasSize(1);
       assertThat(patches.getFirst().getDocumentationUnitVersion()).isZero();
       String savedPatchJson = patches.getFirst().getPatch();
@@ -3881,12 +3842,12 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentationUnit previousDecision = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
+      Decision previousDecision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       TestTransaction.flagForCommit();
-      DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO dto = repository.findById(decision.uuid()).get();
       dto.getPreviousDecisions()
           .add(
               PreviousDecisionDTO.builder()
@@ -3903,7 +3864,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -3921,10 +3882,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      DecisionDTO documentationUnitDTO =
-          (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      DecisionDTO documentationUnitDTO = (DecisionDTO) repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isNull();
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
       documentationUnitDTO = (DecisionDTO) repository.findById(previousDecision.uuid()).get();
@@ -3937,7 +3896,7 @@ class PatchUpdateIntegrationTest {
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertOnSavedPatchEntry(
           patches.getFirst().getPatch(),
           Map.of("op", "remove", "path", "/previousDecisions/0"),
@@ -3956,7 +3915,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -3979,9 +3938,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      documentationUnitDTO = (DecisionDTO) repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isEqualTo("ecliUser2");
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
       documentationUnitDTO = (DecisionDTO) repository.findById(previousDecision.uuid()).get();
@@ -3994,7 +3952,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
           .containsExactly(0L, 1L);
@@ -4018,7 +3976,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(emptyPatchUser1)
           .exchange()
           .expectStatus()
@@ -4042,9 +4000,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      documentationUnitDTO = (DecisionDTO) repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getEcli()).isEqualTo("ecliUser2");
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
       documentationUnitDTO = (DecisionDTO) repository.findById(previousDecision.uuid()).get();
@@ -4057,7 +4014,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
           .containsExactly(0L, 1L);
@@ -4084,12 +4041,12 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentationUnit previousDecision1 = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
+      Decision previousDecision1 = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       TestTransaction.flagForCommit();
-      DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO dto = repository.findById(decision.uuid()).get();
       dto.getPreviousDecisions()
           .add(
               PreviousDecisionDTO.builder()
@@ -4106,7 +4063,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -4124,10 +4081,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      DocumentationUnitDTO documentationUnitDTO = repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
       documentationUnitDTO = repository.findById(previousDecision1.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
@@ -4139,7 +4094,7 @@ class PatchUpdateIntegrationTest {
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
@@ -4162,7 +4117,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -4191,9 +4146,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(2);
-      documentationUnitDTO = repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      documentationUnitDTO = repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
       documentationUnitDTO = repository.findById(previousDecision1.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
@@ -4205,7 +4159,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
           .containsExactly(0L);
@@ -4229,13 +4183,13 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentationUnit previousDecision1 = generateEmptyDocumentationUnit();
-      DocumentationUnit previousDecision2 = generateEmptyDocumentationUnit();
+      Decision decision = generateEmptyDocumentationUnit();
+      Decision previousDecision1 = generateEmptyDocumentationUnit();
+      Decision previousDecision2 = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       TestTransaction.flagForCommit();
-      DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+      DocumentationUnitDTO dto = repository.findById(decision.uuid()).get();
       dto.getPreviousDecisions()
           .add(
               PreviousDecisionDTO.builder()
@@ -4252,7 +4206,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser1)
           .exchange()
           .expectStatus()
@@ -4270,10 +4224,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(3);
-      DocumentationUnitDTO documentationUnitDTO =
-          repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      DocumentationUnitDTO documentationUnitDTO = repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
       documentationUnitDTO = repository.findById(previousDecision1.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
@@ -4289,7 +4241,7 @@ class PatchUpdateIntegrationTest {
 
       List<DocumentationUnitPatchDTO> patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
 
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
@@ -4319,7 +4271,7 @@ class PatchUpdateIntegrationTest {
       risWebTestClient
           .withDefaultLogin()
           .patch()
-          .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
           .bodyValue(patchUser2)
           .exchange()
           .expectStatus()
@@ -4347,9 +4299,8 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       assertThat(repository.findAll()).hasSize(3);
-      documentationUnitDTO = repository.findById(documentationUnit.uuid()).get();
-      assertThat(documentationUnitDTO.getDocumentNumber())
-          .isEqualTo(documentationUnit.documentNumber());
+      documentationUnitDTO = repository.findById(decision.uuid()).get();
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
       assertThat(documentationUnitDTO.getPreviousDecisions()).isEmpty();
       documentationUnitDTO = repository.findById(previousDecision1.uuid()).get();
       assertThat(documentationUnitDTO.getDocumentNumber())
@@ -4365,7 +4316,7 @@ class PatchUpdateIntegrationTest {
 
       patches =
           patchRepository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-              documentationUnit.uuid(), 0L);
+              decision.uuid(), 0L);
       assertThat(patches)
           .map(DocumentationUnitPatchDTO::getDocumentationUnitVersion)
           .containsExactly(0L);
@@ -4750,8 +4701,8 @@ class PatchUpdateIntegrationTest {
 
     private UUID addProcedureToDocUnit(
         DocumentationUnitDTO documentationUnitDTO, DocumentationOffice docOffice) {
-      DocumentationUnit documentationUnitFromFrontend =
-          DocumentationUnit.builder()
+      Decision decisionFromFrontend =
+          Decision.builder()
               .uuid(documentationUnitDTO.getId())
               .documentNumber(documentationUnitDTO.getDocumentNumber())
               .coreData(
@@ -4766,11 +4717,11 @@ class PatchUpdateIntegrationTest {
           .withDefaultLogin()
           .put()
           .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
-          .bodyValue(documentationUnitFromFrontend)
+          .bodyValue(decisionFromFrontend)
           .exchange()
           .expectStatus()
           .is2xxSuccessful()
-          .expectBody(DocumentationUnit.class)
+          .expectBody(Decision.class)
           .consumeWith(
               response -> {
                 CoreData coreData = response.getResponseBody().coreData();
@@ -4782,8 +4733,8 @@ class PatchUpdateIntegrationTest {
     }
   }
 
-  private DocumentationUnit generateEmptyDocumentationUnit() {
-    RisEntityExchangeResult<DocumentationUnit> result =
+  private Decision generateEmptyDocumentationUnit() {
+    RisEntityExchangeResult<Decision> result =
         risWebTestClient
             .withDefaultLogin()
             .put()
@@ -4791,7 +4742,7 @@ class PatchUpdateIntegrationTest {
             .exchange()
             .expectStatus()
             .isCreated()
-            .expectBody(DocumentationUnit.class)
+            .expectBody(Decision.class)
             .returnResult();
 
     assertThat(result.getResponseBody()).isNotNull();
