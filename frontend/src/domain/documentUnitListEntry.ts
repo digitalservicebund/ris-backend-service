@@ -1,4 +1,4 @@
-import { Court } from "./documentUnit"
+import { Court } from "@/domain/court"
 import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"

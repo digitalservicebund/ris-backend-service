@@ -2,10 +2,10 @@ import { UseFetchReturn } from "@vueuse/core"
 import { Component, Ref } from "vue"
 import { LabelPosition } from "@/components/input/InputField.vue"
 import { CitationType } from "@/domain/citationType"
+import { Court } from "@/domain/court"
 import { Decision } from "@/domain/decision" // NOSONAR // This import causes circularity, but only in type files
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
-import { Court } from "@/domain/documentUnit"
 
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"

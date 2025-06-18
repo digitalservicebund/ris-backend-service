@@ -3,6 +3,7 @@ import DocumentationOffice from "./documentationOffice"
 import { FieldOfLaw } from "./fieldOfLaw"
 import NormReference from "./normReference"
 import Reference from "./reference"
+import { Court } from "@/domain/court"
 import { DocumentType } from "@/domain/documentType"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { Procedure } from "@/domain/procedure"
@@ -62,16 +63,6 @@ export type ContentRelatedIndexing = {
   fieldsOfLaw?: FieldOfLaw[]
   jobProfiles?: string[]
   hasLegislativeMandate?: boolean
-}
-
-export type Court = {
-  type?: string
-  location?: string
-  label: string
-  revoked?: string
-  jurisdictionType?: string
-  region?: string
-  responsibleDocOffice?: DocumentationOffice
 }
 
 export type ShortTexts = {
@@ -172,6 +163,7 @@ export type EurlexParameters = {
   documentationOffice: DocumentationOffice
   celexNumbers: string[]
 }
+
 export enum Kind {
   DOCUMENTION_UNIT = "DOCUMENTION_UNIT",
   PENDING_PROCEEDING = "PENDING_PROCEEDING",

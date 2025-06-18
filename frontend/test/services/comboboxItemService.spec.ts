@@ -2,8 +2,8 @@ import { waitFor } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { ref } from "vue"
+import { Court } from "@/domain/court"
 import { DocumentType } from "@/domain/documentType"
-import { Court } from "@/domain/documentUnit"
 import service from "@/services/comboboxItemService"
 
 const court: Court = {
