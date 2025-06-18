@@ -151,7 +151,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return DecisionTransformer.transformToDomain(decisionDTO, user);
     }
     if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
-      return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
+      return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO, user);
     }
     return null;
   }

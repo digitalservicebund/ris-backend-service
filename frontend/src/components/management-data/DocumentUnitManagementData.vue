@@ -18,6 +18,7 @@ import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogServ
 import DocumentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { isPendingProceeding } from "@/utils/typeGuards"
 import IconCheck from "~icons/ic/baseline-check"
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
@@ -104,7 +105,7 @@ const assignDocumentationOffice = async () => {
         :error="historyLogResponseError"
         :loading="isLoading"
       />
-      <dl>
+      <dl v-if="!isPendingProceeding(documentUnit)">
         <div class="flex gap-24 px-0 py-16">
           <dt class="ris-body1-bold shrink-0 grow-0 basis-160">
             Dublettenverdacht
@@ -133,7 +134,7 @@ const assignDocumentationOffice = async () => {
           :title="assignDocOfficeResponseError.title"
         />
       </div>
-      <dl>
+      <dl v-if="!isPendingProceeding(documentUnit)">
         <div class="flex gap-24">
           <dt
             class="ris-body1-bold min-w-160"

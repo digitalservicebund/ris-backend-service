@@ -65,7 +65,6 @@ public class DocumentableTransformer {
                 .map(ReferenceTransformer::transformToDTO)
                 .map(
                     referenceDTO -> {
-                      referenceDTO.setDocumentationUnit(builder.build()); // TODO needed?
                       referenceDTO.setDocumentationUnitRank(rank.incrementAndGet());
 
                       var existingReference =
@@ -95,7 +94,6 @@ public class DocumentableTransformer {
                 .map(ReferenceTransformer::transformToDTO)
                 .map(
                     referenceDTO -> {
-                      referenceDTO.setDocumentationUnit(builder.build()); // TODO needed?
                       referenceDTO.setDocumentationUnitRank(rank.incrementAndGet());
 
                       var existingReference =
@@ -111,6 +109,50 @@ public class DocumentableTransformer {
                       return (LiteratureReferenceDTO) referenceDTO;
                     })
                 .toList());
+  }
+
+  static void addManagementData(
+      Documentable updatedDomainObject,
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder) {
+
+    if (updatedDomainObject.managementData() != null) {
+      var managementData = updatedDomainObject.managementData();
+
+      builder.scheduledPublicationDateTime(managementData.scheduledPublicationDateTime());
+      builder.lastPublicationDateTime(managementData.lastPublicationDateTime());
+      builder.scheduledByEmail(managementData.scheduledByEmail());
+    }
+  }
+
+  /**
+   * Handles post-build operations, typically setting bidirectional relationships or other
+   * properties that require the fully built parent DTO.
+   *
+   * @param result The newly built DocumentationUnitDTO (or subclass).
+   * @param currentDto The existing DTO (from database) which might hold related entities with IDs.
+   * @param <T> The specific DocumentationUnitDTO type.
+   * @return The updated result DTO.
+   */
+  protected static <T extends DocumentationUnitDTO> T postProcessRelationships(
+      T result, DocumentationUnitDTO currentDto) {
+
+    // --- CaselawReferences linking ---
+    if (result.getCaselawReferences() != null) {
+      result.getCaselawReferences().forEach(reference -> reference.setDocumentationUnit(result));
+    }
+
+    // --- LiteratureReferences linking ---
+    if (result.getLiteratureReferences() != null) {
+      result.getLiteratureReferences().forEach(reference -> reference.setDocumentationUnit(result));
+    }
+
+    // --- ManagementData linking ---
+    if (currentDto.getManagementData() != null) {
+      currentDto.getManagementData().setDocumentationUnit(result);
+      result.setManagementData(currentDto.getManagementData());
+    }
+
+    return result;
   }
 
   /**

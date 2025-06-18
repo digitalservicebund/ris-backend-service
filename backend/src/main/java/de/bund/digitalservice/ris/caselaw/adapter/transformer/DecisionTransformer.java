@@ -156,23 +156,14 @@ public class DecisionTransformer extends DocumentableTransformer {
           .headline(null);
     }
 
-    if (updatedDomainObject.managementData() != null) {
-      var managementData = updatedDomainObject.managementData();
-
-      builder.scheduledPublicationDateTime(managementData.scheduledPublicationDateTime());
-      builder.lastPublicationDateTime(managementData.lastPublicationDateTime());
-      builder.scheduledByEmail(managementData.scheduledByEmail());
-    }
-
+    // Calls to pre-build helper methods that populate the builder
     addCaselawReferences(updatedDomainObject, builder, currentDto);
     addLiteratureReferences(updatedDomainObject, builder, currentDto);
+    addManagementData(updatedDomainObject, builder);
 
     DecisionDTO result = builder.build();
-    if (currentDto.getManagementData() != null) {
-      currentDto.getManagementData().setDocumentationUnit(result);
-      result.setManagementData(currentDto.getManagementData());
-    }
-    return result;
+
+    return DocumentableTransformer.postProcessRelationships(result, currentDto);
   }
 
   // No need to check for null, when accessing max of a non-empty list.

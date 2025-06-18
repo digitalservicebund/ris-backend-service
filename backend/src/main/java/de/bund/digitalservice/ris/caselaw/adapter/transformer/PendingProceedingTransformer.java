@@ -7,8 +7,10 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -85,15 +87,18 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
       builder.headline(null);
     }
 
+    // Calls to pre-build helper methods that populate the builder
     addCaselawReferences(pendingProceeding, builder, currentDto);
     addLiteratureReferences(pendingProceeding, builder, currentDto);
+    addManagementData(pendingProceeding, builder);
 
     PendingProceedingDTO result = builder.build();
-    if (currentDto.getManagementData() != null) {
-      currentDto.getManagementData().setDocumentationUnit(result);
-      result.setManagementData(currentDto.getManagementData());
-    }
-    return result;
+
+    return DocumentableTransformer.postProcessRelationships(result, currentDto);
+  }
+
+  public static PendingProceeding transformToDomain(PendingProceedingDTO pendingProceedingDTO) {
+    return transformToDomain(pendingProceedingDTO, null);
   }
 
   /**
@@ -103,7 +108,8 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
    * @param pendingProceedingDTO the database pending proceeding object
    * @return a transformed domain object, or an empty domain object if the input is null
    */
-  public static PendingProceeding transformToDomain(PendingProceedingDTO pendingProceedingDTO) {
+  public static PendingProceeding transformToDomain(
+      PendingProceedingDTO pendingProceedingDTO, @Nullable User user) {
     if (pendingProceedingDTO == null) {
       throw new DocumentationUnitTransformerException(
           "Pending proceeding is null and won't transform");
@@ -126,6 +132,7 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
                 .appellant(pendingProceedingDTO.getAppellant())
                 .build())
         .contentRelatedIndexing(buildContentRelatedIndexing(pendingProceedingDTO))
+        .managementData(ManagementDataTransformer.transformToDomain(pendingProceedingDTO, user))
         .caselawReferences(
             pendingProceedingDTO.getCaselawReferences() == null
                 ? new ArrayList<>()

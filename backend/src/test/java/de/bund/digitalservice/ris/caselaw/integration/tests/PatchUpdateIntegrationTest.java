@@ -4417,8 +4417,7 @@ class PatchUpdateIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations())
-                    .isEmpty(); // because no management data in dto object yet
+                assertThat(responsePatch.patch().getOperations()).hasSize(3);
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
 
@@ -4461,7 +4460,11 @@ class PatchUpdateIntegrationTest {
               "/shortTexts/admissionOfAppeal",
               "value",
               "Rechtsmittelzulassung"),
-          Map.of("op", "add", "path", "/shortTexts/resolutionNote", "value", "Erledigungsvermerk"));
+          Map.of("op", "add", "path", "/shortTexts/resolutionNote", "value", "Erledigungsvermerk"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
+          Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
+          Map.of(
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
     }
