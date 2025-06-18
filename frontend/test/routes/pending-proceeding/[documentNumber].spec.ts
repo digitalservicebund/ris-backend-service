@@ -40,7 +40,15 @@ function renderComponent() {
         name: "caselaw-pending-proceeding-documentNumber-references",
         component: {
           template:
-            "<div data-testid='references'>References<input aria-label=\"Periodikum\"/></div>",
+            "<div data-testid='references'>Fundstellen<input aria-label=\"Fundstellen\"/></div>",
+        },
+      },
+      {
+        path: "/caselaw/pendingProceeding/:documentNumber/managementdata",
+        name: "caselaw-pending-proceeding-documentNumber-managementdata",
+        component: {
+          template:
+            "<div data-testid='managementdata'>Fundstellen<input aria-label=\"Fundstellen\"/></div>",
         },
       },
     ],
@@ -154,6 +162,31 @@ describe("Document Number Route", () => {
 
       // route is rendered
       expect(screen.getByTestId("references")).toBeInTheDocument()
+    })
+
+    test("should render management data side panels and header", async () => {
+      const { router } = renderComponent()
+
+      await router.push({
+        path: "/caselaw/pendingProceeding/1234567891234/managementdata",
+      })
+
+      expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
+
+      // Header with save button
+      expect(screen.getByTestId("document-unit-info-panel")).toBeInTheDocument()
+
+      expect(
+        screen.queryByRole("button", { name: "Speichern Button" }),
+      ).toBeInTheDocument()
+
+      // ExtraContentSidePanel
+      expect(
+        screen.getByRole("button", { name: "Seitenpanel öffnen" }),
+      ).toBeInTheDocument()
+
+      // route is rendered
+      expect(screen.getByTestId("managementdata")).toBeInTheDocument()
     })
 
     test("should render preview without side panels and header", async () => {
