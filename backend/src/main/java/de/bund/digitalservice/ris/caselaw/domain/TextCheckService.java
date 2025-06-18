@@ -57,9 +57,9 @@ public class TextCheckService {
   public List<Match> checkWholeDocumentationUnit(UUID id)
       throws DocumentationUnitNotExistsException {
 
-    Documentable documentable = documentationUnitRepository.findByUuid(id);
+    DocumentationUnit documentationUnit = documentationUnitRepository.findByUuid(id);
 
-    if (documentable instanceof Decision decision) {
+    if (documentationUnit instanceof Decision decision) {
       List<Match> allMatches = Collections.synchronizedList(new ArrayList<>());
 
       stream(CategoryType.values())
@@ -85,15 +85,15 @@ public class TextCheckService {
 
     } else {
       throw new UnsupportedOperationException(
-          "Check not supported for Documentable type: " + documentable.getClass());
+          "Check not supported for Documentable type: " + documentationUnit.getClass());
     }
   }
 
   public TextCheckCategoryResponse checkCategory(UUID id, CategoryType categoryType)
       throws DocumentationUnitNotExistsException {
-    Documentable documentable = documentationUnitRepository.findByUuid(id);
+    DocumentationUnit documentationUnit = documentationUnitRepository.findByUuid(id);
 
-    if (documentable instanceof Decision decision) {
+    if (documentationUnit instanceof Decision decision) {
       return checkCategory(decision, categoryType);
     } else {
       throw new UnsupportedOperationException();

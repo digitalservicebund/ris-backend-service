@@ -7,7 +7,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.BulkAssignProcedureRequest;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
-import de.bund.digitalservice.ris.caselaw.domain.Documentable;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
@@ -213,13 +213,13 @@ public class DocumentationUnitController {
   private void initializeCoreDataAndCheckDuplicates(
       UUID uuid, Attachment2Html attachment2Html, User user) {
     try {
-      Documentable documentable = service.getByUuid(uuid);
-      if (documentable instanceof Decision docUnit) {
+      DocumentationUnit documentationUnit = service.getByUuid(uuid);
+      if (documentationUnit instanceof Decision docUnit) {
         documentationUnitDocxMetadataInitializationService.initializeCoreData(
             docUnit, attachment2Html, user);
         checkDuplicates(docUnit.documentNumber());
       } else {
-        log.info("Documentable type not supported: {}", documentable.getClass().getName());
+        log.info("Documentable type not supported: {}", documentationUnit.getClass().getName());
       }
     } catch (DocumentationUnitNotExistsException ex) {
       // file upload should not fail because of core data initialization or dup check
@@ -293,7 +293,7 @@ public class DocumentationUnitController {
 
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
-  public ResponseEntity<Documentable> getByDocumentNumber(
+  public ResponseEntity<DocumentationUnit> getByDocumentNumber(
       @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String documentNumber) {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
@@ -303,8 +303,9 @@ public class DocumentationUnitController {
     try {
       // Duplicate check must happen before getting the doc unit, otherwise new ones won't be shown
       checkDuplicates(documentNumber);
-      Documentable documentable = service.getByDocumentNumberWithUser(documentNumber, oidcUser);
-      return ResponseEntity.ok(documentable);
+      DocumentationUnit documentationUnit =
+          service.getByDocumentNumberWithUser(documentNumber, oidcUser);
+      return ResponseEntity.ok(documentationUnit);
 
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);

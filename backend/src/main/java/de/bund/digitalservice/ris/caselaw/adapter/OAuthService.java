@@ -9,8 +9,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ApiKeyTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
-import de.bund.digitalservice.ris.caselaw.domain.Documentable;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -298,7 +298,7 @@ public class OAuthService implements AuthService {
     return procedure.userGroupId() != null && procedure.userGroupId().equals(userGroupIdOfUser);
   }
 
-  private boolean userHasWriteAccess(Documentable documentationUnit) {
+  private boolean userHasWriteAccess(DocumentationUnit documentationUnit) {
     return getUserDocumentationOffice()
         .map(
             userOffice ->
@@ -337,7 +337,7 @@ public class OAuthService implements AuthService {
         || isPublishedStatus(status);
   }
 
-  private boolean userHasReadAccess(Documentable documentationUnit) {
+  private boolean userHasReadAccess(DocumentationUnit documentationUnit) {
     return documentationUnit.status() == null
         || isPublishedStatus(documentationUnit.status())
         || userHasWriteAccess(documentationUnit);

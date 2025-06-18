@@ -285,12 +285,12 @@ public class DocumentationUnitService {
         .build();
   }
 
-  public Documentable getByDocumentNumber(String documentNumber)
+  public DocumentationUnit getByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException {
     return repository.findByDocumentNumber(documentNumber);
   }
 
-  public Documentable getByDocumentNumberWithUser(String documentNumber, OidcUser oidcUser)
+  public DocumentationUnit getByDocumentNumberWithUser(String documentNumber, OidcUser oidcUser)
       throws DocumentationUnitNotExistsException {
     var documentable =
         repository.findByDocumentNumber(documentNumber, userService.getUser(oidcUser));
@@ -322,12 +322,12 @@ public class DocumentationUnitService {
     }
   }
 
-  public Documentable getByUuid(UUID documentationUnitId)
+  public DocumentationUnit getByUuid(UUID documentationUnitId)
       throws DocumentationUnitNotExistsException {
     return repository.findByUuid(documentationUnitId, null);
   }
 
-  public Documentable getByUuid(UUID documentationUnitId, User user)
+  public DocumentationUnit getByUuid(UUID documentationUnitId, User user)
       throws DocumentationUnitNotExistsException {
     return repository.findByUuid(documentationUnitId, user);
   }
@@ -335,7 +335,7 @@ public class DocumentationUnitService {
   @Transactional(transactionManager = "jpaTransactionManager")
   public String deleteByUuid(UUID documentationUnitId) throws DocumentationUnitNotExistsException {
 
-    Documentable docUnit = getByUuid(documentationUnitId);
+    DocumentationUnit docUnit = getByUuid(documentationUnitId);
     Map<RelatedDocumentationType, Long> relatedEntities =
         repository.getAllRelatedDocumentationUnitsByDocumentNumber(docUnit.documentNumber());
 
@@ -392,7 +392,7 @@ public class DocumentationUnitService {
        * handle unique following operation (sometimes by add and remove operations at the same time)
     */
 
-    Documentable existingDocumentationUnit = getByUuid(documentationUnitId, user);
+    DocumentationUnit existingDocumentationUnit = getByUuid(documentationUnitId, user);
 
     long newVersion = 1L;
     if (existingDocumentationUnit.version() != null) {
@@ -424,7 +424,7 @@ public class DocumentationUnitService {
       if (!toUpdate.getOperations().isEmpty()) {
         toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
 
-        Documentable patchedDocumentationUnit =
+        DocumentationUnit patchedDocumentationUnit =
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
 
         if (patchedDocumentationUnit instanceof Decision docUnit) {
@@ -435,7 +435,7 @@ public class DocumentationUnitService {
 
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
-        Documentable updatedDocumentationUnit = null;
+        DocumentationUnit updatedDocumentationUnit = null;
         if (patchedDocumentationUnit instanceof Decision docUnit) {
           updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
         } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
@@ -561,9 +561,9 @@ public class DocumentationUnitService {
   public String assignDocumentationOffice(
       UUID documentationUnitId, UUID documentationOfficeId, User user)
       throws DocumentationUnitNotExistsException, DocumentationOfficeNotExistsException {
-    Documentable documentable = repository.findByUuid(documentationUnitId, user);
+    DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId, user);
     var documentationOffice = documentationOfficeService.findByUuid(documentationOfficeId);
-    if (documentable instanceof Decision decision) {
+    if (documentationUnit instanceof Decision decision) {
       // Procedures need to be unassigned as they are linked to the previous documentation Office
       repository.unassignProcedures(decision.uuid());
       repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
@@ -574,7 +574,7 @@ public class DocumentationUnitService {
         "The documentation office could not be reassigned: Document is not a decision.");
   }
 
-  private void saveForRecycling(Documentable documentationUnit) {
+  private void saveForRecycling(DocumentationUnit documentationUnit) {
     try {
       documentNumberRecyclingService.addForRecycling(
           documentationUnit.uuid(),
@@ -595,8 +595,8 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException, BadRequestException {
     Procedure procedure = Procedure.builder().label(procedureLabel).build();
     for (UUID documentationUnitId : documentationUnitIds) {
-      Documentable documentable = repository.findByUuid(documentationUnitId, user);
-      if (documentable instanceof Decision docUnit) {
+      DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId, user);
+      if (documentationUnit instanceof Decision docUnit) {
         Decision updatedDocUnit =
             docUnit.toBuilder()
                 .coreData(docUnit.coreData().toBuilder().procedure(procedure).build())

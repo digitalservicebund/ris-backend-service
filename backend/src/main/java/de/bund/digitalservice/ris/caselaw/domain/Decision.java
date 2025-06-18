@@ -49,7 +49,7 @@ public record Decision(
     InboxStatus inboxStatus,
     boolean isEditable,
     boolean isDeletable)
-    implements Documentable {
+    implements DocumentationUnit {
 
   @Override
   public Kind kind() {

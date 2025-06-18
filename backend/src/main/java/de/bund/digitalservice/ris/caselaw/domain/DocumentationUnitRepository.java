@@ -19,7 +19,7 @@ public interface DocumentationUnitRepository {
    * @param documentNumber the document number
    * @return the documentation unit found (decision or pending proceeding)
    */
-  Documentable findByDocumentNumber(String documentNumber)
+  DocumentationUnit findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
 
   /**
@@ -29,7 +29,7 @@ public interface DocumentationUnitRepository {
    * @param user is optional and can be null
    * @return the documentation unit found (decision or pending proceeding)
    */
-  Documentable findByDocumentNumber(String documentNumber, User user)
+  DocumentationUnit findByDocumentNumber(String documentNumber, User user)
       throws DocumentationUnitNotExistsException;
 
   DocumentationUnitListItem findDocumentationUnitListItemByDocumentNumber(String documentNumber)
@@ -41,7 +41,7 @@ public interface DocumentationUnitRepository {
    * @param uuid the UUID to search for
    * @return the documentation unit found
    */
-  Documentable findByUuid(UUID uuid, User user) throws DocumentationUnitNotExistsException;
+  DocumentationUnit findByUuid(UUID uuid, User user) throws DocumentationUnitNotExistsException;
 
   /**
    * Find a documentation unit by its UUID
@@ -49,7 +49,7 @@ public interface DocumentationUnitRepository {
    * @param uuid the UUID to search for
    * @return the documentation unit found
    */
-  Documentable findByUuid(UUID uuid) throws DocumentationUnitNotExistsException;
+  DocumentationUnit findByUuid(UUID uuid) throws DocumentationUnitNotExistsException;
 
   /**
    * Create a new documentation unit with the given document number and documentation office
@@ -73,32 +73,32 @@ public interface DocumentationUnitRepository {
    *
    * @param documentationUnit the documentation unit to save
    */
-  void save(Documentable documentationUnit);
+  void save(DocumentationUnit documentationUnit);
 
-  void save(Documentable documentable, User currentUser);
+  void save(DocumentationUnit documentationUnit, User currentUser);
 
-  void save(Documentable documentable, User currentUser, String description);
+  void save(DocumentationUnit documentationUnit, User currentUser, String description);
 
   /**
    * Save the keywords of a documentation unit
    *
    * @param documentationUnit the documentation unit to save the keywords for
    */
-  void saveKeywords(Documentable documentationUnit);
+  void saveKeywords(DocumentationUnit documentationUnit);
 
   /**
    * Save the fields of law of a documentation unit
    *
    * @param documentationUnit the documentation unit to save the fields of law for
    */
-  void saveFieldsOfLaw(Documentable documentationUnit);
+  void saveFieldsOfLaw(DocumentationUnit documentationUnit);
 
   /**
    * Save the procedures of a documentation unit
    *
    * @param documentationUnit the documentation unit to save the procedures for
    */
-  void saveProcedures(Documentable documentationUnit, User user);
+  void saveProcedures(DocumentationUnit documentationUnit, User user);
 
   /**
    * Unassign all procedures of a documentation unit
@@ -129,7 +129,7 @@ public interface DocumentationUnitRepository {
    *
    * @param documentationUnit the documentation unit to delete
    */
-  void delete(Documentable documentationUnit);
+  void delete(DocumentationUnit documentationUnit);
 
   /**
    * Search for documentation units that are linkable to the given documentation unit

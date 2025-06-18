@@ -14,7 +14,7 @@ import java.util.UUID;
   @JsonSubTypes.Type(value = Decision.class, name = "DOCUMENTION_UNIT"),
   @JsonSubTypes.Type(value = PendingProceeding.class, name = "PENDING_PROCEEDING")
 })
-public interface Documentable {
+public interface DocumentationUnit {
 
   UUID uuid();
 

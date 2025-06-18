@@ -88,9 +88,9 @@ class TextCheckServiceTest {
   void testCheckWholeDocumentationUnit_invalidDocumentableType()
       throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
-    Documentable documentable = mock(Documentable.class);
+    DocumentationUnit documentationUnit = mock(DocumentationUnit.class);
 
-    when(documentationUnitRepository.findByUuid(uuid)).thenReturn(documentable);
+    when(documentationUnitRepository.findByUuid(uuid)).thenReturn(documentationUnit);
 
     var exception =
         assertThrows(

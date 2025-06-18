@@ -14,7 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDT
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.Documentable;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DocumentableTransformer {
   DocumentableTransformer() {}
 
-  static boolean decisionContainsReferenceWithId(Documentable docUnit, UUID referenceID) {
+  static boolean decisionContainsReferenceWithId(DocumentationUnit docUnit, UUID referenceID) {
     boolean caselawReferencesContainId =
         docUnit.caselawReferences() != null
             && !docUnit.caselawReferences().isEmpty()
@@ -54,7 +54,7 @@ public class DocumentableTransformer {
   }
 
   static void addCaselawReferences(
-      Documentable updatedDomainObject,
+      DocumentationUnit updatedDomainObject,
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder,
       DocumentationUnitDTO currentDTO) {
     AtomicInteger rank = new AtomicInteger(0);
@@ -83,7 +83,7 @@ public class DocumentableTransformer {
   }
 
   static void addLiteratureReferences(
-      Documentable updatedDomainObject,
+      DocumentationUnit updatedDomainObject,
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder,
       DocumentationUnitDTO currentDTO) {
     AtomicInteger rank = new AtomicInteger(0);
@@ -112,7 +112,7 @@ public class DocumentableTransformer {
   }
 
   static void addManagementData(
-      Documentable updatedDomainObject,
+      DocumentationUnit updatedDomainObject,
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder) {
 
     if (updatedDomainObject.managementData() != null) {
@@ -198,7 +198,7 @@ public class DocumentableTransformer {
   }
 
   static void addPreviousDecisions(
-      Documentable updatedDomainObject,
+      DocumentationUnit updatedDomainObject,
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder) {
     List<PreviousDecision> previousDecisions = updatedDomainObject.previousDecisions(); // NOSONAR
     if (previousDecisions != null) {
