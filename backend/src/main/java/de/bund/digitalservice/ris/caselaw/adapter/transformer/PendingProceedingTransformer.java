@@ -90,7 +90,7 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
     // Calls to pre-build helper methods that populate the builder
     addCaselawReferences(pendingProceeding, builder, currentDto);
     addLiteratureReferences(pendingProceeding, builder, currentDto);
-    addManagementData(pendingProceeding, builder); // Now correct for pre-build
+    addManagementData(pendingProceeding, builder);
 
     PendingProceedingDTO result = builder.build();
 

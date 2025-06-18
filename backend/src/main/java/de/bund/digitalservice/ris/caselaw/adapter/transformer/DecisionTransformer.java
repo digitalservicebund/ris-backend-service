@@ -159,7 +159,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     // Calls to pre-build helper methods that populate the builder
     addCaselawReferences(updatedDomainObject, builder, currentDto);
     addLiteratureReferences(updatedDomainObject, builder, currentDto);
-    addManagementData(updatedDomainObject, builder); // Now correct for pre-build
+    addManagementData(updatedDomainObject, builder);
 
     DecisionDTO result = builder.build();
 
