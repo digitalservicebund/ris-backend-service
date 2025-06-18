@@ -5,7 +5,7 @@ import { beforeAll, describe } from "vitest"
 import { createRouter, createWebHistory, Router } from "vue-router"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import Attachment from "@/domain/attachment"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import Reference from "@/domain/reference"
 import featureToggleService from "@/services/featureToggleService"
 import { SelectablePanelContent } from "@/types/panelContentMode"
@@ -30,7 +30,7 @@ function renderComponent(
 ) {
   const user = userEvent.setup()
 
-  const documentUnit = new DocumentUnit("foo", {
+  const documentUnit = new Decision("foo", {
     documentNumber: "1234567891234",
     note: options.note ?? "",
     attachments: options.attachments ?? [],

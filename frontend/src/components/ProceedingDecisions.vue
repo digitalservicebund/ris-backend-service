@@ -4,14 +4,14 @@ import { Ref } from "vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { isDocumentUnit } from "@/utils/typeGuards"
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | PendingProceeding | undefined>
+  documentUnit: Ref<Decision | PendingProceeding | undefined>
 }
 </script>
 

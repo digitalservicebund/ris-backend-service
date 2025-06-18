@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen, within } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import PeriodicalEditionReferences from "@/components/periodical-evaluation/references/PeriodicalEditionReferences.vue"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { PublicationState } from "@/domain/publicationStatus"
@@ -111,7 +111,7 @@ describe("Legal periodical edition evaluation", () => {
     vi.spyOn(documentUnitService, "delete").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: new DocumentUnit("foo", {
+        data: new Decision("foo", {
           documentNumber: "1234567891234",
         }),
       }),

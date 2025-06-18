@@ -5,11 +5,9 @@ import { useRouter } from "vue-router"
 import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelector.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
+import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
-import {
-  DocumentationUnitParameters,
-  DocumentUnit,
-} from "@/domain/documentUnit"
+import { DocumentationUnitParameters } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 
@@ -19,7 +17,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  createdDocumentationUnit: [value: DocumentUnit]
+  createdDocumentationUnit: [value: Decision]
 }>()
 
 const router = useRouter()

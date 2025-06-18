@@ -2,7 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import edition from "@/routes/caselaw/periodical-evaluation/[editionId]/edition.vue"
@@ -182,11 +182,11 @@ describe("Edition Id Route", () => {
 
     test("should display extra content side panel, when docunit loaded", async () => {
       const { router } = renderComponent()
-      const mockDocumentUnit = new DocumentUnit("123", {
+      const mockDocumentUnit = new Decision("123", {
         version: 1,
         documentNumber: "XXRE000029624",
       })
-      const serviceResponse: ServiceResponse<DocumentUnit> = {
+      const serviceResponse: ServiceResponse<Decision> = {
         status: 200,
         data: mockDocumentUnit,
         error: undefined,

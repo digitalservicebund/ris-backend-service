@@ -1,10 +1,10 @@
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { isDocumentUnit, isPendingProceeding } from "@/utils/typeGuards"
 
 describe("isDocumentUnit", () => {
   it("returns true for a DocumentUnit", () => {
-    const doc = new DocumentUnit("test-id-1", {
+    const doc = new Decision("test-id-1", {
       documentNumber: "123",
       shortTexts: {},
     })
@@ -40,7 +40,7 @@ describe("isPendingProceeding", () => {
   })
 
   it("returns false for a DocumentUnit", () => {
-    const doc = new DocumentUnit("test-id-4", {
+    const doc = new Decision("test-id-4", {
       documentNumber: "101",
       shortTexts: {},
     })

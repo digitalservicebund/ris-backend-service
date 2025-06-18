@@ -15,12 +15,8 @@ import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
-import {
-  ContentRelatedIndexing,
-  DocumentUnit,
-  Kind,
-  LongTexts,
-} from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { ContentRelatedIndexing, Kind, LongTexts } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 import Reference from "@/domain/reference"
@@ -31,7 +27,7 @@ const props = defineProps<{
 }>()
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<Decision | undefined>
 }
 
 provide(previewLayoutInjectionKey, props.layout || "wide")

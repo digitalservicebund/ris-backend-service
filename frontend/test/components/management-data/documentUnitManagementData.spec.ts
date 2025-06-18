@@ -5,8 +5,8 @@ import { it } from "vitest"
 import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitManagementData from "@/components/management-data/DocumentUnitManagementData.vue"
+import { Decision } from "@/domain/decision"
 import {
-  DocumentUnit,
   DuplicateRelation,
   DuplicateRelationStatus,
   ManagementData,
@@ -184,7 +184,7 @@ describe("DocumentUnitManagementData", () => {
 
   function mockDocUnitStore(managementData: ManagementData) {
     const mockedSessionStore = useDocumentUnitStore()
-    mockedSessionStore.documentUnit = new DocumentUnit("q834", {
+    mockedSessionStore.documentUnit = new Decision("q834", {
       documentNumber: "DS123",
       managementData,
     })

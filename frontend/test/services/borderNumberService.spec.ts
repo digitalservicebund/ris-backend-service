@@ -1,12 +1,8 @@
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia, Store } from "pinia"
 import { Ref } from "vue"
-import {
-  DocumentUnit,
-  longTextLabels,
-  LongTexts,
-  ShortTexts,
-} from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { longTextLabels, LongTexts, ShortTexts } from "@/domain/documentUnit"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import borderNumberService from "@/services/borderNumberService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -19,7 +15,7 @@ function mockDocUnitStore({
   longTexts?: LongTexts
 }) {
   const mockedSessionStore = useDocumentUnitStore()
-  mockedSessionStore.documentUnit = new DocumentUnit("q834", {
+  mockedSessionStore.documentUnit = new Decision("q834", {
     shortTexts,
     longTexts,
   })
@@ -27,7 +23,7 @@ function mockDocUnitStore({
   return mockedSessionStore as Store<
     "docunitStore",
     {
-      documentUnit: Ref<DocumentUnit>
+      documentUnit: Ref<Decision>
     }
   >
 }

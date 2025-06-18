@@ -3,7 +3,7 @@ import Button from "primevue/button"
 import FileNavigator from "@/components/FileNavigator.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import { isDocumentUnit } from "@/utils/typeGuards"
@@ -17,7 +17,7 @@ import IconImportCategories from "~icons/material-symbols/text-select-move-back-
 
 const props = defineProps<{
   panelMode?: SelectablePanelContent
-  documentUnit: DocumentUnit | PendingProceeding
+  documentUnit: Decision | PendingProceeding
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   currentAttachmentIndex: number

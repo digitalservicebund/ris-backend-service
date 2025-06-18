@@ -5,7 +5,7 @@ import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import CategoryImport from "@/components/category-import/CategoryImport.vue"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { PublicationState } from "@/domain/publicationStatus"
 import documentUnitService from "@/services/documentUnitService"
 import routes from "~/test-helper/routes"
@@ -81,7 +81,7 @@ describe("CategoryImport", () => {
       () =>
         Promise.resolve({
           status: 200,
-          data: new DocumentUnit("foo", {
+          data: new Decision("foo", {
             documentNumber: "XXRE123456789",
             status: {
               publicationStatus: PublicationState.UNPUBLISHED,

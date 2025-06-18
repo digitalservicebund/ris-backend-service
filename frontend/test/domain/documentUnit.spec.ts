@@ -1,19 +1,15 @@
-import {
-  CoreData,
-  DocumentUnit,
-  LongTexts,
-  ShortTexts,
-} from "../../src/domain/documentUnit"
+import { CoreData, LongTexts, ShortTexts } from "../../src/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 
 describe("DocumentUnit", () => {
   it("instantiates with uuid", () => {
-    const documentUnit = new DocumentUnit("foo")
+    const documentUnit = new Decision("foo")
     expect(documentUnit.uuid).toEqual("foo")
     expect(documentUnit.id).toEqual(undefined)
   })
 
   it("returns core Data as object", () => {
-    const documentUnit = new DocumentUnit("foo")
+    const documentUnit = new Decision("foo")
     documentUnit.coreData.fileNumbers = ["bar"]
     documentUnit.coreData.court = {
       type: "baz",
@@ -27,7 +23,7 @@ describe("DocumentUnit", () => {
   })
 
   it("returns short texts as object", () => {
-    const documentUnit = new DocumentUnit("foo")
+    const documentUnit = new Decision("foo")
     documentUnit.shortTexts.headnote = "baz"
 
     const documentUnitTexts: ShortTexts = documentUnit.shortTexts
@@ -35,7 +31,7 @@ describe("DocumentUnit", () => {
   })
 
   it("returns long texts as object", () => {
-    const documentUnit = new DocumentUnit("foo")
+    const documentUnit = new Decision("foo")
     documentUnit.longTexts.reasons = "bar"
 
     const documentUnitTexts: LongTexts = documentUnit.longTexts
@@ -43,22 +39,22 @@ describe("DocumentUnit", () => {
   })
 
   it("returns false if no file is attached", () => {
-    const documentUnit = new DocumentUnit("foo")
+    const documentUnit = new Decision("foo")
     expect(documentUnit.hasAttachments).toBeFalsy()
 
-    const documentUnit2 = new DocumentUnit("foo", { attachments: [] })
+    const documentUnit2 = new Decision("foo", { attachments: [] })
     expect(documentUnit2.hasAttachments).toBeFalsy()
   })
 
   it("returns true if file is attached", () => {
-    const documentUnit = new DocumentUnit("foo", {
+    const documentUnit = new Decision("foo", {
       attachments: [{ s3path: "foo-path" }],
     })
     expect(documentUnit.hasAttachments).toBeTruthy()
   })
 
   it("returns all missing required fields", () => {
-    const documentUnit = new DocumentUnit("foo", {
+    const documentUnit = new Decision("foo", {
       attachments: [{ s3path: "foo-path" }],
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -71,7 +67,7 @@ describe("DocumentUnit", () => {
   })
 
   it("identify missing fields correctly if one field is set", () => {
-    const documentUnit = new DocumentUnit("foo", {
+    const documentUnit = new Decision("foo", {
       attachments: [{ s3path: "foo-path" }],
       coreData: { legalEffect: "foo" },
     })
@@ -84,7 +80,7 @@ describe("DocumentUnit", () => {
   })
 
   it("indentify empty fileNumbers as missing", () => {
-    const documentUnit = new DocumentUnit("foo", {
+    const documentUnit = new Decision("foo", {
       attachments: [{ s3path: "foo-path" }],
       coreData: { fileNumbers: [] },
     })
@@ -98,7 +94,7 @@ describe("DocumentUnit", () => {
   })
 
   it("indentify empty decisionDate as missing", () => {
-    const documentUnit = new DocumentUnit("foo", {
+    const documentUnit = new Decision("foo", {
       attachments: [{ s3path: "foo-path" }],
       coreData: { decisionDate: "" },
     })
@@ -112,7 +108,7 @@ describe("DocumentUnit", () => {
   })
 
   it("indentify all missing required fields", () => {
-    const documentUnit = new DocumentUnit("foo", {
+    const documentUnit = new Decision("foo", {
       attachments: [{ s3path: "foo-path" }],
       coreData: { legalEffect: "foo" },
     })
@@ -125,10 +121,10 @@ describe("DocumentUnit", () => {
   })
 
   it("returns true when field is required", () => {
-    expect(DocumentUnit.isRequiredField("fileNumbers")).toBeTruthy()
+    expect(Decision.isRequiredField("fileNumbers")).toBeTruthy()
   })
 
   it("returns true when field is required", () => {
-    expect(DocumentUnit.isRequiredField("ECLI")).toBeFalsy()
+    expect(Decision.isRequiredField("ECLI")).toBeFalsy()
   })
 })

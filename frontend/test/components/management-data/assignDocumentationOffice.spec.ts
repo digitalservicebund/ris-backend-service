@@ -6,7 +6,8 @@ import { setActivePinia } from "pinia"
 import { describe, it } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitManagementData from "@/components/management-data/DocumentUnitManagementData.vue"
-import { DocumentUnit, ManagementData } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { ManagementData } from "@/domain/documentUnit"
 import errorMessages from "@/i18n/errors.json"
 import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
 import documentUnitService from "@/services/documentUnitService"
@@ -230,7 +231,7 @@ describe("Assigning a new documentation office", () => {
 })
 function mockDocUnitStore(managementData: ManagementData) {
   const mockedSessionStore = useDocumentUnitStore()
-  mockedSessionStore.documentUnit = new DocumentUnit("q834", {
+  mockedSessionStore.documentUnit = new Decision("q834", {
     documentNumber: "DS123",
     coreData: {
       documentationOffice: {

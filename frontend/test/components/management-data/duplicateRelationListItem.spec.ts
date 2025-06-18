@@ -4,8 +4,8 @@ import { setActivePinia, Store } from "pinia"
 import { Ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
+import { Decision } from "@/domain/decision"
 import {
-  DocumentUnit,
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"
@@ -24,7 +24,7 @@ function mockDocUnitStore(
   } = { duplicateRelations: [] },
 ) {
   const mockedSessionStore = useDocumentUnitStore()
-  mockedSessionStore.documentUnit = new DocumentUnit("q834", {
+  mockedSessionStore.documentUnit = new Decision("q834", {
     documentNumber: "original",
     status: state ? { publicationStatus: state } : undefined,
     managementData: {
@@ -359,7 +359,7 @@ describe("DuplicateRelationListItem", () => {
     return store as Store<
       "docunitStore",
       {
-        documentUnit: Ref<DocumentUnit>
+        documentUnit: Ref<Decision>
       }
     >
   }

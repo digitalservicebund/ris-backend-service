@@ -6,8 +6,8 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
+import { Decision } from "@/domain/decision"
 import {
-  DocumentUnit,
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"
@@ -22,7 +22,7 @@ const { duplicateRelation } = defineProps<{
 }>()
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<Decision | undefined>
 }
 
 const hasSetStateError = ref(false)

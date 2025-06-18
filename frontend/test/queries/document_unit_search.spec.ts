@@ -1,8 +1,6 @@
 import { expect, Page, TestInfo } from "@playwright/test"
-import {
-  DocumentUnit,
-  DocumentUnitSearchParameter,
-} from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
 import { getRequest } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -191,7 +189,7 @@ async function runTestMultipleTimes(
 
   if (search.minResults) {
     const documentUnits =
-      ((await response?.json())?.content as DocumentUnit[]) || []
+      ((await response?.json())?.content as Decision[]) || []
     expect(documentUnits.length).toBeGreaterThanOrEqual(search.minResults)
   }
 

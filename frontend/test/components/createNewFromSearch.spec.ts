@@ -4,11 +4,9 @@ import { setupServer } from "msw/node"
 import { describe } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
+import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
-import {
-  DocumentationUnitParameters,
-  DocumentUnit,
-} from "@/domain/documentUnit"
+import { DocumentationUnitParameters } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import routes from "~/test-helper/routes"
 
@@ -80,7 +78,7 @@ describe("Create new documentation unit from search", () => {
     vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: new DocumentUnit("foo", {
+        data: new Decision("foo", {
           documentNumber: "1234567891234",
         }),
       }),
@@ -103,7 +101,7 @@ describe("Create new documentation unit from search", () => {
     vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: new DocumentUnit("foo", {
+        data: new Decision("foo", {
           documentNumber: "1234567891234",
         }),
       }),
@@ -149,7 +147,7 @@ describe("Create new documentation unit from search", () => {
     vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: new DocumentUnit("foo", {
+        data: new Decision("foo", {
           documentNumber: "1234567891234",
         }),
       }),
@@ -175,7 +173,7 @@ describe("Create new documentation unit from search", () => {
     vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: new DocumentUnit("foo", {
+        data: new Decision("foo", {
           documentNumber: "1234567891234",
         }),
       }),
@@ -209,7 +207,7 @@ describe("Create new documentation unit from search", () => {
     vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: new DocumentUnit("foo", {
+        data: new Decision("foo", {
           documentNumber: "1234567891234",
         }),
       }),

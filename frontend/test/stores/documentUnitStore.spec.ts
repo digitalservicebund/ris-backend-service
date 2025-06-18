@@ -1,5 +1,5 @@
 import { setActivePinia, createPinia } from "pinia"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
@@ -18,8 +18,8 @@ describe("useDocumentUnitStore", () => {
 
   describe("loadDocumentUnit", () => {
     it("loads a document unit successfully", async () => {
-      const mockDocumentUnit = new DocumentUnit("123", { version: 1 })
-      const serviceResponse: ServiceResponse<DocumentUnit> = {
+      const mockDocumentUnit = new Decision("123", { version: 1 })
+      const serviceResponse: ServiceResponse<Decision> = {
         status: 200,
         data: mockDocumentUnit,
         error: undefined,
@@ -38,7 +38,7 @@ describe("useDocumentUnitStore", () => {
     })
 
     it("handles failure to load a document unit", async () => {
-      const serviceResponse: ServiceResponse<DocumentUnit> = {
+      const serviceResponse: ServiceResponse<Decision> = {
         status: 200,
         data: undefined,
         error: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED,
@@ -59,9 +59,9 @@ describe("useDocumentUnitStore", () => {
 
   describe("updateDocumentUnit", () => {
     it("updates a document unit successfully", async () => {
-      const mockedLoadResponse: ServiceResponse<DocumentUnit> = {
+      const mockedLoadResponse: ServiceResponse<Decision> = {
         status: 200,
-        data: new DocumentUnit("123", { version: 0 }),
+        data: new Decision("123", { version: 0 }),
         error: undefined,
       }
 
@@ -89,7 +89,7 @@ describe("useDocumentUnitStore", () => {
       await store.loadDocumentUnit("123")
       expect(documentUnitServiceLoadMock).toHaveBeenCalledOnce()
 
-      store.documentUnit = new DocumentUnit("123", {
+      store.documentUnit = new Decision("123", {
         version: 0,
         coreData: {
           fileNumbers: ["123"],
@@ -104,9 +104,9 @@ describe("useDocumentUnitStore", () => {
     })
 
     it("updates a document unit with newer version of updated path", async () => {
-      const mockedLoadResponse: ServiceResponse<DocumentUnit> = {
+      const mockedLoadResponse: ServiceResponse<Decision> = {
         status: 200,
-        data: new DocumentUnit("123", { version: 0 }),
+        data: new Decision("123", { version: 0 }),
         error: undefined,
       }
 
@@ -134,7 +134,7 @@ describe("useDocumentUnitStore", () => {
       await store.loadDocumentUnit("123")
       expect(documentUnitServiceLoadMock).toHaveBeenCalledOnce()
 
-      store.documentUnit = new DocumentUnit("123", {
+      store.documentUnit = new Decision("123", {
         version: 0,
         coreData: {
           ecli: "321",
@@ -157,9 +157,9 @@ describe("useDocumentUnitStore", () => {
     })
 
     it("handles no changes in document unit", async () => {
-      const mockedLoadResponse: ServiceResponse<DocumentUnit> = {
+      const mockedLoadResponse: ServiceResponse<Decision> = {
         status: 200,
-        data: new DocumentUnit("123", { version: 0, documentNumber: "abc" }),
+        data: new Decision("123", { version: 0, documentNumber: "abc" }),
         error: undefined,
       }
 
@@ -225,9 +225,9 @@ describe("useDocumentUnitStore", () => {
     })
 
     it("update not successful", async () => {
-      const mockedLoadResponse: ServiceResponse<DocumentUnit> = {
+      const mockedLoadResponse: ServiceResponse<Decision> = {
         status: 200,
-        data: new DocumentUnit("123", { version: 0, documentNumber: "abc" }),
+        data: new Decision("123", { version: 0, documentNumber: "abc" }),
         error: undefined,
       }
 
@@ -251,7 +251,7 @@ describe("useDocumentUnitStore", () => {
       await store.loadDocumentUnit("123")
 
       // update docunit in frontend
-      store.documentUnit = new DocumentUnit("123", {
+      store.documentUnit = new Decision("123", {
         version: 0,
         documentNumber: "abc",
         coreData: {

@@ -1,4 +1,5 @@
-import { Court, DocumentUnit } from "./documentUnit"
+import { Court } from "./documentUnit"
+import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
 
@@ -10,7 +11,7 @@ export default class DocumentUnitListEntry {
   createdAt?: string
   lastPublicationDateTime?: string
   scheduledPublicationDateTime?: string
-  status?: NonNullable<DocumentUnit["status"]>
+  status?: NonNullable<Decision["status"]>
   fileNumber?: string
   documentType?: DocumentType
   court?: Court

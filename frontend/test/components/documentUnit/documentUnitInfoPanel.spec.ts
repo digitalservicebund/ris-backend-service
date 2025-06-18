@@ -2,9 +2,9 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
+import { Decision } from "@/domain/decision"
 import {
   CoreData,
-  DocumentUnit,
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"
@@ -20,7 +20,7 @@ function renderComponent(options?: {
     history: createWebHistory(),
     routes: routes,
   })
-  const documentUnit = new DocumentUnit("foo", {
+  const documentUnit = new Decision("foo", {
     documentNumber: options?.documentNumber ?? "1234567891234",
     coreData: options?.coreData ?? {
       court: {

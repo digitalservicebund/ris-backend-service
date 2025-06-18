@@ -3,12 +3,12 @@ import httpClient, {
   ServiceResponse,
 } from "./httpClient"
 import { Page } from "@/components/Pagination.vue"
+import { Decision } from "@/domain/decision"
 import {
   DocumentUnitSearchParameter,
   DocumentationUnitParameters,
   DuplicateRelationStatus,
   EurlexParameters,
-  DocumentUnit,
 } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import PendingProceeding from "@/domain/pendingProceeding"
@@ -21,11 +21,11 @@ import { isDocumentUnit, isPendingProceeding } from "@/utils/typeGuards"
 interface DocumentUnitService {
   getByDocumentNumber(
     documentNumber: string,
-  ): Promise<ServiceResponse<DocumentUnit | PendingProceeding>>
+  ): Promise<ServiceResponse<Decision | PendingProceeding>>
 
   createNew(
     params?: DocumentationUnitParameters,
-  ): Promise<ServiceResponse<DocumentUnit>>
+  ): Promise<ServiceResponse<Decision>>
 
   createNewOutOfEurlexDecision(
     params?: EurlexParameters,
@@ -72,7 +72,7 @@ interface DocumentUnitService {
 
 const service: DocumentUnitService = {
   async getByDocumentNumber(documentNumber: string) {
-    const response = await httpClient.get<DocumentUnit | PendingProceeding>(
+    const response = await httpClient.get<Decision | PendingProceeding>(
       `caselaw/documentunits/${documentNumber}`,
     )
     if (response.status >= 300 || response.error) {
@@ -84,7 +84,7 @@ const service: DocumentUnitService = {
             : errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED.title,
       }
     } else if (isDocumentUnit(response.data)) {
-      response.data = new DocumentUnit(response.data.uuid, {
+      response.data = new Decision(response.data.uuid, {
         ...response.data,
       })
     } else if (isPendingProceeding(response.data)) {
@@ -98,7 +98,7 @@ const service: DocumentUnitService = {
   async createNew(parameters?: DocumentationUnitParameters) {
     const response = await httpClient.put<
       DocumentationUnitParameters,
-      DocumentUnit
+      Decision
     >(
       "caselaw/documentunits/new",
       {
@@ -114,8 +114,8 @@ const service: DocumentUnitService = {
         title: errorMessages.DOCUMENT_UNIT_CREATION_FAILED.title,
       }
     } else {
-      response.data = new DocumentUnit((response.data as DocumentUnit).uuid, {
-        ...(response.data as DocumentUnit),
+      response.data = new Decision((response.data as Decision).uuid, {
+        ...(response.data as Decision),
       })
     }
     return response
@@ -191,7 +191,7 @@ const service: DocumentUnitService = {
   },
 
   async takeOver(documentNumber: string) {
-    const response = await httpClient.put<string, DocumentUnit>(
+    const response = await httpClient.put<string, Decision>(
       `caselaw/documentunits/${documentNumber}/takeover`,
     )
     if (response.status >= 300) {

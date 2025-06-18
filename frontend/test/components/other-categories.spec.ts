@@ -3,7 +3,8 @@ import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { vi } from "vitest"
 import OtherCategories from "@/components/OtherCategories.vue"
-import { ContentRelatedIndexing, DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { ContentRelatedIndexing } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 function mockSessionStore(
@@ -11,7 +12,7 @@ function mockSessionStore(
   courtType: string = "",
 ) {
   const mockedSessionStore = useDocumentUnitStore()
-  mockedSessionStore.documentUnit = new DocumentUnit("q834", {
+  mockedSessionStore.documentUnit = new Decision("q834", {
     contentRelatedIndexing: contentRelatedIndexing,
     coreData: {
       court: {

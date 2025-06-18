@@ -1,6 +1,7 @@
 import { storeToRefs } from "pinia"
 import { Ref } from "vue"
-import { DocumentUnit, LongTexts, ShortTexts } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { LongTexts, ShortTexts } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 type ShortTextKeys = keyof ShortTexts
@@ -108,7 +109,7 @@ function updateBorderNumberLinksForText(
  * @param updatedBorderNumbers border numbers that have been changed from (key) -> to (value)
  */
 function updateBorderNumberLinks(
-  documentUnit: DocumentUnit,
+  documentUnit: Decision,
   updatedBorderNumbers: Map<string, number>,
 ) {
   const shortTextNames = Object.keys(documentUnit.shortTexts) as ShortTextKeys[]
@@ -140,7 +141,7 @@ function updateBorderNumberLinks(
  * Returns all categories with invalid border number links.
  */
 function getCategoriesWithInvalidLinks(
-  documentUnit: DocumentUnit,
+  documentUnit: Decision,
 ): (ShortTextKeys | LongTextKeys)[] {
   const texts = [
     ...Object.entries(documentUnit.longTexts).filter(
@@ -197,7 +198,7 @@ function getParsedDocumentPerCategory(
  * Returns all categories with invalid border number links.
  */
 function invalidateBorderNumberLinks(
-  documentUnit: DocumentUnit,
+  documentUnit: Decision,
   numbersToBeInvalidated: string[],
 ): void {
   const { participatingJudges, ...longTexts } = documentUnit.longTexts
@@ -236,7 +237,7 @@ const borderNumberService = {
   makeBorderNumbersSequential: () => {
     try {
       const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
-        documentUnit: Ref<DocumentUnit | undefined>
+        documentUnit: Ref<Decision | undefined>
       }
       let nextBorderNumberCount = 1
       // key: original border number  -> value: new border number
@@ -261,7 +262,7 @@ const borderNumberService = {
       const hasUpdatedAnyBorderNumber = allUpdatedBorderNumbers.size > 0
       if (hasUpdatedAnyBorderNumber) {
         updateBorderNumberLinks(
-          documentUnit.value as DocumentUnit,
+          documentUnit.value as Decision,
           allUpdatedBorderNumbers,
         )
       }
@@ -279,7 +280,7 @@ const borderNumberService = {
   validateBorderNumbers: (): BorderNumberValidationResult => {
     try {
       const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
-        documentUnit: Ref<DocumentUnit | undefined>
+        documentUnit: Ref<Decision | undefined>
       }
       let nextExpectedBorderNumber = 1
       for (const category of orderedCategoriesWithBorderNumbers) {
@@ -316,7 +317,7 @@ const borderNumberService = {
     const { documentUnit } = storeToRefs(useDocumentUnitStore())
 
     const invalidCategories = getCategoriesWithInvalidLinks(
-      documentUnit.value as DocumentUnit,
+      documentUnit.value as Decision,
     )
 
     if (invalidCategories.length > 0) {
@@ -330,7 +331,7 @@ const borderNumberService = {
     const { documentUnit } = storeToRefs(useDocumentUnitStore())
 
     invalidateBorderNumberLinks(
-      documentUnit.value as DocumentUnit,
+      documentUnit.value as Decision,
       numbersToBeInvalidated,
     )
   },

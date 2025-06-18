@@ -5,12 +5,8 @@ import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
 import { ref } from "vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import {
-  CoreData,
-  DocumentUnit,
-  Kind,
-  SourceValue,
-} from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { CoreData, Kind, SourceValue } from "@/domain/documentUnit"
 
 interface RenderProps {
   initialModelValue?: CoreData
@@ -48,7 +44,7 @@ describe("Core Data", () => {
   })
 
   test("renders correctly with given documentUnitId", async () => {
-    const documentUnit = new DocumentUnit("1", {
+    const documentUnit = new Decision("1", {
       coreData: {
         fileNumbers: ["one", "two"],
         ecli: "abc123",
@@ -67,7 +63,7 @@ describe("Core Data", () => {
   })
 
   test("renders deviating decision date", async () => {
-    const documentUnit = new DocumentUnit("1", {
+    const documentUnit = new Decision("1", {
       coreData: {
         deviatingDecisionDates: ["2021-02-01", "2022-02-01"],
       },
@@ -102,7 +98,7 @@ describe("Core Data", () => {
   })
 
   test("renders year of dispute", async () => {
-    const documentUnit = new DocumentUnit("1", {
+    const documentUnit = new Decision("1", {
       coreData: {
         yearsOfDispute: ["2021", "2022"],
       },

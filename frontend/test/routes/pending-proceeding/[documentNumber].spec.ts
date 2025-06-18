@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createHead } from "@unhead/vue/client"
 import { createRouter, createWebHistory } from "vue-router"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import PendingProceeding from "@/domain/pendingProceeding"
 import categories from "@/routes/caselaw/pending-proceeding/[documentNumber]/categories.vue"
 import DocumentNumber from "@/routes/caselaw/pending-proceeding/[documentNumber].vue"
@@ -223,7 +223,7 @@ describe("Document Number Route", () => {
             status: 404,
             data: undefined,
             error: { title: "Backend_Error_Title" },
-          } as ServiceResponse<DocumentUnit>),
+          } as ServiceResponse<Decision>),
       )
 
       const { router } = renderComponent()

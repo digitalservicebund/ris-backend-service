@@ -7,7 +7,7 @@ import Tooltip from "./Tooltip.vue"
 import DocumentationUnitSummary from "@/components/DocumentationUnitSummary.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import ActiveCitation from "@/domain/activeCitation"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import IconBaselineContentCopy from "~icons/ic/baseline-content-copy"
@@ -20,7 +20,7 @@ const props = defineProps<{
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<Decision | undefined>
 }
 
 const isParallelDecision = computed(

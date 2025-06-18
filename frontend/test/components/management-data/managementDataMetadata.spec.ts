@@ -1,12 +1,8 @@
 import { render, screen, within } from "@testing-library/vue"
 import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
+import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
-import {
-  DocumentUnit,
-  ManagementData,
-  Source,
-  SourceValue,
-} from "@/domain/documentUnit"
+import { ManagementData, Source, SourceValue } from "@/domain/documentUnit"
 import { Procedure } from "@/domain/procedure"
 import Reference from "@/domain/reference"
 
@@ -21,7 +17,7 @@ function mockDocUnit({
   procedure?: Procedure
   creatingDocOffice?: DocumentationOffice
 } = {}) {
-  return new DocumentUnit("q834", {
+  return new Decision("q834", {
     documentNumber: "original",
     coreData: { source, procedure, creatingDocOffice },
     managementData: {
@@ -279,7 +275,7 @@ describe("ManagementDataMetadata", () => {
     })
   })
 
-  function renderMetadata(documentUnit: DocumentUnit) {
+  function renderMetadata(documentUnit: Decision) {
     render(ManagementDataMetadata, { props: { documentUnit } })
   }
 })

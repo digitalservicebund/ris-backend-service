@@ -15,8 +15,8 @@ import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
+import { Decision } from "@/domain/decision"
 import {
-  DocumentUnit,
   DuplicateRelationStatus,
   longTextLabels,
   shortTextLabels,
@@ -55,7 +55,7 @@ const emits = defineEmits<{
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<Decision | undefined>
 }
 const sessionStore = useSessionStore()
 const { env } = storeToRefs(sessionStore)

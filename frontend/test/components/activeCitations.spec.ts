@@ -9,8 +9,9 @@ import { createRouter, createWebHistory } from "vue-router"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
+import { Decision } from "@/domain/decision"
 import { DocumentType } from "@/domain/documentType"
-import { Court, DocumentUnit } from "@/domain/documentUnit"
+import { Court } from "@/domain/documentUnit"
 
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
@@ -60,7 +61,7 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
             createTestingPinia({
               initialState: {
                 docunitStore: {
-                  documentUnit: new DocumentUnit("foo", {
+                  documentUnit: new Decision("foo", {
                     documentNumber: "1234567891234",
                     contentRelatedIndexing: {
                       activeCitations: activeCitations ?? [],

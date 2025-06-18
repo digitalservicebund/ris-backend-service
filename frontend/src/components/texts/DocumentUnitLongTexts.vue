@@ -3,7 +3,8 @@ import { storeToRefs } from "pinia"
 import { type Component, computed, Ref } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
-import { DocumentUnit, longTextLabels } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { longTextLabels } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
@@ -13,7 +14,7 @@ defineProps<{
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<Decision | undefined>
 }
 
 const tenor = computed({

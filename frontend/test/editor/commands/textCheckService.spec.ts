@@ -2,7 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { Editor } from "@tiptap/vue-3"
 import { setActivePinia } from "pinia"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { NeurisTextCheckService } from "@/editor/commands/textCheckCommands"
 import languageToolService from "@/services/textCheckService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -29,7 +29,7 @@ describe("check category service", () => {
       createTestingPinia({
         initialState: {
           docunitStore: {
-            documentUnit: new DocumentUnit("foo", {
+            documentUnit: new Decision("foo", {
               documentNumber: "1234567891234",
             }),
           },

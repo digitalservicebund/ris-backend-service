@@ -4,7 +4,8 @@ import { Component, Ref, computed } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
-import { DocumentUnit, shortTextLabels } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { shortTextLabels } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
@@ -14,7 +15,7 @@ defineProps<{
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<Decision | undefined>
 }
 const decisionName = computed({
   get: () => documentUnit.value?.shortTexts.decisionName,

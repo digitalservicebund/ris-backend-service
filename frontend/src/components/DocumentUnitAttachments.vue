@@ -8,7 +8,7 @@ import FlexItem from "@/components/FlexItem.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import attachmentService from "@/services/attachmentService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -20,7 +20,7 @@ const emit = defineEmits<{
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<Decision | undefined>
 }
 const errors = ref<string[]>([])
 const isLoading = ref(false)

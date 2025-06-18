@@ -8,7 +8,7 @@ import InputText from "primevue/inputtext"
 import { describe } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import NormReferences from "@/components/NormReferences.vue"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import LegalForce from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
@@ -41,7 +41,7 @@ function renderComponent(normReferences?: NormReference[]) {
             createTestingPinia({
               initialState: {
                 docunitStore: {
-                  documentUnit: new DocumentUnit("123", {
+                  documentUnit: new Decision("123", {
                     documentNumber: "foo",
                     contentRelatedIndexing: {
                       norms: normReferences ?? undefined,

@@ -9,11 +9,8 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
-import {
-  DocumentUnit,
-  longTextLabels,
-  shortTextLabels,
-} from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { longTextLabels, shortTextLabels } from "@/domain/documentUnit"
 import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import Reference from "@/domain/reference"
@@ -28,12 +25,12 @@ const props = defineProps<{
 }>()
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<Decision | undefined>
 }
 const validationStore = useValidationStore<keyof typeof labels>()
 
 const documentNumber = ref<string>(props.documentNumber ?? "")
-const documentUnitToImport = ref<DocumentUnit | undefined>(undefined)
+const documentUnitToImport = ref<Decision | undefined>(undefined)
 const errorMessage = ref<string | undefined>(undefined)
 const router = useRouter()
 

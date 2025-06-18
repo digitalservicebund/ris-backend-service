@@ -2,9 +2,10 @@ import { UseFetchReturn } from "@vueuse/core"
 import { Component, Ref } from "vue"
 import { LabelPosition } from "@/components/input/InputField.vue"
 import { CitationType } from "@/domain/citationType"
+import { Decision } from "@/domain/decision" // NOSONAR // This import causes circularity, but only in type files
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
-import { Court, DocumentUnit } from "@/domain/documentUnit"
+import { Court } from "@/domain/documentUnit"
 
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
@@ -13,7 +14,7 @@ import { NormAbbreviation } from "@/domain/normAbbreviation"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { Procedure } from "@/domain/procedure"
 import { SelectablePanelContent } from "@/types/panelContentMode"
-import { Match } from "@/types/textCheck" // NOSONAR // This import causes circularity, but only in type files
+import { Match } from "@/types/textCheck"
 
 export enum InputType {
   TEXT = "text",
@@ -230,7 +231,7 @@ export type ValidationError = {
 }
 
 export type ExtraContentSidePanelProps = {
-  documentUnit?: DocumentUnit | PendingProceeding
+  documentUnit?: Decision | PendingProceeding
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   hidePreviewInNewTab?: boolean

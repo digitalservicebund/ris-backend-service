@@ -1,4 +1,4 @@
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import PreviousDecision from "@/domain/previousDecision"
 import errorMessages from "@/i18n/errors.json"
 import httpClient from "@/services/httpClient"
@@ -66,7 +66,7 @@ describe("proceedingDecisionService", () => {
       },
       fileNumber: "bar",
     })
-    const documentUnit = new DocumentUnit("id", {
+    const documentUnit = new Decision("id", {
       previousDecisions: [previousDecision],
     })
 

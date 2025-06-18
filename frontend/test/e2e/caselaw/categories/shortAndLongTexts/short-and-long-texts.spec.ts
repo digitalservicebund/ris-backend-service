@@ -8,7 +8,8 @@ import {
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
-import { DocumentUnit } from "@/domain/documentUnit"
+
+import { Decision } from "@/domain/decision"
 
 test.describe("short and long texts", () => {
   test(
@@ -519,7 +520,7 @@ test.describe("short and long texts", () => {
 
   async function runTextCategoryTest(
     page: Page,
-    prefilledDocumentUnit: DocumentUnit,
+    prefilledDocumentUnit: Decision,
     testId: string,
     value: string,
   ) {
@@ -555,7 +556,7 @@ test.describe("short and long texts", () => {
     testId: string,
     value: string,
     page: Page,
-    prefilledDocumentUnit: DocumentUnit,
+    prefilledDocumentUnit: Decision,
   ) {
     await test.step(`text field '${testId}' and value '${value}' should be visible in preview`, async () => {
       await navigateToPreview(
@@ -572,7 +573,7 @@ test.describe("short and long texts", () => {
     testId: string,
     value: string,
     page: Page,
-    prefilledDocumentUnit: DocumentUnit,
+    prefilledDocumentUnit: Decision,
   ) {
     await test.step(`text field '${testId}' and value '${value}' should be visible in 'XML-Vorschau'`, async () => {
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)

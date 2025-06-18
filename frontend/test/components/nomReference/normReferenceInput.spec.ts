@@ -7,7 +7,7 @@ import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
 import { beforeEach, vi } from "vitest"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
@@ -42,7 +42,7 @@ function renderComponent(options?: { modelValue?: NormReference }) {
         createTestingPinia({
           initialState: {
             docunitStore: {
-              documentUnit: new DocumentUnit("foo", {
+              documentUnit: new Decision("foo", {
                 documentNumber: "1234567891234",
                 coreData: {
                   court: {

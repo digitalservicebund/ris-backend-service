@@ -5,7 +5,7 @@ import { setActivePinia, Store } from "pinia"
 import InputText from "primevue/inputtext"
 import { Ref } from "vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import { ServiceResponse } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -21,7 +21,7 @@ function mockDocUnitStore({
   errorTitle?: string
 } = {}) {
   const mockedSessionStore = useDocumentUnitStore()
-  mockedSessionStore.documentUnit = new DocumentUnit("q834", {
+  mockedSessionStore.documentUnit = new Decision("q834", {
     managementData: {
       scheduledPublicationDateTime,
       scheduledByEmail,
@@ -38,7 +38,7 @@ function mockDocUnitStore({
   return mockedSessionStore as Store<
     "docunitStore",
     {
-      documentUnit: Ref<DocumentUnit>
+      documentUnit: Ref<Decision>
     }
   >
 }

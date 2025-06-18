@@ -6,8 +6,8 @@ import type { Component } from "vue"
 import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
+import { Decision } from "@/domain/decision"
 import {
-  DocumentUnit,
   longTextLabels,
   LongTexts,
   shortTextLabels,
@@ -44,7 +44,7 @@ async function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
             initialState: {
               session: { user: { roles: ["Internal"] } },
               docunitStore: {
-                documentUnit: new DocumentUnit("foo", {
+                documentUnit: new Decision("foo", {
                   documentNumber: "1234567891234",
                   shortTexts: shortTexts ?? {},
                   longTexts: longTexts ?? {},

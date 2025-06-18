@@ -6,13 +6,13 @@ import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
-import { DocumentUnit } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { isDocumentUnit } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
 
 const props = defineProps<{
-  documentUnit: DocumentUnit | PendingProceeding
+  documentUnit: Decision | PendingProceeding
 }>()
 
 const route = useRoute()

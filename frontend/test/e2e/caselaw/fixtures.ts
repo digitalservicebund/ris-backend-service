@@ -9,7 +9,8 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import { navigateToCategories } from "./e2e-utils"
 import { Page as Pagination } from "@/components/Pagination.vue"
-import { DocumentUnit, SourceValue } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { SourceValue } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -20,20 +21,20 @@ dayjs.extend(utc)
 // Declare the types of your fixtures.
 type MyFixtures = {
   documentNumber: string
-  prefilledDocumentUnit: DocumentUnit
-  secondPrefilledDocumentUnit: DocumentUnit
+  prefilledDocumentUnit: Decision
+  secondPrefilledDocumentUnit: Decision
   linkedDocumentNumber: string
   editorField: Locator
   pageWithBghUser: Page
   pageWithExternalUser: Page
-  prefilledDocumentUnitBgh: DocumentUnit
+  prefilledDocumentUnitBgh: Decision
   edition: LegalPeriodicalEdition
   editionWithReferences: LegalPeriodicalEdition
   editionWithManyReferences: LegalPeriodicalEdition
   foreignDocumentationUnit: DocumentUnitListEntry
-  prefilledDocumentUnitWithReferences: DocumentUnit
-  prefilledDocumentUnitWithTexts: DocumentUnit
-  prefilledDocumentUnitWithManyReferences: DocumentUnit
+  prefilledDocumentUnitWithReferences: Decision
+  prefilledDocumentUnitWithTexts: Decision
+  prefilledDocumentUnitWithManyReferences: Decision
 }
 
 /**
