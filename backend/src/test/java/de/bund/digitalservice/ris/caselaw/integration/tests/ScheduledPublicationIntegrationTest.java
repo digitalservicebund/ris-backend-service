@@ -162,6 +162,7 @@ class ScheduledPublicationIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("java:S5961")
   void shouldPublishOnlyDueDocUnitsAndSendErrorNotificationOnSchedule() {
     // Valid doc unit -> publication will succeed
     DocumentationUnitDTO docUnitDueNow =
