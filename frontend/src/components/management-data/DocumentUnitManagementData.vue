@@ -98,7 +98,7 @@ const assignDocumentationOffice = async () => {
       <TitleElement>Verwaltungsdaten</TitleElement>
       <ManagementDataMetadata
         v-if="documentUnit"
-        :document-unit="documentUnit as Decision"
+        :document-unit="documentUnit"
       />
       <DocumentUnitHistoryLog
         :data="historyLogs"

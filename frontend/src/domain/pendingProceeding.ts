@@ -3,7 +3,12 @@ import EnsuingDecision from "./ensuingDecision"
 import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
 import ActiveCitation from "@/domain/activeCitation"
-import { ContentRelatedIndexing, CoreData, Kind } from "@/domain/documentUnit"
+import {
+  ContentRelatedIndexing,
+  CoreData,
+  Kind,
+  ManagementData,
+} from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import { PublicationStatus } from "@/domain/publicationStatus"
@@ -41,6 +46,10 @@ export default class PendingProceeding {
   public contentRelatedIndexing: ContentRelatedIndexing = {}
   public caselawReferences?: Reference[]
   public literatureReferences?: Reference[]
+  public managementData: ManagementData = {
+    borderNumbers: [],
+    duplicateRelations: [],
+  }
 
   public isEditable?: boolean
 
@@ -95,6 +104,15 @@ export default class PendingProceeding {
             ),
           }),
       )
+
+    let managementDataField: keyof ManagementData
+    for (managementDataField in data.managementData) {
+      if (
+        data.managementData &&
+        data.managementData[managementDataField] === null
+      )
+        delete data.managementData[managementDataField]
+    }
 
     if (data.contentRelatedIndexing?.activeCitations)
       data.contentRelatedIndexing.activeCitations =
