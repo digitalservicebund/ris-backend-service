@@ -7,10 +7,10 @@ import { Decision } from "@/domain/decision"
 import {
   DocumentUnitSearchParameter,
   DocumentationUnitParameters,
-  DuplicateRelationStatus,
   EurlexParameters,
 } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { DuplicateRelationStatus } from "@/domain/managementData"
 import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { RisJsonPatch } from "@/domain/risJsonPatch"

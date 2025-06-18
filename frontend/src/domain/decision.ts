@@ -1,23 +1,62 @@
 import dayjs from "dayjs"
 import ActiveCitation from "@/domain/activeCitation"
 import Attachment from "@/domain/attachment"
-import {
-  ContentRelatedIndexing,
-  CoreData,
-  InboxStatus,
-  Kind,
-  LongTexts,
-  ManagementData,
-  ShortTexts,
-} from "@/domain/documentUnit"
+import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
+import { CoreData } from "@/domain/coreData"
+import { Kind } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import LegalForce from "@/domain/legalForce"
+import { ManagementData } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import PreviousDecision from "@/domain/previousDecision"
 import { PublicationStatus } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import SingleNorm from "@/domain/singleNorm"
+
+export enum InboxStatus {
+  EXTERNAL_HANDOVER,
+  EU,
+}
+
+export type ShortTexts = {
+  decisionName?: string
+  headline?: string
+  guidingPrinciple?: string
+  headnote?: string
+  otherHeadnote?: string
+}
+export const shortTextLabels: {
+  [shortTextKey in keyof Required<ShortTexts>]: string
+} = {
+  decisionName: "Entscheidungsname",
+  headline: "Titelzeile",
+  guidingPrinciple: "Leitsatz",
+  headnote: "Orientierungssatz",
+  otherHeadnote: "Sonstiger Orientierungssatz",
+}
+export type LongTexts = {
+  tenor?: string
+  reasons?: string
+  caseFacts?: string
+  decisionReasons?: string
+  dissentingOpinion?: string
+  participatingJudges?: ParticipatingJudge[]
+  otherLongText?: string
+  outline?: string
+}
+export const longTextLabels: {
+  [longTextKey in keyof Required<LongTexts>]: string
+} = {
+  tenor: "Tenor",
+  reasons: "Gründe",
+  caseFacts: "Tatbestand",
+  decisionReasons: "Entscheidungsgründe",
+  dissentingOpinion: "Abweichende Meinung",
+  participatingJudges: "Mitwirkende Richter",
+  otherLongText: "Sonstiger Langtext",
+  outline: "Gliederung",
+}
 
 export class Decision {
   readonly uuid: string

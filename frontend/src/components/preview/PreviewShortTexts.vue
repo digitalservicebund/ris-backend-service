@@ -5,7 +5,7 @@ import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
-import { shortTextLabels, ShortTexts } from "@/domain/documentUnit"
+import { shortTextLabels, ShortTexts } from "@/domain/decision"
 
 const props = defineProps<{
   shortTexts: ShortTexts

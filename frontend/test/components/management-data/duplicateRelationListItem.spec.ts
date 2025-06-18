@@ -8,7 +8,7 @@ import { Decision } from "@/domain/decision"
 import {
   DuplicateRelation,
   DuplicateRelationStatus,
-} from "@/domain/documentUnit"
+} from "@/domain/managementData"
 import { PublicationState } from "@/domain/publicationStatus"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"

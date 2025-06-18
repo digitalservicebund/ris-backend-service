@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/vue"
 import { beforeAll } from "vitest"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
-import { ShortTexts } from "@/domain/documentUnit"
+import { ShortTexts } from "@/domain/decision"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 
 beforeAll(() => {

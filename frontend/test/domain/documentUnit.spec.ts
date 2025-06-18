@@ -1,5 +1,5 @@
-import { CoreData, LongTexts, ShortTexts } from "../../src/domain/documentUnit"
-import { Decision } from "@/domain/decision"
+import { CoreData } from "@/domain/coreData"
+import { Decision, LongTexts, ShortTexts } from "@/domain/decision"
 
 describe("DocumentUnit", () => {
   it("instantiates with uuid", () => {

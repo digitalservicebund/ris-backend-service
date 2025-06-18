@@ -5,8 +5,10 @@ import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
 import { ref } from "vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
+import { CoreData } from "@/domain/coreData"
 import { Decision } from "@/domain/decision"
-import { CoreData, Kind, SourceValue } from "@/domain/documentUnit"
+import { Kind } from "@/domain/documentUnit"
+import { SourceValue } from "@/domain/source"
 
 interface RenderProps {
   initialModelValue?: CoreData

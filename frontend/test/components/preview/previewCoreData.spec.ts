@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
-import { CoreData, Kind, SourceValue } from "@/domain/documentUnit"
+import { CoreData } from "@/domain/coreData"
+import { Kind } from "@/domain/documentUnit"
+import { SourceValue } from "@/domain/source"
 
 function renderComponent(coreData: CoreData, kind?: Kind) {
   return render(PreviewCoreData, {

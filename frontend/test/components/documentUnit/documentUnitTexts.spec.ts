@@ -6,13 +6,13 @@ import type { Component } from "vue"
 import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
-import { Decision } from "@/domain/decision"
 import {
+  Decision,
   longTextLabels,
   LongTexts,
   shortTextLabels,
   ShortTexts,
-} from "@/domain/documentUnit"
+} from "@/domain/decision"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"

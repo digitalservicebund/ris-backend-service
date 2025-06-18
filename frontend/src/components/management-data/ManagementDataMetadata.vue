@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { Decision } from "@/domain/decision"
-import { Source } from "@/domain/documentUnit"
 import PendingProceeding from "@/domain/pendingProceeding"
 import Reference from "@/domain/reference"
+import { Source } from "@/domain/source"
 import DateUtil from "@/utils/dateUtil"
 
 const { documentUnit } = defineProps<{

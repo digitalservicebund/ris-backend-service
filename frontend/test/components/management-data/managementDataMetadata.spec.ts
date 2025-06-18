@@ -2,9 +2,10 @@ import { render, screen, within } from "@testing-library/vue"
 import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
 import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
-import { ManagementData, Source, SourceValue } from "@/domain/documentUnit"
+import { ManagementData } from "@/domain/managementData"
 import { Procedure } from "@/domain/procedure"
 import Reference from "@/domain/reference"
+import { Source, SourceValue } from "@/domain/source"
 
 function mockDocUnit({
   managementData,

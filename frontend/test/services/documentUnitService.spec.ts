@@ -1,5 +1,5 @@
 import { Decision } from "@/domain/decision"
-import { DuplicateRelationStatus } from "@/domain/documentUnit"
+import { DuplicateRelationStatus } from "@/domain/managementData"
 import PendingProceeding from "@/domain/pendingProceeding"
 import errorMessages from "@/i18n/errors.json"
 import service from "@/services/documentUnitService"

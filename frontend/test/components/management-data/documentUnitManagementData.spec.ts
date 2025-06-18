@@ -10,7 +10,7 @@ import {
   DuplicateRelation,
   DuplicateRelationStatus,
   ManagementData,
-} from "@/domain/documentUnit"
+} from "@/domain/managementData"
 import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"

@@ -3,13 +3,11 @@ import EnsuingDecision from "./ensuingDecision"
 import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
 import ActiveCitation from "@/domain/activeCitation"
-import {
-  ContentRelatedIndexing,
-  CoreData,
-  Kind,
-  ManagementData,
-} from "@/domain/documentUnit"
+import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
+import { CoreData } from "@/domain/coreData"
+import { Kind } from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
+import { ManagementData } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
 import { PublicationStatus } from "@/domain/publicationStatus"
 import SingleNorm from "@/domain/singleNorm"

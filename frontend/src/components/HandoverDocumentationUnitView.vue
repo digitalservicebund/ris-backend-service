@@ -15,12 +15,7 @@ import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
-import { Decision } from "@/domain/decision"
-import {
-  DuplicateRelationStatus,
-  longTextLabels,
-  shortTextLabels,
-} from "@/domain/documentUnit"
+import { Decision, longTextLabels, shortTextLabels } from "@/domain/decision"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
 } from "@/domain/ensuingDecision"
@@ -29,6 +24,7 @@ import EventRecord, {
   HandoverMail,
   Preview,
 } from "@/domain/eventRecord"
+import { DuplicateRelationStatus } from "@/domain/managementData"
 import PreviousDecision, {
   previousDecisionFieldLabels,
 } from "@/domain/previousDecision"

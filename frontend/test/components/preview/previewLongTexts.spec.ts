@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
-import { LongTexts } from "@/domain/documentUnit"
+import { LongTexts } from "@/domain/decision"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 

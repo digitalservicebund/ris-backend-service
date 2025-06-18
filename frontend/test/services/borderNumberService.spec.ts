@@ -1,8 +1,12 @@
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia, Store } from "pinia"
 import { Ref } from "vue"
-import { Decision } from "@/domain/decision"
-import { longTextLabels, LongTexts, ShortTexts } from "@/domain/documentUnit"
+import {
+  Decision,
+  longTextLabels,
+  LongTexts,
+  ShortTexts,
+} from "@/domain/decision"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import borderNumberService from "@/services/borderNumberService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"

@@ -6,7 +6,8 @@ import FlexItem from "@/components/FlexItem.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { CoreData, Kind } from "@/domain/documentUnit"
+import { CoreData } from "@/domain/coreData"
+import { Kind } from "@/domain/documentUnit"
 
 const props = defineProps<{
   coreData: CoreData

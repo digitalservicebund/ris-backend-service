@@ -10,10 +10,10 @@ import utc from "dayjs/plugin/utc.js"
 import { navigateToCategories } from "./e2e-utils"
 import { Page as Pagination } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
-import { SourceValue } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
+import { SourceValue } from "@/domain/source"
 import { generateString } from "~/test-helper/dataGenerators"
 
 dayjs.extend(utc)

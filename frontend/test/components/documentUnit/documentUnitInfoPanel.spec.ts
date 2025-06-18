@@ -2,12 +2,12 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
+import { CoreData } from "@/domain/coreData"
 import { Decision } from "@/domain/decision"
 import {
-  CoreData,
   DuplicateRelation,
   DuplicateRelationStatus,
-} from "@/domain/documentUnit"
+} from "@/domain/managementData"
 import routes from "~/test-helper/routes"
 
 function renderComponent(options?: {
