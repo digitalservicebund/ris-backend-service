@@ -563,7 +563,7 @@ onBeforeUnmount(() => {
             <InputField
               id="decisionDate"
               v-slot="slotProps"
-              label="Entscheidungsdatum"
+              label="Datum"
               :validation-error="validationStore.getByField('decisionDate')"
               @update:validation-error="
                 (validationError: any) =>
