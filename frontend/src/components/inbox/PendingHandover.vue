@@ -131,7 +131,11 @@ async function handleReset() {
 
 <template>
   <div class="flex flex-col" data-testId="pending-handover-inbox">
-    <InboxSearch @reset-search-results="handleReset" @search="updateQuery" />
+    <InboxSearch
+      :is-loading="isLoading"
+      @reset-search-results="handleReset"
+      @search="updateQuery"
+    />
     <InfoModal
       v-if="serviceError"
       class="my-16"

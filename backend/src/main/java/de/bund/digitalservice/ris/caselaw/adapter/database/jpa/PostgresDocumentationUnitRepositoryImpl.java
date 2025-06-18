@@ -45,6 +45,7 @@ import jakarta.persistence.criteria.Root;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -73,6 +74,9 @@ import org.springframework.transaction.annotation.Transactional;
 // Repository for main entity -> depends on more than 20 classes :-/
 @SuppressWarnings("java:S6539")
 public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUnitRepository {
+  private static final DateTimeFormatter FORMATTER =
+      DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
   private final DatabaseDocumentationUnitRepository repository;
   private final DatabaseCourtRepository databaseCourtRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
@@ -303,6 +307,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
 
     setLastUpdated(currentUser, documentationUnitDTO);
+
+    saveHistoryLogForScheduledPublication(documentable, documentationUnitDTO, currentUser);
+
     historyLogService.saveHistoryLog(
         documentationUnitDTO.getId(),
         currentUser,
@@ -346,6 +353,79 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       }
     }
     return documentable;
+  }
+
+  private void saveHistoryLogForScheduledPublication(
+      Documentable documentable, DocumentationUnitDTO documentationUnitDTO, User user) {
+    if (documentable instanceof DocumentationUnit documentationUnit) {
+      saveHistoryLogForScheduledPublicationCreation(documentationUnit, documentationUnitDTO, user);
+      saveHistoryLogForScheduledPublicationUpdating(documentationUnit, documentationUnitDTO, user);
+      saveHistoryLogForScheduledPublicationDeletion(documentationUnit, documentationUnitDTO, user);
+    }
+  }
+
+  private void saveHistoryLogForScheduledPublicationCreation(
+      DocumentationUnit documentationUnit, DocumentationUnitDTO documentationUnitDTO, User user) {
+    if (documentationUnitDTO.getScheduledPublicationDateTime() != null) {
+      return;
+    }
+
+    if (documentationUnit.managementData() == null
+        || documentationUnit.managementData().scheduledPublicationDateTime() == null) {
+      return;
+    }
+
+    String dateString =
+        documentationUnit.managementData().scheduledPublicationDateTime().format(FORMATTER);
+    historyLogService.saveHistoryLog(
+        documentationUnitDTO.getId(),
+        user,
+        HistoryLogEventType.UPDATE,
+        "Abgabe wurde auf den " + dateString + " gesetzt.");
+  }
+
+  private void saveHistoryLogForScheduledPublicationUpdating(
+      DocumentationUnit documentationUnit, DocumentationUnitDTO documentationUnitDTO, User user) {
+    if (documentationUnit.managementData() == null
+        || documentationUnit.managementData().scheduledPublicationDateTime() == null) {
+      return;
+    }
+
+    if (documentationUnitDTO.getScheduledPublicationDateTime() == null) {
+      return;
+    }
+
+    if (documentationUnitDTO
+        .getScheduledPublicationDateTime()
+        .equals(documentationUnit.managementData().scheduledPublicationDateTime())) {
+      return;
+    }
+
+    String dateString =
+        documentationUnit.managementData().scheduledPublicationDateTime().format(FORMATTER);
+    historyLogService.saveHistoryLog(
+        documentationUnitDTO.getId(),
+        user,
+        HistoryLogEventType.UPDATE,
+        "Abgabe wurde auf den " + dateString + " geändert.");
+  }
+
+  private void saveHistoryLogForScheduledPublicationDeletion(
+      DocumentationUnit documentationUnit, DocumentationUnitDTO documentationUnitDTO, User user) {
+    if (documentationUnit.managementData() != null
+        && documentationUnit.managementData().scheduledPublicationDateTime() != null) {
+      return;
+    }
+
+    if (documentationUnitDTO.getScheduledPublicationDateTime() == null) {
+      return;
+    }
+
+    historyLogService.saveHistoryLog(
+        documentationUnitDTO.getId(),
+        user,
+        HistoryLogEventType.UPDATE,
+        "Zeitliche Abgabe wurde gelöscht.");
   }
 
   private void setLastUpdated(User currentUser, DocumentationUnitDTO docUnitDTO) {
