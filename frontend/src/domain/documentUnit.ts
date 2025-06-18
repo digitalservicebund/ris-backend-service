@@ -183,7 +183,7 @@ export enum Kind {
   PENDING_PROCEEDING = "PENDING_PROCEEDING",
 }
 
-export default class DocumentUnit {
+export class DocumentUnit {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber: string = ""

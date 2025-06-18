@@ -9,7 +9,8 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
-import DocumentUnit, {
+import {
+  DocumentUnit,
   longTextLabels,
   shortTextLabels,
 } from "@/domain/documentUnit"

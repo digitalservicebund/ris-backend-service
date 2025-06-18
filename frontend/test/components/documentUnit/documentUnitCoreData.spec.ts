@@ -5,8 +5,9 @@ import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
 import { ref } from "vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import DocumentUnit, {
+import {
   CoreData,
+  DocumentUnit,
   Kind,
   SourceValue,
 } from "@/domain/documentUnit"

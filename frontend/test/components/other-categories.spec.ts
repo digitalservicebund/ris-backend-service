@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { vi } from "vitest"
 import OtherCategories from "@/components/OtherCategories.vue"
-import DocumentUnit, { ContentRelatedIndexing } from "@/domain/documentUnit"
+import { ContentRelatedIndexing, DocumentUnit } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 function mockSessionStore(

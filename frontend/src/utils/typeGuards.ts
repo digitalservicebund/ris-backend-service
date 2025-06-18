@@ -1,4 +1,4 @@
-import DocumentUnit, { Kind } from "@/domain/documentUnit"
+import { DocumentUnit, Kind } from "@/domain/documentUnit"
 import PendingProceeding from "@/domain/pendingProceeding"
 
 /**

@@ -1,5 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import ProceedingDecision from "@/domain/previousDecision"
 import errorMessages from "@/i18n/errors.json"
 

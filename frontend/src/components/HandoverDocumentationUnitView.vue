@@ -15,7 +15,8 @@ import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
-import DocumentUnit, {
+import {
+  DocumentUnit,
   DuplicateRelationStatus,
   longTextLabels,
   shortTextLabels,

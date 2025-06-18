@@ -13,7 +13,7 @@ import ManagementDataMetadata from "@/components/management-data/ManagementDataM
 import TitleElement from "@/components/TitleElement.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentationUnitHistoryLog } from "@/domain/documentationUnitHistoryLog"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
 import DocumentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"

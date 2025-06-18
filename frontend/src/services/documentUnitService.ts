@@ -3,11 +3,12 @@ import httpClient, {
   ServiceResponse,
 } from "./httpClient"
 import { Page } from "@/components/Pagination.vue"
-import DocumentUnit, {
+import {
   DocumentUnitSearchParameter,
   DocumentationUnitParameters,
   DuplicateRelationStatus,
   EurlexParameters,
+  DocumentUnit,
 } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import PendingProceeding from "@/domain/pendingProceeding"

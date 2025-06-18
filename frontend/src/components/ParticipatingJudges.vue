@@ -4,7 +4,7 @@ import { Ref } from "vue"
 import DefaultSummary from "@/components/DefaultSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import ParticipatingJudgesInput from "@/components/ParticipatingJudgesInput.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 

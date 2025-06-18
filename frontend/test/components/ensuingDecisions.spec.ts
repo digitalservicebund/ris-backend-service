@@ -9,7 +9,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import { DocumentType } from "@/domain/documentType"
 
-import DocumentUnit, { Court } from "@/domain/documentUnit"
+import { Court, DocumentUnit } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"

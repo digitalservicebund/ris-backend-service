@@ -1,5 +1,5 @@
 import { setActivePinia, createPinia } from "pinia"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"

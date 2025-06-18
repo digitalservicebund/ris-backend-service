@@ -8,7 +8,7 @@ import FlexItem from "@/components/FlexItem.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import attachmentService from "@/services/attachmentService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 

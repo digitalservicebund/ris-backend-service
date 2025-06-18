@@ -15,8 +15,9 @@ import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
-import DocumentUnit, {
+import {
   ContentRelatedIndexing,
+  DocumentUnit,
   Kind,
   LongTexts,
 } from "@/domain/documentUnit"

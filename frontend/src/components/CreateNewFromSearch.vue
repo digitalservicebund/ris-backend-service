@@ -6,8 +6,9 @@ import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelecto
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
-import DocumentUnit, {
+import {
   DocumentationUnitParameters,
+  DocumentUnit,
 } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"

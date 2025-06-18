@@ -8,7 +8,7 @@ import {
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 
 test.describe("short and long texts", () => {
   test(

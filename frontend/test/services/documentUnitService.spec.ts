@@ -1,4 +1,4 @@
-import DocumentUnit, { DuplicateRelationStatus } from "@/domain/documentUnit"
+import { DocumentUnit, DuplicateRelationStatus } from "@/domain/documentUnit"
 import PendingProceeding from "@/domain/pendingProceeding"
 import errorMessages from "@/i18n/errors.json"
 import service from "@/services/documentUnitService"

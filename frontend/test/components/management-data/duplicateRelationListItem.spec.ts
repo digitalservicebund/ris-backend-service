@@ -4,7 +4,8 @@ import { setActivePinia, Store } from "pinia"
 import { Ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DuplicateRelationListItem from "@/components/management-data/DuplicateRelationListItem.vue"
-import DocumentUnit, {
+import {
+  DocumentUnit,
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"

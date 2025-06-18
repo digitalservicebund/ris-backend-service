@@ -6,7 +6,7 @@ import ParticipatingJudges from "@/components/ParticipatingJudges.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 

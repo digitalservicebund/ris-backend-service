@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 
 const documentUnit = new DocumentUnit("foo", {

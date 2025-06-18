@@ -8,7 +8,7 @@ import {
   uploadTestfile,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import DateUtil from "@/utils/dateUtil"
 
 /* eslint-disable playwright/no-nested-step */

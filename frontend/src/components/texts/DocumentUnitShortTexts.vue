@@ -4,7 +4,7 @@ import { Component, Ref, computed } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
-import DocumentUnit, { shortTextLabels } from "@/domain/documentUnit"
+import { DocumentUnit, shortTextLabels } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 

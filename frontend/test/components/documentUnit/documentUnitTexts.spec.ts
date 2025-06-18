@@ -6,7 +6,8 @@ import type { Component } from "vue"
 import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
-import DocumentUnit, {
+import {
+  DocumentUnit,
   longTextLabels,
   LongTexts,
   shortTextLabels,

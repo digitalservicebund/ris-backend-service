@@ -5,7 +5,8 @@ import { it } from "vitest"
 import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitManagementData from "@/components/management-data/DocumentUnitManagementData.vue"
-import DocumentUnit, {
+import {
+  DocumentUnit,
   DuplicateRelation,
   DuplicateRelationStatus,
   ManagementData,

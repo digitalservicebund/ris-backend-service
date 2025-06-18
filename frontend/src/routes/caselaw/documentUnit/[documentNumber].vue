@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia"
 import { Ref } from "vue"
 import DocumentViewer from "@/components/DocumentViewer.vue"
-import DocumentUnit, { Kind } from "@/domain/documentUnit"
+import { DocumentUnit, Kind } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 

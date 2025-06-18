@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import DocumentUnit, { Source } from "@/domain/documentUnit"
+import { DocumentUnit, Source } from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
 import DateUtil from "@/utils/dateUtil"
 

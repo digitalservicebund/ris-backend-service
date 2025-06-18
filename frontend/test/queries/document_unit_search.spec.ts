@@ -1,5 +1,6 @@
 import { expect, Page, TestInfo } from "@playwright/test"
-import DocumentUnit, {
+import {
+  DocumentUnit,
   DocumentUnitSearchParameter,
 } from "@/domain/documentUnit"
 import { getRequest } from "~/e2e/caselaw/e2e-utils"

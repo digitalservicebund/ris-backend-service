@@ -2,7 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import KeywordsComponent from "@/components/KeyWords.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 
 const scrollIntoViewMock = vi.fn()
 window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock

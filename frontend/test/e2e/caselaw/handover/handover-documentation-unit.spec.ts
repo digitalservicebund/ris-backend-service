@@ -8,7 +8,7 @@ import {
   save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import {
   addIgnoreWordToDocumentationUnit,
   updateDocumentationUnit,

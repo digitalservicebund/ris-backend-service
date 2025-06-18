@@ -18,8 +18,9 @@ import SearchResultList, {
 import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
-import DocumentUnit, {
+import {
   DocumentationUnitParameters,
+  DocumentUnit,
 } from "@/domain/documentUnit"
 import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"

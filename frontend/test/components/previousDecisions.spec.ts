@@ -8,7 +8,7 @@ import InputText from "primevue/inputtext"
 import { createRouter, createWebHistory } from "vue-router"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { DocumentType } from "@/domain/documentType"
-import DocumentUnit, { Court } from "@/domain/documentUnit"
+import { Court, DocumentUnit } from "@/domain/documentUnit"
 
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"

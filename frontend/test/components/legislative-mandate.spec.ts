@@ -2,7 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 function mockSessionStore(value: { legislativeMandate: boolean }) {

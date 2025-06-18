@@ -1,4 +1,4 @@
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { isDocumentUnit, isPendingProceeding } from "@/utils/typeGuards"
 

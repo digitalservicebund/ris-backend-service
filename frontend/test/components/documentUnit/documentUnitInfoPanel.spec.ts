@@ -2,8 +2,9 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
-import DocumentUnit, {
+import {
   CoreData,
+  DocumentUnit,
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"

@@ -10,7 +10,7 @@ import ActiveCitations from "@/components/ActiveCitations.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
 import { DocumentType } from "@/domain/documentType"
-import DocumentUnit, { Court } from "@/domain/documentUnit"
+import { Court, DocumentUnit } from "@/domain/documentUnit"
 
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"

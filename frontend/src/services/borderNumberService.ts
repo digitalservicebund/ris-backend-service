@@ -1,6 +1,6 @@
 import { storeToRefs } from "pinia"
 import { Ref } from "vue"
-import DocumentUnit, { LongTexts, ShortTexts } from "@/domain/documentUnit"
+import { DocumentUnit, LongTexts, ShortTexts } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 type ShortTextKeys = keyof ShortTexts

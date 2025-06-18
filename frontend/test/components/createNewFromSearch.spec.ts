@@ -5,8 +5,9 @@ import { describe } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
-import DocumentUnit, {
+import {
   DocumentationUnitParameters,
+  DocumentUnit,
 } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import routes from "~/test-helper/routes"

@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia"
 import { type Component, computed, Ref } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
-import DocumentUnit, { longTextLabels } from "@/domain/documentUnit"
+import { DocumentUnit, longTextLabels } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 

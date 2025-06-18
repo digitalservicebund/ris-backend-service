@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitAttachments from "@/components/DocumentUnitAttachments.vue"
 import Attachment from "@/domain/attachment"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import routes from "~/test-helper/routes"
 
 function renderComponent(attachments?: Attachment[]) {

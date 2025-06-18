@@ -6,7 +6,8 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import DocumentUnit, {
+import {
+  DocumentUnit,
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/documentUnit"

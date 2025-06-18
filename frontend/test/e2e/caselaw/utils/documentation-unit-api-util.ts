@@ -1,6 +1,6 @@
 import { APIRequestContext, APIResponse, expect, Page } from "@playwright/test"
 import { Browser } from "playwright"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 
 export async function updateDocumentationUnit(
   page: Page,

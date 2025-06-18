@@ -1,4 +1,4 @@
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
 import errorMessages from "@/i18n/errors.json"
 import httpClient from "@/services/httpClient"

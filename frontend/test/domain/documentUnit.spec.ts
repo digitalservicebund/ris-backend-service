@@ -1,5 +1,6 @@
-import DocumentUnit, {
+import {
   CoreData,
+  DocumentUnit,
   LongTexts,
   ShortTexts,
 } from "../../src/domain/documentUnit"

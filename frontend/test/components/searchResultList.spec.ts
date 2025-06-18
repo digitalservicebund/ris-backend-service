@@ -5,7 +5,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnit } from "@/domain/documentUnit"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import routes from "~/test-helper/routes"
 

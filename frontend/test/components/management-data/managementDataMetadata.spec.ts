@@ -1,7 +1,8 @@
 import { render, screen, within } from "@testing-library/vue"
 import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
-import DocumentUnit, {
+import {
+  DocumentUnit,
   ManagementData,
   Source,
   SourceValue,

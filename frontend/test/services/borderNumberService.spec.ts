@@ -1,7 +1,8 @@
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia, Store } from "pinia"
 import { Ref } from "vue"
-import DocumentUnit, {
+import {
+  DocumentUnit,
   longTextLabels,
   LongTexts,
   ShortTexts,
