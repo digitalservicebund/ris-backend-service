@@ -182,6 +182,7 @@ test.describe("inbox", () => {
       })
 
       await test.step("pending handover documentation units can be taken over and deleted", async () => {
+        const pagePromise = pageWithBghUser.context().waitForEvent("page")
         const rows = pageWithBghUser.locator("tr")
         const doc1Row = rows.filter({ hasText: documentNumber1 })
         const doc2Row = rows.filter({ hasText: documentNumber2 })
@@ -189,11 +190,23 @@ test.describe("inbox", () => {
         const takeOverButton = doc1Row.getByRole("button", {
           name: "Dokumentationseinheit übernehmen",
         })
+        const previewButton = doc1Row.getByRole("button", {
+          name: "Dokumentationseinheit ansehen",
+        })
         const editButton = doc1Row.getByRole("button", {
           name: "Dokumentationseinheit bearbeiten",
         })
         await expect(takeOverButton).toBeVisible()
+        await expect(previewButton).toBeVisible()
         await expect(editButton).toBeHidden()
+
+        await previewButton.click()
+
+        const newTab = await pagePromise
+
+        await expect(newTab).toHaveURL(
+          /\/caselaw\/documentunit\/[A-Za-z0-9]{13}\/preview$/,
+        )
 
         await takeOverButton.click()
 
