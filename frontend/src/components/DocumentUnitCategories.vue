@@ -13,7 +13,7 @@ import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
-import { Kind } from "@/domain/documentUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 defineProps<{

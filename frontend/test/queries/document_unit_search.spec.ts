@@ -1,6 +1,6 @@
 import { expect, Page, TestInfo } from "@playwright/test"
 import { Decision } from "@/domain/decision"
-import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
+import { DocumentationUnitSearchParameter } from "@/domain/documentationUnitSearchParameter"
 import { getRequest } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -9,7 +9,7 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 test.describe("document unit search queries", () => {
   const testConfigurations: {
     title: string
-    parameter: { [K in DocumentUnitSearchParameter]?: string }
+    parameter: { [K in DocumentationUnitSearchParameter]?: string }
     maxDuration: number
     minResults?: number
     isRelevantForExternalUser?: boolean
@@ -154,7 +154,7 @@ async function runTestMultipleTimes(
   runs: number,
   search: {
     title: string
-    parameter: { [K in DocumentUnitSearchParameter]?: string }
+    parameter: { [K in DocumentationUnitSearchParameter]?: string }
     maxDuration: number
     minResults?: number
   },
@@ -200,7 +200,7 @@ async function runTestMultipleTimes(
 }
 
 function getUrlParams(parameter: {
-  [K in DocumentUnitSearchParameter]?: string
+  [K in DocumentationUnitSearchParameter]?: string
 }): string {
   return (
     parameter &&

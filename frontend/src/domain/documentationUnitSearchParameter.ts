@@ -1,0 +1,13 @@
+export type DocumentationUnitSearchParameter =
+  | "documentNumber"
+  | "fileNumber"
+  | "publicationStatus"
+  | "publicationDate"
+  | "scheduledOnly"
+  | "courtType"
+  | "courtLocation"
+  | "decisionDate"
+  | "decisionDateEnd"
+  | "withError"
+  | "myDocOfficeOnly"
+  | "withDuplicateWarning"

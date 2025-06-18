@@ -7,18 +7,19 @@ import InputField from "@/components/input/InputField.vue"
 import { ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
-import { DocumentUnitSearchParameter } from "@/domain/documentUnit"
+
+import { DocumentationUnitSearchParameter } from "@/domain/documentationUnitSearchParameter"
 
 const props = defineProps<{
   isLoading?: boolean
 }>()
 
 const emit = defineEmits<{
-  search: [value: Query<DocumentUnitSearchParameter>]
+  search: [value: Query<DocumentationUnitSearchParameter>]
   resetSearchResults: [void]
 }>()
 
-const validationStore = useValidationStore<DocumentUnitSearchParameter>()
+const validationStore = useValidationStore<DocumentationUnitSearchParameter>()
 const { route, getQueryFromRoute, pushQueryToRoute } = useQuery()
 const query = ref(getQueryFromRoute())
 
@@ -36,7 +37,7 @@ function resetSearch() {
   emit("resetSearchResults")
 }
 
-function resetErrors(id?: DocumentUnitSearchParameter) {
+function resetErrors(id?: DocumentationUnitSearchParameter) {
   if (id) validationStore.remove(id)
   submitButtonError.value = undefined
 }
@@ -93,9 +94,9 @@ function handleLocalInputError(error: ValidationError | undefined, id: string) {
   if (error) {
     validationStore.add(
       error.message,
-      error.instance as DocumentUnitSearchParameter,
+      error.instance as DocumentationUnitSearchParameter,
     )
-  } else validationStore.remove(id as DocumentUnitSearchParameter)
+  } else validationStore.remove(id as DocumentationUnitSearchParameter)
   validateSearchInput()
 }
 
@@ -168,7 +169,7 @@ watch(
             aria-label="Aktenzeichen Suche"
             fluid
             size="small"
-            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
           ></InputText>
         </InputField>
       </div>
@@ -186,7 +187,7 @@ watch(
             fluid
             placeholder="Gerichtstyp"
             size="small"
-            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
           ></InputText>
         </InputField>
         <span class="pt-6">-</span>
@@ -203,7 +204,7 @@ watch(
             fluid
             placeholder="Ort"
             size="small"
-            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
           ></InputText>
         </InputField>
       </div>
@@ -230,7 +231,7 @@ watch(
             aria-label="Dokumentnummer Suche"
             fluid
             size="small"
-            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
           ></InputText>
         </InputField>
       </div>
@@ -249,7 +250,7 @@ watch(
             aria-label="Entscheidungsdatum Suche"
             :has-error="hasError"
             @blur="validateSearchInput"
-            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
             @update:validation-error="
               (validationError: ValidationError | undefined) =>
                 handleLocalInputError(validationError, id)
@@ -272,7 +273,7 @@ watch(
             :has-error="hasError"
             placeholder="TT.MM.JJJJ (optional)"
             @blur="validateSearchInput"
-            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
             @update:validation-error="
               (validationError: ValidationError | undefined) =>
                 handleLocalInputError(validationError, id)

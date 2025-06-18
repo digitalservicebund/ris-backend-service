@@ -7,12 +7,12 @@ import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
-import { DocumentationUnitParameters } from "@/domain/documentUnit"
+import { DocumentationUnitCreationParameters } from "@/domain/documentationUnitCreationParameters"
 import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{
-  parameters?: DocumentationUnitParameters
+  parameters?: DocumentationUnitCreationParameters
   validateRequiredInput: () => boolean
 }>()
 

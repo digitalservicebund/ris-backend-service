@@ -6,7 +6,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
-import { DocumentationUnitParameters } from "@/domain/documentUnit"
+import { DocumentationUnitCreationParameters } from "@/domain/documentationUnitCreationParameters"
 import documentUnitService from "@/services/documentUnitService"
 import routes from "~/test-helper/routes"
 
@@ -27,7 +27,7 @@ const server = setupServer(
 )
 
 function renderComponent(options?: {
-  parameters?: DocumentationUnitParameters
+  parameters?: DocumentationUnitCreationParameters
   isValid?: boolean
 }) {
   const router = createRouter({
@@ -190,7 +190,7 @@ describe("Create new documentation unit from search", () => {
           title: "Arbeit & Gesundheit",
         },
       },
-    } as DocumentationUnitParameters
+    } as DocumentationUnitCreationParameters
 
     renderComponent({ parameters, isValid: true })
 
@@ -215,7 +215,7 @@ describe("Create new documentation unit from search", () => {
 
     const parameters = {
       court: { label: "Test", responsibleDocOffice: docOffice },
-    } as DocumentationUnitParameters
+    } as DocumentationUnitCreationParameters
 
     await renderComponent({ parameters, isValid: true })
 

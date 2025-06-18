@@ -17,7 +17,7 @@ import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDe
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision, LongTexts } from "@/domain/decision"
-import { Kind } from "@/domain/documentUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 import Reference from "@/domain/reference"

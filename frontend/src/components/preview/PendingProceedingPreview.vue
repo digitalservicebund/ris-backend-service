@@ -17,7 +17,7 @@ import PreviewLiteratureReferences from "@/components/preview/PreviewLiteratureR
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
-import { Kind } from "@/domain/documentUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import PendingProceeding, {
   pendingProceedingLabels,
 } from "@/domain/pendingProceeding"

@@ -19,7 +19,7 @@ import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { Decision } from "@/domain/decision"
-import { DocumentationUnitParameters } from "@/domain/documentUnit"
+import { DocumentationUnitCreationParameters } from "@/domain/documentationUnitCreationParameters"
 import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -97,7 +97,8 @@ const suffix = computed({
   },
 })
 
-const createDocumentationUnitParameters = ref<DocumentationUnitParameters>()
+const createDocumentationUnitParameters =
+  ref<DocumentationUnitCreationParameters>()
 
 function buildCitation(): string | undefined {
   if (StringsUtil.isEmpty(reference.value.citation)) {

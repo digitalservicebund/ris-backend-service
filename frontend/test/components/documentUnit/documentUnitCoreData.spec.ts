@@ -7,7 +7,7 @@ import { ref } from "vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import { CoreData } from "@/domain/coreData"
 import { Decision } from "@/domain/decision"
-import { Kind } from "@/domain/documentUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import { SourceValue } from "@/domain/source"
 
 interface RenderProps {

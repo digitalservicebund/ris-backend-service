@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia"
 import { Ref } from "vue"
 import DocumentViewer from "@/components/DocumentViewer.vue"
 import { Decision } from "@/domain/decision"
-import { Kind } from "@/domain/documentUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 

@@ -4,12 +4,10 @@ import httpClient, {
 } from "./httpClient"
 import { Page } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
-import {
-  DocumentUnitSearchParameter,
-  DocumentationUnitParameters,
-  EurlexParameters,
-} from "@/domain/documentUnit"
+import { DocumentationUnitCreationParameters } from "@/domain/documentationUnitCreationParameters"
+import { DocumentationUnitSearchParameter } from "@/domain/documentationUnitSearchParameter"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { EurlexParameters } from "@/domain/eurlex"
 import { DuplicateRelationStatus } from "@/domain/managementData"
 import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -24,7 +22,7 @@ interface DocumentUnitService {
   ): Promise<ServiceResponse<Decision | PendingProceeding>>
 
   createNew(
-    params?: DocumentationUnitParameters,
+    params?: DocumentationUnitCreationParameters,
   ): Promise<ServiceResponse<Decision>>
 
   createNewOutOfEurlexDecision(
@@ -95,9 +93,9 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async createNew(parameters?: DocumentationUnitParameters) {
+  async createNew(parameters?: DocumentationUnitCreationParameters) {
     const response = await httpClient.put<
-      DocumentationUnitParameters,
+      DocumentationUnitCreationParameters,
       Decision
     >(
       "caselaw/documentunits/new",
@@ -225,7 +223,7 @@ const service: DocumentUnitService = {
 
   async searchByRelatedDocumentation(
     query: RelatedDocumentation = new RelatedDocumentation(),
-    requestParams: { [K in DocumentUnitSearchParameter]?: string } = {},
+    requestParams: { [K in DocumentationUnitSearchParameter]?: string } = {},
   ) {
     const response = await httpClient.put<
       RelatedDocumentation,
@@ -261,7 +259,7 @@ const service: DocumentUnitService = {
   },
 
   async searchByDocumentUnitSearchInput(
-    requestParams: { [K in DocumentUnitSearchParameter]?: string } = {},
+    requestParams: { [K in DocumentationUnitSearchParameter]?: string } = {},
   ) {
     const response = await httpClient.get<Page<DocumentUnitListEntry>>(
       `caselaw/documentunits/search`,

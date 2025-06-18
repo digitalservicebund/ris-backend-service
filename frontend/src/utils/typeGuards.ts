@@ -1,5 +1,5 @@
 import { Decision } from "@/domain/decision"
-import { Kind } from "@/domain/documentUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import PendingProceeding from "@/domain/pendingProceeding"
 
 /**
