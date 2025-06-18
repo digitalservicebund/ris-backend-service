@@ -2,7 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentUnitAttachments from "@/components/DocumentUnitAttachments.vue"
+import DecisionAttachments from "@/components/DecisionAttachments.vue"
 import Attachment from "@/domain/attachment"
 import { Decision } from "@/domain/decision"
 import routes from "~/test-helper/routes"
@@ -16,7 +16,7 @@ function renderComponent(attachments?: Attachment[]) {
   })
   return {
     user,
-    ...render(DocumentUnitAttachments, {
+    ...render(DecisionAttachments, {
       global: {
         plugins: [
           createTestingPinia({

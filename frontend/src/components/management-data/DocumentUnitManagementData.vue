@@ -14,6 +14,7 @@ import TitleElement from "@/components/TitleElement.vue"
 import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentationUnitHistoryLog } from "@/domain/documentationUnitHistoryLog"
+import PendingProceeding from "@/domain/pendingProceeding"
 import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
 import DocumentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
@@ -22,7 +23,7 @@ import { isPendingProceeding } from "@/utils/typeGuards"
 import IconCheck from "~icons/ic/baseline-check"
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
-  documentUnit: Ref<Decision | undefined>
+  documentUnit: Ref<Decision | PendingProceeding | undefined>
 }
 const { updateDocumentUnit } = useDocumentUnitStore()
 const router = useRouter()

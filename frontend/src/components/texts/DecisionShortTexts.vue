@@ -13,69 +13,69 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
-const { documentUnit } = storeToRefs(store) as {
+const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision | undefined>
 }
 const decisionName = computed({
-  get: () => documentUnit.value?.shortTexts.decisionName,
+  get: () => decision.value?.shortTexts.decisionName,
   set: (newValue) => {
-    documentUnit.value!.shortTexts.decisionName =
+    decision.value!.shortTexts.decisionName =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const headline = computed({
   get: () =>
-    documentUnit.value?.shortTexts.headline
+    decision.value?.shortTexts.headline
       ? useValidBorderNumberLinks(
-          documentUnit.value.shortTexts.headline,
-          documentUnit.value.managementData.borderNumbers,
+          decision.value.shortTexts.headline,
+          decision.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    documentUnit.value!.shortTexts.headline =
+    decision.value!.shortTexts.headline =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const guidingPrinciple = computed({
   get: () =>
-    documentUnit.value?.shortTexts.guidingPrinciple
+    decision.value?.shortTexts.guidingPrinciple
       ? useValidBorderNumberLinks(
-          documentUnit.value?.shortTexts.guidingPrinciple,
-          documentUnit.value.managementData.borderNumbers,
+          decision.value?.shortTexts.guidingPrinciple,
+          decision.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    documentUnit.value!.shortTexts.guidingPrinciple =
+    decision.value!.shortTexts.guidingPrinciple =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const headnote = computed({
   get: () =>
-    documentUnit.value?.shortTexts.headnote
+    decision.value?.shortTexts.headnote
       ? useValidBorderNumberLinks(
-          documentUnit.value?.shortTexts.headnote,
-          documentUnit.value.managementData.borderNumbers,
+          decision.value?.shortTexts.headnote,
+          decision.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    documentUnit.value!.shortTexts.headnote =
+    decision.value!.shortTexts.headnote =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const otherHeadnote = computed({
   get: () =>
-    documentUnit.value?.shortTexts.otherHeadnote
+    decision.value?.shortTexts.otherHeadnote
       ? useValidBorderNumberLinks(
-          documentUnit.value?.shortTexts.otherHeadnote,
-          documentUnit.value.managementData.borderNumbers,
+          decision.value?.shortTexts.otherHeadnote,
+          decision.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    documentUnit.value!.shortTexts.otherHeadnote =
+    decision.value!.shortTexts.otherHeadnote =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
@@ -91,7 +91,7 @@ const otherHeadnote = computed({
         :data-testid="shortTextLabels.decisionName"
         editable
         :label="shortTextLabels.decisionName"
-        :should-show-button="!documentUnit?.shortTexts?.decisionName?.length"
+        :should-show-button="!decision?.shortTexts?.decisionName?.length"
       />
 
       <TextEditorCategory
@@ -102,7 +102,7 @@ const otherHeadnote = computed({
         editable
         field-size="small"
         :label="shortTextLabels.headline"
-        :should-show-button="!documentUnit?.shortTexts?.headline?.length"
+        :should-show-button="!decision?.shortTexts?.headline?.length"
       />
 
       <TextEditorCategory
@@ -112,9 +112,7 @@ const otherHeadnote = computed({
         data-testid="guidingPrinciple"
         editable
         :label="shortTextLabels.guidingPrinciple"
-        :should-show-button="
-          !documentUnit?.shortTexts?.guidingPrinciple?.length
-        "
+        :should-show-button="!decision?.shortTexts?.guidingPrinciple?.length"
       />
 
       <TextEditorCategory
@@ -124,7 +122,7 @@ const otherHeadnote = computed({
         data-testid="headnote"
         editable
         :label="shortTextLabels.headnote"
-        :should-show-button="!documentUnit?.shortTexts?.headnote?.length"
+        :should-show-button="!decision?.shortTexts?.headnote?.length"
       />
 
       <TextEditorCategory
@@ -134,7 +132,7 @@ const otherHeadnote = computed({
         data-testid="otherHeadnote"
         editable
         :label="shortTextLabels.otherHeadnote"
-        :should-show-button="!documentUnit?.shortTexts?.otherHeadnote?.length"
+        :should-show-button="!decision?.shortTexts?.otherHeadnote?.length"
       />
     </div>
   </div>

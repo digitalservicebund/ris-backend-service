@@ -9,7 +9,7 @@ import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import { ExtraContentSidePanelProps } from "@/components/input/types"
-import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
+import DecisionPreview from "@/components/preview/DecisionPreview.vue"
 import PendingProceedingPreview from "@/components/preview/PendingProceedingPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import DocumentationUnitTextCheckSummary from "@/components/text-check/DocumentationUnitTextCheckSummary.vue"
@@ -184,7 +184,7 @@ onMounted(() => {
           id="preview-container"
           class="flex max-h-[70vh] overflow-auto"
         >
-          <DocumentUnitPreview
+          <DecisionPreview
             v-if="isDocumentUnit(props.documentUnit)"
             layout="narrow"
           />

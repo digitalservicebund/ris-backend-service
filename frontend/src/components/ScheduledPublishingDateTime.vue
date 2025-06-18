@@ -12,6 +12,7 @@ import InfoModal from "@/components/InfoModal.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import { Decision } from "@/domain/decision"
+import PendingProceeding from "@/domain/pendingProceeding"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import useSessionStore from "@/stores/sessionStore"
@@ -25,7 +26,7 @@ dayjs.extend(customParseFormat)
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<Decision | undefined>
+  documentUnit: Ref<Decision | PendingProceeding | undefined>
 }
 const sessionStore = useSessionStore()
 

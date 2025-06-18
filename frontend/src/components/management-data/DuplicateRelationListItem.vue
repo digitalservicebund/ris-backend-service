@@ -21,7 +21,7 @@ const { duplicateRelation } = defineProps<{
   duplicateRelation: DuplicateRelation
 }>()
 
-const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
+const { documentUnit: decision } = storeToRefs(useDocumentUnitStore()) as {
   documentUnit: Ref<Decision | undefined>
 }
 
@@ -39,13 +39,13 @@ const isIgnored = computed({
 
 const updateStatus = async (newStatus: DuplicateRelationStatus) => {
   const docUnitDupRelation =
-    documentUnit.value?.managementData?.duplicateRelations.find(
+    decision.value?.managementData?.duplicateRelations.find(
       (rel) => rel.documentNumber === duplicateRelation.documentNumber,
     )
   if (docUnitDupRelation) docUnitDupRelation.status = newStatus
 
   const { error } = await documentUnitService.setDuplicateRelationStatus(
-    documentUnit.value!.documentNumber,
+    decision.value!.documentNumber,
     duplicateRelation.documentNumber,
     newStatus,
   )
@@ -58,7 +58,7 @@ const hasDuplicateState = (state?: PublicationState) =>
 const isAutomaticallyIgnored = computed(
   () =>
     hasDuplicateState(duplicateRelation.publicationStatus) ||
-    hasDuplicateState(documentUnit.value!.status?.publicationStatus) ||
+    hasDuplicateState(decision.value!.status?.publicationStatus) ||
     !duplicateRelation.isJdvDuplicateCheckActive,
 )
 const autoIgnoreLabel = computed(() =>

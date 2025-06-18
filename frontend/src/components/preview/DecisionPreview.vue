@@ -27,7 +27,7 @@ const props = defineProps<{
   layout?: PreviewLayout
 }>()
 
-const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
+const { documentUnit: decision } = storeToRefs(useDocumentUnitStore()) as {
   documentUnit: Ref<Decision | undefined>
 }
 
@@ -36,43 +36,43 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
 
 <template>
   <FlexContainer
-    v-if="documentUnit"
+    v-if="decision"
     class="max-w-screen-xl"
     data-testid="preview"
     flex-direction="flex-col"
   >
     <h1 class="ris-heading3-bold mt-16 px-16">
-      {{ documentUnit.documentNumber }}
+      {{ decision.documentNumber }}
     </h1>
     <p class="ris-label3-regular mb-16 px-16">
       Vorschau erstellt am {{ dayjs(new Date()).format("DD.MM.YYYY") }} um
       {{ dayjs(new Date()).format("HH:mm:ss") }}
     </p>
     <PreviewCoreData
-      :core-data="documentUnit.coreData"
+      :core-data="decision.coreData"
       date-label="Entscheidungsdatum"
       :kind="Kind.DOCUMENTION_UNIT"
     />
-    <PreviewNote :note="documentUnit.note" />
+    <PreviewNote :note="decision.note" />
     <PreviewCaselawReferences
-      :caselaw-references="documentUnit.caselawReferences as Reference[]"
+      :caselaw-references="decision.caselawReferences as Reference[]"
     />
     <PreviewLiteratureReferences
-      :literature-references="documentUnit.literatureReferences as Reference[]"
+      :literature-references="decision.literatureReferences as Reference[]"
     />
     <PreviewProceedingDecisions
-      :ensuing-decisions="documentUnit.ensuingDecisions as EnsuingDecision[]"
-      :previous-decisions="documentUnit.previousDecisions as PreviousDecision[]"
+      :ensuing-decisions="decision.ensuingDecisions as EnsuingDecision[]"
+      :previous-decisions="decision.previousDecisions as PreviousDecision[]"
     />
     <PreviewContentRelatedIndexing
       :content-related-indexing="
-        documentUnit.contentRelatedIndexing as ContentRelatedIndexing
+        decision.contentRelatedIndexing as ContentRelatedIndexing
       "
     />
     <PreviewShortTexts
-      :short-texts="documentUnit.shortTexts"
-      :valid-border-numbers="documentUnit.managementData.borderNumbers"
+      :short-texts="decision.shortTexts"
+      :valid-border-numbers="decision.managementData.borderNumbers"
     />
-    <PreviewLongTexts :long-texts="documentUnit.longTexts as LongTexts" />
+    <PreviewLongTexts :long-texts="decision.longTexts as LongTexts" />
   </FlexContainer>
 </template>

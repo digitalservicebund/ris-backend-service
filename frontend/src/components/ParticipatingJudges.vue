@@ -13,7 +13,7 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
-const { documentUnit } = storeToRefs(store) as {
+const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision | undefined>
 }
 </script>
@@ -30,7 +30,7 @@ const { documentUnit } = storeToRefs(store) as {
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList
-          v-model="documentUnit!.longTexts.participatingJudges"
+          v-model="decision!.longTexts.participatingJudges"
           :create-entry="() => new ParticipatingJudge()"
           :edit-component="ParticipatingJudgesInput"
           :summary-component="DefaultSummary"

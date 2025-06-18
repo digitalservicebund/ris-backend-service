@@ -5,7 +5,7 @@ import { beforeEach } from "vitest"
 import type { Component } from "vue"
 import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
+import DecisionTexts from "@/components/texts/DecisionTexts.vue"
 import {
   Decision,
   longTextLabels,
@@ -33,7 +33,7 @@ async function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
     }
   }
 
-  const utils = render(DocumentUnitTexts, {
+  const utils = render(DecisionTexts, {
     props: {
       registerTextEditorRef: registerTextEditorRef,
     },

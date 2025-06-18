@@ -8,7 +8,7 @@ import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import FlexItem from "@/components/FlexItem.vue"
 import ProceedingDecisions from "@/components/ProceedingDecisions.vue"
-import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
+import DecisionTexts from "@/components/texts/DecisionTexts.vue"
 
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
@@ -90,7 +90,7 @@ const isInternalUser = useInternalUser()
     <DocumentUnitContentRelatedIndexing
       :id="DocumentUnitCategoriesEnum.CONTENT_RELATED_INDEXING"
     />
-    <DocumentUnitTexts
+    <DecisionTexts
       v-bind="{ registerTextEditorRef }"
       :id="DocumentUnitCategoriesEnum.TEXTS"
       :text-editor-refs="registerTextEditorRef"
