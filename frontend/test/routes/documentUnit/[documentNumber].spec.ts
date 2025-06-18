@@ -182,6 +182,31 @@ describe("Document Number Route", () => {
       expect(screen.getByTestId("attachments")).toBeInTheDocument()
     })
 
+    test("should render references with side panels and header", async () => {
+      const { router } = renderComponent()
+
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/references",
+      })
+
+      expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
+
+      // Header with save button
+      expect(screen.getByTestId("document-unit-info-panel")).toBeInTheDocument()
+
+      expect(
+        screen.queryByRole("button", { name: "Speichern Button" }),
+      ).toBeInTheDocument()
+
+      // ExtraContentSidePanel
+      expect(
+        screen.getByRole("button", { name: "Seitenpanel öffnen" }),
+      ).toBeInTheDocument()
+
+      // route is rendered
+      expect(screen.getByTestId("references")).toBeInTheDocument()
+    })
+
     test("should render handover with only nav side panel and header", async () => {
       const { router } = renderComponent()
 
