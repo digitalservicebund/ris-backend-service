@@ -74,8 +74,8 @@ import org.springframework.transaction.annotation.Transactional;
 // Repository for main entity -> depends on more than 20 classes :-/
 @SuppressWarnings("java:S6539")
 public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUnitRepository {
-  private static final DateTimeFormatter FORMATTER =
-      DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+  private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm");
 
   private final DatabaseDocumentationUnitRepository repository;
   private final DatabaseCourtRepository databaseCourtRepository;
@@ -359,7 +359,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Documentable documentable, DocumentationUnitDTO documentationUnitDTO, User user) {
     if (documentable instanceof DocumentationUnit documentationUnit) {
       saveHistoryLogForScheduledPublicationCreation(documentationUnit, documentationUnitDTO, user);
-      saveHistoryLogForScheduledPublicationUpdating(documentationUnit, documentationUnitDTO, user);
       saveHistoryLogForScheduledPublicationDeletion(documentationUnit, documentationUnitDTO, user);
     }
   }
@@ -376,38 +375,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
 
     String dateString =
-        documentationUnit.managementData().scheduledPublicationDateTime().format(FORMATTER);
+        documentationUnit.managementData().scheduledPublicationDateTime().format(DATE_FORMATTER);
+    String timeString =
+        documentationUnit.managementData().scheduledPublicationDateTime().format(TIME_FORMATTER);
     historyLogService.saveHistoryLog(
         documentationUnitDTO.getId(),
         user,
-        HistoryLogEventType.UPDATE,
-        "Abgabe wurde auf den " + dateString + " gesetzt.");
-  }
-
-  private void saveHistoryLogForScheduledPublicationUpdating(
-      DocumentationUnit documentationUnit, DocumentationUnitDTO documentationUnitDTO, User user) {
-    if (documentationUnit.managementData() == null
-        || documentationUnit.managementData().scheduledPublicationDateTime() == null) {
-      return;
-    }
-
-    if (documentationUnitDTO.getScheduledPublicationDateTime() == null) {
-      return;
-    }
-
-    if (documentationUnitDTO
-        .getScheduledPublicationDateTime()
-        .equals(documentationUnit.managementData().scheduledPublicationDateTime())) {
-      return;
-    }
-
-    String dateString =
-        documentationUnit.managementData().scheduledPublicationDateTime().format(FORMATTER);
-    historyLogService.saveHistoryLog(
-        documentationUnitDTO.getId(),
-        user,
-        HistoryLogEventType.UPDATE,
-        "Abgabe wurde auf den " + dateString + " geändert.");
+        HistoryLogEventType.SCHEDULED_PUBLICATION,
+        "Abgabe terminiert für den " + dateString + " um " + timeString + " Uhr");
   }
 
   private void saveHistoryLogForScheduledPublicationDeletion(
@@ -424,8 +399,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     historyLogService.saveHistoryLog(
         documentationUnitDTO.getId(),
         user,
-        HistoryLogEventType.UPDATE,
-        "Zeitliche Abgabe wurde gelöscht.");
+        HistoryLogEventType.SCHEDULED_PUBLICATION,
+        "Terminierte Abgabe gelöscht");
   }
 
   private void setLastUpdated(User currentUser, DocumentationUnitDTO docUnitDTO) {

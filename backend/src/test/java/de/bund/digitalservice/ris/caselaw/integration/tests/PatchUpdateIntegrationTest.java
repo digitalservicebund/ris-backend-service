@@ -81,6 +81,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -343,6 +344,91 @@ class PatchUpdateIntegrationTest {
     assertThat(logs2.get(1).description()).isEqualTo("Vorgang geändert: Vorgang1 → Vorgang2");
     assertThat(logs2.get(2).description()).isEqualTo("Vorgang gesetzt: Vorgang1");
     assertThat(logs2.get(3).description()).isEqualTo("Dokeinheit angelegt");
+  }
+
+  @Test
+  @Transactional
+  void testPartialUpdateByUuid_withAddScheduledDate_shouldRightHistoryEntries() {
+    TestTransaction.flagForCommit();
+    TestTransaction.end();
+
+    DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+
+    List<JsonPatchOperation> operations1 =
+        List.of(
+            new AddOperation(
+                "/managementData/scheduledPublicationDateTime",
+                new TextNode("2011-01-01T11:11:00")));
+    RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .patch()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+        .bodyValue(patch1)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    var user = User.builder().documentationOffice(buildDSDocOffice()).build();
+    var logs = documentationUnitHistoryLogService.getHistoryLogs(documentationUnit.uuid(), user);
+    assertThat(logs).hasSize(3);
+    assertThat(logs)
+        .map(HistoryLog::eventType)
+        .containsExactly(
+            HistoryLogEventType.UPDATE,
+            HistoryLogEventType.SCHEDULED_PUBLICATION,
+            HistoryLogEventType.CREATE);
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
+    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+    assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
+    assertThat(logs.get(1).description())
+        .isEqualTo("Abgabe terminiert für den 01.01.2011 um 11:11 Uhr");
+    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+  }
+
+  @Test
+  @Transactional
+  void testPartialUpdateByUuid_withRemoveScheduledDate_shouldRightHistoryEntries() {
+    TestTransaction.flagForCommit();
+    TestTransaction.end();
+
+    DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+
+    TestTransaction.start();
+    DecisionDTO dto = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
+    dto.setScheduledPublicationDateTime(LocalDateTime.of(2010, 12, 31, 11, 11));
+    repository.save(dto);
+    TestTransaction.flagForCommit();
+    TestTransaction.end();
+
+    List<JsonPatchOperation> operations1 =
+        List.of(new RemoveOperation("/managementData/scheduledPublicationDateTime"));
+    RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .patch()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+        .bodyValue(patch1)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    var user = User.builder().documentationOffice(buildDSDocOffice()).build();
+    var logs = documentationUnitHistoryLogService.getHistoryLogs(documentationUnit.uuid(), user);
+    assertThat(logs).hasSize(3);
+    assertThat(logs)
+        .map(HistoryLog::eventType)
+        .containsExactly(
+            HistoryLogEventType.UPDATE,
+            HistoryLogEventType.SCHEDULED_PUBLICATION,
+            HistoryLogEventType.CREATE);
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
+    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+    assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
+    assertThat(logs.get(1).description()).isEqualTo("Terminierte Abgabe gelöscht");
+    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
   }
 
   @Nested
