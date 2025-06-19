@@ -15,30 +15,14 @@ public class DocumentTypeService {
     this.documentTypeRepository = documentTypeRepository;
   }
 
-  public List<DocumentType> getCaselawDocumentTypes(Optional<String> searchStr) {
+  public List<DocumentType> getDocumentTypes(
+      Optional<String> searchStr, DocumentTypeCategory category) {
+
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return documentTypeRepository.findCaselawBySearchStr(searchStr.get().trim());
+      return documentTypeRepository.findDocumentTypesBySearchStrAndCategory(
+          searchStr.get().trim(), category);
+    } else {
+      return documentTypeRepository.findAllDocumentTypesByCategory(category);
     }
-
-    return documentTypeRepository.findAllCaselawOrderByAbbreviationAscLabelAsc();
-  }
-
-  public List<DocumentType> getCaselawAndPendingProceedingDocumentTypes(
-      Optional<String> searchStr) {
-    if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return documentTypeRepository.findCaselawAndPendingProceedingBySearchStr(
-          searchStr.get().trim());
-    }
-
-    return documentTypeRepository
-        .findAllCaselawAndPendingProceedingOrderByAbbreviationAscLabelAsc();
-  }
-
-  public List<DocumentType> getDependentLiteratureDocumentTypes(Optional<String> searchStr) {
-    if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return documentTypeRepository.findDependentLiteratureBySearchStr(searchStr.get().trim());
-    }
-
-    return documentTypeRepository.findAllDependentLiteratureOrderByAbbreviationAscLabelAsc();
   }
 }

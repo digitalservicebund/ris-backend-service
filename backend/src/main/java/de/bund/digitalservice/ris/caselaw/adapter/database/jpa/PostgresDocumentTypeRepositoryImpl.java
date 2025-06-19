@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeCategory;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,43 +22,27 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
   }
 
   @Override
-  public List<DocumentType> findCaselawBySearchStr(String searchString) {
+  public Optional<DocumentType> findUniqueCaselawBySearchStr(String searchString) {
     return repository
-        .findCaselawBySearchStrAndCategory(
+        .findUniqueCaselawBySearchStrAndCategory(
             searchString, categoryRepository.findFirstByLabel("R").getId())
-        .stream()
+        .map(DocumentTypeTransformer::transformToDomain);
+  }
+
+  @Override
+  public List<DocumentType> findDocumentTypesBySearchStrAndCategory(
+      String searchStr, DocumentTypeCategory category) {
+    List<UUID> targetCategoryIds = resolveCategoryIds(category);
+
+    return repository.findBySearchStrAndCategoryId(searchStr, targetCategoryIds).stream()
         .map(DocumentTypeTransformer::transformToDomain)
         .toList();
   }
 
   @Override
-  public List<DocumentType> findAllCaselawOrderByAbbreviationAscLabelAsc() {
-    return repository
-        .findAllByCategoryOrderByAbbreviationAscLabelAsc(categoryRepository.findFirstByLabel("R"))
-        .stream()
-        .map(DocumentTypeTransformer::transformToDomain)
-        .toList();
-  }
+  public List<DocumentType> findAllDocumentTypesByCategory(DocumentTypeCategory category) {
+    List<UUID> targetCategoryIds = resolveCategoryIds(category);
 
-  @Override
-  public List<DocumentType> findCaselawAndPendingProceedingBySearchStr(String searchString) {
-    List<UUID> targetCategoryIds =
-        Arrays.asList(
-            categoryRepository.findFirstByLabel("R").getId(),
-            categoryRepository.findFirstByLabel("A").getId());
-    return repository
-        .findCaselawAndPendingProceedingBySearchStrAndCategory(searchString, targetCategoryIds)
-        .stream()
-        .map(DocumentTypeTransformer::transformToDomain)
-        .toList();
-  }
-
-  @Override
-  public List<DocumentType> findAllCaselawAndPendingProceedingOrderByAbbreviationAscLabelAsc() {
-    List<UUID> targetCategoryIds =
-        Arrays.asList(
-            categoryRepository.findFirstByLabel("R").getId(),
-            categoryRepository.findFirstByLabel("A").getId());
     return repository
         .findAllByCategoryIdInOrderByAbbreviationAscLabelAsc(targetCategoryIds)
         .stream()
@@ -66,30 +50,23 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
         .toList();
   }
 
-  @Override
-  public List<DocumentType> findDependentLiteratureBySearchStr(String searchString) {
-    return repository
-        .findCaselawBySearchStrAndCategory(
-            searchString, categoryRepository.findFirstByLabel("U").getId())
-        .stream()
-        .map(DocumentTypeTransformer::transformToDomain)
-        .toList();
+  public List<UUID> resolveCategoryIds(DocumentTypeCategory category) {
+    return switch (category) {
+      case CASELAW -> getCategoryIdsForLabels(List.of("R"));
+      case CASELAW_PENDING_PROCEEDING -> getCategoryIdsForLabels(List.of("R", "A"));
+      case DEPENDENT_LITERATURE -> getCategoryIdsForLabels(List.of("U"));
+      default -> throw new IllegalArgumentException("Unknown document category group: " + category);
+    };
   }
 
-  @Override
-  public List<DocumentType> findAllDependentLiteratureOrderByAbbreviationAscLabelAsc() {
-    return repository
-        .findAllByCategoryOrderByAbbreviationAscLabelAsc(categoryRepository.findFirstByLabel("U"))
-        .stream()
-        .map(DocumentTypeTransformer::transformToDomain)
+  private List<UUID> getCategoryIdsForLabels(List<String> labels) {
+    return labels.stream()
+        .map(
+            label ->
+                Optional.ofNullable(categoryRepository.findFirstByLabel(label))
+                    .map(DocumentCategoryDTO::getId)
+                    .orElseThrow(
+                        () -> new IllegalStateException("Category '" + label + "' not found.")))
         .toList();
-  }
-
-  @Override
-  public Optional<DocumentType> findUniqueCaselawBySearchStr(String searchString) {
-    return repository
-        .findUniqueCaselawBySearchStrAndCategory(
-            searchString, categoryRepository.findFirstByLabel("R").getId())
-        .map(DocumentTypeTransformer::transformToDomain);
   }
 }

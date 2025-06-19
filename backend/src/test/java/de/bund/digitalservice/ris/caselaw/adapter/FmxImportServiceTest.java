@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.HttpEurlexRetrievalService;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeCategory;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -210,7 +211,8 @@ class FmxImportServiceTest {
         .findById(id);
     when(courtRepository.findByTypeAndLocation("EuG", null))
         .thenReturn(Optional.ofNullable(Court.builder().label("EuG").build()));
-    when(documentTypeRepository.findCaselawBySearchStr("Beschluss"))
+    when(documentTypeRepository.findDocumentTypesBySearchStrAndCategory(
+            "Beschluss", DocumentTypeCategory.CASELAW))
         .thenReturn(List.of(DocumentType.builder().label("Beschluss").build()));
 
     service.getDataFromEurlex(celexNumber, documentationUnit, user);
@@ -258,7 +260,8 @@ class FmxImportServiceTest {
         .findById(id);
     when(courtRepository.findByTypeAndLocation("EuGH", null))
         .thenReturn(Optional.ofNullable(Court.builder().label("EuGH").build()));
-    when(documentTypeRepository.findCaselawBySearchStr("Gutachten"))
+    when(documentTypeRepository.findDocumentTypesBySearchStrAndCategory(
+            "Gutachten", DocumentTypeCategory.CASELAW))
         .thenReturn(List.of(DocumentType.builder().label("Gutachten").build()));
 
     service.getDataFromEurlex(celexNumber, documentationUnit, user);

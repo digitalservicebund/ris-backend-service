@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeCategory;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.List;
@@ -22,24 +23,11 @@ public class DocumentTypeController {
     this.service = service;
   }
 
-  @GetMapping(value = "/caselaw", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<DocumentType> getCaselawDocumentTypes(
+  public List<DocumentType> getDocumentTypes(
+      @RequestParam("category") DocumentTypeCategory category,
       @RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getCaselawDocumentTypes(searchStr);
-  }
-
-  @GetMapping(value = "/caselaw-pending-proceeding", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("isAuthenticated()")
-  public List<DocumentType> getCaselawAndPendingProceedingDocumentTypes(
-      @RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getCaselawAndPendingProceedingDocumentTypes(searchStr);
-  }
-
-  @GetMapping(value = "/dependent-literature", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("isAuthenticated()")
-  public List<DocumentType> getDependentLiteratureDocumentTypes(
-      @RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getDependentLiteratureDocumentTypes(searchStr);
+    return service.getDocumentTypes(searchStr, category);
   }
 }

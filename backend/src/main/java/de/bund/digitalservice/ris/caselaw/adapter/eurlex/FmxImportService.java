@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeCategory;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -296,7 +297,9 @@ public class FmxImportService implements TransformationService {
       documentType = documentTypeRepository.findUniqueCaselawBySearchStr(docTypeLabel);
     }
     if (documentType.isEmpty() && docTypeLabel != null) {
-      var docTypes = documentTypeRepository.findCaselawBySearchStr(docTypeLabel);
+      var docTypes =
+          documentTypeRepository.findDocumentTypesBySearchStrAndCategory(
+              docTypeLabel, DocumentTypeCategory.CASELAW);
       if (!docTypes.isEmpty()) {
         documentType = Optional.of(docTypes.getFirst());
       }
