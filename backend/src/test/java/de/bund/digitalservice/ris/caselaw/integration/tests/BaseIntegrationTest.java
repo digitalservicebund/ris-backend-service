@@ -4,7 +4,6 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
-import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,7 +17,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -74,7 +72,6 @@ public abstract class BaseIntegrationTest {
   @MockitoBean FeatureToggleService featureToggleService;
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean UserGroupService userGroupService;
-  @MockitoSpyBean HttpMailSender mailSender;
 
   @BeforeAll
   public static void baseBeforeAll() {

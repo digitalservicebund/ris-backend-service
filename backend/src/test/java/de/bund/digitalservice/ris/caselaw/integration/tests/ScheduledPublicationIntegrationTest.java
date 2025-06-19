@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.time.Duration;
 import java.time.Instant;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @Import(MockXmlExporter.class)
 class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
@@ -38,6 +40,8 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository docUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DocumentationUnitHistoryLogService docUnitHistoryLogService;
+
+  @MockitoSpyBean private HttpMailSender mailSender;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
