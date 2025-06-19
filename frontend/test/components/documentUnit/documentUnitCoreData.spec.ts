@@ -22,7 +22,7 @@ function renderComponent(props: RenderProps = {}) {
 
   const effectiveProps = {
     modelValue: model.value,
-    kind: props.kind || Kind.DOCUMENTION_UNIT,
+    kind: props.kind || Kind.DECISION,
   }
 
   const view = render(DocumentUnitCoreData, {

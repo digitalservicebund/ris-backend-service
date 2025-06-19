@@ -82,7 +82,7 @@ const isInternalUser = useInternalUser()
       v-if="isInternalUser"
       :id="DocumentUnitCategoriesEnum.CORE_DATA"
       v-model="coreData"
-      :kind="Kind.DOCUMENTION_UNIT"
+      :kind="Kind.DECISION"
     />
     <ProceedingDecisions
       :id="DocumentUnitCategoriesEnum.PROCEEDINGS_DECISIONS"

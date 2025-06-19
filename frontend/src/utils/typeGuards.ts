@@ -11,7 +11,7 @@ import PendingProceeding from "@/domain/pendingProceeding"
 export function isDecision(
   doc: DocumentationUnit | undefined | null,
 ): doc is Decision {
-  return doc?.kind === Kind.DOCUMENTION_UNIT
+  return doc?.kind === Kind.DECISION
 }
 
 /**
