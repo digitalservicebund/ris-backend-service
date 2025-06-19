@@ -17,7 +17,8 @@ class DecisionBuilderTest {
   void shouldConvertDecisionCorrectly() {
     DecisionDTO documentationUnitDTO = new DecisionDTO();
     documentationUnitDTO.setAttachments(
-        Collections.singletonList(AttachmentDTO.builder().filename("doc.docx").build()));
+        Collections.singletonList(
+            AttachmentDTO.builder().filename("doc.docx").format("docx").build()));
     documentationUnitDTO.setGrounds("reasons123");
     documentationUnitDTO.setDocumentationOffice(DocumentationOfficeDTO.builder().build());
     Decision decision = DecisionTransformer.transformToDomain(documentationUnitDTO);

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
@@ -1524,5 +1525,27 @@ class DecisionTransformerTest {
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
     assertThat(decision.documentalists()).isEmpty();
+  }
+
+  @Test
+  void testTransformToDomain_withAttachments_shouldOnlyAddDocxAndFmxTypes() {
+    DecisionDTO decisionDTO =
+        generateSimpleDTOBuilder()
+            .attachments(
+                List.of(
+                    AttachmentDTO.builder().filename("foo").format("fmx").build(),
+                    AttachmentDTO.builder().filename("bar").format("docx").build(),
+                    AttachmentDTO.builder().filename("baz").format("png").build(),
+                    AttachmentDTO.builder().filename("qux").format("jpg").build(),
+                    AttachmentDTO.builder().filename("quux").format("foo").build()))
+            .build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.attachments())
+        .hasSize(2)
+        .satisfiesExactlyInAnyOrder(
+            attachment -> assertThat(attachment.name()).isEqualTo("foo"),
+            attachment -> assertThat(attachment.name()).isEqualTo("bar"));
   }
 }
