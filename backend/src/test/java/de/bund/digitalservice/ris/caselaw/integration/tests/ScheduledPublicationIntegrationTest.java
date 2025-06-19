@@ -162,6 +162,7 @@ class ScheduledPublicationIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("java:S5961")
   void shouldPublishOnlyDueDocUnitsAndSendErrorNotificationOnSchedule() {
     // Valid doc unit -> publication will succeed
     DocumentationUnitDTO docUnitDueNow =
@@ -243,16 +244,22 @@ class ScheduledPublicationIntegrationTest {
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
     var logs = docUnitHistoryLogService.getHistoryLogs(docUnitDueNow.getId(), user);
 
-    assertThat(logs).hasSize(2);
+    assertThat(logs).hasSize(3);
 
     // The lastPublicationDate is set -> additional update event is logged
     assertThat(logs.get(0).eventType()).isEqualTo(HistoryLogEventType.UPDATE);
     assertThat(logs.get(0).createdBy()).isEqualTo("NeuRIS");
 
-    assertThat(logs.get(1).description()).isEqualTo("Dokeinheit an jDV übergeben");
+    assertThat(logs.get(1).description()).isEqualTo("Terminierte Abgabe gelöscht");
     assertThat(logs.get(1).createdBy()).isEqualTo("NeuRIS");
-    assertThat(logs.get(1).eventType()).isEqualTo(HistoryLogEventType.HANDOVER);
+    assertThat(logs.get(1).eventType()).isEqualTo(HistoryLogEventType.SCHEDULED_PUBLICATION);
     assertThat(logs.get(1).createdAt()).isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
     assertThat(logs.get(1).documentationOffice()).isNull();
+
+    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit an jDV übergeben");
+    assertThat(logs.get(2).createdBy()).isEqualTo("NeuRIS");
+    assertThat(logs.get(2).eventType()).isEqualTo(HistoryLogEventType.HANDOVER);
+    assertThat(logs.get(2).createdAt()).isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
+    assertThat(logs.get(2).documentationOffice()).isNull();
   }
 }

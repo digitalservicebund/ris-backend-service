@@ -215,7 +215,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
 
     var logsAfterFirstUpdate =
         databaseHistoryLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(docUnit.getId());
-    assertThat(logsAfterFirstUpdate).hasSize(1);
+    assertThat(logsAfterFirstUpdate).hasSize(2);
 
     docUnit.setScheduledPublicationDateTime(LocalDateTime.now());
     documentationUnitService.updateDocumentationUnit(
@@ -225,7 +225,7 @@ class DocumentationUnitHistoryLogIntegrationTest {
 
     var logsAfterSecondUpdate =
         databaseHistoryLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(docUnit.getId());
-    assertThat(logsAfterSecondUpdate).hasSize(1);
+    assertThat(logsAfterSecondUpdate).hasSize(2);
 
     var firstLog = logsAfterFirstUpdate.getFirst();
     var secondLog = logsAfterSecondUpdate.getFirst();
