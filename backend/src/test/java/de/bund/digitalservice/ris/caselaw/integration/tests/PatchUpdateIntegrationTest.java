@@ -352,7 +352,7 @@ class PatchUpdateIntegrationTest {
     TestTransaction.flagForCommit();
     TestTransaction.end();
 
-    DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+    Decision decision = generateEmptyDocumentationUnit();
 
     List<JsonPatchOperation> operations1 =
         List.of(
@@ -364,14 +364,14 @@ class PatchUpdateIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .patch()
-        .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+        .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch1)
         .exchange()
         .expectStatus()
         .is2xxSuccessful();
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
-    var logs = documentationUnitHistoryLogService.getHistoryLogs(documentationUnit.uuid(), user);
+    var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
     assertThat(logs).hasSize(3);
     assertThat(logs)
         .map(HistoryLog::eventType)
@@ -393,10 +393,10 @@ class PatchUpdateIntegrationTest {
     TestTransaction.flagForCommit();
     TestTransaction.end();
 
-    DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+    Decision decision = generateEmptyDocumentationUnit();
 
     TestTransaction.start();
-    DecisionDTO dto = (DecisionDTO) repository.findById(documentationUnit.uuid()).get();
+    DecisionDTO dto = (DecisionDTO) repository.findById(decision.uuid()).get();
     dto.setScheduledPublicationDateTime(LocalDateTime.of(2010, 12, 31, 11, 11));
     repository.save(dto);
     TestTransaction.flagForCommit();
@@ -409,14 +409,14 @@ class PatchUpdateIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .patch()
-        .uri("/api/v1/caselaw/documentunits/" + documentationUnit.uuid())
+        .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch1)
         .exchange()
         .expectStatus()
         .is2xxSuccessful();
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
-    var logs = documentationUnitHistoryLogService.getHistoryLogs(documentationUnit.uuid(), user);
+    var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), user);
     assertThat(logs).hasSize(3);
     assertThat(logs)
         .map(HistoryLog::eventType)
