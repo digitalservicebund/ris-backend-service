@@ -45,6 +45,7 @@ import jakarta.persistence.criteria.Root;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -378,10 +379,16 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return;
     }
 
-    String dateString =
-        decision.managementData().scheduledPublicationDateTime().format(DATE_FORMATTER);
-    String timeString =
-        decision.managementData().scheduledPublicationDateTime().format(TIME_FORMATTER);
+    // Have to reworked after change from localdatetime to instant
+    LocalDateTime cstDateTime =
+        decision
+            .managementData()
+            .scheduledPublicationDateTime()
+            .atZone(ZoneId.of("UTC"))
+            .withZoneSameInstant(ZoneId.of("Europe/Berlin"))
+            .toLocalDateTime();
+    String dateString = cstDateTime.format(DATE_FORMATTER);
+    String timeString = cstDateTime.format(TIME_FORMATTER);
     historyLogService.saveHistoryLog(
         documentationUnitDTO.getId(),
         user,

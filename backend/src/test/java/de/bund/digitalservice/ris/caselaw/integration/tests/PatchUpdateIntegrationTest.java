@@ -383,7 +383,7 @@ class PatchUpdateIntegrationTest {
     assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
     assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
     assertThat(logs.get(1).description())
-        .isEqualTo("Abgabe terminiert für den 01.01.2011 um 11:11 Uhr");
+        .isEqualTo("Abgabe terminiert für den 01.01.2011 um 12:11 Uhr");
     assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
   }
 
