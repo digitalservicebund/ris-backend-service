@@ -90,7 +90,8 @@ export class Decision {
     "documentType",
   ] as const
 
-  constructor(uuid: string, data: Partial<Decision> = {}) {
+  // prettier-ignore
+  constructor(uuid: string, data: Partial<Decision> = {}) { // NOSONAR: Ignore Cognitive Complexity
     this.uuid = String(uuid)
 
     let rootField: keyof Decision
