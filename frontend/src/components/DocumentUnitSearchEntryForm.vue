@@ -9,8 +9,8 @@ import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
-import { DocumentationUnitSearchParameter } from "@/domain/documentationUnitSearchParameter"
 import { PublicationState } from "@/domain/publicationStatus"
+import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
 defineProps<{
   isLoading?: boolean

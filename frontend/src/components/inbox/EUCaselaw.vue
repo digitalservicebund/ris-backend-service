@@ -7,10 +7,10 @@ import InfoModal from "@/components/InfoModal.vue"
 import { Page } from "@/components/Pagination.vue"
 import { Query } from "@/composables/useQueryFromRoute"
 import { InboxStatus } from "@/domain/decision"
-import { DocumentationUnitSearchParameter } from "@/domain/documentationUnitSearchParameter"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
+import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
 const isLoading = ref(false)
 const pageNumber = ref<number>(0)

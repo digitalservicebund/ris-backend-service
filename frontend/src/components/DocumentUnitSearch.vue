@@ -10,13 +10,13 @@ import Pagination, { Page } from "@/components/Pagination.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { Query } from "@/composables/useQueryFromRoute"
 import { Court } from "@/domain/court"
-import { DocumentationUnitSearchParameter } from "@/domain/documentationUnitSearchParameter"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import errorMessages from "@/i18n/errors.json"
 import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
 const router = useRouter()
 const store = useDocumentUnitStore()

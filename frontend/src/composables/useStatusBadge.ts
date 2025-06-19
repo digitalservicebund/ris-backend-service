@@ -1,5 +1,5 @@
 import { computed, FunctionalComponent, SVGAttributes } from "vue"
-import { DocumentationUnit } from "@/domain/documentation-unit"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import { Label, PublicationState } from "@/domain/publicationStatus"
 
 export interface Badge {

@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
-import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
+import HandoverDecisionView from "@/components/HandoverDecisionView.vue"
 import { Decision } from "@/domain/decision"
 import { Env } from "@/domain/env"
 import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
@@ -37,7 +37,7 @@ function renderComponent(
 
   return {
     user,
-    ...render(HandoverDocumentationUnitView, {
+    ...render(HandoverDecisionView, {
       props: options.props ?? {},
       global: {
         plugins: [
@@ -377,7 +377,7 @@ describe("HandoverDocumentationUnitView:", () => {
           },
         },
       })
-      render(HandoverDocumentationUnitView, {
+      render(HandoverDecisionView, {
         global: {
           plugins: [[router], [pinia]],
         },

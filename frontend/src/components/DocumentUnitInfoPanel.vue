@@ -6,7 +6,7 @@ import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
-import { DocumentationUnit } from "@/domain/documentation-unit"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import { isDecision } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
 

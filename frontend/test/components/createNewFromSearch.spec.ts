@@ -6,8 +6,8 @@ import { createRouter, createWebHistory } from "vue-router"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
-import { DocumentationUnitCreationParameters } from "@/domain/documentationUnitCreationParameters"
 import documentUnitService from "@/services/documentUnitService"
+import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
 import routes from "~/test-helper/routes"
 
 const docOffice: DocumentationOffice = {

@@ -7,9 +7,9 @@ import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
-import { DocumentationUnitCreationParameters } from "@/domain/documentationUnitCreationParameters"
 import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
+import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
 
 const props = defineProps<{
   parameters?: DocumentationUnitCreationParameters

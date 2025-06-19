@@ -8,7 +8,7 @@ import { ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 
-import { DocumentationUnitSearchParameter } from "@/domain/documentationUnitSearchParameter"
+import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
 const props = defineProps<{
   isLoading?: boolean

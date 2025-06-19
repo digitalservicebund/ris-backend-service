@@ -9,7 +9,7 @@ import KeyWords from "@/components/KeyWords.vue"
 import Norms from "@/components/NormReferences.vue"
 import OtherCategories from "@/components/OtherCategories.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import { DocumentationUnit } from "@/domain/documentation-unit"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { isDecision } from "@/utils/typeGuards"
 

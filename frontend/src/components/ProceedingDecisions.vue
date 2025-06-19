@@ -4,7 +4,7 @@ import { Ref } from "vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import { DocumentationUnit } from "@/domain/documentation-unit"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { isDecision } from "@/utils/typeGuards"
 
