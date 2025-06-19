@@ -63,7 +63,7 @@ export class Decision {
   readonly id?: string
   readonly documentNumber: string = ""
   readonly status?: PublicationStatus
-  readonly kind = Kind.DOCUMENTION_UNIT
+  readonly kind = Kind.DECISION
   public version: number = 0
   public attachments: Attachment[] = []
   public coreData: CoreData = {}

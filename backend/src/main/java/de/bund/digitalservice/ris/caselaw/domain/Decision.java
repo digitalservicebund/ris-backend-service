@@ -53,6 +53,6 @@ public record Decision(
 
   @Override
   public Kind kind() {
-    return Kind.DOCUMENTION_UNIT;
+    return Kind.DECISION;
   }
 }
