@@ -1,58 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.PageTestImpl;
-import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
-import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresEurLexResultRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexController;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.MockEurlexRetrievalService;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
-import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
-import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
-@RISIntegrationTest(
-    imports = {
-      PostgresJPAConfig.class,
-      FlywayConfig.class,
-      SecurityConfig.class,
-      TestConfig.class,
-      OAuthService.class,
-      KeycloakUserService.class,
-      EurLexSOAPSearchService.class,
-      PostgresEurLexResultRepositoryImpl.class,
-      MockEurlexRetrievalService.class,
-    },
-    controllers = {EurLexController.class})
 @Sql(
     scripts = {"classpath:eurlex_init.sql"},
     executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -60,33 +20,9 @@ import org.testcontainers.junit.jupiter.Container;
     scripts = {"classpath:eurlex_cleanup.sql"},
     executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @SuppressWarnings("java:S5976")
-class EurLexResultIntegrationTest {
-  @Container
-  static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
-
-  @DynamicPropertySource
-  static void registerDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("database.user", () -> postgreSQLContainer.getUsername());
-    registry.add("database.password", () -> postgreSQLContainer.getPassword());
-    registry.add("database.host", () -> postgreSQLContainer.getHost());
-    registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
-    registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
-  }
+class EurLexResultIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
-
-  @MockitoSpyBean private UserService userService;
-
-  @MockitoBean private ClientRegistrationRepository registrationRepository;
-  @MockitoBean private UserGroupService userGroupService;
-  @MockitoBean private DocumentationUnitService documentationUnitService;
-  @MockitoBean private ProcedureService procedureService;
-
-  @BeforeEach
-  void setUp() {
-    mockUserGroups(userGroupService);
-  }
 
   @Test
   void getSearchResults() {
@@ -111,13 +47,9 @@ class EurLexResultIntegrationTest {
 
   @Test
   void getSearchResults_withDocOfficeBGH() {
-    doReturn(DocumentationOffice.builder().abbreviation("BGH").build())
-        .when(userService)
-        .getDocumentationOffice(any(OidcUser.class));
-
     Page<SearchResult> searchResultPage =
         risWebTestClient
-            .withDefaultLogin()
+            .withLogin("/BGH")
             .get()
             .uri("/api/v1/caselaw/eurlex")
             .exchange()
@@ -134,13 +66,9 @@ class EurLexResultIntegrationTest {
 
   @Test
   void getSearchResults_withDocOfficeBFH() {
-    doReturn(DocumentationOffice.builder().abbreviation("BFH").build())
-        .when(userService)
-        .getDocumentationOffice(any(OidcUser.class));
-
     Page<SearchResult> searchResultPage =
         risWebTestClient
-            .withDefaultLogin()
+            .withLogin("/BFH")
             .get()
             .uri("/api/v1/caselaw/eurlex")
             .exchange()
@@ -157,13 +85,9 @@ class EurLexResultIntegrationTest {
 
   @Test
   void getSearchResults_withNotAllowedDocOffice() {
-    doReturn(DocumentationOffice.builder().abbreviation("NotAllowedDocOffice").build())
-        .when(userService)
-        .getDocumentationOffice(any(OidcUser.class));
-
     Page<SearchResult> searchResultPage =
         risWebTestClient
-            .withDefaultLogin()
+            .withLogin("/CC-RIS")
             .get()
             .uri("/api/v1/caselaw/eurlex")
             .exchange()
