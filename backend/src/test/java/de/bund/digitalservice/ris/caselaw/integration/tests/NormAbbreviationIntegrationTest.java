@@ -2,10 +2,6 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.NormAbbreviationController;
-import de.bund.digitalservice.ris.caselaw.adapter.NormAbbreviationService;
-import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
@@ -13,15 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresNormAbbreviationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
-import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.MailService;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation.NormAbbreviationBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
@@ -39,26 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
 
-@RISIntegrationTest(
-    imports = {
-      NormAbbreviationService.class,
-      PostgresJPAConfig.class,
-      FlywayConfig.class,
-      PostgresNormAbbreviationRepositoryImpl.class,
-      SecurityConfig.class,
-      OAuthService.class,
-      TestConfig.class
-    },
-    controllers = {NormAbbreviationController.class})
-class NormAbbreviationIntegrationTest {
+class NormAbbreviationIntegrationTest extends BaseIntegrationTest {
   private NormAbbreviationDTO abbreviation1 =
       NormAbbreviationDTO.builder()
           .abbreviation("norm abbreviation 1")
@@ -173,31 +143,11 @@ class NormAbbreviationIntegrationTest {
   private RegionDTO region1 = RegionDTO.builder().code("region code 1").build();
   private RegionDTO region2 = RegionDTO.builder().code("region code 2").build();
 
-  @Container
-  static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
-
-  @DynamicPropertySource
-  static void registerDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("database.user", () -> postgreSQLContainer.getUsername());
-    registry.add("database.password", () -> postgreSQLContainer.getPassword());
-    registry.add("database.host", () -> postgreSQLContainer.getHost());
-    registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
-    registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
-  }
-
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseNormAbbreviationRepository repository;
   @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
   @Autowired private DatabaseDocumentCategoryRepository documentCategoryRepository;
   @Autowired private DatabaseRegionRepository regionRepository;
-
-  @MockitoBean UserService userService;
-  @MockitoBean private DocumentationUnitService documentationUnitService;
-  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private S3AsyncClient s3AsyncClient;
-  @MockitoBean private MailService mailService;
-  @MockitoBean private ProcedureService procedureService;
 
   @AfterEach
   void cleanUp() {

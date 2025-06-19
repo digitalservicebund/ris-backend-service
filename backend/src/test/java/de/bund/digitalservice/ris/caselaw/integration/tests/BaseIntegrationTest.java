@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -17,7 +16,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -49,9 +47,6 @@ public abstract class BaseIntegrationTest {
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql").withReuse(true);
 
-  @Autowired MockMvc mockMvc;
-  @MockitoBean FeatureToggleService featureToggleService;
-
   static GenericContainer<?> redis =
       new GenericContainer<>(DockerImageName.parse("redis:7.0"))
           .withExposedPorts(6379)
@@ -70,8 +65,9 @@ public abstract class BaseIntegrationTest {
     registry.add("spring.data.redis.timeout", () -> "200");
   }
 
+  @MockitoBean FeatureToggleService featureToggleService;
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private UserGroupService userGroupService;
+  @MockitoBean UserGroupService userGroupService;
 
   @BeforeAll
   public static void beforeAll() {
