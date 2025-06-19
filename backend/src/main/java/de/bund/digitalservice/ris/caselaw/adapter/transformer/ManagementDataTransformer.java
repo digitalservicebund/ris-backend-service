@@ -36,14 +36,15 @@ public class ManagementDataTransformer {
   }
 
   /**
-   * Transforms a {@link DecisionDTO} and optional {@link User} context into a {@link
+   * Transforms a {@link DocumentationUnitDTO} and optional {@link User} context into a {@link
    * ManagementData} domain object.
    *
    * <p>The transformation extracts relevant metadata like publication dates, user info,
    * documentation office abbreviations, and access-controlled names. If the user is provided,
    * additional visibility checks are applied to restrict sensitive data.
    *
-   * @param decisionDTO the decision DTO containing management data and other metadata
+   * @param documentationUnitDTO the documentation unit DTO containing management data and other
+   *     metadata
    * @param user the currently authenticated user, can be {@code null}
    * @return a {@link ManagementData} domain object built from the input DTO
    */
@@ -142,26 +143,29 @@ public class ManagementDataTransformer {
 
   @NotNull
   private static List<DuplicateRelation> transformDuplicateRelations(
-      DocumentationUnitDTO decisionDTO) {
-    return Stream.concat(
-            decisionDTO.getDuplicateRelations1().stream()
-                .filter(
-                    relation ->
-                        isPublishedDuplicateOrSameDocOffice(
-                            decisionDTO, relation.getDocumentationUnit2())),
-            decisionDTO.getDuplicateRelations2().stream()
-                .filter(
-                    relation ->
-                        isPublishedDuplicateOrSameDocOffice(
-                            decisionDTO, relation.getDocumentationUnit1())))
-        .map(relation -> DuplicateRelationTransformer.transformToDomain(relation, decisionDTO))
-        .sorted(
-            Comparator.comparing(
-                    (DuplicateRelation relation) ->
-                        Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
-                    Comparator.reverseOrder())
-                .thenComparing(DuplicateRelation::documentNumber))
-        .toList();
+      DocumentationUnitDTO documentationUnitDTO) {
+    if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
+      return Stream.concat(
+              decisionDTO.getDuplicateRelations1().stream()
+                  .filter(
+                      relation ->
+                          isPublishedDuplicateOrSameDocOffice(
+                              decisionDTO, relation.getDocumentationUnit2())),
+              decisionDTO.getDuplicateRelations2().stream()
+                  .filter(
+                      relation ->
+                          isPublishedDuplicateOrSameDocOffice(
+                              decisionDTO, relation.getDocumentationUnit1())))
+          .map(relation -> DuplicateRelationTransformer.transformToDomain(relation, decisionDTO))
+          .sorted(
+              Comparator.comparing(
+                      (DuplicateRelation relation) ->
+                          Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
+                      Comparator.reverseOrder())
+                  .thenComparing(DuplicateRelation::documentNumber))
+          .toList();
+    }
+    return new ArrayList<>();
   }
 
   private static Boolean isPublishedDuplicateOrSameDocOffice(
