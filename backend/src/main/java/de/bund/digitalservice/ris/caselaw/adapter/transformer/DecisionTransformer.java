@@ -20,7 +20,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -60,8 +60,7 @@ public class DecisionTransformer extends DocumentableTransformer {
    *     updatedDomainObject
    */
   @SuppressWarnings({"java:S6541", "java:S3776"})
-  public static DecisionDTO transformToDTO(
-      DecisionDTO currentDto, DocumentationUnit updatedDomainObject) {
+  public static DecisionDTO transformToDTO(DecisionDTO currentDto, Decision updatedDomainObject) {
     final var builder = currentDto.toBuilder();
 
     builder
@@ -180,7 +179,7 @@ public class DecisionTransformer extends DocumentableTransformer {
    C2) ... and if the value of the highest ranking source is different -> we replace the source.
   */
   private static void addSource(
-      DecisionDTO currentDto, DecisionDTOBuilder<?, ?> builder, DocumentationUnit decision) {
+      DecisionDTO currentDto, DecisionDTOBuilder<?, ?> builder, Decision decision) {
     if (decision.coreData().source() == null) {
       return;
     }
@@ -219,8 +218,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.source(existingSources); // Update builder with new list
   }
 
-  private static void addLongTexts(
-      DocumentationUnit updatedDomainObject, DecisionDTOBuilder<?, ?> builder) {
+  private static void addLongTexts(Decision updatedDomainObject, DecisionDTOBuilder<?, ?> builder) {
     LongTexts longTexts = updatedDomainObject.longTexts();
 
     builder
@@ -236,9 +234,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addShortTexts(
-      DocumentationUnit updatedDomainObject,
-      DecisionDTOBuilder<?, ?> builder,
-      DecisionDTO currentDto) {
+      Decision updatedDomainObject, DecisionDTOBuilder<?, ?> builder, DecisionDTO currentDto) {
     ShortTexts shortTexts = updatedDomainObject.shortTexts();
 
     builder
@@ -345,9 +341,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addEnsuingAndPendingDecisions(
-      DocumentationUnit updatedDomainObject,
-      DecisionDTOBuilder<?, ?> builder,
-      DecisionDTO currentDTO) {
+      Decision updatedDomainObject, DecisionDTOBuilder<?, ?> builder, DecisionDTO currentDTO) {
     List<EnsuingDecision> ensuingDecisions = updatedDomainObject.ensuingDecisions();
 
     List<EnsuingDecisionDTO> ensuingDecisionDTOs = new ArrayList<>();
@@ -390,9 +384,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addLegalEffect(
-      DecisionDTO currentDto,
-      DocumentationUnit updatedDomainObject,
-      DecisionDTOBuilder<?, ?> builder) {
+      DecisionDTO currentDto, Decision updatedDomainObject, DecisionDTOBuilder<?, ?> builder) {
 
     boolean courtWasAdded =
         currentDto.getCourt() == null
@@ -416,7 +408,7 @@ public class DecisionTransformer extends DocumentableTransformer {
   }
 
   private static void addLeadingDecisionNormReferences(
-      DocumentationUnit updatedDomainObject, DecisionDTOBuilder<?, ?> builder) {
+      Decision updatedDomainObject, DecisionDTOBuilder<?, ?> builder) {
 
     List<String> leadingDecisionNormReferences =
         updatedDomainObject.coreData().leadingDecisionNormReferences();
@@ -474,7 +466,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.inputTypes(inputTypeDTOs);
   }
 
-  public static DocumentationUnit transformToDomain(DecisionDTO decisionDTO) {
+  public static Decision transformToDomain(DecisionDTO decisionDTO) {
     return transformToDomain(decisionDTO, null);
   }
 
@@ -486,14 +478,14 @@ public class DecisionTransformer extends DocumentableTransformer {
    * @param user the {@link User}, may be null
    * @return a transformed domain object, or an empty domain object if the input is null
    */
-  public static DocumentationUnit transformToDomain(DecisionDTO decisionDTO, @Nullable User user) {
+  public static Decision transformToDomain(DecisionDTO decisionDTO, @Nullable User user) {
     if (decisionDTO == null) {
       throw new DocumentationUnitTransformerException("Document unit is null and won't transform");
     }
 
     log.debug("transfer database documentation unit '{}' to domain object", decisionDTO.getId());
 
-    return DocumentationUnit.builder()
+    return Decision.builder()
         .note(decisionDTO.getNote())
         .version(decisionDTO.getVersion())
         .uuid(decisionDTO.getId())

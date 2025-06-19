@@ -9,7 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
-import de.bund.digitalservice.ris.caselaw.domain.Documentable;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.Instant;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.UUID;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class DocumentableTransformerTest {
+class DocumentationUnitTransformerTest {
 
   static UUID normAbbreviationId = UUID.randomUUID();
 
@@ -36,13 +36,14 @@ class DocumentableTransformerTest {
   @ParameterizedTest
   @MethodSource("getDTOsWithStatus")
   void testTransformToDomain_shouldTransformStatus(DocumentationUnitDTO dto) {
-    Documentable documentable =
+    DocumentationUnit documentationUnit =
         dto instanceof PendingProceedingDTO
             ? PendingProceedingTransformer.transformToDomain((PendingProceedingDTO) dto)
             : DecisionTransformer.transformToDomain((DecisionDTO) dto);
 
-    assertThat(documentable.status().publicationStatus()).isEqualTo(PublicationStatus.UNPUBLISHED);
-    assertThat(documentable.status().withError()).isFalse();
+    assertThat(documentationUnit.status().publicationStatus())
+        .isEqualTo(PublicationStatus.UNPUBLISHED);
+    assertThat(documentationUnit.status().withError()).isFalse();
   }
 
   public static List<DocumentationUnitDTO> getDTOsWithSameNormAbbreviation() {
@@ -66,16 +67,17 @@ class DocumentableTransformerTest {
   void testTransformToDomain_withMultipleNormReferences_withSameNormAbbreviation_shouldGroupNorms(
       DocumentationUnitDTO dto) {
 
-    Documentable documentable =
+    DocumentationUnit documentationUnit =
         dto instanceof PendingProceedingDTO
             ? PendingProceedingTransformer.transformToDomain((PendingProceedingDTO) dto)
             : DecisionTransformer.transformToDomain((DecisionDTO) dto);
 
-    assertThat(documentable.contentRelatedIndexing().norms()).hasSize(1);
-    assertThat(documentable.contentRelatedIndexing().norms().getFirst().normAbbreviation().id())
+    assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(1);
+    assertThat(
+            documentationUnit.contentRelatedIndexing().norms().getFirst().normAbbreviation().id())
         .isEqualTo(normAbbreviationId);
     assertThat(
-            documentable
+            documentationUnit
                 .contentRelatedIndexing()
                 .norms()
                 .getFirst()
@@ -84,7 +86,7 @@ class DocumentableTransformerTest {
                 .singleNorm())
         .isEqualTo("single norm 1");
     assertThat(
-            documentable
+            documentationUnit
                 .contentRelatedIndexing()
                 .norms()
                 .getFirst()
@@ -115,16 +117,21 @@ class DocumentableTransformerTest {
   void
       testTransformToDomain_withMultipleNormReferences_withNoAbbreviation_withSameNAbbreviationRawValue_shouldGroupNorms(
           DocumentationUnitDTO dto) {
-    Documentable documentable =
+    DocumentationUnit documentationUnit =
         dto instanceof PendingProceedingDTO
             ? PendingProceedingTransformer.transformToDomain((PendingProceedingDTO) dto)
             : DecisionTransformer.transformToDomain((DecisionDTO) dto);
 
-    assertThat(documentable.contentRelatedIndexing().norms()).hasSize(1);
-    assertThat(documentable.contentRelatedIndexing().norms().getFirst().normAbbreviationRawValue())
+    assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(1);
+    assertThat(
+            documentationUnit
+                .contentRelatedIndexing()
+                .norms()
+                .getFirst()
+                .normAbbreviationRawValue())
         .isEqualTo("foo");
     assertThat(
-            documentable
+            documentationUnit
                 .contentRelatedIndexing()
                 .norms()
                 .getFirst()
@@ -133,7 +140,7 @@ class DocumentableTransformerTest {
                 .singleNorm())
         .isEqualTo("single norm 1");
     assertThat(
-            documentable
+            documentationUnit
                 .contentRelatedIndexing()
                 .norms()
                 .getFirst()
@@ -163,18 +170,19 @@ class DocumentableTransformerTest {
   @MethodSource("getDTOsWithDifferentNormAbbreviation")
   void testTransformToDomain_withMultipleNormReferences_withDifferentNormAbbreviation(
       DocumentationUnitDTO dto) {
-    Documentable documentable =
+    DocumentationUnit documentationUnit =
         dto instanceof PendingProceedingDTO
             ? PendingProceedingTransformer.transformToDomain((PendingProceedingDTO) dto)
             : DecisionTransformer.transformToDomain((DecisionDTO) dto);
 
-    assertThat(documentable.contentRelatedIndexing().norms()).hasSize(2);
-    assertThat(documentable.contentRelatedIndexing().norms().getFirst().normAbbreviation().id())
+    assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(2);
+    assertThat(
+            documentationUnit.contentRelatedIndexing().norms().getFirst().normAbbreviation().id())
         .isEqualTo(dto.getNormReferences().getFirst().getNormAbbreviation().getId());
-    assertThat(documentable.contentRelatedIndexing().norms().get(1).normAbbreviation().id())
+    assertThat(documentationUnit.contentRelatedIndexing().norms().get(1).normAbbreviation().id())
         .isEqualTo(dto.getNormReferences().get(1).getNormAbbreviation().getId());
     assertThat(
-            documentable
+            documentationUnit
                 .contentRelatedIndexing()
                 .norms()
                 .getFirst()
@@ -183,7 +191,7 @@ class DocumentableTransformerTest {
                 .singleNorm())
         .isEqualTo("single norm 1");
     assertThat(
-            documentable
+            documentationUnit
                 .contentRelatedIndexing()
                 .norms()
                 .get(1)

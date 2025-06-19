@@ -38,9 +38,9 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -166,17 +166,17 @@ class SaveNormIntegrationTest {
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, documentationOfficeDTO);
 
-    DocumentationUnit documentationUnitFromFrontend = generateDocumentationUnit(dto.getId());
+    Decision decisionFromFrontend = generateDocumentationUnit(dto.getId());
 
     risWebTestClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -202,10 +202,9 @@ class SaveNormIntegrationTest {
                             .normAbbreviation(normAbbreviation)
                             .build())));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        generateDocumentationUnit(savedDocumentationUnitDTO.getId());
+    Decision decisionFromFrontend = generateDocumentationUnit(savedDocumentationUnitDTO.getId());
 
-    documentationUnitFromFrontend
+    decisionFromFrontend
         .contentRelatedIndexing()
         .norms()
         .add(
@@ -217,11 +216,11 @@ class SaveNormIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId())
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -249,7 +248,7 @@ class SaveNormIntegrationTest {
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, documentationOfficeDTO, "1234567890123");
 
-    DocumentationUnit documentationUnitFromFrontend = generateDocumentationUnit(dto.getId());
+    Decision decisionFromFrontend = generateDocumentationUnit(dto.getId());
 
     NormReference norm1 =
         NormReference.builder()
@@ -259,17 +258,17 @@ class SaveNormIntegrationTest {
         NormReference.builder()
             .normAbbreviation(NormAbbreviation.builder().id(dbNormAbbreviation2.getId()).build())
             .build();
-    documentationUnitFromFrontend.contentRelatedIndexing().norms().addAll(List.of(norm1, norm2));
+    decisionFromFrontend.contentRelatedIndexing().norms().addAll(List.of(norm1, norm2));
 
     risWebTestClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -296,8 +295,8 @@ class SaveNormIntegrationTest {
             });
   }
 
-  private DocumentationUnit generateDocumentationUnit(UUID uuid) {
-    return DocumentationUnit.builder()
+  private Decision generateDocumentationUnit(UUID uuid) {
+    return Decision.builder()
         .uuid(uuid)
         .documentNumber("1234567890123")
         .coreData(CoreData.builder().documentationOffice(docOffice).build())

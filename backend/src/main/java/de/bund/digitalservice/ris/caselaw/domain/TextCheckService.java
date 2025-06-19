@@ -57,9 +57,9 @@ public class TextCheckService {
   public List<Match> checkWholeDocumentationUnit(UUID id)
       throws DocumentationUnitNotExistsException {
 
-    Documentable documentable = documentationUnitRepository.findByUuid(id);
+    DocumentationUnit documentationUnit = documentationUnitRepository.findByUuid(id);
 
-    if (documentable instanceof DocumentationUnit documentationUnit) {
+    if (documentationUnit instanceof Decision decision) {
       List<Match> allMatches = Collections.synchronizedList(new ArrayList<>());
 
       stream(CategoryType.values())
@@ -67,8 +67,7 @@ public class TextCheckService {
           .forEach(
               categoryType -> {
                 try {
-                  TextCheckCategoryResponse response =
-                      checkCategory(documentationUnit, categoryType);
+                  TextCheckCategoryResponse response = checkCategory(decision, categoryType);
                   if (response != null) {
                     allMatches.addAll(response.matches());
                   }
@@ -86,65 +85,48 @@ public class TextCheckService {
 
     } else {
       throw new UnsupportedOperationException(
-          "Check not supported for Documentable type: " + documentable.getClass());
+          "Check not supported for Documentable type: " + documentationUnit.getClass());
     }
   }
 
   public TextCheckCategoryResponse checkCategory(UUID id, CategoryType categoryType)
       throws DocumentationUnitNotExistsException {
-    Documentable documentable = documentationUnitRepository.findByUuid(id);
+    DocumentationUnit documentationUnit = documentationUnitRepository.findByUuid(id);
 
-    if (documentable instanceof DocumentationUnit documentationUnit) {
-      return checkCategory(documentationUnit, categoryType);
+    if (documentationUnit instanceof Decision decision) {
+      return checkCategory(decision, categoryType);
     } else {
       throw new UnsupportedOperationException();
     }
   }
 
-  private TextCheckCategoryResponse checkCategory(
-      DocumentationUnit documentationUnit, CategoryType category) {
+  private TextCheckCategoryResponse checkCategory(Decision decision, CategoryType category) {
     if (category == null) {
       throw new TextCheckUnknownCategoryException();
     }
 
     return switch (category) {
       case REASONS ->
-          checkCategoryByHTML(
-              documentationUnit.longTexts().reasons(), category, documentationUnit.uuid());
+          checkCategoryByHTML(decision.longTexts().reasons(), category, decision.uuid());
       case CASE_FACTS ->
-          checkCategoryByHTML(
-              documentationUnit.longTexts().caseFacts(), category, documentationUnit.uuid());
+          checkCategoryByHTML(decision.longTexts().caseFacts(), category, decision.uuid());
       case DECISION_REASONS ->
-          checkCategoryByHTML(
-              documentationUnit.longTexts().decisionReasons(), category, documentationUnit.uuid());
+          checkCategoryByHTML(decision.longTexts().decisionReasons(), category, decision.uuid());
       case HEADNOTE ->
-          checkCategoryByHTML(
-              documentationUnit.shortTexts().headnote(), category, documentationUnit.uuid());
+          checkCategoryByHTML(decision.shortTexts().headnote(), category, decision.uuid());
       case OTHER_HEADNOTE ->
-          checkCategoryByHTML(
-              documentationUnit.shortTexts().otherHeadnote(), category, documentationUnit.uuid());
+          checkCategoryByHTML(decision.shortTexts().otherHeadnote(), category, decision.uuid());
       case HEADLINE ->
-          checkCategoryByHTML(
-              documentationUnit.shortTexts().headline(), category, documentationUnit.uuid());
+          checkCategoryByHTML(decision.shortTexts().headline(), category, decision.uuid());
       case GUIDING_PRINCIPLE ->
-          checkCategoryByHTML(
-              documentationUnit.shortTexts().guidingPrinciple(),
-              category,
-              documentationUnit.uuid());
-      case TENOR ->
-          checkCategoryByHTML(
-              documentationUnit.longTexts().tenor(), category, documentationUnit.uuid());
+          checkCategoryByHTML(decision.shortTexts().guidingPrinciple(), category, decision.uuid());
+      case TENOR -> checkCategoryByHTML(decision.longTexts().tenor(), category, decision.uuid());
       case OTHER_LONG_TEXT ->
-          checkCategoryByHTML(
-              documentationUnit.longTexts().otherLongText(), category, documentationUnit.uuid());
+          checkCategoryByHTML(decision.longTexts().otherLongText(), category, decision.uuid());
       case DISSENTING_OPINION ->
-          checkCategoryByHTML(
-              documentationUnit.longTexts().dissentingOpinion(),
-              category,
-              documentationUnit.uuid());
+          checkCategoryByHTML(decision.longTexts().dissentingOpinion(), category, decision.uuid());
       case OUTLINE ->
-          checkCategoryByHTML(
-              documentationUnit.longTexts().outline(), category, documentationUnit.uuid());
+          checkCategoryByHTML(decision.longTexts().outline(), category, decision.uuid());
     };
   }
 
@@ -158,18 +140,16 @@ public class TextCheckService {
   /**
    * Method to retrieve no index words and exports the ignore list for jDV publication
    *
-   * @param documentationUnit without noindex tags
+   * @param decision without noindex tags
    * @return object with noindex tags on long and short texts
    */
-  public DocumentationUnit addNoIndexTagsForHandOver(DocumentationUnit documentationUnit) {
+  public Decision addNoIndexTagsForHandOver(Decision decision) {
     if (!featureToggleService.isEnabled("neuris.text-check-noindex-handover")) {
-      return documentationUnit;
+      return decision;
     }
 
     List<String> ignoredTextCheckWords =
-        ignoredTextCheckWordRepository
-            .findAllByDocumentationUnitId(documentationUnit.uuid())
-            .stream()
+        ignoredTextCheckWordRepository.findAllByDocumentationUnitId(decision.uuid()).stream()
             .map(IgnoredTextCheckWord::word)
             .sorted(
                 (s1, s2) ->
@@ -177,24 +157,24 @@ public class TextCheckService {
             .toList();
 
     if (ignoredTextCheckWords.isEmpty()) {
-      return documentationUnit;
+      return decision;
     }
 
-    if (documentationUnit.longTexts() != null) {
-      documentationUnit =
-          documentationUnit.toBuilder()
-              .longTexts(updateLongTexts(documentationUnit.longTexts(), ignoredTextCheckWords))
+    if (decision.longTexts() != null) {
+      decision =
+          decision.toBuilder()
+              .longTexts(updateLongTexts(decision.longTexts(), ignoredTextCheckWords))
               .build();
     }
 
-    if (documentationUnit.shortTexts() != null) {
-      documentationUnit =
-          documentationUnit.toBuilder()
-              .shortTexts(updateShortTexts(documentationUnit.shortTexts(), ignoredTextCheckWords))
+    if (decision.shortTexts() != null) {
+      decision =
+          decision.toBuilder()
+              .shortTexts(updateShortTexts(decision.shortTexts(), ignoredTextCheckWords))
               .build();
     }
 
-    return documentationUnit;
+    return decision;
   }
 
   private LongTexts updateLongTexts(LongTexts texts, List<String> ignoredWords) {

@@ -8,8 +8,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
@@ -114,8 +114,7 @@ public class FmxImportService implements TransformationService {
     xPath = XPathFactory.newInstance().newXPath();
   }
 
-  public void getDataFromEurlex(
-      String celexNumber, DocumentationUnit documentationUnit, User user) {
+  public void getDataFromEurlex(String celexNumber, Decision decision, User user) {
     Optional<EurLexResultDTO> eurLexResultDTO =
         eurLexResultRepository.findByCelexNumber(celexNumber);
     if (eurLexResultDTO.isEmpty()) {
@@ -126,8 +125,8 @@ public class FmxImportService implements TransformationService {
     String fmxFileContent = eurlexRetrievalService.requestSingleEurlexDocument(sourceUrl);
 
     if (Strings.isNotBlank(fmxFileContent)) {
-      attachFmxToDocumentationUnit(documentationUnit.uuid(), fmxFileContent, sourceUrl);
-      extractMetaDataFromFmx(fmxFileContent, documentationUnit, user);
+      attachFmxToDocumentationUnit(decision.uuid(), fmxFileContent, sourceUrl);
+      extractMetaDataFromFmx(fmxFileContent, decision, user);
     } else {
       throw new FmxImporterException("FMX file has no content.");
     }
@@ -150,8 +149,7 @@ public class FmxImportService implements TransformationService {
     attachmentRepository.save(attachmentDTO);
   }
 
-  private void extractMetaDataFromFmx(
-      String fileContent, DocumentationUnit documentationUnit, User user) {
+  private void extractMetaDataFromFmx(String fileContent, Decision decision, User user) {
     xsltTransformer = initialiseXsltTransformer();
     try {
       final Document doc = parseFmx(fileContent);
@@ -172,9 +170,9 @@ public class FmxImportService implements TransformationService {
       Node finalNode = (Node) xPath.compile(FINAL_XPATH).evaluate(doc, XPathConstants.NODE);
       Node note = (Node) xPath.compile(NOTE_XPATH).evaluate(doc, XPathConstants.NODE);
 
-      CoreData.CoreDataBuilder coreDataBuilder = documentationUnit.coreData().toBuilder();
-      LongTexts.LongTextsBuilder longTextsBuilder = documentationUnit.longTexts().toBuilder();
-      ShortTexts.ShortTextsBuilder shortTextsBuilder = documentationUnit.shortTexts().toBuilder();
+      CoreData.CoreDataBuilder coreDataBuilder = decision.coreData().toBuilder();
+      LongTexts.LongTextsBuilder longTextsBuilder = decision.longTexts().toBuilder();
+      ShortTexts.ShortTextsBuilder shortTextsBuilder = decision.shortTexts().toBuilder();
 
       coreDataBuilder.source(Source.builder().value(SourceValue.L).build());
       CoreData coreData =
@@ -196,8 +194,8 @@ public class FmxImportService implements TransformationService {
         shortTextsBuilder.headnote("CELEX Nummer: " + celex);
       }
 
-      DocumentationUnit updatedDocumentationUnit =
-          documentationUnit.toBuilder()
+      Decision updatedDecision =
+          decision.toBuilder()
               .inboxStatus(InboxStatus.EU)
               .coreData(coreData)
               .longTexts(longTexts)
@@ -205,10 +203,10 @@ public class FmxImportService implements TransformationService {
               .build();
 
       documentationUnitRepository.save(
-          updatedDocumentationUnit,
+          updatedDecision,
           user,
           "EU-Entscheidung angelegt für "
-              + documentationUnit.coreData().documentationOffice().abbreviation());
+              + decision.coreData().documentationOffice().abbreviation());
     } catch (XPathExpressionException exception) {
       throw new FmxImporterException("Failed to extract data from FMX file.", exception);
     }

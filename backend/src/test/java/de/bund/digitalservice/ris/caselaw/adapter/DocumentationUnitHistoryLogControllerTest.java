@@ -16,8 +16,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
@@ -80,7 +80,7 @@ class DocumentationUnitHistoryLogControllerTest {
     doReturn(true).when(userService).isInternal(any());
     when(docUnitService.getByUuid(TEST_UUID))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .build());
   }

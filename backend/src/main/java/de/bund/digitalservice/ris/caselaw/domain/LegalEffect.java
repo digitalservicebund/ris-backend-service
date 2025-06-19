@@ -46,16 +46,15 @@ public enum LegalEffect {
     return label;
   }
 
-  public static LegalEffect deriveFrom(
-      DocumentationUnit documentationUnit, boolean courtHasChanged) {
-    if (documentationUnit == null
-        || documentationUnit.coreData() == null
-        || documentationUnit.coreData().legalEffect() == null) {
+  public static LegalEffect deriveFrom(Decision decision, boolean courtHasChanged) {
+    if (decision == null
+        || decision.coreData() == null
+        || decision.coreData().legalEffect() == null) {
       return null;
     }
 
-    return deriveFrom(documentationUnit.coreData().court(), courtHasChanged)
-        .orElse(of(documentationUnit.coreData().legalEffect()));
+    return deriveFrom(decision.coreData().court(), courtHasChanged)
+        .orElse(of(decision.coreData().legalEffect()));
   }
 
   public static Optional<LegalEffect> deriveFrom(Court court, boolean courtHasChanged) {

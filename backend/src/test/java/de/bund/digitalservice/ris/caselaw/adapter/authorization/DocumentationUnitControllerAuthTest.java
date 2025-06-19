@@ -21,8 +21,8 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
@@ -191,7 +191,7 @@ class DocumentationUnitControllerAuthTest {
 
   @Test
   void testUpdateByUuid() throws DocumentationUnitNotExistsException {
-    DocumentationUnit docUnit = mockDocumentationUnit(docOffice2, null, null);
+    Decision docUnit = mockDocumentationUnit(docOffice2, null, null);
     when(service.updateDocumentationUnit(docUnit)).thenReturn(null);
     when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
 
@@ -323,12 +323,12 @@ class DocumentationUnitControllerAuthTest {
         .isForbidden();
   }
 
-  private DocumentationUnit mockDocumentationUnit(
+  private Decision mockDocumentationUnit(
       DocumentationOffice docOffice, String s3path, Status status)
       throws DocumentationUnitNotExistsException {
 
-    DocumentationUnit docUnit =
-        DocumentationUnit.builder()
+    Decision docUnit =
+        Decision.builder()
             .uuid(TEST_UUID)
             .status(status == null ? Status.builder().publicationStatus(PUBLISHED).build() : status)
             .attachments(Collections.singletonList(Attachment.builder().s3path(s3path).build()))

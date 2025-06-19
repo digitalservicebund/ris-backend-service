@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
@@ -26,16 +26,15 @@ public class JurisXmlExporterWrapper implements XmlExporter {
   /**
    * Generates juris XML from a documentation unit.
    *
-   * @param documentationUnit the documentation unit
+   * @param decision the documentation unit
    * @return the XML export result that may be unsuccessful and may contain error messages
    * @throws ParserConfigurationException if the XML generation fails due to a configuration error
    * @throws TransformerException if the XML generation fails due to failed transformation
    */
   @Override
-  public XmlTransformationResult transformToXml(
-      DocumentationUnit documentationUnit, boolean prettyPrint)
+  public XmlTransformationResult transformToXml(Decision decision, boolean prettyPrint)
       throws ParserConfigurationException, TransformerException {
-    ResultObject resultObject = jurisXmlExporter.generateXml(documentationUnit, true, prettyPrint);
+    ResultObject resultObject = jurisXmlExporter.generateXml(decision, true, prettyPrint);
     return new XmlTransformationResult(
         resultObject.xml(),
         resultObject.status().statusCode().equals("200"),
@@ -45,11 +44,10 @@ public class JurisXmlExporterWrapper implements XmlExporter {
   }
 
   @Override
-  public String generateEncryptedXMLString(DocumentationUnit documentationUnit)
-      throws XmlExporterException {
+  public String generateEncryptedXMLString(Decision decision) throws XmlExporterException {
     String resultObject;
     try {
-      resultObject = jurisXmlExporter.generateEncryptedXMLString(documentationUnit);
+      resultObject = jurisXmlExporter.generateEncryptedXMLString(decision);
     } catch (Exception e) {
       throw new XmlExporterException("Failed to generate encrypted XML string", e);
     }
@@ -72,7 +70,7 @@ public class JurisXmlExporterWrapper implements XmlExporter {
     for (Reference reference : edition.references()) {
       ResultObject resultObject =
           jurisXmlExporter.generateXml(
-              DocumentationUnit.builder()
+              Decision.builder()
                   .documentNumber(reference.documentationUnit().getDocumentNumber())
                   .caselawReferences(List.of(reference))
                   .build(),

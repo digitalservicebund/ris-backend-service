@@ -39,9 +39,9 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -161,7 +161,7 @@ class LegalForceIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().norms()).hasSize(1);
@@ -188,7 +188,7 @@ class LegalForceIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().norms()).hasSize(1);
@@ -226,8 +226,8 @@ class LegalForceIntegrationTest {
                 .findById(UUID.fromString("55555555-2222-3333-4444-555555555555"))
                 .get());
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -255,11 +255,11 @@ class LegalForceIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(
@@ -289,8 +289,8 @@ class LegalForceIntegrationTest {
                 .findById(UUID.fromString("55555555-2222-3333-4444-555555555555"))
                 .get());
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -317,7 +317,7 @@ class LegalForceIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .is5xxServerError();
@@ -346,8 +346,8 @@ class LegalForceIntegrationTest {
 
     LegalForce legalForce = LegalForce.builder().region(region).type(legalForceType).build();
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -371,11 +371,11 @@ class LegalForceIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(
@@ -406,8 +406,8 @@ class LegalForceIntegrationTest {
                 .findById(UUID.fromString("33333333-2222-3333-4444-555555555555"))
                 .get());
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -427,11 +427,11 @@ class LegalForceIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(
@@ -471,8 +471,8 @@ class LegalForceIntegrationTest {
 
     LegalForce legalForce = LegalForce.builder().type(legalForceType).build();
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -496,11 +496,11 @@ class LegalForceIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(
@@ -545,8 +545,8 @@ class LegalForceIntegrationTest {
 
     LegalForce legalForce = LegalForce.builder().region(region).build();
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -570,11 +570,11 @@ class LegalForceIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(

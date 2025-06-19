@@ -52,7 +52,7 @@ public class ScheduledPublicationService {
     }
   }
 
-  private void handoverDocument(DocumentationUnit docUnit) {
+  private void handoverDocument(Decision docUnit) {
     try {
       String email = docUnit.managementData().scheduledByEmail();
       var result =
@@ -70,7 +70,7 @@ public class ScheduledPublicationService {
     }
   }
 
-  private void informUserAboutErrorViaMail(DocumentationUnit docUnit, Exception error) {
+  private void informUserAboutErrorViaMail(Decision docUnit, Exception error) {
     try {
       var docNumber = docUnit.documentNumber();
       String email = docUnit.managementData().scheduledByEmail();
@@ -88,7 +88,7 @@ Technischer Fehler: %s""")
     }
   }
 
-  private void savePublicationDates(DocumentationUnit docUnit) {
+  private void savePublicationDates(Decision docUnit) {
     try {
       var updatedDocUnit = setPublicationDates(docUnit);
       docUnitRepository.save(updatedDocUnit);
@@ -98,7 +98,7 @@ Technischer Fehler: %s""")
     }
   }
 
-  private DocumentationUnit setPublicationDates(DocumentationUnit docUnit) {
+  private Decision setPublicationDates(Decision docUnit) {
     return docUnit.toBuilder()
         .managementData(
             docUnit.managementData().toBuilder()

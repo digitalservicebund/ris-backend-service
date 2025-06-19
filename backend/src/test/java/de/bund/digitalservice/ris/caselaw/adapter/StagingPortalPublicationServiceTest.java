@@ -21,7 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
@@ -50,7 +50,7 @@ class StagingPortalPublicationServiceTest {
   @MockitoBean private ObjectMapper objectMapper;
   @MockitoBean private PortalTransformer portalTransformer;
 
-  private static DocumentationUnit testDocumentUnit;
+  private static Decision testDocumentUnit;
   private static CaseLawLdml testLdml;
 
   private StagingPortalPublicationService subject;
@@ -70,7 +70,7 @@ class StagingPortalPublicationServiceTest {
 
     UUID testUUID = UUID.randomUUID();
     testDocumentUnit =
-        DocumentationUnit.builder()
+        Decision.builder()
             .uuid(testUUID)
             .coreData(
                 CoreData.builder()

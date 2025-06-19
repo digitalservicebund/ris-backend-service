@@ -61,7 +61,7 @@ class TextCheckServiceTest {
 
     when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .longTexts(
                     LongTexts.builder()
                         .reasons("<p>Reason text</p>")
@@ -88,9 +88,9 @@ class TextCheckServiceTest {
   void testCheckWholeDocumentationUnit_invalidDocumentableType()
       throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
-    Documentable documentable = mock(Documentable.class);
+    DocumentationUnit documentationUnit = mock(DocumentationUnit.class);
 
-    when(documentationUnitRepository.findByUuid(uuid)).thenReturn(documentable);
+    when(documentationUnitRepository.findByUuid(uuid)).thenReturn(documentationUnit);
 
     var exception =
         assertThrows(
@@ -108,7 +108,7 @@ class TextCheckServiceTest {
 
     when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .longTexts(
                     LongTexts.builder()
                         .reasons("<p>Reason text</p>")
@@ -144,7 +144,7 @@ class TextCheckServiceTest {
 
     when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .longTexts(
                     LongTexts.builder()
                         .reasons("<p>Reason text</p>")
@@ -177,7 +177,7 @@ class TextCheckServiceTest {
     UUID uuid = UUID.randomUUID();
     when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .coreData(
                     CoreData.builder()
                         .documentationOffice(
@@ -195,7 +195,7 @@ class TextCheckServiceTest {
 
     when(documentationUnitRepository.findByUuid(uuid))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .coreData(
                     CoreData.builder()
                         .documentationOffice(
@@ -474,7 +474,7 @@ class TextCheckServiceTest {
     var ignoredWord =
         new IgnoredTextCheckWord(UUID.randomUUID(), IgnoredTextCheckType.GLOBAL, "text");
     var docUnit =
-        DocumentationUnit.builder()
+        Decision.builder()
             .uuid(uuid)
             .longTexts(
                 LongTexts.builder()

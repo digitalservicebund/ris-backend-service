@@ -27,7 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -65,9 +65,9 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
     this.documentBuilderFactory = documentBuilderFactory;
   }
 
-  public CaseLawLdml transformToLdml(DocumentationUnit documentationUnit) {
+  public CaseLawLdml transformToLdml(Decision decision) {
     try {
-      return CaseLawLdml.builder().judgment(buildJudgment(documentationUnit)).build();
+      return CaseLawLdml.builder().judgment(buildJudgment(decision)).build();
     } catch (ValidationException e) {
       if (e.getMessage().contains("Empty judgment body")) {
         throw new LdmlTransformationException("Missing judgment body.", e);
@@ -76,17 +76,17 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
     }
   }
 
-  private Judgment buildJudgment(DocumentationUnit documentationUnit) throws ValidationException {
+  private Judgment buildJudgment(Decision decision) throws ValidationException {
     return Judgment.builder()
-        .header(buildHeader(documentationUnit))
-        .meta(buildMeta(documentationUnit))
-        .judgmentBody(buildJudgmentBody(documentationUnit))
+        .header(buildHeader(decision))
+        .meta(buildMeta(decision))
+        .judgmentBody(buildJudgmentBody(decision))
         .build();
   }
 
-  private JaxbHtml buildHeader(DocumentationUnit documentationUnit) throws ValidationException {
-    validateCoreData(documentationUnit);
-    var coreData = documentationUnit.coreData();
+  private JaxbHtml buildHeader(Decision decision) throws ValidationException {
+    validateCoreData(decision);
+    var coreData = decision.coreData();
     String fallbackTitle =
         "<p>"
             + coreData.court().label()
@@ -97,29 +97,28 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
             + "</p>";
     String title =
         ObjectUtils.defaultIfNull(
-            nullSafeGet(documentationUnit.shortTexts(), ShortTexts::headline), fallbackTitle);
+            nullSafeGet(decision.shortTexts(), ShortTexts::headline), fallbackTitle);
 
     validateNotNull(title, "Title missing");
     return JaxbHtml.build(htmlStringToObjectList(title));
   }
 
-  protected abstract Meta buildMeta(DocumentationUnit documentationUnit) throws ValidationException;
+  protected abstract Meta buildMeta(Decision decision) throws ValidationException;
 
-  protected abstract AknMultipleBlock buildIntroduction(DocumentationUnit documentationUnit);
+  protected abstract AknMultipleBlock buildIntroduction(Decision decision);
 
-  protected RisMeta.RisMetaBuilder buildCommonRisMeta(DocumentationUnit documentationUnit) {
+  protected RisMeta.RisMetaBuilder buildCommonRisMeta(Decision decision) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
-    if (documentationUnit.previousDecisions() != null) {
+    if (decision.previousDecisions() != null) {
       applyIfNotEmpty(
-          buildRelatedDecisions(documentationUnit.previousDecisions()), builder::previousDecision);
+          buildRelatedDecisions(decision.previousDecisions()), builder::previousDecision);
     }
-    if (documentationUnit.ensuingDecisions() != null) {
-      applyIfNotEmpty(
-          buildRelatedDecisions(documentationUnit.ensuingDecisions()), builder::ensuingDecision);
+    if (decision.ensuingDecisions() != null) {
+      applyIfNotEmpty(buildRelatedDecisions(decision.ensuingDecisions()), builder::ensuingDecision);
     }
 
-    var contentRelatedIndexing = documentationUnit.contentRelatedIndexing();
+    var contentRelatedIndexing = decision.contentRelatedIndexing();
     if (contentRelatedIndexing != null && contentRelatedIndexing.norms() != null) {
       applyIfNotEmpty(
           contentRelatedIndexing.norms().stream()
@@ -138,13 +137,12 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
     return builder;
   }
 
-  private JudgmentBody buildJudgmentBody(DocumentationUnit documentationUnit)
-      throws ValidationException {
+  private JudgmentBody buildJudgmentBody(Decision decision) throws ValidationException {
 
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
-    var shortTexts = documentationUnit.shortTexts();
-    var longTexts = documentationUnit.longTexts();
+    var shortTexts = decision.shortTexts();
+    var longTexts = decision.longTexts();
 
     builder
         // set guidingPrinciple/Leitsatz
@@ -153,14 +151,14 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
                 htmlStringToObjectList(nullSafeGet(shortTexts, ShortTexts::guidingPrinciple))))
         // set headnote/Orientierungssatz, "other headnote"/"Sonstiger Orientierungssatz",
         // Outline/Gliederung, Tenor/Tenor
-        .introduction(buildIntroduction(documentationUnit))
+        .introduction(buildIntroduction(decision))
         // set caseFacts/Tatbestand
         .background(
             JaxbHtml.build(htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::caseFacts))))
         // set decisionReasons/Entscheidungsgründe, reasons/Gründe, otherLongText/"Sonstiger,
         // dissentingOpinion/"Abweichende Meinung"
         // Langtext"
-        .decision(buildDecision(documentationUnit));
+        .decision(buildDecision(decision));
 
     var judgmentBody = builder.build();
 
@@ -174,8 +172,8 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
     return judgmentBody;
   }
 
-  private AknMultipleBlock buildDecision(DocumentationUnit documentationUnit) {
-    var longTexts = documentationUnit.longTexts();
+  private AknMultipleBlock buildDecision(Decision decision) {
+    var longTexts = decision.longTexts();
 
     var decisionReasons = nullSafeGet(longTexts, LongTexts::decisionReasons);
     var reasons = nullSafeGet(longTexts, LongTexts::reasons);
@@ -220,22 +218,20 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
     return previousDecision;
   }
 
-  protected Identification buildIdentification(DocumentationUnit documentationUnit)
-      throws ValidationException {
-    validateNotNull(documentationUnit.documentNumber(), "Unique identifier missing");
-    validateNotNull(documentationUnit.uuid(), "Caselaw UUID missing");
+  protected Identification buildIdentification(Decision decision) throws ValidationException {
+    validateNotNull(decision.documentNumber(), "Unique identifier missing");
+    validateNotNull(decision.uuid(), "Caselaw UUID missing");
     validateNotNull(
-        nullSafeGet(documentationUnit.coreData(), CoreData::decisionDate), "DecisionDate missing");
+        nullSafeGet(decision.coreData(), CoreData::decisionDate), "DecisionDate missing");
 
     // Case law handover: When we always have an ecli, use that instead for the uniqueId
-    String uniqueId = documentationUnit.documentNumber();
+    String uniqueId = decision.documentNumber();
     FrbrDate frbrDate =
         new FrbrDate(
-            DateUtils.toDateString(
-                nullSafeGet(documentationUnit.coreData(), CoreData::decisionDate)));
+            DateUtils.toDateString(nullSafeGet(decision.coreData(), CoreData::decisionDate)));
     FrbrAuthor frbrAuthor = new FrbrAuthor();
 
-    List<FrbrAlias> aliases = generateAliases(documentationUnit);
+    List<FrbrAlias> aliases = generateAliases(decision);
 
     FrbrElement work =
         FrbrElement.builder()
@@ -268,13 +264,13 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
         .build();
   }
 
-  protected List<FrbrAlias> generateAliases(DocumentationUnit documentationUnit) {
+  protected List<FrbrAlias> generateAliases(Decision decision) {
     List<FrbrAlias> aliases = new ArrayList<>();
 
-    aliases.add(new FrbrAlias("uebergreifende-id", documentationUnit.uuid().toString()));
+    aliases.add(new FrbrAlias("uebergreifende-id", decision.uuid().toString()));
 
-    if (documentationUnit.coreData() != null && documentationUnit.coreData().ecli() != null) {
-      aliases.add(new FrbrAlias("ecli", documentationUnit.coreData().ecli()));
+    if (decision.coreData() != null && decision.coreData().ecli() != null) {
+      aliases.add(new FrbrAlias("ecli", decision.coreData().ecli()));
     }
 
     return aliases;
@@ -318,16 +314,16 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
     }
   }
 
-  protected void validateCoreData(DocumentationUnit documentationUnit) throws ValidationException {
-    if (documentationUnit.coreData() != null) {
-      validateNotNull(documentationUnit.coreData().court(), "Court missing");
-      if (documentationUnit.coreData().court() != null) {
-        validateNotNull(documentationUnit.coreData().court().type(), "CourtType missing");
-        validateNotNull(documentationUnit.coreData().court().type(), "CourtLabel missing");
+  protected void validateCoreData(Decision decision) throws ValidationException {
+    if (decision.coreData() != null) {
+      validateNotNull(decision.coreData().court(), "Court missing");
+      if (decision.coreData().court() != null) {
+        validateNotNull(decision.coreData().court().type(), "CourtType missing");
+        validateNotNull(decision.coreData().court().type(), "CourtLabel missing");
       }
-      validateNotNull(documentationUnit.coreData().documentType(), "DocumentType missing");
-      validate(!documentationUnit.coreData().fileNumbers().isEmpty(), "FileNumber missing");
-      validateNotNull(documentationUnit.coreData().decisionDate(), "DecisionDate missing");
+      validateNotNull(decision.coreData().documentType(), "DocumentType missing");
+      validate(!decision.coreData().fileNumbers().isEmpty(), "FileNumber missing");
+      validateNotNull(decision.coreData().decisionDate(), "DecisionDate missing");
     } else {
       throw new ValidationException("Core data is null");
     }

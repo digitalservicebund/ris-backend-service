@@ -30,71 +30,66 @@ public class DocumentationUnitDocxMetadataInitializationService {
     this.documentTypeRepository = documentTypeRepository;
   }
 
-  public void initializeCoreData(
-      DocumentationUnit documentationUnit, Attachment2Html attachment2Html, User user) {
-    CoreData.CoreDataBuilder builder = documentationUnit.coreData().toBuilder();
+  public void initializeCoreData(Decision decision, Attachment2Html attachment2Html, User user) {
+    CoreData.CoreDataBuilder builder = decision.coreData().toBuilder();
     if (attachment2Html instanceof Docx2Html docx2html) {
 
-      initializeFieldsFromProperties(docx2html.properties(), documentationUnit, builder);
+      initializeFieldsFromProperties(docx2html.properties(), decision, builder);
 
       if (docx2html.ecliList().size() == 1) {
-        handleEcli(documentationUnit, builder, docx2html.ecliList().getFirst());
+        handleEcli(decision, builder, docx2html.ecliList().getFirst());
       }
     }
 
-    DocumentationUnit updatedDocumentationUnit =
-        documentationUnit.toBuilder().coreData(builder.build()).build();
-    repository.saveProcedures(updatedDocumentationUnit, user);
+    Decision updatedDecision = decision.toBuilder().coreData(builder.build()).build();
+    repository.saveProcedures(updatedDecision, user);
     // save new court first to avoid override of legal effect
     repository.save(
-        documentationUnit.toBuilder()
-            .coreData(
-                documentationUnit.coreData().toBuilder().court(builder.build().court()).build())
+        decision.toBuilder()
+            .coreData(decision.coreData().toBuilder().court(builder.build().court()).build())
             .build(),
         user);
-    repository.save(updatedDocumentationUnit, user);
+    repository.save(updatedDecision, user);
   }
 
   private void initializeFieldsFromProperties(
       Map<DocxMetadataProperty, String> properties,
-      DocumentationUnit documentationUnit,
+      Decision decision,
       CoreData.CoreDataBuilder builder) {
 
     properties.forEach(
         (key, value) -> {
           switch (key) {
-            case FILE_NUMBER -> handleFileNumber(documentationUnit, builder, value);
-            case DECISION_DATE -> handleDecisionDate(documentationUnit, builder, value);
-            case COURT_TYPE, COURT_LOCATION, COURT ->
-                handleCourt(properties, documentationUnit, builder);
-            case APPRAISAL_BODY -> handleAppraisalBody(documentationUnit, builder, value);
-            case DOCUMENT_TYPE -> handleDocumentType(documentationUnit, builder, value);
-            case ECLI -> handleEcli(documentationUnit, builder, value);
-            case PROCEDURE -> handleProcedure(documentationUnit, builder, value);
-            case LEGAL_EFFECT -> handleLegalEffect(documentationUnit, builder, value);
+            case FILE_NUMBER -> handleFileNumber(decision, builder, value);
+            case DECISION_DATE -> handleDecisionDate(decision, builder, value);
+            case COURT_TYPE, COURT_LOCATION, COURT -> handleCourt(properties, decision, builder);
+            case APPRAISAL_BODY -> handleAppraisalBody(decision, builder, value);
+            case DOCUMENT_TYPE -> handleDocumentType(decision, builder, value);
+            case ECLI -> handleEcli(decision, builder, value);
+            case PROCEDURE -> handleProcedure(decision, builder, value);
+            case LEGAL_EFFECT -> handleLegalEffect(decision, builder, value);
           }
         });
   }
 
-  private void handleFileNumber(
-      DocumentationUnit documentationUnit, CoreData.CoreDataBuilder builder, String value) {
-    if (documentationUnit.coreData().fileNumbers().isEmpty()) {
+  private void handleFileNumber(Decision decision, CoreData.CoreDataBuilder builder, String value) {
+    if (decision.coreData().fileNumbers().isEmpty()) {
       builder.fileNumbers(Collections.singletonList(value));
     }
   }
 
   private void handleDecisionDate(
-      DocumentationUnit documentationUnit, CoreData.CoreDataBuilder builder, String value) {
-    if (documentationUnit.coreData().decisionDate() == null) {
+      Decision decision, CoreData.CoreDataBuilder builder, String value) {
+    if (decision.coreData().decisionDate() == null) {
       builder.decisionDate(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
   }
 
   private void handleCourt(
       Map<DocxMetadataProperty, String> properties,
-      DocumentationUnit documentationUnit,
+      Decision decision,
       CoreData.CoreDataBuilder builder) {
-    if (documentationUnit.coreData().court() == null && builder.build().court() == null) {
+    if (decision.coreData().court() == null && builder.build().court() == null) {
       String courtTypeProperty = properties.get(DocxMetadataProperty.COURT_TYPE);
       String courtLocationProperty = properties.get(DocxMetadataProperty.COURT_LOCATION);
       String courtProperty = properties.get(DocxMetadataProperty.COURT);
@@ -112,42 +107,37 @@ public class DocumentationUnitDocxMetadataInitializationService {
   }
 
   private void handleAppraisalBody(
-      DocumentationUnit documentationUnit, CoreData.CoreDataBuilder builder, String value) {
-    if (documentationUnit.coreData().appraisalBody() == null) {
+      Decision decision, CoreData.CoreDataBuilder builder, String value) {
+    if (decision.coreData().appraisalBody() == null) {
       builder.appraisalBody(value);
     }
   }
 
   private void handleDocumentType(
-      DocumentationUnit documentationUnit, CoreData.CoreDataBuilder builder, String value) {
-    if (documentationUnit.coreData().documentType() == null) {
+      Decision decision, CoreData.CoreDataBuilder builder, String value) {
+    if (decision.coreData().documentType() == null) {
       Optional<DocumentType> documentType =
           documentTypeRepository.findUniqueCaselawBySearchStr(value);
       builder.documentType(documentType.orElse(null));
     }
   }
 
-  private void handleEcli(
-      DocumentationUnit documentationUnit, CoreData.CoreDataBuilder builder, String value) {
-    if (documentationUnit.coreData().ecli() == null && builder.build().ecli() == null) {
+  private void handleEcli(Decision decision, CoreData.CoreDataBuilder builder, String value) {
+    if (decision.coreData().ecli() == null && builder.build().ecli() == null) {
       builder.ecli(value);
     }
   }
 
-  private void handleProcedure(
-      DocumentationUnit documentationUnit, CoreData.CoreDataBuilder builder, String value) {
-    if (documentationUnit.coreData().procedure() == null) {
+  private void handleProcedure(Decision decision, CoreData.CoreDataBuilder builder, String value) {
+    if (decision.coreData().procedure() == null) {
       builder.procedure(Procedure.builder().label(value).build());
     }
   }
 
   private void handleLegalEffect(
-      DocumentationUnit documentationUnit, CoreData.CoreDataBuilder builder, String value) {
-    if (documentationUnit.coreData().legalEffect() == null
-        || documentationUnit
-            .coreData()
-            .legalEffect()
-            .equals(LegalEffect.NOT_SPECIFIED.getLabel())) {
+      Decision decision, CoreData.CoreDataBuilder builder, String value) {
+    if (decision.coreData().legalEffect() == null
+        || decision.coreData().legalEffect().equals(LegalEffect.NOT_SPECIFIED.getLabel())) {
       builder.legalEffect(value);
     }
   }

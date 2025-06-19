@@ -6,7 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
-import de.bund.digitalservice.ris.caselaw.domain.Documentable;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -54,13 +54,14 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
    */
   public void publishDocumentationUnitWithChangelog(UUID documentationUnitId)
       throws DocumentationUnitNotExistsException {
-    Documentable documentable = documentationUnitRepository.findByUuid(documentationUnitId);
-    publishToBucket(documentable);
+    DocumentationUnit documentationUnit =
+        documentationUnitRepository.findByUuid(documentationUnitId);
+    publishToBucket(documentationUnit);
     try {
-      uploadChangelog(List.of(documentable.documentNumber() + ".xml"), null);
+      uploadChangelog(List.of(documentationUnit.documentNumber() + ".xml"), null);
     } catch (Exception e) {
       log.error("Could not upload changelog file.");
-      deleteDocumentationUnit(documentable.documentNumber());
+      deleteDocumentationUnit(documentationUnit.documentNumber());
       throw new PublishException("Could not save changelog to bucket.", e);
     }
   }
@@ -78,16 +79,17 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
    */
   public void publishDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
-    Documentable documentable = documentationUnitRepository.findByDocumentNumber(documentNumber);
-    publishToBucket(documentable);
+    DocumentationUnit documentationUnit =
+        documentationUnitRepository.findByDocumentNumber(documentNumber);
+    publishToBucket(documentationUnit);
   }
 
-  private void publishToBucket(Documentable documentable) {
-    if (!(documentable instanceof DocumentationUnit documentationUnit)) {
+  private void publishToBucket(DocumentationUnit documentationUnit) {
+    if (!(documentationUnit instanceof Decision decision)) {
       // for now pending proceedings can not be transformed to LDML, so they are ignored.
       return;
     }
-    CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
+    CaseLawLdml ldml = ldmlTransformer.transformToLdml(decision);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);

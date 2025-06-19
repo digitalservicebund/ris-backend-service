@@ -138,10 +138,10 @@ class ScheduledPublicationServiceTest {
         .thenReturn(result);
   }
 
-  private DocumentationUnit createDocUnit(
+  private Decision createDocUnit(
       LocalDateTime lastPublicationDateTime, LocalDateTime scheduledPublicationDateTime) {
     String randomName = RandomStringGenerator.builder().selectFrom('a', 'b', 'c').get().generate(5);
-    return DocumentationUnit.builder()
+    return Decision.builder()
         .uuid(UUID.randomUUID())
         .documentNumber("KORE12345" + randomName)
         .managementData(
@@ -155,7 +155,7 @@ class ScheduledPublicationServiceTest {
         .build();
   }
 
-  private void verifyPublicationAndDocUnitUpdate(DocumentationUnit docUnit)
+  private void verifyPublicationAndDocUnitUpdate(Decision docUnit)
       throws DocumentationUnitNotExistsException {
     verify(handoverService, times(1))
         .handoverDocumentationUnitAsMail(
@@ -164,11 +164,11 @@ class ScheduledPublicationServiceTest {
         .save(
             argThat(
                 updatedDocUnit ->
-                    werePublicationDatesSet((DocumentationUnit) updatedDocUnit)
-                        && areAllOtherFieldsEqual(docUnit, (DocumentationUnit) updatedDocUnit)));
+                    werePublicationDatesSet((Decision) updatedDocUnit)
+                        && areAllOtherFieldsEqual(docUnit, (Decision) updatedDocUnit)));
   }
 
-  private boolean werePublicationDatesSet(DocumentationUnit actualDocUnit) {
+  private boolean werePublicationDatesSet(Decision actualDocUnit) {
     boolean wasPublishedWithin5Seconds =
         Duration.between(
                     LocalDateTime.now(), actualDocUnit.managementData().lastPublicationDateTime())
@@ -180,8 +180,7 @@ class ScheduledPublicationServiceTest {
     return schedulingWasUnset && wasPublishedWithin5Seconds;
   }
 
-  private boolean areAllOtherFieldsEqual(
-      DocumentationUnit expectedDocUnit, DocumentationUnit actualDocUnit) {
+  private boolean areAllOtherFieldsEqual(Decision expectedDocUnit, Decision actualDocUnit) {
     return expectedDocUnit.toBuilder()
         .managementData(
             expectedDocUnit.managementData().toBuilder()
@@ -199,7 +198,7 @@ class ScheduledPublicationServiceTest {
                 .build());
   }
 
-  private void verifyEmailErrorNotification(DocumentationUnit docUnit) {
+  private void verifyEmailErrorNotification(Decision docUnit) {
     verify(httpMailSender, times(1))
         .sendMail(
             any(),

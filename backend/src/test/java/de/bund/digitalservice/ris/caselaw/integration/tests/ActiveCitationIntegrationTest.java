@@ -36,8 +36,8 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -151,7 +151,7 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -167,7 +167,7 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -202,14 +202,14 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
                     .hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -256,11 +256,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -290,7 +290,7 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -322,8 +322,8 @@ class ActiveCitationIntegrationTest {
                   .isEqualTo(activeCitationUUID1);
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -355,11 +355,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -403,14 +403,14 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
                     .hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -443,11 +443,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -463,14 +463,14 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
                     .hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -496,11 +496,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -516,14 +516,14 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
                     .hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -546,11 +546,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -566,14 +566,14 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
                     .hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -588,11 +588,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -608,15 +608,15 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
                     .hasSize(2));
     UUID uuid = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -651,11 +651,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -701,7 +701,7 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -725,8 +725,8 @@ class ActiveCitationIntegrationTest {
                   .isEqualTo(UUID.fromString("96301f85-9bd2-4690-a67f-f9fdfe725de3"));
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -757,11 +757,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -789,7 +789,7 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -832,8 +832,8 @@ class ActiveCitationIntegrationTest {
                   .isEqualTo("Nichtanwendung");
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -858,11 +858,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -890,7 +890,7 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -906,8 +906,8 @@ class ActiveCitationIntegrationTest {
                   .isEqualTo("Beschluss");
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -932,11 +932,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -964,7 +964,7 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -979,8 +979,8 @@ class ActiveCitationIntegrationTest {
                   .isEqualTo("abc");
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -1005,11 +1005,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -1037,7 +1037,7 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -1052,8 +1052,8 @@ class ActiveCitationIntegrationTest {
                   .isEqualTo("2011-01-21");
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -1078,11 +1078,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -1108,7 +1108,7 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -1134,8 +1134,8 @@ class ActiveCitationIntegrationTest {
 
   @Test
   void testUpdateDocumentationUnit_addLinkedActiveCitation() {
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -1150,11 +1150,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
@@ -1179,14 +1179,14 @@ class ActiveCitationIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
                     .hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -1209,11 +1209,11 @@ class ActiveCitationIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())

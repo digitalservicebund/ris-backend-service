@@ -50,10 +50,10 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -270,7 +270,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(DocumentationUnit.class)
+            .expectBody(Decision.class)
             .returnResult()
             .getResponseBody();
 
@@ -311,7 +311,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(DocumentationUnit.class)
+            .expectBody(Decision.class)
             .returnResult()
             .getResponseBody();
 
@@ -554,7 +554,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(DocumentationUnit.class)
+            .expectBody(Decision.class)
             .returnResult()
             .getResponseBody();
 
@@ -612,7 +612,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(DocumentationUnit.class)
+            .expectBody(Decision.class)
             .returnResult()
             .getResponseBody();
 

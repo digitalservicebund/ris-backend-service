@@ -32,7 +32,7 @@ class DocumentationUnitHistoryLogServiceTest {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    Decision decision = Decision.builder().build();
 
     HistoryLog log1 =
         HistoryLog.builder()
@@ -42,14 +42,13 @@ class DocumentationUnitHistoryLogServiceTest {
             .createdBy("mock-user")
             .build();
 
-    when(repository.findByDocumentationUnitId(documentationUnit.uuid(), user))
-        .thenReturn(List.of(log1));
+    when(repository.findByDocumentationUnitId(decision.uuid(), user)).thenReturn(List.of(log1));
 
-    List<HistoryLog> result = service.getHistoryLogs(documentationUnit.uuid(), user);
+    List<HistoryLog> result = service.getHistoryLogs(decision.uuid(), user);
 
     assertThat(result).hasSize(1).containsExactly(log1);
 
-    verify(repository).findByDocumentationUnitId(documentationUnit.uuid(), user);
+    verify(repository).findByDocumentationUnitId(decision.uuid(), user);
   }
 
   @Test
@@ -57,15 +56,13 @@ class DocumentationUnitHistoryLogServiceTest {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    Decision decision = Decision.builder().build();
 
-    service.saveHistoryLog(
-        documentationUnit.uuid(), user, HistoryLogEventType.STATUS, "Status geändert");
+    service.saveHistoryLog(decision.uuid(), user, HistoryLogEventType.STATUS, "Status geändert");
 
     verify(repository, never()).findUpdateLogForDuration(any(), any(), any(), any());
     verify(repository)
-        .saveHistoryLog(
-            null, documentationUnit.uuid(), user, HistoryLogEventType.STATUS, "Status geändert");
+        .saveHistoryLog(null, decision.uuid(), user, HistoryLogEventType.STATUS, "Status geändert");
   }
 
   @Test
@@ -73,16 +70,16 @@ class DocumentationUnitHistoryLogServiceTest {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    Decision decision = Decision.builder().build();
 
     when(repository.findUpdateLogForDuration(any(), any(), any(), any()))
         .thenReturn(Optional.empty());
 
-    service.saveHistoryLog(documentationUnit.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
+    service.saveHistoryLog(decision.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
 
     verify(repository, times(1)).findUpdateLogForDuration(any(), any(), any(), any());
     verify(repository)
-        .saveHistoryLog(null, documentationUnit.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
+        .saveHistoryLog(null, decision.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
   }
 
   @Test
@@ -90,7 +87,7 @@ class DocumentationUnitHistoryLogServiceTest {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder().id(UUID.randomUUID()).build();
     User user = User.builder().documentationOffice(documentationOffice).build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    Decision decision = Decision.builder().build();
 
     HistoryLog log =
         HistoryLog.builder()
@@ -102,14 +99,13 @@ class DocumentationUnitHistoryLogServiceTest {
             .build();
     var startOfDay = Instant.now().truncatedTo(ChronoUnit.DAYS);
     var endOfDay = startOfDay.plus(1, ChronoUnit.DAYS);
-    when(repository.findUpdateLogForDuration(documentationUnit.uuid(), user, startOfDay, endOfDay))
+    when(repository.findUpdateLogForDuration(decision.uuid(), user, startOfDay, endOfDay))
         .thenReturn(Optional.ofNullable(log));
 
-    service.saveHistoryLog(documentationUnit.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
+    service.saveHistoryLog(decision.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
 
     verify(repository, times(1)).findUpdateLogForDuration(any(), any(), any(), any());
     verify(repository)
-        .saveHistoryLog(
-            log.id(), documentationUnit.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
+        .saveHistoryLog(log.id(), decision.uuid(), user, HistoryLogEventType.UPDATE, "Edit");
   }
 }

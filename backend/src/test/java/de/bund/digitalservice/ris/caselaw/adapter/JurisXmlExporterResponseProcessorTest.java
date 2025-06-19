@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -106,7 +106,7 @@ class JurisXmlExporterResponseProcessorTest {
     when(reportRepository.saveAll(any())).thenReturn(Collections.emptyList());
 
     when(documentationUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
-        .thenReturn(DocumentationUnit.builder().uuid(DOCUMENT_UUID).build());
+        .thenReturn(Decision.builder().uuid(DOCUMENT_UUID).build());
 
     when(xmlHandoverRepository.getLastXmlHandoverMail(DOCUMENT_UUID))
         .thenReturn(HandoverMail.builder().issuerAddress("test@digitalservice.bund.de").build());

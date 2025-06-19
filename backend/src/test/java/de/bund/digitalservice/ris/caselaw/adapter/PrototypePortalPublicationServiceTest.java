@@ -24,7 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
@@ -55,7 +55,7 @@ class PrototypePortalPublicationServiceTest {
   @MockitoBean private PortalTransformer portalTransformer;
   @MockitoBean private RiiService riiService;
 
-  private static DocumentationUnit testDocumentUnit;
+  private static Decision testDocumentUnit;
   private static String testDocumentNumber;
   private static CaseLawLdml testLdml;
 
@@ -76,7 +76,7 @@ class PrototypePortalPublicationServiceTest {
 
     testDocumentNumber = "TEST123456789";
     testDocumentUnit =
-        DocumentationUnit.builder()
+        Decision.builder()
             .uuid(UUID.randomUUID())
             .coreData(
                 CoreData.builder()

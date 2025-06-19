@@ -7,8 +7,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -101,10 +101,10 @@ class ManagementDataTransformerTest {
       original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
 
       // Act
-      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+      Decision decision = DecisionTransformer.transformToDomain(original);
 
       // Assert
-      assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
+      assertThat(decision.managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -131,10 +131,10 @@ class ManagementDataTransformerTest {
       original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
 
       // Act
-      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+      Decision decision = DecisionTransformer.transformToDomain(original);
 
       // Assert
-      assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
+      assertThat(decision.managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -159,10 +159,10 @@ class ManagementDataTransformerTest {
       original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
 
       // Act
-      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+      Decision decision = DecisionTransformer.transformToDomain(original);
 
       // Assert
-      assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+      assertThat(decision.managementData().duplicateRelations()).hasSize(1);
     }
 
     @Test
@@ -189,12 +189,12 @@ class ManagementDataTransformerTest {
       original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
 
       // Act
-      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+      Decision decision = DecisionTransformer.transformToDomain(original);
 
       // Assert
-      assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+      assertThat(decision.managementData().duplicateRelations()).hasSize(1);
       assertThat(
-              documentationUnit.managementData().duplicateRelations().stream()
+              decision.managementData().duplicateRelations().stream()
                   .findFirst()
                   .get()
                   .documentNumber())
@@ -225,12 +225,12 @@ class ManagementDataTransformerTest {
       original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
 
       // Act
-      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+      Decision decision = DecisionTransformer.transformToDomain(original);
 
       // Assert
-      assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+      assertThat(decision.managementData().duplicateRelations()).hasSize(1);
       assertThat(
-              documentationUnit.managementData().duplicateRelations().stream()
+              decision.managementData().duplicateRelations().stream()
                   .findFirst()
                   .get()
                   .documentNumber())
@@ -298,10 +298,10 @@ class ManagementDataTransformerTest {
               .build();
 
       // Act
-      DocumentationUnit documentationUnit = DecisionTransformer.transformToDomain(original);
+      Decision decision = DecisionTransformer.transformToDomain(original);
 
       // Assert
-      var transformedRelations = documentationUnit.managementData().duplicateRelations();
+      var transformedRelations = decision.managementData().duplicateRelations();
       assertThat(transformedRelations).hasSize(5);
       assertThat(transformedRelations.stream().map(DuplicateRelation::documentNumber))
           .containsExactly("duplicate3", "duplicate4", "duplicate1", "duplicate05", "duplicate2");

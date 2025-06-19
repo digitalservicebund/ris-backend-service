@@ -5,11 +5,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 public interface XmlExporter {
-  XmlTransformationResult transformToXml(DocumentationUnit documentationUnit, boolean prettyPrint)
+  XmlTransformationResult transformToXml(Decision decision, boolean prettyPrint)
       throws ParserConfigurationException, TransformerException;
 
-  String generateEncryptedXMLString(DocumentationUnit documentationUnit)
-      throws XmlExporterException;
+  String generateEncryptedXMLString(Decision decision) throws XmlExporterException;
 
   List<XmlTransformationResult> transformToXml(LegalPeriodicalEdition edition)
       throws ParserConfigurationException, TransformerException;
