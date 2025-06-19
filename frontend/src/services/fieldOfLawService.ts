@@ -18,7 +18,9 @@ interface FieldOfLawService {
 
   getChildrenOf(identifier: string): Promise<ServiceResponse<FieldOfLaw[]>>
 
-  getTreeForIdentifier(identifier: string): Promise<ServiceResponse<FieldOfLaw>>
+  getParentAndChildrenForIdentifier(
+    identifier: string,
+  ): Promise<ServiceResponse<FieldOfLaw>>
 
   searchForFieldsOfLaw(
     page: number,
@@ -87,7 +89,8 @@ const service: FieldOfLawService = {
     }
     return response
   },
-  async getTreeForIdentifier(identifier: string) {
+
+  async getParentAndChildrenForIdentifier(identifier: string) {
     const response = await httpClient.get<FieldOfLaw>(
       `caselaw/fieldsoflaw/${identifier}/tree`,
     )
