@@ -7,7 +7,7 @@ import TextEditorButton, {
   EditorButton,
 } from "@/components/input/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
-import { longTextLabels } from "@/domain/documentUnit"
+import { longTextLabels } from "@/domain/decision"
 import IcSharpAddBox from "~icons/ic/sharp-add-box"
 import MaterialSymbolsDeleteSweepOutline from "~icons/ic/sharp-delete-sweep"
 import IconExpand from "~icons/ic/sharp-expand"

@@ -3,7 +3,7 @@ import TextEditor from "@/components/input/TextEditor.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { longTextLabels, LongTexts } from "@/domain/documentUnit"
+import { longTextLabels, LongTexts } from "@/domain/decision"
 
 defineProps<{
   longTexts: LongTexts

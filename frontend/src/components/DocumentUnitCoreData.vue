@@ -14,8 +14,10 @@ import NestedComponent from "@/components/NestedComponents.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
-import { CoreData, Kind, SourceValue } from "@/domain/documentUnit"
+import { CoreData } from "@/domain/coreData"
+import { Kind } from "@/domain/documentationUnitKind"
 import { pendingProceedingLabels } from "@/domain/pendingProceeding"
+import { SourceValue } from "@/domain/source"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 const props = defineProps<{

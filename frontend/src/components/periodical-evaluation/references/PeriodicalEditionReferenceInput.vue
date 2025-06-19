@@ -18,9 +18,7 @@ import SearchResultList, {
 import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
-import DocumentUnit, {
-  DocumentationUnitParameters,
-} from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -29,6 +27,7 @@ import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
+import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
 import StringsUtil from "@/utils/stringsUtil"
 
 const props = defineProps<{
@@ -98,7 +97,8 @@ const suffix = computed({
   },
 })
 
-const createDocumentationUnitParameters = ref<DocumentationUnitParameters>()
+const createDocumentationUnitParameters =
+  ref<DocumentationUnitCreationParameters>()
 
 function buildCitation(): string | undefined {
   if (StringsUtil.isEmpty(reference.value.citation)) {
@@ -212,7 +212,7 @@ async function addReference(decision: RelatedDocumentation) {
   }
 }
 
-async function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
+async function addReferenceWithCreatedDocumentationUnit(docUnit: Decision) {
   if (!docUnit) return
   await addReference(
     new RelatedDocumentation({

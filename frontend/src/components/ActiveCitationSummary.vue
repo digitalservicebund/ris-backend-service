@@ -7,7 +7,7 @@ import Tooltip from "./Tooltip.vue"
 import DocumentationUnitSummary from "@/components/DocumentationUnitSummary.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import ActiveCitation from "@/domain/activeCitation"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import IconBaselineContentCopy from "~icons/ic/baseline-content-copy"
@@ -19,8 +19,8 @@ const props = defineProps<{
 }>()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 const store = useDocumentUnitStore()
-const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+const { documentUnit: decision } = storeToRefs(store) as {
+  documentUnit: Ref<Decision | undefined>
 }
 
 const isParallelDecision = computed(
@@ -42,7 +42,7 @@ async function openCategoryImport(documentNumber?: string) {
 async function generateHeadnote() {
   const text = `${props.data.citationType?.label == "Teilweise Parallelentscheidung" ? "Teilweise " : ""}Parallelentscheidung zu der Entscheidung (${props.data.documentType?.label}) des ${props.data.court?.label} vom ${dayjs(props.data.decisionDate).format("DD.MM.YYYY")} - ${props.data.fileNumber}${props.data.citationType?.label == "Teilweise Parallelentscheidung" ? "." : ", welche vollständig dokumentiert ist."}`
 
-  documentUnit.value!.shortTexts.headnote = text
+  decision.value!.shortTexts.headnote = text
   await store.updateDocumentUnit()
   //scroll to headnote
   const element = document.getElementById(DocumentUnitCategoriesEnum.TEXTS)
@@ -77,7 +77,7 @@ async function generateHeadnote() {
       <Tooltip
         v-if="isParallelDecision"
         :text="
-          !!documentUnit!.shortTexts.headnote
+          !!decision!.shortTexts.headnote
             ? 'Zielrubrik Orientierungssatz bereits ausgefüllt'
             : 'O-Satz generieren'
         "
@@ -86,7 +86,7 @@ async function generateHeadnote() {
           id="generate-headnote"
           aria-label="O-Satz generieren"
           data-testid="generate-headnote"
-          :disabled="!!documentUnit!.shortTexts.headnote"
+          :disabled="!!decision!.shortTexts.headnote"
           size="small"
           text
           @click="generateHeadnote"
@@ -99,7 +99,7 @@ async function generateHeadnote() {
           id="category-import"
           aria-label="Rubriken-Import anzeigen"
           data-testid="copy-summary"
-          :disabled="!!documentUnit!.shortTexts.headnote"
+          :disabled="!!decision!.shortTexts.headnote"
           size="small"
           text
           @click="copySummary"

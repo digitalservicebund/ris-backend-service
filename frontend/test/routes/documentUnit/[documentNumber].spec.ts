@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createHead } from "@unhead/vue/client"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import categories from "@/routes/caselaw/documentUnit/[documentNumber]/categories.vue"
 import DocumentNumber from "@/routes/caselaw/documentUnit/[documentNumber].vue"
 import documentUnitService from "@/services/documentUnitService"
@@ -88,7 +88,7 @@ function renderComponent() {
               initialState: {
                 session: { user: { roles: ["Internal"] } },
                 docunitStore: {
-                  documentUnit: new DocumentUnit("foo", {
+                  documentUnit: new Decision("foo", {
                     documentNumber: "1234567891234",
                     coreData: {
                       court: {
@@ -121,7 +121,7 @@ describe("Document Number Route", () => {
       () =>
         Promise.resolve({
           status: 200,
-          data: new DocumentUnit("foo", {
+          data: new Decision("foo", {
             documentNumber: "1234567891234",
           }),
         }),
@@ -263,7 +263,7 @@ describe("Document Number Route", () => {
             status: 404,
             data: undefined,
             error: { title: "Backend_Error_Title" },
-          } as ServiceResponse<DocumentUnit>),
+          } as ServiceResponse<Decision>),
       )
 
       const { router } = renderComponent()

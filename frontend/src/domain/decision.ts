@@ -1,83 +1,22 @@
 import dayjs from "dayjs"
-import ActiveCitation from "./activeCitation"
-import DocumentationOffice from "./documentationOffice"
-import EnsuingDecision from "./ensuingDecision"
-import { FieldOfLaw } from "./fieldOfLaw"
-import NormReference from "./normReference"
-import PreviousDecision from "./previousDecision"
-import Reference from "./reference"
-import SingleNorm from "./singleNorm"
+import ActiveCitation from "@/domain/activeCitation"
 import Attachment from "@/domain/attachment"
-import { DocumentType } from "@/domain/documentType"
+import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
+import { CoreData } from "@/domain/coreData"
+import { Kind } from "@/domain/documentationUnitKind"
+import EnsuingDecision from "@/domain/ensuingDecision"
 import LegalForce from "@/domain/legalForce"
+import { ManagementData } from "@/domain/managementData"
+import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
-import { Procedure } from "@/domain/procedure"
-import { PublicationState, PublicationStatus } from "@/domain/publicationStatus"
-
-export type CoreData = {
-  fileNumbers?: string[]
-  deviatingFileNumbers?: string[]
-  court?: Court
-  deviatingCourts?: string[]
-  documentType?: DocumentType
-  procedure?: Procedure
-  previousProcedures?: string[]
-  ecli?: string
-  deviatingEclis?: string[]
-  appraisalBody?: string
-  decisionDate?: string
-  deviatingDecisionDates?: string[]
-  legalEffect?: string
-  inputTypes?: string[]
-  documentationOffice?: DocumentationOffice
-  creatingDocOffice?: DocumentationOffice
-  yearsOfDispute?: string[]
-  leadingDecisionNormReferences?: string[]
-  source?: Source
-  isResolved?: boolean
-  resolutionDate?: string
-}
-
-export enum SourceValue {
-  UnaufgefordertesOriginal = "O",
-  AngefordertesOriginal = "A",
-  Zeitschrift = "Z",
-  Email = "E",
-  LaenderEuGH = "L",
-  Sonstige = "S",
-}
-
-export type Source = {
-  value?: SourceValue
-  reference?: Reference
-  sourceRawValue?: string
-}
+import PreviousDecision from "@/domain/previousDecision"
+import { PublicationStatus } from "@/domain/publicationStatus"
+import Reference from "@/domain/reference"
+import SingleNorm from "@/domain/singleNorm"
 
 export enum InboxStatus {
   EXTERNAL_HANDOVER,
   EU,
-}
-
-export type ContentRelatedIndexing = {
-  collectiveAgreements?: string[]
-  dismissalTypes?: string[]
-  dismissalGrounds?: string[]
-  keywords?: string[]
-  norms?: NormReference[]
-  activeCitations?: ActiveCitation[]
-  fieldsOfLaw?: FieldOfLaw[]
-  jobProfiles?: string[]
-  hasLegislativeMandate?: boolean
-}
-
-export type Court = {
-  type?: string
-  location?: string
-  label: string
-  revoked?: string
-  jurisdictionType?: string
-  region?: string
-  responsibleDocOffice?: DocumentationOffice
 }
 
 export type ShortTexts = {
@@ -87,7 +26,6 @@ export type ShortTexts = {
   headnote?: string
   otherHeadnote?: string
 }
-
 export const shortTextLabels: {
   [shortTextKey in keyof Required<ShortTexts>]: string
 } = {
@@ -97,7 +35,6 @@ export const shortTextLabels: {
   headnote: "Orientierungssatz",
   otherHeadnote: "Sonstiger Orientierungssatz",
 }
-
 export type LongTexts = {
   tenor?: string
   reasons?: string
@@ -121,69 +58,7 @@ export const longTextLabels: {
   outline: "Gliederung",
 }
 
-export enum DuplicateRelationStatus {
-  PENDING = "PENDING",
-  IGNORED = "IGNORED",
-}
-
-export type DuplicateRelation = {
-  documentNumber: string
-  status: DuplicateRelationStatus
-  isJdvDuplicateCheckActive: boolean
-  courtLabel?: string
-  decisionDate?: string
-  fileNumber?: string
-  documentType?: string
-  publicationStatus?: PublicationState
-}
-
-export type ManagementData = {
-  scheduledPublicationDateTime?: string
-  scheduledByEmail?: string
-  duplicateRelations: DuplicateRelation[]
-  borderNumbers: string[]
-  lastUpdatedAtDateTime?: string
-  lastUpdatedByName?: string
-  lastUpdatedByDocOffice?: string
-  createdAtDateTime?: string
-  createdByName?: string
-  createdByDocOffice?: string
-  firstPublishedAtDateTime?: string
-}
-
-export type DocumentationUnitParameters = {
-  documentationOffice?: DocumentationOffice
-  documentType?: DocumentType
-  decisionDate?: string
-  fileNumber?: string
-  court?: Court
-  reference?: Reference
-}
-
-export type DocumentUnitSearchParameter =
-  | "documentNumber"
-  | "fileNumber"
-  | "publicationStatus"
-  | "publicationDate"
-  | "scheduledOnly"
-  | "courtType"
-  | "courtLocation"
-  | "decisionDate"
-  | "decisionDateEnd"
-  | "withError"
-  | "myDocOfficeOnly"
-  | "withDuplicateWarning"
-
-export type EurlexParameters = {
-  documentationOffice: DocumentationOffice
-  celexNumbers: string[]
-}
-export enum Kind {
-  DOCUMENTION_UNIT = "DOCUMENTION_UNIT",
-  PENDING_PROCEEDING = "PENDING_PROCEEDING",
-}
-
-export default class DocumentUnit {
+export class Decision {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber: string = ""
@@ -215,10 +90,10 @@ export default class DocumentUnit {
     "documentType",
   ] as const
 
-  constructor(uuid: string, data: Partial<DocumentUnit> = {}) {
+  constructor(uuid: string, data: Partial<Decision> = {}) {
     this.uuid = String(uuid)
 
-    let rootField: keyof DocumentUnit
+    let rootField: keyof Decision
     for (rootField in data) {
       if (data[rootField] === null) delete data[rootField]
     }
@@ -324,20 +199,18 @@ export default class DocumentUnit {
   }
 
   get missingRequiredFields() {
-    return DocumentUnit.requiredFields.filter((field) =>
+    return Decision.requiredFields.filter((field) =>
       this.isEmpty(this.coreData[field]),
     )
   }
 
   public static isRequiredField(fieldName: string) {
-    return DocumentUnit.requiredFields.some(
+    return Decision.requiredFields.some(
       (requiredfieldName) => requiredfieldName === fieldName,
     )
   }
 
-  public isEmpty(
-    value: CoreData[(typeof DocumentUnit.requiredFields)[number]],
-  ) {
+  public isEmpty(value: CoreData[(typeof Decision.requiredFields)[number]]) {
     if (value === undefined || !value) {
       return true
     }

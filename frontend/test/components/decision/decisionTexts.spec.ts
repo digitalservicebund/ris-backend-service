@@ -5,13 +5,14 @@ import { beforeEach } from "vitest"
 import type { Component } from "vue"
 import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
-import DocumentUnit, {
+import DecisionTexts from "@/components/texts/DecisionTexts.vue"
+import {
+  Decision,
   longTextLabels,
   LongTexts,
   shortTextLabels,
   ShortTexts,
-} from "@/domain/documentUnit"
+} from "@/domain/decision"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
@@ -32,7 +33,7 @@ async function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
     }
   }
 
-  const utils = render(DocumentUnitTexts, {
+  const utils = render(DecisionTexts, {
     props: {
       registerTextEditorRef: registerTextEditorRef,
     },
@@ -43,7 +44,7 @@ async function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
             initialState: {
               session: { user: { roles: ["Internal"] } },
               docunitStore: {
-                documentUnit: new DocumentUnit("foo", {
+                documentUnit: new Decision("foo", {
                   documentNumber: "1234567891234",
                   shortTexts: shortTexts ?? {},
                   longTexts: longTexts ?? {},

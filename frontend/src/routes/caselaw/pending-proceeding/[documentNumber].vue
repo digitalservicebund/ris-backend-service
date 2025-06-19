@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import DocumentViewer from "@/components/DocumentViewer.vue"
-import { Kind } from "@/domain/documentUnit"
+
+import { Kind } from "@/domain/documentationUnitKind"
 
 defineProps<{
   documentNumber: string

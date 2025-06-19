@@ -12,8 +12,8 @@ import DuplicateRelationListItem from "@/components/management-data/DuplicateRel
 import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import { DocumentationUnitHistoryLog } from "@/domain/documentationUnitHistoryLog"
-import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
 import DocumentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
@@ -22,7 +22,7 @@ import { isPendingProceeding } from "@/utils/typeGuards"
 import IconCheck from "~icons/ic/baseline-check"
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<DocumentationUnit | undefined>
 }
 const { updateDocumentUnit } = useDocumentUnitStore()
 const router = useRouter()
@@ -98,7 +98,7 @@ const assignDocumentationOffice = async () => {
       <TitleElement>Verwaltungsdaten</TitleElement>
       <ManagementDataMetadata
         v-if="documentUnit"
-        :document-unit="documentUnit as DocumentUnit"
+        :document-unit="documentUnit"
       />
       <DocumentUnitHistoryLog
         :data="historyLogs"

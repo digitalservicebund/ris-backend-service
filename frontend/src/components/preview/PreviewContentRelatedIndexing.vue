@@ -5,7 +5,8 @@ import FieldOfLawNodeView from "@/components/preview/FieldOfLawNodeView.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { ContentRelatedIndexing } from "@/domain/documentUnit"
+
+import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 
 const props = defineProps<{
   contentRelatedIndexing: ContentRelatedIndexing

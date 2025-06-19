@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitHandover from "@/components/DocumentUnitHandover.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { HandoverMail, HandoverReport, Preview } from "@/domain/eventRecord"
 import documentUnitService from "@/services/documentUnitService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
@@ -27,7 +27,7 @@ function renderComponent() {
           createTestingPinia({
             initialState: {
               docunitStore: {
-                documentUnit: new DocumentUnit("foo", {
+                documentUnit: new Decision("foo", {
                   documentNumber: "1234567891234",
                   coreData: {
                     fileNumbers: ["123"],
@@ -131,7 +131,7 @@ describe("Document Unit Handover", () => {
       () =>
         Promise.resolve({
           status: 200,
-          data: new DocumentUnit("foo", {
+          data: new Decision("foo", {
             documentNumber: "1234567891234",
             coreData: {
               court: {

@@ -1,5 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import ProceedingDecision from "@/domain/previousDecision"
 import errorMessages from "@/i18n/errors.json"
 
@@ -58,7 +58,7 @@ const service: ProceedingDecisionService = {
   },
 
   async linkProceedingDecision(parentUuid: string, childUuid: string) {
-    const response = await httpClient.put<undefined, DocumentUnit>(
+    const response = await httpClient.put<undefined, Decision>(
       `caselaw/documentunits/${parentUuid}/proceedingdecisions/${childUuid}`,
     )
     if (response.status >= 300) {
@@ -75,8 +75,7 @@ const service: ProceedingDecisionService = {
       return {
         status: 200,
         data: (
-          (response.data as DocumentUnit)
-            .previousDecisions as ProceedingDecision[]
+          (response.data as Decision).previousDecisions as ProceedingDecision[]
         ).map((decision) => new ProceedingDecision({ ...decision })),
       }
     }

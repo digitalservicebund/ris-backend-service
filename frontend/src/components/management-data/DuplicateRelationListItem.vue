@@ -6,10 +6,11 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import DocumentUnit, {
+import { Decision } from "@/domain/decision"
+import {
   DuplicateRelation,
   DuplicateRelationStatus,
-} from "@/domain/documentUnit"
+} from "@/domain/managementData"
 import { PublicationState } from "@/domain/publicationStatus"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -20,8 +21,8 @@ const { duplicateRelation } = defineProps<{
   duplicateRelation: DuplicateRelation
 }>()
 
-const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+const { documentUnit: decision } = storeToRefs(useDocumentUnitStore()) as {
+  documentUnit: Ref<Decision | undefined>
 }
 
 const hasSetStateError = ref(false)
@@ -38,13 +39,13 @@ const isIgnored = computed({
 
 const updateStatus = async (newStatus: DuplicateRelationStatus) => {
   const docUnitDupRelation =
-    documentUnit.value?.managementData?.duplicateRelations.find(
+    decision.value?.managementData?.duplicateRelations.find(
       (rel) => rel.documentNumber === duplicateRelation.documentNumber,
     )
   if (docUnitDupRelation) docUnitDupRelation.status = newStatus
 
   const { error } = await documentUnitService.setDuplicateRelationStatus(
-    documentUnit.value!.documentNumber,
+    decision.value!.documentNumber,
     duplicateRelation.documentNumber,
     newStatus,
   )
@@ -57,7 +58,7 @@ const hasDuplicateState = (state?: PublicationState) =>
 const isAutomaticallyIgnored = computed(
   () =>
     hasDuplicateState(duplicateRelation.publicationStatus) ||
-    hasDuplicateState(documentUnit.value!.status?.publicationStatus) ||
+    hasDuplicateState(decision.value!.status?.publicationStatus) ||
     !duplicateRelation.isJdvDuplicateCheckActive,
 )
 const autoIgnoreLabel = computed(() =>

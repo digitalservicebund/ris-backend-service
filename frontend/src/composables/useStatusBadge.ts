@@ -1,5 +1,5 @@
 import { computed, FunctionalComponent, SVGAttributes } from "vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import { Label, PublicationState } from "@/domain/publicationStatus"
 
 export interface Badge {
@@ -9,7 +9,7 @@ export interface Badge {
   backgroundColor: string
 }
 
-export function useStatusBadge(status: DocumentUnit["status"]) {
+export function useStatusBadge(status: DocumentationUnit["status"]) {
   const badge: Badge = {
     label: "",
     icon: undefined,

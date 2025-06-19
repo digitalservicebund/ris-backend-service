@@ -9,14 +9,13 @@ import KeyWords from "@/components/KeyWords.vue"
 import Norms from "@/components/NormReferences.vue"
 import OtherCategories from "@/components/OtherCategories.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import DocumentUnit from "@/domain/documentUnit"
-import PendingProceeding from "@/domain/pendingProceeding"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { isDocumentUnit } from "@/utils/typeGuards"
+import { isDecision } from "@/utils/typeGuards"
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | PendingProceeding | undefined>
+  documentUnit: Ref<DocumentationUnit | undefined>
 }
 
 const hasKeywords = computed(
@@ -40,9 +39,9 @@ const hasKeywords = computed(
     <FieldsOfLaw data-testid="fieldsOfLaw" />
     <Norms data-testid="norms" />
     <ActiveCitations
-      v-if="isDocumentUnit(documentUnit)"
+      v-if="isDecision(documentUnit)"
       data-testid="activeCitations"
     />
-    <OtherCategories v-if="isDocumentUnit(documentUnit)" />
+    <OtherCategories v-if="isDecision(documentUnit)" />
   </div>
 </template>

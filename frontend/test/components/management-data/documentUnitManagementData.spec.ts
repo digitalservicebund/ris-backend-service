@@ -5,11 +5,12 @@ import { it } from "vitest"
 import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitManagementData from "@/components/management-data/DocumentUnitManagementData.vue"
-import DocumentUnit, {
+import { Decision } from "@/domain/decision"
+import {
   DuplicateRelation,
   DuplicateRelationStatus,
   ManagementData,
-} from "@/domain/documentUnit"
+} from "@/domain/managementData"
 import DocumentUnitHistoryLogService from "@/services/documentUnitHistoryLogService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
@@ -183,7 +184,7 @@ describe("DocumentUnitManagementData", () => {
 
   function mockDocUnitStore(managementData: ManagementData) {
     const mockedSessionStore = useDocumentUnitStore()
-    mockedSessionStore.documentUnit = new DocumentUnit("q834", {
+    mockedSessionStore.documentUnit = new Decision("q834", {
       documentNumber: "DS123",
       managementData,
     })

@@ -1,3 +1,5 @@
+import DocumentationOffice from "@/domain/documentationOffice"
+
 export default interface EURLexResult {
   ecli: string
   celex: string
@@ -9,4 +11,8 @@ export default interface EURLexResult {
   publicationDate: string
   uri: string
   htmlLink?: string
+}
+export type EurlexParameters = {
+  documentationOffice: DocumentationOffice
+  celexNumbers: string[]
 }

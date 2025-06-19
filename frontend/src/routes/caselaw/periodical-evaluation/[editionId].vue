@@ -10,7 +10,7 @@ import PeriodicalEditionInfoPanel from "@/components/periodical-evaluation/Perio
 import SideToggle from "@/components/SideToggle.vue"
 import { usePeriodicalEvaluationMenuItems } from "@/composables/usePeriodicalEvaluationMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useEditionStore } from "@/stores/editionStore"
@@ -47,7 +47,7 @@ function toggleNavigationPanel(expand?: boolean) {
 }
 
 const { documentUnit } = storeToRefs(documentUnitStore) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<Decision | undefined>
 }
 const infoSubtitle = computed(() =>
   StringsUtil.mergeNonBlankStrings(

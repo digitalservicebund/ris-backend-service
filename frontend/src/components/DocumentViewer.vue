@@ -14,7 +14,9 @@ import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { usePendingProceedingMenuItems } from "@/composables/usePendingProceedingMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
-import DocumentUnit, { Kind } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { DocumentationUnit } from "@/domain/documentationUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import MenuItem from "@/domain/menuItem"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { ResponseError } from "@/services/httpClient"
@@ -41,16 +43,14 @@ const textCheck = useFeatureToggle("neuris.text-check-side-panel")
 const store = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
-const documentUnit = computed<DocumentUnit | PendingProceeding | undefined>(
-  () => {
-    if (props.kind === Kind.DOCUMENTION_UNIT) {
-      return store.documentUnit as DocumentUnit
-    } else if (props.kind === Kind.PENDING_PROCEEDING) {
-      return store.documentUnit as PendingProceeding
-    }
-    return undefined
-  },
-)
+const documentUnit = computed<DocumentationUnit | undefined>(() => {
+  if (props.kind === Kind.DOCUMENTION_UNIT) {
+    return store.documentUnit as Decision
+  } else if (props.kind === Kind.PENDING_PROCEEDING) {
+    return store.documentUnit as PendingProceeding
+  }
+  return undefined
+})
 
 const route = useRoute()
 

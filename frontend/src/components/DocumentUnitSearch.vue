@@ -9,13 +9,14 @@ import InfoModal from "@/components/InfoModal.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { Query } from "@/composables/useQueryFromRoute"
-import { Court, DocumentUnitSearchParameter } from "@/domain/documentUnit"
+import { Court } from "@/domain/court"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import errorMessages from "@/i18n/errors.json"
 import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
 const router = useRouter()
 const store = useDocumentUnitStore()
@@ -26,7 +27,7 @@ const documentUnitListEntries = computed(() => currentPage.value?.content)
 const itemsPerPage = 100
 const searchResponseError = ref()
 const isLoading = ref(false)
-const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
+const searchQuery = ref<Query<DocumentationUnitSearchParameter>>()
 const pageNumber = ref<number>(0)
 const isInternalUser = useInternalUser()
 
@@ -137,9 +138,9 @@ async function updatePage(page: number) {
  * The search form emits an event, when clicking the search button and is
  * triggering the search with the updated query here.
  * It will always reset the pagination to the first page.
- * @param {Query<DocumentUnitSearchParameter>} value - The page to be updated
+ * @param {Query<DocumentationUnitSearchParameter>} value - The page to be updated
  */
-async function updateQuery(value: Query<DocumentUnitSearchParameter>) {
+async function updateQuery(value: Query<DocumentationUnitSearchParameter>) {
   searchQuery.value = value
   pageNumber.value = 0
   await search()

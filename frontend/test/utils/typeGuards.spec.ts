@@ -1,14 +1,14 @@
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import PendingProceeding from "@/domain/pendingProceeding"
-import { isDocumentUnit, isPendingProceeding } from "@/utils/typeGuards"
+import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 
 describe("isDocumentUnit", () => {
   it("returns true for a DocumentUnit", () => {
-    const doc = new DocumentUnit("test-id-1", {
+    const doc = new Decision("test-id-1", {
       documentNumber: "123",
       shortTexts: {},
     })
-    expect(isDocumentUnit(doc)).toBe(true)
+    expect(isDecision(doc)).toBe(true)
   })
 
   it("returns false for a PendingProceeding", () => {
@@ -17,15 +17,15 @@ describe("isDocumentUnit", () => {
       shortTexts: {},
       coreData: {},
     })
-    expect(isDocumentUnit(doc)).toBe(false)
+    expect(isDecision(doc)).toBe(false)
   })
 
   it("returns false for undefined", () => {
-    expect(isDocumentUnit(undefined)).toBe(false)
+    expect(isDecision(undefined)).toBe(false)
   })
 
   it("returns false for null", () => {
-    expect(isDocumentUnit(null)).toBe(false)
+    expect(isDecision(null)).toBe(false)
   })
 })
 
@@ -40,7 +40,7 @@ describe("isPendingProceeding", () => {
   })
 
   it("returns false for a DocumentUnit", () => {
-    const doc = new DocumentUnit("test-id-4", {
+    const doc = new Decision("test-id-4", {
       documentNumber: "101",
       shortTexts: {},
     })
