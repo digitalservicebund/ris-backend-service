@@ -5,6 +5,7 @@ import { ref } from "vue"
 import fields from "@/data/fieldNames.json"
 import { Decision } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
+import PendingProceeding from "@/domain/pendingProceeding"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
@@ -12,6 +13,7 @@ import {
   FailedValidationServerResponse,
   ServiceResponse,
 } from "@/services/httpClient"
+import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 
 export const useDocumentUnitStore = defineStore("docunitStore", () => {
   const documentUnit = ref<DocumentationUnit | undefined>(undefined)
@@ -67,23 +69,17 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
             try {
                 // We apply the changes from the backend response to our local docUnit
                 documentUnit.value = getPatchApplyResult(
-                    new Decision(documentUnit.value.uuid, {
-                        ...JSON.parse(JSON.stringify(documentUnit.value)),
-                    }),
+                    instantiateDocUnitClass(documentUnit.value as DocumentationUnit),
                     backendPatch.patch,
                 )
                 // We apply the local changes that were successfully saved in the backend on our docUnit backend representation
                 originalDocumentUnit.value = getPatchApplyResult(
-                    new Decision(documentUnit.value.uuid, {
-                        ...JSON.parse(JSON.stringify(originalDocumentUnit.value)),
-                    }),
+                    instantiateDocUnitClass(originalDocumentUnit.value as DocumentationUnit),
                     frontendPatch,
                 )
                 // We apply the backend response changes to our backend docUnit representation.
                 originalDocumentUnit.value = getPatchApplyResult(
-                    new Decision(documentUnit.value.uuid, {
-                        ...JSON.parse(JSON.stringify(originalDocumentUnit.value)),
-                    }),
+                    instantiateDocUnitClass(originalDocumentUnit.value as DocumentationUnit),
                     backendPatch.patch,
                 )
 
@@ -144,14 +140,29 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
         return response
     }
 
-  function getPatchApplyResult(docUnit: Decision, backendPatch: Operation[]) {
+  function instantiateDocUnitClass(docUnit?: DocumentationUnit) {
+    if (isDecision(docUnit)) {
+      return new Decision(docUnit.uuid, {
+        ...JSON.parse(JSON.stringify(docUnit)),
+      })
+    } else if (isPendingProceeding(docUnit)) {
+      return new PendingProceeding(docUnit.uuid, {
+        ...JSON.parse(JSON.stringify(docUnit)),
+      })
+    } else {
+      throw Error("Unsupported doc type: " + docUnit)
+    }
+  }
+
+  function getPatchApplyResult(
+    docUnit: DocumentationUnit,
+    backendPatch: Operation[],
+  ) {
     if (!documentUnit.value?.uuid) {
       throw new Error("Can't apply patch on an empty uuid")
     }
     jsonpatch.applyPatch(docUnit, backendPatch)
-    return new Decision(docUnit.uuid, {
-      ...JSON.parse(JSON.stringify(docUnit)),
-    })
+    return instantiateDocUnitClass(docUnit)
   }
 
   return {
