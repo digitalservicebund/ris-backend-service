@@ -1,14 +1,14 @@
 <script lang="ts" setup>
+import Checkbox from "primevue/checkbox"
 import { computed, ref, watch } from "vue"
 import FieldOfLawTreeNode from "./FieldOfLawTreeNode.vue"
 
-import Checkbox from "primevue/checkbox"
-import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import { buildRoot, type FieldOfLaw } from "@/domain/fieldOfLaw"
 import {
   NodeHelper,
   NodeHelperInterface,
 } from "@/components/field-of-law/fieldOfLawNode"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
+import { buildRoot, type FieldOfLaw } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{
   selectedNodes: FieldOfLaw[]
@@ -121,11 +121,11 @@ defineExpose({ collapseTree })
       :key="root.identifier"
       :expanded-nodes="expandedNodes"
       is-root
-      :selected-nodes="selectedNodes"
       :node="root"
       :node-helper="nodeHelper"
       :node-of-interest="nodeOfInterest"
       :search-results="searchResults"
+      :selected-nodes="selectedNodes"
       :show-norms="showNorms"
       @node-of-interest:reset="emit('node-of-interest:reset')"
       @node:add="emit('node:add', $event)"
