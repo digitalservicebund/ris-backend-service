@@ -16,7 +16,8 @@ import { Procedure } from "@/domain/procedure"
 import errorMessages from "@/i18n/errors.json"
 
 enum Endpoint {
-  documentTypes = "documenttypes",
+  caselawDocumentTypes = "documenttypes/caselaw",
+  caselawAndPendingProceedingDocumentTypes = "documenttypes/caselaw-pending-proceeding",
   dependentLiteratureDocumentTypes = "documenttypes/dependent-literature",
   courts = "courts",
   citationTypes = "citationtypes",
@@ -34,7 +35,8 @@ function formatDropdownItems(
   endpoint: Endpoint,
 ): ComboboxItem[] {
   switch (endpoint) {
-    case Endpoint.documentTypes:
+    case Endpoint.caselawDocumentTypes:
+    case Endpoint.caselawAndPendingProceedingDocumentTypes:
     case Endpoint.dependentLiteratureDocumentTypes: {
       return (responseData as DocumentType[]).map((item) => ({
         label: item.label,
@@ -147,8 +149,15 @@ type ComboboxItemService = {
 const service: ComboboxItemService = {
   getCourts: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.courts, filter, 200),
-  getDocumentTypes: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.documentTypes, filter),
+  getCaselawDocumentTypes: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.caselawDocumentTypes, filter),
+  getCaselawAndPendingProceedingDocumentTypes: (
+    filter: Ref<string | undefined>,
+  ) =>
+    fetchFromEndpoint(
+      Endpoint.caselawAndPendingProceedingDocumentTypes,
+      filter,
+    ),
   getDependentLiteratureDocumentTypes: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.dependentLiteratureDocumentTypes, filter),
   getFieldOfLawSearchByIdentifier: (filter: Ref<string | undefined>) =>

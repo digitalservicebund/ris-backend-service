@@ -281,7 +281,7 @@ onMounted(() => {
             id="activeCitationDecisionDocumentType"
             v-model="activeCitation.documentType"
             aria-label="Dokumenttyp Aktivzitierung"
-            :item-service="ComboboxItemService.getDocumentTypes"
+            :item-service="ComboboxItemService.getCaselawDocumentTypes"
             :read-only="activeCitation.hasForeignSource"
           ></ComboboxInput>
         </InputField>

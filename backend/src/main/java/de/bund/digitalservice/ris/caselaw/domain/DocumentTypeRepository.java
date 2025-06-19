@@ -9,11 +9,15 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface DocumentTypeRepository {
   List<DocumentType> findCaselawBySearchStr(String searchString);
 
+  List<DocumentType> findAllCaselawOrderByAbbreviationAscLabelAsc();
+
+  List<DocumentType> findCaselawAndPendingProceedingBySearchStr(String searchString);
+
+  List<DocumentType> findAllCaselawAndPendingProceedingOrderByAbbreviationAscLabelAsc();
+
   List<DocumentType> findDependentLiteratureBySearchStr(String searchString);
 
   List<DocumentType> findAllDependentLiteratureOrderByAbbreviationAscLabelAsc();
 
   Optional<DocumentType> findUniqueCaselawBySearchStr(String searchString);
-
-  List<DocumentType> findAllByDocumentTypeOrderByAbbreviationAscLabelAsc(char shortcut);
 }

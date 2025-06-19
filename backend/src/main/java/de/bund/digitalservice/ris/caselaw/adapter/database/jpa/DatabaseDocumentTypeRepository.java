@@ -18,6 +18,8 @@ public interface DatabaseDocumentTypeRepository extends JpaRepository<DocumentTy
   List<DocumentTypeDTO> findAllByCategoryOrderByAbbreviationAscLabelAsc(
       DocumentCategoryDTO category);
 
+  List<DocumentTypeDTO> findAllByCategoryIdInOrderByAbbreviationAscLabelAsc(List<UUID> categoryIds);
+
   // see query explanation in CourtRepository, it's almost the same
   @Query(
       nativeQuery = true,
@@ -38,6 +40,26 @@ public interface DatabaseDocumentTypeRepository extends JpaRepository<DocumentTy
               + "ORDER BY weight, concat")
   List<DocumentTypeDTO> findCaselawBySearchStrAndCategory(
       @Param("searchStr") String searchStr, @Param("category") UUID category);
+
+  @Query(
+      nativeQuery = true,
+      value =
+          "WITH label_added AS (SELECT *, "
+              + " UPPER(CONCAT(abbreviation, ' ', label)) AS concat"
+              + " from incremental_migration.document_type) "
+              + "SELECT *,"
+              + "       concat, "
+              + "       CASE "
+              + "           WHEN concat LIKE UPPER(:searchStr||'%') THEN 1 "
+              + "           WHEN concat LIKE UPPER('% '||:searchStr||'%') THEN 2 "
+              + "           WHEN concat LIKE UPPER('%-'||:searchStr||'%') THEN 2 "
+              + "           ELSE 3 "
+              + "           END AS weight "
+              + "FROM label_added "
+              + "WHERE concat LIKE UPPER('%'||:searchStr||'%') AND document_category_id IN (:categoryIds) "
+              + "ORDER BY weight, concat")
+  List<DocumentTypeDTO> findCaselawAndPendingProceedingBySearchStrAndCategory(
+      @Param("searchStr") String searchStr, @Param("categoryIds") List<UUID> categoryIds);
 
   @Query(
       nativeQuery = true,

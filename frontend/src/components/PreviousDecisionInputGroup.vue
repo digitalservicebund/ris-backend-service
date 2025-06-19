@@ -283,7 +283,7 @@ onMounted(async () => {
             id="documentType"
             v-model="previousDecision.documentType"
             aria-label="Dokumenttyp Vorgehende Entscheidung"
-            :item-service="ComboboxItemService.getDocumentTypes"
+            :item-service="ComboboxItemService.getCaselawDocumentTypes"
             :read-only="previousDecision.hasForeignSource"
           ></ComboboxInput>
         </InputField>

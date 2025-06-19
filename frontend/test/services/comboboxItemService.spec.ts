@@ -28,7 +28,7 @@ describe("comboboxItemService", () => {
   })
 
   it("should fetch document type from lookup table", async () => {
-    const { data, execute } = service.getDocumentTypes(ref())
+    const { data, execute } = service.getCaselawDocumentTypes(ref())
 
     await execute()
     await waitFor(() => {

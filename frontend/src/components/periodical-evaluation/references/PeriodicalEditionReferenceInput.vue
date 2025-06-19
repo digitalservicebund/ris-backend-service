@@ -539,7 +539,7 @@ onBeforeUnmount(() => {
         v-if="!reference?.documentationUnit?.hasForeignSource"
         id="documentationUnit"
       >
-        <h2 class="ris-label1-bold mb-16">Entscheidung hinzufügen</h2>
+        <h2 class="ris-label1-bold mb-16">Dokumentationseinheit hinzufügen</h2>
 
         <div class="flex flex-col gap-24">
           <div class="flex justify-between gap-24">
@@ -603,7 +603,9 @@ onBeforeUnmount(() => {
                 id="decisionDocumentType"
                 v-model="relatedDocumentationUnit.documentType"
                 aria-label="Dokumenttyp"
-                :item-service="ComboboxItemService.getDocumentTypes"
+                :item-service="
+                  ComboboxItemService.getCaselawAndPendingProceedingDocumentTypes
+                "
               ></ComboboxInput>
             </InputField>
           </div>

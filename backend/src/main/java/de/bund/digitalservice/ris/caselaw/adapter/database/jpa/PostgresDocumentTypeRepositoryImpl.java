@@ -3,9 +3,10 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.repository.query.Param;
+import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -25,6 +26,41 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
     return repository
         .findCaselawBySearchStrAndCategory(
             searchString, categoryRepository.findFirstByLabel("R").getId())
+        .stream()
+        .map(DocumentTypeTransformer::transformToDomain)
+        .toList();
+  }
+
+  @Override
+  public List<DocumentType> findAllCaselawOrderByAbbreviationAscLabelAsc() {
+    return repository
+        .findAllByCategoryOrderByAbbreviationAscLabelAsc(categoryRepository.findFirstByLabel("R"))
+        .stream()
+        .map(DocumentTypeTransformer::transformToDomain)
+        .toList();
+  }
+
+  @Override
+  public List<DocumentType> findCaselawAndPendingProceedingBySearchStr(String searchString) {
+    List<UUID> targetCategoryIds =
+        Arrays.asList(
+            categoryRepository.findFirstByLabel("R").getId(),
+            categoryRepository.findFirstByLabel("A").getId());
+    return repository
+        .findCaselawAndPendingProceedingBySearchStrAndCategory(searchString, targetCategoryIds)
+        .stream()
+        .map(DocumentTypeTransformer::transformToDomain)
+        .toList();
+  }
+
+  @Override
+  public List<DocumentType> findAllCaselawAndPendingProceedingOrderByAbbreviationAscLabelAsc() {
+    List<UUID> targetCategoryIds =
+        Arrays.asList(
+            categoryRepository.findFirstByLabel("R").getId(),
+            categoryRepository.findFirstByLabel("A").getId());
+    return repository
+        .findAllByCategoryIdInOrderByAbbreviationAscLabelAsc(targetCategoryIds)
         .stream()
         .map(DocumentTypeTransformer::transformToDomain)
         .toList();
@@ -55,15 +91,5 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
         .findUniqueCaselawBySearchStrAndCategory(
             searchString, categoryRepository.findFirstByLabel("R").getId())
         .map(DocumentTypeTransformer::transformToDomain);
-  }
-
-  @Override
-  public List<DocumentType> findAllByDocumentTypeOrderByAbbreviationAscLabelAsc(
-      @Param("shortcut") char shortcut) {
-    return repository
-        .findAllByCategoryOrderByAbbreviationAscLabelAsc(categoryRepository.findFirstByLabel("R"))
-        .stream()
-        .map(DocumentTypeTransformer::transformToDomain)
-        .toList();
   }
 }

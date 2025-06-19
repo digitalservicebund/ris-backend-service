@@ -22,11 +22,18 @@ public class DocumentTypeController {
     this.service = service;
   }
 
-  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/caselaw", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<DocumentType> getDocumentTypes(
+  public List<DocumentType> getCaselawDocumentTypes(
       @RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getDocumentTypes(searchStr);
+    return service.getCaselawDocumentTypes(searchStr);
+  }
+
+  @GetMapping(value = "/caselaw-pending-proceeding", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  public List<DocumentType> getCaselawAndPendingProceedingDocumentTypes(
+      @RequestParam(value = "q") Optional<String> searchStr) {
+    return service.getCaselawAndPendingProceedingDocumentTypes(searchStr);
   }
 
   @GetMapping(value = "/dependent-literature", produces = MediaType.APPLICATION_JSON_VALUE)
