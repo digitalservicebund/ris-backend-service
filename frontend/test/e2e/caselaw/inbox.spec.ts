@@ -395,6 +395,9 @@ test.describe("inbox", () => {
         const courtType = tab.getByLabel("Gerichtstyp Suche")
         const courtLocation = tab.getByLabel("Gerichtsort Suche")
         const docNumber = tab.getByLabel("Dokumentnummer Suche")
+        const searchButton = tab.getByLabel(
+          "Nach Dokumentationseinheiten suchen",
+        )
         const decisionDate = tab.getByLabel("Entscheidungsdatum Suche", {
           exact: true,
         })
@@ -404,6 +407,9 @@ test.describe("inbox", () => {
             exact: true,
           },
         )
+
+        // Wait for initial search to be completed before filling out the form
+        await expect(searchButton).toBeEnabled()
 
         await expect(fileNumberInput).toBeVisible()
         await expect(courtType).toBeVisible()
@@ -419,10 +425,7 @@ test.describe("inbox", () => {
         await docNumber.fill("YYTestDoc0012")
         await decisionDate.fill("09.09.1987")
 
-        await page
-          .getByTestId("eu-inbox")
-          .getByLabel("Nach Dokumentationseinheiten suchen")
-          .click()
+        await searchButton.click()
 
         // header row and result row
         await expect(page.locator("tr")).toHaveCount(2)

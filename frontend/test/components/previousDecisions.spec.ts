@@ -7,8 +7,9 @@ import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
 import { createRouter, createWebHistory } from "vue-router"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
+import { Court } from "@/domain/court"
+import { Decision } from "@/domain/decision"
 import { DocumentType } from "@/domain/documentType"
-import DocumentUnit, { Court } from "@/domain/documentUnit"
 
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
@@ -56,7 +57,7 @@ function renderComponent(previousDecisions?: PreviousDecision[]) {
             createTestingPinia({
               initialState: {
                 docunitStore: {
-                  documentUnit: new DocumentUnit("foo", {
+                  documentUnit: new Decision("foo", {
                     documentNumber: "1234567891234",
                     coreData: {},
                     shortTexts: {},

@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingT
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.StatusTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
-import de.bund.digitalservice.ris.caselaw.domain.Documentable;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
@@ -45,6 +45,7 @@ import jakarta.persistence.criteria.Root;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -74,8 +75,8 @@ import org.springframework.transaction.annotation.Transactional;
 // Repository for main entity -> depends on more than 20 classes :-/
 @SuppressWarnings("java:S6539")
 public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUnitRepository {
-  private static final DateTimeFormatter FORMATTER =
-      DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+  private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm");
 
   private final DatabaseDocumentationUnitRepository repository;
   private final DatabaseCourtRepository databaseCourtRepository;
@@ -123,19 +124,19 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Documentable findByDocumentNumber(String documentNumber)
+  public DocumentationUnit findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException {
     return findByDocumentNumberNonTransactional(documentNumber, null);
   }
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Documentable findByDocumentNumber(String documentNumber, User user)
+  public DocumentationUnit findByDocumentNumber(String documentNumber, User user)
       throws DocumentationUnitNotExistsException {
     return findByDocumentNumberNonTransactional(documentNumber, user);
   }
 
-  private Documentable findByDocumentNumberNonTransactional(String documentNumber, User user)
+  private DocumentationUnit findByDocumentNumberNonTransactional(String documentNumber, User user)
       throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository
@@ -145,7 +146,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Nullable
-  private static Documentable getDocumentationUnit(
+  private static DocumentationUnit getDocumentationUnit(
       DocumentationUnitDTO documentationUnit, @Nullable User user) {
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
       return DecisionTransformer.transformToDomain(decisionDTO, user);
@@ -169,17 +170,18 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Documentable findByUuid(UUID uuid, User user) throws DocumentationUnitNotExistsException {
+  public DocumentationUnit findByUuid(UUID uuid, User user)
+      throws DocumentationUnitNotExistsException {
     return this.findByUuidNonTransactional(uuid, user);
   }
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Documentable findByUuid(UUID uuid) throws DocumentationUnitNotExistsException {
+  public DocumentationUnit findByUuid(UUID uuid) throws DocumentationUnitNotExistsException {
     return this.findByUuidNonTransactional(uuid, null);
   }
 
-  private Documentable findByUuidNonTransactional(UUID uuid, User user)
+  private DocumentationUnit findByUuidNonTransactional(UUID uuid, User user)
       throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
@@ -188,8 +190,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit docUnit,
+  public Decision createNewDocumentationUnit(
+      Decision docUnit,
       Status status,
       Reference createdFromReference,
       String fileNumber,
@@ -275,40 +277,42 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
-  public void save(Documentable documentable) {
-    saveNonTransactional(documentable, null, null);
+  public void save(DocumentationUnit documentationUnit) {
+    saveNonTransactional(documentationUnit, null, null);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
-  public void save(Documentable documentable, @Nullable User currentUser) {
-    saveNonTransactional(documentable, currentUser, null);
+  public void save(DocumentationUnit documentationUnit, @Nullable User currentUser) {
+    saveNonTransactional(documentationUnit, currentUser, null);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(
-      Documentable documentable, @Nullable User currentUser, @Nullable String description) {
-    saveNonTransactional(documentable, currentUser, description);
+      DocumentationUnit documentationUnit,
+      @Nullable User currentUser,
+      @Nullable String description) {
+    saveNonTransactional(documentationUnit, currentUser, description);
   }
 
   private void saveNonTransactional(
-      Documentable documentable, @Nullable User currentUser, String description) {
+      DocumentationUnit documentationUnit, @Nullable User currentUser, String description) {
     DocumentationUnitDTO documentationUnitDTO =
-        repository.findById(documentable.uuid()).orElse(null);
+        repository.findById(documentationUnit.uuid()).orElse(null);
     if (documentationUnitDTO == null) {
-      log.info("Can't save non-existing docUnit with id = " + documentable.uuid());
+      log.info("Can't save non-existing docUnit with id = " + documentationUnit.uuid());
       return;
     }
 
     // Doing database-related (pre) transformation
-    if (documentable.coreData() != null) {
-      documentable = processCoreData(documentable, documentationUnitDTO);
+    if (documentationUnit.coreData() != null) {
+      documentationUnit = processCoreData(documentationUnit, documentationUnitDTO);
     }
 
     setLastUpdated(currentUser, documentationUnitDTO);
 
-    saveHistoryLogForScheduledPublication(documentable, documentationUnitDTO, currentUser);
+    saveHistoryLogForScheduledPublication(documentationUnit, documentationUnitDTO, currentUser);
 
     historyLogService.saveHistoryLog(
         documentationUnitDTO.getId(),
@@ -319,101 +323,83 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       documentationUnitDTO =
-          DecisionTransformer.transformToDTO(decisionDTO, (DocumentationUnit) documentable);
+          DecisionTransformer.transformToDTO(decisionDTO, (Decision) documentationUnit);
       repository.save(documentationUnitDTO);
     }
     if (documentationUnitDTO instanceof PendingProceedingDTO pendingProceedingDTO) {
       documentationUnitDTO =
           PendingProceedingTransformer.transformToDTO(
-              pendingProceedingDTO, (PendingProceeding) documentable);
+              pendingProceedingDTO, (PendingProceeding) documentationUnit);
       repository.save(documentationUnitDTO);
     }
   }
 
-  private Documentable processCoreData(
-      Documentable documentable, DocumentationUnitDTO documentationUnitDTO) {
+  private DocumentationUnit processCoreData(
+      DocumentationUnit documentationUnit, DocumentationUnitDTO documentationUnitDTO) {
     documentationUnitDTO.getRegions().clear();
-    if (documentable.coreData().court() != null && documentable.coreData().court().id() != null) {
+    if (documentationUnit.coreData().court() != null
+        && documentationUnit.coreData().court().id() != null) {
       Optional<CourtDTO> court =
-          databaseCourtRepository.findById(documentable.coreData().court().id());
+          databaseCourtRepository.findById(documentationUnit.coreData().court().id());
       if (court.isPresent() && court.get().getRegion() != null) {
         documentationUnitDTO.getRegions().add(court.get().getRegion());
       }
       // delete leading decision norm references if court is not BGH
-      if (documentable instanceof DocumentationUnit documentationUnit
+      if (documentationUnit instanceof Decision decision
           && court.isPresent()
           && !court.get().getType().equals("BGH")) {
-        documentable =
-            documentationUnit.toBuilder()
+        documentationUnit =
+            decision.toBuilder()
                 .coreData(
-                    documentationUnit.coreData().toBuilder()
+                    decision.coreData().toBuilder()
                         .leadingDecisionNormReferences(List.of())
                         .build())
                 .build();
       }
     }
-    return documentable;
+    return documentationUnit;
   }
 
   private void saveHistoryLogForScheduledPublication(
-      Documentable documentable, DocumentationUnitDTO documentationUnitDTO, User user) {
-    if (documentable instanceof DocumentationUnit documentationUnit) {
-      saveHistoryLogForScheduledPublicationCreation(documentationUnit, documentationUnitDTO, user);
-      saveHistoryLogForScheduledPublicationUpdating(documentationUnit, documentationUnitDTO, user);
-      saveHistoryLogForScheduledPublicationDeletion(documentationUnit, documentationUnitDTO, user);
+      DocumentationUnit documentationUnit, DocumentationUnitDTO documentationUnitDTO, User user) {
+    if (documentationUnit instanceof Decision decision) {
+      saveHistoryLogForScheduledPublicationCreation(decision, documentationUnitDTO, user);
+      saveHistoryLogForScheduledPublicationDeletion(decision, documentationUnitDTO, user);
     }
   }
 
   private void saveHistoryLogForScheduledPublicationCreation(
-      DocumentationUnit documentationUnit, DocumentationUnitDTO documentationUnitDTO, User user) {
+      Decision decision, DocumentationUnitDTO documentationUnitDTO, User user) {
     if (documentationUnitDTO.getScheduledPublicationDateTime() != null) {
       return;
     }
 
-    if (documentationUnit.managementData() == null
-        || documentationUnit.managementData().scheduledPublicationDateTime() == null) {
+    if (decision.managementData() == null
+        || decision.managementData().scheduledPublicationDateTime() == null) {
       return;
     }
 
-    String dateString =
-        documentationUnit.managementData().scheduledPublicationDateTime().format(FORMATTER);
+    // Have to reworked after change from localdatetime to instant
+    LocalDateTime cstDateTime =
+        decision
+            .managementData()
+            .scheduledPublicationDateTime()
+            .atZone(ZoneId.of("UTC"))
+            .withZoneSameInstant(ZoneId.of("Europe/Berlin"))
+            .toLocalDateTime();
+    String dateString = cstDateTime.format(DATE_FORMATTER);
+    String timeString = cstDateTime.format(TIME_FORMATTER);
     historyLogService.saveHistoryLog(
         documentationUnitDTO.getId(),
         user,
-        HistoryLogEventType.UPDATE,
-        "Abgabe wurde auf den " + dateString + " gesetzt.");
-  }
-
-  private void saveHistoryLogForScheduledPublicationUpdating(
-      DocumentationUnit documentationUnit, DocumentationUnitDTO documentationUnitDTO, User user) {
-    if (documentationUnit.managementData() == null
-        || documentationUnit.managementData().scheduledPublicationDateTime() == null) {
-      return;
-    }
-
-    if (documentationUnitDTO.getScheduledPublicationDateTime() == null) {
-      return;
-    }
-
-    if (documentationUnitDTO
-        .getScheduledPublicationDateTime()
-        .equals(documentationUnit.managementData().scheduledPublicationDateTime())) {
-      return;
-    }
-
-    String dateString =
-        documentationUnit.managementData().scheduledPublicationDateTime().format(FORMATTER);
-    historyLogService.saveHistoryLog(
-        documentationUnitDTO.getId(),
-        user,
-        HistoryLogEventType.UPDATE,
-        "Abgabe wurde auf den " + dateString + " geändert.");
+        HistoryLogEventType.SCHEDULED_PUBLICATION,
+        "Abgabe terminiert für den " + dateString + " um " + timeString + " Uhr");
   }
 
   private void saveHistoryLogForScheduledPublicationDeletion(
-      DocumentationUnit documentationUnit, DocumentationUnitDTO documentationUnitDTO, User user) {
-    if (documentationUnit.managementData() != null
-        && documentationUnit.managementData().scheduledPublicationDateTime() != null) {
+      Decision decision, DocumentationUnitDTO documentationUnitDTO, User user) {
+    if (decision.managementData() != null
+        && decision.managementData().scheduledPublicationDateTime() != null) {
       return;
     }
 
@@ -424,8 +410,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     historyLogService.saveHistoryLog(
         documentationUnitDTO.getId(),
         user,
-        HistoryLogEventType.UPDATE,
-        "Zeitliche Abgabe wurde gelöscht.");
+        HistoryLogEventType.SCHEDULED_PUBLICATION,
+        "Terminierte Abgabe gelöscht");
   }
 
   private void setLastUpdated(User currentUser, DocumentationUnitDTO docUnitDTO) {
@@ -449,7 +435,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
-  public void saveKeywords(Documentable documentationUnit) {
+  public void saveKeywords(DocumentationUnit documentationUnit) {
     if (documentationUnit == null || documentationUnit.contentRelatedIndexing() == null) {
       return;
     }
@@ -497,7 +483,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
-  public void saveFieldsOfLaw(Documentable documentationUnit) {
+  public void saveFieldsOfLaw(DocumentationUnit documentationUnit) {
     if (documentationUnit == null || documentationUnit.contentRelatedIndexing() == null) {
       return;
     }
@@ -549,11 +535,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void saveProcedures(Documentable documentationUnit, @Nullable User user) {
+  public void saveProcedures(DocumentationUnit documentationUnit, @Nullable User user) {
     if (documentationUnit == null
         || documentationUnit.coreData() == null
         || documentationUnit.coreData().procedure() == null
-        || !(documentationUnit instanceof DocumentationUnit)) {
+        || !(documentationUnit instanceof Decision)) {
       return;
     }
 
@@ -674,7 +660,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
-  public void delete(Documentable documentationUnit) {
+  public void delete(DocumentationUnit documentationUnit) {
     repository.deleteById(documentationUnit.uuid());
   }
 
@@ -964,7 +950,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public List<DocumentationUnit> getScheduledDocumentationUnitsDueNow() {
+  public List<Decision> getScheduledDocumentationUnitsDueNow() {
     return repository.getScheduledDocumentationUnitsDueNow().stream()
         .limit(50)
         .filter(DecisionDTO.class::isInstance) // TODO transform pending proceedings as well

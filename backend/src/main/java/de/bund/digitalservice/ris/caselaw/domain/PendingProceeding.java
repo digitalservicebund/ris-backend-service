@@ -39,7 +39,7 @@ public record PendingProceeding(
     List<String> documentalists,
     boolean isEditable,
     boolean isDeletable)
-    implements Documentable {
+    implements DocumentationUnit {
 
   @Override
   public Kind kind() {

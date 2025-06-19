@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 
-const documentUnit = new DocumentUnit("foo", {
+const documentUnit = new Decision("foo", {
   documentNumber: "XXRE202300002",
   coreData: {
     court: {

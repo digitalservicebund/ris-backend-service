@@ -2,9 +2,9 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentUnitAttachments from "@/components/DocumentUnitAttachments.vue"
+import DecisionAttachments from "@/components/DecisionAttachments.vue"
 import Attachment from "@/domain/attachment"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import routes from "~/test-helper/routes"
 
 function renderComponent(attachments?: Attachment[]) {
@@ -16,13 +16,13 @@ function renderComponent(attachments?: Attachment[]) {
   })
   return {
     user,
-    ...render(DocumentUnitAttachments, {
+    ...render(DecisionAttachments, {
       global: {
         plugins: [
           createTestingPinia({
             initialState: {
               docunitStore: {
-                documentUnit: new DocumentUnit("foo", {
+                documentUnit: new Decision("foo", {
                   documentNumber: "1234567891234",
                   attachments: attachments ?? [],
                 }),

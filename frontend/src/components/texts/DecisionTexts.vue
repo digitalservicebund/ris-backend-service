@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import type { Component } from "vue"
-import DocumentUnitAdditionalTexts from "@/components/texts/DocumentUnitAdditionalTexts.vue"
-import DocumentUnitLongTexts from "@/components/texts/DocumentUnitLongTexts.vue"
-import DocumentUnitShortTexts from "@/components/texts/DocumentUnitShortTexts.vue"
+import DecisionAdditionalTexts from "@/components/texts/DecisionAdditionalTexts.vue"
+import DecisionLongTexts from "@/components/texts/DecisionLongTexts.vue"
+import DecisionShortTexts from "@/components/texts/DecisionShortTexts.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 
@@ -16,12 +16,12 @@ const isInternalUser = useInternalUser()
 <template>
   <div class="flex flex-col gap-24 bg-white p-24">
     <TitleElement>Kurz- & Langtexte</TitleElement>
-    <DocumentUnitShortTexts v-bind="{ registerTextEditorRef }" />
-    <DocumentUnitLongTexts
+    <DecisionShortTexts v-bind="{ registerTextEditorRef }" />
+    <DecisionLongTexts
       v-if="isInternalUser"
       v-bind="{ registerTextEditorRef }"
     />
-    <DocumentUnitAdditionalTexts
+    <DecisionAdditionalTexts
       v-if="isInternalUser"
       v-bind="{ registerTextEditorRef }"
     />

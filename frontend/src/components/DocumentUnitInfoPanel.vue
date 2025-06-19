@@ -6,14 +6,11 @@ import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
-import DocumentUnit from "@/domain/documentUnit"
-import PendingProceeding from "@/domain/pendingProceeding"
-import { isDocumentUnit } from "@/utils/typeGuards"
+import { DocumentationUnit } from "@/domain/documentationUnit"
+import { isDecision } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
 
-const props = defineProps<{
-  documentUnit: DocumentUnit | PendingProceeding
-}>()
+const props = defineProps<{ documentUnit: DocumentationUnit }>()
 
 const route = useRoute()
 
@@ -30,7 +27,7 @@ const decisionDateInfo = computed(() => {
 })
 
 const hasPendingDuplicateWarning = computed(() => {
-  if (isDocumentUnit(props.documentUnit)) {
+  if (isDecision(props.documentUnit)) {
     return (props.documentUnit.managementData.duplicateRelations ?? []).some(
       (warning) => warning.status === "PENDING",
     )

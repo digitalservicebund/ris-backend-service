@@ -4,7 +4,7 @@ import { Ref } from "vue"
 import DefaultSummary from "@/components/DefaultSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import ParticipatingJudgesInput from "@/components/ParticipatingJudgesInput.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -13,8 +13,8 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
-const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+const { documentUnit: decision } = storeToRefs(store) as {
+  documentUnit: Ref<Decision | undefined>
 }
 </script>
 
@@ -30,7 +30,7 @@ const { documentUnit } = storeToRefs(store) as {
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList
-          v-model="documentUnit!.longTexts.participatingJudges"
+          v-model="decision!.longTexts.participatingJudges"
           :create-entry="() => new ParticipatingJudge()"
           :edit-component="ParticipatingJudgesInput"
           :summary-component="DefaultSummary"

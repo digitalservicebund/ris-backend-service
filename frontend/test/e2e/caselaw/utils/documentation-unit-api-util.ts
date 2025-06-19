@@ -1,10 +1,11 @@
 import { APIRequestContext, APIResponse, expect, Page } from "@playwright/test"
 import { Browser } from "playwright"
-import DocumentUnit from "@/domain/documentUnit"
+
+import { Decision } from "@/domain/decision"
 
 export async function updateDocumentationUnit(
   page: Page,
-  documentUnit: DocumentUnit,
+  documentUnit: Decision,
   request: APIRequestContext,
 ): Promise<APIResponse> {
   const cookies = await page.context().cookies()

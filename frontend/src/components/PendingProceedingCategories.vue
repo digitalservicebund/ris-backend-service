@@ -12,7 +12,7 @@ import ProceedingDecisions from "@/components/ProceedingDecisions.vue"
 import PendingProceedingTexts from "@/components/texts/PendingProceedingTexts.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScroll } from "@/composables/useScroll"
-import { Kind } from "@/domain/documentUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 defineProps<{

@@ -3,11 +3,12 @@ import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
-import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
-import DocumentUnit, { DuplicateRelationStatus } from "@/domain/documentUnit"
+import HandoverDecisionView from "@/components/HandoverDecisionView.vue"
+import { Decision } from "@/domain/decision"
 import { Env } from "@/domain/env"
 import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
+import { DuplicateRelationStatus } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 import featureToggleService from "@/services/featureToggleService"
@@ -26,7 +27,7 @@ const router = createRouter({
 function renderComponent(
   options: {
     props?: unknown
-    documentUnit?: DocumentUnit
+    documentUnit?: Decision
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     stubs?: any
     env?: Env
@@ -36,7 +37,7 @@ function renderComponent(
 
   return {
     user,
-    ...render(HandoverDocumentationUnitView, {
+    ...render(HandoverDecisionView, {
       props: options.props ?? {},
       global: {
         plugins: [
@@ -47,7 +48,7 @@ function renderComponent(
                 docunitStore: {
                   documentUnit:
                     options.documentUnit ??
-                    new DocumentUnit("123", {
+                    new Decision("123", {
                       documentNumber: "foo",
                     }),
                 },
@@ -89,7 +90,7 @@ describe("HandoverDocumentationUnitView:", () => {
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
       renderComponent({
-        documentUnit: new DocumentUnit("123", {
+        documentUnit: new Decision("123", {
           documentNumber: "foo",
           coreData: {
             fileNumbers: ["foo"],
@@ -133,7 +134,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
     it("with required fields missing", async () => {
       renderComponent({
-        documentUnit: new DocumentUnit("123", {
+        documentUnit: new Decision("123", {
           documentNumber: "foo",
           contentRelatedIndexing: {
             norms: [
@@ -170,7 +171,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
     it("should show error message with invalid outline", async () => {
       renderComponent({
-        documentUnit: new DocumentUnit("123", {
+        documentUnit: new Decision("123", {
           documentNumber: "foo",
           coreData: {
             fileNumbers: ["foo"],
@@ -204,7 +205,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
     it("should show validation error message when casefacts are invalid", async () => {
       renderComponent({
-        documentUnit: new DocumentUnit("123", {
+        documentUnit: new Decision("123", {
           documentNumber: "foo",
           coreData: {
             fileNumbers: ["foo"],
@@ -244,7 +245,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
     it("should show no validation error message when casefacts are valid", async () => {
       renderComponent({
-        documentUnit: new DocumentUnit("123", {
+        documentUnit: new Decision("123", {
           documentNumber: "foo",
           coreData: {
             fileNumbers: ["foo"],
@@ -284,7 +285,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
     it("should show validation error message when decisionReasons are invalid", async () => {
       renderComponent({
-        documentUnit: new DocumentUnit("123", {
+        documentUnit: new Decision("123", {
           documentNumber: "foo",
           coreData: {
             fileNumbers: ["foo"],
@@ -324,7 +325,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
     it("should show no validation error message when decisionReasons are valid", async () => {
       renderComponent({
-        documentUnit: new DocumentUnit("123", {
+        documentUnit: new Decision("123", {
           documentNumber: "foo",
           coreData: {
             fileNumbers: ["foo"],
@@ -366,7 +367,7 @@ describe("HandoverDocumentationUnitView:", () => {
       const pinia = createTestingPinia({
         initialState: {
           docunitStore: {
-            documentUnit: new DocumentUnit("123", {
+            documentUnit: new Decision("123", {
               documentNumber: "foo",
               longTexts: {
                 reasons: "Reasons",
@@ -376,7 +377,7 @@ describe("HandoverDocumentationUnitView:", () => {
           },
         },
       })
-      render(HandoverDocumentationUnitView, {
+      render(HandoverDecisionView, {
         global: {
           plugins: [[router], [pinia]],
         },
@@ -395,7 +396,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
     it("should not allow to publish with pending duplicate", async () => {
       renderComponent({
-        documentUnit: new DocumentUnit("123", {
+        documentUnit: new Decision("123", {
           documentNumber: "foo",
           managementData: {
             duplicateRelations: [
@@ -431,7 +432,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
     it("should allow to publish with ignored duplicate", async () => {
       renderComponent({
-        documentUnit: new DocumentUnit("123", {
+        documentUnit: new Decision("123", {
           documentNumber: "foo",
           coreData: {
             fileNumbers: ["foo"],
@@ -475,7 +476,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
   it("should show error message with invalid border numbers", async () => {
     renderComponent({
-      documentUnit: new DocumentUnit("123", {
+      documentUnit: new Decision("123", {
         documentNumber: "foo",
         coreData: {
           fileNumbers: ["foo"],
@@ -517,7 +518,7 @@ describe("HandoverDocumentationUnitView:", () => {
   describe("on press 'Dokumentationseinheit an jDV übergeben'", () => {
     it("hands over successfully", async () => {
       const { emitted } = renderComponent({
-        documentUnit: new DocumentUnit("123", {
+        documentUnit: new Decision("123", {
           documentNumber: "foo",
           coreData: {
             fileNumbers: ["foo"],
@@ -627,7 +628,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
   it("with preview stubbing", async () => {
     renderComponent({
-      documentUnit: new DocumentUnit("123", {
+      documentUnit: new Decision("123", {
         coreData: {
           fileNumbers: ["foo"],
           court: { type: "type", location: "location", label: "label" },
@@ -658,7 +659,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
   it("should not allow to publish when publication is scheduled", async () => {
     renderComponent({
-      documentUnit: new DocumentUnit("123", {
+      documentUnit: new Decision("123", {
         managementData: {
           duplicateRelations: [],
           borderNumbers: [],
@@ -705,7 +706,7 @@ describe("HandoverDocumentationUnitView:", () => {
           }),
         ],
       },
-      documentUnit: new DocumentUnit("123", {
+      documentUnit: new Decision("123", {
         coreData: {
           fileNumbers: ["foo"],
           court: { type: "type", location: "location", label: "label" },

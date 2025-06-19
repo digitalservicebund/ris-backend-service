@@ -9,7 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
@@ -29,21 +29,21 @@ public class PrototypePortalTransformer extends CommonPortalTransformer {
   }
 
   @Override
-  protected Meta buildMeta(DocumentationUnit documentationUnit) throws ValidationException {
-    validateCoreData(documentationUnit);
+  protected Meta buildMeta(Decision decision) throws ValidationException {
+    validateCoreData(decision);
 
     Meta.MetaBuilder builder = Meta.builder();
 
     return builder
-        .identification(buildIdentification(documentationUnit))
-        .proprietary(Proprietary.builder().meta(buildRisMeta(documentationUnit)).build())
+        .identification(buildIdentification(decision))
+        .proprietary(Proprietary.builder().meta(buildRisMeta(decision)).build())
         .build();
   }
 
-  private RisMeta buildRisMeta(DocumentationUnit documentationUnit) {
-    var builder = buildCommonRisMeta(documentationUnit);
+  private RisMeta buildRisMeta(Decision decision) {
+    var builder = buildCommonRisMeta(decision);
 
-    var coreData = documentationUnit.coreData();
+    var coreData = decision.coreData();
     if (coreData != null) {
       applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
 
@@ -57,8 +57,8 @@ public class PrototypePortalTransformer extends CommonPortalTransformer {
   }
 
   @Override
-  protected AknMultipleBlock buildIntroduction(DocumentationUnit documentationUnit) {
-    var longTexts = documentationUnit.longTexts();
+  protected AknMultipleBlock buildIntroduction(Decision decision) {
+    var longTexts = decision.longTexts();
 
     var outline = nullSafeGet(longTexts, LongTexts::outline);
     var tenor = nullSafeGet(longTexts, LongTexts::tenor);

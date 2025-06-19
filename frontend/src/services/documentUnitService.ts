@@ -3,28 +3,28 @@ import httpClient, {
   ServiceResponse,
 } from "./httpClient"
 import { Page } from "@/components/Pagination.vue"
-import DocumentUnit, {
-  DocumentUnitSearchParameter,
-  DocumentationUnitParameters,
-  DuplicateRelationStatus,
-  EurlexParameters,
-} from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { EurlexParameters } from "@/domain/eurlex"
+import { DuplicateRelationStatus } from "@/domain/managementData"
 import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import { SingleNormValidationInfo } from "@/domain/singleNorm"
 import errorMessages from "@/i18n/errors.json"
-import { isDocumentUnit, isPendingProceeding } from "@/utils/typeGuards"
+import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
+import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
+import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 
 interface DocumentUnitService {
   getByDocumentNumber(
     documentNumber: string,
-  ): Promise<ServiceResponse<DocumentUnit | PendingProceeding>>
+  ): Promise<ServiceResponse<DocumentationUnit>>
 
   createNew(
-    params?: DocumentationUnitParameters,
-  ): Promise<ServiceResponse<DocumentUnit>>
+    params?: DocumentationUnitCreationParameters,
+  ): Promise<ServiceResponse<Decision>>
 
   createNewOutOfEurlexDecision(
     params?: EurlexParameters,
@@ -71,7 +71,7 @@ interface DocumentUnitService {
 
 const service: DocumentUnitService = {
   async getByDocumentNumber(documentNumber: string) {
-    const response = await httpClient.get<DocumentUnit | PendingProceeding>(
+    const response = await httpClient.get<DocumentationUnit>(
       `caselaw/documentunits/${documentNumber}`,
     )
     if (response.status >= 300 || response.error) {
@@ -82,8 +82,8 @@ const service: DocumentUnitService = {
             ? errorMessages.DOCUMENT_UNIT_NOT_ALLOWED.title
             : errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED.title,
       }
-    } else if (isDocumentUnit(response.data)) {
-      response.data = new DocumentUnit(response.data.uuid, {
+    } else if (isDecision(response.data)) {
+      response.data = new Decision(response.data.uuid, {
         ...response.data,
       })
     } else if (isPendingProceeding(response.data)) {
@@ -94,10 +94,10 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async createNew(parameters?: DocumentationUnitParameters) {
+  async createNew(parameters?: DocumentationUnitCreationParameters) {
     const response = await httpClient.put<
-      DocumentationUnitParameters,
-      DocumentUnit
+      DocumentationUnitCreationParameters,
+      Decision
     >(
       "caselaw/documentunits/new",
       {
@@ -113,8 +113,8 @@ const service: DocumentUnitService = {
         title: errorMessages.DOCUMENT_UNIT_CREATION_FAILED.title,
       }
     } else {
-      response.data = new DocumentUnit((response.data as DocumentUnit).uuid, {
-        ...(response.data as DocumentUnit),
+      response.data = new Decision((response.data as Decision).uuid, {
+        ...(response.data as Decision),
       })
     }
     return response
@@ -190,7 +190,7 @@ const service: DocumentUnitService = {
   },
 
   async takeOver(documentNumber: string) {
-    const response = await httpClient.put<string, DocumentUnit>(
+    const response = await httpClient.put<string, Decision>(
       `caselaw/documentunits/${documentNumber}/takeover`,
     )
     if (response.status >= 300) {
@@ -224,7 +224,7 @@ const service: DocumentUnitService = {
 
   async searchByRelatedDocumentation(
     query: RelatedDocumentation = new RelatedDocumentation(),
-    requestParams: { [K in DocumentUnitSearchParameter]?: string } = {},
+    requestParams: { [K in DocumentationUnitSearchParameter]?: string } = {},
   ) {
     const response = await httpClient.put<
       RelatedDocumentation,
@@ -260,7 +260,7 @@ const service: DocumentUnitService = {
   },
 
   async searchByDocumentUnitSearchInput(
-    requestParams: { [K in DocumentUnitSearchParameter]?: string } = {},
+    requestParams: { [K in DocumentationUnitSearchParameter]?: string } = {},
   ) {
     const response = await httpClient.get<Page<DocumentUnitListEntry>>(
       `caselaw/documentunits/search`,

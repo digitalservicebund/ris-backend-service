@@ -7,7 +7,7 @@ import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.
 import {
   DuplicateRelation,
   DuplicateRelationStatus,
-} from "@/domain/documentUnit"
+} from "@/domain/managementData"
 import { PublicationState } from "@/domain/publicationStatus"
 import routes from "~/test-helper/routes"
 

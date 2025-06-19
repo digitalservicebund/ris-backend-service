@@ -8,7 +8,7 @@ import {
   uploadTestfile,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import DateUtil from "@/utils/dateUtil"
 
 /* eslint-disable playwright/no-nested-step */
@@ -343,7 +343,7 @@ test.describe(
   },
 )
 
-async function setFileNumberToMatchDocUnit(page: Page, docUnit: DocumentUnit) {
+async function setFileNumberToMatchDocUnit(page: Page, docUnit: Decision) {
   await test.step("Set fileNumber to match existing doc", async () => {
     await page
       .getByLabel("Aktenzeichen", { exact: true })
@@ -353,7 +353,7 @@ async function setFileNumberToMatchDocUnit(page: Page, docUnit: DocumentUnit) {
 
 async function setDeviatingFileNumberToMatchDocUnit(
   page: Page,
-  docUnit: DocumentUnit,
+  docUnit: Decision,
 ) {
   await test.step("Set deviating fileNumber to match existing doc", async () => {
     await page.getByLabel("Abweichendes Aktenzeichen anzeigen").click()
@@ -366,10 +366,7 @@ async function setDeviatingFileNumberToMatchDocUnit(
   })
 }
 
-async function setDecisionDateToMatchDocUnit(
-  page: Page,
-  docUnit: DocumentUnit,
-) {
+async function setDecisionDateToMatchDocUnit(page: Page, docUnit: Decision) {
   await test.step("Set decisionDate to match existing doc", async () => {
     const date = DateUtil.formatDate(docUnit.coreData.decisionDate)!
     await page.getByLabel("Entscheidungsdatum", { exact: true }).fill(date)
@@ -378,7 +375,7 @@ async function setDecisionDateToMatchDocUnit(
 
 async function setDeviatingDecisionDateToMatchDocUnit(
   page: Page,
-  docUnit: DocumentUnit,
+  docUnit: Decision,
 ) {
   await test.step("Set deviating decisionDate to match existing doc", async () => {
     await page.getByLabel("Abweichendes Entscheidungsdatum anzeigen").click()
@@ -390,7 +387,7 @@ async function setDeviatingDecisionDateToMatchDocUnit(
   })
 }
 
-async function setDocTypeToMatchDocUnit(page: Page, docUnit: DocumentUnit) {
+async function setDocTypeToMatchDocUnit(page: Page, docUnit: Decision) {
   await test.step("Set documentType to match existing doc", async () => {
     await page
       .getByLabel("Dokumenttyp", { exact: true })
@@ -416,7 +413,7 @@ async function setCourtToBGH(page: Page) {
   })
 }
 
-async function ignoreDuplicateWarning(page: Page, docUnit: DocumentUnit) {
+async function ignoreDuplicateWarning(page: Page, docUnit: Decision) {
   await test.step("Ignore duplicate warning", async () => {
     const setStatusRequest = page.waitForRequest(
       "**/api/v1/caselaw/documentunits/*/duplicate-status/*",
@@ -431,7 +428,7 @@ async function ignoreDuplicateWarning(page: Page, docUnit: DocumentUnit) {
 
 async function expectDocUnitSummaryInDuplicatesList(
   page: Page,
-  docUnit: DocumentUnit,
+  docUnit: Decision,
 ) {
   await test.step("Ensure duplicate doc unit appears in duplicate warnings", async () => {
     const duplicateSummary = page.getByTestId(

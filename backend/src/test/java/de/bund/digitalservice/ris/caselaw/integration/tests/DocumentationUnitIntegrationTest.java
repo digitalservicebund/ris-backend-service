@@ -73,9 +73,9 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepository;
@@ -261,7 +261,7 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -305,7 +305,7 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -337,7 +337,7 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -367,7 +367,7 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -392,7 +392,7 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -430,8 +430,8 @@ class DocumentationUnitIntegrationTest {
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, documentationOffice, "1234567890123");
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(
@@ -446,11 +446,11 @@ class DocumentationUnitIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -501,8 +501,8 @@ class DocumentationUnitIntegrationTest {
                 .court(bghCourt)
                 .documentationOffice(documentationOffice));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(
@@ -517,11 +517,11 @@ class DocumentationUnitIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -546,8 +546,8 @@ class DocumentationUnitIntegrationTest {
                 .singleNorms(singleNorms)
                 .build());
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .contentRelatedIndexing(ContentRelatedIndexing.builder().norms(norms).build())
@@ -558,11 +558,11 @@ class DocumentationUnitIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -620,8 +620,8 @@ class DocumentationUnitIntegrationTest {
                 .singleNorms(singleNorms)
                 .build());
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .contentRelatedIndexing(ContentRelatedIndexing.builder().norms(norms).build())
@@ -632,11 +632,11 @@ class DocumentationUnitIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -704,8 +704,8 @@ class DocumentationUnitIntegrationTest {
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, documentationOffice, "1234567890123");
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(
@@ -719,11 +719,11 @@ class DocumentationUnitIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -775,8 +775,8 @@ class DocumentationUnitIntegrationTest {
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, documentationOffice, "1234567890123");
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(documentationUnitDto.getId())
             .documentNumber(documentationUnitDto.getDocumentNumber())
             .coreData(
@@ -794,12 +794,12 @@ class DocumentationUnitIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentationUnitFromFrontend.uuid())
-        .bodyValue(documentationUnitFromFrontend)
+        .uri("/api/v1/caselaw/documentunits/" + decisionFromFrontend.uuid())
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -832,8 +832,8 @@ class DocumentationUnitIntegrationTest {
     assertThat(repository.findAll()).hasSize(1);
     assertThat(repository.findById(dto.getId())).isPresent();
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(CoreData.builder().documentationOffice(docOffice).documentType(null).build())
@@ -842,12 +842,12 @@ class DocumentationUnitIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentationUnitFromFrontend.uuid())
-        .bodyValue(documentationUnitFromFrontend)
+        .uri("/api/v1/caselaw/documentunits/" + decisionFromFrontend.uuid())
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -1347,7 +1347,7 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
@@ -1383,7 +1383,7 @@ class DocumentationUnitIntegrationTest {
             .exchange()
             .expectStatus()
             .isCreated()
-            .expectBody(DocumentationUnit.class)
+            .expectBody(Decision.class)
             .returnResult()
             .getResponseBody();
 
@@ -1401,7 +1401,7 @@ class DocumentationUnitIntegrationTest {
             .exchange()
             .expectStatus()
             .is2xxSuccessful()
-            .expectBody(DocumentationUnit.class)
+            .expectBody(Decision.class)
             .returnResult()
             .getResponseBody();
 
@@ -1426,7 +1426,7 @@ class DocumentationUnitIntegrationTest {
             .exchange()
             .expectStatus()
             .isCreated()
-            .expectBody(DocumentationUnit.class)
+            .expectBody(Decision.class)
             .returnResult()
             .getResponseBody();
 
@@ -1452,7 +1452,7 @@ class DocumentationUnitIntegrationTest {
             .exchange()
             .expectStatus()
             .is2xxSuccessful()
-            .expectBody(DocumentationUnit.class)
+            .expectBody(Decision.class)
             .returnResult()
             .getResponseBody();
 
@@ -1508,7 +1508,7 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
@@ -1547,7 +1547,7 @@ class DocumentationUnitIntegrationTest {
                     .build())
             .build();
 
-    DocumentationUnit createdDocUnit =
+    Decision createdDocUnit =
         risWebTestClient
             .withDefaultLogin()
             .put()
@@ -1557,7 +1557,7 @@ class DocumentationUnitIntegrationTest {
             .exchange()
             .expectStatus()
             .isCreated()
-            .expectBody(DocumentationUnit.class)
+            .expectBody(Decision.class)
             .returnResult()
             .getResponseBody();
 

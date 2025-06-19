@@ -2,7 +2,8 @@
 import { storeToRefs } from "pinia"
 import { Ref } from "vue"
 import DocumentViewer from "@/components/DocumentViewer.vue"
-import DocumentUnit, { Kind } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { Kind } from "@/domain/documentationUnitKind"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 
@@ -14,7 +15,7 @@ const extraContentSidePanelStore = useExtraContentSidePanelStore()
 const documentUnitStore = useDocumentUnitStore()
 
 const { documentUnit } = storeToRefs(documentUnitStore) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+  documentUnit: Ref<Decision | undefined>
 }
 
 async function attachmentIndexSelected(index: number) {
@@ -48,10 +49,7 @@ async function attachmentsUploaded(
 </script>
 
 <template>
-  <DocumentViewer
-    :document-number="documentNumber"
-    :kind="Kind.DOCUMENTION_UNIT"
-  >
+  <DocumentViewer :document-number="documentNumber" :kind="Kind.DECISION">
     <template
       #default="{
         registerTextEditorRef,

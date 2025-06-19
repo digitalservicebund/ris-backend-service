@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,10 +26,8 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
@@ -230,16 +227,6 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
 
   @Column(name = "scheduled_by_email")
   private String scheduledByEmail;
-
-  @OneToMany(mappedBy = "documentationUnit1", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JsonManagedReference // Prevent infinite recursion
-  @Builder.Default
-  private Set<DuplicateRelationDTO> duplicateRelations1 = new HashSet<>();
-
-  @OneToMany(mappedBy = "documentationUnit2", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JsonManagedReference // Prevent infinite recursion
-  @Builder.Default
-  private Set<DuplicateRelationDTO> duplicateRelations2 = new HashSet<>();
 
   /**
    * This field represents the "Dupcode ausschalten" functionality from the jDV. It is set to false

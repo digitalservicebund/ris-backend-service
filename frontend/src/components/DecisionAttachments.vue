@@ -8,7 +8,7 @@ import FlexItem from "@/components/FlexItem.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import attachmentService from "@/services/attachmentService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -19,8 +19,8 @@ const emit = defineEmits<{
 }>()
 
 const store = useDocumentUnitStore()
-const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+const { documentUnit: decision } = storeToRefs(store) as {
+  documentUnit: Ref<Decision | undefined>
 }
 const errors = ref<string[]>([])
 const isLoading = ref(false)
@@ -46,12 +46,8 @@ const handleDeleteAttachment = async (index: number) => {
   }
 
   if (
-    (
-      await attachmentService.delete(
-        documentUnit.value!.uuid,
-        fileToDelete.s3path,
-      )
-    ).status < 300
+    (await attachmentService.delete(decision.value!.uuid, fileToDelete.s3path))
+      .status < 300
   ) {
     emit("attachmentIndexDeleted", index)
     await store.loadDocumentUnit(store.documentUnit!.documentNumber!)
@@ -82,7 +78,7 @@ async function upload(files: FileList) {
     for (const file of Array.from(files)) {
       isLoading.value = true
       const response = await attachmentService.upload(
-        documentUnit.value!.uuid,
+        decision.value!.uuid,
         file,
       )
       if (response.status === 200 && response.data) {
@@ -120,20 +116,20 @@ function closeDeleteModal() {
 }
 
 const hasAttachments = computed<boolean>(() => {
-  return documentUnit.value!.attachments.length > 0
+  return decision.value!.attachments.length > 0
 })
 
 const attachments = computed({
-  get: () => documentUnit.value!.attachments,
+  get: () => decision.value!.attachments,
   set: (newValues) => {
-    documentUnit.value!.attachments = newValues
+    decision.value!.attachments = newValues
   },
 })
 </script>
 
 <template>
   <FlexItem
-    v-if="documentUnit"
+    v-if="decision"
     class="w-full flex-1 grow p-24"
     data-testid="document-unit-attachments"
   >

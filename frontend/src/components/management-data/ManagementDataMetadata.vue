@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import DocumentUnit, { Source } from "@/domain/documentUnit"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import Reference from "@/domain/reference"
+import { Source } from "@/domain/source"
 import DateUtil from "@/utils/dateUtil"
 
 const { documentUnit } = defineProps<{
-  documentUnit: DocumentUnit
+  documentUnit: DocumentationUnit
 }>()
 
 const createdBy = computed(() =>

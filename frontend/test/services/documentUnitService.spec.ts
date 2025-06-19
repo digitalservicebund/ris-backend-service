@@ -1,4 +1,5 @@
-import DocumentUnit, { DuplicateRelationStatus } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { DuplicateRelationStatus } from "@/domain/managementData"
 import PendingProceeding from "@/domain/pendingProceeding"
 import errorMessages from "@/i18n/errors.json"
 import service from "@/services/documentUnitService"
@@ -159,7 +160,7 @@ describe("documentUnitService", () => {
     })
 
     it("should return document unit on success", async () => {
-      const data = new DocumentUnit("uuid")
+      const data = new Decision("uuid")
       const httpMock = vi.spyOn(HttpClient, "get").mockResolvedValue({
         status: 200,
         data: data,

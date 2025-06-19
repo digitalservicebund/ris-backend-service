@@ -56,7 +56,7 @@ class SendInBlueMailTrackingServiceTest {
   void testProcessDeliveredEvent_shouldNotSearchUUIDInDb()
       throws DocumentationUnitNotExistsException {
     when(documentationUnitService.getByUuid(TEST_UUID))
-        .thenReturn(DocumentationUnit.builder().uuid(TEST_UUID).build());
+        .thenReturn(Decision.builder().uuid(TEST_UUID).build());
 
     service.processMailSendingState("88888888-4444-4444-4444-121212121212", "delivered");
     verifyNoInteractions(documentationUnitService);
@@ -66,7 +66,7 @@ class SendInBlueMailTrackingServiceTest {
   void testProcessDeliveredEventOfKnownUUID_shouldSearchInDb()
       throws DocumentationUnitNotExistsException {
     when(documentationUnitService.getByUuid(TEST_UUID))
-        .thenReturn(DocumentationUnit.builder().uuid(TEST_UUID).build());
+        .thenReturn(Decision.builder().uuid(TEST_UUID).build());
 
     service.processMailSendingState(TEST_UUID.toString(), "error");
     verify(documentationUnitService).getByUuid(TEST_UUID);
@@ -77,7 +77,7 @@ class SendInBlueMailTrackingServiceTest {
       throws DocumentationUnitNotExistsException {
 
     when(documentationUnitService.getByUuid(TEST_UUID))
-        .thenReturn(DocumentationUnit.builder().uuid(TEST_UUID).build());
+        .thenReturn(Decision.builder().uuid(TEST_UUID).build());
 
     service.processMailSendingState("88888888-4444-4444-4444-121212121212", "error");
     verify(documentationUnitService)

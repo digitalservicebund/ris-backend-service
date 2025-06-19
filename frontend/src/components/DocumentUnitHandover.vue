@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import LoadingSpinner from "./LoadingSpinner.vue"
-import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
+import HandoverDecisionView from "@/components/HandoverDecisionView.vue"
 import EventRecord, { HandoverMail } from "@/domain/eventRecord"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ResponseError } from "@/services/httpClient"
@@ -55,7 +55,7 @@ onMounted(async () => {
 
 <template>
   <div class="w-full grow p-24">
-    <HandoverDocumentationUnitView
+    <HandoverDecisionView
       v-if="loadDone"
       :error-message="errorMessage"
       :event-log="eventLog"

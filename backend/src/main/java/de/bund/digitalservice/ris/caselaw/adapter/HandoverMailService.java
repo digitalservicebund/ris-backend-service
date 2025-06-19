@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -65,27 +65,26 @@ public class HandoverMailService implements MailService {
   /**
    * Hands over a documentation unit as XML to jDV via email.
    *
-   * @param documentationUnit the documentation unit to hand over
+   * @param decision the documentation unit to hand over
    * @param receiverAddress the email address of the receiver
    * @param issuerAddress the email address of the issuer
    * @return the result of the handover
    * @throws HandoverException if the XML export fails
    */
   @Override
-  public HandoverMail handOver(
-      DocumentationUnit documentationUnit, String receiverAddress, String issuerAddress) {
+  public HandoverMail handOver(Decision decision, String receiverAddress, String issuerAddress) {
     XmlTransformationResult xml;
     try {
-      xml = xmlExporter.transformToXml(getTestDocumentationUnit(documentationUnit), false);
+      xml = xmlExporter.transformToXml(getTestDocumentationUnit(decision), false);
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new HandoverException("Couldn't generate xml for documentationUnit.", ex);
     }
 
-    String mailSubject = generateMailSubject(documentationUnit);
+    String mailSubject = generateMailSubject(decision);
 
     HandoverMail handoverMail =
         generateXmlHandoverMail(
-            documentationUnit.uuid(),
+            decision.uuid(),
             receiverAddress,
             mailSubject,
             List.of(xml),
@@ -149,14 +148,14 @@ public class HandoverMailService implements MailService {
   /**
    * Generates a preview of the XML that would be sent via email.
    *
-   * @param documentationUnit the documentation unit
+   * @param decision the documentation unit
    * @return the XML export result, containing the XML and possibly errors
    * @throws HandoverException if the XML export fails
    */
   @Override
-  public XmlTransformationResult getXmlPreview(DocumentationUnit documentationUnit) {
+  public XmlTransformationResult getXmlPreview(Decision decision) {
     try {
-      return xmlExporter.transformToXml(documentationUnit, true);
+      return xmlExporter.transformToXml(decision, true);
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new HandoverException("Couldn't generate xml for documentation unit.", ex);
     }
@@ -177,11 +176,11 @@ public class HandoverMailService implements MailService {
     }
   }
 
-  private String generateMailSubject(DocumentationUnit documentationUnit) {
-    if (documentationUnit.documentNumber() == null) {
+  private String generateMailSubject(Decision decision) {
+    if (decision.documentNumber() == null) {
       throw new HandoverException("No document number has been set in the document unit.");
     }
-    return generateMailSubject(documentationUnit.documentNumber(), "N");
+    return generateMailSubject(decision.documentNumber(), "N");
   }
 
   private String generateMailSubject(LegalPeriodicalEdition edition) {
@@ -290,18 +289,17 @@ public class HandoverMailService implements MailService {
     return renamedAttachments;
   }
 
-  private DocumentationUnit getTestDocumentationUnit(DocumentationUnit documentationUnit) {
+  private Decision getTestDocumentationUnit(Decision decision) {
     if (env.matchesProfiles("production")) {
-      return documentationUnit.toBuilder()
+      return decision.toBuilder()
           .coreData(
-              Optional.ofNullable(documentationUnit.coreData())
-                  .orElseGet(() -> CoreData.builder().build()))
+              Optional.ofNullable(decision.coreData()).orElseGet(() -> CoreData.builder().build()))
           .build();
     }
-    return documentationUnit.toBuilder()
-        .documentNumber("TEST" + documentationUnit.documentNumber())
+    return decision.toBuilder()
+        .documentNumber("TEST" + decision.documentNumber())
         .coreData(
-            Optional.ofNullable(documentationUnit.coreData())
+            Optional.ofNullable(decision.coreData())
                 .map(
                     coreData ->
                         coreData.toBuilder()
@@ -314,7 +312,7 @@ public class HandoverMailService implements MailService {
                             .fileNumbers(
                                 Stream.concat(
                                         Stream.of("TEST"),
-                                        documentationUnit.coreData().fileNumbers().stream())
+                                        decision.coreData().fileNumbers().stream())
                                     .toList())
                             .build())
                 .orElseGet(

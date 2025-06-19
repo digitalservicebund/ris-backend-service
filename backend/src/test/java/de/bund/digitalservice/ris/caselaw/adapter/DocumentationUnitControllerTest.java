@@ -33,9 +33,9 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
@@ -134,7 +134,7 @@ class DocumentationUnitControllerTest {
 
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
@@ -146,7 +146,7 @@ class DocumentationUnitControllerTest {
     when(userService.getUser(any())).thenReturn(user);
     when(service.generateNewDocumentationUnit(null, null))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .build());
 
@@ -157,7 +157,7 @@ class DocumentationUnitControllerTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentationUnit.class);
+        .expectBody(Decision.class);
 
     verify(service, times(1)).generateNewDocumentationUnit(user, Optional.empty());
     verify(userService, times(1)).getUser(any(OidcUser.class));
@@ -175,7 +175,7 @@ class DocumentationUnitControllerTest {
 
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
@@ -204,8 +204,8 @@ class DocumentationUnitControllerTest {
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
 
-    DocumentationUnit docUnit =
-        DocumentationUnit.builder()
+    Decision docUnit =
+        Decision.builder()
             .documentNumber("myDocNumber1")
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
@@ -251,7 +251,7 @@ class DocumentationUnitControllerTest {
   void testGetByDocumentnumber() throws DocumentationUnitNotExistsException {
     when(service.getByDocumentNumber("ABCD202200001"))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
@@ -263,7 +263,7 @@ class DocumentationUnitControllerTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class);
+        .expectBody(Decision.class);
 
     // once by the AuthService and once by the controller asking the service
     verify(service, times(1)).getByDocumentNumber("ABCD202200001");
@@ -362,22 +362,21 @@ class DocumentationUnitControllerTest {
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .build();
-    DocumentationUnit documentationUnit =
-        DecisionTransformer.transformToDomain(documentationUnitDTO);
+    Decision decision = DecisionTransformer.transformToDomain(documentationUnitDTO);
 
-    when(service.updateDocumentationUnit(documentationUnit)).thenReturn(null);
+    when(service.updateDocumentationUnit(decision)).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
         .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(documentationUnit)
+        .bodyValue(decision)
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).updateDocumentationUnit(documentationUnit);
+    verify(service).updateDocumentationUnit(decision);
   }
 
   @Test
@@ -389,11 +388,10 @@ class DocumentationUnitControllerTest {
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .build();
-    DocumentationUnit documentationUnit =
-        DecisionTransformer.transformToDomain(documentationUnitDTO);
+    Decision decision = DecisionTransformer.transformToDomain(documentationUnitDTO);
 
-    when(service.updateDocumentationUnit(documentationUnit)).thenReturn(documentationUnit);
-    when(service.getByUuid(TEST_UUID)).thenReturn(documentationUnit);
+    when(service.updateDocumentationUnit(decision)).thenReturn(decision);
+    when(service.getByUuid(TEST_UUID)).thenReturn(decision);
 
     JsonNode valueToReplace = new TextNode("newValue");
     JsonPatchOperation replaceOp = new ReplaceOperation("/coreData/appraisalBody", valueToReplace);
@@ -413,14 +411,14 @@ class DocumentationUnitControllerTest {
 
   @Test
   void testUpdateByUuid_withInvalidUuid() {
-    DocumentationUnit documentationUnitDTO = DocumentationUnit.builder().uuid(TEST_UUID).build();
+    Decision decisionDTO = Decision.builder().uuid(TEST_UUID).build();
 
     risWebClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/abc")
         .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(documentationUnitDTO)
+        .bodyValue(decisionDTO)
         .exchange()
         .expectStatus()
         .is4xxClientError();
@@ -673,7 +671,7 @@ class DocumentationUnitControllerTest {
   void testGetHtml() throws DocumentationUnitNotExistsException {
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
-            DocumentationUnit.builder()
+            Decision.builder()
                 .attachments(Collections.singletonList(Attachment.builder().s3path("123").build()))
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
@@ -703,8 +701,8 @@ class DocumentationUnitControllerTest {
             .build();
     String documentNumber = "ABCD202200001";
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(documentNumber)
             .status(
                 Status.builder()
@@ -713,7 +711,7 @@ class DocumentationUnitControllerTest {
             .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
             .build();
 
-    when(service.getByDocumentNumber(documentNumber)).thenReturn(documentationUnit);
+    when(service.getByDocumentNumber(documentNumber)).thenReturn(decision);
 
     risWebClient
         .withDefaultLogin()
@@ -748,8 +746,8 @@ class DocumentationUnitControllerTest {
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
     when(userService.getDocumentationOffice(any())).thenReturn(office);
     String documentNumber = "ABCD202200001";
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(documentNumber)
             .status(
                 Status.builder()
@@ -758,7 +756,7 @@ class DocumentationUnitControllerTest {
             .coreData(CoreData.builder().documentationOffice(office).build())
             .build();
 
-    when(service.getByDocumentNumber(documentNumber)).thenReturn(documentationUnit);
+    when(service.getByDocumentNumber(documentNumber)).thenReturn(decision);
 
     risWebClient
         .withDefaultLogin()
@@ -838,13 +836,13 @@ class DocumentationUnitControllerTest {
             .abbreviation("DS")
             .build();
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(docNumberOrigin)
             .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
             .build();
 
-    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(documentationUnit);
+    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(decision);
 
     DuplicateRelationStatusRequest body =
         DuplicateRelationStatusRequest.builder().status(DuplicateRelationStatus.IGNORED).build();
@@ -874,13 +872,13 @@ class DocumentationUnitControllerTest {
             .abbreviation("DS")
             .build();
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(docNumberOrigin)
             .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
             .build();
 
-    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(documentationUnit);
+    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(decision);
 
     String body =
         """
@@ -913,13 +911,13 @@ class DocumentationUnitControllerTest {
             .abbreviation("DS")
             .build();
 
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .documentNumber(docNumberOrigin)
             .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
             .build();
 
-    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(documentationUnit);
+    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(decision);
 
     when(duplicateCheckService.updateDuplicateStatus(any(), any(), any()))
         .thenThrow(EntityNotFoundException.class);

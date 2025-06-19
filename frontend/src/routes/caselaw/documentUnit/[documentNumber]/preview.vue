@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
+import DecisionPreview from "@/components/preview/DecisionPreview.vue"
 </script>
 <template>
-  <DocumentUnitPreview />
+  <DecisionPreview />
 </template>

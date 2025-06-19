@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
@@ -122,7 +122,7 @@ class HandoverMailServiceUATTest {
           new XmlTransformationResult(
               "xml 2", true, List.of("succeed"), "test2.xml", CREATED_DATE));
 
-  private DocumentationUnit documentationUnit;
+  private Decision decision;
 
   private final LegalPeriodical legalPeriodical =
       LegalPeriodical.builder().abbreviation("ABC").build();
@@ -149,8 +149,7 @@ class HandoverMailServiceUATTest {
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
-    documentationUnit =
-        DocumentationUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
+    decision = Decision.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
 
     when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
 
@@ -177,8 +176,7 @@ class HandoverMailServiceUATTest {
                                 .build())
                         .build()))
             .build();
-    when(xmlExporter.transformToXml(any(DocumentationUnit.class), anyBoolean()))
-        .thenReturn(DOC_UNIT_XML);
+    when(xmlExporter.transformToXml(any(Decision.class), anyBoolean())).thenReturn(DOC_UNIT_XML);
     when(xmlExporter.transformToXml(any(LegalPeriodicalEdition.class))).thenReturn(EDITION_XML);
     when(repository.save(DOC_UNIT_SAVED_MAIL)).thenReturn(DOC_UNIT_SAVED_MAIL);
     when(repository.save(EDITION_SAVED_MAIL)).thenReturn(EDITION_SAVED_MAIL);
@@ -186,13 +184,13 @@ class HandoverMailServiceUATTest {
 
   @Test
   void testSendDocumentationUnit() throws ParserConfigurationException, TransformerException {
-    var response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+    var response = service.handOver(decision, RECEIVER_ADDRESS, ISSUER_ADDRESS);
 
     assertThat(response).usingRecursiveComparison().isEqualTo(DOC_UNIT_SAVED_MAIL);
 
     verify(xmlExporter)
         .transformToXml(
-            documentationUnit.toBuilder()
+            decision.toBuilder()
                 .documentNumber("TESTtest-document-number")
                 .coreData(
                     CoreData.builder()
@@ -330,10 +328,10 @@ class HandoverMailServiceUATTest {
             .success(false)
             .build();
 
-    when(xmlExporter.transformToXml(any(DocumentationUnit.class), anyBoolean()))
+    when(xmlExporter.transformToXml(any(Decision.class), anyBoolean()))
         .thenReturn(xmlWithValidationError);
 
-    var response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+    var response = service.handOver(decision, RECEIVER_ADDRESS, ISSUER_ADDRESS);
     assertThat(response).usingRecursiveComparison().isEqualTo(expected);
 
     verify(repository, never()).save(any(HandoverMail.class));
@@ -368,13 +366,13 @@ class HandoverMailServiceUATTest {
   @Test
   void testSendDocumentationUnit_withExceptionFromXmlExporter()
       throws ParserConfigurationException, TransformerException {
-    when(xmlExporter.transformToXml(any(DocumentationUnit.class), anyBoolean()))
+    when(xmlExporter.transformToXml(any(Decision.class), anyBoolean()))
         .thenThrow(ParserConfigurationException.class);
 
     HandoverException ex =
         Assertions.assertThrows(
             HandoverException.class,
-            () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
+            () -> service.handOver(decision, RECEIVER_ADDRESS, ISSUER_ADDRESS));
     Assertions.assertEquals("Couldn't generate xml for documentationUnit.", ex.getMessage());
 
     verify(repository, never()).save(any(HandoverMail.class));
@@ -401,13 +399,13 @@ class HandoverMailServiceUATTest {
 
   @Test
   void testSendDocumentationUnit_withoutDocumentNumber() {
-    documentationUnit = documentationUnit.toBuilder().documentNumber(null).build();
+    decision = decision.toBuilder().documentNumber(null).build();
 
     // Call the method and check for the exception
     Throwable throwable =
         Assert.assertThrows(
             HandoverException.class,
-            () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
+            () -> service.handOver(decision, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     assertThat(throwable.getMessage())
         .isEqualTo("No document number has been set in the document unit.");
@@ -442,7 +440,7 @@ class HandoverMailServiceUATTest {
 
     Assert.assertThrows(
         IllegalArgumentException.class,
-        () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
+        () -> service.handOver(decision, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     verify(repository).save(any(HandoverMail.class));
     verify(mailSender)
@@ -452,8 +450,7 @@ class HandoverMailServiceUATTest {
   @Test
   void testSend_withoutToReceiverAddressSet() {
     Throwable throwable =
-        Assert.assertThrows(
-            HandoverException.class, () -> service.handOver(documentationUnit, null, null));
+        Assert.assertThrows(HandoverException.class, () -> service.handOver(decision, null, null));
 
     assertThat(throwable.getMessage()).isEqualTo("No receiver mail address is set");
 
@@ -477,7 +474,7 @@ class HandoverMailServiceUATTest {
 
     Assert.assertThrows(
         HandoverException.class,
-        () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
+        () -> service.handOver(decision, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender)

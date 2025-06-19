@@ -14,7 +14,9 @@ import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { usePendingProceedingMenuItems } from "@/composables/usePendingProceedingMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
-import DocumentUnit, { Kind } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { DocumentationUnit } from "@/domain/documentationUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import MenuItem from "@/domain/menuItem"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { ResponseError } from "@/services/httpClient"
@@ -41,16 +43,14 @@ const textCheck = useFeatureToggle("neuris.text-check-side-panel")
 const store = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
-const documentUnit = computed<DocumentUnit | PendingProceeding | undefined>(
-  () => {
-    if (props.kind === Kind.DOCUMENTION_UNIT) {
-      return store.documentUnit as DocumentUnit
-    } else if (props.kind === Kind.PENDING_PROCEEDING) {
-      return store.documentUnit as PendingProceeding
-    }
-    return undefined
-  },
-)
+const documentUnit = computed<DocumentationUnit | undefined>(() => {
+  if (props.kind === Kind.DECISION) {
+    return store.documentUnit as Decision
+  } else if (props.kind === Kind.PENDING_PROCEEDING) {
+    return store.documentUnit as PendingProceeding
+  }
+  return undefined
+})
 
 const route = useRoute()
 
@@ -58,7 +58,7 @@ const { pushQueryToRoute } = useQuery()
 
 const menuItems = computed<MenuItem[]>(() => {
   let itemsRef
-  if (props.kind === Kind.DOCUMENTION_UNIT) {
+  if (props.kind === Kind.DECISION) {
     itemsRef = useCaseLawMenuItems(props.documentNumber!, route.query)
   } else if (props.kind === Kind.PENDING_PROCEEDING) {
     itemsRef = usePendingProceedingMenuItems(props.documentNumber!, route.query)
@@ -124,14 +124,14 @@ const handleKeyDown = (event: KeyboardEvent) => {
       toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
       break
     case "n":
-      if (props.kind === Kind.DOCUMENTION_UNIT) {
+      if (props.kind === Kind.DECISION) {
         event.preventDefault()
         extraContentSidePanelStore.togglePanel(true)
         extraContentSidePanelStore.setSidePanelMode("note")
       }
       break
     case "d":
-      if (props.kind === Kind.DOCUMENTION_UNIT) {
+      if (props.kind === Kind.DECISION) {
         event.preventDefault()
         extraContentSidePanelStore.togglePanel(true)
         extraContentSidePanelStore.setSidePanelMode("attachments")
@@ -142,13 +142,13 @@ const handleKeyDown = (event: KeyboardEvent) => {
       extraContentSidePanelStore.setSidePanelMode("preview")
       break
     case "r":
-      if (props.kind === Kind.DOCUMENTION_UNIT) {
+      if (props.kind === Kind.DECISION) {
         extraContentSidePanelStore.togglePanel(true)
         extraContentSidePanelStore.setSidePanelMode("category-import")
       }
       break
     case "t":
-      if (!textCheck.value && props.kind === Kind.DOCUMENTION_UNIT) break
+      if (!textCheck.value && props.kind === Kind.DECISION) break
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("text-check")
       break

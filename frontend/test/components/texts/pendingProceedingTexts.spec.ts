@@ -7,7 +7,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import PendingProceedingTexts from "@/components/texts/PendingProceedingTexts.vue"
 import admissionOfAppealTypes from "@/data/admissionOfAppealTypes.json"
 import appellantTypes from "@/data/appellantTypes.json"
-import { Court } from "@/domain/documentUnit"
+import { Court } from "@/domain/court"
 import PendingProceeding, {
   pendingProceedingLabels,
   PendingProceedingShortTexts,

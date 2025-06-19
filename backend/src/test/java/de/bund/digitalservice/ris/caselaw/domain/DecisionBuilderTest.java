@@ -12,18 +12,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-class DocumentationUnitBuilderTest {
+class DecisionBuilderTest {
   @Test
-  void shouldConvertDocumentationUnitCorrectly() {
+  void shouldConvertDecisionCorrectly() {
     DecisionDTO documentationUnitDTO = new DecisionDTO();
     documentationUnitDTO.setAttachments(
-        Collections.singletonList(AttachmentDTO.builder().filename("doc.docx").build()));
+        Collections.singletonList(
+            AttachmentDTO.builder().filename("doc.docx").format("docx").build()));
     documentationUnitDTO.setGrounds("reasons123");
     documentationUnitDTO.setDocumentationOffice(DocumentationOfficeDTO.builder().build());
-    DocumentationUnit documentationUnit =
-        DecisionTransformer.transformToDomain(documentationUnitDTO);
+    Decision decision = DecisionTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentationUnit.attachments().get(0).name()).isEqualTo("doc.docx");
-    assertThat(documentationUnit.longTexts().reasons()).isEqualTo("reasons123");
+    assertThat(decision.attachments().get(0).name()).isEqualTo("doc.docx");
+    assertThat(decision.longTexts().reasons()).isEqualTo("reasons123");
   }
 }

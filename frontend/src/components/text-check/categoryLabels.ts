@@ -1,4 +1,4 @@
-import { longTextLabels, shortTextLabels } from "@/domain/documentUnit"
+import { longTextLabels, shortTextLabels } from "@/domain/decision"
 
 const textCheckCategoriesGermanLabels: Record<string, string | undefined> = {
   ...longTextLabels,

@@ -33,8 +33,8 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -148,7 +148,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).isEmpty());
   }
@@ -162,7 +162,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -181,12 +181,12 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -210,11 +210,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(4);
@@ -235,7 +235,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -247,8 +247,8 @@ class EnsuingDecisionsIntegrationTest {
                   .isEqualTo(ensuingDecisionUUID1);
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -271,11 +271,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -301,12 +301,12 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -330,11 +330,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
   }
@@ -348,12 +348,12 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -375,11 +375,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1));
   }
@@ -393,12 +393,12 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -416,11 +416,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1));
   }
@@ -434,12 +434,12 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -449,11 +449,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).isEmpty());
   }
@@ -470,7 +470,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -479,8 +479,8 @@ class EnsuingDecisionsIntegrationTest {
               assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending()).isTrue();
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -502,11 +502,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -521,8 +521,8 @@ class EnsuingDecisionsIntegrationTest {
     UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
     UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
     UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -549,11 +549,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(3);
@@ -567,8 +567,8 @@ class EnsuingDecisionsIntegrationTest {
     UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
     UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
     UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -591,11 +591,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -616,7 +616,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -624,8 +624,8 @@ class EnsuingDecisionsIntegrationTest {
                   .isFalse();
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -642,11 +642,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
@@ -667,7 +667,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -679,8 +679,8 @@ class EnsuingDecisionsIntegrationTest {
                   .isEqualTo(UUID.fromString("96301f85-9bd2-4690-a67f-f9fdfe725de3"));
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -710,11 +710,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -737,7 +737,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -747,8 +747,8 @@ class EnsuingDecisionsIntegrationTest {
                   .isEqualTo("2011-01-21");
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -773,11 +773,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -799,7 +799,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -809,8 +809,8 @@ class EnsuingDecisionsIntegrationTest {
                   .isEqualTo("cba");
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -828,11 +828,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -855,7 +855,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -867,8 +867,8 @@ class EnsuingDecisionsIntegrationTest {
                   .isEqualTo("Anordnung");
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -891,11 +891,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -919,7 +919,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -929,8 +929,8 @@ class EnsuingDecisionsIntegrationTest {
                   .isEqualTo("note2");
             });
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -952,11 +952,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -976,7 +976,7 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
@@ -989,8 +989,8 @@ class EnsuingDecisionsIntegrationTest {
 
   @Test
   void testUpdateDocumentationUnit_addLinkedEnsuingDecision() {
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -1002,11 +1002,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
@@ -1026,12 +1026,12 @@ class EnsuingDecisionsIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
 
-    DocumentationUnit documentationUnitFromFrontend =
-        DocumentationUnit.builder()
+    Decision decisionFromFrontend =
+        Decision.builder()
             .uuid(uuid)
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
@@ -1048,11 +1048,11 @@ class EnsuingDecisionsIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentationUnitFromFrontend)
+        .bodyValue(decisionFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationUnit.class)
+        .expectBody(Decision.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);

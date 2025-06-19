@@ -17,7 +17,7 @@ import PreviewLiteratureReferences from "@/components/preview/PreviewLiteratureR
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
-import { Kind } from "@/domain/documentUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import PendingProceeding, {
   pendingProceedingLabels,
 } from "@/domain/pendingProceeding"
@@ -29,7 +29,9 @@ const props = defineProps<{
   documentNumber: string
 }>()
 
-const { documentUnit } = storeToRefs(useDocumentUnitStore()) as {
+const { documentUnit: pendingProceeding } = storeToRefs(
+  useDocumentUnitStore(),
+) as {
   documentUnit: Ref<PendingProceeding | undefined>
 }
 
@@ -38,42 +40,44 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
 
 <template>
   <FlexContainer
-    v-if="documentUnit"
+    v-if="pendingProceeding"
     class="max-w-screen-xl"
     data-testid="preview"
     flex-direction="flex-col"
   >
     <h1 class="ris-heading3-bold mt-16 px-16">
-      {{ documentUnit.documentNumber }}
+      {{ pendingProceeding.documentNumber }}
     </h1>
     <p class="ris-label3-regular mb-16 px-16">
       Vorschau erstellt am {{ dayjs(new Date()).format("DD.MM.YYYY") }} um
       {{ dayjs(new Date()).format("HH:mm:ss") }}
     </p>
     <PreviewCoreData
-      :core-data="documentUnit.coreData"
+      :core-data="pendingProceeding.coreData"
       date-label="Mitteilungsdatum"
       is-pending-proceeding
       :kind="Kind.PENDING_PROCEEDING"
     />
     <PreviewCaselawReferences
-      :caselaw-references="documentUnit.caselawReferences as Reference[]"
+      :caselaw-references="pendingProceeding.caselawReferences as Reference[]"
     />
     <PreviewLiteratureReferences
-      :literature-references="documentUnit.literatureReferences as Reference[]"
+      :literature-references="
+        pendingProceeding.literatureReferences as Reference[]
+      "
     />
     <PreviewProceedingDecisions
-      :ensuing-decisions="documentUnit.ensuingDecisions"
-      :previous-decisions="documentUnit.previousDecisions"
+      :ensuing-decisions="pendingProceeding.ensuingDecisions"
+      :previous-decisions="pendingProceeding.previousDecisions"
     />
     <PreviewContentRelatedIndexing
-      :content-related-indexing="documentUnit.contentRelatedIndexing"
+      :content-related-indexing="pendingProceeding.contentRelatedIndexing"
     />
     <PreviewShortTexts
-      :short-texts="documentUnit.shortTexts"
+      :short-texts="pendingProceeding.shortTexts"
       :valid-border-numbers="[]"
     />
-    <PreviewRow v-if="documentUnit.shortTexts.legalIssue">
+    <PreviewRow v-if="pendingProceeding.shortTexts.legalIssue">
       <PreviewCategory>{{
         pendingProceedingLabels.legalIssue
       }}</PreviewCategory>
@@ -83,25 +87,25 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
           :aria-label="pendingProceedingLabels.legalIssue"
           field-size="max"
           preview
-          :value="documentUnit.shortTexts.legalIssue"
+          :value="pendingProceeding.shortTexts.legalIssue"
         />
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="documentUnit.shortTexts.admissionOfAppeal">
+    <PreviewRow v-if="pendingProceeding.shortTexts.admissionOfAppeal">
       <PreviewCategory>{{
         pendingProceedingLabels.admissionOfAppeal
       }}</PreviewCategory>
       <PreviewContent>
-        {{ documentUnit.shortTexts.admissionOfAppeal }}
+        {{ pendingProceeding.shortTexts.admissionOfAppeal }}
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="documentUnit.shortTexts.appellant">
+    <PreviewRow v-if="pendingProceeding.shortTexts.appellant">
       <PreviewCategory>{{ pendingProceedingLabels.appellant }}</PreviewCategory>
       <PreviewContent>
-        {{ documentUnit.shortTexts.appellant }}
+        {{ pendingProceeding.shortTexts.appellant }}
       </PreviewContent>
     </PreviewRow>
-    <PreviewRow v-if="documentUnit.shortTexts.resolutionNote">
+    <PreviewRow v-if="pendingProceeding.shortTexts.resolutionNote">
       <PreviewCategory>Erledigungsvermerk</PreviewCategory>
       <PreviewContent>
         <TextEditor
@@ -109,7 +113,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
           :aria-label="pendingProceedingLabels.resolutionNote"
           field-size="max"
           preview
-          :value="documentUnit.shortTexts.resolutionNote"
+          :value="pendingProceeding.shortTexts.resolutionNote"
         />
       </PreviewContent>
     </PreviewRow>

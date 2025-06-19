@@ -19,10 +19,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.HttpEurlexRetrievalService;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.FmxImporterException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeCategory;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FmxRepository;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
@@ -100,8 +100,8 @@ class FmxImportServiceTest {
   void shouldAttachFmxToDocumentationUnit() {
     String celexNumber = "CELEX1234";
     UUID id = UUID.randomUUID();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(id)
             .coreData(
                 CoreData.builder()
@@ -126,7 +126,7 @@ class FmxImportServiceTest {
         .when(databaseDocumentationUnitRepository)
         .findById(id);
 
-    service.getDataFromEurlex(celexNumber, documentationUnit, user);
+    service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(attachmentRepository).save(attachmentCaptor.capture());
     AttachmentDTO attachmentDTO = attachmentCaptor.getValue();
@@ -139,8 +139,8 @@ class FmxImportServiceTest {
     String celexNumber = "62022CJ0303";
     String uri = "https://publications.europa.eu/resource/celex/" + celexNumber;
     UUID id = UUID.randomUUID();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(id)
             .coreData(
                 CoreData.builder()
@@ -155,8 +155,7 @@ class FmxImportServiceTest {
     when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
 
     doReturn(judgment).when(retrievalService).requestSingleEurlexDocument(uri);
-    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> docUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
     doReturn(Optional.of(documentationUnitDTO))
         .when(databaseDocumentationUnitRepository)
@@ -166,11 +165,11 @@ class FmxImportServiceTest {
     when(documentTypeRepository.findUniqueCaselawBySearchStr("Urteil"))
         .thenReturn(Optional.of(DocumentType.builder().label("Urteil").build()));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit, user);
+    service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
         .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
-    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuGH");
     assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("C-303/22");
     assertThat(savedDocUnit.coreData().decisionDate()).isEqualTo(LocalDate.of(2017, 2, 14));
@@ -187,8 +186,8 @@ class FmxImportServiceTest {
     String celexNumber = "62018TO0235(04)";
     String uri = "https://publications.europa.eu/resource/celex/" + celexNumber;
     UUID id = UUID.randomUUID();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(id)
             .coreData(
                 CoreData.builder()
@@ -203,8 +202,7 @@ class FmxImportServiceTest {
     when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
 
     doReturn(order).when(retrievalService).requestSingleEurlexDocument(uri);
-    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> docUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
     doReturn(Optional.of(documentationUnitDTO))
         .when(databaseDocumentationUnitRepository)
@@ -215,11 +213,11 @@ class FmxImportServiceTest {
             "Beschluss", DocumentTypeCategory.CASELAW))
         .thenReturn(List.of(DocumentType.builder().label("Beschluss").build()));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit, user);
+    service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
         .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
-    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuG");
     assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("T-235/18");
     assertThat(savedDocUnit.coreData().decisionDate()).isEqualTo(LocalDate.of(2024, 2, 29));
@@ -236,8 +234,8 @@ class FmxImportServiceTest {
     String celexNumber = "62013CV0001";
     String uri = "https://publications.europa.eu/resource/celex/" + celexNumber;
     UUID id = UUID.randomUUID();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(id)
             .coreData(
                 CoreData.builder()
@@ -252,8 +250,7 @@ class FmxImportServiceTest {
     when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.of(eurLexResultDTO));
 
     doReturn(opinion).when(retrievalService).requestSingleEurlexDocument(uri);
-    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> docUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
     doReturn(Optional.of(documentationUnitDTO))
         .when(databaseDocumentationUnitRepository)
@@ -264,11 +261,11 @@ class FmxImportServiceTest {
             "Gutachten", DocumentTypeCategory.CASELAW))
         .thenReturn(List.of(DocumentType.builder().label("Gutachten").build()));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit, user);
+    service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
         .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
-    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuGH");
     assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("Avis 1/13");
     assertThat(savedDocUnit.coreData().decisionDate()).isEqualTo(LocalDate.of(2014, 10, 14));
@@ -284,8 +281,8 @@ class FmxImportServiceTest {
   void judgment_shouldExtractLongTexts() {
     String celexNumber = "CELEX1234";
     UUID id = UUID.randomUUID();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(id)
             .coreData(
                 CoreData.builder()
@@ -304,17 +301,16 @@ class FmxImportServiceTest {
         .when(retrievalService)
         .requestSingleEurlexDocument(
             "https://publications.europa.eu/resource/celex/" + celexNumber);
-    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> docUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
     when(databaseDocumentationUnitRepository.findById(id))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit, user);
+    service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
         .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
-    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Urteil");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Unterschriften");
     assertThat(savedDocUnit.longTexts().reasons()).contains("<p>Verfahrenssprache: Englisch.</p>");
@@ -331,8 +327,8 @@ class FmxImportServiceTest {
   void order_shouldExtractLongTexts() {
     String celexNumber = "CELEX1234";
     UUID id = UUID.randomUUID();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(id)
             .coreData(
                 CoreData.builder()
@@ -351,17 +347,16 @@ class FmxImportServiceTest {
         .when(retrievalService)
         .requestSingleEurlexDocument(
             "https://publications.europa.eu/resource/celex/" + celexNumber);
-    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> docUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
     when(databaseDocumentationUnitRepository.findById(id))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit, user);
+    service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
         .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
-    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Beschluss");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Luxemburg, den");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Der Kanzler");
@@ -379,8 +374,8 @@ class FmxImportServiceTest {
   void opinion_shouldExtractLongTexts() {
     String celexNumber = "CELEX1234";
     UUID id = UUID.randomUUID();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(id)
             .coreData(
                 CoreData.builder()
@@ -399,17 +394,16 @@ class FmxImportServiceTest {
         .when(retrievalService)
         .requestSingleEurlexDocument(
             "https://publications.europa.eu/resource/celex/" + celexNumber);
-    ArgumentCaptor<DocumentationUnit> docUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> docUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     DocumentationUnitDTO documentationUnitDTO = mock(DocumentationUnitDTO.class);
     when(databaseDocumentationUnitRepository.findById(id))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    service.getDataFromEurlex(celexNumber, documentationUnit, user);
+    service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
         .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
-    DocumentationUnit savedDocUnit = docUnitCaptor.getValue();
+    Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Gutachten");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Unterschriften");
     assertThat(savedDocUnit.longTexts().reasons())
@@ -427,8 +421,8 @@ class FmxImportServiceTest {
   void emptyXml_shouldThrowTransformationException() {
     String celexNumber = "CELEX1234";
     UUID id = UUID.randomUUID();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(id)
             .coreData(
                 CoreData.builder()
@@ -449,7 +443,7 @@ class FmxImportServiceTest {
             "https://publications.europa.eu/resource/celex/" + celexNumber);
 
     assertThatExceptionOfType(FmxImporterException.class)
-        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
+        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, decision, user))
         .withMessageContaining("FMX file has no content.");
   }
 
@@ -457,8 +451,8 @@ class FmxImportServiceTest {
   void malformedXml_shouldThrowTransformationException() {
     String celexNumber = "CELEX1234";
     UUID id = UUID.randomUUID();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(id)
             .coreData(
                 CoreData.builder()
@@ -482,7 +476,7 @@ class FmxImportServiceTest {
         .thenReturn(Optional.of(documentationUnitDTO));
 
     assertThatExceptionOfType(FmxImporterException.class)
-        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
+        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, decision, user))
         .withMessageContaining("Failed to parse FMX file content.");
   }
 
@@ -490,8 +484,8 @@ class FmxImportServiceTest {
   void missingEurlexResult_shouldThrowTransformationException() {
     String celexNumber = "CELEX1234";
     UUID id = UUID.randomUUID();
-    DocumentationUnit documentationUnit =
-        DocumentationUnit.builder()
+    Decision decision =
+        Decision.builder()
             .uuid(id)
             .coreData(
                 CoreData.builder()
@@ -507,7 +501,7 @@ class FmxImportServiceTest {
     when(eurLexResultRepository.findByCelexNumber(any())).thenReturn(Optional.empty());
 
     assertThatExceptionOfType(FmxImporterException.class)
-        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, documentationUnit, user))
+        .isThrownBy(() -> service.getDataFromEurlex(celexNumber, decision, user))
         .withMessageContaining(
             "Could not find matching Eurlex Result for Celex Number " + celexNumber);
   }

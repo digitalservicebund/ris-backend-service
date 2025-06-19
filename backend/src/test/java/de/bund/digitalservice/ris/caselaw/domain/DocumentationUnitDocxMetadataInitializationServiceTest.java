@@ -47,12 +47,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
   @MockitoBean private DatabaseCourtRepository databaseCourtRepository;
   @MockitoBean private DocumentTypeRepository documentTypeRepository;
 
-  private DocumentationUnit documentationUnit;
+  private Decision decision;
 
   @BeforeEach
   void beforeEach() {
     CoreData coreData = CoreData.builder().fileNumbers(List.of()).build();
-    documentationUnit = DocumentationUnit.builder().coreData(coreData).build();
+    decision = Decision.builder().coreData(coreData).build();
   }
 
   @Test
@@ -87,10 +87,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     when(databaseCourtRepository.findOneByTypeAndLocation("AG", "Berlin"))
         .thenReturn(Optional.of(CourtDTO.builder().type("AG").location("Berlin").build()));
     User user = User.builder().name("test").build();
-    service.initializeCoreData(documentationUnit, docx2html, user);
+    service.initializeCoreData(decision, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
@@ -111,10 +110,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     List<String> ecliList = List.of("ECLI:TEST", "ECLI:TEST2");
     Docx2Html docx2html = new Docx2Html(null, ecliList, Collections.emptyMap());
     User user = User.builder().name("test").build();
-    service.initializeCoreData(documentationUnit, docx2html, user);
+    service.initializeCoreData(decision, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
@@ -128,10 +126,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     Docx2Html docx2html = new Docx2Html(null, ecliList, properties);
     User user = User.builder().name("test").build();
-    service.initializeCoreData(documentationUnit, docx2html, user);
+    service.initializeCoreData(decision, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
@@ -147,7 +144,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
             .fileNumbers(List.of())
             .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
             .build();
-    DocumentationUnit docUnit = DocumentationUnit.builder().coreData(coreData).build();
+    Decision docUnit = Decision.builder().coreData(coreData).build();
     when(repository.findByUuid(TEST_UUID)).thenReturn(docUnit);
 
     Map<DocxMetadataProperty, String> properties =
@@ -156,8 +153,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     User user = User.builder().name("test").build();
     service.initializeCoreData(docUnit, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
 
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
@@ -171,10 +167,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     when(databaseCourtRepository.findByExactSearchString("AG B")).thenReturn(List.of());
     User user = User.builder().name("test").build();
-    service.initializeCoreData(documentationUnit, docx2html, user);
+    service.initializeCoreData(decision, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
@@ -189,10 +184,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     when(databaseCourtRepository.findOneByType("BFH"))
         .thenReturn(Optional.of(CourtDTO.builder().type("BFH").build()));
     User user = User.builder().name("test").build();
-    service.initializeCoreData(documentationUnit, docx2html, user);
+    service.initializeCoreData(decision, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
@@ -206,10 +200,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     when(courtRepository.findByTypeAndLocation("AG", null)).thenReturn(Optional.empty());
     User user = User.builder().name("test").build();
-    service.initializeCoreData(documentationUnit, docx2html, user);
+    service.initializeCoreData(decision, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
@@ -225,10 +218,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     when(databaseCourtRepository.findOneByTypeAndLocation(null, "Bonn"))
         .thenReturn(Optional.empty());
     User user = User.builder().name("test").build();
-    service.initializeCoreData(documentationUnit, docx2html, user);
+    service.initializeCoreData(decision, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
@@ -243,10 +235,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     when(databaseCourtRepository.findByExactSearchString("LG Bern"))
         .thenReturn(List.of(CourtDTO.builder().type("LG").location("Bern").build()));
     User user = User.builder().name("test").build();
-    service.initializeCoreData(documentationUnit, docx2html, user);
+    service.initializeCoreData(decision, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
@@ -274,10 +265,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
                 CourtDTO.builder().type("LG").location("Bernau").build(),
                 CourtDTO.builder().type("LG").location("Bern").build()));
     User user = User.builder().name("test").build();
-    service.initializeCoreData(documentationUnit, docx2html, user);
+    service.initializeCoreData(decision, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
@@ -303,10 +293,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     when(databaseCourtRepository.findByExactSearchString("LG Bernau"))
         .thenReturn(List.of(CourtDTO.builder().type("LG").location("Bernau").build()));
     User user = User.builder().name("test").build();
-    service.initializeCoreData(documentationUnit, docx2html, user);
+    service.initializeCoreData(decision, docx2html, user);
 
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
+    ArgumentCaptor<Decision> documentationUnitCaptor = ArgumentCaptor.forClass(Decision.class);
     verify(repository, times(2)).save(documentationUnitCaptor.capture(), eq(user));
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 

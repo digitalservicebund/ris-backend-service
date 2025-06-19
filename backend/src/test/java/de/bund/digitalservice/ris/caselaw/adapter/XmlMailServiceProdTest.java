@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
@@ -93,7 +93,7 @@ class XmlMailServiceProdTest {
   private static final XmlTransformationResult FORMATTED_XML =
       new XmlTransformationResult("xml", true, List.of("succeed"), "test.xml", CREATED_DATE);
 
-  private DocumentationUnit documentationUnit;
+  private Decision decision;
 
   @Autowired private HandoverMailService service;
 
@@ -113,8 +113,8 @@ class XmlMailServiceProdTest {
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
-    documentationUnit =
-        DocumentationUnit.builder()
+    decision =
+        Decision.builder()
             .uuid(TEST_UUID)
             .documentNumber("test-document-number")
             .coreData(
@@ -123,8 +123,7 @@ class XmlMailServiceProdTest {
                     .build())
             .attachments(Collections.singletonList(Attachment.builder().name("file_name").build()))
             .build();
-    when(xmlExporter.transformToXml(any(DocumentationUnit.class), anyBoolean()))
-        .thenReturn(FORMATTED_XML);
+    when(xmlExporter.transformToXml(any(Decision.class), anyBoolean())).thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE_PROD)).thenReturn(SAVED_XML_MAIL_PROD);
   }
@@ -133,11 +132,11 @@ class XmlMailServiceProdTest {
   void testSendWithProdSubjectAndOriginalCourtAndFileNumber()
       throws ParserConfigurationException, TransformerException {
 
-    HandoverMail response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+    HandoverMail response = service.handOver(decision, RECEIVER_ADDRESS, ISSUER_ADDRESS);
 
     assertThat(response.mailSubject()).isEqualTo(PROD_MAIL_SUBJECT);
 
-    verify(xmlExporter).transformToXml(documentationUnit, false);
+    verify(xmlExporter).transformToXml(decision, false);
     verify(repository).save(EXPECTED_BEFORE_SAVE_PROD);
     verify(mailSender)
         .sendMail(

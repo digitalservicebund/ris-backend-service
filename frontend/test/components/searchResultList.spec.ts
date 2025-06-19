@@ -5,7 +5,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import routes from "~/test-helper/routes"
 
@@ -48,7 +48,7 @@ function renderSearchResults(
         createTestingPinia({
           initialState: {
             docunitStore: {
-              documentUnit: new DocumentUnit("foo", {
+              documentUnit: new Decision("foo", {
                 documentNumber: "1234567891234",
               }),
             },

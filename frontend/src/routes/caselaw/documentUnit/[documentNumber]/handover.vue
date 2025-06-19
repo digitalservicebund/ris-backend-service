@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import DocumentUnitHandover from "@/components/DocumentUnitHandover.vue"
+import DecisionHandover from "@/components/DocumentUnitHandover.vue"
 </script>
 
 <template>
-  <DocumentUnitHandover />
+  <DecisionHandover />
 </template>

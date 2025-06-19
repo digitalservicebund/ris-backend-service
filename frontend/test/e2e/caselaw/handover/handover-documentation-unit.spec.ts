@@ -8,7 +8,7 @@ import {
   save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import {
   addIgnoreWordToDocumentationUnit,
   updateDocumentationUnit,
@@ -334,7 +334,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
             dissentingOpinion:
               "<border-number><number>7</number><content>Text</content></border-number>",
           },
-        } as DocumentUnit
+        } as Decision
         await updateDocumentationUnit(page, documentationUnit, request)
       })
 
@@ -456,7 +456,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
             otherLongText: text,
             dissentingOpinion: text,
           },
-        } as DocumentUnit
+        } as Decision
         await updateDocumentationUnit(page, documentationUnit, request)
       })
 
@@ -526,7 +526,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
             otherLongText: text,
             dissentingOpinion: text,
           },
-        } as DocumentUnit
+        } as Decision
         await updateDocumentationUnit(page, documentationUnit, request)
       })
 

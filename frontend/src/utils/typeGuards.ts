@@ -1,24 +1,26 @@
-import DocumentUnit, { Kind } from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
+import { DocumentationUnit } from "@/domain/documentationUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import PendingProceeding from "@/domain/pendingProceeding"
 
 /**
- * Type guard to check if a document is a DocumentUnit.
+ * Type guard to check if a document is a Decision.
  * @param doc The document to check.
- * @returns True if the object is a DocumentUnit, false otherwise.
+ * @returns True if the DocumentationUnit is a Decision, false otherwise.
  */
-export function isDocumentUnit(
-  doc: DocumentUnit | PendingProceeding | undefined | null,
-): doc is DocumentUnit {
-  return doc?.kind === Kind.DOCUMENTION_UNIT
+export function isDecision(
+  doc: DocumentationUnit | undefined | null,
+): doc is Decision {
+  return doc?.kind === Kind.DECISION
 }
 
 /**
  * Type guard to check if a document is a PendingProceeding.
  * @param doc The document to check.
- * @returns True if the object is a PendingProceeding, false otherwise.
+ * @returns True if the DocumentationUnit is a PendingProceeding, false otherwise.
  */
 export function isPendingProceeding(
-  doc: DocumentUnit | PendingProceeding | undefined | null,
+  doc: DocumentationUnit | undefined | null,
 ): doc is PendingProceeding {
   return doc?.kind === Kind.PENDING_PROCEEDING
 }

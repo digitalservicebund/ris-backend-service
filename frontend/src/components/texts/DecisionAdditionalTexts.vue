@@ -6,7 +6,7 @@ import ParticipatingJudges from "@/components/ParticipatingJudges.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
@@ -15,50 +15,50 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
-const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentUnit | undefined>
+const { documentUnit: decision } = storeToRefs(store) as {
+  documentUnit: Ref<Decision | undefined>
 }
 
 const isInternalUser = useInternalUser()
 
 const otherLongText = computed({
   get: () =>
-    documentUnit.value?.longTexts.otherLongText
+    decision.value?.longTexts.otherLongText
       ? useValidBorderNumberLinks(
-          documentUnit.value?.longTexts.otherLongText,
-          documentUnit.value.managementData.borderNumbers,
+          decision.value?.longTexts.otherLongText,
+          decision.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    documentUnit.value!.longTexts.otherLongText =
+    decision.value!.longTexts.otherLongText =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const dissentingOpinion = computed({
   get: () =>
-    documentUnit.value?.longTexts.dissentingOpinion
+    decision.value?.longTexts.dissentingOpinion
       ? useValidBorderNumberLinks(
-          documentUnit.value?.longTexts.dissentingOpinion,
-          documentUnit.value.managementData.borderNumbers,
+          decision.value?.longTexts.dissentingOpinion,
+          decision.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    documentUnit.value!.longTexts.dissentingOpinion =
+    decision.value!.longTexts.dissentingOpinion =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const outline = computed({
   get: () =>
-    documentUnit.value?.longTexts.outline
+    decision.value?.longTexts.outline
       ? useValidBorderNumberLinks(
-          documentUnit.value?.longTexts.outline,
-          documentUnit.value.managementData.borderNumbers,
+          decision.value?.longTexts.outline,
+          decision.value.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
-    documentUnit.value!.longTexts.outline =
+    decision.value!.longTexts.outline =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
@@ -75,7 +75,7 @@ const outline = computed({
         data-testid="otherLongText"
         :editable="isInternalUser"
         label="Sonstiger Langtext"
-        :should-show-button="!documentUnit?.longTexts?.otherLongText?.length"
+        :should-show-button="!decision?.longTexts?.otherLongText?.length"
       />
 
       <TextEditorCategory
@@ -85,16 +85,12 @@ const outline = computed({
         data-testid="dissentingOpinion"
         :editable="isInternalUser"
         label="Abweichende Meinung"
-        :should-show-button="
-          !documentUnit?.longTexts?.dissentingOpinion?.length
-        "
+        :should-show-button="!decision?.longTexts?.dissentingOpinion?.length"
       />
 
       <CategoryWrapper
         label="Mitwirkende Richter"
-        :should-show-button="
-          !documentUnit?.longTexts?.participatingJudges?.length
-        "
+        :should-show-button="!decision?.longTexts?.participatingJudges?.length"
       >
         <ParticipatingJudges label="Mitwirkende Richter" />
       </CategoryWrapper>
@@ -107,7 +103,7 @@ const outline = computed({
           data-testid="outline"
           :editable="isInternalUser"
           label="Gliederung"
-          :should-show-button="!documentUnit?.longTexts?.outline?.length"
+          :should-show-button="!decision?.longTexts?.outline?.length"
         />
       </div>
     </div>

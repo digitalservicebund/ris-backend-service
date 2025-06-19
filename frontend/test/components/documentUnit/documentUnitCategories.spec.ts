@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
@@ -30,7 +30,7 @@ function renderComponent() {
             initialState: {
               session: { user: { roles: ["Internal"] } },
               docunitStore: {
-                documentUnit: new DocumentUnit("foo", {
+                documentUnit: new Decision("foo", {
                   documentNumber: "1234567891234",
                 }),
               },

@@ -55,9 +55,9 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -237,8 +237,7 @@ class DuplicateCheckFullIntegrationTest {
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(((Decision) foundDocUnit).managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -259,8 +258,7 @@ class DuplicateCheckFullIntegrationTest {
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(((Decision) foundDocUnit).managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -296,8 +294,7 @@ class DuplicateCheckFullIntegrationTest {
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) initialDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(((Decision) initialDocUnit).managementData().duplicateRelations()).isEmpty();
     }
 
     @Test
@@ -336,7 +333,7 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       DuplicateRelation duplicate =
-          ((DocumentationUnit) foundDocUnit)
+          ((Decision) foundDocUnit)
               .managementData().duplicateRelations().stream().findFirst().get();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
@@ -378,7 +375,7 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       DuplicateRelation duplicate =
-          ((DocumentationUnit) foundDocUnit)
+          ((Decision) foundDocUnit)
               .managementData().duplicateRelations().stream().findFirst().get();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
@@ -422,7 +419,7 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       DuplicateRelation duplicate =
-          ((DocumentationUnit) foundDocUnit)
+          ((Decision) foundDocUnit)
               .managementData().duplicateRelations().stream().findFirst().get();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
@@ -462,8 +459,7 @@ class DuplicateCheckFullIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -507,8 +503,7 @@ class DuplicateCheckFullIntegrationTest {
       // Act
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -556,7 +551,7 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       DuplicateRelation duplicate =
-          ((DocumentationUnit) foundDocUnit)
+          ((Decision) foundDocUnit)
               .managementData().duplicateRelations().stream().findFirst().get();
       assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.IGNORED);
@@ -594,7 +589,7 @@ class DuplicateCheckFullIntegrationTest {
       // Create duplicate with pending status
       duplicateCheckService.checkAllDuplicates();
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+              ((Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData().duplicateRelations().stream().findFirst().get().status())
           .isEqualTo(DuplicateRelationStatus.PENDING);
 
@@ -609,7 +604,7 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       DuplicateRelation duplicate =
-          ((DocumentationUnit) foundDocUnit)
+          ((Decision) foundDocUnit)
               .managementData().duplicateRelations().stream().findFirst().get();
       assertThat(duplicate.documentNumber()).isEqualTo(duplicateDTO.getDocumentNumber());
       assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.IGNORED);
@@ -654,7 +649,7 @@ class DuplicateCheckFullIntegrationTest {
       // Create duplicates
       duplicateCheckService.checkAllDuplicates();
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+              ((Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData().duplicateRelations().stream().findFirst().get().status())
           .isEqualTo(DuplicateRelationStatus.PENDING);
       assertThat(duplicateRelationRepository.findAll()).hasSize(3);
@@ -670,7 +665,7 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-              ((DocumentationUnit) foundDocUnit)
+              ((Decision) foundDocUnit)
                   .managementData().duplicateRelations().stream()
                       .findFirst()
                       .get()
@@ -708,7 +703,7 @@ class DuplicateCheckFullIntegrationTest {
       // Create duplicates
       duplicateCheckService.checkAllDuplicates();
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+              ((Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations())
           .hasSize(1);
@@ -720,7 +715,7 @@ class DuplicateCheckFullIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+              ((Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations())
           .isEmpty();
@@ -766,7 +761,7 @@ class DuplicateCheckFullIntegrationTest {
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       // ... it won't be sent to the frontend
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
+              ((Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId()))
                   .managementData()
                   .duplicateRelations())
           .isEmpty();
@@ -812,7 +807,7 @@ class DuplicateCheckFullIntegrationTest {
 
       // Assert
       assertThat(
-              ((DocumentationUnit) documentationUnitService.getByUuid(original.getId()))
+              ((Decision) documentationUnitService.getByUuid(original.getId()))
                   .managementData().duplicateRelations().stream().findFirst().get().status())
           .isEqualTo(DuplicateRelationStatus.IGNORED);
     }
@@ -964,8 +959,7 @@ class DuplicateCheckFullIntegrationTest {
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
-      assertThat(((DocumentationUnit) foundDocUnit).managementData().duplicateRelations())
-          .isEmpty();
+      assertThat(((Decision) foundDocUnit).managementData().duplicateRelations()).isEmpty();
     }
   }
 
@@ -982,8 +976,7 @@ class DuplicateCheckFullIntegrationTest {
 
       // Act
       duplicateCheckService.checkAllDuplicates();
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
@@ -1006,8 +999,7 @@ class DuplicateCheckFullIntegrationTest {
 
       // Act
       duplicateCheckService.checkAllDuplicates();
-      var foundDocUnit =
-          (DocumentationUnit) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+      var foundDocUnit = (Decision) documentationUnitService.getByUuid(docUnitToBeChecked.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
@@ -1371,8 +1363,8 @@ class DuplicateCheckFullIntegrationTest {
       params = params.toBuilder().documentationOffice(userDocOffice).build();
     }
 
-    DocumentationUnit docUnit =
-        DocumentationUnit.builder()
+    Decision docUnit =
+        Decision.builder()
             .version(0L)
             .documentNumber(params.documentNumber())
             .coreData(

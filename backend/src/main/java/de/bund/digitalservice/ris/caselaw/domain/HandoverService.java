@@ -64,15 +64,15 @@ public class HandoverService {
       UUID documentationUnitId, String issuerAddress, @Nullable User user)
       throws DocumentationUnitNotExistsException {
 
-    Documentable documentable = repository.findByUuid(documentationUnitId);
+    DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId);
 
-    if (documentable instanceof DocumentationUnit documentationUnit) {
+    if (documentationUnit instanceof Decision decision) {
       String description = "Dokeinheit an jDV übergeben";
       historyLogService.saveHistoryLog(
-          documentationUnit.uuid(), user, HistoryLogEventType.HANDOVER, description);
-      return mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
+          decision.uuid(), user, HistoryLogEventType.HANDOVER, description);
+      return mailService.handOver(decision, recipientAddress, issuerAddress);
     } else {
-      log.info("Documentable type not supported: {}", documentable.getClass().getName());
+      log.info("Documentable type not supported: {}", documentationUnit.getClass().getName());
       return null;
     }
   }
@@ -108,12 +108,12 @@ public class HandoverService {
   public XmlTransformationResult createPreviewXml(UUID documentUuid)
       throws DocumentationUnitNotExistsException {
 
-    Documentable documentable = repository.findByUuid(documentUuid);
+    DocumentationUnit documentationUnit = repository.findByUuid(documentUuid);
 
-    if (documentable instanceof DocumentationUnit documentationUnit) {
-      return mailService.getXmlPreview(documentationUnit);
+    if (documentationUnit instanceof Decision decision) {
+      return mailService.getXmlPreview(decision);
     } else {
-      log.info("Documentable type not supported: {}", documentable.getClass().getName());
+      log.info("Documentable type not supported: {}", documentationUnit.getClass().getName());
     }
     return null;
   }

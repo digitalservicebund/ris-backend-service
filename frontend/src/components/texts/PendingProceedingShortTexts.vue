@@ -17,7 +17,7 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
-const { documentUnit } = storeToRefs(store) as {
+const { documentUnit: pendingProceeding } = storeToRefs(store) as {
   documentUnit: Ref<PendingProceeding | undefined>
 }
 const headline = computed({
@@ -29,38 +29,38 @@ const headline = computed({
 })
 
 const legalIssue = computed({
-  get: () => documentUnit.value?.shortTexts.legalIssue,
+  get: () => pendingProceeding.value?.shortTexts.legalIssue,
   set: (newValue) => {
-    documentUnit.value!.shortTexts.legalIssue =
+    pendingProceeding.value!.shortTexts.legalIssue =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const resolutionNote = computed({
-  get: () => documentUnit.value?.shortTexts.resolutionNote,
+  get: () => pendingProceeding.value?.shortTexts.resolutionNote,
   set: (newValue) => {
-    documentUnit.value!.shortTexts.resolutionNote =
+    pendingProceeding.value!.shortTexts.resolutionNote =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const appellant = computed({
-  get: () => documentUnit.value?.shortTexts.appellant,
+  get: () => pendingProceeding.value?.shortTexts.appellant,
   set: (newValue) => {
-    documentUnit.value!.shortTexts.appellant =
+    pendingProceeding.value!.shortTexts.appellant =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const admissionOfAppeal = computed({
-  get: () => documentUnit.value?.shortTexts.admissionOfAppeal,
+  get: () => pendingProceeding.value?.shortTexts.admissionOfAppeal,
   set: (newValue) => {
-    documentUnit.value!.shortTexts.admissionOfAppeal =
+    pendingProceeding.value!.shortTexts.admissionOfAppeal =
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 watch(
-  () => documentUnit.value?.coreData.court?.label,
+  () => pendingProceeding.value?.coreData.court?.label,
   (newCourtLabel, oldCourtLabel) => {
     if (newCourtLabel && newCourtLabel !== oldCourtLabel) {
       store.documentUnit!.shortTexts.headline =
@@ -82,7 +82,7 @@ watch(
         editable
         field-size="small"
         :label="pendingProceedingLabels.headline"
-        :should-show-button="!documentUnit?.shortTexts?.headline?.length"
+        :should-show-button="!pendingProceeding?.shortTexts?.headline?.length"
       />
 
       <TextEditorCategory
@@ -93,7 +93,7 @@ watch(
         editable
         field-size="small"
         :label="pendingProceedingLabels.legalIssue"
-        :should-show-button="!documentUnit?.shortTexts.legalIssue?.length"
+        :should-show-button="!pendingProceeding?.shortTexts.legalIssue?.length"
       />
       <div class="flex flex-row gap-24">
         <InputField
@@ -136,7 +136,9 @@ watch(
         editable
         field-size="small"
         :label="pendingProceedingLabels.resolutionNote"
-        :should-show-button="!documentUnit?.shortTexts.resolutionNote?.length"
+        :should-show-button="
+          !pendingProceeding?.shortTexts.resolutionNote?.length
+        "
       />
     </div>
   </div>

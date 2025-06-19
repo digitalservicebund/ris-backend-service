@@ -2,12 +2,12 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { Decision } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 function mockSessionStore(value: { legislativeMandate: boolean }) {
   const mockedSessionStore = useDocumentUnitStore()
-  mockedSessionStore.documentUnit = new DocumentUnit("q834", {
+  mockedSessionStore.documentUnit = new Decision("q834", {
     contentRelatedIndexing: {
       hasLegislativeMandate: value.legislativeMandate,
     },

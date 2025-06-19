@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain.mapper;
 
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
-import de.bund.digitalservice.ris.caselaw.domain.Documentable;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import java.util.List;
 import java.util.UUID;
@@ -35,7 +35,10 @@ public interface PatchMapperService {
    * @return extended JsonPatch {@link RisJsonPatch} with version information and error paths
    */
   RisJsonPatch handlePatchForSamePath(
-      Documentable existingDocumentationUnit, JsonPatch patch1, JsonPatch patch2, JsonPatch patch3);
+      DocumentationUnit existingDocumentationUnit,
+      JsonPatch patch1,
+      JsonPatch patch2,
+      JsonPatch patch3);
 
   /**
    * Save the patch for the new version. Diff of the updated documentation unit to the existing
@@ -55,7 +58,8 @@ public interface PatchMapperService {
    * @param existingDocumentationUnit existing documentation unit
    * @return result of the existing documentation and the applied patch
    */
-  Documentable applyPatchToEntity(JsonPatch patch, Documentable existingDocumentationUnit);
+  DocumentationUnit applyPatchToEntity(
+      JsonPatch patch, DocumentationUnit existingDocumentationUnit);
 
   /**
    * Generate a patch between the two documentation units.
@@ -64,7 +68,7 @@ public interface PatchMapperService {
    * @param updated new documentation unit
    * @return patch with the diff between both values
    */
-  JsonPatch getDiffPatch(Documentable existed, Documentable updated);
+  JsonPatch getDiffPatch(DocumentationUnit existed, DocumentationUnit updated);
 
   /**
    * Generate a patch without operation on the same path

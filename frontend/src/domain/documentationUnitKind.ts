@@ -1,0 +1,4 @@
+export enum Kind {
+  DECISION = "DECISION",
+  PENDING_PROCEEDING = "PENDING_PROCEEDING",
+}

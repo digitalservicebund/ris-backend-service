@@ -2,7 +2,8 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import KeywordsComponent from "@/components/KeyWords.vue"
-import DocumentUnit from "@/domain/documentUnit"
+
+import { Decision } from "@/domain/decision"
 
 const scrollIntoViewMock = vi.fn()
 window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
@@ -19,7 +20,7 @@ function renderComponent(keywords?: string[]) {
             createTestingPinia({
               initialState: {
                 docunitStore: {
-                  documentUnit: new DocumentUnit("foo", {
+                  documentUnit: new Decision("foo", {
                     documentNumber: "1234567891234",
                     contentRelatedIndexing: {
                       keywords: keywords ?? [],
