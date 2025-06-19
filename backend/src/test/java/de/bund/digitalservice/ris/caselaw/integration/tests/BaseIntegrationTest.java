@@ -4,10 +4,13 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
+import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
+import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -15,6 +18,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -31,6 +35,8 @@ import org.testcontainers.utility.DockerImageName;
       "otc.obs.endpoint=testUrl",
       "local.file-storage=.local-storage",
       "mail.from.address=test@test.com",
+      "mail.exporter.jurisUsername=test-user",
+      "mail.exporter.recipientAddress=neuris@example.com",
       "management.endpoint.health.probes.enabled=true",
       "management.health.livenessState.enabled=true",
       "management.health.readinessState.enabled=true",
@@ -68,9 +74,10 @@ public abstract class BaseIntegrationTest {
   @MockitoBean FeatureToggleService featureToggleService;
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean UserGroupService userGroupService;
+  @MockitoSpyBean HttpMailSender mailSender;
 
   @BeforeAll
-  public static void beforeAll() {
+  public static void baseBeforeAll() {
     postgreSQLContainer.start();
     redis.start();
   }
@@ -80,5 +87,10 @@ public abstract class BaseIntegrationTest {
     // Replace with test configuration instead of mocking difficult because doc offices are not
     // available on startup when needed by user group service
     mockUserGroups(userGroupService);
+  }
+
+  @AfterEach
+  void baseAfterEach() {
+    Mockito.reset(featureToggleService);
   }
 }

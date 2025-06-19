@@ -61,14 +61,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 
-@TestPropertySource(
-    properties = {
-      "mail.exporter.jurisUsername=test-user",
-      "mail.exporter.recipientAddress=neuris@example.com"
-    })
 @Sql(scripts = {"classpath:legal_periodical_init.sql"})
 @Sql(
     scripts = {"classpath:legal_periodical_cleanup.sql"},
