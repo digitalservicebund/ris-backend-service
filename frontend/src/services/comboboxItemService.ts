@@ -112,7 +112,6 @@ function fetchFromEndpoint(
   size?: number,
   category?: DocumentTypeCategory,
 ) {
-  console.log(endpoint, category?.toString())
   const requestParams = computed<{
     q?: string
     sz?: string
