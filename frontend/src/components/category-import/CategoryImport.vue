@@ -16,7 +16,7 @@ import Reference from "@/domain/reference"
 import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { isDocumentUnit } from "@/utils/typeGuards"
+import { isDecision } from "@/utils/typeGuards"
 import IconSearch from "~icons/ic/baseline-search"
 
 const props = defineProps<{
@@ -41,7 +41,7 @@ async function searchForDocumentUnit() {
   const response = await documentUnitService.getByDocumentNumber(
     documentNumber.value,
   )
-  if (isDocumentUnit(response.data)) {
+  if (isDecision(response.data)) {
     decisionToImport.value = response.data
     errorMessage.value = undefined
   } else {

@@ -16,7 +16,7 @@ import DocumentationUnitTextCheckSummary from "@/components/text-check/Documenta
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
-import { isDocumentUnit, isPendingProceeding } from "@/utils/typeGuards"
+import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 
 const props = defineProps<ExtraContentSidePanelProps>()
 
@@ -31,7 +31,7 @@ const textCheckAll = useFeatureToggle("neuris.text-side-panel")
 
 const hasNote = computed(() => {
   return (
-    isDocumentUnit(props.documentUnit) &&
+    isDecision(props.documentUnit) &&
     !!props.documentUnit!.note &&
     props.documentUnit!.note.length > 0
   )
@@ -39,7 +39,7 @@ const hasNote = computed(() => {
 
 const hasAttachments = computed(() => {
   return (
-    isDocumentUnit(props.documentUnit) &&
+    isDecision(props.documentUnit) &&
     !!props.documentUnit!.attachments &&
     props.documentUnit!.attachments.length > 0
   )
@@ -87,7 +87,7 @@ function setDefaultState() {
   if (props.sidePanelMode) {
     store.setSidePanelMode(props.sidePanelMode)
   } else if (
-    isDocumentUnit(props.documentUnit) &&
+    isDecision(props.documentUnit) &&
     !props.documentUnit!.note &&
     props.documentUnit!.hasAttachments
   ) {
@@ -133,7 +133,7 @@ onMounted(() => {
       @update:is-expanded="togglePanel"
     >
       <ExtraContentExtraContentSidePanelMenu
-        v-if="isDocumentUnit(props.documentUnit)"
+        v-if="isDecision(props.documentUnit)"
         :current-attachment-index="currentAttachmentIndex"
         :document-unit="props.documentUnit"
         :hide-panel-mode-bar="props.hidePanelModeBar"
@@ -144,7 +144,7 @@ onMounted(() => {
         @panel-mode:update="setSidePanelMode"
       />
       <div class="m-24">
-        <div v-if="panelMode === 'note' && isDocumentUnit(props.documentUnit)">
+        <div v-if="panelMode === 'note' && isDecision(props.documentUnit)">
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
@@ -158,7 +158,7 @@ onMounted(() => {
         </div>
         <div
           v-else-if="
-            panelMode === 'attachments' && isDocumentUnit(props.documentUnit)
+            panelMode === 'attachments' && isDecision(props.documentUnit)
           "
         >
           <AttachmentView
@@ -185,7 +185,7 @@ onMounted(() => {
           class="flex max-h-[70vh] overflow-auto"
         >
           <DecisionPreview
-            v-if="isDocumentUnit(props.documentUnit)"
+            v-if="isDecision(props.documentUnit)"
             layout="narrow"
           />
           <PendingProceedingPreview
@@ -197,8 +197,7 @@ onMounted(() => {
 
         <CategoryImport
           v-else-if="
-            panelMode === 'category-import' &&
-            isDocumentUnit(props.documentUnit)
+            panelMode === 'category-import' && isDecision(props.documentUnit)
           "
           :document-number="importDocumentNumber"
         />
@@ -207,7 +206,7 @@ onMounted(() => {
           v-else-if="
             panelMode === 'text-check' &&
             textCheckAll &&
-            isDocumentUnit(props.documentUnit)
+            isDecision(props.documentUnit)
           "
           v-bind="{ jumpToMatch }"
         />

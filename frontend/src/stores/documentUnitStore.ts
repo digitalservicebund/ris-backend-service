@@ -4,7 +4,7 @@ import { defineStore } from "pinia"
 import { ref } from "vue"
 import fields from "@/data/fieldNames.json"
 import { Decision } from "@/domain/decision"
-import PendingProceeding from "@/domain/pendingProceeding"
+import { DocumentationUnit } from "@/domain/documentation-unit"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
@@ -14,14 +14,12 @@ import {
 } from "@/services/httpClient"
 
 export const useDocumentUnitStore = defineStore("docunitStore", () => {
-  const documentUnit = ref<Decision | PendingProceeding | undefined>(undefined)
-  const originalDocumentUnit = ref<Decision | PendingProceeding | undefined>(
-    undefined,
-  )
+  const documentUnit = ref<DocumentationUnit | undefined>(undefined)
+  const originalDocumentUnit = ref<DocumentationUnit | undefined>(undefined)
 
   async function loadDocumentUnit(
     documentNumber: string,
-  ): Promise<ServiceResponse<Decision | PendingProceeding>> {
+  ): Promise<ServiceResponse<DocumentationUnit>> {
     const response =
       await documentUnitService.getByDocumentNumber(documentNumber)
     if (response.data) {

@@ -11,8 +11,7 @@ import { ValidationError } from "./input/types"
 import InfoModal from "@/components/InfoModal.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
-import { Decision } from "@/domain/decision"
-import PendingProceeding from "@/domain/pendingProceeding"
+import { DocumentationUnit } from "@/domain/documentation-unit"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import useSessionStore from "@/stores/sessionStore"
@@ -26,7 +25,7 @@ dayjs.extend(customParseFormat)
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<Decision | PendingProceeding | undefined>
+  documentUnit: Ref<DocumentationUnit | undefined>
 }
 const sessionStore = useSessionStore()
 

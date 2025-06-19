@@ -3,7 +3,7 @@ import { Component, Ref } from "vue"
 import { LabelPosition } from "@/components/input/InputField.vue"
 import { CitationType } from "@/domain/citationType"
 import { Court } from "@/domain/court"
-import { Decision } from "@/domain/decision" // NOSONAR // This import causes circularity, but only in type files
+import { DocumentationUnit } from "@/domain/documentation-unit"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
 
@@ -11,7 +11,6 @@ import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
-import PendingProceeding from "@/domain/pendingProceeding"
 import { Procedure } from "@/domain/procedure"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import { Match } from "@/types/textCheck"
@@ -231,7 +230,7 @@ export type ValidationError = {
 }
 
 export type ExtraContentSidePanelProps = {
-  documentUnit?: Decision | PendingProceeding
+  documentUnit?: DocumentationUnit
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   hidePreviewInNewTab?: boolean

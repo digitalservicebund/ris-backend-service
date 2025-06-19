@@ -15,6 +15,7 @@ import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { usePendingProceedingMenuItems } from "@/composables/usePendingProceedingMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
 import { Decision } from "@/domain/decision"
+import { DocumentationUnit } from "@/domain/documentation-unit"
 import { Kind } from "@/domain/documentationUnitKind"
 import MenuItem from "@/domain/menuItem"
 import PendingProceeding from "@/domain/pendingProceeding"
@@ -42,7 +43,7 @@ const textCheck = useFeatureToggle("neuris.text-check-side-panel")
 const store = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
-const documentUnit = computed<Decision | PendingProceeding | undefined>(() => {
+const documentUnit = computed<DocumentationUnit | undefined>(() => {
   if (props.kind === Kind.DOCUMENTION_UNIT) {
     return store.documentUnit as Decision
   } else if (props.kind === Kind.PENDING_PROCEEDING) {

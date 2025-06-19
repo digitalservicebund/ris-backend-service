@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import { Decision } from "@/domain/decision"
-import PendingProceeding from "@/domain/pendingProceeding"
+import { DocumentationUnit } from "@/domain/documentation-unit"
 import Reference from "@/domain/reference"
 import { Source } from "@/domain/source"
 import DateUtil from "@/utils/dateUtil"
 
 const { documentUnit } = defineProps<{
-  documentUnit: Decision | PendingProceeding
+  documentUnit: DocumentationUnit
 }>()
 
 const createdBy = computed(() =>

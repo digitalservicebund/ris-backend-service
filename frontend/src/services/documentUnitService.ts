@@ -4,6 +4,7 @@ import httpClient, {
 } from "./httpClient"
 import { Page } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
+import { DocumentationUnit } from "@/domain/documentation-unit"
 import { DocumentationUnitCreationParameters } from "@/domain/documentationUnitCreationParameters"
 import { DocumentationUnitSearchParameter } from "@/domain/documentationUnitSearchParameter"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
@@ -14,12 +15,12 @@ import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import { SingleNormValidationInfo } from "@/domain/singleNorm"
 import errorMessages from "@/i18n/errors.json"
-import { isDocumentUnit, isPendingProceeding } from "@/utils/typeGuards"
+import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 
 interface DocumentUnitService {
   getByDocumentNumber(
     documentNumber: string,
-  ): Promise<ServiceResponse<Decision | PendingProceeding>>
+  ): Promise<ServiceResponse<DocumentationUnit>>
 
   createNew(
     params?: DocumentationUnitCreationParameters,
@@ -70,7 +71,7 @@ interface DocumentUnitService {
 
 const service: DocumentUnitService = {
   async getByDocumentNumber(documentNumber: string) {
-    const response = await httpClient.get<Decision | PendingProceeding>(
+    const response = await httpClient.get<DocumentationUnit>(
       `caselaw/documentunits/${documentNumber}`,
     )
     if (response.status >= 300 || response.error) {
@@ -81,7 +82,7 @@ const service: DocumentUnitService = {
             ? errorMessages.DOCUMENT_UNIT_NOT_ALLOWED.title
             : errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED.title,
       }
-    } else if (isDocumentUnit(response.data)) {
+    } else if (isDecision(response.data)) {
       response.data = new Decision(response.data.uuid, {
         ...response.data,
       })
