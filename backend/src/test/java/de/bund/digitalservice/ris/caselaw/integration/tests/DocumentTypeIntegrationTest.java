@@ -70,7 +70,7 @@ class DocumentTypeIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documenttypes?category=CASELAW")
+        .uri("/api/v1/caselaw/documenttypes")
         .exchange()
         .expectStatus()
         .isOk()
@@ -112,7 +112,7 @@ class DocumentTypeIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documenttypes?q=Anord&category=CASELAW")
+        .uri("/api/v1/caselaw/documenttypes?q=Anord")
         .exchange()
         .expectStatus()
         .isOk()

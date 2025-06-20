@@ -26,8 +26,8 @@ public class DocumentTypeController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public List<DocumentType> getDocumentTypes(
-      @RequestParam("category") DocumentTypeCategory category,
-      @RequestParam(value = "q") Optional<String> searchStr) {
+      @RequestParam(value = "q") Optional<String> searchStr,
+      @RequestParam(value = "category", defaultValue = "CASELAW") DocumentTypeCategory category) {
     return service.getDocumentTypes(searchStr, category);
   }
 }

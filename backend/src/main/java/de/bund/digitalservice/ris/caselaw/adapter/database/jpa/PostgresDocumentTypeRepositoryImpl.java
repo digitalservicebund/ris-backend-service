@@ -4,12 +4,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransf
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeCategory;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Slf4j
 public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepository {
   private final DatabaseDocumentTypeRepository repository;
   private final DatabaseDocumentCategoryRepository categoryRepository;
@@ -51,12 +54,16 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
   }
 
   public List<UUID> resolveCategoryIds(DocumentTypeCategory category) {
-    return switch (category) {
-      case CASELAW -> getCategoryIdsForLabels(List.of("R"));
-      case CASELAW_PENDING_PROCEEDING -> getCategoryIdsForLabels(List.of("R", "A"));
-      case DEPENDENT_LITERATURE -> getCategoryIdsForLabels(List.of("U"));
-      default -> throw new IllegalArgumentException("Unknown document category group: " + category);
-    };
+    try {
+      return switch (category) {
+        case CASELAW -> getCategoryIdsForLabels(List.of("R"));
+        case CASELAW_PENDING_PROCEEDING -> getCategoryIdsForLabels(List.of("R", "A"));
+        case DEPENDENT_LITERATURE -> getCategoryIdsForLabels(List.of("U"));
+      };
+    } catch (IllegalStateException e) {
+      log.error("Failed to resolve category IDs for category {}: {}", category, e.getMessage());
+      return Collections.emptyList();
+    }
   }
 
   private List<UUID> getCategoryIdsForLabels(List<String> labels) {

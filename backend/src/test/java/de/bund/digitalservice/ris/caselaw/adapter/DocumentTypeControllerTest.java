@@ -83,7 +83,7 @@ class DocumentTypeControllerTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documenttypes?q=label1&category=CASELAW")
+        .uri("/api/v1/caselaw/documenttypes?q=label1")
         .exchange()
         .expectStatus()
         .isOk();

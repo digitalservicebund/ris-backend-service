@@ -167,12 +167,7 @@ const service: ComboboxItemService = {
   getCourts: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.courts, filter, 200),
   getCaselawDocumentTypes: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(
-      Endpoint.documentTypes,
-      filter,
-      undefined,
-      DocumentTypeCategory.CASELAW,
-    ),
+    fetchFromEndpoint(Endpoint.documentTypes, filter),
   getCaselawAndPendingProceedingDocumentTypes: (
     filter: Ref<string | undefined>,
   ) =>
