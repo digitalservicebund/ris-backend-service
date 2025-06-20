@@ -724,7 +724,7 @@ export const caselawTest = test.extend<MyFixtures>({
     const eanDocType = (
       (await (
         await request.get(
-          `api/v1/caselaw/documenttypes/q=Ean&category=DEPENDENT_LITERATURE`,
+          `api/v1/caselaw/documenttypes?q=Ean&category=DEPENDENT_LITERATURE`,
         )
       ).json()) as DocumentType[]
     )[0]
