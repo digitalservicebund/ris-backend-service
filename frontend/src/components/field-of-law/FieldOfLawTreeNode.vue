@@ -172,10 +172,7 @@ watch(
           class="pb-6 pl-8"
           flex-direction="flex-col"
         >
-          <FlexContainer
-            class="text-[14px] text-[#66522e]"
-            flex-wrap="flex-wrap"
-          >
+          <FlexContainer class="text-[14px]" flex-wrap="flex-wrap">
             <span v-for="(norm, idx) in node.norms" :key="idx">
               <strong>{{ norm.singleNormDescription }}</strong>
               {{ norm.abbreviation
