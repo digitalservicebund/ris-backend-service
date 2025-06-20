@@ -29,7 +29,7 @@ const currentPage = ref<Page<FieldOfLaw>>()
 const itemsPerPage = 10
 
 const store = useDocumentUnitStore()
-const localModelValue = computed({
+const selectedNodes = computed({
   get: () => store.documentUnit!.contentRelatedIndexing.fieldsOfLaw,
   set: (newValues) => {
     store.documentUnit!.contentRelatedIndexing.fieldsOfLaw = newValues?.filter(
@@ -86,18 +86,18 @@ async function submitSearch(page: number) {
 
 const addFieldOfLaw = async (fieldOfLaw: FieldOfLaw) => {
   if (
-    !localModelValue.value?.find(
+    !selectedNodes.value?.find(
       (entry) => entry.identifier === fieldOfLaw.identifier,
     )
   ) {
-    localModelValue.value?.push(fieldOfLaw)
+    selectedNodes.value?.push(fieldOfLaw)
   }
   await setScrollPosition()
 }
 
 const removeFieldOfLaw = async (fieldOfLaw: FieldOfLaw) => {
-  localModelValue.value =
-    localModelValue.value?.filter(
+  selectedNodes.value =
+    selectedNodes.value?.filter(
       (entry) => entry.identifier !== fieldOfLaw.identifier,
     ) ?? []
   await setScrollPosition()
@@ -154,6 +154,7 @@ function resetSearch() {
 }
 
 const inputMethod = ref(InputMethod.DIRECT)
+
 function updateInputMethod(value: InputMethod) {
   inputMethod.value = value
 }
@@ -161,8 +162,8 @@ function updateInputMethod(value: InputMethod) {
 
 <template>
   <FieldOfLawExpandableContainer
-    v-if="localModelValue"
-    :fields-of-law="localModelValue"
+    v-if="selectedNodes"
+    :fields-of-law="selectedNodes"
     :is-reset-button-visible="isResetButtonVisible"
     @editing-done="resetSearch"
     @input-method-selected="updateInputMethod"
@@ -200,11 +201,11 @@ function updateInputMethod(value: InputMethod) {
       />
 
       <FieldOfLawTree
-        v-if="localModelValue"
+        v-if="selectedNodes"
         ref="treeRef"
-        v-model="localModelValue"
         :node-of-interest="nodeOfInterest"
         :search-results="results"
+        :selected-nodes="selectedNodes"
         :show-norms="showNorms"
         @linked-field:select="setNodeOfInterest"
         @node-of-interest:reset="removeNodeOfInterest"
