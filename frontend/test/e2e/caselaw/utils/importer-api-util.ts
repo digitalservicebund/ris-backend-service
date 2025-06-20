@@ -9,6 +9,14 @@ export async function importDocumentationUnitFromXml(
   password: string,
   request: APIRequestContext,
 ): Promise<APIResponse> {
+  if (
+    [process.env.IMPORTER_URL, username, password].some(
+      (required) => required === undefined,
+    )
+  ) {
+    throw new Error("Missing required value for import")
+  }
+
   const cookies = await page.context().cookies()
   const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
   const usernamePassword = `${username}:${password}`

@@ -6,14 +6,13 @@ import { getPreview } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { importDocumentationUnitFromXml } from "~/e2e/caselaw/utils/importer-api-util"
 
 test.describe("ensuring the exported XML is generated from imported decision as expected", () => {
-  test("xml preview shows expected xml", async ({ page }) => {
-    // skip this test when running locally as there is no importer available
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
-      process.env.E2E_TEST_URL === "http://127.0.0.1",
-      "Skipping this test on local execution",
-    )
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
+    process.env.E2E_TEST_URL === "http://127.0.0.1",
+    "Skipping this test on local execution, as there is no importer available",
+  )
 
+  test("xml preview shows expected xml", async ({ page }) => {
     const apiKey = await test.step("Generate API Key", async () => {
       await navigateToSettings(page)
       // eslint-disable-next-line playwright/no-conditional-in-test
@@ -31,12 +30,15 @@ test.describe("ensuring the exported XML is generated from imported decision as 
           page,
           "./test/e2e/caselaw/testfiles/docunit_to_import.xml",
           apiKey!,
-          process.env.IMPORTER_USERNAME ?? "importer",
-          process.env.IMPORTER_PASSWORD ?? "importer",
+          process.env.IMPORTER_USERNAME!,
+          process.env.IMPORTER_PASSWORD!,
           page.request,
         )
 
-        expect(importResponse.ok()).toBeTruthy()
+        expect(
+          importResponse.ok(),
+          "could not import xml file, check your credentials and importer service",
+        ).toBeTruthy()
 
         const response = await page.request.get(
           `/api/v1/caselaw/documentunits/IITestDoc0019`,
