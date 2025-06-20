@@ -2,20 +2,8 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doReturn;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
-import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
-import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
@@ -24,124 +12,24 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
-import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
-import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
-import de.bund.digitalservice.ris.caselaw.domain.MailService;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
 
-@RISIntegrationTest(
-    imports = {
-      DocumentationUnitService.class,
-      PostgresDeltaMigrationRepositoryImpl.class,
-      DatabaseDocumentNumberGeneratorService.class,
-      DatabaseDocumentNumberRecyclingService.class,
-      DatabaseDocumentationUnitStatusService.class,
-      DatabaseProcedureService.class,
-      PostgresHandoverReportRepositoryImpl.class,
-      PostgresDocumentationUnitRepositoryImpl.class,
-      PostgresJPAConfig.class,
-      FlywayConfig.class,
-      SecurityConfig.class,
-      OAuthService.class,
-      TestConfig.class,
-      DocumentNumberPatternConfig.class,
-      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class,
-      PostgresDocumentationUnitSearchRepositoryImpl.class,
-    },
-    controllers = {DocumentationUnitController.class})
-class DeviatingObjectIntegrationTest {
-  @Container
-  static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
-
-  @DynamicPropertySource
-  static void registerDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("database.user", () -> postgreSQLContainer.getUsername());
-    registry.add("database.password", () -> postgreSQLContainer.getPassword());
-    registry.add("database.host", () -> postgreSQLContainer.getHost());
-    registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
-    registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
-  }
+class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
-  @MockitoBean private S3AsyncClient s3AsyncClient;
-  @MockitoBean private MailService mailService;
-  @MockitoBean private DocxConverterService docxConverterService;
-  @MockitoBean private UserService userService;
-  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private AttachmentService attachmentService;
-  @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private HandoverService handoverService;
-  @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
-  @MockitoBean private FmxImportService fmxImportService;
-  @MockitoBean private ConverterService converterService;
-  @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
-  @MockitoBean private FeatureToggleService featureToggleService;
-  @MockitoBean private DocumentationOfficeService documentationOfficeService;
-
-  @MockitoBean
-  private DocumentationUnitDocxMetadataInitializationService
-      documentationUnitDocxMetadataInitializationService;
-
   private final DocumentationOffice docOffice = buildDSDocOffice();
-
-  @BeforeEach
-  void setUp() {
-
-    doReturn(docOffice)
-        .when(userService)
-        .getDocumentationOffice(
-            argThat(
-                (OidcUser user) -> {
-                  List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).getFirst().equals("/DS");
-                }));
-  }
 
   private DocumentationUnitDTO prepareDocumentationUnitDTOWithDeviatingFileNumbers() {
     return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(

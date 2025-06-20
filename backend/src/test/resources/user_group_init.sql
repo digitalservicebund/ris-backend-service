@@ -12,4 +12,4 @@ VALUES
     'BGH/Extern',
     '41e62dbc-e5b6-414f-91e2-0cfe559447d1',
     false
-  );
+  ) ON CONFLICT DO NOTHING;

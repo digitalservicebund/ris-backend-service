@@ -2,14 +2,9 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
-import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
-import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
@@ -19,50 +14,25 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
-import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
-import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
-import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -71,38 +41,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
-@RISIntegrationTest(
-    imports = {
-      DocumentationUnitService.class,
-      LegalPeriodicalEditionService.class,
-      PostgresLegalPeriodicalEditionRepositoryImpl.class,
-      PostgresLegalPeriodicalRepositoryImpl.class,
-      PostgresDocumentationUnitRepositoryImpl.class,
-      PostgresJPAConfig.class,
-      FlywayConfig.class,
-      PostgresFieldOfLawRepositoryImpl.class,
-      SecurityConfig.class,
-      OAuthService.class,
-      TestConfig.class,
-      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class,
-      PostgresDocumentationUnitSearchRepositoryImpl.class
-    },
-    controllers = {LegalPeriodicalEditionController.class})
 @Sql(scripts = {"classpath:legal_periodical_init.sql", "classpath:document_types.sql"})
 @Sql(
-    scripts = {"classpath:legal_periodical_cleanup.sql"},
+    scripts = {"classpath:legal_periodical_cleanup.sql", "classpath:document_types_cleanup.sql"},
     executionPhase = AFTER_TEST_METHOD)
-class LegalPeriodicalEditionIntegrationTest {
+class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
   public static final DocumentType EBS =
       DocumentType.builder()
           .uuid(UUID.fromString("198b276e-8e6d-4df6-8692-44d74ed4fcba"))
@@ -114,22 +59,6 @@ class LegalPeriodicalEditionIntegrationTest {
           .jurisShortcut("Ean")
           .build();
 
-  @Container
-  static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
-
-  @Autowired
-  private PostgresLegalPeriodicalEditionRepositoryImpl postgresLegalPeriodicalEditionRepositoryImpl;
-
-  @DynamicPropertySource
-  static void registerDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("database.user", () -> postgreSQLContainer.getUsername());
-    registry.add("database.password", () -> postgreSQLContainer.getPassword());
-    registry.add("database.host", () -> postgreSQLContainer.getHost());
-    registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
-    registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
-  }
-
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private LegalPeriodicalEditionRepository repository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
@@ -139,44 +68,12 @@ class LegalPeriodicalEditionIntegrationTest {
   @Autowired private DocumentationUnitService documentationUnitService;
   @Autowired private DatabaseReferenceRepository referenceRepository;
 
-  @MockitoBean private UserService userService;
-  @MockitoBean private DocumentationUnitStatusService statusService;
-  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private HandoverService handoverService;
-  @MockitoBean private DocumentNumberService numberService;
-  @MockitoBean private DocumentNumberRecyclingService recyclingService;
-  @MockitoBean private AttachmentService attachmentService;
-  @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
-  @MockitoBean private FmxImportService fmxImportService;
-  @MockitoBean private ConverterService converterService;
-  @MockitoBean private FeatureToggleService featureToggleService;
-  @MockitoBean private DocumentationOfficeService documentationOfficeService;
-
   private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private LegalPeriodical legalPeriodical;
 
   @BeforeEach
   void setUp() {
-    doReturn(docOffice)
-        .when(userService)
-        .getDocumentationOffice(
-            argThat(
-                (OidcUser user) -> {
-                  List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).getFirst().equals("/DS");
-                }));
-    doReturn(true)
-        .when(userService)
-        .isInternal(
-            argThat(
-                (OidcUser user) -> {
-                  List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).getFirst().equals("/DS");
-                }));
-
     legalPeriodical =
         legalPeriodicalRepository.findAllBySearchStr("ABC").stream()
             .findAny()

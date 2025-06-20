@@ -1,51 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.AdminController;
-import de.bund.digitalservice.ris.caselaw.adapter.EnvironmentService;
-import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
-import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
-@RISIntegrationTest(
-    imports = {
-      PostgresJPAConfig.class,
-      FlywayConfig.class,
-      SecurityConfig.class,
-      TestConfig.class,
-    },
-    controllers = {AdminController.class})
-class SecurityIntegrationTest {
-
-  @Container
-  static PostgreSQLContainer postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
-
-  @DynamicPropertySource
-  static void registerDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("database.user", () -> postgreSQLContainer.getUsername());
-    registry.add("database.password", () -> postgreSQLContainer.getPassword());
-    registry.add("database.host", () -> postgreSQLContainer.getHost());
-    registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
-    registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
-  }
+class SecurityIntegrationTest extends BaseIntegrationTest {
 
   @Autowired RisWebTestClient webTestClient;
-  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean MailTrackingService mailTrackingService;
-  @MockitoBean EnvironmentService environmentService;
-  @MockitoBean StagingPortalPublicationService stagingPortalPublicationService;
 
   @Test
   void shouldHaveEnabledCSPHeader() {

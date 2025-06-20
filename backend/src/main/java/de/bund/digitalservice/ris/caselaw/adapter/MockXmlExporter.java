@@ -6,11 +6,13 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.context.annotation.Primary;
 
 /**
  * Mock implementation of the {@link XmlExporter} interface. This implementation is used for testing
  * purposes.
  */
+@Primary
 public class MockXmlExporter implements XmlExporter {
 
   /**

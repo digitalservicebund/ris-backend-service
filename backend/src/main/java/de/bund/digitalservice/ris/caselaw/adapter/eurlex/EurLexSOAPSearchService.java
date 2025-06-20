@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -89,7 +90,7 @@ public class EurLexSOAPSearchService implements SearchService {
     if (!documentationOffice.abbreviation().equals("DS")
         && !documentationOffice.abbreviation().equals("BGH")
         && !documentationOffice.abbreviation().equals("BFH")) {
-      return Page.empty();
+      return new PageImpl<>(List.of(), PageRequest.of(0, PAGE_SIZE), 0);
     }
 
     int pageNumber = 0;
