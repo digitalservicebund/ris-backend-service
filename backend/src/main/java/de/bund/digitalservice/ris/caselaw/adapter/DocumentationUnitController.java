@@ -444,9 +444,11 @@ public class DocumentationUnitController {
    */
   @GetMapping(value = "/{uuid}/preview-xml", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
-  public XmlTransformationResult getXmlPreview(@PathVariable UUID uuid) {
+  public XmlTransformationResult getXmlPreview(
+      @PathVariable UUID uuid,
+      @RequestParam(value = "prettify", defaultValue = "true") boolean prettify) {
     try {
-      return handoverService.createPreviewXml(uuid);
+      return handoverService.createPreviewXml(uuid, prettify);
     } catch (DocumentationUnitNotExistsException e) {
       return null;
     }

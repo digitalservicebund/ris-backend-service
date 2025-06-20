@@ -307,9 +307,9 @@ class HandoverServiceTest {
     XmlTransformationResult mockXmlTransformationResult =
         new XmlTransformationResult("some xml", true, List.of("success"), "foo.xml", Instant.now());
     when(repository.findByUuid(TEST_UUID)).thenReturn(testDecision);
-    when(mailService.getXmlPreview(testDecision)).thenReturn(mockXmlTransformationResult);
+    when(mailService.getXmlPreview(testDecision, true)).thenReturn(mockXmlTransformationResult);
 
-    Assertions.assertEquals(mockXmlTransformationResult, service.createPreviewXml(TEST_UUID));
+    Assertions.assertEquals(mockXmlTransformationResult, service.createPreviewXml(TEST_UUID, true));
   }
 
   @Test

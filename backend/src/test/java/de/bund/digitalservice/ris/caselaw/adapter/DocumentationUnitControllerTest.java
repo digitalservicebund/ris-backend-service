@@ -560,7 +560,7 @@ class DocumentationUnitControllerTest {
   @Test
   void testGetXmlPreview() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(handoverService.createPreviewXml(TEST_UUID))
+    when(handoverService.createPreviewXml(TEST_UUID, true))
         .thenReturn(
             new XmlTransformationResult(
                 "xml",
@@ -592,7 +592,7 @@ class DocumentationUnitControllerTest {
                 .fileName("test.xml")
                 .build());
 
-    verify(handoverService).createPreviewXml(TEST_UUID);
+    verify(handoverService).createPreviewXml(TEST_UUID, true);
   }
 
   @Test
