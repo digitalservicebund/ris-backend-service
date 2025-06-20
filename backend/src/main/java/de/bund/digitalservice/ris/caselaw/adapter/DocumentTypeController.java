@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeCategory;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.List;
@@ -25,14 +26,8 @@ public class DocumentTypeController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public List<DocumentType> getDocumentTypes(
-      @RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getDocumentTypes(searchStr);
-  }
-
-  @GetMapping(value = "/dependent-literature", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("isAuthenticated()")
-  public List<DocumentType> getDependentLiteratureDocumentTypes(
-      @RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getDependentLiteratureDocumentTypes(searchStr);
+      @RequestParam(value = "q") Optional<String> searchStr,
+      @RequestParam(value = "category", defaultValue = "CASELAW") DocumentTypeCategory category) {
+    return service.getDocumentTypes(searchStr, category);
   }
 }

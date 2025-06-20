@@ -202,7 +202,7 @@ export const caselawTest = test.extend<MyFixtures>({
     const documentType = await documentTypeResponse.json()
 
     const literatureDocumentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypes/dependent-literature?q=Ean`,
+      `api/v1/caselaw/documenttypes?q=Ean&category=DEPENDENT_LITERATURE`,
     )
     const literatureDocumentType = await literatureDocumentTypeResponse.json()
 
@@ -284,7 +284,7 @@ export const caselawTest = test.extend<MyFixtures>({
     const documentType = await documentTypeResponse.json()
 
     const literatureDocumentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypes/dependent-literature?q=Ean`,
+      `api/v1/caselaw/documenttypesq=Ean&category=DEPENDENT_LITERATURE`,
     )
     const literatureDocumentType = await literatureDocumentTypeResponse.json()
 
@@ -724,7 +724,7 @@ export const caselawTest = test.extend<MyFixtures>({
     const eanDocType = (
       (await (
         await request.get(
-          `api/v1/caselaw/documenttypes/dependent-literature?q=Ean`,
+          `api/v1/caselaw/documenttypes?q=Ean&category=DEPENDENT_LITERATURE`,
         )
       ).json()) as DocumentType[]
     )[0]

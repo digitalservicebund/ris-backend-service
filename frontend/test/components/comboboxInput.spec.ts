@@ -280,7 +280,7 @@ describe("Combobox Element", () => {
     )
 
     renderComponent({
-      itemService: comboboxItemService.getDocumentTypes,
+      itemService: comboboxItemService.getCaselawDocumentTypes,
     })
 
     const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")

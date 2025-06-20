@@ -256,7 +256,7 @@ onMounted(() => {
             id="documentType"
             v-model="ensuingDecision.documentType"
             aria-label="Dokumenttyp Nachgehende Entscheidung"
-            :item-service="ComboboxItemService.getDocumentTypes"
+            :item-service="ComboboxItemService.getCaselawDocumentTypes"
             :read-only="ensuingDecision.hasForeignSource"
           ></ComboboxInput>
         </InputField>

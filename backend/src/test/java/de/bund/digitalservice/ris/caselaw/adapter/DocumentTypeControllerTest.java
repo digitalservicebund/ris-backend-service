@@ -1,12 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeCategory;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -56,43 +58,27 @@ class DocumentTypeControllerTest {
   void shouldReturnListOfDocumentTypes_whenGetDocumentTypesIsCalled() {
     List<DocumentType> documentTypes = List.of(documentType1, documentType2);
 
-    when(service.getDocumentTypes(any(Optional.class))).thenReturn(documentTypes);
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documenttypes")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service, times(1)).getDocumentTypes(any(Optional.class));
-  }
-
-  @Test
-  void
-      shouldReturnListOfDependentLiteratureDocumentTypes_whenGetDependentLiteratureDocumentTypesIsCalled() {
-    List<DocumentType> documentTypes = List.of(documentType1, documentType2);
-
-    when(service.getDependentLiteratureDocumentTypes(any(Optional.class)))
+    when(service.getDocumentTypes(any(Optional.class), eq(DocumentTypeCategory.CASELAW)))
         .thenReturn(documentTypes);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documenttypes/dependent-literature")
+        .uri("/api/v1/caselaw/documenttypes?category=CASELAW")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getDependentLiteratureDocumentTypes(any(Optional.class));
+    verify(service, times(1))
+        .getDocumentTypes(any(Optional.class), eq(DocumentTypeCategory.CASELAW));
   }
 
   @Test
   void shouldCallServiceWithSearchQueryParameter_whenGetDocumentTypesIsCalledWithSearchString() {
     List<DocumentType> documentTypes = List.of(documentType1, documentType2);
 
-    when(service.getDocumentTypes(any(Optional.class))).thenReturn(documentTypes);
+    when(service.getDocumentTypes(any(Optional.class), eq(DocumentTypeCategory.CASELAW)))
+        .thenReturn(documentTypes);
 
     risWebTestClient
         .withDefaultLogin()
@@ -102,25 +88,6 @@ class DocumentTypeControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getDocumentTypes(Optional.of("label1"));
-  }
-
-  @Test
-  void
-      shouldCallServiceWithSearchQueryParameter_whenGetDependentLiteratureDocumentTypesIsCalledWithSearchString() {
-    List<DocumentType> documentTypes = List.of(documentType1, documentType2);
-
-    when(service.getDependentLiteratureDocumentTypes(any(Optional.class)))
-        .thenReturn(documentTypes);
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documenttypes/dependent-literature?q=label2")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service, times(1)).getDependentLiteratureDocumentTypes(Optional.of("label2"));
+    verify(service, times(1)).getDocumentTypes(Optional.of("label1"), DocumentTypeCategory.CASELAW);
   }
 }

@@ -7,7 +7,7 @@ import { CitationType } from "@/domain/citationType"
 import { Court } from "@/domain/court"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
-
+import { DocumentTypeCategory } from "@/domain/documentTypeCategory"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
@@ -17,7 +17,6 @@ import errorMessages from "@/i18n/errors.json"
 
 enum Endpoint {
   documentTypes = "documenttypes",
-  dependentLiteratureDocumentTypes = "documenttypes/dependent-literature",
   courts = "courts",
   citationTypes = "citationtypes",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
@@ -34,8 +33,7 @@ function formatDropdownItems(
   endpoint: Endpoint,
 ): ComboboxItem[] {
   switch (endpoint) {
-    case Endpoint.documentTypes:
-    case Endpoint.dependentLiteratureDocumentTypes: {
+    case Endpoint.documentTypes: {
       return (responseData as DocumentType[]).map((item) => ({
         label: item.label,
         value: item,
@@ -113,10 +111,16 @@ function fetchFromEndpoint(
   endpoint: Endpoint,
   filter: Ref<string | undefined>,
   size?: number,
+  category?: DocumentTypeCategory,
 ) {
-  const requestParams = computed<{ q?: string; sz?: string }>(() => ({
+  const requestParams = computed<{
+    q?: string
+    sz?: string
+    category?: string
+  }>(() => ({
     ...(filter.value ? { q: filter.value } : {}),
     ...(size != undefined ? { sz: size.toString(), pg: "0" } : {}),
+    ...(category ? { category: category.toString() } : {}),
   }))
   const url = computed(() => {
     const queryParams = new URLSearchParams(requestParams.value).toString()
@@ -139,7 +143,22 @@ function fetchFromEndpoint(
 }
 
 type ComboboxItemService = {
-  [key in keyof typeof Endpoint as `get${Capitalize<key>}`]: (
+  // Generic signature for most methods (excluding 'documentTypes')
+  [key in Exclude<
+    keyof typeof Endpoint,
+    "documentTypes"
+  > as `get${Capitalize<key>}`]: (
+    filter: Ref<string | undefined>,
+  ) => UseFetchReturn<ComboboxItem[]>
+} & {
+  // --- Convenience methods for document types ---
+  getCaselawDocumentTypes: (
+    filter: Ref<string | undefined>,
+  ) => UseFetchReturn<ComboboxItem[]>
+  getCaselawAndPendingProceedingDocumentTypes: (
+    filter: Ref<string | undefined>,
+  ) => UseFetchReturn<ComboboxItem[]>
+  getDependentLiteratureDocumentTypes: (
     filter: Ref<string | undefined>,
   ) => UseFetchReturn<ComboboxItem[]>
 }
@@ -147,10 +166,24 @@ type ComboboxItemService = {
 const service: ComboboxItemService = {
   getCourts: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.courts, filter, 200),
-  getDocumentTypes: (filter: Ref<string | undefined>) =>
+  getCaselawDocumentTypes: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.documentTypes, filter),
+  getCaselawAndPendingProceedingDocumentTypes: (
+    filter: Ref<string | undefined>,
+  ) =>
+    fetchFromEndpoint(
+      Endpoint.documentTypes,
+      filter,
+      undefined,
+      DocumentTypeCategory.CASELAW_PENDING_PROCEEDING,
+    ),
   getDependentLiteratureDocumentTypes: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.dependentLiteratureDocumentTypes, filter),
+    fetchFromEndpoint(
+      Endpoint.documentTypes,
+      filter,
+      undefined,
+      DocumentTypeCategory.DEPENDENT_LITERATURE,
+    ),
   getFieldOfLawSearchByIdentifier: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
   getRisAbbreviations: (filter: Ref<string | undefined>) =>

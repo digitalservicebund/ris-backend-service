@@ -272,7 +272,7 @@ onBeforeUnmount(() => {
           id="documentType"
           v-model="coreDataModel.documentType"
           aria-label="Dokumenttyp"
-          :item-service="ComboboxItemService.getDocumentTypes"
+          :item-service="ComboboxItemService.getCaselawDocumentTypes"
         ></ComboboxInput>
       </InputField>
     </div>

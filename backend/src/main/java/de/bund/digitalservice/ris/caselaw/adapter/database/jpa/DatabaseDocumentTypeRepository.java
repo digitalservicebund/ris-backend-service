@@ -15,8 +15,7 @@ public interface DatabaseDocumentTypeRepository extends JpaRepository<DocumentTy
   DocumentTypeDTO findFirstByAbbreviationAndCategory(
       String jurisShortcut, DocumentCategoryDTO category);
 
-  List<DocumentTypeDTO> findAllByCategoryOrderByAbbreviationAscLabelAsc(
-      DocumentCategoryDTO category);
+  List<DocumentTypeDTO> findAllByCategoryIdInOrderByAbbreviationAscLabelAsc(List<UUID> categoryIds);
 
   // see query explanation in CourtRepository, it's almost the same
   @Query(
@@ -34,10 +33,10 @@ public interface DatabaseDocumentTypeRepository extends JpaRepository<DocumentTy
               + "           ELSE 3 "
               + "           END AS weight "
               + "FROM label_added "
-              + "WHERE concat LIKE UPPER('%'||:searchStr||'%') AND document_category_id = :category "
+              + "WHERE concat LIKE UPPER('%'||:searchStr||'%') AND document_category_id IN (:categoryIds) "
               + "ORDER BY weight, concat")
-  List<DocumentTypeDTO> findCaselawBySearchStrAndCategory(
-      @Param("searchStr") String searchStr, @Param("category") UUID category);
+  List<DocumentTypeDTO> findBySearchStrAndCategoryId(
+      @Param("searchStr") String searchStr, @Param("categoryIds") List<UUID> categoryIds);
 
   @Query(
       nativeQuery = true,
