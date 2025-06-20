@@ -6,7 +6,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentTypeController;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -60,6 +62,7 @@ class DocumentTypeIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentTypeRepository repository;
+  @Autowired private DatabaseDocumentCategoryRepository categoryRepository;
   @MockitoBean private UserService userService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private DocumentationUnitService service;
@@ -81,6 +84,38 @@ class DocumentTypeIntegrationTest {
                   .extracting("label", "jurisShortcut")
                   .containsExactly(
                       Tuple.tuple("Amtsrechtliche Anordnung", "AmA"),
+                      Tuple.tuple("Anordnung", "Ao"),
+                      Tuple.tuple("Beschluss", "Bes"),
+                      Tuple.tuple("Urteil", "Ur"));
+            });
+  }
+
+  @Test
+  void testGetAllCaselawPendingProceedingDocumentTypes() {
+    var category = categoryRepository.findFirstByLabel("A");
+    repository.save(
+        DocumentTypeDTO.builder()
+            .label("Anhängiges Verfahren")
+            .abbreviation("Anh")
+            .multiple(false)
+            .category(category)
+            .build());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documenttypes?category=CASELAW_PENDING_PROCEEDING")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<List<DocumentType>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("label", "jurisShortcut")
+                  .containsExactly(
+                      Tuple.tuple("Amtsrechtliche Anordnung", "AmA"),
+                      Tuple.tuple("Anhängiges Verfahren", "Anh"),
                       Tuple.tuple("Anordnung", "Ao"),
                       Tuple.tuple("Beschluss", "Bes"),
                       Tuple.tuple("Urteil", "Ur"));
