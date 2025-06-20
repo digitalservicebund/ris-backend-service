@@ -2,7 +2,9 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.Arrays;
 import java.util.Objects;
+import lombok.Builder;
 
+@Builder
 public record Image(byte[] content, String contentType, String name) {
 
   @Override

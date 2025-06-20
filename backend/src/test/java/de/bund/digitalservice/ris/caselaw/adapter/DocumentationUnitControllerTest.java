@@ -46,6 +46,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -60,6 +61,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ImageNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import jakarta.persistence.EntityNotFoundException;
@@ -1049,5 +1051,63 @@ class DocumentationUnitControllerTest {
               // Assert
               assertThat(response.getResponseBody()).isEqualTo(result);
             });
+  }
+
+  @Test
+  void testGetImage_shouldReturnCorrectContentType()
+      throws DocumentationUnitNotExistsException, ImageNotExistsException {
+    when(service.getByDocumentNumber("ABCD202200001"))
+        .thenReturn(
+            Decision.builder()
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+                .build());
+    when(service.getImageBytes("ABCD202200001", "bild.jpg"))
+        .thenReturn(
+            Image.builder()
+                .name("bild.jpg")
+                .contentType("jpg")
+                .content("imageContent".getBytes())
+                .build());
+
+    risWebClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/ABCD202200001/image/bild.jpg")
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectHeader()
+        .contentType(MediaType.parseMediaType("image/jpg"))
+        .expectBody(byte[].class);
+
+    // once by the AuthService and once by the controller asking the service
+    verify(service, times(1)).getImageBytes("ABCD202200001", "bild.jpg");
+  }
+
+  @Test
+  void testGetImage_shouldReturnNotFoundForMissingImage()
+      throws DocumentationUnitNotExistsException, ImageNotExistsException {
+    when(service.getByDocumentNumber("ABCD202200001"))
+        .thenReturn(
+            Decision.builder()
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+                .build());
+    when(service.getImageBytes("ABCD202200001", "bild.jpg"))
+        .thenThrow(new ImageNotExistsException("Image not found"));
+
+    risWebClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/ABCD202200001/image/bild.abc")
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .exchange()
+        .expectStatus()
+        .isNotFound();
+
+    // once by the AuthService and once by the controller asking the service
+    verify(service, times(1)).getImageBytes("ABCD202200001", "bild.abc");
   }
 }
