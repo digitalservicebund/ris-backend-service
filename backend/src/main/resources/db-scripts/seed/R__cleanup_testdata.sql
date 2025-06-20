@@ -90,16 +90,16 @@ where word LIKE 'etoe%';
 delete
 from incremental_migration.attachment using
     incremental_migration.documentation_unit d
-where d.celex_number = '62019CV0001' or d.celex_number = '62024CO0878' or d.celex_number = '62023CJ0538';
+where d.celex_number = '62019CV0001(02)' or d.celex_number = '62024CO0878' or d.celex_number = '62023CJ0538';
 
 delete
 from incremental_migration.decision using
     incremental_migration.documentation_unit d
-where d.celex_number = '62019CV0001' or d.celex_number = '62024CO0878' or d.celex_number = '62023CJ0538';
+where d.celex_number = '62019CV0001(02)' or d.celex_number = '62024CO0878' or d.celex_number = '62023CJ0538';
 
 delete
 from incremental_migration.documentation_unit
-where celex_number = '62019CV0001' or celex_number = '62024CO0878' or celex_number = '62023CJ0538';
+where celex_number = '62019CV0001(02)' or celex_number = '62024CO0878' or celex_number = '62023CJ0538';
 
 delete from incremental_migration.eurlex
-where celex = '62019CV0001' or celex = '62024CO0878' or celex = '62023CJ0538';
+where celex = '62019CV0001(02)' or celex = '62024CO0878' or celex = '62023CJ0538';
