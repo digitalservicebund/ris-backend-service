@@ -7,8 +7,7 @@ import {
 } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 
 test.describe("eurlex", () => {
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip(
+  test(
     "Eurlex Entscheidungen können in NeuRIS übernommen werden",
     { tag: ["@RISDEV-7376", "@RISDEV-7578"] },
     async ({ page }) => {
