@@ -56,6 +56,26 @@ class DocumentTypeIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  void testGetAllDependantLiteratureDocumentTypes() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documenttypes?category=DEPENDENT_LITERATURE")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<List<DocumentType>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("label", "jurisShortcut")
+                  .containsExactly(
+                      Tuple.tuple("Anmerkung", "Ean"),
+                      Tuple.tuple("Entscheidungsbesprechung", "Ebs"));
+            });
+  }
+
+  @Test
   void testGetAllCaselawPendingProceedingDocumentTypes() {
     risWebTestClient
         .withDefaultLogin()
@@ -75,26 +95,6 @@ class DocumentTypeIntegrationTest extends BaseIntegrationTest {
                       Tuple.tuple("Anordnung", "Ao"),
                       Tuple.tuple("Beschluss", "Bes"),
                       Tuple.tuple("Urteil", "Ur"));
-            });
-  }
-
-  @Test
-  void testGetAllDependantLiteratureDocumentTypes() {
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documenttypes?category=DEPENDENT_LITERATURE")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(new TypeReference<List<DocumentType>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .extracting("label", "jurisShortcut")
-                  .containsExactly(
-                      Tuple.tuple("Anmerkung", "Ean"),
-                      Tuple.tuple("Entscheidungsbesprechung", "Ebs"));
             });
   }
 
