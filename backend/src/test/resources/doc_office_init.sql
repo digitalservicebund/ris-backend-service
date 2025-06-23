@@ -13,6 +13,7 @@ INSERT INTO
 VALUES
     ('41e62dbc-e5b6-414f-91e2-0cfe559447d1', 'BGH', '27e099f9-5b47-4ce9-ac58-b84ca4643bc2'),
     ('f13c2fdb-5323-49aa-bc6d-09fa68c3acb9', 'CC-RIS', null),
+    ('1baf3d1f-b800-4a65-badd-80c84cb38da9', 'BFH', null),
     ('ba90a851-3c54-4858-b4fa-7742ffbe8f05', 'DS', null) ON CONFLICT
     DO
     NOTHING;

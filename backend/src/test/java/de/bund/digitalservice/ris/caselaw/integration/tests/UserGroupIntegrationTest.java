@@ -7,102 +7,23 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import ch.qos.logback.classic.Level;
-import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseUserGroupService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
-import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.UserGroupController;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
-import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.AuthService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
-import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
-@RISIntegrationTest(
-    imports = {
-      DocumentationUnitService.class,
-      PostgresDocumentationUnitRepositoryImpl.class,
-      PostgresJPAConfig.class,
-      FlywayConfig.class,
-      KeycloakUserService.class,
-      DatabaseUserGroupService.class,
-      SecurityConfig.class,
-      OAuthService.class,
-      DatabaseDocumentationUnitStatusService.class,
-      TestConfig.class,
-      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class,
-      PostgresDocumentationUnitSearchRepositoryImpl.class
-    },
-    controllers = {UserGroupController.class})
 @Sql(scripts = {"classpath:doc_office_init.sql", "classpath:user_group_init.sql"})
 @Sql(
     scripts = {"classpath:procedures_cleanup.sql"},
     executionPhase = AFTER_TEST_METHOD)
-class UserGroupIntegrationTest {
-  @Container
-  static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
-
-  @DynamicPropertySource
-  static void registerDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("database.user", () -> postgreSQLContainer.getUsername());
-    registry.add("database.password", () -> postgreSQLContainer.getPassword());
-    registry.add("database.host", () -> postgreSQLContainer.getHost());
-    registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
-    registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
-  }
+class UserGroupIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private DatabaseDocumentationUnitRepository documentationUnitRepository;
-  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  @Autowired private DatabaseProcedureRepository repository;
-  @Autowired private DatabaseUserGroupRepository userGroupRepository;
-  @Autowired private AuthService authService;
-
-  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private DocumentNumberService numberService;
-  @MockitoBean private DocumentNumberRecyclingService documentNumberRecyclingService;
-  @MockitoBean private AttachmentService attachmentService;
-  @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
-  @MockitoBean private FmxImportService fmxImportService;
-  @MockitoBean private FeatureToggleService featureToggleService;
-  @MockitoBean private DatabaseUserGroupService databaseUserGroupService;
-  @MockitoBean private DocumentationOfficeService documentationOfficeService;
 
   UserGroup internalUserGroup =
       UserGroup.builder()
@@ -133,14 +54,14 @@ class UserGroupIntegrationTest {
   @BeforeEach()
   void beforeEach() {
     doReturn(List.of(internalUserGroup, externalUserGroup, externalUserGroup1, externalUserGroup2))
-        .when(databaseUserGroupService)
+        .when(userGroupService)
         .getAllUserGroups();
   }
 
   @Test
   void testGetUserGroups_withInternalUser_shouldReturnExternalUserGroupsOfDocOffice() {
     doReturn(List.of(externalUserGroup, externalUserGroup1, externalUserGroup2))
-        .when(databaseUserGroupService)
+        .when(userGroupService)
         .getExternalUserGroups(any());
 
     risWebTestClient
@@ -163,7 +84,7 @@ class UserGroupIntegrationTest {
   @Test
   void testGetUserGroups_withExternalUser_shouldReturnExternalUserGroupsOfDocOffice() {
     doReturn(List.of(externalUserGroup, externalUserGroup1, externalUserGroup2))
-        .when(databaseUserGroupService)
+        .when(userGroupService)
         .getExternalUserGroups(any());
 
     risWebTestClient
@@ -185,7 +106,7 @@ class UserGroupIntegrationTest {
 
   @Test
   void testGetUserGroups_withExternalUser_shouldReturnNoUserGroupsAndWarnings() {
-    doReturn(List.of()).when(databaseUserGroupService).getExternalUserGroups(any());
+    doReturn(List.of()).when(userGroupService).getExternalUserGroups(any());
     TestMemoryAppender memoryAppender = new TestMemoryAppender(KeycloakUserService.class);
 
     risWebTestClient
