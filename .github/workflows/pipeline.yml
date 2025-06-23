@@ -754,6 +754,17 @@ jobs:
           git config user.name "${{ github.repository }}"
           # This email identifies the commit as GitHub Actions - see https://github.com/orgs/community/discussions/26560
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      # First checkout ris-backend-service because of ADRs
+      - name: Checkout ris-norms repository
+        uses: actions/checkout@v4
+        with:
+          path: ris-backend-service
+      # Copy ADRs into tmp folder
+      - name: Copy ADRs
+        run: |
+          mkdir -p tmp/adr-source
+          find ris-backend-service/doc/adr/ -type f -exec cp {} tmp/adr-source/ \;
+          ls -l tmp/adr-source
       # ER-diagram
       # - name: ER-diagram - Download artifact
       #   uses: actions/download-artifact@v4
@@ -818,6 +829,14 @@ jobs:
           filePath: tmp/html-test-report/
           destinationDir: test-reports/ris-backend-service
           reportIsDirectory: true
+      # ADRs
+      - name: add ADRs to report
+        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
+        with:
+          filePath: tmp/adr-source
+          destinationDir: ris-reports/adr/caselaw
+          reportIsDirectory: true
+          keepAllVersions: false
       # Push reports
       - name: Push reports
         # we use `toJSON(...)` below to escape double quotation marks
