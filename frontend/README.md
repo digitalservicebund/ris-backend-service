@@ -158,7 +158,6 @@ To debug frontend in IntelliJ IDEA, such as setting watchers and breakpoints:
 1. **Run Chrome in Debug Mode:**
 
    Start your Chrome browser in remote debugging mode to allow IntelliJ IDEA to connect to it by:
-
    - Locate your Chromium-based browser:
      ```bash
      cd /Applications/Brave\ Browser.app/Contents/MacOS/
