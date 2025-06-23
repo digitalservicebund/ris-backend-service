@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -26,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 class ManagementDataTransformerTest {
   @Test
-  void testTransformToDomain_withoutManagementData_shouldTransformToEmptyManagementData() {
+  void testTransformDecisionToDomain_withoutManagementData_shouldTransformToEmptyManagementData() {
     // Arrange
     DecisionDTO decisionDTO = DecisionDTO.builder().build();
     ManagementData expected =
@@ -40,7 +41,23 @@ class ManagementDataTransformerTest {
   }
 
   @Test
-  void testTransformToDomain_withBorderNumbers_shouldExtractOnlyRelevantBorderNumbers() {
+  void
+      testTransformPendingProceedingToDomain_withoutManagementData_shouldTransformToEmptyManagementData() {
+    // Arrange
+    PendingProceedingDTO pendingProceedingDTO = PendingProceedingDTO.builder().build();
+    ManagementData expected =
+        generateManagementData(Optional.of(CreationParameters.builder().build()));
+
+    // Act
+    ManagementData managementData =
+        ManagementDataTransformer.transformToDomain(pendingProceedingDTO, null);
+
+    // Assert
+    assertThat(managementData).isEqualTo(expected);
+  }
+
+  @Test
+  void testTransformDecisionToDomain_withBorderNumbers_shouldExtractOnlyRelevantBorderNumbers() {
     // Arrange
     DecisionDTO decisionDTO =
         DecisionDTO.builder()
@@ -75,11 +92,34 @@ class ManagementDataTransformerTest {
     assertThat(managementData).isEqualTo(expected);
   }
 
+  @Test
+  void testTransformPendingProceedingToDomain_withBorderNumbers_shouldNotExtractBorderNumbers() {
+    // Arrange
+    PendingProceedingDTO pendingProceedingDTO =
+        PendingProceedingDTO.builder()
+            .headline("<border-number><number>9</number><content>hello</content></border-number>")
+            .resolutionNote(
+                "<border-number><number>10</number><content>hello</content></border-number>")
+            .legalIssue(
+                "<border-number><number>11</number><content>hello</content></border-number>")
+            .build();
+    ManagementData expected =
+        generateManagementData(
+            Optional.of(CreationParameters.builder().borderNumbers(List.of()).build()));
+
+    // Act
+    ManagementData managementData =
+        ManagementDataTransformer.transformToDomain(pendingProceedingDTO, null);
+
+    // Assert
+    assertThat(managementData).isEqualTo(expected);
+  }
+
   @Nested
   class DuplicateRelations {
     @Test
     void
-        testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations1_shouldFilterOutWarning() {
+        testTransformDecisionToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations1_shouldFilterOutWarning() {
       // Arrange
       var original =
           generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
@@ -109,7 +149,7 @@ class ManagementDataTransformerTest {
 
     @Test
     void
-        testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations2_shouldFilterOutWarning() {
+        testTransformDecisionToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations2_shouldFilterOutWarning() {
       // Arrange
       var original =
           generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
@@ -139,7 +179,7 @@ class ManagementDataTransformerTest {
 
     @Test
     void
-        testTransformToDomain_withUnpublishedDuplicateWarningFromSameDocOffice_shouldNotFilterOutWarning() {
+        testTransformDecisionToDomain_withUnpublishedDuplicateWarningFromSameDocOffice_shouldNotFilterOutWarning() {
       // Arrange
       var original =
           generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
@@ -167,7 +207,7 @@ class ManagementDataTransformerTest {
 
     @Test
     void
-        testTransformToDomain_withPublishedDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
+        testTransformDecisionToDomain_withPublishedDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
       // Arrange
       var original =
           generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
@@ -203,7 +243,7 @@ class ManagementDataTransformerTest {
 
     @Test
     void
-        testTransformToDomain_withPublishingDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
+        testTransformDecisionToDomain_withPublishingDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
       // Arrange
       var original =
           generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
@@ -239,7 +279,7 @@ class ManagementDataTransformerTest {
 
     @Test
     void
-        testTransformToDomain_withMultipleDuplicateWarnings_shouldSortByDecisionDateAndDocNumber() {
+        testTransformDecisionToDomain_withMultipleDuplicateWarnings_shouldSortByDecisionDateAndDocNumber() {
       // Arrange
       var original =
           generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
@@ -311,7 +351,7 @@ class ManagementDataTransformerTest {
   @Nested
   class MetaData {
     @Test
-    void testTransformToDomain_withAllMetaDataAndUser_shouldTransformAll() {
+    void testTransformDecisionToDomain_withAllMetaDataAndUser_shouldTransformAll() {
       // Arrange
       Instant lastUpdatedAtDateTime = Instant.now();
       DocumentationOfficeDTO creatingAndUpdatingDocOffice =
@@ -361,7 +401,58 @@ class ManagementDataTransformerTest {
     }
 
     @Test
-    void testTransformToDomain_withAllowedUserDocOffice_shouldTransformUserName() {
+    void testTransformPendingProceedingToDomain_withAllMetaDataAndUser_shouldTransformAll() {
+      // Arrange
+      Instant lastUpdatedAtDateTime = Instant.now();
+      DocumentationOfficeDTO creatingAndUpdatingDocOffice =
+          DocumentationOfficeDTO.builder().id(UUID.randomUUID()).abbreviation("BGH").build();
+      String lastUpdatedByName = "Winnie Puuh";
+      Instant createdAtDateTime = Instant.now();
+      String createdByName = "I Aah";
+      Instant firstPublishedAtDateTime = Instant.now();
+
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedAtDateTime(lastUpdatedAtDateTime)
+              .lastUpdatedByUserName(lastUpdatedByName)
+              .lastUpdatedByDocumentationOffice(creatingAndUpdatingDocOffice)
+              .createdAtDateTime(createdAtDateTime)
+              .createdByUserName(createdByName)
+              .createdByDocumentationOffice(creatingAndUpdatingDocOffice)
+              .firstPublishedAtDateTime(firstPublishedAtDateTime)
+              .build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      CreationParameters parameters =
+          CreationParameters.builder()
+              .lastUpdatedAtDateTime(lastUpdatedAtDateTime)
+              .lastUpdatedByName(lastUpdatedByName)
+              .lastUpdatedByDocumentationOffice(creatingAndUpdatingDocOffice.getAbbreviation())
+              .createdAtDateTime(createdAtDateTime)
+              .createdByName(createdByName)
+              .createdByDocumentationOffice(creatingAndUpdatingDocOffice.getAbbreviation())
+              .firstPublishedAtDateTime(firstPublishedAtDateTime)
+              .build();
+      ManagementData expected = generateManagementData(Optional.of(parameters));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder()
+                      .id(creatingAndUpdatingDocOffice.getId())
+                      .abbreviation(creatingAndUpdatingDocOffice.getAbbreviation())
+                      .build())
+              .build();
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, user);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void testTransformDecisionToDomain_withAllowedUserDocOffice_shouldTransformUserName() {
       // Arrange
       UUID docOfficeId = UUID.randomUUID();
       DocumentationOfficeDTO documentationOfficeDTO =
@@ -394,8 +485,42 @@ class ManagementDataTransformerTest {
     }
 
     @Test
+    void testTransformPendingProceedingToDomain_withAllowedUserDocOffice_shouldTransformUserName() {
+      // Arrange
+      UUID docOfficeId = UUID.randomUUID();
+      DocumentationOfficeDTO documentationOfficeDTO =
+          DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation("BGH").build();
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedByUserName("Winnie Puuh")
+              .lastUpdatedByDocumentationOffice(documentationOfficeDTO)
+              .build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByName("Winnie Puuh")
+                      .lastUpdatedByDocumentationOffice("BGH")
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().id(docOfficeId).abbreviation("BGH").build())
+              .build();
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, user);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
     void
-        testTransformToDomain_withOtherUserDocOfficeAndSystemName_shouldTransformLastUpdatedByNameToSystemName() {
+        testTransformDecisionToDomain_withOtherUserDocOfficeAndSystemName_shouldTransformLastUpdatedByNameToSystemName() {
       // Arrange
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder()
@@ -430,7 +555,45 @@ class ManagementDataTransformerTest {
     }
 
     @Test
-    void testTransformToDomain_withOtherUserDocOffice_shouldTransformLastUpdatedByNameToNull() {
+    void
+        testTransformPendingProceedingToDomain_withOtherUserDocOfficeAndSystemName_shouldTransformLastUpdatedByNameToSystemName() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedByUserName("Winnie Puuh")
+              .lastUpdatedBySystemName("NeuRIS")
+              .lastUpdatedByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByName("NeuRIS")
+                      .lastUpdatedByDocumentationOffice("BGH")
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, user);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void
+        testTransformDecisionToDomain_withOtherUserDocOffice_shouldTransformLastUpdatedByNameToNull() {
       // Arrange
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder()
@@ -464,7 +627,43 @@ class ManagementDataTransformerTest {
     }
 
     @Test
-    void testTransformToDomain_withoutDocOffice_shouldTransformLastUpdatedByNameToNull() {
+    void
+        testTransformPendingProceedingToDomain_withOtherUserDocOffice_shouldTransformLastUpdatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedByUserName("Winnie Puuh")
+              .lastUpdatedByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByDocumentationOffice("BGH")
+                      .lastUpdatedByName(null)
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, user);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void testTransformDecisionToDomain_withoutDocOffice_shouldTransformLastUpdatedByNameToNull() {
       // Arrange
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder().lastUpdatedByUserName("Winnie Puuh").build();
@@ -491,7 +690,36 @@ class ManagementDataTransformerTest {
     }
 
     @Test
-    void testTransformToDomain_withoutUser_shouldTransformLastUpdatedByNameToNull() {
+    void
+        testTransformPendingProceedingToDomain_withoutDocOffice_shouldTransformLastUpdatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder().lastUpdatedByUserName("Winnie Puuh").build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByDocumentationOffice(null)
+                      .lastUpdatedByName(null)
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, user);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void testTransformDecisionToDomain_withoutUser_shouldTransformLastUpdatedByNameToNull() {
       // Arrange
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder()
@@ -520,7 +748,8 @@ class ManagementDataTransformerTest {
     }
 
     @Test
-    void testTransformToDomain_withoutUserDocOffice_shouldTransformLastUpdatedByNameToNull() {
+    void
+        testTransformPendingProceedingToDomain_withoutUser_shouldTransformLastUpdatedByNameToNull() {
       // Arrange
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder()
@@ -531,7 +760,8 @@ class ManagementDataTransformerTest {
                       .abbreviation("BGH")
                       .build())
               .build();
-      DecisionDTO decisionDTO = DecisionDTO.builder().managementData(managementDataDTO).build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
       ManagementData expected =
           generateManagementData(
               Optional.of(
@@ -542,7 +772,7 @@ class ManagementDataTransformerTest {
 
       // Act
       ManagementData managementData =
-          ManagementDataTransformer.transformToDomain(decisionDTO, User.builder().build());
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, null);
 
       // Assert
       assertThat(managementData).isEqualTo(expected);
@@ -550,7 +780,38 @@ class ManagementDataTransformerTest {
 
     @Test
     void
-        testTransformToDomain_withOtherUserDocOfficeAndSystemName_shouldTransformCreatedByNameToSystemName() {
+        testTransformPendingProceedingToDomain_withoutUserDocOffice_shouldTransformLastUpdatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .lastUpdatedByUserName("Winnie Puuh")
+              .lastUpdatedByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .lastUpdatedByDocumentationOffice("BGH")
+                      .lastUpdatedByName(null)
+                      .build()));
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, User.builder().build());
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void
+        testTransformDecisionToDomain_withOtherUserDocOfficeAndSystemName_shouldTransformCreatedByNameToSystemName() {
       // Arrange
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder()
@@ -585,7 +846,44 @@ class ManagementDataTransformerTest {
     }
 
     @Test
-    void testTransformToDomain_withoutUser_shouldTransformCreatedByNameToNull() {
+    void
+        testTransformPendingProceedingToDomain_withOtherUserDocOfficeAndSystemName_shouldTransformCreatedByNameToSystemName() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .createdByUserName("Winnie Puuh")
+              .createdBySystemName("NeuRIS")
+              .createdByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .createdByName("NeuRIS")
+                      .createdByDocumentationOffice("BGH")
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, user);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void testTransformDecisionToDomain_withoutUser_shouldTransformCreatedByNameToNull() {
       // Arrange
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder()
@@ -614,7 +912,37 @@ class ManagementDataTransformerTest {
     }
 
     @Test
-    void testTransformToDomain_withoutUserDocOffice_shouldTransformCreatedByNameToNull() {
+    void testTransformPendingProceedingToDomain_withoutUser_shouldTransformCreatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .createdByUserName("Winnie Puuh")
+              .createdByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .createdByDocumentationOffice("BGH")
+                      .createdByName(null)
+                      .build()));
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, null);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void testTransformDecisionToDomain_withoutUserDocOffice_shouldTransformCreatedByNameToNull() {
       // Arrange
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder()
@@ -643,7 +971,38 @@ class ManagementDataTransformerTest {
     }
 
     @Test
-    void testTransformToDomain_withoutDocOffice_shouldTransformCreatedByNameToNull() {
+    void
+        testTransformPendingProceedingToDomain_withoutUserDocOffice_shouldTransformCreatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .createdByUserName("Winnie Puuh")
+              .createdByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .createdByDocumentationOffice("BGH")
+                      .createdByName(null)
+                      .build()));
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, User.builder().build());
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void testTransformDecisionToDomain_withoutDocOffice_shouldTransformCreatedByNameToNull() {
       // Arrange
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder().createdByUserName("Winnie Puuh").build();
@@ -670,7 +1029,36 @@ class ManagementDataTransformerTest {
     }
 
     @Test
-    void testTransformToDomain_withOtherUserDocOffice_shouldTransformCreatedByNameToNull() {
+    void
+        testTransformPendingProceedingToDomain_withoutDocOffice_shouldTransformCreatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder().createdByUserName("Winnie Puuh").build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .createdByDocumentationOffice(null)
+                      .createdByName(null)
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, user);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void testTransformDecisionToDomain_withOtherUserDocOffice_shouldTransformCreatedByNameToNull() {
       // Arrange
       ManagementDataDTO managementDataDTO =
           ManagementDataDTO.builder()
@@ -698,6 +1086,42 @@ class ManagementDataTransformerTest {
       // Act
       ManagementData managementData =
           ManagementDataTransformer.transformToDomain(decisionDTO, user);
+
+      // Assert
+      assertThat(managementData).isEqualTo(expected);
+    }
+
+    @Test
+    void
+        testTransformPendingProceedingToDomain_withOtherUserDocOffice_shouldTransformCreatedByNameToNull() {
+      // Arrange
+      ManagementDataDTO managementDataDTO =
+          ManagementDataDTO.builder()
+              .createdByUserName("Winnie Puuh")
+              .createdByDocumentationOffice(
+                  DocumentationOfficeDTO.builder()
+                      .id(UUID.randomUUID())
+                      .abbreviation("BGH")
+                      .build())
+              .build();
+      PendingProceedingDTO pendingProceedingDTO =
+          PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+      ManagementData expected =
+          generateManagementData(
+              Optional.of(
+                  CreationParameters.builder()
+                      .createdByDocumentationOffice("BGH")
+                      .createdByName(null)
+                      .build()));
+      User user =
+          User.builder()
+              .documentationOffice(
+                  DocumentationOffice.builder().id(UUID.randomUUID()).abbreviation("DS").build())
+              .build();
+
+      // Act
+      ManagementData managementData =
+          ManagementDataTransformer.transformToDomain(pendingProceedingDTO, user);
 
       // Assert
       assertThat(managementData).isEqualTo(expected);
