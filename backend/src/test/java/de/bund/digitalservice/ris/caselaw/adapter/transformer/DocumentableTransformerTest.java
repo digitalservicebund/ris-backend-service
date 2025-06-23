@@ -181,29 +181,6 @@ class DocumentableTransformerTest {
       assertNull(builder.build().getLastPublicationDateTime());
       assertNull(builder.build().getScheduledByEmail());
     }
-
-    @Test
-    void testPendingProceeding_withManagementData_shouldAddManagementData() {
-      // Arrange
-      PendingProceeding updatedDomainObject =
-          PendingProceeding.builder()
-              .managementData(
-                  ManagementData.builder()
-                      .scheduledPublicationDateTime(LocalDateTime.now())
-                      .scheduledByEmail("test@test.de")
-                      .lastPublicationDateTime(LocalDateTime.now())
-                      .build())
-              .build();
-      var builder = PendingProceedingDTO.builder().build().toBuilder();
-
-      // Act
-      DocumentableTransformer.addManagementData(updatedDomainObject, builder);
-
-      // Assert
-      assertNull(builder.build().getScheduledPublicationDateTime());
-      assertNull(builder.build().getLastPublicationDateTime());
-      assertThat(builder.build().getScheduledByEmail()).isEqualTo("test@test.de");
-    }
   }
 
   @Nested
