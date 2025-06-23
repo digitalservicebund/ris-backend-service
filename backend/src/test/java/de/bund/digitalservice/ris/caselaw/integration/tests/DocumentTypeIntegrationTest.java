@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -30,7 +31,6 @@ class DocumentTypeIntegrationTest extends BaseIntegrationTest {
   @AfterEach
   void cleanup() {
     repository.deleteAll();
-    categoryRepository.deleteAll();
   }
 
   @Test
@@ -56,27 +56,17 @@ class DocumentTypeIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  void testGetAllDependantLiteratureDocumentTypes() {
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documenttypes?category=DEPENDENT_LITERATURE")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(new TypeReference<List<DocumentType>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .extracting("label", "jurisShortcut")
-                  .containsExactly(
-                      Tuple.tuple("Anmerkung", "Ean"),
-                      Tuple.tuple("Entscheidungsbesprechung", "Ebs"));
-            });
-  }
-
-  @Test
   void testGetAllCaselawPendingProceedingDocumentTypes() {
+    var categoryA = categoryRepository.findFirstByLabel("A");
+    repository.save(
+        DocumentTypeDTO.builder()
+            .label("Anhängiges Verfahren")
+            .category(categoryA)
+            .abbreviation("Anh")
+            .multiple(false)
+            .build());
+    assertThat(repository.findAll()).hasSize(8);
+    assertThat(categoryRepository.findAll()).hasSize(4);
     risWebTestClient
         .withDefaultLogin()
         .get()
@@ -95,6 +85,26 @@ class DocumentTypeIntegrationTest extends BaseIntegrationTest {
                       Tuple.tuple("Anordnung", "Ao"),
                       Tuple.tuple("Beschluss", "Bes"),
                       Tuple.tuple("Urteil", "Ur"));
+            });
+  }
+
+  @Test
+  void testGetAllDependantLiteratureDocumentTypes() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documenttypes?category=DEPENDENT_LITERATURE")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<List<DocumentType>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("label", "jurisShortcut")
+                  .containsExactly(
+                      Tuple.tuple("Anmerkung", "Ean"),
+                      Tuple.tuple("Entscheidungsbesprechung", "Ebs"));
             });
   }
 
