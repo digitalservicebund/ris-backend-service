@@ -43,6 +43,10 @@ describe("api key settings", () => {
   })
 
   test("creates api key", async () => {
+    vi.spyOn(authService, "getImportApiKey").mockResolvedValue({
+      status: 200,
+      data: { apiKey: "fooKey", validUntil: new Date(), valid: false },
+    })
     vi.spyOn(authService, "generateImportApiKey").mockResolvedValue({
       status: 200,
       data: { apiKey: "fooKey", validUntil: new Date(), valid: true },

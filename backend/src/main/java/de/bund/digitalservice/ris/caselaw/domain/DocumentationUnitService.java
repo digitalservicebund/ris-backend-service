@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDele
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ImageNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -614,13 +615,13 @@ public class DocumentationUnitService {
   }
 
   public Image getImageBytes(String documentNumber, String imageName)
-      throws BadRequestException, DocumentationUnitNotExistsException {
+      throws ImageNotExistsException, DocumentationUnitNotExistsException {
     var docUnit = getByDocumentNumber(documentNumber);
     return attachmentService
         .findByDocumentationUnitIdAndFileName(docUnit.uuid(), imageName)
         .orElseThrow(
             () ->
-                new BadRequestException(
+                new ImageNotExistsException(
                     "Image not found for documentation unit: "
                         + docUnit.uuid()
                         + " and image name: "

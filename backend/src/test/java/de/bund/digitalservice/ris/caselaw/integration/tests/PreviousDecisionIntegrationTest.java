@@ -2,21 +2,10 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
-import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
-import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
@@ -31,39 +20,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
-import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
-import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
-import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisBodySpec;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.LocalDate;
@@ -77,52 +43,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
 
-@RISIntegrationTest(
-    imports = {
-      DocumentationUnitService.class,
-      PostgresDeltaMigrationRepositoryImpl.class,
-      DatabaseDocumentationUnitStatusService.class,
-      DatabaseDocumentNumberRecyclingService.class,
-      DatabaseDocumentNumberGeneratorService.class,
-      PostgresDocumentationUnitRepositoryImpl.class,
-      PostgresHandoverReportRepositoryImpl.class,
-      PostgresJPAConfig.class,
-      FlywayConfig.class,
-      SecurityConfig.class,
-      OAuthService.class,
-      TestConfig.class,
-      DocumentNumberPatternConfig.class,
-      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class,
-      PostgresDocumentationUnitSearchRepositoryImpl.class
-    },
-    controllers = {DocumentationUnitController.class})
-class PreviousDecisionIntegrationTest {
-  @Container
-  static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
+class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
 
   private DocumentCategoryDTO category;
   private CourtDTO testCourt;
-
-  @DynamicPropertySource
-  static void registerDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("database.user", () -> postgreSQLContainer.getUsername());
-    registry.add("database.password", () -> postgreSQLContainer.getPassword());
-    registry.add("database.host", () -> postgreSQLContainer.getHost());
-    registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
-    registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
-  }
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
@@ -133,28 +59,6 @@ class PreviousDecisionIntegrationTest {
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseFileNumberRepository databaseFileNumberRepository;
 
-  @MockitoBean UserService userService;
-  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private S3AsyncClient s3AsyncClient;
-  @MockitoBean private MailService mailService;
-  @MockitoBean DocxConverterService docxConverterService;
-  @MockitoBean AttachmentService attachmentService;
-  @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private HandoverService handoverService;
-  @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
-  @MockitoBean private FmxImportService fmxImportService;
-  @MockitoBean private ConverterService converterService;
-  @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
-  @MockitoBean private DocumentationOfficeService documentationOfficeService;
-
-  @MockitoBean private FeatureToggleService featureToggleService;
-
-  @MockitoBean
-  private DocumentationUnitDocxMetadataInitializationService
-      documentationUnitDocxMetadataInitializationService;
-
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;
   private final AtomicInteger courtJurisId = new AtomicInteger(100);
@@ -163,7 +67,6 @@ class PreviousDecisionIntegrationTest {
   void setUp() {
     documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
-    doReturn(docOffice).when(userService).getDocumentationOffice(any(OidcUser.class));
 
     category =
         databaseDocumentCategoryRepository.saveAndFlush(

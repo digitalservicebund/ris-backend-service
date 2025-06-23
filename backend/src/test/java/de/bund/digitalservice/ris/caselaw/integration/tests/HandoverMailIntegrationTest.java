@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.Mockito.when;
@@ -9,26 +8,13 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
-import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
-import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.HandoverMailService;
-import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
-import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
-import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseIgnoredTextCheckWordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseXmlHandoverMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -39,53 +25,24 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverReportDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.IgnoredTextCheckWordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitHistoryLogRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitSearchRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresIgnoredTextCheckWordRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
-import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.RelatedDocumentationUnitTransformer;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
-import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.EventType;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
-import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
-import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
-import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
-import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
-import de.bund.digitalservice.ris.caselaw.domain.TextCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
-import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Clock;
 import java.time.Instant;
@@ -103,68 +60,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
 
-@RISIntegrationTest(
-    imports = {
-      DocumentationUnitService.class,
-      HandoverService.class,
-      PostgresDeltaMigrationRepositoryImpl.class,
-      KeycloakUserService.class,
-      DatabaseDocumentNumberGeneratorService.class,
-      DatabaseDocumentNumberRecyclingService.class,
-      PostgresDocumentationUnitRepositoryImpl.class,
-      PostgresLegalPeriodicalEditionRepositoryImpl.class,
-      PostgresLegalPeriodicalRepositoryImpl.class,
-      PostgresHandoverRepositoryImpl.class,
-      PostgresHandoverReportRepositoryImpl.class,
-      PostgresIgnoredTextCheckWordRepositoryImpl.class,
-      HandoverMailService.class,
-      DatabaseDocumentationUnitStatusService.class,
-      LegalPeriodicalEditionService.class,
-      MockXmlExporter.class,
-      PostgresJPAConfig.class,
-      FlywayConfig.class,
-      SecurityConfig.class,
-      OAuthService.class,
-      TestConfig.class,
-      TextCheckService.class,
-      DocumentNumberPatternConfig.class,
-      PostgresDocumentationUnitHistoryLogRepositoryImpl.class,
-      DocumentationUnitHistoryLogService.class,
-      PostgresDocumentationUnitSearchRepositoryImpl.class
-    },
-    controllers = {DocumentationUnitController.class, LegalPeriodicalEditionController.class})
-@TestPropertySource(
-    properties = {
-      "mail.exporter.jurisUsername=test-user",
-      "mail.exporter.recipientAddress=neuris@example.com"
-    })
 @Sql(scripts = {"classpath:legal_periodical_init.sql"})
 @Sql(
     scripts = {"classpath:legal_periodical_cleanup.sql"},
     executionPhase = AFTER_TEST_METHOD)
-class HandoverMailIntegrationTest {
-  @Container
-  static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
-
-  @DynamicPropertySource
-  static void registerDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("database.user", () -> postgreSQLContainer.getUsername());
-    registry.add("database.password", () -> postgreSQLContainer.getPassword());
-    registry.add("database.host", () -> postgreSQLContainer.getHost());
-    registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
-    registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
-  }
+@Import(MockXmlExporter.class)
+class HandoverMailIntegrationTest extends BaseIntegrationTest {
 
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String DELIVER_DATE =
@@ -173,8 +77,6 @@ class HandoverMailIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseLegalPeriodicalEditionRepository editionRepository;
-  @Autowired private DatabaseReferenceRepository referenceRepository;
-  @Autowired private LegalPeriodicalRepository legalPeriodicalRepository;
   @Autowired private DatabaseLegalPeriodicalRepository dblegalPeriodicalRepository;
   @Autowired private DatabaseXmlHandoverMailRepository xmlHandoverRepository;
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
@@ -183,26 +85,6 @@ class HandoverMailIntegrationTest {
   @Autowired private DatabaseIgnoredTextCheckWordRepository ignoredTextCheckWordRepository;
   @Autowired private DocumentationUnitHistoryLogService docUnitHistoryLogService;
 
-  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private S3AsyncClient s3AsyncClient;
-  @MockitoBean private HttpMailSender mailSender;
-  @MockitoBean DocxConverterService docxConverterService;
-  @MockitoBean AttachmentService attachmentService;
-  @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
-  @MockitoBean private UserGroupService userGroupService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
-  @MockitoBean private FeatureToggleService featureToggleService;
-  @MockitoBean private FmxImportService fmxImportService;
-  @MockitoBean private ConverterService converterService;
-  @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
-  @MockitoBean private DocumentationOfficeService documentationOfficeService;
-
-  @MockitoBean
-  private DocumentationUnitDocxMetadataInitializationService
-      documentationUnitDocxMetadataInitializationService;
-
   private DocumentationOfficeDTO docOffice;
 
   @BeforeEach
@@ -210,8 +92,6 @@ class HandoverMailIntegrationTest {
     docOffice = documentationOfficeRepository.findByAbbreviation("DS");
 
     when(featureToggleService.isEnabled("neuris.text-check-noindex-handover")).thenReturn(true);
-
-    mockUserGroups(userGroupService);
   }
 
   @AfterEach

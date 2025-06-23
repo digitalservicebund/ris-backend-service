@@ -105,13 +105,13 @@ public class HandoverService {
    * @param documentUuid the UUID of the documentation unit
    * @return the export result, containing the juris xml and export metadata
    */
-  public XmlTransformationResult createPreviewXml(UUID documentUuid)
+  public XmlTransformationResult createPreviewXml(UUID documentUuid, boolean prettifyXml)
       throws DocumentationUnitNotExistsException {
 
     DocumentationUnit documentationUnit = repository.findByUuid(documentUuid);
 
     if (documentationUnit instanceof Decision decision) {
-      return mailService.getXmlPreview(decision);
+      return mailService.getXmlPreview(decision, prettifyXml);
     } else {
       log.info("Documentable type not supported: {}", documentationUnit.getClass().getName());
     }

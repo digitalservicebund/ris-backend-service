@@ -153,9 +153,9 @@ public class HandoverMailService implements MailService {
    * @throws HandoverException if the XML export fails
    */
   @Override
-  public XmlTransformationResult getXmlPreview(Decision decision) {
+  public XmlTransformationResult getXmlPreview(Decision decision, boolean prettifyXml) {
     try {
-      return xmlExporter.transformToXml(decision, true);
+      return xmlExporter.transformToXml(decision, prettifyXml);
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new HandoverException("Couldn't generate xml for documentation unit.", ex);
     }

@@ -32,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNo
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ImageNotExistsException;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -443,9 +444,11 @@ public class DocumentationUnitController {
    */
   @GetMapping(value = "/{uuid}/preview-xml", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
-  public XmlTransformationResult getXmlPreview(@PathVariable UUID uuid) {
+  public XmlTransformationResult getXmlPreview(
+      @PathVariable UUID uuid,
+      @RequestParam(value = "prettify", defaultValue = "true") boolean prettify) {
     try {
-      return handoverService.createPreviewXml(uuid);
+      return handoverService.createPreviewXml(uuid, prettify);
     } catch (DocumentationUnitNotExistsException e) {
       return null;
     }
@@ -514,10 +517,12 @@ public class DocumentationUnitController {
       headers.setContentLength(imageBytes.length);
 
       return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
-
-    } catch (Exception e) {
-      log.error("Error fetching image: {}", e.getMessage());
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (DocumentationUnitNotExistsException e) {
+      log.warn("Documentation unit not found: {}", documentNumber, e);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } catch (ImageNotExistsException e) {
+      log.warn("Image {} not found for documentation unit {}", imageName, documentNumber, e);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
 
@@ -530,9 +535,9 @@ public class DocumentationUnitController {
   @NotNull
   private static MediaType getMediaType(String contentType) {
     try {
-      return MediaType.parseMediaType(contentType);
+      return MediaType.parseMediaType("image/" + contentType);
     } catch (IllegalArgumentException e) {
-      log.error("Invalid content type retrieved from service: {}", contentType);
+      // defaulting to application/octet-stream if parsing fails
       return MediaType.APPLICATION_OCTET_STREAM;
     }
   }

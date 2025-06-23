@@ -92,6 +92,13 @@ public class AuthUtils {
         .build();
   }
 
+  public static DocumentationOffice buildBFHDocOffice() {
+    return DocumentationOffice.builder()
+        .abbreviation("BFH")
+        .id(UUID.fromString("1baf3d1f-b800-4a65-badd-80c84cb38da9"))
+        .build();
+  }
+
   public static void mockUserGroups(UserGroupService userGroupService) {
     doReturn(
             List.of(
@@ -115,6 +122,12 @@ public class AuthUtils {
                     .id(UUID.fromString("3b733549-d2cc-40f0-b7f3-9bfa9f3c1b89"))
                     .docOffice(buildBGHDocOffice())
                     .userGroupPathName("/BGH/Extern")
+                    .isInternal(true)
+                    .build(),
+                UserGroup.builder()
+                    .id(UUID.fromString("032d5a5e-bf3f-470a-b2c7-63066cb88ebb"))
+                    .docOffice(buildBFHDocOffice())
+                    .userGroupPathName("/BFH")
                     .isInternal(true)
                     .build(),
                 UserGroup.builder()

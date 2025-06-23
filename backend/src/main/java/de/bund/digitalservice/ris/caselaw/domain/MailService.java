@@ -11,7 +11,7 @@ public interface MailService {
 
   List<HandoverMail> getHandoverResult(UUID entityId, HandoverEntityType entityType);
 
-  XmlTransformationResult getXmlPreview(Decision decision);
+  XmlTransformationResult getXmlPreview(Decision decision, boolean prettifyXml);
 
   List<XmlTransformationResult> getXmlPreview(LegalPeriodicalEdition edition);
 }

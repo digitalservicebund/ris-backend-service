@@ -114,7 +114,7 @@ export async function getPreview(
   const cookies = await page.context().cookies()
   const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
   return await page.request.get(
-    `/api/v1/caselaw/documentunits/${documentUnitId}/preview-xml`,
+    `/api/v1/caselaw/documentunits/${documentUnitId}/preview-xml?prettify=false`,
     {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
     },
