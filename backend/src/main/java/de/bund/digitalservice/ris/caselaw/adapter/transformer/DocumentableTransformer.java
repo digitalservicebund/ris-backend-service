@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DocumentableTransformer {
   DocumentableTransformer() {}
 
-  static boolean decisionContainsReferenceWithId(DocumentationUnit docUnit, UUID referenceID) {
+  static boolean documentableContainsReferenceWithId(DocumentationUnit docUnit, UUID referenceID) {
     boolean caselawReferencesContainId =
         docUnit.caselawReferences() != null
             && !docUnit.caselawReferences().isEmpty()
