@@ -7,6 +7,7 @@ import { ApiKey } from "@/domain/apiKey"
 import authService from "@/services/authService"
 
 const apiKey = ref<ApiKey | null>(null)
+const isLoading = ref(true)
 
 async function generateApiKey() {
   const response = await authService.generateImportApiKey()
@@ -25,13 +26,17 @@ async function invalidateApiKey() {
 onMounted(async () => {
   const response = await authService.getImportApiKey()
   if (response.data) apiKey.value = response.data
+  isLoading.value = false // Set loading to false after fetch
 })
 </script>
 
 <template>
   <div class="flex-col gap-16">
     <span class="ris-label2-bold">API Key</span>
-    <div v-if="apiKey">
+    <div v-if="isLoading" class="ris-body1-regular mt-24">
+      Loading API Key...
+    </div>
+    <div v-else-if="apiKey">
       <div class="ris-body1-regular mt-24">
         <CopyableLabel
           v-if="apiKey.valid"
