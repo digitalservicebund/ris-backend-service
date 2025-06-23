@@ -209,7 +209,7 @@ class PrototypePortalPublicationJobIntegrationTest {
             bodyCaptor.getValue().contentStreamProvider().newStream().readAllBytes(),
             StandardCharsets.UTF_8);
 
-    assertThat(putRequest.key()).contains(dto.getDocumentNumber());
+    assertThat(putRequest.key()).isEqualTo(dto.getDocumentNumber() + ".xml");
     assertThat(ldmlContent)
         .contains("gruende test")
         .doesNotContain("entscheidungsname test")

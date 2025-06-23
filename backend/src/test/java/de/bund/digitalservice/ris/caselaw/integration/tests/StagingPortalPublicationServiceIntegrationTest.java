@@ -186,11 +186,11 @@ class StagingPortalPublicationServiceIntegrationTest {
 
     ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
-    verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
+    verify(s3Client, times(1)).putObject(captor.capture(), any(RequestBody.class));
 
     var capturedRequests = captor.getAllValues();
-    assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123.xml");
-    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
+    assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
+    //    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
   }
 
   @Test

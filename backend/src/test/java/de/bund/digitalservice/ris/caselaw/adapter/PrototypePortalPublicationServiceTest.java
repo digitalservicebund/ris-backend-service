@@ -173,7 +173,7 @@ class PrototypePortalPublicationServiceTest {
 
     subject.publishDocumentationUnit(testDocumentNumber);
 
-    verify(prototypePortalBucket, times(1)).save(contains(testDocumentNumber), eq(transformed));
+    verify(prototypePortalBucket, times(1)).save(eq(testDocumentNumber + ".xml"), eq(transformed));
   }
 
   @Test

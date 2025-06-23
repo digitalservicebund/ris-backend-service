@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -51,6 +52,7 @@ class StagingPortalPublicationServiceTest {
   @MockitoBean private PortalTransformer portalTransformer;
 
   private static Decision testDocumentUnit;
+  private static String testDocumentNumber;
   private static CaseLawLdml testLdml;
 
   private StagingPortalPublicationService subject;
@@ -69,6 +71,7 @@ class StagingPortalPublicationServiceTest {
         related1.toBuilder().documentNumber("Test document number 2").build();
 
     UUID testUUID = UUID.randomUUID();
+    testDocumentNumber = "TEST123456789";
     testDocumentUnit =
         Decision.builder()
             .uuid(testUUID)
@@ -83,7 +86,7 @@ class StagingPortalPublicationServiceTest {
                     .fileNumbers(List.of("testFileNumber"))
                     .decisionDate(LocalDate.of(2020, 1, 1))
                     .build())
-            .documentNumber("testDocumentNumber")
+            .documentNumber(testDocumentNumber)
             .longTexts(LongTexts.builder().caseFacts("<p>Example content 1</p>").build())
             .shortTexts(ShortTexts.builder().build())
             .previousDecisions(List.of(related1, related2))
@@ -99,7 +102,7 @@ class StagingPortalPublicationServiceTest {
                                 Identification.builder()
                                     .frbrWork(
                                         FrbrElement.builder()
-                                            .frbrThis(new FrbrThis("XXRE123456789"))
+                                            .frbrThis(new FrbrThis(testDocumentNumber))
                                             .build())
                                     .build())
                             .build())
@@ -123,13 +126,15 @@ class StagingPortalPublicationServiceTest {
   @DisplayName("Should publish single documentation unit successfully")
   void publishSuccessfully() throws DocumentationUnitNotExistsException {
     UUID documentationUnitId = UUID.randomUUID();
+    String transformed = "<akn:akomaNtoso />";
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
-    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
+    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
 
     subject.publishDocumentationUnitWithChangelog(documentationUnitId);
 
-    verify(caseLawBucket, times(2)).save(anyString(), anyString());
+    verify(caseLawBucket, times(1))
+        .save(eq(testDocumentNumber + "/" + testDocumentNumber + ".xml"), eq(transformed));
   }
 
   @Test
@@ -160,37 +165,42 @@ class StagingPortalPublicationServiceTest {
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
 
-  @Test
-  @DisplayName("Should fail when changelog file cannot be created")
-  void failChangelogFileFailure()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
-    UUID documentationUnitId = UUID.randomUUID();
-    when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
-    when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
-    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
-    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
+  // changelog currently disabled
+  //  @Test
+  //  @DisplayName("Should fail when changelog file cannot be created")
+  //  void failChangelogFileFailure()
+  //      throws DocumentationUnitNotExistsException, JsonProcessingException {
+  //    UUID documentationUnitId = UUID.randomUUID();
+  //
+  // when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
+  //    when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+  //    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+  //    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
+  //
+  //    assertThatExceptionOfType(PublishException.class)
+  //        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
+  //        .withMessageContaining("Could not save changelog to bucket");
+  //    verify(caseLawBucket).delete(testDocumentUnit.documentNumber() + ".xml");
+  //  }
 
-    assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
-        .withMessageContaining("Could not save changelog to bucket");
-    verify(caseLawBucket).delete(testDocumentUnit.documentNumber() + ".xml");
-  }
-
-  @Test
-  @DisplayName("Should fail when changelog file cannot be saved to bucket")
-  void failWithBucketException() throws DocumentationUnitNotExistsException {
-    UUID documentationUnitId = UUID.randomUUID();
-    when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
-    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
-    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
-
-    doThrow(BucketException.class).when(caseLawBucket).save(contains("changelogs/"), anyString());
-
-    assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
-        .withMessageContaining("Could not save changelog to bucket");
-    verify(caseLawBucket).delete(testDocumentUnit.documentNumber() + ".xml");
-  }
+  // changelog currently disabled
+  //  @Test
+  //  @DisplayName("Should fail when changelog file cannot be saved to bucket")
+  //  void failWithBucketException() throws DocumentationUnitNotExistsException {
+  //    UUID documentationUnitId = UUID.randomUUID();
+  //
+  // when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
+  //    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+  //    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
+  //
+  //    doThrow(BucketException.class).when(caseLawBucket).save(contains("changelogs/"),
+  // anyString());
+  //
+  //    assertThatExceptionOfType(PublishException.class)
+  //        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
+  //        .withMessageContaining("Could not save changelog to bucket");
+  //    verify(caseLawBucket).delete(testDocumentUnit.documentNumber() + ".xml");
+  //  }
 
   @Test
   @DisplayName("Should fail when ldml file cannot be saved to bucket")
