@@ -50,5 +50,11 @@ values
         'Ebs',
         'Entscheidungsbesprechung',
         '4879ae8e-e809-4dd7-8517-d5c795bead79'
+    ),
+    (
+        '3e58b70a-65fc-4f7a-8d3a-f42b9e9d3c47',
+        'Anh',
+        'Anhängiges Verfahren',
+        (select id from incremental_migration.document_category where label = 'A')
     )
 on conflict do nothing;
