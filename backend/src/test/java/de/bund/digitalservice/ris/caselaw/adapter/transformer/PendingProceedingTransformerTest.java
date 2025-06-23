@@ -12,15 +12,20 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumb
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -56,6 +61,59 @@ class PendingProceedingTransformerTest {
     assertThat(pendingProceeding.shortTexts().admissionOfAppeal()).isEqualTo("admission of appeal");
     assertThat(pendingProceeding.shortTexts().legalIssue()).isEqualTo("legal issue");
     assertThat(pendingProceeding.shortTexts().resolutionNote()).isEqualTo("resolution note");
+  }
+
+  @Test
+  void testTransformToDomain_withManagementData() {
+    // Arrange
+    Instant lastUpdatedAtDateTime = Instant.now();
+    DocumentationOfficeDTO creatingAndUpdatingDocOffice =
+        DocumentationOfficeDTO.builder().id(UUID.randomUUID()).abbreviation("BGH").build();
+    String lastUpdatedByName = "Winnie Puuh";
+    Instant createdAtDateTime = Instant.now();
+    String createdByName = "I Aah";
+    Instant firstPublishedAtDateTime = Instant.now();
+
+    ManagementDataDTO managementDataDTO =
+        ManagementDataDTO.builder()
+            .lastUpdatedAtDateTime(lastUpdatedAtDateTime)
+            .lastUpdatedByUserName(lastUpdatedByName)
+            .lastUpdatedByDocumentationOffice(creatingAndUpdatingDocOffice)
+            .createdAtDateTime(createdAtDateTime)
+            .createdByUserName(createdByName)
+            .createdByDocumentationOffice(creatingAndUpdatingDocOffice)
+            .firstPublishedAtDateTime(firstPublishedAtDateTime)
+            .build();
+    PendingProceedingDTO pendingProceedingDTO =
+        PendingProceedingDTO.builder().managementData(managementDataDTO).build();
+
+    ManagementData expected =
+        ManagementData.builder()
+            .lastUpdatedAtDateTime(lastUpdatedAtDateTime)
+            .lastUpdatedByName(lastUpdatedByName)
+            .lastUpdatedByDocOffice(creatingAndUpdatingDocOffice.getAbbreviation())
+            .createdAtDateTime(createdAtDateTime)
+            .createdByName(createdByName)
+            .createdByDocOffice(creatingAndUpdatingDocOffice.getAbbreviation())
+            .firstPublishedAtDateTime(firstPublishedAtDateTime)
+            .duplicateRelations(List.of())
+            .borderNumbers(List.of())
+            .build();
+    User user =
+        User.builder()
+            .documentationOffice(
+                DocumentationOffice.builder()
+                    .id(creatingAndUpdatingDocOffice.getId())
+                    .abbreviation(creatingAndUpdatingDocOffice.getAbbreviation())
+                    .build())
+            .build();
+
+    // Act
+    PendingProceeding pendingProceeding =
+        PendingProceedingTransformer.transformToDomain(pendingProceedingDTO, user);
+
+    // Assert
+    assertThat(pendingProceeding.managementData()).isEqualTo(expected);
   }
 
   @Test
