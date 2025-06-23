@@ -19,7 +19,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -36,7 +35,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Slice;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
@@ -52,10 +50,6 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
   @Autowired private DatabaseDuplicateCheckService duplicateCheckService;
-
-  @MockitoBean
-  private DocumentationUnitDocxMetadataInitializationService
-      documentationUnitDocxMetadataInitializationService;
 
   private static final CourtDTO courtAgAachen =
       CourtDTO.builder().id(UUID.fromString("46301f85-9bd2-4690-a67f-f9fdfe725de3")).build();
