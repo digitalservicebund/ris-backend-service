@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
@@ -183,6 +184,67 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
     assertThat(responseBodyWithExternalHandoverFilter)
         .map(DocumentationUnitListItem::documentNumber)
         .containsExactly("ABCD202200003");
+  }
+
+  @Test
+  void shouldFilterByDocUnitKind() {
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DecisionDTO.builder().documentNumber("ABCD202200001").documentationOffice(docOfficeDTO));
+
+    EntityBuilderTestUtil.createAndSavePublishedPendingProceeding(
+        repository,
+        PendingProceedingDTO.builder()
+            .documentationOffice(docOfficeDTO)
+            .documentNumber("ABCD202200002"));
+
+    Slice<DocumentationUnitListItem> responseBodyWithoutFilter =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=5")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(responseBodyWithoutFilter.getNumberOfElements()).isEqualTo(2);
+    assertThat(responseBodyWithoutFilter)
+        .map(DocumentationUnitListItem::documentNumber)
+        .containsExactly("ABCD202200002", "ABCD202200001");
+
+    Slice<DocumentationUnitListItem> responseBodyWithDecisionFilter =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=5&kind=DECISION")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(responseBodyWithDecisionFilter.getNumberOfElements()).isEqualTo(1);
+    assertThat(responseBodyWithDecisionFilter)
+        .map(DocumentationUnitListItem::documentNumber)
+        .containsExactly("ABCD202200001");
+
+    Slice<DocumentationUnitListItem> responseBodyWithExternalHandoverFilter =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=5&kind=PENDING_PROCEEDING")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(responseBodyWithExternalHandoverFilter.getNumberOfElements()).isEqualTo(1);
+    assertThat(responseBodyWithExternalHandoverFilter)
+        .map(DocumentationUnitListItem::documentNumber)
+        .containsExactly("ABCD202200002");
   }
 
   @Test

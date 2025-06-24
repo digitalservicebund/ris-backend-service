@@ -217,7 +217,8 @@ public class DocumentationUnitService {
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly,
       Optional<Boolean> withDuplicateWarning,
-      Optional<InboxStatus> inboxStatus) {
+      Optional<InboxStatus> inboxStatus,
+      Optional<Kind> kind) {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
@@ -240,6 +241,7 @@ public class DocumentationUnitService {
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .withDuplicateWarning(withDuplicateWarning.orElse(false))
             .inboxStatus(inboxStatus.orElse(null))
+            .kind(kind.orElse(null))
             .build();
 
     Slice<DocumentationUnitListItem> documentationUnitListItems =
