@@ -5,19 +5,27 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
+import java.sql.Connection;
+import java.sql.SQLException;
+import javax.sql.DataSource;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -43,6 +51,7 @@ import org.testcontainers.utility.DockerImageName;
     })
 @AutoConfigureMockMvc
 @Tag("integration")
+@SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 @Sql(
     scripts = {"classpath:doc_office_init.sql"},
     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -73,6 +82,13 @@ public abstract class BaseIntegrationTest {
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean UserGroupService userGroupService;
 
+  static DataSource dataSource;
+
+  @Autowired
+  void setDataSource(DataSource dataSource) {
+    BaseIntegrationTest.dataSource = dataSource;
+  }
+
   @BeforeAll
   public static void baseBeforeAll() {
     postgreSQLContainer.start();
@@ -89,5 +105,16 @@ public abstract class BaseIntegrationTest {
   @AfterEach
   void baseAfterEach() {
     Mockito.reset(featureToggleService);
+  }
+
+  /**
+   * We cannot use @Sql with AFTER_TEST_CLASS because it will be overwritten by individual tests
+   * that have their own @Sql annotations.
+   */
+  @AfterAll
+  static void baseAfterAll() throws SQLException {
+    try (Connection conn = dataSource.getConnection()) {
+      ScriptUtils.executeSqlScript(conn, new ClassPathResource("documentation_unit_cleanup.sql"));
+    }
   }
 }
