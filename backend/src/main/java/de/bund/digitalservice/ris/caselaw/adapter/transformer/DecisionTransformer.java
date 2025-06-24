@@ -84,6 +84,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       builder
           .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
           .date(coreData.decisionDate())
+          .celexNumber(coreData.celexNumber())
           .documentType(
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
