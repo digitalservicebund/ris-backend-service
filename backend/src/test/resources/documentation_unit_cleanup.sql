@@ -1,0 +1,1 @@
+TRUNCATE incremental_migration.documentation_unit CASCADE;

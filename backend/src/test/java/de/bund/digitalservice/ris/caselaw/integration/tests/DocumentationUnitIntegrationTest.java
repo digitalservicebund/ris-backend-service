@@ -129,11 +129,10 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Autowired private DocumentationUnitHistoryLogRepository historyLogRepository;
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DocumentationUnitHistoryLogService historyLogService;
-  // FIXME: Get rid of mocks
+
   @MockitoBean private MailService mailService;
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private HandoverReportRepository handoverReportRepository;
-
   @MockitoBean DocumentNumberPatternConfig documentNumberPatternConfig;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
