@@ -49,9 +49,170 @@ test.describe(
     })
 
     test(
-      "Add references to edition",
+      "Add decision caselaw references to edition",
       {
         tag: "@RISDEV-4560",
+      },
+      async ({
+        page,
+        edition,
+        prefilledDocumentUnit,
+        secondPrefilledDocumentUnit,
+      }) => {
+        const suffix = edition.suffix || ""
+        const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] ?? ""
+        const secondFileNumber =
+          secondPrefilledDocumentUnit.coreData.fileNumbers?.[0] ?? ""
+
+        await navigateToPeriodicalReferences(page, edition.id || "")
+
+        await test.step("A docunit can be added as reference by entering citation and search fields", async () => {
+          await searchForDocUnitWithFileNumberAndDecisionDate(
+            page,
+            fileNumber,
+            "31.12.2019",
+          )
+          // wait search result to be visible
+          const searchResultsContainer = page.getByTestId("search-results")
+          await expect(
+            searchResultsContainer.getByTestId(
+              `decision-summary-${prefilledDocumentUnit.documentNumber}`,
+            ),
+          ).toBeVisible()
+          // wait for panel to open
+          await expect(page).toHaveURL(/showAttachmentPanel=true/)
+          await expect(
+            page.getByLabel("Listen Eintrag", { exact: true }),
+          ).toHaveCount(1)
+
+          await fillInput(page, "Zitatstelle *", "5")
+          await fillInput(page, "Klammernzusatz", "LT")
+          await page.getByLabel("Treffer übernehmen").click()
+
+          // 1 decision summary visible
+          const editableListContainer = page.getByTestId(
+            "editable-list-container",
+          )
+          await expect(
+            editableListContainer.getByTestId(
+              `decision-summary-${prefilledDocumentUnit.documentNumber}`,
+            ),
+          ).toHaveCount(1)
+          // 1 reference summary visible
+          await expect(
+            page.getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
+          ).toHaveCount(1)
+
+          await expect(
+            page.getByLabel("Listen Eintrag", { exact: true }),
+          ).toHaveCount(2)
+
+          await expect(page).toHaveURL(/showAttachmentPanel=false/)
+        })
+
+        await test.step("A docunit can be added to an edition multiple times", async () => {
+          await searchForDocUnitWithFileNumberAndDecisionDate(
+            page,
+            fileNumber,
+            "31.12.2019",
+          )
+
+          // wait search result to be visible
+          const searchResultsContainer = page.getByTestId("search-results")
+          await expect(
+            searchResultsContainer.getByTestId(
+              `decision-summary-${prefilledDocumentUnit.documentNumber}`,
+            ),
+          ).toBeVisible()
+
+          // wait for panel to open
+          await expect(page).toHaveURL(/showAttachmentPanel=true/)
+
+          await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
+          await fillInput(page, "Zitatstelle *", "99")
+          await fillInput(page, "Klammernzusatz", "LT")
+          await page.getByLabel("Treffer übernehmen").click()
+
+          // second decision summary visible
+          const editableListContainer = page.getByTestId(
+            "editable-list-container",
+          )
+          await expect(
+            editableListContainer.getByTestId(
+              `decision-summary-${prefilledDocumentUnit.documentNumber}`,
+            ),
+          ).toHaveCount(2)
+
+          // reference summary visible
+          await expect(
+            page.getByText(`MMG 2024, 99${suffix} (LT)`, { exact: true }),
+          ).toBeVisible()
+
+          await expect(
+            page.getByLabel("Listen Eintrag", { exact: true }),
+          ).toHaveCount(3)
+
+          await expect(page).toHaveURL(/showAttachmentPanel=false/)
+        })
+
+        await test.step("Other docUnits can be added to an edition", async () => {
+          await searchForDocUnitWithFileNumberAndDecisionDate(
+            page,
+            secondFileNumber,
+            "01.01.2020",
+          )
+
+          // wait search result to be visible
+          const searchResultsContainer = page.getByTestId("search-results")
+          await expect(
+            searchResultsContainer.getByTestId(
+              `decision-summary-${secondPrefilledDocumentUnit.documentNumber}`,
+            ),
+          ).toBeVisible()
+
+          // wait for panel to open
+          await expect(page).toHaveURL(/showAttachmentPanel=true/)
+
+          await fillInput(page, "Zitatstelle *", "104")
+          await fillInput(page, "Klammernzusatz", "LT")
+
+          await page.getByLabel("Treffer übernehmen").click()
+
+          // decision summary visible
+          const editableListContainer = page.getByTestId(
+            "editable-list-container",
+          )
+          await expect(
+            editableListContainer.getByTestId(
+              `decision-summary-${secondPrefilledDocumentUnit.documentNumber}`,
+            ),
+          ).toHaveCount(1)
+          // 1 reference summary visible
+          await expect(
+            page.getByText(`MMG 2024, 104${suffix} (LT)`, { exact: true }),
+          ).toBeVisible()
+
+          await expect(
+            page.getByLabel("Listen Eintrag", { exact: true }),
+          ).toHaveCount(4)
+        })
+
+        await test.step("The form is cleared after adding a reference", async () => {
+          await expect(page.getByLabel("Zitatstelle *")).toBeEmpty()
+          await expect(page.getByLabel("Klammernzusatz")).toBeEmpty()
+          await expect(page.getByLabel("Gericht")).toBeEmpty()
+          await expect(page.getByLabel("Aktenzeichen")).toBeEmpty()
+          await expect(page.getByLabel("Entscheidungsdatum")).toBeEmpty()
+          await expect(page.getByLabel("Dokumenttyp")).toBeEmpty()
+        })
+      },
+    )
+    // Todo: new endpoint for pending proceeding missing for this test case
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      "Add pending proceeding caselaw references to edition",
+      {
+        tag: "@RISDEV-7932",
       },
       async ({
         page,

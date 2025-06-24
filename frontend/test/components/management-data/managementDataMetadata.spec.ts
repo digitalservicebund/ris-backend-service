@@ -2,12 +2,14 @@ import { render, screen, within } from "@testing-library/vue"
 import ManagementDataMetadata from "@/components/management-data/ManagementDataMetadata.vue"
 import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import { ManagementData } from "@/domain/managementData"
+import PendingProceeding from "@/domain/pendingProceeding"
 import { Procedure } from "@/domain/procedure"
 import Reference from "@/domain/reference"
 import { Source, SourceValue } from "@/domain/source"
 
-function mockDocUnit({
+function mockDecision({
   managementData,
   source,
   procedure,
@@ -29,13 +31,28 @@ function mockDocUnit({
   })
 }
 
+function mockPendingProceeding({
+  managementData,
+}: {
+  managementData?: Partial<ManagementData>
+} = {}) {
+  return new PendingProceeding("q834", {
+    documentNumber: "original",
+    managementData: {
+      duplicateRelations: [],
+      borderNumbers: [],
+      ...managementData,
+    },
+  })
+}
+
 describe("ManagementDataMetadata", () => {
   beforeEach(() => {
     vi.resetAllMocks()
   })
 
   it("should show all fields with – for a doc unit without data", async () => {
-    const docUnit = mockDocUnit()
+    const docUnit = mockDecision()
     renderMetadata(docUnit)
 
     const createdAt = screen.getByTestId("management-data-created-at")
@@ -74,7 +91,7 @@ describe("ManagementDataMetadata", () => {
   })
 
   it("should show date time for firstPublishedAtDateTime", async () => {
-    const docUnit = mockDocUnit({
+    const docUnit = mockDecision({
       managementData: { firstPublishedAtDateTime: "2025-07-31T08:00:00Z" },
     })
     renderMetadata(docUnit)
@@ -88,8 +105,17 @@ describe("ManagementDataMetadata", () => {
     ).toBeInTheDocument()
   })
 
+  it("should not show procedure for pending proceeding", async () => {
+    const docUnit = mockPendingProceeding()
+    renderMetadata(docUnit)
+
+    expect(
+      screen.queryByTestId("management-data-procedure"),
+    ).not.toBeInTheDocument()
+  })
+
   it("should show procedure if present", async () => {
-    const docUnit = mockDocUnit({
+    const docUnit = mockDecision({
       procedure: {
         label: "Mein Vorgang",
         createdAt: "1234",
@@ -105,7 +131,7 @@ describe("ManagementDataMetadata", () => {
 
   describe("Angelegt von/am", () => {
     it("should show date time for createdAt", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         managementData: { createdAtDateTime: "2023-10-01T12:11:43Z" },
       })
       renderMetadata(docUnit)
@@ -118,7 +144,7 @@ describe("ManagementDataMetadata", () => {
     })
 
     it("should show name and doc office for createdBy", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         managementData: {
           createdByDocOffice: "BGH",
           createdByName: "Ada Lovelace",
@@ -134,7 +160,7 @@ describe("ManagementDataMetadata", () => {
     })
 
     it("should show only doc office for createdBy", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         managementData: {
           createdByDocOffice: "BGH",
         },
@@ -147,7 +173,7 @@ describe("ManagementDataMetadata", () => {
     })
 
     it("should show only name for createdBy", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         managementData: {
           createdByName: "NeuRIS",
         },
@@ -162,7 +188,7 @@ describe("ManagementDataMetadata", () => {
 
   describe("Zuletzt bearbeitet von/am", () => {
     it("should show date time for lastUpdatedAt", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         managementData: { lastUpdatedAtDateTime: "2025-01-31T23:55:59Z" },
       })
       renderMetadata(docUnit)
@@ -177,7 +203,7 @@ describe("ManagementDataMetadata", () => {
     })
 
     it("should show name and doc office for lastUpdated", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         managementData: {
           lastUpdatedByDocOffice: "BGH",
           lastUpdatedByName: "Ada Lovelace",
@@ -193,7 +219,7 @@ describe("ManagementDataMetadata", () => {
     })
 
     it("should show only doc office for lastUpdated", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         managementData: {
           lastUpdatedByDocOffice: "BGH",
         },
@@ -206,7 +232,7 @@ describe("ManagementDataMetadata", () => {
     })
 
     it("should show only name for lastUpdated", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         managementData: {
           lastUpdatedByName: "NeuRIS",
         },
@@ -221,7 +247,7 @@ describe("ManagementDataMetadata", () => {
 
   describe("Quelle", () => {
     it("should show source without reference", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         source: { value: SourceValue.Email },
       })
       renderMetadata(docUnit)
@@ -232,7 +258,7 @@ describe("ManagementDataMetadata", () => {
     })
 
     it("should show source with reference without creating doc office", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         source: {
           value: SourceValue.Zeitschrift,
           reference: new Reference({
@@ -256,7 +282,7 @@ describe("ManagementDataMetadata", () => {
     })
 
     it("should show source with reference with creating doc office", async () => {
-      const docUnit = mockDocUnit({
+      const docUnit = mockDecision({
         source: {
           value: SourceValue.Zeitschrift,
           reference: new Reference({
@@ -276,7 +302,7 @@ describe("ManagementDataMetadata", () => {
     })
   })
 
-  function renderMetadata(documentUnit: Decision) {
+  function renderMetadata(documentUnit: DocumentationUnit) {
     render(ManagementDataMetadata, { props: { documentUnit } })
   }
 })

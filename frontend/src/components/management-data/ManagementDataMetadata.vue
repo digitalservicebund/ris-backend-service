@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { DocumentationUnit } from "@/domain/documentationUnit"
+import { Kind } from "@/domain/documentationUnitKind"
 import Reference from "@/domain/reference"
 import { Source } from "@/domain/source"
 import DateUtil from "@/utils/dateUtil"
@@ -78,7 +79,10 @@ const formatSource = (source?: Source) => {
       <dt class="ris-label2-bold">Von</dt>
       <dd class="ris-label2-regular">{{ lastUpdatedBy }}</dd>
     </div>
-    <div data-testid="management-data-procedure">
+    <div
+      v-if="documentUnit.kind === Kind.DECISION"
+      data-testid="management-data-procedure"
+    >
       <dt class="ris-label2-bold">Vorgang</dt>
       <dd class="ris-label2-regular">{{ procedure }}</dd>
     </div>

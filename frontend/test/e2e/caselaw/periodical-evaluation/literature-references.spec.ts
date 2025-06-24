@@ -80,7 +80,73 @@ test.describe("Literature references", () => {
   )
 
   test(
-    "Literature references can be added to periodical evaluation",
+    "Literature references can be added for decisions to periodical evaluation",
+    {
+      tag: "@RISDEV-5240 @RISDEV-5237 @RISDEV-5454",
+    },
+    async ({ page, prefilledDocumentUnit, edition }) => {
+      const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+      await test.step("Literature references are validated for required inputs", async () => {
+        await navigateToPeriodicalReferences(page, edition.id || "")
+        await page.getByLabel("Literatur Fundstelle").click()
+        await expect(page.getByLabel("Literatur Fundstelle")).toBeChecked()
+        await fillInput(page, "Zitatstelle *", `2`)
+
+        await searchForDocUnitWithFileNumberAndDecisionDate(
+          page,
+          fileNumber,
+          "31.12.2019",
+        )
+        // wait for panel to open
+        await expect(page).toHaveURL(/showAttachmentPanel=true/)
+        await page.getByLabel("Treffer übernehmen").click()
+        // check that both fields display error message
+        await expect(
+          page.getByText("Pflichtfeld nicht befüllt", { exact: true }),
+        ).toHaveCount(2)
+
+        // Switching between radio buttons resets the validation errors
+        await page.getByLabel("Rechtsprechung Fundstelle").click()
+        await page.getByLabel("Literatur Fundstelle").click()
+        await expect(
+          page.getByText("Pflichtfeld nicht befüllt", { exact: true }),
+        ).toHaveCount(0)
+        await page.getByLabel("Seitenpanel schließen").click()
+        await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
+      })
+
+      await test.step("Save literature reference, verify that it is shown in the list", async () => {
+        await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
+        await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
+        await page.getByText("Ean", { exact: true }).click()
+        await expect(
+          page.getByLabel("Dokumenttyp Literaturfundstelle", { exact: true }),
+        ).toHaveValue("Anmerkung")
+
+        await searchForDocUnitWithFileNumberAndDecisionDate(
+          page,
+          fileNumber,
+          "31.12.2019",
+        )
+        await page.getByLabel("Treffer übernehmen").click()
+        await expect(
+          page.getByText(`MMG 2024, 2${edition.suffix}, Bilen, Ulviye (Ean)`),
+        ).toBeVisible()
+      })
+
+      await test.step("Radio buttons should not be visible after saving", async () => {
+        await page.getByTestId("list-entry-0").click()
+        await expect(page.getByLabel("Rechtsprechung Fundstelle")).toBeHidden()
+
+        await expect(page.getByLabel("Literatur Fundstelle")).toBeHidden()
+      })
+    },
+  )
+
+  // Todo: new endpoint for pending proceeding missing for this test case
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
+    "Literature references can be added for pending proceedings to periodical evaluation",
     {
       tag: "@RISDEV-5240 @RISDEV-5237 @RISDEV-5454",
     },
