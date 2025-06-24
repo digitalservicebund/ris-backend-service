@@ -117,7 +117,7 @@ public class DocumentationUnitController {
    */
   @PutMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
-  public ResponseEntity<Decision> generateNewDocumentationUnit(
+  public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody(required = false) Optional<DocumentationUnitCreationParameters> parameters) {
     try {

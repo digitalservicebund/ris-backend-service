@@ -100,7 +100,7 @@ class DocumentationUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    assertNotNull(service.generateNewDocumentationUnit(user, Optional.empty()));
+    assertNotNull(service.generateNewDecision(user, Optional.empty()));
 
     verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
     verify(duplicateCheckService, times(1)).checkDuplicates("nextDocumentNumber");
@@ -158,7 +158,7 @@ class DocumentationUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    assertNotNull(service.generateNewDocumentationUnit(user, Optional.of(parameters)));
+    assertNotNull(service.generateNewDecision(user, Optional.of(parameters)));
 
     verify(documentNumberService)
         .generateDocumentNumber(designatedDocumentationOffice.abbreviation());

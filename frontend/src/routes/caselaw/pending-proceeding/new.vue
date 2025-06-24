@@ -8,11 +8,11 @@ const router = useRouter()
 
 onBeforeMount(async () => {
   const createResponse = await documentUnitService.createNew({
-    kind: Kind.DECISION,
+    kind: Kind.PENDING_PROCEEDING,
   })
   if (createResponse.data)
     await router.replace({
-      name: "caselaw-documentUnit-documentNumber-attachments",
+      name: "caselaw-pending-proceeding-documentNumber-categories",
       params: { documentNumber: createResponse.data.documentNumber },
     })
 })

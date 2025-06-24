@@ -146,7 +146,7 @@ class DocumentationUnitControllerTest {
   void testGenerateNewDocumentationUnit_withInternalUser_shouldSucceed() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
     when(userService.getUser(any())).thenReturn(user);
-    when(service.generateNewDocumentationUnit(null, null))
+    when(service.generateNewDecision(null, null))
         .thenReturn(
             Decision.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
@@ -161,7 +161,7 @@ class DocumentationUnitControllerTest {
         .isCreated()
         .expectBody(Decision.class);
 
-    verify(service, times(1)).generateNewDocumentationUnit(user, Optional.empty());
+    verify(service, times(1)).generateNewDecision(user, Optional.empty());
     verify(userService, times(1)).getUser(any(OidcUser.class));
   }
 
@@ -245,7 +245,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .isForbidden();
 
-    verify(service, times(0)).generateNewDocumentationUnit(user, null);
+    verify(service, times(0)).generateNewDecision(user, null);
     verify(userService, times(0)).getDocumentationOffice(any(OidcUser.class));
   }
 
