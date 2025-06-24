@@ -253,7 +253,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
       default ->
           throw new DocumentationUnitException(
-              "DocumentationUnitDTO is neither DecisionDTO nor PendingProceedingDTO.");
+              "DocumentationUnitDTO couldn't be transformed to domain DocumentationUnitDTO as"
+                  + " it is neither DecisionDTO nor PendingProceedingDTO.");
     };
   }
 
@@ -269,15 +270,18 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                       docUnit.coreData().creatingDocOffice()))
               .build(),
           decision);
-    } else {
+    } else if (docUnit instanceof PendingProceeding pendingProceeding) {
       return PendingProceedingTransformer.transformToDTO(
           PendingProceedingDTO.builder()
               .documentationOffice(
                   DocumentationOfficeTransformer.transformToDTO(
                       docUnit.coreData().documentationOffice()))
               .build(),
-          (PendingProceeding) docUnit);
+          pendingProceeding);
     }
+    throw new DocumentationUnitException(
+        "DocumentationUnit couldn't be transformed to DTO as"
+            + " it is neither Decision nor PendingProceeding.");
   }
 
   private ManagementDataDTO getCreatedBy(User user, DocumentationUnitDTO documentationUnitDTO) {

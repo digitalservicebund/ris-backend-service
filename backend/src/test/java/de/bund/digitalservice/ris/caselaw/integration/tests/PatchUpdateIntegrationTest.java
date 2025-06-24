@@ -37,9 +37,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOffic
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
@@ -63,6 +65,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -4724,11 +4727,16 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
   }
 
   private Decision generateEmptyDocumentationUnit() {
+    DocumentationUnitCreationParameters params =
+        DocumentationUnitCreationParameters.builder().kind(Kind.DECISION).build();
+
     RisEntityExchangeResult<Decision> result =
         risWebTestClient
             .withDefaultLogin()
             .put()
             .uri("/api/v1/caselaw/documentunits/new")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(params)
             .exchange()
             .expectStatus()
             .isCreated()
