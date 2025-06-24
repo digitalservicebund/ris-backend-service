@@ -79,6 +79,7 @@ class DocumentationUnitServiceTest {
   @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
   @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
+  @MockitoBean private DocumentationUnitSearchRepository docUnitSearchRepository;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
@@ -461,8 +462,8 @@ class DocumentationUnitServiceTest {
     when(authService.isAssignedViaProcedure()).thenReturn(user -> true);
     when(repository.findByDocumentNumber(any()))
         .thenReturn(Decision.builder().uuid(UUID.randomUUID()).build());
-    when(repository.searchByDocumentationUnitSearchInput(
-            pageRequest, oidcUser, documentationUnitSearchInput))
+    when(docUnitSearchRepository.searchByDocumentationUnitSearchInput(
+            documentationUnitSearchInput, pageRequest, oidcUser))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
 
     service.searchByDocumentationUnitSearchInput(
@@ -481,8 +482,8 @@ class DocumentationUnitServiceTest {
         Optional.empty(),
         Optional.empty(),
         Optional.empty());
-    verify(repository)
-        .searchByDocumentationUnitSearchInput(pageRequest, oidcUser, documentationUnitSearchInput);
+    verify(docUnitSearchRepository)
+        .searchByDocumentationUnitSearchInput(documentationUnitSearchInput, pageRequest, oidcUser);
   }
 
   @Test
@@ -495,8 +496,8 @@ class DocumentationUnitServiceTest {
     when(authService.isAssignedViaProcedure()).thenReturn(user -> true);
     when(repository.findByDocumentNumber(any()))
         .thenReturn(Decision.builder().uuid(UUID.randomUUID()).build());
-    when(repository.searchByDocumentationUnitSearchInput(
-            any(PageRequest.class), any(OidcUser.class), any(DocumentationUnitSearchInput.class)))
+    when(docUnitSearchRepository.searchByDocumentationUnitSearchInput(
+            any(DocumentationUnitSearchInput.class), any(PageRequest.class), any(OidcUser.class)))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
 
     service.searchByDocumentationUnitSearchInput(
@@ -517,9 +518,9 @@ class DocumentationUnitServiceTest {
         Optional.empty());
 
     // Capture the searchInput argument
-    verify(repository)
+    verify(docUnitSearchRepository)
         .searchByDocumentationUnitSearchInput(
-            any(PageRequest.class), any(OidcUser.class), searchInputCaptor.capture());
+            any(DocumentationUnitSearchInput.class), any(PageRequest.class), any(OidcUser.class));
 
     DocumentationUnitSearchInput capturedSearchInput = searchInputCaptor.getValue();
 

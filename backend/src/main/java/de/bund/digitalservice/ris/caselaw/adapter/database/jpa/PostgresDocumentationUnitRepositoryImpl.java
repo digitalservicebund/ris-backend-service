@@ -14,8 +14,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
@@ -28,7 +26,6 @@ import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -48,23 +45,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.repository.query.Param;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,12 +76,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
-  private final UserService userService;
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
-  private final PostgresDocumentationUnitSearchRepositoryImpl docUnitSearchRepo;
-  private final FeatureToggleService featureToggleService;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -100,12 +88,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseKeywordRepository keywordRepository,
       DatabaseProcedureRepository procedureRepository,
       DatabaseFieldOfLawRepository fieldOfLawRepository,
-      UserService userService,
       EntityManager entityManager,
       DatabaseReferenceRepository referenceRepository,
-      DocumentationUnitHistoryLogService historyLogService,
-      PostgresDocumentationUnitSearchRepositoryImpl docUnitSearchRepo,
-      FeatureToggleService featureToggleService) {
+      DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -115,11 +100,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
     this.referenceRepository = referenceRepository;
-    this.userService = userService;
     this.entityManager = entityManager;
     this.historyLogService = historyLogService;
-    this.docUnitSearchRepo = docUnitSearchRepo;
-    this.featureToggleService = featureToggleService;
   }
 
   @Override
@@ -782,158 +764,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     SliceImpl<DocumentationUnitDTO> allResults = new SliceImpl<>(resultList, pageable, hasNext);
     return allResults.map(DocumentationUnitListItemTransformer::transformToRelatedDocumentation);
-  }
-
-  @NotNull
-  @SuppressWarnings("java:S107")
-  private Slice<DocumentationUnitListItemDTO> getDocumentationUnitSearchResultDTOS(
-      Pageable pageable,
-      String courtType,
-      String courtLocation,
-      String documentNumber,
-      String fileNumber,
-      LocalDate decisionDate,
-      LocalDate decisionDateEnd,
-      LocalDate publicationDate,
-      Boolean scheduledOnly,
-      PublicationStatus status,
-      Boolean withError,
-      Boolean myDocOfficeOnly,
-      Boolean withDuplicateWarning,
-      InboxStatus inboxStatus,
-      DocumentationOfficeDTO documentationOfficeDTO) {
-
-    if ((fileNumber == null || fileNumber.trim().isEmpty())) {
-      return repository.searchByDocumentationUnitSearchInput(
-          documentationOfficeDTO.getId(),
-          documentNumber,
-          courtType,
-          courtLocation,
-          decisionDate,
-          decisionDateEnd,
-          publicationDate,
-          scheduledOnly,
-          status,
-          withError,
-          myDocOfficeOnly,
-          withDuplicateWarning,
-          inboxStatus,
-          pageable);
-    }
-
-    // The highest possible number of results - For page 0: 30, for page 1: 60, for page 2: 90, etc.
-    int maxResultsUpToCurrentPage = (pageable.getPageNumber() + 1) * pageable.getPageSize();
-
-    // We need to start with index 0 because we collect 3 results sets, each of the desired size of
-    // the page. Then we sort the full ist and cut it to the page size (possibly leaving 2x page
-    // size results behind). If we don't always start with index 0, we might miss results.
-    // This approach could even be better if we replace the next/previous with a "load more" button
-    Pageable fixedPageRequest = PageRequest.of(0, maxResultsUpToCurrentPage);
-
-    Slice<DocumentationUnitListItemDTO> fileNumberResults =
-        repository.searchByDocumentationUnitSearchInputFileNumber(
-            documentationOfficeDTO.getId(),
-            documentNumber,
-            fileNumber.trim(),
-            courtType,
-            courtLocation,
-            decisionDate,
-            decisionDateEnd,
-            publicationDate,
-            scheduledOnly,
-            status,
-            withError,
-            myDocOfficeOnly,
-            withDuplicateWarning,
-            inboxStatus,
-            fixedPageRequest);
-
-    Slice<DocumentationUnitListItemDTO> deviatingFileNumberResults =
-        repository.searchByDocumentationUnitSearchInputDeviatingFileNumber(
-            documentationOfficeDTO.getId(),
-            documentNumber,
-            fileNumber.trim(),
-            courtType,
-            courtLocation,
-            decisionDate,
-            decisionDateEnd,
-            publicationDate,
-            scheduledOnly,
-            status,
-            withError,
-            myDocOfficeOnly,
-            withDuplicateWarning,
-            inboxStatus,
-            fixedPageRequest);
-
-    Set<DocumentationUnitListItemDTO> allResults = new HashSet<>();
-
-    allResults.addAll(fileNumberResults.getContent());
-    allResults.addAll(deviatingFileNumberResults.getContent());
-
-    // We can provide entries for a next page if ...
-    // A) we already have collected more results than fit on the current page, or
-    // B) at least one of the queries has more results
-    boolean hasNext =
-        allResults.size() >= maxResultsUpToCurrentPage
-            || fileNumberResults.hasNext()
-            || deviatingFileNumberResults.hasNext();
-
-    return new SliceImpl<>(
-        allResults.stream()
-            .sorted(
-                (o1, o2) -> {
-                  if (o1.getDate() != null && o2.getDate() != null) {
-                    return o1.getDocumentNumber().compareTo(o2.getDocumentNumber());
-                  }
-                  return 0;
-                })
-            .toList()
-            .subList(
-                pageable.getPageNumber() * pageable.getPageSize(),
-                Math.min(allResults.size(), maxResultsUpToCurrentPage)),
-        pageable,
-        hasNext);
-  }
-
-  @Transactional(transactionManager = "jpaTransactionManager", readOnly = true)
-  public Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
-      Pageable pageable,
-      OidcUser oidcUser,
-      @Param("searchInput") DocumentationUnitSearchInput searchInput) {
-    if (featureToggleService.isEnabled("neuris.search-criteria-api")) {
-      return docUnitSearchRepo.searchByDocumentationUnitSearchInput(
-          searchInput, pageable, oidcUser);
-    }
-
-    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
-    log.debug("Find by overview search: {}, {}", documentationOffice.abbreviation(), searchInput);
-
-    DocumentationOfficeDTO documentationOfficeDTO =
-        documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
-
-    Boolean withError =
-        Optional.ofNullable(searchInput.status()).map(Status::withError).orElse(false);
-
-    Slice<DocumentationUnitListItemDTO> allResults =
-        getDocumentationUnitSearchResultDTOS(
-            pageable,
-            searchInput.courtType(),
-            searchInput.courtLocation(),
-            searchInput.documentNumber(),
-            searchInput.fileNumber(),
-            searchInput.decisionDate(),
-            searchInput.decisionDateEnd(),
-            searchInput.publicationDate(),
-            searchInput.scheduledOnly(),
-            searchInput.status() != null ? searchInput.status().publicationStatus() : null,
-            withError,
-            searchInput.myDocOfficeOnly(),
-            searchInput.withDuplicateWarning(),
-            searchInput.inboxStatus(),
-            documentationOfficeDTO);
-
-    return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);
   }
 
   @Override
