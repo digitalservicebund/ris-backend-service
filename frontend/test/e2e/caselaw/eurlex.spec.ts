@@ -1,22 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { expect } from "@playwright/test"
 import { navigateToInbox } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import {
-  addEurlexDecisions,
-  cleanUpEurlexDecisions,
-} from "~/e2e/caselaw/utils/documentation-unit-api-util"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("eurlex", () => {
   // eslint-disable-next-line playwright/no-skipped-test
   test.skip(
     "Eurlex Entscheidungen können in NeuRIS übernommen werden",
     { tag: ["@RISDEV-7376", "@RISDEV-7578"] },
-    async ({ page }) => {
+    // @ts-expect-error: eurlexSetup not used in test, but needed as fixture.
+    async ({ page, eurlexSetup }) => {
       const celexNumber1 = "62024CO0878"
       const celexNumber2 = "62023CJ0538"
       const celexNumber3 = "62019CV0001(02)"
-
-      await addEurlexDecisions(page)
 
       const tab = page.getByTestId("eurlex-tab")
       await navigateToInbox(page)
@@ -234,10 +231,28 @@ test.describe("eurlex", () => {
           newTab.getByText("Urteil des Gerichtshofs (Zweite Kammer)"),
         ).toBeVisible()
       })
+
+      await test.step("EU-Rechtsprechungsdokument kann aus Eingang in Vorgang verschoben werden", async () => {
+        const rows = page.locator("tr")
+        const procedureName = generateString({ length: 10 })
+        await page
+          .getByRole("textbox", { name: "Vorgang auswählen" })
+          .fill(procedureName)
+        await page.getByText(`${procedureName} neu erstellen`).click()
+
+        const row = rows.filter({ hasText: "C-538/23" }).first()
+        await row.getByLabel("Zeile abgewählt").click()
+
+        await expect(row.getByLabel("Zeile ausgewählt")).toBeChecked()
+
+        await page
+          .getByRole("button", { name: "Zu Vorgang hinzufügen" })
+          .click()
+
+        await expect(page.getByText("Hinzufügen erfolgreich")).toBeVisible()
+
+        await expect(row).toBeHidden()
+      })
     },
   )
-
-  test.afterEach("Clean up test data", async ({ page }) => {
-    await cleanUpEurlexDecisions(page)
-  })
 })
