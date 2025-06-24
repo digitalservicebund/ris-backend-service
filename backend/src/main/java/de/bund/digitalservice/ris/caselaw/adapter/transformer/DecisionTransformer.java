@@ -201,7 +201,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       // Check if the first existing source has a reference and remove if it has been deleted in
       // domain object. A reference is only linked if the doc unit is created from a reference,
       // that's why it is enough to check the first reference.
-      if (reference != null && !decisionContainsReferenceWithId(decision, reference.getId())) {
+      if (reference != null && !documentableContainsReferenceWithId(decision, reference.getId())) {
         firstSource.setReference(null); // Otherwise the source can not be deleted
       }
 

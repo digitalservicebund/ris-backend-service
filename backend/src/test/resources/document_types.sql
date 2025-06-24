@@ -1,6 +1,7 @@
 insert into
     incremental_migration.document_category (id, label)
 values
+    ('a7cbd3c2-0d9a-4e0c-a8a7-2f9b7d4e3542', 'A'),
     ('0f382996-497f-4c2f-9a30-1c73d8ac0a88', 'R'),
     ('4879ae8e-e809-4dd7-8517-d5c795bead79', 'U'),
     ('11defe05-cd4d-43e5-a07e-06c611b81a28', 'S')
@@ -50,5 +51,11 @@ values
         'Ebs',
         'Entscheidungsbesprechung',
         '4879ae8e-e809-4dd7-8517-d5c795bead79'
+    ),
+    (
+        '3e58b70a-65fc-4f7a-8d3a-f42b9e9d3c47',
+        'Anh',
+        'Anhängiges Verfahren',
+        'a7cbd3c2-0d9a-4e0c-a8a7-2f9b7d4e3542'
     )
 on conflict do nothing;

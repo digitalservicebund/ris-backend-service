@@ -90,4 +90,15 @@ class DocumentTypeControllerTest {
 
     verify(service, times(1)).getDocumentTypes(Optional.of("label1"), DocumentTypeCategory.CASELAW);
   }
+
+  @Test
+  void test_withInvalidType_shouldReturnBadRequest() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documenttypes?q=Ea&category=INVALID_TYPE")
+        .exchange()
+        .expectStatus()
+        .isBadRequest();
+  }
 }
