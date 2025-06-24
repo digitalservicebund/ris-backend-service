@@ -6,7 +6,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
@@ -14,11 +13,8 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Fetch;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -29,7 +25,6 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -45,6 +40,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Repository
@@ -54,20 +50,18 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
   private final UserService userService;
   private static final Set<PublicationStatus> PublicStatusSet =
       Set.of(PublicationStatus.PUBLISHED, PublicationStatus.PUBLISHING);
-  private final FeatureToggleService featureToggleService;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @PersistenceContext private EntityManager entityManager;
 
   public PostgresDocumentationUnitSearchRepositoryImpl(
       UserService userService,
-      FeatureToggleService featureToggleService,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
     this.userService = userService;
-    this.featureToggleService = featureToggleService;
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager", readOnly = true)
   public Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       DocumentationUnitSearchInput searchInput, Pageable pageable, OidcUser oidcUser) {
     SearchParameters parameters = getSearchParameters(searchInput, oidcUser);
@@ -77,13 +71,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         cb.createQuery(DocumentationUnitListItemDTO.class);
 
     Root<DocumentationUnitDTO> root = cq.from(DocumentationUnitDTO.class);
-    if (featureToggleService.isEnabled("neuris.search-fetch-relationships")) {
-      root.fetch(DocumentationUnitDTO_.managementData, JoinType.LEFT);
-      root.fetch(DocumentationUnitDTO_.court, JoinType.LEFT);
-      root.fetch(DocumentationUnitDTO_.documentType, JoinType.LEFT);
-      root.fetch(DocumentationUnitDTO_.status, JoinType.LEFT);
-      root.fetch(DocumentationUnitDTO_.documentationOffice, JoinType.LEFT);
-    }
 
     List<Predicate> predicates = new ArrayList<>();
     predicates.addAll(getDocNumberPredicates(parameters, cb, root));
@@ -115,14 +102,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       resultList = resultList.subList(0, pageable.getPageSize());
     }
 
-    if (featureToggleService.isEnabled("neuris.search-fetch-relationships")) {
-      // Fetching relationships
-      List<UUID> docUnitIds = resultList.stream().map(DocumentationUnitListItemDTO::getId).toList();
-      fetchFileNumbers(docUnitIds);
-      fetchSources(docUnitIds);
-      fetchAttachments(docUnitIds);
-    }
-
     List<DocumentationUnitListItem> docUnitDomainResults =
         resultList.stream().map(DocumentationUnitListItemTransformer::transformToDomain).toList();
 
@@ -136,48 +115,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
   private Expression<Date> getDateOnly(
       HibernateCriteriaBuilder cb, Path<LocalDateTime> dateTimeColumn) {
     return cb.function("date", Date.class, dateTimeColumn);
-  }
-
-  private void fetchFileNumbers(Collection<UUID> ids) {
-    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-    CriteriaQuery<DocumentationUnitListItemDTO> cq =
-        cb.createQuery(DocumentationUnitListItemDTO.class);
-    Root<DocumentationUnitDTO> root = cq.from(DocumentationUnitDTO.class);
-    root.fetch(DocumentationUnitDTO_.fileNumbers, JoinType.LEFT);
-    // No need to fetch deviating file numbers as we do not display them in the list
-
-    cq.select(root).where(root.get(DocumentationUnitDTO_.id).in(ids));
-
-    entityManager.createQuery(cq).getResultList();
-  }
-
-  private void fetchSources(Collection<UUID> ids) {
-    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-    CriteriaQuery<DocumentationUnitListItemDTO> cq =
-        cb.createQuery(DocumentationUnitListItemDTO.class);
-    Root<DecisionDTO> root = cq.from(DecisionDTO.class);
-    Fetch<DecisionDTO, SourceDTO> sourceFetch = root.fetch(DecisionDTO_.source, JoinType.LEFT);
-    Fetch<SourceDTO, ReferenceDTO> referenceFetch =
-        sourceFetch.fetch(SourceDTO_.reference, JoinType.LEFT);
-    referenceFetch.fetch(ReferenceDTO_.edition, JoinType.LEFT);
-    root.fetch(DecisionDTO_.procedure, JoinType.LEFT);
-    root.fetch(DecisionDTO_.creatingDocumentationOffice, JoinType.LEFT);
-
-    cq.select(root).where(root.get(DocumentationUnitDTO_.id).in(ids));
-
-    entityManager.createQuery(cq).getResultList();
-  }
-
-  private void fetchAttachments(Collection<UUID> ids) {
-    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-    CriteriaQuery<DocumentationUnitListItemDTO> cq =
-        cb.createQuery(DocumentationUnitListItemDTO.class);
-    Root<DecisionDTO> root = cq.from(DecisionDTO.class);
-    root.fetch(DocumentationUnitDTO_.attachments, JoinType.LEFT);
-
-    cq.select(root).where(root.get(DocumentationUnitDTO_.id).in(ids));
-
-    entityManager.createQuery(cq).getResultList();
   }
 
   private List<Predicate> getDocNumberPredicates(
