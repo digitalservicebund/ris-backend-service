@@ -298,7 +298,7 @@ test.describe("search", () => {
       .poll(async () =>
         page.getByText("Veröffentlicht", { exact: true }).count(),
       )
-      .toBe(7)
+      .toBe(8)
   })
 
   test(
@@ -371,7 +371,7 @@ test.describe("search", () => {
     await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     //16 + table header
-    await expect.poll(async () => page.locator(".table-row").count()).toBe(18)
+    await expect.poll(async () => page.locator(".table-row").count()).toBe(19)
 
     const docofficeOnly = page.getByLabel("Nur meine Dokstelle Filter")
     await docofficeOnly.click()
