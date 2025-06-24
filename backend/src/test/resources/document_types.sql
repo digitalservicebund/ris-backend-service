@@ -1,3 +1,8 @@
+-- We need to explicitly delete category 'A' in order to be able to add it afterwards
+-- Otherwise, we would have conflicts with this migration script which adds category 'A' already:
+-- https://github.com/digitalservicebund/ris-data-migration/blob/d08de33076482211f35adfab516312af282b82db/schema/src/main/resources/db/migration/V1.72__add_pending_document_category.sql
+delete from incremental_migration.document_category where label = 'A';
+
 insert into
     incremental_migration.document_category (id, label)
 values

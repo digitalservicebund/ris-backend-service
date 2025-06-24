@@ -552,7 +552,41 @@ VALUES
     NULL,
     NULL,
     NULL
-    );
+    ),
+  (
+      gen_random_uuid (),
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.court
+          WHERE
+              type
+                  = 'EuGH'
+      ),
+      '2002-09-09',
+      'YYTestDoc0019',
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.document_type
+          WHERE
+              abbreviation = 'EU'
+      ),
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_office
+          WHERE
+              abbreviation = 'DS'
+      ),
+      '1.Senat, 2. Kammer',
+      NULL,
+      NULL,
+      'EU'
+  );
 
 INSERT INTO
     incremental_migration.decision (
@@ -777,6 +811,19 @@ VALUES
         NULL,
         NULL,
         NULL
+    ),
+    (
+        (SELECT
+             id
+         FROM
+             incremental_migration.documentation_unit
+         WHERE
+             document_number
+                 = 'YYTestDoc0019'),
+        NULL,
+        'guiding principle',
+        NULL,
+        'tenorx'
     );
 
 
@@ -1130,6 +1177,20 @@ VALUES
           WHERE
               document_number = 'YYTestDoc0018'
       )
+  ),
+  (
+      gen_random_uuid (),
+      '2024-03-14 18:38:43.043877 +00:00',
+      'PUBLISHED',
+      false,
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_unit
+          WHERE
+              document_number = 'YYTestDoc0019'
+      )
   )
     ;
 
@@ -1205,6 +1266,10 @@ WHERE document_number = 'YYTestDoc0017';
 UPDATE incremental_migration.documentation_unit SET current_status_id =
     (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0018'))
 WHERE document_number = 'YYTestDoc0018';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0019'))
+WHERE document_number = 'YYTestDoc0019';
 
 
 UPDATE

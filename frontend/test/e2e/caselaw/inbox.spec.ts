@@ -181,7 +181,7 @@ test.describe("inbox", () => {
         ).toHaveValue("")
       })
 
-      await test.step("pending handover documentation units can be taken over and deleted", async () => {
+      await test.step("pending handover documentation units can be taken over, previewed and deleted", async () => {
         const pagePromise = pageWithBghUser.context().waitForEvent("page")
         const rows = pageWithBghUser.locator("tr")
         const doc1Row = rows.filter({ hasText: documentNumber1 })
@@ -379,7 +379,8 @@ test.describe("inbox", () => {
     "EU-Rechtsprechungsdokumente können im Eingang eingesehen und weiterverarbeitet werden",
     { tag: ["@RISDEV-7375"] },
     async ({ page }) => {
-      const documentNumber = "YYTestDoc0012"
+      const documentNumber1 = "YYTestDoc0012"
+      const documentNumber2 = "YYTestDoc0019"
 
       await test.step("eu caselaw inbox can be accessed via top navbar", async () => {
         const tab = page.getByTestId("eu-tab")
@@ -387,6 +388,22 @@ test.describe("inbox", () => {
         await expect(tab).toBeVisible()
         await tab.click()
         await expect(page.getByTestId("inbox-list")).toBeVisible()
+      })
+
+      await test.step("sorted by decision date, latest first", async () => {
+        const rows = page.locator("tr")
+        const regex = new RegExp(`${documentNumber1}|${documentNumber2}`)
+
+        const matchingRows = rows.filter({ hasText: regex })
+
+        await expect(matchingRows).toHaveCount(2)
+
+        const firstRowText = await matchingRows.nth(0).textContent()
+        const secondRowText = await matchingRows.nth(1).textContent()
+
+        // Assert documentNumber2 comes before documentNumber1
+        expect(firstRowText).toContain(documentNumber2)
+        expect(secondRowText).toContain(documentNumber1)
       })
 
       await test.step("user can filter eu documentation units", async () => {
@@ -433,7 +450,7 @@ test.describe("inbox", () => {
 
       await test.step("doc unit row data is displayed", async () => {
         const rows = page.locator("tr")
-        const row = rows.filter({ hasText: documentNumber })
+        const row = rows.filter({ hasText: documentNumber1 })
         await expect(row).toHaveCount(1)
 
         // Icons
@@ -448,25 +465,38 @@ test.describe("inbox", () => {
         await expect(row).toContainText("fileNumber4") // Aktenzeichen
       })
 
-      await test.step("eu documentation units can be edited and deleted", async () => {
-        const pagePromise = page.context().waitForEvent("page")
+      await test.step("eu documentation units can be edited, previewed and deleted", async () => {
         const rows = page.locator("tr")
-        const row = rows.filter({ hasText: documentNumber })
+        const row = rows.filter({ hasText: documentNumber1 })
+
         const editButton = row.getByRole("button", {
           name: "Dokumentationseinheit bearbeiten",
         })
+        const previewButton = row.getByRole("button", {
+          name: "Dokumentationseinheit ansehen",
+        })
+        const deleteButton = row.getByRole("button", {
+          name: "Dokumentationseinheit löschen",
+        })
 
+        const editPagePromise = page.context().waitForEvent("page")
+        await expect(editButton).toBeVisible()
         await editButton.click()
-
-        const newTab = await pagePromise
-
-        await expect(newTab).toHaveURL(
+        const newEditTab = await editPagePromise
+        await expect(newEditTab).toHaveURL(
           /\/caselaw\/documentunit\/[A-Za-z0-9]{13}\/categories$/,
         )
 
-        await row
-          .getByRole("button", { name: "Dokumentationseinheit löschen" })
-          .click()
+        const previewPagePromise = page.context().waitForEvent("page")
+        await expect(previewButton).toBeVisible()
+        await previewButton.click()
+        const newPreviewTab = await previewPagePromise
+        await expect(newPreviewTab).toHaveURL(
+          /\/caselaw\/documentunit\/[A-Za-z0-9]{13}\/preview$/,
+        )
+
+        await expect(deleteButton).toBeVisible()
+        await deleteButton.click()
         await page.getByRole("button", { name: "Abbrechen" }).click()
       })
 

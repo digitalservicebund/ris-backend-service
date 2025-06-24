@@ -3,13 +3,10 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
 import org.assertj.core.groups.Tuple;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -24,13 +21,6 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 class DocumentTypeIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private DatabaseDocumentTypeRepository repository;
-  @Autowired private DatabaseDocumentCategoryRepository categoryRepository;
-
-  @AfterEach
-  void cleanup() {
-    repository.deleteAll();
-  }
 
   @Test
   void testGetAllDocumentTypes() {

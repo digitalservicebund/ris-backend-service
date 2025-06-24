@@ -1,10 +1,11 @@
 import { expect } from "@playwright/test"
-import { navigateToInbox } from "~/e2e/caselaw/e2e-utils"
-import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   addEurlexDecisions,
   cleanUpEurlexDecisions,
-} from "~/e2e/caselaw/utils/documentation-unit-api-util"
+} from "./utils/documentation-unit-api-util"
+import { navigateToInbox } from "~/e2e/caselaw/e2e-utils"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("eurlex", () => {
   // eslint-disable-next-line playwright/no-skipped-test
@@ -233,6 +234,28 @@ test.describe("eurlex", () => {
         await expect(
           newTab.getByText("Urteil des Gerichtshofs (Zweite Kammer)"),
         ).toBeVisible()
+      })
+
+      await test.step("EU-Rechtsprechungsdokument kann aus Eingang in Vorgang verschoben werden", async () => {
+        const rows = page.locator("tr")
+        const procedureName = generateString({ length: 10 })
+        await page
+          .getByRole("textbox", { name: "Vorgang auswählen" })
+          .fill(procedureName)
+        await page.getByText(`${procedureName} neu erstellen`).click()
+
+        const row = rows.filter({ hasText: "C-538/23" }).first()
+        await row.getByLabel("Zeile abgewählt").click()
+
+        await expect(row.getByLabel("Zeile ausgewählt")).toBeChecked()
+
+        await page
+          .getByRole("button", { name: "Zu Vorgang hinzufügen" })
+          .click()
+
+        await expect(page.getByText("Hinzufügen erfolgreich")).toBeVisible()
+
+        await expect(row).toBeHidden()
       })
     },
   )
