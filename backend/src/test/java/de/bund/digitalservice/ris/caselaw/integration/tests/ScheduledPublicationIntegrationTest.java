@@ -129,21 +129,20 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
         .untilAsserted(
             () -> {
               ArgumentCaptor<String> subjectCaptor = ArgumentCaptor.forClass(String.class);
-              ArgumentCaptor<String> tagCaptor = ArgumentCaptor.forClass(String.class);
 
               verify(mailSender, times(1))
                   .sendMail(
-                      any(), any(), subjectCaptor.capture(), any(), any(), tagCaptor.capture());
+                      any(), any(), subjectCaptor.capture(), any(), any(), eq(uuid.toString()));
 
               assertThat(subjectCaptor.getAllValues())
-                  .anyMatch(subject -> !subject.startsWith(error));
-              assertThat(tagCaptor.getAllValues()).contains(uuid.toString());
-            });
+                  .anyMatch(subject -> !subject.startsWith("Terminierte Abgabe fehlgeschlagen:"));
 
-    var subject = error + docUnitWithFailingXmlExport.getDocumentNumber();
-    // One error notification mail to the user is sent out.
-    verify(mailSender, times(1))
-        .sendMail(any(), eq("invalid-docunit@example.local"), eq(subject), any(), any(), any());
+              var subject = error + docUnitWithFailingXmlExport.getDocumentNumber();
+              // One error notification mail to the user is sent out.
+              verify(mailSender, times(1))
+                  .sendMail(
+                      any(), eq("invalid-docunit@example.local"), eq(subject), any(), any(), any());
+            });
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
     var logs = docUnitHistoryLogService.getHistoryLogs(docUnitDueNow.getId(), user);
