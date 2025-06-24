@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.byLessThan;
 import static org.assertj.core.api.Assertions.within;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -124,8 +124,21 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
     var error = "Terminierte Abgabe fehlgeschlagen: ";
     var uuid = docUnitDueNow.getId();
     // One handover mail to jDV is sent out.
-    verify(mailSender, times(1))
-        .sendMail(any(), any(), argThat(s -> !s.startsWith(error)), any(), any(), eq(uuid + ""));
+    await()
+        .atMost(Duration.ofSeconds(10))
+        .untilAsserted(
+            () -> {
+              ArgumentCaptor<String> subjectCaptor = ArgumentCaptor.forClass(String.class);
+              ArgumentCaptor<String> tagCaptor = ArgumentCaptor.forClass(String.class);
+
+              verify(mailSender, times(1))
+                  .sendMail(
+                      any(), any(), subjectCaptor.capture(), any(), any(), tagCaptor.capture());
+
+              assertThat(subjectCaptor.getAllValues())
+                  .anyMatch(subject -> !subject.startsWith(error));
+              assertThat(tagCaptor.getAllValues()).contains(uuid.toString());
+            });
 
     var subject = error + docUnitWithFailingXmlExport.getDocumentNumber();
     // One error notification mail to the user is sent out.
