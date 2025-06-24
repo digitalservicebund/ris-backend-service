@@ -22,7 +22,6 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import jakarta.persistence.metamodel.SingularAttribute;
-import java.security.InvalidParameterException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -291,13 +290,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
     List<Predicate> predicates = new ArrayList<>();
     if (parameters.kind.isPresent()) {
-      Class<? extends DocumentationUnitDTO> kindClass;
-      switch (parameters.kind.get()) {
-        case DECISION -> kindClass = DecisionDTO.class;
-        case PENDING_PROCEEDING -> kindClass = PendingProceedingDTO.class;
-        default -> throw new InvalidParameterException("Unsupported documentation unit kind");
-      }
-      Predicate kindPredicate = cb.equal(root.type(), kindClass);
+      Predicate kindPredicate = cb.equal(root.type(), parameters.kind.get().getDtoClass());
       predicates.add(kindPredicate);
     }
     return predicates;
