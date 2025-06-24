@@ -65,11 +65,9 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private AttachmentRepository attachmentRepository;
-  // FIXME: Avoid mocks
   @MockitoSpyBean private DocumentationUnitDocxMetadataInitializationService service;
   @Autowired private DocumentationUnitHistoryLogService historyLogService;
 
-  // FIXME: Avoid mocks
   @MockitoBean
   @Qualifier("docxS3Client")
   private S3Client s3Client;
