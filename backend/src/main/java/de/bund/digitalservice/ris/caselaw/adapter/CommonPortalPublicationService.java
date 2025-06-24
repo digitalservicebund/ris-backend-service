@@ -57,18 +57,19 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
     publishToBucket(documentationUnit);
-    try {
-      uploadChangelog(List.of(documentationUnit.documentNumber() + ".xml"), null);
-    } catch (Exception e) {
-      log.error("Could not upload changelog file.");
-      deleteDocumentationUnit(documentationUnit.documentNumber());
-      throw new PublishException("Could not save changelog to bucket.", e);
-    }
+    // uploading changelog temporarily disabled
+    //    try {
+    //      uploadChangelog(List.of(documentationUnit.documentNumber() + ".xml"), null);
+    //    } catch (Exception e) {
+    //      log.error("Could not upload changelog file.");
+    //      deleteDocumentationUnit(documentationUnit.documentNumber());
+    //      throw new PublishException("Could not save changelog to bucket.", e);
+    //    }
   }
 
   /**
-   * Publish the documentation unit by transforming it to valid LDML and putting the resulting XML
-   * file into a bucket together, specifying which documentation unit has been added or updated.
+   * Publish the documentation unit by transforming it to LDML and writing the resulting XML file to
+   * a bucket.
    *
    * @param documentNumber the documentation unit that should be published
    * @throws DocumentationUnitNotExistsException if the documentation unit with the given document
@@ -95,8 +96,13 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
     }
 
+    saveToBucket(ldml.getUniqueId(), ldml.getFileName(), fileContent.get());
+  }
+
+  @SuppressWarnings("java:S1172")
+  protected void saveToBucket(String uniqueId, String filename, String filecontent) {
     try {
-      portalBucket.save(ldml.getFileName(), fileContent.get());
+      portalBucket.save(filename, filecontent);
     } catch (BucketException e) {
       throw new PublishException("Could not save LDML to bucket.", e);
     }
