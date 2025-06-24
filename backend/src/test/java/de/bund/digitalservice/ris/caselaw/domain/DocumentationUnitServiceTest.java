@@ -520,7 +520,7 @@ class DocumentationUnitServiceTest {
     // Capture the searchInput argument
     verify(docUnitSearchRepository)
         .searchByDocumentationUnitSearchInput(
-            any(DocumentationUnitSearchInput.class), any(PageRequest.class), any(OidcUser.class));
+            searchInputCaptor.capture(), any(PageRequest.class), any(OidcUser.class));
 
     DocumentationUnitSearchInput capturedSearchInput = searchInputCaptor.getValue();
 
