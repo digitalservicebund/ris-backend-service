@@ -834,7 +834,7 @@ jobs:
         uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
         with:
           filePath: tmp/adr-source
-          destinationDir: ris-reports/adr/caselaw
+          destinationDir: adr/caselaw
           reportIsDirectory: true
           keepAllVersions: false
       # Push reports
