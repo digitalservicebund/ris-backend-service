@@ -8,10 +8,6 @@ import {
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import { navigateToCategories } from "./e2e-utils"
-import {
-  addEurlexDecisions,
-  cleanUpEurlexDecisions,
-} from "./utils/documentation-unit-api-util"
 import { Page as Pagination } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
@@ -39,7 +35,6 @@ type MyFixtures = {
   prefilledDocumentUnitWithReferences: Decision
   prefilledDocumentUnitWithTexts: Decision
   prefilledDocumentUnitWithManyReferences: Decision
-  eurlexSetup: void
 }
 
 /**
@@ -994,13 +989,5 @@ export const caselawTest = test.extend<MyFixtures>({
       throw Error(`Edition with number ${edition.id} couldn't be deleted:
       ${deleteResponse.status()} ${deleteResponse.statusText()}`)
     }
-  },
-
-  eurlexSetup: async ({ page }, use) => {
-    await addEurlexDecisions(page)
-
-    await use()
-
-    await cleanUpEurlexDecisions(page)
   },
 })

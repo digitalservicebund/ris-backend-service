@@ -1,5 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { expect } from "@playwright/test"
+import {
+  addEurlexDecisions,
+  cleanUpEurlexDecisions,
+} from "./utils/documentation-unit-api-util"
 import { navigateToInbox } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -9,11 +12,12 @@ test.describe("eurlex", () => {
   test.skip(
     "Eurlex Entscheidungen können in NeuRIS übernommen werden",
     { tag: ["@RISDEV-7376", "@RISDEV-7578"] },
-    // @ts-expect-error: eurlexSetup not used in test, but needed as fixture.
-    async ({ page, eurlexSetup }) => {
+    async ({ page }) => {
       const celexNumber1 = "62024CO0878"
       const celexNumber2 = "62023CJ0538"
       const celexNumber3 = "62019CV0001(02)"
+
+      await addEurlexDecisions(page)
 
       const tab = page.getByTestId("eurlex-tab")
       await navigateToInbox(page)
@@ -255,4 +259,8 @@ test.describe("eurlex", () => {
       })
     },
   )
+
+  test.afterEach("Clean up test data", async ({ page }) => {
+    await cleanUpEurlexDecisions(page)
+  })
 })
