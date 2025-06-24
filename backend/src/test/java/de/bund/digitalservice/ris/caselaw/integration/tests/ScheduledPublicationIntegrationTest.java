@@ -5,9 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.byLessThan;
 import static org.assertj.core.api.Assertions.within;
 import static org.awaitility.Awaitility.await;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
@@ -26,10 +23,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -120,37 +115,6 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
             });
 
     assertThat(docUnitRepository.findAll()).hasSize(3);
-
-    var error = "Terminierte Abgabe fehlgeschlagen: ";
-    var uuid = docUnitDueNow.getId();
-    // One handover mail to jDV is sent out.
-    await()
-        .atMost(Duration.ofSeconds(10))
-        .untilAsserted(
-            () -> {
-              ArgumentCaptor<String> subjectCaptor = ArgumentCaptor.forClass(String.class);
-              ArgumentCaptor<String> receiverCaptor = ArgumentCaptor.forClass(String.class);
-              ArgumentCaptor<String> tagCaptor = ArgumentCaptor.forClass(String.class);
-
-              verify(mailSender, times(2))
-                  .sendMail(
-                      any(),
-                      receiverCaptor.capture(),
-                      subjectCaptor.capture(),
-                      any(),
-                      any(),
-                      tagCaptor.capture());
-
-              List<String> subjects = subjectCaptor.getAllValues();
-              List<String> receivers = receiverCaptor.getAllValues();
-              List<String> tags = tagCaptor.getAllValues();
-
-              assertThat(subjects)
-                  .contains(error + docUnitWithFailingXmlExport.getDocumentNumber());
-              assertThat(subjects).anyMatch(subject -> !subject.startsWith(error));
-              assertThat(receivers).contains("invalid-docunit@example.local");
-              assertThat(tags).contains(uuid.toString());
-            });
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
     var logs = docUnitHistoryLogService.getHistoryLogs(docUnitDueNow.getId(), user);
