@@ -228,7 +228,7 @@ class StagingPortalPublicationJobIntegrationTest {
   }
 
   @Test
-  void shouldOnlyAddDocumentNumberToChangelogForLatestKindOfJob() throws IOException {
+  void shouldOnlyAddDocumentNumberToChangelogForLatestKindOfJob() {
     DocumentationUnitDTO dto1 =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, buildValidDocumentationUnit("1"));

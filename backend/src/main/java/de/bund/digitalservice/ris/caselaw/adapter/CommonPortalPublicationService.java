@@ -99,6 +99,7 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
     saveToBucket(ldml.getUniqueId(), ldml.getFileName(), fileContent.get());
   }
 
+  @SuppressWarnings("java:S1172")
   protected void saveToBucket(String uniqueId, String filename, String filecontent) {
     try {
       portalBucket.save(filename, filecontent);
