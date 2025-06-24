@@ -309,6 +309,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       repository.save(documentationUnitDTO);
     }
     if (documentationUnitDTO instanceof PendingProceedingDTO pendingProceedingDTO) {
+      if (!pendingProceedingDTO.isResolved
+          && documentationUnit.coreData() != null
+          && documentationUnit.coreData().isResolved()) {
+        historyLogService.saveHistoryLog(
+            documentationUnitDTO.getId(),
+            currentUser,
+            HistoryLogEventType.RESOLVE_PENDING_PROCEEDING,
+            "Dokument als \"Erledigt\" markiert");
+      }
       documentationUnitDTO =
           PendingProceedingTransformer.transformToDTO(
               pendingProceedingDTO, (PendingProceeding) documentationUnit);
