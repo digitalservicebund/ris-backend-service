@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.byLessThan;
 import static org.assertj.core.api.Assertions.within;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -27,6 +26,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -129,19 +129,27 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
         .untilAsserted(
             () -> {
               ArgumentCaptor<String> subjectCaptor = ArgumentCaptor.forClass(String.class);
+              ArgumentCaptor<String> receiverCaptor = ArgumentCaptor.forClass(String.class);
+              ArgumentCaptor<String> tagCaptor = ArgumentCaptor.forClass(String.class);
 
-              verify(mailSender, times(1))
+              verify(mailSender, times(2))
                   .sendMail(
-                      any(), any(), subjectCaptor.capture(), any(), any(), eq(uuid.toString()));
+                      any(),
+                      receiverCaptor.capture(),
+                      subjectCaptor.capture(),
+                      any(),
+                      any(),
+                      tagCaptor.capture());
 
-              assertThat(subjectCaptor.getAllValues())
-                  .anyMatch(subject -> !subject.startsWith("Terminierte Abgabe fehlgeschlagen:"));
+              List<String> subjects = subjectCaptor.getAllValues();
+              List<String> receivers = receiverCaptor.getAllValues();
+              List<String> tags = tagCaptor.getAllValues();
 
-              var subject = error + docUnitWithFailingXmlExport.getDocumentNumber();
-              // One error notification mail to the user is sent out.
-              verify(mailSender, times(1))
-                  .sendMail(
-                      any(), eq("invalid-docunit@example.local"), eq(subject), any(), any(), any());
+              assertThat(subjects)
+                  .contains(error + docUnitWithFailingXmlExport.getDocumentNumber());
+              assertThat(subjects).anyMatch(subject -> !subject.startsWith(error));
+              assertThat(receivers).contains("invalid-docunit@example.local");
+              assertThat(tags).contains(uuid.toString());
             });
 
     var user = User.builder().documentationOffice(buildDSDocOffice()).build();
