@@ -68,7 +68,10 @@ public class FieldOfLawService {
 
     List<FieldOfLaw> unorderedList =
         repository.findByCombinedCriteria(
-            identifier.orElse(null), descriptionSearchTerms.orElse(null), normTerms.orElse(null));
+            identifier.orElse(null),
+            descriptionSearchTerms.orElse(null),
+            normTerms.orElse(null),
+            norm.orElse(null));
 
     // If no results found, return an empty page
     if (unorderedList.isEmpty()) {

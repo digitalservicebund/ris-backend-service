@@ -58,7 +58,7 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
       throws DocumentNumberPatternException,
           DocumentationUnitExistsException,
           DocumentNumberFormatterException {
-    if (StringUtils.returnTrueIfNullOrBlank(documentationOfficeAbbreviation)) {
+    if (StringUtils.isNullOrBlank(documentationOfficeAbbreviation)) {
       throw new DocumentNumberPatternException(
           "Documentation Office abbreviation can not be empty");
     }

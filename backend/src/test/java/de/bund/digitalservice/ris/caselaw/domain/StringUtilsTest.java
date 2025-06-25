@@ -10,27 +10,28 @@ import org.junit.jupiter.api.Test;
 class StringUtilsTest {
 
   @Test
-  void testReturnTrueIfNullOrBlank() {
+  void testIsNullOrBlank() {
     // Test with null input
-    assertTrue(StringUtils.returnTrueIfNullOrBlank(null));
+    //noinspection ConstantValue
+    assertTrue(StringUtils.isNullOrBlank(null));
 
     // Test with empty string
-    assertTrue(StringUtils.returnTrueIfNullOrBlank(""));
+    assertTrue(StringUtils.isNullOrBlank(""));
 
     // Test with blank string (spaces)
-    assertTrue(StringUtils.returnTrueIfNullOrBlank("   "));
+    assertTrue(StringUtils.isNullOrBlank("   "));
 
     // Test with blank string (tabs)
-    assertTrue(StringUtils.returnTrueIfNullOrBlank("\t"));
+    assertTrue(StringUtils.isNullOrBlank("\t"));
 
     // Test with blank string (newlines)
-    assertTrue(StringUtils.returnTrueIfNullOrBlank("\n"));
+    assertTrue(StringUtils.isNullOrBlank("\n"));
 
     // Test with non-blank string
-    assertFalse(StringUtils.returnTrueIfNullOrBlank("abc"));
+    assertFalse(StringUtils.isNullOrBlank("abc"));
 
     // Test with string containing spaces
-    assertFalse(StringUtils.returnTrueIfNullOrBlank(" abc "));
+    assertFalse(StringUtils.isNullOrBlank(" abc "));
   }
 
   @Test

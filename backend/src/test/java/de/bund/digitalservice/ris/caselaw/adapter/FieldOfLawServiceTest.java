@@ -47,7 +47,7 @@ class FieldOfLawServiceTest {
     assertThat(page.getContent()).isEmpty();
 
     verify(repository).findAllByOrderByIdentifierAsc(pageable);
-    verify(repository, never()).findByCombinedCriteria(any(), any(), any());
+    verify(repository, never()).findByCombinedCriteria(any(), any(), any(), any());
   }
 
   @Test
@@ -62,7 +62,7 @@ class FieldOfLawServiceTest {
     assertThat(page.getContent()).isEmpty();
 
     verify(repository).findAllByOrderByIdentifierAsc(pageable);
-    verify(repository, never()).findByCombinedCriteria(any(), any(), any());
+    verify(repository, never()).findByCombinedCriteria(any(), any(), any(), any());
   }
 
   @Test
@@ -70,7 +70,7 @@ class FieldOfLawServiceTest {
     Pageable pageable = PageRequest.of(0, 10);
     var identifierString = "foo";
     var expectedFieldsOfLaw = List.of(generateFieldOfLaw());
-    when(repository.findByCombinedCriteria(identifierString, null, null))
+    when(repository.findByCombinedCriteria(identifierString, null, null, null))
         .thenReturn(expectedFieldsOfLaw);
 
     var page =
@@ -79,7 +79,7 @@ class FieldOfLawServiceTest {
     assertThat(page.getContent()).isEqualTo(expectedFieldsOfLaw);
     assertThat(page.isEmpty()).isFalse();
 
-    verify(repository).findByCombinedCriteria(identifierString, null, null);
+    verify(repository).findByCombinedCriteria(identifierString, null, null, null);
   }
 
   @Test
@@ -87,7 +87,7 @@ class FieldOfLawServiceTest {
     Pageable pageable = PageRequest.of(0, 10);
     var searchTerms = new String[] {"foo", "bar"};
     var expectedFieldsOfLaw = List.of(generateFieldOfLaw());
-    when(repository.findByCombinedCriteria(null, searchTerms, null))
+    when(repository.findByCombinedCriteria(null, searchTerms, null, null))
         .thenReturn(expectedFieldsOfLaw);
 
     var page =
@@ -96,24 +96,25 @@ class FieldOfLawServiceTest {
     assertThat(page.isEmpty()).isFalse();
     assertThat(page.getContent()).isEqualTo(expectedFieldsOfLaw);
 
-    verify(repository).findByCombinedCriteria(null, searchTerms, null);
+    verify(repository).findByCombinedCriteria(null, searchTerms, null, null);
   }
 
   @Test
   void testGetFieldsOfLaw_withNorm_shouldFindByNorm() {
     Pageable pageable = PageRequest.of(0, 10);
     var normSearchTerms = new String[] {"foo", "bar"};
+    var normSearchTerm = "foo § bar";
     var expectedFieldsOfLaw = List.of(generateFieldOfLaw());
-    when(repository.findByCombinedCriteria(null, null, normSearchTerms))
+    when(repository.findByCombinedCriteria(null, null, normSearchTerms, normSearchTerm))
         .thenReturn(expectedFieldsOfLaw);
 
     var page =
         service.getFieldsOfLawBySearchQuery(
-            Optional.empty(), Optional.empty(), Optional.of("foo § bar"), pageable);
+            Optional.empty(), Optional.empty(), Optional.of(normSearchTerm), pageable);
     assertThat(page.isEmpty()).isFalse();
     assertThat(page.getContent()).isEqualTo(expectedFieldsOfLaw);
 
-    verify(repository).findByCombinedCriteria(null, null, normSearchTerms);
+    verify(repository).findByCombinedCriteria(null, null, normSearchTerms, normSearchTerm);
   }
 
   @Test
@@ -122,21 +123,25 @@ class FieldOfLawServiceTest {
     Pageable pageable = PageRequest.of(0, 10);
     var identifierString = "foo";
     var searchTerms = new String[] {"foo", "bar"};
+    var normSearchTerm = "§baz qux";
+
     var normString = new String[] {"baz", "qux"};
     var expectedFieldsOfLaw = List.of(generateFieldOfLaw());
-    when(repository.findByCombinedCriteria(identifierString, searchTerms, normString))
+    when(repository.findByCombinedCriteria(
+            identifierString, searchTerms, normString, normSearchTerm))
         .thenReturn(expectedFieldsOfLaw);
 
     var page =
         service.getFieldsOfLawBySearchQuery(
             Optional.of(identifierString),
             Optional.of("foo bar"),
-            Optional.of("§baz qux"),
+            Optional.of(normSearchTerm),
             pageable);
     assertThat(page.isEmpty()).isFalse();
     assertThat(page.getContent()).isEqualTo(expectedFieldsOfLaw);
 
-    verify(repository).findByCombinedCriteria(identifierString, searchTerms, normString);
+    verify(repository)
+        .findByCombinedCriteria(identifierString, searchTerms, normString, normSearchTerm);
   }
 
   @Test
@@ -145,7 +150,7 @@ class FieldOfLawServiceTest {
     var identifierString = "foo";
     var searchTerms = new String[] {"foo", "bar"};
     var expectedFieldsOfLaw = List.of(generateFieldOfLaw());
-    when(repository.findByCombinedCriteria(identifierString, searchTerms, null))
+    when(repository.findByCombinedCriteria(identifierString, searchTerms, null, null))
         .thenReturn(expectedFieldsOfLaw);
 
     var page =
@@ -154,7 +159,7 @@ class FieldOfLawServiceTest {
     assertThat(page.isEmpty()).isFalse();
     assertThat(page.getContent()).isEqualTo(expectedFieldsOfLaw);
 
-    verify(repository).findByCombinedCriteria(identifierString, searchTerms, null);
+    verify(repository).findByCombinedCriteria(identifierString, searchTerms, null, null);
   }
 
   @Test
@@ -163,7 +168,8 @@ class FieldOfLawServiceTest {
     var identifierString = "foo";
     var normString = new String[] {"foo", "bar"};
     var expectedFieldsOfLaw = List.of(generateFieldOfLaw());
-    when(repository.findByCombinedCriteria(identifierString, null, normString))
+    when(repository.findByCombinedCriteria(
+            identifierString, null, normString, String.join(" ", normString)))
         .thenReturn(expectedFieldsOfLaw);
 
     var page =
@@ -172,7 +178,8 @@ class FieldOfLawServiceTest {
     assertThat(page.isEmpty()).isFalse();
     assertThat(page.getContent()).isEqualTo(expectedFieldsOfLaw);
 
-    verify(repository).findByCombinedCriteria(identifierString, null, normString);
+    verify(repository)
+        .findByCombinedCriteria(identifierString, null, normString, String.join(" ", normString));
   }
 
   @Test
@@ -180,17 +187,18 @@ class FieldOfLawServiceTest {
     Pageable pageable = PageRequest.of(0, 10);
     var searchTerms = new String[] {"foo", "bar"};
     var normString = new String[] {"baz", "qux"};
+    var normSearchTerm = "baz §qux ";
     var expectedFieldsOfLaw = List.of(generateFieldOfLaw());
-    when(repository.findByCombinedCriteria(null, searchTerms, normString))
+    when(repository.findByCombinedCriteria(null, searchTerms, normString, normSearchTerm))
         .thenReturn(expectedFieldsOfLaw);
 
     var page =
         service.getFieldsOfLawBySearchQuery(
-            Optional.empty(), Optional.of("foo bar"), Optional.of("baz §qux "), pageable);
+            Optional.empty(), Optional.of("foo bar"), Optional.of(normSearchTerm), pageable);
     assertThat(page.isEmpty()).isFalse();
     assertThat(page.getContent()).isEqualTo(expectedFieldsOfLaw);
 
-    verify(repository).findByCombinedCriteria(null, searchTerms, normString);
+    verify(repository).findByCombinedCriteria(null, searchTerms, normString, normSearchTerm);
   }
 
   @Test

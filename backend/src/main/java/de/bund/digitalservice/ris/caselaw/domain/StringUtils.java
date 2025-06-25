@@ -5,8 +5,12 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class StringUtils {
 
-  public static boolean returnTrueIfNullOrBlank(String string) {
+  public static boolean isNullOrBlank(String string) {
     return string == null || string.isBlank();
+  }
+
+  public static boolean isExactQuated(String string) {
+    return string != null && string.startsWith("\"") && string.endsWith("\"");
   }
 
   public static String normalizeSpace(String input) {
