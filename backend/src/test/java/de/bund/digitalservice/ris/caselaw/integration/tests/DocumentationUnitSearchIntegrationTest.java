@@ -230,7 +230,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
         .map(DocumentationUnitListItem::documentNumber)
         .containsExactly("ABCD202200001");
 
-    Slice<DocumentationUnitListItem> responseBodyWithExternalHandoverFilter =
+    Slice<DocumentationUnitListItem> responseBodyWithPendingProceedingFilter =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -241,8 +241,8 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
             .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
             .returnResult()
             .getResponseBody();
-    assertThat(responseBodyWithExternalHandoverFilter.getNumberOfElements()).isEqualTo(1);
-    assertThat(responseBodyWithExternalHandoverFilter)
+    assertThat(responseBodyWithPendingProceedingFilter.getNumberOfElements()).isEqualTo(1);
+    assertThat(responseBodyWithPendingProceedingFilter)
         .map(DocumentationUnitListItem::documentNumber)
         .containsExactly("ABCD202200002");
   }
