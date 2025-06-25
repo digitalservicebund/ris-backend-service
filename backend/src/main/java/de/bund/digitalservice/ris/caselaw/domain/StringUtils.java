@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import java.util.Arrays;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -9,8 +10,12 @@ public class StringUtils {
     return string == null || string.isBlank();
   }
 
-  public static boolean isExactQuated(String string) {
+  public static boolean isExactQuoted(String string) {
     return string != null && string.startsWith("\"") && string.endsWith("\"");
+  }
+
+  public String[] splitSearchTerms(String searchStr) {
+    return Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
   }
 
   public static String normalizeSpace(String input) {

@@ -81,7 +81,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   @Transactional
   public List<FieldOfLaw> findByCombinedCriteria(
-      String identifier, String[] descriptionSearchTerms, String[] normSearchTerms, String norm) {
+      String identifier, String descriptionSearchTerms, String norm) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<FieldOfLawDTO> cq = cb.createQuery(FieldOfLawDTO.class);
     Root<FieldOfLawDTO> fieldOfLawRoot = cq.from(FieldOfLawDTO.class);
@@ -92,7 +92,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     predicates.add(notationPredicate);
 
     if (descriptionSearchTerms != null) {
-      for (String searchTerm : descriptionSearchTerms) {
+      for (String searchTerm : StringUtils.splitSearchTerms(descriptionSearchTerms)) {
         predicates.add(
             cb.like(cb.lower(fieldOfLawRoot.get("text")), "%" + searchTerm.toLowerCase() + "%"));
       }
@@ -103,11 +103,14 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
       predicates.add(identifierPredicate);
     }
 
-    if (!StringUtils.isNullOrBlank(norm) && StringUtils.isExactQuated(norm)) {
-      String unquoted = norm.substring(1, norm.length() - 1);
-      predicates.add(getExactNormPredicate(unquoted, fieldOfLawRoot, cb));
-    } else {
-      predicates.addAll(getAllFieldsSearchNormsPredicates(fieldOfLawRoot, cb, normSearchTerms));
+    if (!StringUtils.isNullOrBlank(norm)) {
+      if (StringUtils.isExactQuoted(norm)) {
+        String unquoted = norm.substring(1, norm.length() - 1);
+        predicates.add(getExactNormPredicate(unquoted, fieldOfLawRoot, cb));
+      } else {
+        var normSearchs = StringUtils.splitSearchTerms(norm.replace("§", "").trim());
+        predicates.addAll(getAllFieldsSearchNormsPredicates(fieldOfLawRoot, cb, normSearchs));
+      }
     }
 
     cq.select(fieldOfLawRoot).where(predicates.toArray(Predicate[]::new));
