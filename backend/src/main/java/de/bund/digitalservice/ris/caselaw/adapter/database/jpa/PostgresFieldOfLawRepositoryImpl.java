@@ -105,9 +105,9 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     }
 
     if (!StringUtils.isNullOrBlank(norm)) {
-      if (StringUtils.isExactQuoted(norm)) {
-        String unquoted = norm.substring(1, norm.length() - 1);
-        predicates.add(getExactNormPredicate(unquoted, fieldOfLawRoot, cb));
+      if (norm.endsWith("%")) {
+        String cleanNormSearch = norm.substring(0, norm.length() - 1);
+        predicates.add(getExactNormPredicate(cleanNormSearch, fieldOfLawRoot, cb));
       } else {
         var normSearchs = StringUtils.splitSearchTerms(norm.replace("§", "").trim());
         predicates.addAll(getAllFieldsSearchNormsPredicates(fieldOfLawRoot, cb, normSearchs));
