@@ -12,6 +12,7 @@ import { Page as Pagination } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { SourceValue } from "@/domain/source"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -35,6 +36,7 @@ type MyFixtures = {
   prefilledDocumentUnitWithReferences: Decision
   prefilledDocumentUnitWithTexts: Decision
   prefilledDocumentUnitWithManyReferences: Decision
+  pendingProceeding: PendingProceeding
 }
 
 /**
@@ -989,5 +991,42 @@ export const caselawTest = test.extend<MyFixtures>({
       throw Error(`Edition with number ${edition.id} couldn't be deleted:
       ${deleteResponse.status()} ${deleteResponse.statusText()}`)
     }
+  },
+
+  pendingProceeding: async ({ request, context }, use) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+
+    const documentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes?q=Anh&category=CASELAW_PENDING_PROCEEDING`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const parameters = {
+      kind: "PENDING_PROCEEDING",
+      documentType: documentType?.[0],
+      fileNumber: generateString(),
+    }
+    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      data: parameters,
+    })
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create pending proceeding document: ${response.status()} ${response.statusText()}`,
+      )
+    }
+
+    const pendingProceeding = await response.json()
+
+    await use(pendingProceeding)
+
+    await deleteWithRetry(
+      request,
+      pendingProceeding.uuid,
+      csrfToken,
+      pendingProceeding.documentNumber,
+    )
   },
 })

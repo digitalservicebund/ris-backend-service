@@ -24,6 +24,7 @@ neuris:
   environment: staging
   document-number-patterns:
     DS: XXRE0******YY
+    DS-Anh: XXRE6******YY
     CC-RIS: XXRE1******YY
     BGH: XXRE2******YY
     BVerfG: XXRE3******YY

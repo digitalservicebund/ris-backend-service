@@ -1,81 +1,85 @@
 import { expect, Page } from "@playwright/test"
-import { navigateToManagementData, navigateToSearch } from "../e2e-utils"
+import {
+  navigateToManagementData,
+  expectHistoryCount,
+  expectHistoryLogRow,
+  navigateToCategories,
+} from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
-test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-8004"] }, () => {
-  // Todo: new endpoint for pending proceeding missing for this test case
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("Die wichtigsten Verwaltungsdaten eines anhängigen Verfahrens werden vollständig für die eigene Dokstelle angezeigt", async ({
+test.describe("Verwaltungsdaten", { tag: ["@RISDEV-8004"] }, () => {
+  test("Verwaltungsdaten für anhängige Verfahren", async ({
     page,
+    pendingProceeding,
   }) => {
-    let documentNumber: string
-
-    await navigateToSearch(page)
-    await test.step("Erstelle neue Dokumentationseinheit", async () => {
-      await page
-        .getByRole("button", {
-          name: "Neue Dokumentationseinheit",
-          exact: true,
-        })
-        .click()
-
-      await expect(page).toHaveURL(
-        /\/caselaw\/documentunit\/[A-Z0-9]{13}\/attachments$/,
-      )
-
-      documentNumber = /caselaw\/documentunit\/(.*)\/attachments/g.exec(
-        page.url(),
-      )?.[1] as string
+    await test.step("Metadaten eines anhängigen Verfahrens werden korrekt für die eigene Dokstelle angezeigt", async () => {
+      await navigateToManagementData(page, pendingProceeding.documentNumber)
+      await expectCreatedAt(page, /^\d{2}\.\d{2}\.\d{4} um \d{2}:\d{2} Uhr$/)
+      await expectCreatedBy(page, "DS (e2e_tests DigitalService)")
+      await expectSource(page, "–")
+      await expectLastUpdatedAt(page, "–")
+      await expectLastUpdatedBy(page, "–")
+      await expectFirstPublishedAt(page, "–")
+      await expect(
+        page.locator('[data-testid="management-data-procedure"] dd'),
+      ).toBeHidden()
     })
 
-    await navigateToManagementData(page, documentNumber!)
-    await expectCreatedAt(page, /^\d{2}\.\d{2}\.\d{4} um \d{2}:\d{2} Uhr$/)
-    await expectCreatedBy(page, "DS (e2e_tests DigitalService)")
-    await expectSource(page, "–")
-    await expectLastUpdatedAt(page, "–")
-    await expectLastUpdatedBy(page, "–")
-    await expectFirstPublishedAt(page, "–")
-    // expect procedure not to be visible
+    await test.step("Die Historie hat ein 'Dokeinheit angelegt'-Event", async () => {
+      await navigateToManagementData(page, pendingProceeding.documentNumber)
+      await expectHistoryCount(page, 1)
+      await expectHistoryLogRow(
+        page,
+        0,
+        "DS (e2e_tests DigitalService)",
+        `Dokeinheit angelegt`,
+      )
+    })
 
-    // expect history logs to be visible
-    // expect Duplicatecheck not to be visible
-    // expect assign docoffice not to be visible
-    // expect Delete Button to be visible
+    await test.step("Dublettencheck und Zuweisen werden nicht angezeigt für anhängige Verfahren", async () => {
+      await expect(page.getByText("Dublettenverdacht")).toBeHidden()
+      await expect(page.getByText("Zuweisen")).toBeHidden()
+    })
 
-    // Act
-    // Update pending proceeding
-    await navigateToManagementData(page, documentNumber!)
+    await test.step("Anhängige Verfahren können über Verwaltungsdaten gelöscht werden", async () => {
+      const deleteButton = page.getByLabel("Dokumentationseinheit löschen")
+      await expect(deleteButton).toBeVisible()
+      await deleteButton.click()
+      await expect(
+        page.getByRole("dialog").getByText("Dokumentationseinheit löschen"),
+      ).toBeVisible()
+    })
 
-    await expectLastUpdatedAt(page, /^\d{2}\.\d{2}\.\d{4} um \d{2}:\d{2} Uhr$/)
-    await expectLastUpdatedBy(page, "DS (e2e_tests DigitalService)")
-  })
+    await test.step("Erledigung eines anhängigen Verfahren erstellt einen Log in den Historiendaten, aktualisiert die Metadaten", async () => {
+      await navigateToCategories(page, pendingProceeding.documentNumber, {
+        type: "pending-proceeding",
+      })
+      const isResolved = page.getByLabel("Erledigt")
 
-  // Todo: new endpoint for pending proceeding missing for this test case
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("Erledigung eines anhängigen Verfahren erstellt einen Log in den Historiendaten", async ({
-    page,
-  }) => {
-    // Todo
-    let documentNumber: string
+      await isResolved.check()
+      await expect(isResolved).toBeChecked()
 
-    await navigateToSearch(page)
-    await test.step("Erstelle neue Dokumentationseinheit", async () => {
-      await page
-        .getByRole("button", {
-          name: "Neue Dokumentationseinheit",
-          exact: true,
-        })
-        .click()
-
-      await expect(page).toHaveURL(
-        /\/caselaw\/documentunit\/[A-Z0-9]{13}\/attachments$/,
+      await navigateToManagementData(page, pendingProceeding.documentNumber)
+      await expectLastUpdatedAt(
+        page,
+        /^\d{2}\.\d{2}\.\d{4} um \d{2}:\d{2} Uhr$/,
+      )
+      await expectLastUpdatedBy(page, "DS (e2e_tests DigitalService)")
+      await expectHistoryCount(page, 3)
+      await expectHistoryLogRow(
+        page,
+        0,
+        "DS (e2e_tests DigitalService)",
+        `Dokument als "Erledigt" markiert`,
       )
 
-      documentNumber = /caselaw\/documentunit\/(.*)\/attachments/g.exec(
-        page.url(),
-      )?.[1] as string
+      await expectHistoryLogRow(
+        page,
+        1,
+        "DS (e2e_tests DigitalService)",
+        `Dokeinheit bearbeitet`,
+      )
     })
-    await navigateToManagementData(page, documentNumber!)
   })
 
   async function expectCreatedAt(page: Page, createdAt: RegExp) {

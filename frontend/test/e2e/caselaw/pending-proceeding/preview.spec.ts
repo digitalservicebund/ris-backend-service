@@ -13,7 +13,9 @@ test.describe("preview pending proceeding", () => {
       },
     },
     async ({ page }) => {
-      await navigateToPreview(page, "YYTestDoc0017", "pending-proceeding")
+      await navigateToPreview(page, "YYTestDoc0017", {
+        type: "pending-proceeding",
+      })
 
       const fileNumber = "I R 20000/34"
       await expect(page.getByText("GerichtBFH")).toBeVisible()
