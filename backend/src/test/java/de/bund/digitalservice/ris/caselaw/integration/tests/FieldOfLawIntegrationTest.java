@@ -110,6 +110,25 @@ class FieldOfLawIntegrationTest extends BaseIntegrationTest {
   }
 
   @ParameterizedTest
+  @ValueSource(strings = {"aber hallo § 123", "aber", "ABER HALLO"})
+  void testGetFieldsOfLawWithExactSearch_OnlyNormText(String input) {
+    String quotedString = "\"" + input + "\""; // wrap in quotes for exact match
+    Slice<FieldOfLaw> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?norm=" + quotedString + "&pg=0&sz=3")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody).extracting("identifier").containsExactlyInAnyOrder("CD-02");
+  }
+
+  @ParameterizedTest
   @ValueSource(
       strings = {
         "§ 123", // paragraph

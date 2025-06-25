@@ -72,9 +72,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     addPreviousDecisions(updatedDomainObject, builder);
 
     builder.note(
-        StringUtils.returnTrueIfNullOrBlank(updatedDomainObject.note())
-            ? null
-            : updatedDomainObject.note());
+        StringUtils.isNullOrBlank(updatedDomainObject.note()) ? null : updatedDomainObject.note());
 
     addEnsuingAndPendingDecisions(updatedDomainObject, builder, currentDto);
 
@@ -84,6 +82,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       builder
           .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
           .date(coreData.decisionDate())
+          .celexNumber(coreData.celexNumber())
           .documentType(
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())

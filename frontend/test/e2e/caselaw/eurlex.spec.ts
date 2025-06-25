@@ -8,8 +8,7 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("eurlex", () => {
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip(
+  test(
     "Eurlex Entscheidungen können in NeuRIS übernommen werden",
     { tag: ["@RISDEV-7376", "@RISDEV-7578"] },
     async ({ page }) => {

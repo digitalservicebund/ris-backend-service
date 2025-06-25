@@ -253,9 +253,54 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     assertThat(logs2.get(3).description()).isEqualTo("Dokeinheit angelegt");
   }
 
+  // Todo: Uncomment this test, when new endpoint also creates pending proceeding
+  //  @Test
+  //  @Transactional
+  //  void testPartialUpdateByUuid_withIsResolvedAdded_shouldWriteHistoryEntries() {
+  //    TestTransaction.flagForCommit();
+  //    TestTransaction.end();
+  //
+  //    PendingProceeding pendingProceeding = generateEmptyDocumentationUnit();
+  //
+  //    List<JsonPatchOperation> operations1 =
+  //            List.of(
+  //                    new AddOperation(
+  //                            "/coreData/isResolved",
+  //                            BooleanNode.TRUE));
+  //    RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1),
+  // Collections.emptyList());
+  //
+  //    risWebTestClient
+  //            .withDefaultLogin()
+  //            .patch()
+  //            .uri("/api/v1/caselaw/documentunits/" + pendingProceeding.uuid())
+  //            .bodyValue(patch1)
+  //            .exchange()
+  //            .expectStatus()
+  //            .is2xxSuccessful();
+  //
+  //    var user = User.builder().documentationOffice(buildDSDocOffice()).build();
+  //    var logs = documentationUnitHistoryLogService.getHistoryLogs(pendingProceeding.uuid(),
+  // user);
+  //    assertThat(logs).hasSize(3);
+  //    assertThat(logs)
+  //            .map(HistoryLog::eventType)
+  //            .containsExactly(
+  //                    HistoryLogEventType.UPDATE,
+  //                    HistoryLogEventType.RESOLVE_PENDING_PROCEEDING,
+  //                    HistoryLogEventType.CREATE);
+  //    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser",
+  // "testUser");
+  //    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+  //    assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
+  //    assertThat(logs.get(1).description())
+  //            .isEqualTo("Dokument als \"Erledigt\" markiert");
+  //    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+  //  }
+
   @Test
   @Transactional
-  void testPartialUpdateByUuid_withAddScheduledDate_shouldRightHistoryEntries() {
+  void testPartialUpdateByUuid_withAddScheduledDate_shouldWriteHistoryEntries() {
     TestTransaction.flagForCommit();
     TestTransaction.end();
 

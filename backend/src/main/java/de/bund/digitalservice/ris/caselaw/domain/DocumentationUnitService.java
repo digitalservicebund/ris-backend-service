@@ -62,6 +62,7 @@ public class DocumentationUnitService {
           "/coreData/deviatingDecisionDates",
           "/coreData/documentType");
   private final DocumentationUnitHistoryLogService historyLogService;
+  private final DocumentationUnitSearchRepository docUnitSearchRepository;
 
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
@@ -76,7 +77,8 @@ public class DocumentationUnitService {
       PatchMapperService patchMapperService,
       DuplicateCheckService duplicateCheckService,
       DocumentationOfficeService documentationOfficeService,
-      DocumentationUnitHistoryLogService historyLogService) {
+      DocumentationUnitHistoryLogService historyLogService,
+      DocumentationUnitSearchRepository docUnitSearchRepository) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -91,6 +93,7 @@ public class DocumentationUnitService {
     this.duplicateCheckService = duplicateCheckService;
     this.documentationOfficeService = documentationOfficeService;
     this.historyLogService = historyLogService;
+    this.docUnitSearchRepository = docUnitSearchRepository;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -293,10 +296,10 @@ public class DocumentationUnitService {
             .build();
 
     Slice<DocumentationUnitListItem> documentationUnitListItems =
-        repository.searchByDocumentationUnitSearchInput(
+        docUnitSearchRepository.searchByDocumentationUnitSearchInput(
+            searchInput,
             PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
-            oidcUser,
-            searchInput);
+            oidcUser);
 
     return documentationUnitListItems.map(item -> addPermissions(oidcUser, item));
   }
