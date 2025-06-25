@@ -73,6 +73,17 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  void shouldRejectUnauthenticatedSearch() {
+    risWebTestClient
+        .withoutAuthentication()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=5")
+        .exchange()
+        .expectStatus()
+        .isUnauthorized();
+  }
+
+  @Test
   void testForCorrectResponseWhenRequestingAll() {
 
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
