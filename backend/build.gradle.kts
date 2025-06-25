@@ -21,7 +21,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "11.9.1"
-    id("io.sentry.jvm.gradle") version "5.7.0"
+    id("io.sentry.jvm.gradle") version "5.8.0"
 }
 
 group = "de.bund.digitalservice"
@@ -190,7 +190,7 @@ dependencies {
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
-    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.6")
+    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7")
     implementation("net.sf.saxon:Saxon-HE:12.7")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
@@ -224,7 +224,7 @@ dependencies {
 
     implementation("io.getunleash:unleash-client-java:11.0.0")
     implementation("org.apache.commons:commons-text:1.13.1")
-    implementation("org.jsoup:jsoup:1.20.1")
+    implementation("org.jsoup:jsoup:1.21.1")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.0")
