@@ -30,7 +30,7 @@ public class DocumentNumberPatternConfig {
     var pattern = documentNumberPatterns.get(documentationOfficeAbbreviation);
 
     try {
-      if (StringUtils.returnTrueIfNullOrBlank(documentationUnitNumber)) {
+      if (StringUtils.isNullOrBlank(documentationUnitNumber)) {
         throw new DocumentNumberPatternException("Document unit number is null or blank");
       }
 
