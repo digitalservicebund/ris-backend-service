@@ -248,6 +248,17 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  void shouldRejectInvalidDocUnitKindFilter() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=5&kind=INVALID_KIND")
+        .exchange()
+        .expectStatus()
+        .isBadRequest();
+  }
+
+  @Test
   void testOrderedByDateDescending() {
     List<LocalDate> dates =
         Arrays.asList(
