@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalPublicationServ
 import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PrototypePortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -24,6 +25,7 @@ public class PortalPublicationConfig {
   @Profile({"production"})
   public PortalPublicationService prototypePortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
+      AttachmentRepository attachmentRepository,
       XmlUtilService xmlUtilService,
       PrototypePortalBucket prototypePortalBucket,
       ObjectMapper objectMapper,
@@ -31,6 +33,7 @@ public class PortalPublicationConfig {
       RiiService riiService) {
     return new PrototypePortalPublicationService(
         documentationUnitRepository,
+        attachmentRepository,
         xmlUtilService,
         prototypePortalBucket,
         objectMapper,
@@ -42,12 +45,18 @@ public class PortalPublicationConfig {
   @Profile({"staging", "local"})
   public PortalPublicationService stagingPortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
+      AttachmentRepository attachmentRepository,
       XmlUtilService xmlUtilService,
       PortalBucket portalBucket,
       ObjectMapper objectMapper,
       de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer portalTransformer) {
     return new StagingPortalPublicationService(
-        documentationUnitRepository, xmlUtilService, portalBucket, objectMapper, portalTransformer);
+        documentationUnitRepository,
+        attachmentRepository,
+        xmlUtilService,
+        portalBucket,
+        objectMapper,
+        portalTransformer);
   }
 
   @Bean

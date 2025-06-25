@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,9 @@ public class S3Bucket {
         ListObjectsV2Request.builder().bucket(bucketName).prefix(path).build();
     do {
       response = s3Client.listObjectsV2(request);
+      if (response == null) {
+        return Collections.emptyList();
+      }
       keys.addAll(response.contents().stream().map(S3Object::key).toList());
       String token = response.nextContinuationToken();
       request = ListObjectsV2Request.builder().bucket(bucketName).continuationToken(token).build();
@@ -91,6 +95,17 @@ public class S3Bucket {
         PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
     try {
       s3Client.putObject(putObjectRequest, RequestBody.fromString(fileContent));
+    } catch (S3Exception e) {
+      log.error(FILE_COULD_NOT_BE_SAVED_TO_BUCKET, e);
+      throw new BucketException(FILE_COULD_NOT_BE_SAVED_TO_BUCKET, e);
+    }
+  }
+
+  public void saveBytes(String fileName, byte[] bytes) {
+    PutObjectRequest putObjectRequest =
+        PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
+    try {
+      s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
     } catch (S3Exception e) {
       log.error(FILE_COULD_NOT_BE_SAVED_TO_BUCKET, e);
       throw new BucketException(FILE_COULD_NOT_BE_SAVED_TO_BUCKET, e);

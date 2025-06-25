@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -57,12 +58,14 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
     @Primary
     public PortalPublicationService stagingPortalPublicationService(
         DocumentationUnitRepository documentationUnitRepository,
+        AttachmentRepository attachmentRepository,
         XmlUtilService xmlUtilService,
         PortalBucket portalBucket,
         ObjectMapper objectMapper,
         de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer portalTransformer) {
       return new StagingPortalPublicationService(
           documentationUnitRepository,
+          attachmentRepository,
           xmlUtilService,
           portalBucket,
           objectMapper,
@@ -117,11 +120,11 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
 
     ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
-    verify(s3Client, times(1)).putObject(captor.capture(), any(RequestBody.class));
+    verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
 
     var capturedRequests = captor.getAllValues();
     assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
-    //    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
+    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
   }
 
   @Test

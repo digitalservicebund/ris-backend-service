@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrThis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
@@ -48,6 +49,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class PrototypePortalPublicationServiceTest {
 
   @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean private AttachmentRepository attachmentRepository;
   @MockitoBean private PrototypePortalBucket prototypePortalBucket;
   @MockitoBean private XmlUtilService xmlUtilService;
   @MockitoBean private ObjectMapper objectMapper;
@@ -117,6 +119,7 @@ class PrototypePortalPublicationServiceTest {
     subject =
         new PrototypePortalPublicationService(
             documentationUnitRepository,
+            attachmentRepository,
             xmlUtilService,
             prototypePortalBucket,
             objectMapper,
@@ -172,7 +175,8 @@ class PrototypePortalPublicationServiceTest {
 
     subject.publishDocumentationUnit(testDocumentNumber);
 
-    verify(prototypePortalBucket, times(1)).save(testDocumentNumber + ".xml", transformed);
+    verify(prototypePortalBucket, times(1))
+        .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
   }
 
   @Test
@@ -204,12 +208,15 @@ class PrototypePortalPublicationServiceTest {
   void delete_shouldDeleteFromBucket() {
     subject.deleteDocumentationUnit(testDocumentNumber);
 
-    verify(prototypePortalBucket, times(1)).delete(testDocumentNumber + ".xml");
+    verify(prototypePortalBucket, times(1))
+        .delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
   }
 
   @Test
   void delete_shouldThrow() {
-    doThrow(BucketException.class).when(prototypePortalBucket).delete(testDocumentNumber + ".xml");
+    doThrow(BucketException.class)
+        .when(prototypePortalBucket)
+        .delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.deleteDocumentationUnit(testDocumentNumber))
@@ -236,22 +243,22 @@ class PrototypePortalPublicationServiceTest {
   void sanityCheck_shouldDeleteDocumentNumbersInPortalButNotInRii() throws JsonProcessingException {
     when(riiService.fetchRiiDocumentNumbers()).thenReturn(List.of("123", "456"));
     when(prototypePortalBucket.getAllFilenames())
-        .thenReturn(List.of("123.xml", "456.xml", "789.xml"));
+        .thenReturn(List.of("123/123.xml", "456/456.xml", "789/789.xml"));
     ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> fileContentCaptor = ArgumentCaptor.forClass(String.class);
-    when(objectMapper.writeValueAsString(new ChangelogUpdateDelete(null, List.of("789.xml"))))
+    when(objectMapper.writeValueAsString(new ChangelogUpdateDelete(null, List.of("789/789.xml"))))
         .thenReturn(
             """
-                {"deleted":["789.xml"]}""");
+                {"deleted":["789/789.xml"]}""");
 
     subject.logPortalPublicationSanityCheck();
 
-    verify(prototypePortalBucket).delete("789.xml");
+    verify(prototypePortalBucket).delete("789/789.xml");
     verify(prototypePortalBucket).save(fileNameCaptor.capture(), fileContentCaptor.capture());
     assertThat(fileNameCaptor.getValue()).contains("changelogs");
     assertThat(fileContentCaptor.getValue())
         .isEqualTo(
             """
-                {"deleted":["789.xml"]}""");
+                {"deleted":["789/789.xml"]}""");
   }
 }

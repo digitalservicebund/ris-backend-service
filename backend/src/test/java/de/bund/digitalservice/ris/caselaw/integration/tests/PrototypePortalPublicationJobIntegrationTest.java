@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -68,6 +69,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     @Primary
     public PortalPublicationService prototypePortalPublicationService(
         DocumentationUnitRepository documentationUnitRepository,
+        AttachmentRepository attachmentRepository,
         XmlUtilService xmlUtilService,
         PrototypePortalBucket prototypePortalBucket,
         ObjectMapper objectMapper,
@@ -75,6 +77,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         RiiService riiService) {
       return new PrototypePortalPublicationService(
           documentationUnitRepository,
+          attachmentRepository,
           xmlUtilService,
           prototypePortalBucket,
           objectMapper,
@@ -138,7 +141,8 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
             bodyCaptor.getValue().contentStreamProvider().newStream().readAllBytes(),
             StandardCharsets.UTF_8);
 
-    assertThat(putRequest.key()).isEqualTo(dto.getDocumentNumber() + ".xml");
+    assertThat(putRequest.key())
+        .isEqualTo(dto.getDocumentNumber() + "/" + dto.getDocumentNumber() + ".xml");
     assertThat(ldmlContent)
         .contains("gruende test")
         .doesNotContain("entscheidungsname test")

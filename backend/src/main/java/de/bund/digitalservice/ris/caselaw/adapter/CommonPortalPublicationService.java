@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
@@ -11,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class CommonPortalPublicationService implements PortalPublicationService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
+  private final AttachmentRepository attachmentRepository;
   private final S3Bucket portalBucket;
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
@@ -27,12 +31,14 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
 
   protected CommonPortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
+      AttachmentRepository attachmentRepository,
       XmlUtilService xmlUtilService,
       S3Bucket portalBucket,
       ObjectMapper objectMapper,
       PortalTransformer portalTransformer) {
 
     this.documentationUnitRepository = documentationUnitRepository;
+    this.attachmentRepository = attachmentRepository;
     this.portalBucket = portalBucket;
     this.objectMapper = objectMapper;
     this.xmlUtilService = xmlUtilService;
@@ -56,15 +62,17 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       throws DocumentationUnitNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
-    publishToBucket(documentationUnit);
-    // uploading changelog temporarily disabled
-    //    try {
-    //      uploadChangelog(List.of(documentationUnit.documentNumber() + ".xml"), null);
-    //    } catch (Exception e) {
-    //      log.error("Could not upload changelog file.");
-    //      deleteDocumentationUnit(documentationUnit.documentNumber());
-    //      throw new PublishException("Could not save changelog to bucket.", e);
-    //    }
+    List<AttachmentDTO> attachmentDTOS =
+        attachmentRepository.findAllByDocumentationUnitId(documentationUnitId);
+
+    var result = publishToBucket(documentationUnit, attachmentDTOS);
+    try {
+      uploadChangelog(result.changedPaths(), result.deletedPaths());
+    } catch (Exception e) {
+      log.error("Could not upload changelog file.");
+      deleteDocumentationUnit(documentationUnit.documentNumber());
+      throw new PublishException("Could not save changelog to bucket.", e);
+    }
   }
 
   /**
@@ -78,17 +86,18 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
    *     LDML
    * @throws PublishException if the LDML file could not be saved in the bucket
    */
-  public void publishDocumentationUnit(String documentNumber)
+  public PortalPublicationResult publishDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByDocumentNumber(documentNumber);
-    publishToBucket(documentationUnit);
+    return publishToBucket(documentationUnit, List.of());
   }
 
-  private void publishToBucket(DocumentationUnit documentationUnit) {
+  private PortalPublicationResult publishToBucket(
+      DocumentationUnit documentationUnit, List<AttachmentDTO> attachments) {
     if (!(documentationUnit instanceof Decision decision)) {
       // for now pending proceedings can not be transformed to LDML, so they are ignored.
-      return;
+      return null;
     }
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(decision);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
@@ -96,13 +105,38 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
     }
 
-    saveToBucket(ldml.getUniqueId(), ldml.getFileName(), fileContent.get());
+    return saveToBucket(
+        ldml.getUniqueId() + "/", ldml.getFileName(), fileContent.get(), attachments);
   }
 
-  @SuppressWarnings("java:S1172")
-  protected void saveToBucket(String uniqueId, String filename, String filecontent) {
+  protected PortalPublicationResult saveToBucket(
+      String path, String fileName, String fileContent, List<AttachmentDTO> attachments) {
     try {
-      portalBucket.save(filename, filecontent);
+      List<String> existingFiles = portalBucket.getAllFilenamesByPath(path);
+      List<String> deletedFiles = new ArrayList<>();
+      List<String> addedFiles = new ArrayList<>();
+
+      if (!existingFiles.isEmpty()) {
+        existingFiles.forEach(
+            existingFile -> {
+              portalBucket.delete(existingFile);
+              deletedFiles.add(existingFile);
+            });
+      }
+
+      portalBucket.save(path + fileName, fileContent);
+      existingFiles.remove(path + fileName);
+      addedFiles.add(path + fileName);
+
+      if (!attachments.isEmpty()) {
+        attachments.forEach(
+            attachment -> {
+              portalBucket.saveBytes(path + attachment.getFilename(), attachment.getContent());
+              deletedFiles.remove(path + attachment.getFilename());
+              addedFiles.add(path + attachment.getFilename());
+            });
+      }
+      return new PortalPublicationResult(addedFiles, deletedFiles);
     } catch (BucketException e) {
       throw new PublishException("Could not save LDML to bucket.", e);
     }
@@ -113,9 +147,11 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
    *
    * @param documentNumber the document number of the documentation unit to be deleted.
    */
-  public void deleteDocumentationUnit(String documentNumber) {
+  public PortalPublicationResult deleteDocumentationUnit(String documentNumber) {
     try {
-      portalBucket.delete(documentNumber + ".xml");
+      var fileLocation = documentNumber + "/" + documentNumber + ".xml";
+      portalBucket.delete(fileLocation);
+      return new PortalPublicationResult(List.of(), List.of(fileLocation));
     } catch (BucketException e) {
       throw new PublishException("Could not delete LDML from bucket.", e);
     }
