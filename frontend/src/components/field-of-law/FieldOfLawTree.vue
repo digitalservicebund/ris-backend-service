@@ -108,6 +108,7 @@ defineExpose({ collapseTree })
         <InputField
           id="showNorms"
           aria-label="Normen anzeigen"
+          data-testid="showNorms"
           label="Mit Normen"
           label-class="ris-label2-regular"
           :label-position="LabelPosition.RIGHT"
