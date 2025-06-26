@@ -47,6 +47,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
+import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -146,7 +147,7 @@ class DocumentationUnitControllerTest {
   void testGenerateNewDocumentationUnit_withInternalUser_shouldSucceed() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
     when(userService.getUser(any())).thenReturn(user);
-    when(service.generateNewDecision(null, null))
+    when(service.generateNewDocumentationUnit(null, null, Kind.DECISION))
         .thenReturn(
             Decision.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
@@ -161,7 +162,7 @@ class DocumentationUnitControllerTest {
         .isCreated()
         .expectBody(Decision.class);
 
-    verify(service, times(1)).generateNewDecision(user, Optional.empty());
+    verify(service, times(1)).generateNewDocumentationUnit(user, Optional.empty(), Kind.DECISION);
     verify(userService, times(1)).getUser(any(OidcUser.class));
   }
 
