@@ -76,7 +76,8 @@ const vitestConfig = defineVitestConfig({
       "test/setup.ts",
     ],
     coverage: {
-      reporter: ["lcov"],
+      provider: "istanbul",
+      reporter: ["lcov", "text"],
       exclude: [
         // Configuration and generated outputs
         "**/[.]**",
