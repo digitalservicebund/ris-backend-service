@@ -82,7 +82,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   @Transactional
   public List<FieldOfLaw> findByCombinedCriteria(
-      String identifier, String descriptionSearchTerms, String norm) {
+      String identifier, String descriptionSearchTerms, String norm, boolean isPrefixNormSearch) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<FieldOfLawDTO> cq = cb.createQuery(FieldOfLawDTO.class);
     Root<FieldOfLawDTO> fieldOfLawRoot = cq.from(FieldOfLawDTO.class);
@@ -105,12 +105,10 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     }
 
     if (!StringUtils.isNullOrBlank(norm)) {
-      if (StringUtils.isExactQuoted(norm)) {
-        String unquoted = norm.substring(1, norm.length() - 1);
-        predicates.add(getExactNormPredicate(unquoted, fieldOfLawRoot, cb));
+      if (isPrefixNormSearch) {
+        predicates.add(getExactNormPredicate(norm, fieldOfLawRoot, cb));
       } else {
-        var normSearchs = StringUtils.splitSearchTerms(norm.replace("§", "").trim());
-        predicates.addAll(getAllFieldsSearchNormsPredicates(fieldOfLawRoot, cb, normSearchs));
+        predicates.addAll(getAllFieldsSearchNormsPredicates(fieldOfLawRoot, cb, norm));
       }
     }
 
@@ -128,7 +126,8 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   private static List<Predicate> getAllFieldsSearchNormsPredicates(
-      Root<FieldOfLawDTO> fieldOfLawRoot, CriteriaBuilder cb, String[] normSearchTerms) {
+      Root<FieldOfLawDTO> fieldOfLawRoot, CriteriaBuilder cb, String normStr) {
+    var normSearchTerms = StringUtils.splitSearchTerms(normStr.replace("§", "").trim());
 
     if (normSearchTerms != null && normSearchTerms.length > 0) {
       List<Predicate> predicates = new ArrayList<>();

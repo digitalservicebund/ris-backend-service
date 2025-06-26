@@ -110,14 +110,13 @@ class FieldOfLawIntegrationTest extends BaseIntegrationTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"aber hallo § 123", "aber", "ABER HALLO"})
-  void testGetFieldsOfLawWithExactSearch_OnlyNormText(String input) {
-    String quotedString = "\"" + input + "\""; // wrap in quotes for exact match
+  @ValueSource(strings = {"aber hallo § 12%", "aber%", "ABER HALLO%"})
+  void shouldCallExactNormPredicateForWildcardNorm(String wildcardNormSearch) {
     Slice<FieldOfLaw> responseBody =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?norm=" + quotedString + "&pg=0&sz=3")
+            .uri("/api/v1/caselaw/fieldsoflaw?norm=" + wildcardNormSearch + "&pg=0&sz=3")
             .exchange()
             .expectStatus()
             .isOk()

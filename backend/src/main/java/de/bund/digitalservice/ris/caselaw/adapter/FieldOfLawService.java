@@ -61,26 +61,36 @@ public class FieldOfLawService {
       Optional<String> identifier,
       Optional<String> norm,
       Pageable pageable) {
-    Optional<String> normStr = norm.map(n -> n.trim().replaceAll("§(\\d+)", "§ $1"));
+
+    String normString = norm.orElse(null);
+    boolean isPrefixNormSearch = false;
+
+    if (!StringUtils.isNullOrBlank(normString) && normString.endsWith("%")) {
+      normString = normString.substring(0, norm.get().length() - 1);
+      isPrefixNormSearch = true;
+    }
 
     List<FieldOfLaw> unorderedList =
         repository.findByCombinedCriteria(
-            identifier.orElse(null), description.orElse(null), norm.orElse(null));
+            identifier.orElse(null), description.orElse(null), normString, isPrefixNormSearch);
 
     // If no results found, return an empty page
     if (unorderedList.isEmpty()) {
       return new PageImpl<>(List.of(), pageable, 0);
     }
 
-    List<FieldOfLaw> orderedList = orderResults(description, normStr, unorderedList);
+    List<FieldOfLaw> orderedList = orderResults(description, norm, unorderedList);
 
     return sliceResults(orderedList, pageable);
   }
 
   private List<FieldOfLaw> orderResults(
-      Optional<String> desciprtion, Optional<String> normStr, List<FieldOfLaw> unorderedList) {
+      Optional<String> description, Optional<String> normStr, List<FieldOfLaw> unorderedList) {
+
     // Calculate scores and sort the list based on the score and identifier
-    Map<FieldOfLaw, Integer> scores = calculateScore(desciprtion, normStr, unorderedList);
+    Map<FieldOfLaw, Integer> scores =
+        calculateScore(
+            description, normStr.map(n -> n.trim().replaceAll("§(\\d+)", "§ $1")), unorderedList);
     return unorderedList.stream()
         .sorted(
             (f1, f2) -> {

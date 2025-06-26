@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JurisdictionTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -173,6 +174,46 @@ public class EntityBuilderTestUtil {
     dtoBeforeSave.setDeviatingFileNumbers(null);
 
     DecisionDTO dto = repository.save(dtoBeforeSave);
+
+    fileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
+    deviatingFileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
+    dto.setFileNumbers(fileNumbers);
+    dto.setDeviatingFileNumbers(deviatingFileNumbers);
+
+    return repository.save(
+        dto.toBuilder()
+            .status(
+                StatusDTO.builder()
+                    .publicationStatus(
+                        publicationStatus != null ? publicationStatus : PublicationStatus.PUBLISHED)
+                    .createdAt(Instant.now())
+                    .withError(errorStatus)
+                    .documentationUnit(dto)
+                    .build())
+            .build());
+  }
+
+  public static PendingProceedingDTO createAndSavePublishedPendingProceeding(
+      DatabaseDocumentationUnitRepository repository,
+      PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> builder) {
+    return createAndSavePublishedPendingProceeding(repository, builder, null, false);
+  }
+
+  public static PendingProceedingDTO createAndSavePublishedPendingProceeding(
+      DatabaseDocumentationUnitRepository repository,
+      PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> builder,
+      PublicationStatus publicationStatus,
+      boolean errorStatus) {
+
+    var dtoBeforeSave = builder.build();
+
+    // FileNumbers need back reference to docUnit -> needs to be saved first without them
+    var fileNumbers = dtoBeforeSave.getFileNumbers();
+    dtoBeforeSave.setFileNumbers(null);
+    var deviatingFileNumbers = dtoBeforeSave.getDeviatingFileNumbers();
+    dtoBeforeSave.setDeviatingFileNumbers(null);
+
+    PendingProceedingDTO dto = repository.save(dtoBeforeSave);
 
     fileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
     deviatingFileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
