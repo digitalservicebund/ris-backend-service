@@ -443,6 +443,36 @@ describe("FieldsOfLaw", () => {
     })
   })
 
+  it("Shows norms by default when searching for norms and preserves user toggled checkbox state after re-search", async () => {
+    // given
+    const { user } = renderComponent()
+
+    // when
+    await user.click(screen.getByRole("button", { name: "Sachgebiete" }))
+    await user.click(
+      screen.getByRole("radio", { name: "Sachgebietsuche auswählen" }),
+    )
+    await user.type(screen.getByLabelText("Sachgebietsnorm"), "§ 99")
+
+    await user.click(
+      screen.getByRole("button", { name: "Sachgebietssuche ausführen" }),
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText("§ 99")).toBeInTheDocument()
+    })
+
+    await user.click(screen.getAllByRole("checkbox")[0])
+
+    await user.click(
+      screen.getByRole("button", { name: "Sachgebietssuche ausführen" }),
+    )
+    // then
+    await waitFor(() => {
+      expect(screen.queryByText("§ 99")).not.toBeInTheDocument()
+    })
+  })
+
   it("Shows warning when backend responds with error message", async () => {
     // given
     vi.spyOn(FieldOfLawService, "searchForFieldsOfLaw").mockImplementation(
