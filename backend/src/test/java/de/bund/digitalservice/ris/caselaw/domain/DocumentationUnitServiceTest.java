@@ -66,6 +66,7 @@ class DocumentationUnitServiceTest {
   @MockitoBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @MockitoBean private DocumentationUnitRepository repository;
   @MockitoBean private DocumentNumberService documentNumberService;
+  @MockitoBean private DocumentTypeService documentTypeService;
   @MockitoBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockitoBean private MailService mailService;
   @MockitoBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
