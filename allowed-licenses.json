@@ -22,9 +22,6 @@
       "moduleLicense": "MIT-0"
     },
     {
-      "moduleLicense": "CC-BY-4.0"
-    },
-    {
       "moduleLicense": "Bouncy Castle Licence"
     },
     {
@@ -48,6 +45,7 @@
     {
       "moduleLicense": "Creative Commons Legal Code"
     },
+
     {
       "moduleLicense": "MIT"
     },
@@ -73,6 +71,7 @@
       "moduleLicense": "Mozilla Public License Version 2.0",
       "moduleName": "net.sf.saxon:Saxon-HE"
     },
+
     {
       "moduleLicense": null,
       "moduleName": "software.amazon.awssdk:bom"
