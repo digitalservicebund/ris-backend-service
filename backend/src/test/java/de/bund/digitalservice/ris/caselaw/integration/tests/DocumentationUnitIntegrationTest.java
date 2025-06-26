@@ -63,7 +63,6 @@ import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
-import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
@@ -197,7 +196,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                 .court(Court.builder().id(court.getId()).type("AG").location("Aachen").build())
                 .fileNumber("abc")
                 .decisionDate(LocalDate.of(2021, 1, 1))
-                .kind(Kind.DECISION)
                 .build())
         .exchange()
         .expectStatus()
@@ -1217,7 +1215,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Test
   void testGenerateNewDocumentationUnit_withInternalUser_shouldSucceed() {
     DocumentationUnitCreationParameters params =
-        DocumentationUnitCreationParameters.builder().kind(Kind.DECISION).build();
+        DocumentationUnitCreationParameters.builder().build();
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "ZZREYYYY*****"));
     risWebTestClient
@@ -1337,7 +1335,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                     .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
                     .citation("test")
                     .build())
-            .kind(Kind.DECISION)
             .build();
 
     risWebTestClient
@@ -1386,7 +1383,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                     .legalPeriodicalRawValue(legalPeriodical.getAbbreviation())
                     .citation("test")
                     .build())
-            .kind(Kind.DECISION)
             .build();
 
     Decision createdDocUnit =
@@ -1807,14 +1803,11 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   }
 
   private RisEntityExchangeResult<Decision> generateNewDecision() {
-    DocumentationUnitCreationParameters params =
-        DocumentationUnitCreationParameters.builder().kind(Kind.DECISION).build();
     return risWebTestClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(params)
         .exchange()
         .expectStatus()
         .isCreated()

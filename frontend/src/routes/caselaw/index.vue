@@ -16,7 +16,7 @@ const isInternalUser = useInternalUser()
       <Button
         v-if="isInternalUser"
         label="Neue Dokumentationseinheit"
-        @click="router.push({ name: 'caselaw-pending-proceeding-new' })"
+        @click="router.push({ name: 'caselaw-documentUnit-new' })"
       ></Button>
     </div>
     <DocumentUnitSearch />

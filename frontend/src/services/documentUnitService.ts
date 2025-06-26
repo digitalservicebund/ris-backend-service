@@ -24,6 +24,7 @@ interface DocumentUnitService {
 
   createNew(
     params?: DocumentationUnitCreationParameters,
+    requestParams?: { [key: string]: string } | undefined,
   ): Promise<ServiceResponse<DocumentationUnit>>
 
   createNewOutOfEurlexDecision(
@@ -94,13 +95,17 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async createNew(parameters?: DocumentationUnitCreationParameters) {
+  async createNew(
+    parameters?: DocumentationUnitCreationParameters,
+    requestParams?: { [key: string]: string } | undefined,
+  ) {
     const response = await httpClient.put<
       DocumentationUnitCreationParameters,
       DocumentationUnit
     >(
       "caselaw/documentunits/new",
       {
+        params: requestParams,
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",

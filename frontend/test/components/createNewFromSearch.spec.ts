@@ -6,7 +6,6 @@ import { createRouter, createWebHistory } from "vue-router"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import { Decision } from "@/domain/decision"
 import DocumentationOffice from "@/domain/documentationOffice"
-import { Kind } from "@/domain/documentationUnitKind"
 import documentUnitService from "@/services/documentUnitService"
 import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
 import routes from "~/test-helper/routes"
@@ -201,7 +200,6 @@ describe("Create new documentation unit from search", () => {
     expect(documentUnitService.createNew).toHaveBeenCalledWith({
       ...parameters,
       documentationOffice: docOffice,
-      kind: Kind.DECISION,
     })
   })
 
@@ -239,7 +237,6 @@ describe("Create new documentation unit from search", () => {
     expect(documentUnitService.createNew).toHaveBeenCalledWith({
       ...parameters,
       documentationOffice: dsDocOffice,
-      kind: Kind.DECISION,
     })
   })
 })

@@ -7,7 +7,7 @@ import documentUnitService from "@/services/documentUnitService"
 const router = useRouter()
 
 onBeforeMount(async () => {
-  const createResponse = await documentUnitService.createNew({
+  const createResponse = await documentUnitService.createNew(undefined, {
     kind: Kind.PENDING_PROCEEDING,
   })
   if (createResponse.data)

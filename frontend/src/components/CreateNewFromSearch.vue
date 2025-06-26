@@ -7,7 +7,6 @@ import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentationUnit } from "@/domain/documentationUnit"
-import { Kind } from "@/domain/documentationUnitKind"
 import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
@@ -59,7 +58,6 @@ async function createNewFromSearch(openDocunit: boolean = false) {
   const createResponse = await documentUnitService.createNew({
     ...props.parameters,
     documentationOffice: selectedDocumentationOffice.value,
-    kind: Kind.DECISION,
   })
   if (createResponse.error) {
     createNewFromSearchResponseError.value = createResponse.error

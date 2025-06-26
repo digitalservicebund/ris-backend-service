@@ -10,7 +10,6 @@ import Pagination, { Page } from "@/components/Pagination.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { Query } from "@/composables/useQueryFromRoute"
 import { Court } from "@/domain/court"
-import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import errorMessages from "@/i18n/errors.json"
 import comboboxItemService from "@/services/comboboxItemService"
@@ -166,7 +165,7 @@ const createFromSearchQueryResponseError = ref<ResponseError | undefined>()
 async function createFromSearchQuery() {
   isLoading.value = true
   createFromSearchQueryResponseError.value = undefined
-  const createResponse = await service.createNew({ kind: Kind.DECISION })
+  const createResponse = await service.createNew()
   if (createResponse.error) {
     createFromSearchQueryResponseError.value = createResponse.error
     isLoading.value = false

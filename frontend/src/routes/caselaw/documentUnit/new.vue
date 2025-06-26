@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { onBeforeMount } from "vue"
 import { useRouter } from "vue-router"
-import { Kind } from "@/domain/documentationUnitKind"
 import documentUnitService from "@/services/documentUnitService"
 
 const router = useRouter()
 
 onBeforeMount(async () => {
-  const createResponse = await documentUnitService.createNew({
-    kind: Kind.DECISION,
-  })
+  const createResponse = await documentUnitService.createNew()
   if (createResponse.data)
     await router.replace({
       name: "caselaw-documentUnit-documentNumber-attachments",

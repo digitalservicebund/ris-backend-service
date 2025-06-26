@@ -19,7 +19,6 @@ import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { DocumentationUnit } from "@/domain/documentationUnit"
-import { Kind } from "@/domain/documentationUnitKind"
 import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -309,7 +308,6 @@ watch(
       fileNumber: relatedDocumentationUnit.value.fileNumber,
       court: relatedDocumentationUnit.value.court,
       reference: reference.value,
-      kind: Kind.DECISION,
     }
   },
   { deep: true },

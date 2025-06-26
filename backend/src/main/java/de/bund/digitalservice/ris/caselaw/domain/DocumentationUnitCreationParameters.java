@@ -13,5 +13,4 @@ public record DocumentationUnitCreationParameters(
     DocumentType documentType,
     @PastOrPresent LocalDate decisionDate,
     String fileNumber,
-    Reference reference,
-    Kind kind) {}
+    Reference reference) {}

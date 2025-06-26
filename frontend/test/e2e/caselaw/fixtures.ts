@@ -10,6 +10,7 @@ import utc from "dayjs/plugin/utc.js"
 import { navigateToCategories } from "./e2e-utils"
 import { Page as Pagination } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
+import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import PendingProceeding from "@/domain/pendingProceeding"
@@ -81,12 +82,8 @@ export const caselawTest = test.extend<MyFixtures>({
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
 
-    const parameters = {
-      kind: "DECISION",
-    }
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      data: parameters,
     })
 
     const { uuid, documentNumber } = await response.json()
@@ -98,12 +95,9 @@ export const caselawTest = test.extend<MyFixtures>({
   prefilledDocumentUnit: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-    const parameters = {
-      kind: "DECISION",
-    }
+
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      data: parameters,
     })
 
     if (!response.ok()) {
@@ -199,12 +193,8 @@ export const caselawTest = test.extend<MyFixtures>({
   prefilledDocumentUnitWithReferences: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-    const parameters = {
-      kind: "DECISION",
-    }
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      data: parameters,
     })
     const prefilledDocumentUnit = await response.json()
 
@@ -285,12 +275,8 @@ export const caselawTest = test.extend<MyFixtures>({
   ) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-    const parameters = {
-      kind: "DECISION",
-    }
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      data: parameters,
     })
     const prefilledDocumentUnit = await response.json()
 
@@ -453,12 +439,8 @@ export const caselawTest = test.extend<MyFixtures>({
   prefilledDocumentUnitWithTexts: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-    const parameters = {
-      kind: "DECISION",
-    }
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      data: parameters,
     })
     const prefilledDocumentUnitWithLongTexts = await response.json()
 
@@ -517,12 +499,8 @@ export const caselawTest = test.extend<MyFixtures>({
   secondPrefilledDocumentUnit: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-    const parameters = {
-      kind: "DECISION",
-    }
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      data: parameters,
     })
     const secondPrefilledDocumentUnit = await response.json()
 
@@ -568,12 +546,8 @@ export const caselawTest = test.extend<MyFixtures>({
   ) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-    const parameters = {
-      kind: "DECISION",
-    }
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      data: parameters,
     })
     const { uuid, documentNumber } = await response.json()
 
@@ -627,12 +601,8 @@ export const caselawTest = test.extend<MyFixtures>({
     })
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-    const parameters = {
-      kind: "DECISION",
-    }
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      data: parameters,
     })
     const prefilledDocumentUnit = await response.json()
 
@@ -1031,11 +1001,11 @@ export const caselawTest = test.extend<MyFixtures>({
     const documentType = await documentTypeResponse.json()
 
     const parameters = {
-      kind: "PENDING_PROCEEDING",
       documentType: documentType?.[0],
       fileNumber: generateString(),
     }
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+      params: { kind: Kind.PENDING_PROCEEDING },
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
       data: parameters,
     })

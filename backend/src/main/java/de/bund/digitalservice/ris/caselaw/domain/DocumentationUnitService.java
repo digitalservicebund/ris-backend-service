@@ -98,10 +98,10 @@ public class DocumentationUnitService {
 
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit generateNewDocumentationUnit(
-      User user, Optional<DocumentationUnitCreationParameters> parameters) {
-    if (parameters.isPresent() && parameters.get().kind().equals(Kind.DECISION)) {
+      User user, Optional<DocumentationUnitCreationParameters> parameters, Kind kind) {
+    if (kind.equals(Kind.DECISION)) {
       return generateNewDecision(user, parameters);
-    } else if (parameters.isPresent() && parameters.get().kind().equals(Kind.PENDING_PROCEEDING)) {
+    } else if (kind.equals(Kind.PENDING_PROCEEDING)) {
       return generateNewPendingProceeding(user, parameters);
     } else {
       throw new DocumentationUnitException(
