@@ -1786,7 +1786,13 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             repository, documentationOffice, "TEST123456789");
 
     when(attachmentService.findByDocumentationUnitIdAndFileName(dto.getId(), "image.png"))
-        .thenReturn(Optional.of(new Image(new byte[] {1, 2, 3}, "png", "image.png")));
+        .thenReturn(
+            Optional.of(
+                Image.builder()
+                    .content(new byte[] {1, 2, 3})
+                    .contentType("png")
+                    .name("image.png")
+                    .build()));
 
     byte[] imageBytes =
         risWebTestClient
