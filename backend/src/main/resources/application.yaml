@@ -102,8 +102,9 @@ neuris:
     BVerwG: WBRE6****YYYY
     BSG: KSRE1******YY
     DS: XXRE0******YY
-    DS-Anh: XXAHYYYY2****
+    DS-Anh: XXAH0******YY
     CC-RIS: XXRE1******YY
+    CC-RIS-Anh: XXAH1******YY
     BFH: STREYYYY2****
     BFH-Anh: STAHYYYY2****
     BPatG: MPRE6******YY
