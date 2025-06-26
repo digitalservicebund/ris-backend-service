@@ -82,6 +82,12 @@ const relatedDocumentationUnit = ref<RelatedDocumentation>(
     : new RelatedDocumentation(),
 )
 
+const isPendingProceeding = computed(
+  () =>
+    relatedDocumentationUnit.value.documentType?.label ===
+    "Anhängiges Verfahren",
+)
+
 const prefix = computed({
   get: () =>
     store.edition && store.edition?.prefix ? store.edition.prefix : undefined,
@@ -694,7 +700,7 @@ onBeforeUnmount(() => {
         </Pagination>
       </div>
       <CreateNewFromSearch
-        v-if="searchResults && featureToggle"
+        v-if="searchResults && featureToggle && !isPendingProceeding"
         :parameters="createDocumentationUnitParameters"
         :validate-required-input="() => validateRequiredInput(reference)"
         @created-documentation-unit="addReferenceWithCreatedDocumentationUnit"
