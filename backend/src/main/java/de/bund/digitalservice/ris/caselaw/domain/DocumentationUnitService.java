@@ -40,6 +40,7 @@ public class DocumentationUnitService {
 
   private final DocumentationUnitRepository repository;
   private final DocumentNumberService documentNumberService;
+  private final DocumentTypeService documentTypeService;
   private final DocumentationUnitStatusService statusService;
   private final AttachmentService attachmentService;
   private final TransformationService transformationService;
@@ -67,6 +68,7 @@ public class DocumentationUnitService {
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
       DocumentNumberService documentNumberService,
+      DocumentTypeService documentTypeService,
       DocumentationUnitStatusService statusService,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       UserService userService,
@@ -82,6 +84,7 @@ public class DocumentationUnitService {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
+    this.documentTypeService = documentTypeService;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.userService = userService;
     this.validator = validator;
@@ -131,6 +134,7 @@ public class DocumentationUnitService {
       params = params.toBuilder().documentationOffice(userDocOffice).build();
     }
 
+    var documentType = documentTypeService.getPendingProceedingType();
     PendingProceeding docUnit =
         PendingProceeding.builder()
             .version(0L)
@@ -139,7 +143,7 @@ public class DocumentationUnitService {
             .coreData(
                 CoreData.builder()
                     .documentationOffice(params.documentationOffice())
-                    .documentType(params.documentType())
+                    .documentType(documentType)
                     .decisionDate(params.decisionDate())
                     .court(params.court())
                     .legalEffect(
