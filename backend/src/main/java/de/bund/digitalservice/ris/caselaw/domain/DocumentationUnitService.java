@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -244,11 +245,28 @@ public class DocumentationUnitService {
             .kind(kind.orElse(null))
             .build();
 
-    Slice<DocumentationUnitListItem> documentationUnitListItems =
-        docUnitSearchRepository.searchByDocumentationUnitSearchInput(
-            searchInput,
-            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
-            oidcUser);
+    Slice<DocumentationUnitListItem> documentationUnitListItems;
+    try {
+      documentationUnitListItems =
+          docUnitSearchRepository.searchByDocumentationUnitSearchInput(
+              searchInput,
+              PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+              oidcUser);
+    } catch (JpaObjectRetrievalFailureException e) {
+      // This exception can occur if a doc unit is deleted while the search is running.
+      // 1. Search runs and fetches list of doc unit entities incl. doc unit A123, request ongoing
+      // 2. Other user/requests deletes doc unit A123
+      // 3. Search tries to fetch lazy relationships of doc unit A123 while transforming to domain
+      //    object and fails because the status with referenced id does not exist anymore.
+
+      // This regularly happens during e2e tests running in parallel.
+      log.info("Retrying search after JpaObjectRetrievalFailureException", e);
+      documentationUnitListItems =
+          docUnitSearchRepository.searchByDocumentationUnitSearchInput(
+              searchInput,
+              PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+              oidcUser);
+    }
 
     return documentationUnitListItems.map(item -> addPermissions(oidcUser, item));
   }
