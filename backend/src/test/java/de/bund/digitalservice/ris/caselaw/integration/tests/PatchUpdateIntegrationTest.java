@@ -63,7 +63,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -4775,7 +4774,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
             .withDefaultLogin()
             .put()
             .uri("/api/v1/caselaw/documentunits/new")
-            .contentType(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
             .isCreated()

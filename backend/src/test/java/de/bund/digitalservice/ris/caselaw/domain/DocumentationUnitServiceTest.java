@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -84,109 +85,250 @@ class DocumentationUnitServiceTest {
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
-  @Test
-  void testGenerateNewDocumentationUnit()
-      throws DocumentationUnitExistsException,
-          DocumentNumberPatternException,
-          DocumentNumberFormatterException {
-    DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().id(UUID.randomUUID()).build();
-    User user = User.builder().documentationOffice(documentationOffice).build();
-    Decision decision = Decision.builder().build();
+  @Nested
+  class GenerateNew {
+    @Test
+    void testGenerateNewDecision()
+        throws DocumentationUnitExistsException,
+            DocumentNumberPatternException,
+            DocumentNumberFormatterException {
+      DocumentationOffice documentationOffice =
+          DocumentationOffice.builder().id(UUID.randomUUID()).build();
+      User user = User.builder().documentationOffice(documentationOffice).build();
+      Decision decision = Decision.builder().build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
-        .thenReturn(decision);
-    when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
-        .thenReturn("nextDocumentNumber");
-    // Can we use a captor to check if the document number was correctly created?
-    // The chicken-egg-problem is, that we are dictating what happens when
-    // repository.save(), so we can't just use a captor at the same time
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+          .thenReturn(decision);
+      when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
+          .thenReturn("nextDocumentNumber");
+      // Can we use a captor to check if the document number was correctly created?
+      // The chicken-egg-problem is, that we are dictating what happens when
+      // repository.save(), so we can't just use a captor at the same time
 
-    assertNotNull(service.generateNewDecision(user, Optional.empty()));
+      assertNotNull(service.generateNewDecision(user, Optional.empty()));
 
-    verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
-    verify(duplicateCheckService, times(1)).checkDuplicates("nextDocumentNumber");
-    verify(repository)
-        .createNewDocumentationUnit(
-            Decision.builder()
-                .version(0L)
-                .documentNumber("nextDocumentNumber")
-                .coreData(
-                    CoreData.builder()
-                        .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
-                        .documentationOffice(documentationOffice)
-                        .build())
-                .build(),
-            Status.builder()
-                .publicationStatus(PublicationStatus.UNPUBLISHED)
-                .withError(false)
-                .build(),
-            null,
-            null,
-            user);
-  }
+      verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
+      verify(duplicateCheckService, times(1)).checkDuplicates("nextDocumentNumber");
+      verify(repository)
+          .createNewDocumentationUnit(
+              Decision.builder()
+                  .version(0L)
+                  .documentNumber("nextDocumentNumber")
+                  .coreData(
+                      CoreData.builder()
+                          .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
+                          .documentationOffice(documentationOffice)
+                          .build())
+                  .build(),
+              Status.builder()
+                  .publicationStatus(PublicationStatus.UNPUBLISHED)
+                  .withError(false)
+                  .build(),
+              null,
+              null,
+              user);
+    }
 
-  @Test
-  void testGenerateNewDocumentationUnitWithParameters()
-      throws DocumentationUnitExistsException,
-          DocumentNumberPatternException,
-          DocumentNumberFormatterException {
-    DocumentationOffice userDocumentationOffice =
-        DocumentationOffice.builder().abbreviation("BAG").id(UUID.randomUUID()).build();
-    User user = User.builder().documentationOffice(userDocumentationOffice).build();
-    DocumentationOffice designatedDocumentationOffice =
-        DocumentationOffice.builder().abbreviation("BGH").id(UUID.randomUUID()).build();
-    Decision decision = Decision.builder().build();
-    DocumentationUnitCreationParameters parameters =
-        DocumentationUnitCreationParameters.builder()
-            .documentationOffice(designatedDocumentationOffice)
-            .fileNumber("fileNumber")
-            .court(Court.builder().type("BGH").build())
-            .decisionDate(LocalDate.now())
-            .documentType(DocumentType.builder().label("Bes").build())
-            .reference(
-                Reference.builder()
-                    .citation("2024, 4")
-                    .legalPeriodical(LegalPeriodical.builder().abbreviation("BAG").build())
-                    .build())
-            .build();
+    @Test
+    void testGenerateNewDecisionWithParameters()
+        throws DocumentationUnitExistsException,
+            DocumentNumberPatternException,
+            DocumentNumberFormatterException {
+      DocumentationOffice userDocumentationOffice =
+          DocumentationOffice.builder().abbreviation("BAG").id(UUID.randomUUID()).build();
+      User user = User.builder().documentationOffice(userDocumentationOffice).build();
+      DocumentationOffice designatedDocumentationOffice =
+          DocumentationOffice.builder().abbreviation("BGH").id(UUID.randomUUID()).build();
+      Decision decision = Decision.builder().build();
+      DocumentationUnitCreationParameters parameters =
+          DocumentationUnitCreationParameters.builder()
+              .documentationOffice(designatedDocumentationOffice)
+              .fileNumber("fileNumber")
+              .court(Court.builder().type("BGH").build())
+              .decisionDate(LocalDate.now())
+              .documentType(DocumentType.builder().label("Bes").build())
+              .reference(
+                  Reference.builder()
+                      .citation("2024, 4")
+                      .legalPeriodical(LegalPeriodical.builder().abbreviation("BAG").build())
+                      .build())
+              .build();
 
-    when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
-        .thenReturn(decision);
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+          .thenReturn(decision);
 
-    when(documentNumberService.generateDocumentNumber(designatedDocumentationOffice.abbreviation()))
-        .thenReturn("nextDocumentNumber");
-    // Can we use a captor to check if the document number was correctly created?
-    // The chicken-egg-problem is, that we are dictating what happens when
-    // repository.save(), so we can't just use a captor at the same time
+      when(documentNumberService.generateDocumentNumber(
+              designatedDocumentationOffice.abbreviation()))
+          .thenReturn("nextDocumentNumber");
+      // Can we use a captor to check if the document number was correctly created?
+      // The chicken-egg-problem is, that we are dictating what happens when
+      // repository.save(), so we can't just use a captor at the same time
 
-    assertNotNull(service.generateNewDecision(user, Optional.of(parameters)));
+      assertNotNull(service.generateNewDecision(user, Optional.of(parameters)));
 
-    verify(documentNumberService)
-        .generateDocumentNumber(designatedDocumentationOffice.abbreviation());
-    verify(repository)
-        .createNewDocumentationUnit(
-            Decision.builder()
-                .version(0L)
-                .documentNumber("nextDocumentNumber")
-                .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
-                .coreData(
-                    CoreData.builder()
-                        .creatingDocOffice(userDocumentationOffice)
-                        .documentationOffice(designatedDocumentationOffice)
-                        .court(parameters.court())
-                        .legalEffect(LegalEffect.YES.getLabel())
-                        .decisionDate(parameters.decisionDate())
-                        .documentType(parameters.documentType())
-                        .build())
-                .build(),
-            Status.builder()
-                .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
-                .withError(false)
-                .build(),
-            parameters.reference(),
-            parameters.fileNumber(),
-            user);
+      verify(documentNumberService)
+          .generateDocumentNumber(designatedDocumentationOffice.abbreviation());
+      verify(repository)
+          .createNewDocumentationUnit(
+              Decision.builder()
+                  .version(0L)
+                  .documentNumber("nextDocumentNumber")
+                  .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
+                  .coreData(
+                      CoreData.builder()
+                          .creatingDocOffice(userDocumentationOffice)
+                          .documentationOffice(designatedDocumentationOffice)
+                          .court(parameters.court())
+                          .legalEffect(LegalEffect.YES.getLabel())
+                          .decisionDate(parameters.decisionDate())
+                          .documentType(parameters.documentType())
+                          .build())
+                  .build(),
+              Status.builder()
+                  .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                  .withError(false)
+                  .build(),
+              parameters.reference(),
+              parameters.fileNumber(),
+              user);
+    }
+
+    @Test
+    void testGenerateNewPendingProceeding()
+        throws DocumentationUnitExistsException,
+            DocumentNumberPatternException,
+            DocumentNumberFormatterException {
+      // Arrange
+      DocumentationOffice documentationOffice =
+          DocumentationOffice.builder().id(UUID.randomUUID()).build();
+      User user = User.builder().documentationOffice(documentationOffice).build();
+      PendingProceeding pendingProceeding = PendingProceeding.builder().build();
+      DocumentType documentType =
+          DocumentType.builder()
+              .uuid(UUID.randomUUID())
+              .label("Anhängiges Verfahren")
+              .jurisShortcut("Anh")
+              .build();
+
+      when(documentTypeService.getPendingProceedingType()).thenReturn(documentType);
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+          .thenReturn(pendingProceeding);
+      when(documentNumberService.generateDocumentNumber(
+              documentationOffice.abbreviation() + "-Anh"))
+          .thenReturn("nextDocumentNumber");
+
+      // Act
+      assertNotNull(service.generateNewPendingProceeding(user, Optional.empty()));
+
+      // Assert
+      verify(documentNumberService)
+          .generateDocumentNumber(documentationOffice.abbreviation() + "-Anh");
+      verify(duplicateCheckService, never()).checkDuplicates(any());
+      verify(repository)
+          .createNewDocumentationUnit(
+              PendingProceeding.builder()
+                  .version(0L)
+                  .documentNumber("nextDocumentNumber")
+                  .coreData(
+                      CoreData.builder()
+                          .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
+                          .documentationOffice(documentationOffice)
+                          .documentType(documentType)
+                          .build())
+                  .build(),
+              Status.builder()
+                  .publicationStatus(PublicationStatus.UNPUBLISHED)
+                  .withError(false)
+                  .build(),
+              null,
+              null,
+              user);
+    }
+
+    @Test
+    void testGenerateNewPendingProceedingWithParameters()
+        throws DocumentationUnitExistsException,
+            DocumentNumberPatternException,
+            DocumentNumberFormatterException {
+      // Arrange
+      DocumentationOffice userDocumentationOffice =
+          DocumentationOffice.builder().abbreviation("BAG").id(UUID.randomUUID()).build();
+      User user = User.builder().documentationOffice(userDocumentationOffice).build();
+      DocumentationOffice designatedDocumentationOffice =
+          DocumentationOffice.builder().abbreviation("BGH").id(UUID.randomUUID()).build();
+      PendingProceeding pendingProceeding = PendingProceeding.builder().build();
+      DocumentType documentType =
+          DocumentType.builder()
+              .uuid(UUID.randomUUID())
+              .label("Anhängiges Verfahren")
+              .jurisShortcut("Anh")
+              .build();
+      DocumentationUnitCreationParameters parameters =
+          DocumentationUnitCreationParameters.builder()
+              .documentationOffice(designatedDocumentationOffice)
+              .fileNumber("fileNumber")
+              .court(Court.builder().type("BGH").build())
+              .decisionDate(LocalDate.now())
+              .documentType(documentType)
+              .reference(
+                  Reference.builder()
+                      .citation("2024, 4")
+                      .legalPeriodical(LegalPeriodical.builder().abbreviation("BAG").build())
+                      .build())
+              .build();
+
+      when(documentTypeService.getPendingProceedingType()).thenReturn(documentType);
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+          .thenReturn(pendingProceeding);
+      when(documentNumberService.generateDocumentNumber(
+              designatedDocumentationOffice.abbreviation() + "-Anh"))
+          .thenReturn("nextDocumentNumber");
+
+      // Act
+      assertNotNull(service.generateNewPendingProceeding(user, Optional.of(parameters)));
+
+      // Assert
+      verify(documentNumberService)
+          .generateDocumentNumber(designatedDocumentationOffice.abbreviation() + "-Anh");
+      verify(repository)
+          .createNewDocumentationUnit(
+              PendingProceeding.builder()
+                  .version(0L)
+                  .documentNumber("nextDocumentNumber")
+                  .coreData(
+                      CoreData.builder()
+                          .documentationOffice(designatedDocumentationOffice)
+                          .court(parameters.court())
+                          .legalEffect(LegalEffect.YES.getLabel())
+                          .decisionDate(parameters.decisionDate())
+                          .documentType(documentType)
+                          .build())
+                  .build(),
+              Status.builder()
+                  .publicationStatus(PublicationStatus.UNPUBLISHED)
+                  .withError(false)
+                  .build(),
+              parameters.reference(),
+              parameters.fileNumber(),
+              user);
+    }
+
+    @Test
+    void
+        testGenerateNewDocumentationUnit_withUnsupportedKind_shouldThrowDocumentationUnitException() {
+      // Arrange
+      DocumentationOffice userDocumentationOffice =
+          DocumentationOffice.builder().abbreviation("BFH").id(UUID.randomUUID()).build();
+      User user = User.builder().documentationOffice(userDocumentationOffice).build();
+
+      // Assert
+      assertThatThrownBy(
+              () ->
+                  // Act
+                  service.generateNewDocumentationUnit(user, Optional.empty(), Kind.UNSUPPORTED))
+          .isInstanceOf(DocumentationUnitException.class)
+          .hasMessageContaining("DocumentationUnit is neither decision nor pending proceeding.");
+    }
   }
 
   @Test

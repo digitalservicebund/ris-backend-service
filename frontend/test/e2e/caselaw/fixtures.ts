@@ -81,7 +81,6 @@ export const caselawTest = test.extend<MyFixtures>({
   documentNumber: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
     })
@@ -95,7 +94,6 @@ export const caselawTest = test.extend<MyFixtures>({
   prefilledDocumentUnit: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
       headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
     })
