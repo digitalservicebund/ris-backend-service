@@ -84,16 +84,11 @@ test.describe("ensuring the authorization works as expected", () => {
         error,
       } of testCases) {
         await test.step(`Verifying: pending proceeding preview ${description}`, async () => {
-          await navigateToPreview(
-            page,
-            documentNumber,
-            type as "pending-proceeding" | "documentunit",
-            options,
-          )
+          await navigateToPreview(page, documentNumber, {
+            type: type as "pending-proceeding" | "documentunit",
+          })
 
-          await expect(
-            page.getByText(error ? error : documentNumber),
-          ).toBeVisible()
+          await expect(page.getByText(error ?? documentNumber)).toBeVisible()
         })
       }
     },

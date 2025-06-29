@@ -159,22 +159,12 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "XXRE0******YY"));
 
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/new")
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(Decision.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE0");
-              assertThat(response.getResponseBody().status())
-                  .isEqualTo(
-                      Status.builder().publicationStatus(UNPUBLISHED).withError(false).build());
-            });
+    var response = generateNewDecision();
+
+    assertThat(response.getResponseBody()).isNotNull();
+    assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE0");
+    assertThat(response.getResponseBody().status())
+        .isEqualTo(Status.builder().publicationStatus(UNPUBLISHED).withError(false).build());
 
     List<DocumentationUnitDTO> list = repository.findAll();
     assertThat(list).hasSize(1);
@@ -235,19 +225,9 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     when(documentNumberPatternConfig.hasValidPattern(anyString(), anyString()))
         .thenReturn(Boolean.TRUE);
 
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/new")
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(Decision.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE0");
-            });
+    var result = generateNewDecision();
+    assertThat(result.getResponseBody()).isNotNull();
+    assertThat(result.getResponseBody().documentNumber()).startsWith("XXRE0");
 
     assertThat(repository.findAll()).hasSize(1);
     var deletedDocumentationUnit = repository.findAll().get(0);
@@ -265,20 +245,9 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     assertThat(repository.findAll()).isEmpty();
 
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/new")
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(Decision.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber())
-                  .isEqualTo(reusableDocumentNumber);
-            });
+    var finalResult = generateNewDecision();
+    assertThat(finalResult.getResponseBody()).isNotNull();
+    assertThat(finalResult.getResponseBody().documentNumber()).isEqualTo(reusableDocumentNumber);
   }
 
   @Test
@@ -290,19 +259,9 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     when(mailService.getHandoverResult(any(), any())).thenReturn(List.of());
     when(handoverReportRepository.getAllByEntityId(any())).thenReturn(List.of());
 
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/new")
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(Decision.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE0");
-            });
+    var response = generateNewDecision();
+    assertThat(response.getResponseBody()).isNotNull();
+    assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE0");
 
     assertThat(repository.findAll()).hasSize(1);
     var deletedDocumentationUnit = repository.findAll().get(0);
@@ -323,7 +282,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         .expectStatus()
         .isOk()
         .expectBody(String.class)
-        .consumeWith(response -> assertThat(response.getResponseBody()).isNotNull());
+        .consumeWith(result -> assertThat(result.getResponseBody()).isNotNull());
 
     assertThat(repository.findAll()).isEmpty();
     assertThat(originalXmlRepository.findAll()).isEmpty();
@@ -1245,32 +1204,26 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "ZZREYYYY*****"));
 
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/new")
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(Decision.class)
-        .consumeWith(
-            response ->
-                assertThat(response.getResponseBody())
-                    .extracting("documentNumber")
-                    .isEqualTo("ZZRE" + LocalDate.now().getYear() + "00002"));
-
+    var response = generateNewDecision();
+    assertThat(response.getResponseBody())
+        .extracting("documentNumber")
+        .isEqualTo("ZZRE" + LocalDate.now().getYear() + "00002");
     List<DeletedDocumentationUnitDTO> allDeletedIds = deletedDocumentationIdsRepository.findAll();
     assertThat(allDeletedIds).isEmpty();
   }
 
   @Test
   void testGenerateNewDocumentationUnit_withInternalUser_shouldSucceed() {
+    DocumentationUnitCreationParameters params =
+        DocumentationUnitCreationParameters.builder().build();
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "ZZREYYYY*****"));
     risWebTestClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/new")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(params)
         .exchange()
         .expectStatus()
         .isCreated();
@@ -1280,17 +1233,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   void testGenerateNewDocumentationUnit_ManagementData_shouldSetCreatedBy() {
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "ZZREYYYY*****"));
-    var createdDocUnit =
-        risWebTestClient
-            .withDefaultLogin()
-            .put()
-            .uri("/api/v1/caselaw/documentunits/new")
-            .exchange()
-            .expectStatus()
-            .isCreated()
-            .expectBody(Decision.class)
-            .returnResult()
-            .getResponseBody();
+    var createdDocUnit = generateNewDecision().getResponseBody();
 
     ManagementData createdManagementData = createdDocUnit.managementData();
     assertThat(createdManagementData.createdByDocOffice()).isEqualTo("DS");
@@ -1323,17 +1266,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
           throws DocumentationUnitNotExistsException {
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "ZZREYYYY*****"));
-    var createdDocUnit =
-        risWebTestClient
-            .withDefaultLogin()
-            .put()
-            .uri("/api/v1/caselaw/documentunits/new")
-            .exchange()
-            .expectStatus()
-            .isCreated()
-            .expectBody(Decision.class)
-            .returnResult()
-            .getResponseBody();
+    var createdDocUnit = generateNewDecision().getResponseBody();
 
     ManagementData createdManagementData = createdDocUnit.managementData();
     assertThat(createdManagementData.createdByDocOffice()).isEqualTo("DS");
@@ -1867,5 +1800,18 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .returnResult()
             .getResponseBody();
     assertThat(imageBytes).isEqualTo(new byte[] {1, 2, 3});
+  }
+
+  private RisEntityExchangeResult<Decision> generateNewDecision() {
+    return risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/new")
+        .contentType(MediaType.APPLICATION_JSON)
+        .exchange()
+        .expectStatus()
+        .isCreated()
+        .expectBody(Decision.class)
+        .returnResult();
   }
 }

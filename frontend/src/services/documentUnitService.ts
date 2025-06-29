@@ -24,7 +24,8 @@ interface DocumentUnitService {
 
   createNew(
     params?: DocumentationUnitCreationParameters,
-  ): Promise<ServiceResponse<Decision>>
+    requestParams?: { [key: string]: string } | undefined,
+  ): Promise<ServiceResponse<DocumentationUnit>>
 
   createNewOutOfEurlexDecision(
     params?: EurlexParameters,
@@ -94,13 +95,17 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async createNew(parameters?: DocumentationUnitCreationParameters) {
+  async createNew(
+    parameters?: DocumentationUnitCreationParameters,
+    requestParams?: { [key: string]: string } | undefined,
+  ) {
     const response = await httpClient.put<
       DocumentationUnitCreationParameters,
-      Decision
+      DocumentationUnit
     >(
       "caselaw/documentunits/new",
       {
+        params: requestParams,
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
@@ -112,9 +117,13 @@ const service: DocumentUnitService = {
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_CREATION_FAILED.title,
       }
-    } else {
-      response.data = new Decision((response.data as Decision).uuid, {
-        ...(response.data as Decision),
+    } else if (isDecision(response.data)) {
+      response.data = new Decision(response.data.uuid, {
+        ...response.data,
+      })
+    } else if (isPendingProceeding(response.data)) {
+      response.data = new PendingProceeding(response.data.uuid, {
+        ...response.data,
       })
     }
     return response
