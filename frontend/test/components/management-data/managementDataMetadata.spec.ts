@@ -257,6 +257,17 @@ describe("ManagementDataMetadata", () => {
       expect(within(lastUpdated).getByText("E")).toBeInTheDocument()
     })
 
+    it("should show source without value", async () => {
+      const docUnit = mockDecision({
+        source: { value: undefined, sourceRawValue: "Custom" },
+      })
+      renderMetadata(docUnit)
+
+      const lastUpdated = screen.getByTestId("management-data-source")
+      expect(within(lastUpdated).getByText("Quelle")).toBeInTheDocument()
+      expect(within(lastUpdated).getByText("Custom")).toBeInTheDocument()
+    })
+
     it("should show source with reference without creating doc office", async () => {
       const docUnit = mockDecision({
         source: {
@@ -298,6 +309,25 @@ describe("ManagementDataMetadata", () => {
       expect(within(lastUpdated).getByText("Quelle")).toBeInTheDocument()
       expect(
         within(lastUpdated).getByText("Z aus R&R 2024, 01 (BGH)"),
+      ).toBeInTheDocument()
+    })
+
+    it("should show source with reference without value", async () => {
+      const docUnit = mockDecision({
+        source: {
+          sourceRawValue: "Custom",
+          reference: new Reference({
+            legalPeriodical: { abbreviation: "R&R" },
+            citation: "2024",
+          }),
+        },
+      })
+      renderMetadata(docUnit)
+
+      const lastUpdated = screen.getByTestId("management-data-source")
+      expect(within(lastUpdated).getByText("Quelle")).toBeInTheDocument()
+      expect(
+        within(lastUpdated).getByText("Custom aus R&R 2024"),
       ).toBeInTheDocument()
     })
   })
