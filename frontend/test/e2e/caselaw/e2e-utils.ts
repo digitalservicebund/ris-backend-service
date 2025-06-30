@@ -187,9 +187,13 @@ export const navigateToAttachments = async (
 export const navigateToManagementData = async (
   page: Page,
   documentNumber: string,
+  options?: {
+    type?: "pending-proceeding" | "documentunit"
+  },
 ) => {
   await test.step("Navigate to 'Verwaltungsdaten'", async () => {
-    const baseUrl = `/caselaw/documentunit/${documentNumber}/managementdata`
+    const documentType = options?.type ?? "documentunit"
+    const baseUrl = `/caselaw/${documentType}/${documentNumber}/managementdata`
     await getRequest(baseUrl, page)
     await expect(page.getByTestId("title").first()).toHaveText(
       "Verwaltungsdaten",

@@ -4,6 +4,7 @@ import {
   expectHistoryCount,
   expectHistoryLogRow,
   navigateToCategories,
+  save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -58,8 +59,11 @@ test.describe("Verwaltungsdaten", { tag: ["@RISDEV-8004"] }, () => {
 
       await isResolved.check()
       await expect(isResolved).toBeChecked()
+      await save(page)
 
-      await navigateToManagementData(page, pendingProceeding.documentNumber)
+      await navigateToManagementData(page, pendingProceeding.documentNumber, {
+        type: "pending-proceeding",
+      })
       await expectLastUpdatedAt(
         page,
         /^\d{2}\.\d{2}\.\d{4} um \d{2}:\d{2} Uhr$/,

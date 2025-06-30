@@ -91,6 +91,8 @@ test.describe("edit pending proceeding", () => {
           headline.getByText("Anhängiges Verfahren beim BFH"),
         ).toBeVisible()
         await headline.click()
+        await headline.getByText("Anhängiges Verfahren beim BFH").dblclick()
+        await page.keyboard.press("ArrowRight")
         await page.keyboard.type(` test`)
         await expect(
           headline.getByText("Anhängiges Verfahren beim BFH test"),
