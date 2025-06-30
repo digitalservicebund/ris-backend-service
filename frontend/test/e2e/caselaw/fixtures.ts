@@ -497,20 +497,25 @@ export const caselawTest = test.extend<MyFixtures>({
   secondPrefilledDocumentUnit: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
-      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-    })
+    const response = await context.request.put(
+      `/api/v1/caselaw/documentunits/new`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
     const secondPrefilledDocumentUnit = await response.json()
 
-    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    const courtResponse = await context.request.get(
+      `api/v1/caselaw/courts?q=AG+Aachen`,
+    )
     const court = await courtResponse.json()
 
-    const documentTypeResponse = await request.get(
+    const documentTypeResponse = await context.request.get(
       `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
     )
     const documentType = await documentTypeResponse.json()
 
-    const updateResponse = await request.put(
+    const updateResponse = await context.request.put(
       `/api/v1/caselaw/documentunits/${secondPrefilledDocumentUnit.uuid}`,
       {
         data: {
@@ -544,9 +549,12 @@ export const caselawTest = test.extend<MyFixtures>({
   ) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
-      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-    })
+    const response = await context.request.put(
+      `/api/v1/caselaw/documentunits/new`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
     const { uuid, documentNumber } = await response.json()
 
     await use(documentNumber)
@@ -599,9 +607,12 @@ export const caselawTest = test.extend<MyFixtures>({
     })
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
-      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-    })
+    const response = await context.request.put(
+      `/api/v1/caselaw/documentunits/new`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
     const prefilledDocumentUnit = await response.json()
 
     const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
