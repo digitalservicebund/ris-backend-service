@@ -147,7 +147,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.21.2"
+    val testContainersVersion = "1.21.3"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -230,7 +230,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.0")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.13.0")
+    implementation("com.squareup.okio:okio-jvm:3.14.0")
 
     val flywayCore = "org.flywaydb:flyway-core:11.10.0"
     implementation(flywayCore)
@@ -252,7 +252,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.18.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.19.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
