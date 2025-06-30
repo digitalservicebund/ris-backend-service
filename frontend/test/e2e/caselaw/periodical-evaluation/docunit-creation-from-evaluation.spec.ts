@@ -665,7 +665,7 @@ test.describe(
           )
           await saveRequest
 
-          await navigateToPreview(page, documentNumber, "documentunit", {
+          await navigateToPreview(page, documentNumber, {
             skipAssert: true,
           })
 

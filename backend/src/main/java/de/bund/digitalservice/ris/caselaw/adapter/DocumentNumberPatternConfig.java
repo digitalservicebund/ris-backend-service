@@ -39,7 +39,8 @@ public class DocumentNumberPatternConfig {
             documentationOfficeAbbreviation + " is not included in pattern");
 
       if (!documentationUnitNumber.contains(DocumentNumberFormatter.extractPrefix(pattern))
-          && !documentationOfficeAbbreviation.equals("BFH")) {
+          && !documentationOfficeAbbreviation.equals("BFH")
+          && !documentationOfficeAbbreviation.equals("BFH-Anh")) {
         throw new DocumentNumberPatternException(
             String.format(
                 "Invalid pattern %s: the prefix must appear before the sequence part (****).",

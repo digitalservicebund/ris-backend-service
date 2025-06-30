@@ -41,6 +41,7 @@ public class DocumentationUnitService {
 
   private final DocumentationUnitRepository repository;
   private final DocumentNumberService documentNumberService;
+  private final DocumentTypeService documentTypeService;
   private final DocumentationUnitStatusService statusService;
   private final AttachmentService attachmentService;
   private final TransformationService transformationService;
@@ -68,6 +69,7 @@ public class DocumentationUnitService {
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
       DocumentNumberService documentNumberService,
+      DocumentTypeService documentTypeService,
       DocumentationUnitStatusService statusService,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       UserService userService,
@@ -83,6 +85,7 @@ public class DocumentationUnitService {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
+    this.documentTypeService = documentTypeService;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.userService = userService;
     this.validator = validator;
@@ -98,11 +101,65 @@ public class DocumentationUnitService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Decision generateNewDocumentationUnit(
+  public DocumentationUnit generateNewDocumentationUnit(
+      User user, Optional<DocumentationUnitCreationParameters> parameters, Kind kind) {
+    if (kind.equals(Kind.DECISION)) {
+      return generateNewDecision(user, parameters);
+    } else if (kind.equals(Kind.PENDING_PROCEEDING)) {
+      return generateNewPendingProceeding(user, parameters);
+    } else {
+      throw new DocumentationUnitException(
+          "DocumentationUnit is neither decision nor pending proceeding.");
+    }
+  }
+
+  public Decision generateNewDecision(
       User user, Optional<DocumentationUnitCreationParameters> parameters)
       throws DocumentationUnitException {
 
-    return generateNewDocumentationUnit(user, parameters, null);
+    return generateNewDecision(user, parameters, null);
+  }
+
+  public PendingProceeding generateNewPendingProceeding(
+      User user, Optional<DocumentationUnitCreationParameters> parameters)
+      throws DocumentationUnitException {
+
+    var userDocOffice = user.documentationOffice();
+    // default office is user office
+    DocumentationUnitCreationParameters params =
+        parameters.orElse(
+            DocumentationUnitCreationParameters.builder()
+                .documentationOffice(userDocOffice)
+                .build());
+    if (params.documentationOffice() == null) {
+      params = params.toBuilder().documentationOffice(userDocOffice).build();
+    }
+
+    var documentType = documentTypeService.getPendingProceedingType();
+    PendingProceeding docUnit =
+        PendingProceeding.builder()
+            .version(0L)
+            .documentNumber(
+                generateDocumentNumber(params.documentationOffice().abbreviation() + "-Anh"))
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(params.documentationOffice())
+                    .documentType(documentType)
+                    .decisionDate(params.decisionDate())
+                    .court(params.court())
+                    .legalEffect(
+                        LegalEffect.deriveFrom(params.court(), true)
+                            .orElse(LegalEffect.NOT_SPECIFIED)
+                            .getLabel())
+                    .build())
+            .build();
+
+    Status status =
+        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build();
+
+    return (PendingProceeding)
+        repository.createNewDocumentationUnit(
+            docUnit, status, params.reference(), params.fileNumber(), user);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -114,7 +171,7 @@ public class DocumentationUnitService {
     if (parameters.isPresent() && !parameters.get().celexNumbers().isEmpty()) {
       for (String celexNumber : parameters.get().celexNumbers()) {
         documentNumbers.add(
-            generateNewDocumentationUnit(
+            generateNewDecision(
                     user,
                     parameters.map(
                         params ->
@@ -129,7 +186,7 @@ public class DocumentationUnitService {
     return documentNumbers;
   }
 
-  private Decision generateNewDocumentationUnit(
+  private Decision generateNewDecision(
       User user, Optional<DocumentationUnitCreationParameters> parameters, String celexNumber) {
     var userDocOffice = user.documentationOffice();
     // default office is user office
@@ -151,7 +208,7 @@ public class DocumentationUnitService {
     Decision docUnit =
         Decision.builder()
             .version(0L)
-            .documentNumber(generateDocumentNumber(params.documentationOffice()))
+            .documentNumber(generateDocumentNumber(params.documentationOffice().abbreviation()))
             .coreData(
                 CoreData.builder()
                     .documentationOffice(params.documentationOffice())
@@ -188,16 +245,16 @@ public class DocumentationUnitService {
     }
 
     if (celexNumber != null) {
-      transformationService.getDataFromEurlex(celexNumber, newDocumentationUnit, user);
+      transformationService.getDataFromEurlex(celexNumber, (Decision) newDocumentationUnit, user);
     }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
 
-    return newDocumentationUnit;
+    return (Decision) newDocumentationUnit;
   }
 
-  private String generateDocumentNumber(DocumentationOffice documentationOffice) {
+  private String generateDocumentNumber(String documentationOfficeAbbreviation) {
     try {
-      return documentNumberService.generateDocumentNumber(documentationOffice.abbreviation());
+      return documentNumberService.generateDocumentNumber(documentationOfficeAbbreviation);
     } catch (Exception e) {
       throw new DocumentationUnitException("Could not generate document number", e);
     }

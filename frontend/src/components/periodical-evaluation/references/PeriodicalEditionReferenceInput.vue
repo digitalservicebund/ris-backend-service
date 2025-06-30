@@ -18,7 +18,7 @@ import SearchResultList, {
 import { useIsSaved } from "@/composables/useIsSaved"
 import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
-import { Decision } from "@/domain/decision"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -218,7 +218,9 @@ async function addReference(decision: RelatedDocumentation) {
   }
 }
 
-async function addReferenceWithCreatedDocumentationUnit(docUnit: Decision) {
+async function addReferenceWithCreatedDocumentationUnit(
+  docUnit: DocumentationUnit,
+) {
   if (!docUnit) return
   await addReference(
     new RelatedDocumentation({

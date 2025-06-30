@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,6 +48,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
+import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -77,6 +79,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -142,27 +145,138 @@ class DocumentationUnitControllerTest {
                 .build());
   }
 
-  @Test
-  void testGenerateNewDocumentationUnit_withInternalUser_shouldSucceed() {
-    // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(userService.getUser(any())).thenReturn(user);
-    when(service.generateNewDocumentationUnit(null, null))
-        .thenReturn(
-            Decision.builder()
-                .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                .build());
+  @Nested
+  class GenerateNewDocumentationUnit {
+    @Test
+    void
+        testGenerateNewDocumentationUnit_withInternalUserAndNoKind_shouldSuccessfullyCreateDecision() {
+      // userService.getDocumentationOffice is mocked in @BeforeEach
+      when(userService.getUser(any())).thenReturn(user);
+      when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.DECISION))
+          .thenReturn(
+              Decision.builder()
+                  .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                  .build());
 
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/new")
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(Decision.class);
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/new")
+          .exchange()
+          .expectStatus()
+          .isCreated()
+          .expectBody(Decision.class);
 
-    verify(service, times(1)).generateNewDocumentationUnit(user, Optional.empty());
-    verify(userService, times(1)).getUser(any(OidcUser.class));
+      verify(service, times(1)).generateNewDocumentationUnit(user, Optional.empty(), Kind.DECISION);
+      verify(userService, times(1)).getUser(any(OidcUser.class));
+    }
+
+    @Test
+    void
+        testGenerateNewDocumentationUnit_withInternalUserAndKindPendingProceeding_shouldSuccessfullyCreatePendingProceeding() {
+      // Arrange
+      when(userService.getUser(any())).thenReturn(user);
+      when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.PENDING_PROCEEDING))
+          .thenReturn(
+              PendingProceeding.builder()
+                  .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                  .build());
+
+      // Act
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/new?kind=PENDING_PROCEEDING")
+          .exchange()
+          .expectStatus()
+          .isCreated()
+          .expectBody(PendingProceeding.class);
+
+      // Assert
+      verify(service, times(1))
+          .generateNewDocumentationUnit(user, Optional.empty(), Kind.PENDING_PROCEEDING);
+      verify(userService, times(1)).getUser(any(OidcUser.class));
+    }
+
+    @Test
+    void testGenerateNewDocumentationUnit_withExternalUserAndNoKind_shouldBeForbidden() {
+      // Arrange
+      when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
+
+      // Act
+      risWebClient
+          .withExternalLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/new")
+          .exchange()
+          .expectStatus()
+          .isForbidden();
+
+      // Assert
+      verify(service, never()).generateNewDocumentationUnit(any(), any(), any());
+      verify(userService, times(0)).getDocumentationOffice(any(OidcUser.class));
+    }
+
+    @Test
+    void
+        testGenerateNewDocumentationUnit_withExternalUserAndKindPendingProceeding_shouldBeForbidden() {
+      // Arrange
+      when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
+
+      // Act
+      risWebClient
+          .withExternalLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/new?kind=PENDING_PROCEEDING")
+          .exchange()
+          .expectStatus()
+          .isForbidden();
+
+      // Assert
+      verify(service, never()).generateNewDocumentationUnit(any(), any(), any());
+      verify(userService, times(0)).getDocumentationOffice(any(OidcUser.class));
+    }
+
+    @Test
+    void testGenerateNewDocumentationUnit_withUnknownKind_shouldBeBadRequest() {
+      // Arrange
+      when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
+
+      // Act
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/new?kind=UNKNOWN")
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
+
+      // Assert
+      verify(service, never()).generateNewDocumentationUnit(any(), any(), any());
+      verify(userService, times(0)).getDocumentationOffice(any(OidcUser.class));
+    }
+
+    @Test
+    void testGenerateNewDocumentationUnit_withUnsupportedKind_shouldBeForbidden() {
+      // Arrange
+      when(userService.getUser(any())).thenReturn(user);
+      when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+      when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.UNSUPPORTED))
+          .thenThrow(DocumentationUnitException.class);
+
+      // Act
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/new?kind=UNSUPPORTED")
+          .exchange()
+          .expectStatus()
+          .is5xxServerError();
+
+      // Assert
+      verify(service, times(1))
+          .generateNewDocumentationUnit(user, Optional.empty(), Kind.UNSUPPORTED);
+    }
   }
 
   @Test
@@ -230,23 +344,6 @@ class DocumentationUnitControllerTest {
     verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any(), any());
 
     verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any(), any());
-  }
-
-  @Test
-  void testGenerateNewDocumentationUnit_withExternalUser_shouldBeForbidden() {
-    // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
-
-    risWebClient
-        .withExternalLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/new")
-        .exchange()
-        .expectStatus()
-        .isForbidden();
-
-    verify(service, times(0)).generateNewDocumentationUnit(user, null);
-    verify(userService, times(0)).getDocumentationOffice(any(OidcUser.class));
   }
 
   @Test
