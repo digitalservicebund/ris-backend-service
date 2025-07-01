@@ -9,8 +9,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalPublicationServ
 import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.PortalTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.PrototypePortalTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PrototypePortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.springframework.context.annotation.Bean;
