@@ -57,11 +57,11 @@ import org.xml.sax.SAXException;
  * common transformation logic and helper methods.
  */
 @Slf4j
-public abstract class CommonPortalTransformer implements PortalTransformer {
+public abstract class DecisionCommonPortalTransformer implements PortalTransformer {
 
   private final DocumentBuilderFactory documentBuilderFactory;
 
-  protected CommonPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  protected DecisionCommonPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
     this.documentBuilderFactory = documentBuilderFactory;
   }
 

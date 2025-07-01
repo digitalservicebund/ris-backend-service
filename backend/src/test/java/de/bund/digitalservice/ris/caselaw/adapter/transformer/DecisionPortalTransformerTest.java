@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DecisionPortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -52,19 +52,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class PortalTransformerTest {
+class DecisionPortalTransformerTest {
 
   private static Decision testDocumentUnit;
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
 
-  private static PortalTransformer subject;
+  private static DecisionPortalTransformer subject;
   private static UUID documentationUnitId;
 
   @BeforeAll
   static void setUpBeforeClass() {
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-    subject = new PortalTransformer(documentBuilderFactory);
+    subject = new DecisionPortalTransformer(documentBuilderFactory);
 
     documentationUnitId = UUID.randomUUID();
 
