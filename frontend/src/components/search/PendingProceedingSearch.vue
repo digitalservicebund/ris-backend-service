@@ -122,7 +122,7 @@ async function handleReset() {
 </script>
 
 <template>
-  <div class="flex flex-col" data-testId="eu-inbox">
+  <div class="flex flex-col gap-24" data-testId="eu-inbox">
     <SearchForm
       :is-loading="isLoading"
       @reset-search-results="handleReset"
