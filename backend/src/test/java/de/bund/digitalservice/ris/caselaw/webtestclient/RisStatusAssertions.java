@@ -86,6 +86,15 @@ public class RisStatusAssertions {
     return responseSpec;
   }
 
+  public RisResponseSpec isUnauthorized() {
+    try {
+      resultActions.andExpect(status().isUnauthorized());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    return responseSpec;
+  }
+
   public RisResponseSpec is2xxSuccessful() {
     try {
       resultActions.andExpect(status().is2xxSuccessful());

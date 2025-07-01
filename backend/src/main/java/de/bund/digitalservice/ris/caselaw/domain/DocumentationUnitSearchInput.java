@@ -19,4 +19,5 @@ public record DocumentationUnitSearchInput(
     Status status,
     boolean myDocOfficeOnly,
     boolean withDuplicateWarning,
-    InboxStatus inboxStatus) {}
+    InboxStatus inboxStatus,
+    Kind kind) {}

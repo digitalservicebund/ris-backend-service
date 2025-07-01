@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +41,7 @@ public class DocumentationUnitService {
 
   private final DocumentationUnitRepository repository;
   private final DocumentNumberService documentNumberService;
+  private final DocumentTypeService documentTypeService;
   private final DocumentationUnitStatusService statusService;
   private final AttachmentService attachmentService;
   private final TransformationService transformationService;
@@ -67,6 +69,7 @@ public class DocumentationUnitService {
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
       DocumentNumberService documentNumberService,
+      DocumentTypeService documentTypeService,
       DocumentationUnitStatusService statusService,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       UserService userService,
@@ -82,6 +85,7 @@ public class DocumentationUnitService {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
+    this.documentTypeService = documentTypeService;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.userService = userService;
     this.validator = validator;
@@ -97,11 +101,65 @@ public class DocumentationUnitService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Decision generateNewDocumentationUnit(
+  public DocumentationUnit generateNewDocumentationUnit(
+      User user, Optional<DocumentationUnitCreationParameters> parameters, Kind kind) {
+    if (kind.equals(Kind.DECISION)) {
+      return generateNewDecision(user, parameters);
+    } else if (kind.equals(Kind.PENDING_PROCEEDING)) {
+      return generateNewPendingProceeding(user, parameters);
+    } else {
+      throw new DocumentationUnitException(
+          "DocumentationUnit is neither decision nor pending proceeding.");
+    }
+  }
+
+  public Decision generateNewDecision(
       User user, Optional<DocumentationUnitCreationParameters> parameters)
       throws DocumentationUnitException {
 
-    return generateNewDocumentationUnit(user, parameters, null);
+    return generateNewDecision(user, parameters, null);
+  }
+
+  public PendingProceeding generateNewPendingProceeding(
+      User user, Optional<DocumentationUnitCreationParameters> parameters)
+      throws DocumentationUnitException {
+
+    var userDocOffice = user.documentationOffice();
+    // default office is user office
+    DocumentationUnitCreationParameters params =
+        parameters.orElse(
+            DocumentationUnitCreationParameters.builder()
+                .documentationOffice(userDocOffice)
+                .build());
+    if (params.documentationOffice() == null) {
+      params = params.toBuilder().documentationOffice(userDocOffice).build();
+    }
+
+    var documentType = documentTypeService.getPendingProceedingType();
+    PendingProceeding docUnit =
+        PendingProceeding.builder()
+            .version(0L)
+            .documentNumber(
+                generateDocumentNumber(params.documentationOffice().abbreviation() + "-Anh"))
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(params.documentationOffice())
+                    .documentType(documentType)
+                    .decisionDate(params.decisionDate())
+                    .court(params.court())
+                    .legalEffect(
+                        LegalEffect.deriveFrom(params.court(), true)
+                            .orElse(LegalEffect.NOT_SPECIFIED)
+                            .getLabel())
+                    .build())
+            .build();
+
+    Status status =
+        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build();
+
+    return (PendingProceeding)
+        repository.createNewDocumentationUnit(
+            docUnit, status, params.reference(), params.fileNumber(), user);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -113,7 +171,7 @@ public class DocumentationUnitService {
     if (parameters.isPresent() && !parameters.get().celexNumbers().isEmpty()) {
       for (String celexNumber : parameters.get().celexNumbers()) {
         documentNumbers.add(
-            generateNewDocumentationUnit(
+            generateNewDecision(
                     user,
                     parameters.map(
                         params ->
@@ -128,7 +186,7 @@ public class DocumentationUnitService {
     return documentNumbers;
   }
 
-  private Decision generateNewDocumentationUnit(
+  private Decision generateNewDecision(
       User user, Optional<DocumentationUnitCreationParameters> parameters, String celexNumber) {
     var userDocOffice = user.documentationOffice();
     // default office is user office
@@ -150,7 +208,7 @@ public class DocumentationUnitService {
     Decision docUnit =
         Decision.builder()
             .version(0L)
-            .documentNumber(generateDocumentNumber(params.documentationOffice()))
+            .documentNumber(generateDocumentNumber(params.documentationOffice().abbreviation()))
             .coreData(
                 CoreData.builder()
                     .documentationOffice(params.documentationOffice())
@@ -187,16 +245,16 @@ public class DocumentationUnitService {
     }
 
     if (celexNumber != null) {
-      transformationService.getDataFromEurlex(celexNumber, newDocumentationUnit, user);
+      transformationService.getDataFromEurlex(celexNumber, (Decision) newDocumentationUnit, user);
     }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
 
-    return newDocumentationUnit;
+    return (Decision) newDocumentationUnit;
   }
 
-  private String generateDocumentNumber(DocumentationOffice documentationOffice) {
+  private String generateDocumentNumber(String documentationOfficeAbbreviation) {
     try {
-      return documentNumberService.generateDocumentNumber(documentationOffice.abbreviation());
+      return documentNumberService.generateDocumentNumber(documentationOfficeAbbreviation);
     } catch (Exception e) {
       throw new DocumentationUnitException("Could not generate document number", e);
     }
@@ -217,7 +275,8 @@ public class DocumentationUnitService {
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly,
       Optional<Boolean> withDuplicateWarning,
-      Optional<InboxStatus> inboxStatus) {
+      Optional<InboxStatus> inboxStatus,
+      Optional<Kind> kind) {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
@@ -240,13 +299,31 @@ public class DocumentationUnitService {
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .withDuplicateWarning(withDuplicateWarning.orElse(false))
             .inboxStatus(inboxStatus.orElse(null))
+            .kind(kind.orElse(null))
             .build();
 
-    Slice<DocumentationUnitListItem> documentationUnitListItems =
-        docUnitSearchRepository.searchByDocumentationUnitSearchInput(
-            searchInput,
-            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
-            oidcUser);
+    Slice<DocumentationUnitListItem> documentationUnitListItems;
+    try {
+      documentationUnitListItems =
+          docUnitSearchRepository.searchByDocumentationUnitSearchInput(
+              searchInput,
+              PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+              oidcUser);
+    } catch (JpaObjectRetrievalFailureException e) {
+      // This exception can occur if a doc unit is deleted while the search is running.
+      // 1. Search runs and fetches list of doc unit entities incl. doc unit A123, request ongoing
+      // 2. Other user/requests deletes doc unit A123
+      // 3. Search tries to fetch lazy relationships of doc unit A123 while transforming to domain
+      //    object and fails because the status with referenced id does not exist anymore.
+
+      // This regularly happens during e2e tests running in parallel.
+      log.info("Retrying search after JpaObjectRetrievalFailureException", e);
+      documentationUnitListItems =
+          docUnitSearchRepository.searchByDocumentationUnitSearchInput(
+              searchInput,
+              PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+              oidcUser);
+    }
 
     return documentationUnitListItems.map(item -> addPermissions(oidcUser, item));
   }

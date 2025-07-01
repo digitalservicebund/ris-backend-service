@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
@@ -117,12 +118,13 @@ public class DocumentationUnitController {
    */
   @PutMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
-  public ResponseEntity<Decision> generateNewDocumentationUnit(
+  public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
-      @RequestBody(required = false) Optional<DocumentationUnitCreationParameters> parameters) {
+      @RequestBody(required = false) Optional<DocumentationUnitCreationParameters> parameters,
+      @RequestParam(value = "kind", defaultValue = "DECISION") Kind kind) {
     try {
       var documentationUnit =
-          service.generateNewDocumentationUnit(userService.getUser(oidcUser), parameters);
+          service.generateNewDocumentationUnit(userService.getUser(oidcUser), parameters, kind);
       return ResponseEntity.status(HttpStatus.CREATED).body(documentationUnit);
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
@@ -272,6 +274,7 @@ public class DocumentationUnitController {
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
       @RequestParam(value = "withDuplicateWarning") Optional<Boolean> withDuplicateWarning,
       @RequestParam(value = "inboxStatus") Optional<InboxStatus> inboxStatus,
+      @RequestParam(value = "kind") Optional<Kind> kind,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     return service.searchByDocumentationUnitSearchInput(
@@ -289,7 +292,8 @@ public class DocumentationUnitController {
         withError,
         myDocOfficeOnly,
         withDuplicateWarning,
-        inboxStatus);
+        inboxStatus,
+        kind);
   }
 
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)

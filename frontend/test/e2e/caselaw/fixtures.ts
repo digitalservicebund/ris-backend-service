@@ -10,8 +10,10 @@ import utc from "dayjs/plugin/utc.js"
 import { navigateToCategories } from "./e2e-utils"
 import { Page as Pagination } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
+import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import PendingProceeding from "@/domain/pendingProceeding"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { SourceValue } from "@/domain/source"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -35,6 +37,7 @@ type MyFixtures = {
   prefilledDocumentUnitWithReferences: Decision
   prefilledDocumentUnitWithTexts: Decision
   prefilledDocumentUnitWithManyReferences: Decision
+  pendingProceeding: PendingProceeding
 }
 
 /**
@@ -496,19 +499,23 @@ export const caselawTest = test.extend<MyFixtures>({
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
     const response = await context.request.put(
       `/api/v1/caselaw/documentunits/new`,
-      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
     )
     const secondPrefilledDocumentUnit = await response.json()
 
-    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    const courtResponse = await context.request.get(
+      `api/v1/caselaw/courts?q=AG+Aachen`,
+    )
     const court = await courtResponse.json()
 
-    const documentTypeResponse = await request.get(
+    const documentTypeResponse = await context.request.get(
       `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
     )
     const documentType = await documentTypeResponse.json()
 
-    const updateResponse = await request.put(
+    const updateResponse = await context.request.put(
       `/api/v1/caselaw/documentunits/${secondPrefilledDocumentUnit.uuid}`,
       {
         data: {
@@ -602,7 +609,9 @@ export const caselawTest = test.extend<MyFixtures>({
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
     const response = await context.request.put(
       `/api/v1/caselaw/documentunits/new`,
-      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
     )
     const prefilledDocumentUnit = await response.json()
 
@@ -989,5 +998,42 @@ export const caselawTest = test.extend<MyFixtures>({
       throw Error(`Edition with number ${edition.id} couldn't be deleted:
       ${deleteResponse.status()} ${deleteResponse.statusText()}`)
     }
+  },
+
+  pendingProceeding: async ({ request, context }, use) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+
+    const documentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes?q=Anh&category=CASELAW_PENDING_PROCEEDING`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const parameters = {
+      documentType: documentType?.[0],
+      fileNumber: generateString(),
+    }
+    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+      params: { kind: Kind.PENDING_PROCEEDING },
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      data: parameters,
+    })
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create pending proceeding document: ${response.status()} ${response.statusText()}`,
+      )
+    }
+
+    const pendingProceeding = await response.json()
+
+    await use(pendingProceeding)
+
+    await deleteWithRetry(
+      request,
+      pendingProceeding.uuid,
+      csrfToken,
+      pendingProceeding.documentNumber,
+    )
   },
 })
