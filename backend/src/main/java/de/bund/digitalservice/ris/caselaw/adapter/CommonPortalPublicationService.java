@@ -113,30 +113,24 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       String path, String fileName, String fileContent, List<AttachmentDTO> attachments) {
     try {
       List<String> existingFiles = portalBucket.getAllFilenamesByPath(path);
-      List<String> deletedFiles = new ArrayList<>();
       List<String> addedFiles = new ArrayList<>();
 
-      if (!existingFiles.isEmpty()) {
-        existingFiles.forEach(
-            existingFile -> {
-              portalBucket.delete(existingFile);
-              deletedFiles.add(existingFile);
-            });
-      }
-
       portalBucket.save(path + fileName, fileContent);
-      deletedFiles.remove(path + fileName);
       addedFiles.add(path + fileName);
 
       if (!attachments.isEmpty()) {
         attachments.forEach(
             attachment -> {
               portalBucket.saveBytes(path + attachment.getFilename(), attachment.getContent());
-              deletedFiles.remove(path + attachment.getFilename());
               addedFiles.add(path + attachment.getFilename());
             });
       }
-      return new PortalPublicationResult(addedFiles, deletedFiles);
+
+      // Check for files that are not part of this update and remove them (e.g. removed images)
+      existingFiles.removeAll(addedFiles);
+      existingFiles.forEach(portalBucket::delete);
+
+      return new PortalPublicationResult(addedFiles, existingFiles);
     } catch (BucketException e) {
       throw new PublishException("Could not save LDML to bucket.", e);
     }

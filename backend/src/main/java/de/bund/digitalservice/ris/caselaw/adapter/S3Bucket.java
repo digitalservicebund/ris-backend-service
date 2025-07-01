@@ -12,6 +12,7 @@ import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
@@ -83,7 +84,9 @@ public class S3Bucket {
    */
   public boolean delete(String fileName) {
     try {
-      s3Client.deleteObject(builder -> builder.bucket(bucketName).key(fileName));
+      DeleteObjectRequest request =
+          DeleteObjectRequest.builder().bucket(bucketName).key(fileName).build();
+      s3Client.deleteObject(request);
       return true;
     } catch (NoSuchKeyException e) {
       return false;

@@ -39,7 +39,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Consumer;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -303,12 +302,12 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
         .isOk();
 
     ArgumentCaptor<PutObjectRequest> updateCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
-    ArgumentCaptor<Consumer<DeleteObjectRequest.Builder>> deleteCaptor =
-        ArgumentCaptor.forClass(Consumer.class);
+    ArgumentCaptor<DeleteObjectRequest> deleteCaptor =
+        ArgumentCaptor.forClass(DeleteObjectRequest.class);
     ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
 
     verify(s3Client, times(7)).putObject(updateCaptor.capture(), bodyCaptor.capture());
-    verify(s3Client, times(3)).deleteObject(deleteCaptor.capture());
+    verify(s3Client, times(1)).deleteObject(deleteCaptor.capture());
 
     var changelogContent =
         new String(
@@ -316,9 +315,11 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
             StandardCharsets.UTF_8);
 
     var updateCapturedRequests = updateCaptor.getAllValues();
+    var deleteCapturedRequests = deleteCaptor.getAllValues();
     assertThat(updateCapturedRequests.get(4).key()).isEqualTo("1234567890123/1234567890123.xml");
     assertThat(updateCapturedRequests.get(5).key()).isEqualTo("1234567890123/bild1.png");
     assertThat(updateCapturedRequests.get(6).key()).contains("changelogs/");
+    assertThat(deleteCapturedRequests.get(0).key()).isEqualTo("1234567890123/bild2.png");
     assertThat(changelogContent)
         .isEqualTo(
             """
