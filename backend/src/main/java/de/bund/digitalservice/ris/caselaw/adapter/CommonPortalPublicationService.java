@@ -125,7 +125,7 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       }
 
       portalBucket.save(path + fileName, fileContent);
-      existingFiles.remove(path + fileName);
+      deletedFiles.remove(path + fileName);
       addedFiles.add(path + fileName);
 
       if (!attachments.isEmpty()) {
