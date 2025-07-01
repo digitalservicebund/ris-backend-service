@@ -17,7 +17,7 @@ import StringsUtil from "@/utils/stringsUtil"
 type FieldOfLawTreeType = InstanceType<typeof FieldOfLawTree>
 const treeRef = useTemplateRef<FieldOfLawTreeType>("treeRef")
 
-const showNorms = ref<boolean | undefined>()
+const showNorms = ref(false)
 const nodeOfInterest = ref<FieldOfLaw | undefined>(undefined)
 const isResetButtonVisible = ref(false)
 const description = ref("")
@@ -74,8 +74,7 @@ async function submitSearch(page: number) {
     if (results.value?.[0]) {
       nodeOfInterest.value = results.value[0]
     }
-    showNorms.value ??= !!norm.value // Show norms searched for the first time
-
+    showNorms.value = !!norm.value
     isResetButtonVisible.value = true
   } else {
     currentPage.value = undefined
@@ -207,7 +206,7 @@ function updateInputMethod(value: InputMethod) {
         :node-of-interest="nodeOfInterest"
         :search-results="results"
         :selected-nodes="selectedNodes"
-        :show-norms="showNorms || false"
+        :show-norms="showNorms"
         @linked-field:select="setNodeOfInterest"
         @node-of-interest:reset="removeNodeOfInterest"
         @node:add="addFieldOfLaw"

@@ -20,21 +20,21 @@ test.describe("ensuring the authorization works as expected", () => {
 
     await expect(
       pageWithBghUser.getByText(
-        "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung",
+        "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
       ),
     ).toBeVisible()
 
     await navigateToAttachments(pageWithBghUser, documentNumber, options)
     await expect(
       pageWithBghUser.getByText(
-        "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung",
+        "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
       ),
     ).toBeVisible()
 
     await navigateToHandover(pageWithBghUser, documentNumber, options)
     await expect(
       pageWithBghUser.getByText(
-        "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung",
+        "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
       ),
     ).toBeVisible()
   })
@@ -55,24 +55,24 @@ test.describe("ensuring the authorization works as expected", () => {
             "can be accessed for users of the same documentationOffice",
           page: page,
           documentNumber: "YYTestDoc0018",
-          options: { skipAssert: false, type: "pending-proceeding" },
+          type: "pending-proceeding",
           error: null,
         },
         {
           description: "can't be accessed for foreign users",
           page: pageWithBghUser,
           documentNumber: "YYTestDoc0018",
-          options: { skipAssert: true, type: "pending-proceeding" },
+          type: "pending-proceeding",
           error:
-            "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung",
+            "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
         },
         {
           description: "can't be accessed when document number is wrong",
           page: page,
           documentNumber: "YYTestDoc9999",
-          options: { skipAssert: true, type: "pending-proceeding" },
+          type: "pending-proceeding",
           error:
-            "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung",
+            "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
         },
       ]
 
@@ -80,20 +80,20 @@ test.describe("ensuring the authorization works as expected", () => {
         description,
         page,
         documentNumber,
-        options,
+        type,
         error,
       } of testCases) {
         await test.step(`Verifying: pending proceeding preview ${description}`, async () => {
           await navigateToPreview(
             page,
             documentNumber,
-            options as {
-              skipAssert?: boolean
-              type?: "pending-proceeding" | "documentunit"
-            },
+            type as "pending-proceeding" | "documentunit",
+            options,
           )
 
-          await expect(page.getByText(error ?? documentNumber)).toBeVisible()
+          await expect(
+            page.getByText(error ? error : documentNumber),
+          ).toBeVisible()
         })
       }
     },

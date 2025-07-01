@@ -72,7 +72,9 @@ public class DecisionTransformer extends DocumentableTransformer {
     addPreviousDecisions(updatedDomainObject, builder);
 
     builder.note(
-        StringUtils.isNullOrBlank(updatedDomainObject.note()) ? null : updatedDomainObject.note());
+        StringUtils.returnTrueIfNullOrBlank(updatedDomainObject.note())
+            ? null
+            : updatedDomainObject.note());
 
     addEnsuingAndPendingDecisions(updatedDomainObject, builder, currentDto);
 

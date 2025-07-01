@@ -15,8 +15,7 @@ class DocumentNumberPatternConfigStagingTest extends DocumentNumberPatternConfig
         .forEach(
             pattern -> {
               Assertions.assertTrue(
-                  pattern.startsWith("XXRE") || pattern.startsWith("XXAH"),
-                  "Doc number pattern must start with XXRE on staging");
+                  pattern.startsWith("XXRE"), "Doc number pattern must start with XXRE on staging");
             });
   }
 }

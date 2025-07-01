@@ -1,5 +1,4 @@
 import { Decision } from "@/domain/decision"
-import { Kind } from "@/domain/documentationUnitKind"
 import { DuplicateRelationStatus } from "@/domain/managementData"
 import PendingProceeding from "@/domain/pendingProceeding"
 import errorMessages from "@/i18n/errors.json"
@@ -7,52 +6,6 @@ import service from "@/services/documentUnitService"
 import HttpClient from "@/services/httpClient"
 
 describe("documentUnitService", () => {
-  describe("createNew", () => {
-    it("should return error message on failure", async () => {
-      const httpMock = vi.spyOn(HttpClient, "put").mockResolvedValue({
-        status: 400,
-        data: "error",
-      })
-
-      const response = await service.createNew()
-
-      expect(response.error?.title).toBe(
-        errorMessages.DOCUMENT_UNIT_CREATION_FAILED.title,
-      )
-      expect(httpMock).toHaveBeenCalled()
-    })
-
-    it("should return Decision on success", async () => {
-      const responseData = new Decision("uuid")
-      const httpMock = vi.spyOn(HttpClient, "put").mockResolvedValue({
-        status: 200,
-        data: responseData,
-      })
-
-      const response = await service.createNew()
-
-      expect(response.data).toBeInstanceOf(Decision)
-      expect(response.data?.uuid).toBe("uuid")
-      expect(httpMock).toHaveBeenCalled()
-    })
-
-    it("should return PendingProceeding on success", async () => {
-      const responseData = new PendingProceeding("uuid")
-      const httpMock = vi.spyOn(HttpClient, "put").mockResolvedValue({
-        status: 200,
-        data: responseData,
-      })
-
-      const response = await service.createNew(undefined, {
-        kind: Kind.PENDING_PROCEEDING,
-      })
-
-      expect(response.data).toBeInstanceOf(PendingProceeding)
-      expect(response.data?.uuid).toBe("uuid")
-      expect(httpMock).toHaveBeenCalled()
-    })
-  })
-
   it("appends correct error message if status 500", async () => {
     vi.spyOn(HttpClient, "get").mockResolvedValue({
       status: 500,

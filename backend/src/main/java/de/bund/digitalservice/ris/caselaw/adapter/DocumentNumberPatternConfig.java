@@ -30,7 +30,7 @@ public class DocumentNumberPatternConfig {
     var pattern = documentNumberPatterns.get(documentationOfficeAbbreviation);
 
     try {
-      if (StringUtils.isNullOrBlank(documentationUnitNumber)) {
+      if (StringUtils.returnTrueIfNullOrBlank(documentationUnitNumber)) {
         throw new DocumentNumberPatternException("Document unit number is null or blank");
       }
 
@@ -39,8 +39,7 @@ public class DocumentNumberPatternConfig {
             documentationOfficeAbbreviation + " is not included in pattern");
 
       if (!documentationUnitNumber.contains(DocumentNumberFormatter.extractPrefix(pattern))
-          && !documentationOfficeAbbreviation.equals("BFH")
-          && !documentationOfficeAbbreviation.equals("BFH-Anh")) {
+          && !documentationOfficeAbbreviation.equals("BFH")) {
         throw new DocumentNumberPatternException(
             String.format(
                 "Invalid pattern %s: the prefix must appear before the sequence part (****).",

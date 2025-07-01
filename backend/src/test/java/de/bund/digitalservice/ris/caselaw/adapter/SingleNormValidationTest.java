@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DeltaMigrationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -53,7 +52,6 @@ class SingleNormValidationTest {
   @MockitoBean private CourtRepository courtRepository;
   @MockitoBean private NormElementRepository normElementRepository;
   @MockitoBean private DocumentNumberService numberService;
-  @MockitoBean private DocumentTypeService documentTypeService;
   @MockitoBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;

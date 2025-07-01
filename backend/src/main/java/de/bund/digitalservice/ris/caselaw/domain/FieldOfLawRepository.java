@@ -18,6 +18,5 @@ public interface FieldOfLawRepository {
 
   List<FieldOfLaw> findByIdentifier(String searchStr, Pageable pageable);
 
-  List<FieldOfLaw> findByCombinedCriteria(
-      String identifier, String description, String normSearch, boolean isPrefixNormSearch);
+  List<FieldOfLaw> findByCombinedCriteria(String identifier, String[] searchTerms, String[] norm);
 }

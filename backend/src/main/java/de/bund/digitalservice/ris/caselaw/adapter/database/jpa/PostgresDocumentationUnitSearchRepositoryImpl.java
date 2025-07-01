@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
-import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -22,7 +21,6 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import jakarta.persistence.metamodel.SingularAttribute;
-import java.security.InvalidParameterException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -87,7 +85,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     predicates.addAll(getInboxStatusPredicates(parameters, cb, root));
     predicates.addAll(getDuplicateWarningPredicates(parameters, cq, cb, root));
     predicates.addAll(getFileNumberPredicates(parameters, cq, cb, root));
-    predicates.addAll(getDocUnitKindPredicates(parameters, cb, root));
 
     // Use cb.construct() to only select the DTO projection instead of the full entity
     cq.select(root).where(predicates.toArray(new Predicate[0]));
@@ -287,22 +284,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     return predicates;
   }
 
-  private List<Predicate> getDocUnitKindPredicates(
-      SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
-    List<Predicate> predicates = new ArrayList<>();
-    if (parameters.kind.isPresent()) {
-      Class<? extends DocumentationUnitDTO> kindClass =
-          switch (parameters.kind.get()) {
-            case DECISION -> DecisionDTO.class;
-            case PENDING_PROCEEDING -> PendingProceedingDTO.class;
-            default -> throw new InvalidParameterException("Unsupported documentation unit kind");
-          };
-      Predicate kindPredicate = cb.equal(root.type(), kindClass);
-      predicates.add(kindPredicate);
-    }
-    return predicates;
-  }
-
   private List<Predicate> getDuplicateWarningPredicates(
       SearchParameters parameters,
       CriteriaQuery<DocumentationUnitListItemDTO> cq,
@@ -438,7 +419,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .withDuplicateWarning(searchInput.withDuplicateWarning())
         .inboxStatus(Optional.ofNullable(searchInput.inboxStatus()))
         .documentationOfficeDTO(documentationOfficeDTO)
-        .kind(Optional.ofNullable(searchInput.kind()))
         .build();
   }
 
@@ -457,6 +437,5 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       boolean myDocOfficeOnly,
       boolean withDuplicateWarning,
       Optional<InboxStatus> inboxStatus,
-      DocumentationOfficeDTO documentationOfficeDTO,
-      Optional<Kind> kind) {}
+      DocumentationOfficeDTO documentationOfficeDTO) {}
 }

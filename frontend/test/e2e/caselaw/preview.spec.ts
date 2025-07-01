@@ -12,7 +12,10 @@ test.describe("preview decision", () => {
     page,
     prefilledDocumentUnit,
   }) => {
-    await navigateToPreview(page, prefilledDocumentUnit.documentNumber)
+    await navigateToPreview(
+      page,
+      prefilledDocumentUnit.documentNumber as string,
+    )
 
     const fileNumber = prefilledDocumentUnit.coreData.fileNumbers![0]
     await expect(page.getByText("AG Aachen", { exact: true })).toBeVisible()
@@ -35,7 +38,10 @@ test.describe("preview decision", () => {
     prefilledDocumentUnit,
   }) => {
     await test.step("check that original values are displayed in preview", async () => {
-      await navigateToPreview(page, prefilledDocumentUnit.documentNumber)
+      await navigateToPreview(
+        page,
+        prefilledDocumentUnit.documentNumber as string,
+      )
       await expect(page.getByText("AG Aachen", { exact: true })).toBeVisible()
       await expect(page.getByText("31.12.2019")).toBeVisible()
       await expect(page.getByText("NW", { exact: true })).toBeVisible()
@@ -43,7 +49,10 @@ test.describe("preview decision", () => {
     })
 
     await test.step("navigate to categories and update values", async () => {
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
+      await navigateToCategories(
+        page,
+        prefilledDocumentUnit.documentNumber as string,
+      )
 
       await page.getByLabel("Gericht", { exact: true }).fill("BVerfG")
       await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
@@ -65,7 +74,10 @@ test.describe("preview decision", () => {
     })
 
     await test.step("check updated values in preview", async () => {
-      await navigateToPreview(page, prefilledDocumentUnit.documentNumber)
+      await navigateToPreview(
+        page,
+        prefilledDocumentUnit.documentNumber as string,
+      )
 
       await expect(page.getByText("BVerfG")).toBeVisible()
       await expect(page.getByText("01.01.2021")).toBeVisible()
@@ -79,7 +91,10 @@ test.describe("preview decision", () => {
     prefilledDocumentUnit,
   }) => {
     await test.step("check that original values are displayed in preview", async () => {
-      await navigateToPreview(page, prefilledDocumentUnit.documentNumber)
+      await navigateToPreview(
+        page,
+        prefilledDocumentUnit.documentNumber as string,
+      )
       await expect(page.getByText("AG Aachen", { exact: true })).toBeVisible()
       await expect(page.getByText("31.12.2019")).toBeVisible()
       await expect(page.getByText("RegionNW")).toBeVisible()
@@ -87,7 +102,10 @@ test.describe("preview decision", () => {
     })
 
     await test.step("navigate to categories and delete values", async () => {
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
+      await navigateToCategories(
+        page,
+        prefilledDocumentUnit.documentNumber as string,
+      )
 
       await page.getByLabel("Entscheidungsdatum", { exact: true }).fill("")
 
@@ -106,7 +124,10 @@ test.describe("preview decision", () => {
     })
 
     await test.step("check deleted values are not in preview", async () => {
-      await navigateToPreview(page, prefilledDocumentUnit.documentNumber)
+      await navigateToPreview(
+        page,
+        prefilledDocumentUnit.documentNumber as string,
+      )
 
       await expect(page.getByText("Gericht")).toBeHidden()
       await expect(page.getByText("Entscheidungsdatum")).toBeHidden()

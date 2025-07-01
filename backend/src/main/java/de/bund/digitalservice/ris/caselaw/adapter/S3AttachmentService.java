@@ -187,7 +187,7 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   private void deleteObjectFromBucket(String s3Path) {
-    if (StringUtils.isNullOrBlank(s3Path)) {
+    if (StringUtils.returnTrueIfNullOrBlank(s3Path)) {
       throw new AttachmentException("s3Path cant be null");
     }
 

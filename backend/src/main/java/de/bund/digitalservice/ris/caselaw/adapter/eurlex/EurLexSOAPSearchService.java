@@ -84,7 +84,7 @@ public class EurLexSOAPSearchService implements SearchService {
       Optional<LocalDate> endDate) {
 
     if (documentationOffice == null || documentationOffice.abbreviation() == null) {
-      return new PageImpl<>(List.of(), PageRequest.of(0, PAGE_SIZE), 0);
+      return Page.empty();
     }
 
     if (!documentationOffice.abbreviation().equals("DS")

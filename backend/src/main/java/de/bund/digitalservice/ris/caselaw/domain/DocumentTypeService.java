@@ -25,8 +25,4 @@ public class DocumentTypeService {
       return documentTypeRepository.findAllDocumentTypesByCategory(category);
     }
   }
-
-  public DocumentType getPendingProceedingType() {
-    return documentTypeRepository.findPendingProceeding();
-  }
 }

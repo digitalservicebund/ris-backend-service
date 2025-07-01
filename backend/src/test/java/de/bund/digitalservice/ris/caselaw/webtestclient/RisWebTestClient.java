@@ -45,8 +45,4 @@ public class RisWebTestClient {
     return new RisRequestSpec(
         mockMvc, objectMapper, getMockLoginWithDocOffice(docOfficeGroup, role), csrfCookie);
   }
-
-  public RisRequestSpec withoutAuthentication() {
-    return new RisRequestSpec(mockMvc, objectMapper, null, csrfCookie);
-  }
 }

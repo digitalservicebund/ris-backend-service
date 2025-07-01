@@ -9,8 +9,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface DocumentTypeRepository {
   Optional<DocumentType> findUniqueCaselawBySearchStr(String searchString);
 
-  DocumentType findPendingProceeding();
-
   List<DocumentType> findDocumentTypesBySearchStrAndCategory(
       String searchStr, DocumentTypeCategory category);
 

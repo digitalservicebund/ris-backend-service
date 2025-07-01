@@ -33,13 +33,6 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
   }
 
   @Override
-  public DocumentType findPendingProceeding() {
-    var pendingProceedingCategory = categoryRepository.findFirstByLabel("A");
-    return DocumentTypeTransformer.transformToDomain(
-        repository.findFirstByAbbreviationAndCategory("Anh", pendingProceedingCategory));
-  }
-
-  @Override
   public List<DocumentType> findDocumentTypesBySearchStrAndCategory(
       String searchStr, DocumentTypeCategory category) {
     List<UUID> targetCategoryIds = resolveCategoryIds(category);

@@ -2,19 +2,15 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
-import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.data.domain.Pageable;
@@ -82,7 +78,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   @Transactional
   public List<FieldOfLaw> findByCombinedCriteria(
-      String identifier, String descriptionSearchTerms, String norm, boolean isPrefixNormSearch) {
+      String identifier, String[] descriptionSearchTerms, String[] normSearchTerms) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<FieldOfLawDTO> cq = cb.createQuery(FieldOfLawDTO.class);
     Root<FieldOfLawDTO> fieldOfLawRoot = cq.from(FieldOfLawDTO.class);
@@ -93,7 +89,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     predicates.add(notationPredicate);
 
     if (descriptionSearchTerms != null) {
-      for (String searchTerm : StringUtils.splitSearchTerms(descriptionSearchTerms)) {
+      for (String searchTerm : descriptionSearchTerms) {
         predicates.add(
             cb.like(cb.lower(fieldOfLawRoot.get("text")), "%" + searchTerm.toLowerCase() + "%"));
       }
@@ -103,12 +99,19 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
           cb.like(fieldOfLawRoot.get("identifier"), identifier.toUpperCase() + "%");
       predicates.add(identifierPredicate);
     }
-
-    if (!StringUtils.isNullOrBlank(norm)) {
-      if (isPrefixNormSearch) {
-        predicates.add(getExactNormPredicate(norm, fieldOfLawRoot, cb));
-      } else {
-        predicates.addAll(getAllFieldsSearchNormsPredicates(fieldOfLawRoot, cb, norm));
+    if (normSearchTerms != null) {
+      fieldOfLawRoot.fetch(NORMS, JoinType.LEFT);
+      for (String searchTerm : normSearchTerms) {
+        Predicate normAbbreviationPredicate =
+            cb.like(
+                cb.lower(fieldOfLawRoot.get(NORMS).get("abbreviation")),
+                "%" + searchTerm.toLowerCase() + "%");
+        Predicate singleNormPredicate =
+            cb.like(
+                cb.lower(fieldOfLawRoot.get(NORMS).get("singleNormDescription")),
+                "%" + searchTerm.toLowerCase() + "%");
+        Predicate combined = cb.or(normAbbreviationPredicate, singleNormPredicate);
+        predicates.add(combined);
       }
     }
 
@@ -123,43 +126,6 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .distinct()
         .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
         .toList();
-  }
-
-  private static List<Predicate> getAllFieldsSearchNormsPredicates(
-      Root<FieldOfLawDTO> fieldOfLawRoot, CriteriaBuilder cb, String normStr) {
-    var normSearchTerms = StringUtils.splitSearchTerms(normStr.replace("§", "").trim());
-
-    if (normSearchTerms != null && normSearchTerms.length > 0) {
-      List<Predicate> predicates = new ArrayList<>();
-
-      fieldOfLawRoot.fetch(NORMS, JoinType.LEFT);
-      for (String searchTerm : normSearchTerms) {
-        Predicate normAbbreviationPredicate =
-            cb.like(
-                cb.lower(fieldOfLawRoot.get(NORMS).get("abbreviation")),
-                "%" + searchTerm.toLowerCase() + "%");
-        Predicate singleNormPredicate =
-            cb.like(
-                cb.lower(fieldOfLawRoot.get(NORMS).get("singleNormDescription")),
-                "%" + searchTerm.toLowerCase() + "%");
-        Predicate combined = cb.or(normAbbreviationPredicate, singleNormPredicate);
-        predicates.add(combined);
-      }
-      return predicates;
-    }
-    return Collections.emptyList();
-  }
-
-  private Predicate getExactNormPredicate(
-      String normsString, Root<FieldOfLawDTO> fieldOfLawRoot, CriteriaBuilder cb) {
-    Join<FieldOfLawDTO, ?> normsJoin = fieldOfLawRoot.join(NORMS, JoinType.LEFT);
-
-    Expression<String> combinedNorm =
-        cb.concat(
-            cb.concat(cb.lower(normsJoin.get("abbreviation")), " "),
-            cb.lower(normsJoin.get("singleNormDescription")));
-
-    return cb.like(combinedNorm, normsString.toLowerCase() + "%");
   }
 
   @Override

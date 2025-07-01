@@ -3,20 +3,30 @@ import { caselawTest as test } from "../fixtures"
 import { navigateToCategories, save } from "~/e2e/caselaw/e2e-utils"
 
 test.describe("edit pending proceeding", () => {
-  test(
-    "user can edit and save inputs relevant for pending proceeding documents",
+  // skip until API has new endpoint to add a more robust fixture for pending proceeding
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
+    "user can edit and save pending proceeding documents",
     { tag: ["@RISDEV-7774"] },
-    async ({ page, pendingProceeding }) => {
-      await navigateToCategories(page, pendingProceeding.documentNumber, {
+    async ({ page }) => {
+      // Todo: use pending proceeding fixture for better cleanup
+      await navigateToCategories(page, "YYTestDoc0018", {
         type: "pending-proceeding",
       })
 
       // Stammdaten
 
       // Gericht
-      await test.step("court can be changed", async () => {
+      await test.step("court with existing value BFH can be changed to BGH", async () => {
         const court = page.getByLabel("Gericht", { exact: true })
-        await expect(court).toHaveValue("")
+        await expect(court).toHaveValue("BFH")
+        await court.fill("BGH")
+        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+        await expect(court).toHaveValue("BGH")
+        await expect(page.getByText("BGH")).toBeVisible()
+        await page.getByText("BGH").click()
+        await expect(court).toHaveValue("BGH")
+
         // switch again to BFH
         await court.fill("BFH")
         await expect(page.getByTestId("combobox-spinner")).toBeHidden()
@@ -36,11 +46,10 @@ test.describe("edit pending proceeding", () => {
       })
 
       //Mitteilungsdatum
-      await test.step("decision date can be added", async () => {
+      await test.step("decision date can be edited", async () => {
         await expect(page.getByText("Mitteilungsdatum *")).toBeVisible()
         const date = page.getByLabel("Entscheidungsdatum", { exact: true })
         await expect(date).toBeVisible()
-        await date.fill("24.02.2025")
         await expect(date).toHaveValue("24.02.2025")
       })
 
@@ -91,8 +100,6 @@ test.describe("edit pending proceeding", () => {
           headline.getByText("Anhängiges Verfahren beim BFH"),
         ).toBeVisible()
         await headline.click()
-        await headline.getByText("Anhängiges Verfahren beim BFH").dblclick()
-        await page.keyboard.press("ArrowRight")
         await page.keyboard.type(` test`)
         await expect(
           headline.getByText("Anhängiges Verfahren beim BFH test"),
@@ -101,12 +108,14 @@ test.describe("edit pending proceeding", () => {
 
       // Rechtsfrage
       await test.step("user can edit legal issue", async () => {
-        await page.getByLabel("Rechtsfrage").click()
         const headline = page.locator("#legalIssue")
-        await headline.click()
-        await page.keyboard.type(`Unveröffentlichtes anhängiges Verfahren`)
         await expect(
           headline.getByText("Unveröffentlichtes anhängiges Verfahren"),
+        ).toBeVisible()
+        await headline.click()
+        await page.keyboard.type(` test`)
+        await expect(
+          headline.getByText("Unveröffentlichtes anhängiges Verfahren test"),
         ).toBeVisible()
       })
 

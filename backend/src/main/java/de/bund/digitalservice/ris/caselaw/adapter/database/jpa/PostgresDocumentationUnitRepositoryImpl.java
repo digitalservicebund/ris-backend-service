@@ -172,14 +172,25 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public DocumentationUnit createNewDocumentationUnit(
-      DocumentationUnit docUnit,
+  public Decision createNewDocumentationUnit(
+      Decision docUnit,
       Status status,
       Reference createdFromReference,
       String fileNumber,
       User user) {
 
-    var documentationUnitDTO = repository.save(getTransformedEntity(docUnit));
+    var documentationUnitDTO =
+        repository.save(
+            DecisionTransformer.transformToDTO(
+                DecisionDTO.builder()
+                    .documentationOffice(
+                        DocumentationOfficeTransformer.transformToDTO(
+                            docUnit.coreData().documentationOffice()))
+                    .creatingDocumentationOffice(
+                        DocumentationOfficeTransformer.transformToDTO(
+                            docUnit.coreData().creatingDocOffice()))
+                    .build(),
+                docUnit));
 
     List<SourceDTO> sources = new ArrayList<>();
     if (createdFromReference != null) {
@@ -220,53 +231,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             .build();
 
     documentationUnitDTO.setStatus(statusDTO);
-    if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
-      decisionDTO.setSource(sources);
-    }
+    documentationUnitDTO.setSource(sources);
 
     // saving a second time is necessary because status, managementData and reference need a
     // reference to a
     // persisted documentation unit
-    DocumentationUnitDTO savedDocUnit = repository.save(documentationUnitDTO);
+    DecisionDTO savedDocUnit = repository.save(documentationUnitDTO);
 
-    return switch (savedDocUnit) {
-      case DecisionDTO decisionDTO -> DecisionTransformer.transformToDomain(decisionDTO, user);
-      case PendingProceedingDTO pendingProceedingDTO ->
-          PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
-      default ->
-          throw new DocumentationUnitException(
-              "DocumentationUnitDTO couldn't be transformed to domain DocumentationUnitDTO as"
-                  + " it is neither DecisionDTO nor PendingProceedingDTO.");
-    };
+    return DecisionTransformer.transformToDomain(savedDocUnit, user);
   }
 
-  private static DocumentationUnitDTO getTransformedEntity(DocumentationUnit docUnit) {
-    if (docUnit instanceof Decision decision) {
-      return DecisionTransformer.transformToDTO(
-          DecisionDTO.builder()
-              .documentationOffice(
-                  DocumentationOfficeTransformer.transformToDTO(
-                      docUnit.coreData().documentationOffice()))
-              .creatingDocumentationOffice(
-                  DocumentationOfficeTransformer.transformToDTO(
-                      docUnit.coreData().creatingDocOffice()))
-              .build(),
-          decision);
-    } else if (docUnit instanceof PendingProceeding pendingProceeding) {
-      return PendingProceedingTransformer.transformToDTO(
-          PendingProceedingDTO.builder()
-              .documentationOffice(
-                  DocumentationOfficeTransformer.transformToDTO(
-                      docUnit.coreData().documentationOffice()))
-              .build(),
-          pendingProceeding);
-    }
-    throw new DocumentationUnitException(
-        "DocumentationUnit couldn't be transformed to DTO as"
-            + " it is neither Decision nor PendingProceeding.");
-  }
-
-  private ManagementDataDTO getCreatedBy(User user, DocumentationUnitDTO documentationUnitDTO) {
+  private ManagementDataDTO getCreatedBy(User user, DecisionDTO documentationUnitDTO) {
     ManagementDataDTO.ManagementDataDTOBuilder managementDataBuilder =
         ManagementDataDTO.builder()
             .documentationUnit(documentationUnitDTO)

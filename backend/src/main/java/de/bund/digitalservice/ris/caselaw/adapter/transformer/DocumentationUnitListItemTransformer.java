@@ -45,14 +45,7 @@ public class DocumentationUnitListItemTransformer {
         .lastPublicationDateTime(documentationUnitListItemDTO.getLastPublicationDateTime())
         .appraisalBody(documentationUnitListItemDTO.getJudicialBody())
         .hasHeadnoteOrPrinciple(hasHeadnoteOrPrinciple(documentationUnitListItemDTO))
-        .hasAttachments(
-            !documentationUnitListItemDTO.getAttachments().stream()
-                .filter(
-                    attachmentDTO ->
-                        "fmx".equals(attachmentDTO.getFormat())
-                            || "docx".equals(attachmentDTO.getFormat()))
-                .toList()
-                .isEmpty())
+        .hasAttachments(!documentationUnitListItemDTO.getAttachments().isEmpty())
         .documentType(
             DocumentTypeTransformer.transformToDomain(
                 documentationUnitListItemDTO.getDocumentType()))

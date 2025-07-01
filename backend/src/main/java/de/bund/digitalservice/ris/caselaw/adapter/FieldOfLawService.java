@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
-import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,36 +61,33 @@ public class FieldOfLawService {
       Optional<String> identifier,
       Optional<String> norm,
       Pageable pageable) {
-
-    String normString = norm.orElse(null);
-    boolean isPrefixNormSearch = false;
-
-    if (!StringUtils.isNullOrBlank(normString) && normString.endsWith("%")) {
-      normString = normString.substring(0, norm.get().length() - 1);
-      isPrefixNormSearch = true;
-    }
+    Optional<String[]> descriptionSearchTerms = description.map(this::splitSearchTerms);
+    Optional<String> normStr = norm.map(n -> n.trim().replaceAll("§(\\d+)", "§ $1"));
+    Optional<String[]> normTerms =
+        norm.map(n -> n.replace("§", "").trim()).map(this::splitSearchTerms);
 
     List<FieldOfLaw> unorderedList =
         repository.findByCombinedCriteria(
-            identifier.orElse(null), description.orElse(null), normString, isPrefixNormSearch);
+            identifier.orElse(null), descriptionSearchTerms.orElse(null), normTerms.orElse(null));
 
     // If no results found, return an empty page
     if (unorderedList.isEmpty()) {
       return new PageImpl<>(List.of(), pageable, 0);
     }
 
-    List<FieldOfLaw> orderedList = orderResults(description, norm, unorderedList);
+    List<FieldOfLaw> orderedList = orderResults(descriptionSearchTerms, normStr, unorderedList);
 
     return sliceResults(orderedList, pageable);
   }
 
-  private List<FieldOfLaw> orderResults(
-      Optional<String> description, Optional<String> normStr, List<FieldOfLaw> unorderedList) {
+  private String[] splitSearchTerms(String searchStr) {
+    return Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
+  }
 
+  private List<FieldOfLaw> orderResults(
+      Optional<String[]> searchTerms, Optional<String> normStr, List<FieldOfLaw> unorderedList) {
     // Calculate scores and sort the list based on the score and identifier
-    Map<FieldOfLaw, Integer> scores =
-        calculateScore(
-            description, normStr.map(n -> n.trim().replaceAll("§(\\d+)", "§ $1")), unorderedList);
+    Map<FieldOfLaw, Integer> scores = calculateScore(searchTerms, normStr, unorderedList);
     return unorderedList.stream()
         .sorted(
             (f1, f2) -> {
@@ -109,20 +106,19 @@ public class FieldOfLawService {
   }
 
   private Map<FieldOfLaw, Integer> calculateScore(
-      Optional<String> descriptionStr, Optional<String> normStr, List<FieldOfLaw> fieldOfLaws) {
+      Optional<String[]> searchTerms, Optional<String> normStr, List<FieldOfLaw> fieldOfLaws) {
     Map<FieldOfLaw, Integer> scores = new HashMap<>();
 
     if (fieldOfLaws == null || fieldOfLaws.isEmpty()) {
       return scores;
     }
-    Optional<String[]> descriptionSearchTerms = descriptionStr.map(StringUtils::splitSearchTerms);
 
     fieldOfLaws.forEach(
         fieldOfLaw -> {
           int score = 0;
 
-          if (descriptionSearchTerms.isPresent()) {
-            for (String searchTerm : descriptionSearchTerms.get()) {
+          if (searchTerms.isPresent()) {
+            for (String searchTerm : searchTerms.get()) {
               score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
             }
           }

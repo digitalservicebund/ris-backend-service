@@ -48,10 +48,9 @@ const formatEditor = (docOffice?: string, name?: string) => {
 
 const formatSource = (source?: Source) => {
   if (!source) return "–"
-  const value = source.value || source.sourceRawValue
-  if (!source.reference) return value
+  if (!source.reference) return source.value
   const reference = new Reference(source.reference)
-  const referenceText = `${value} aus ${reference.renderSummary}`
+  const referenceText = `${source.value} aus ${reference.renderSummary}`
   if (!documentUnit.coreData.creatingDocOffice) return referenceText
   return `${referenceText} (${documentUnit.coreData.creatingDocOffice.abbreviation})`
 }

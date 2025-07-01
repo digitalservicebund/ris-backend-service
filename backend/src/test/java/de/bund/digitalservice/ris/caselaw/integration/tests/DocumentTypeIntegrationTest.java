@@ -3,10 +3,6 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -25,8 +21,6 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 class DocumentTypeIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private DocumentTypeService documentTypeService;
-  @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
 
   @Test
   void testGetAllDocumentTypes() {
@@ -129,26 +123,5 @@ class DocumentTypeIntegrationTest extends BaseIntegrationTest {
                   .extracting("label", "jurisShortcut")
                   .containsExactly(Tuple.tuple("Anmerkung", "Ean"));
             });
-  }
-
-  @Test
-  void testGetPendingProceedingType_shouldReturnPendingProceedingType() {
-    // Arrange
-    List<DocumentTypeDTO> documentTypes = documentTypeRepository.findAll();
-    assertThat(documentTypes).hasSize(8);
-
-    DocumentTypeDTO anhDocumentType =
-        documentTypes.stream()
-            .filter(type -> "Anh".equals(type.getAbbreviation()))
-            .findFirst()
-            .get();
-
-    var expectedPendingProceedingType = DocumentTypeTransformer.transformToDomain(anhDocumentType);
-
-    // Act
-    var actualPendingProceedingType = documentTypeService.getPendingProceedingType();
-
-    // Assert
-    assertThat(actualPendingProceedingType).isEqualTo(expectedPendingProceedingType);
   }
 }
