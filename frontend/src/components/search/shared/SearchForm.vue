@@ -156,7 +156,7 @@ watch(
     query.value = getQueryFromRoute()
     handleSearch()
   },
-  { deep: true, immediate: true },
+  { deep: true },
 )
 </script>
 
