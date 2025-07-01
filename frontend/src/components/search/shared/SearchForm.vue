@@ -43,15 +43,11 @@ const scheduledOnly = computed({
   },
 })
 
-const resolvedOnly = computed({
+const isResolved = computed({
   get: () =>
-    query.value?.resolvedOnly ? JSON.parse(query.value.resolvedOnly) : false,
+    query.value?.isResolved ? JSON.parse(query.value.isResolved) : false,
   set: (data) => {
-    if (!data) {
-      delete query.value.resolvedOnly
-    } else {
-      query.value.resolvedOnly = "true"
-    }
+    query.value.isResolved = data
   },
 })
 
@@ -435,7 +431,7 @@ watch(
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
-            v-model="resolvedOnly"
+            v-model="isResolved"
             aria-label="Erledigt Filter"
             binary
             :input-id="id"

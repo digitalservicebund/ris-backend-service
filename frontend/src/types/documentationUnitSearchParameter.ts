@@ -13,3 +13,4 @@ export type DocumentationUnitSearchParameter =
   | "withDuplicateWarning"
   | "resolutionDate"
   | "resolutionDateEnd"
+  | "isResolved"
