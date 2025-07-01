@@ -89,7 +89,7 @@ function hasValidationErrors() {
 }
 
 function validateSearchInput() {
-  //Startdatum fehlt
+  //Startdatum fehlt für Mitteilungsdatum
   if (
     query.value?.decisionDateEnd &&
     !query.value?.decisionDate &&
@@ -103,7 +103,7 @@ function validateSearchInput() {
     validationStore.remove("decisionDate")
   }
 
-  //Enddatum darf nicht vor Startdatum liegen
+  //Enddatum darf nicht vor Startdatum liegen für Mitteilungsdatum
   if (
     query.value?.decisionDateEnd &&
     query.value?.decisionDate &&
@@ -121,6 +121,40 @@ function validateSearchInput() {
   ) {
     validationStore.remove("decisionDateEnd")
   }
+
+  //Startdatum fehlt für Erledigungsvermerk
+  if (
+    query.value?.resolutionDateEnd &&
+    !query.value?.resolutionDate &&
+    !validationStore.getByField("resolutionDate")
+  ) {
+    validationStore.add("Startdatum fehlt", "resolutionDate")
+  } else if (
+    !query.value.resolutionDateEnd &&
+    validationStore.getByMessage("Startdatum fehlt").length === 1
+  ) {
+    validationStore.remove("resolutionDate")
+  }
+
+  //Enddatum darf nicht vor Startdatum liegen für Mitteilungsdatum
+  if (
+    query.value?.resolutionDateEnd &&
+    query.value?.resolutionDate &&
+    new Date(query.value.resolutionDate) >
+      new Date(query.value.resolutionDateEnd)
+  ) {
+    if (!validationStore.getByField("resolutionDateEnd")) {
+      validationStore.add(
+        "Enddatum darf nicht vor Startdatum liegen",
+        "resolutionDateEnd",
+      )
+    }
+  } else if (
+    validationStore.getByMessage("Enddatum darf nicht vor Startdatum liegen")
+      .length === 1
+  ) {
+    validationStore.remove("resolutionDateEnd")
+  }
 }
 
 function handleLocalInputError(error: ValidationError | undefined, id: string) {
@@ -133,11 +167,25 @@ function handleLocalInputError(error: ValidationError | undefined, id: string) {
   validateSearchInput()
 }
 
+/**
+ * Checks if the current search query is identical to the previous query.
+ * @returns {boolean} - `true` if the current query matches the previous query, otherwise `false`.
+ */
+function isIdenticalSearch(): boolean {
+  const previousQuery = getQueryFromRoute()
+  const newQuery = query.value
+  return JSON.stringify(previousQuery) === JSON.stringify(newQuery)
+}
+
 function handleSearchButtonClicked() {
   validateSearchInput()
 
   if (isSearchInputInvalid()) {
     return
+  }
+
+  if (isIdenticalSearch()) {
+    handleSearch()
   }
   pushQueryToRoute(query.value)
 }
