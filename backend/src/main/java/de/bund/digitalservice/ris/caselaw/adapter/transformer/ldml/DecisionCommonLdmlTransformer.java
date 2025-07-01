@@ -228,7 +228,8 @@ public abstract class DecisionCommonLdmlTransformer
     String uniqueId = decision.documentNumber();
     FrbrDate frbrDate =
         new FrbrDate(
-            DateUtils.toDateString(nullSafeGet(decision.coreData(), CoreData::decisionDate)));
+            DateUtils.toDateString(nullSafeGet(decision.coreData(), CoreData::decisionDate)),
+            "entscheidungsdatum");
     FrbrAuthor frbrAuthor = new FrbrAuthor();
 
     List<FrbrAlias> aliases = generateAliases(decision);

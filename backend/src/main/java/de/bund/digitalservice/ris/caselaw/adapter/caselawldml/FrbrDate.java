@@ -8,9 +8,10 @@ import lombok.NoArgsConstructor;
 @Getter
 public class FrbrDate {
   @XmlAttribute private String date;
-  @XmlAttribute private String name = "entscheidungsdatum";
+  @XmlAttribute private String name;
 
-  public FrbrDate(String date) {
+  public FrbrDate(String date, String name) {
     this.date = date;
+    this.name = name;
   }
 }
