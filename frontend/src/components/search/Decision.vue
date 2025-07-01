@@ -64,6 +64,7 @@ async function search() {
       : {}),
     ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
     ...searchQuery.value,
+    kind: "DECISION",
   })
   if (response.data) {
     currentPage.value = response.data

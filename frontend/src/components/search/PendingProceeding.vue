@@ -54,6 +54,7 @@ async function search() {
       : {}),
     ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
     ...searchQuery.value,
+    kind: "PENDING_PROCEEDING",
   })
   if (response.data) {
     currentPage.value = response.data
