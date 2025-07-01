@@ -144,14 +144,15 @@ export const navigateToPeriodicalHandover = async (
 export const navigateToPreview = async (
   page: Page,
   documentNumber: string,
-  type: "pending-proceeding" | "documentunit" = "documentunit",
   options?: {
     skipAssert?: boolean
+    type?: "pending-proceeding" | "documentunit"
   },
 ) => {
   await test.step("Navigate to 'Vorschau'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
-    const baseUrl = `/caselaw/${type}/${documentNumber}/preview${queryParams}`
+    const documentType = options?.type ?? "documentunit"
+    const baseUrl = `/caselaw/${documentType}/${documentNumber}/preview${queryParams}`
 
     await page.goto(baseUrl)
 
@@ -186,9 +187,13 @@ export const navigateToAttachments = async (
 export const navigateToManagementData = async (
   page: Page,
   documentNumber: string,
+  options?: {
+    type?: "pending-proceeding" | "documentunit"
+  },
 ) => {
   await test.step("Navigate to 'Verwaltungsdaten'", async () => {
-    const baseUrl = `/caselaw/documentunit/${documentNumber}/managementdata`
+    const documentType = options?.type ?? "documentunit"
+    const baseUrl = `/caselaw/${documentType}/${documentNumber}/managementdata`
     await getRequest(baseUrl, page)
     await expect(page.getByTestId("title").first()).toHaveText(
       "Verwaltungsdaten",
@@ -832,4 +837,32 @@ export async function searchForDocUnit(
   }
 
   await page.getByText("Suchen").click()
+}
+
+export async function expectHistoryCount(page: Page, count: number) {
+  await expect(
+    page.getByTestId("document-unit-history-log").getByRole("row"),
+    // header counts as row
+  ).toHaveCount(count + 1)
+}
+
+export async function expectHistoryLogRow(
+  page: Page,
+  index: number,
+  createdBy: string,
+  description: string,
+) {
+  const historyRow = page
+    .getByTestId("document-unit-history-log")
+    .getByRole("row")
+    // Header has index 0
+    .nth(index + 1)
+  const createdAtCell = historyRow.getByRole("cell").nth(0)
+  const createdByCell = historyRow.getByRole("cell").nth(1)
+  const descriptionCell = historyRow.getByRole("cell").nth(2)
+  await expect(createdAtCell).toHaveText(
+    /^\d{2}\.\d{2}\.\d{4} um \d{2}:\d{2} Uhr$/,
+  )
+  await expect(createdByCell).toHaveText(createdBy)
+  await expect(descriptionCell).toHaveText(description)
 }

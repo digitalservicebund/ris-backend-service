@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
@@ -107,5 +108,41 @@ class DocumentationUnitListItemTransformerTest {
         DocumentationUnitListItemTransformer.transformToDomain(currentDto);
 
     assertThat(documentationUnitListItem.note()).isNull();
+  }
+
+  @Test
+  void testTransformToDomain_withOnlyImages_hasAttachmentsShouldBeFalse() {
+    UUID id = UUID.randomUUID();
+    DocumentationUnitListItemDTO currentDto =
+        DecisionDTO.builder()
+            .id(id)
+            .attachments(
+                List.of(
+                    AttachmentDTO.builder().format("png").build(),
+                    AttachmentDTO.builder().format("jpg").build()))
+            .build();
+
+    DocumentationUnitListItem documentationUnitListItem =
+        DocumentationUnitListItemTransformer.transformToDomain(currentDto);
+
+    assertThat(documentationUnitListItem.hasAttachments()).isFalse();
+  }
+
+  @Test
+  void testTransformToDomain_withMixedAttachments_hasAttachmentsShouldBeTrue() {
+    UUID id = UUID.randomUUID();
+    DocumentationUnitListItemDTO currentDto =
+        DecisionDTO.builder()
+            .id(id)
+            .attachments(
+                List.of(
+                    AttachmentDTO.builder().format("png").build(),
+                    AttachmentDTO.builder().format("fmx").build()))
+            .build();
+
+    DocumentationUnitListItem documentationUnitListItem =
+        DocumentationUnitListItemTransformer.transformToDomain(currentDto);
+
+    assertThat(documentationUnitListItem.hasAttachments()).isTrue();
   }
 }

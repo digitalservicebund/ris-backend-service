@@ -31,13 +31,18 @@ mail:
 
 neuris:
   document-number-patterns:
-    BGH: KORE7****YYYY # results in e.g. KORE 7 0001 24
+    BGH: KORE7****YYYY # results in e.g. KORE 7 0001 2024
     BVerfG: KVRE*****YY41 # results in e.g. KVRE 00001 24 41
-    BVerwG: WBRE7****YYYY
+    BVerwG: WBRE6****YYYY
     BSG: KSRE1******YY
     DS: XXRE0******YY
+    DS-Anh: XXAH0******YY
     CC-RIS: XXRE1******YY
-    # TODO: other docoffices
+    CC-RIS-Anh: XXAH1******YY
+    BFH: STREYYYY2****
+    BFH-Anh: STAHYYYY2****
+    BPatG: MPRE6******YY
+    BAG: KARE7****YYYY
 
 eurlex:
   url: https://eur-lex.europa.eu/EURLexWebService?WSDL
