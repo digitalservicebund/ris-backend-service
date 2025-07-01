@@ -118,11 +118,7 @@ const emptyText = computed(() => (props.loading ? "" : props.emptyText))
             />
           </template>
         </Column>
-        <Column field="resolutionDate">
-          <template #header>
-            <div class="flex flex-row">Erledigungsmitteilung</div>
-          </template>
-
+        <Column field="resolutionDate" header="Erledigungsmitteilung">
           <template #body="{ data: item }">
             {{
               item.resolutionDate

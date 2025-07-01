@@ -253,6 +253,13 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   private InboxStatus inboxStatus;
 
   @Override
+  @Nullable
+  public LocalDate getResolutionDate() {
+    return null; // Default implementation for non-PendingProceedingDTOs, needed by
+    // DocumentationUnitListItemDTO
+  }
+
+  @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar
   public boolean equals(Object o) {
     if (this == o) return true;
