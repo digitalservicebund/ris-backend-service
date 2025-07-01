@@ -7,8 +7,8 @@ import TabPanels from "primevue/tabpanels"
 import Tabs from "primevue/tabs"
 import { computed, onMounted, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import DecisionSearch from "@/components/search/Decision.vue"
-import PendingProceedingSearch from "@/components/search/PendingProceeding.vue"
+import DecisionSearch from "@/components/search/DecisionSearch.vue"
+import PendingProceedingSearch from "@/components/search/PendingProceedingSearch.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import useSessionStore from "@/stores/sessionStore"
 
@@ -57,7 +57,9 @@ watch(value, async (newVal) => {
       ></Button>
     </div>
     <Tabs v-model:value="value" lazy>
-      <TabList v-if="documentationOfficeAbbreviation === 'BFH'">
+      <!-- Todo: for development not yet hidden for BFH, hide the TabList
+      v-if="documentationOfficeAbbreviation !== 'BFH' -->
+      <TabList v-if="documentationOfficeAbbreviation !== 'BFH'">
         <Tab data-testid="search-tab-caselaw" value="0">Rechtsprechung</Tab>
         <Tab data-testid="search-tab-pending-proceeding" value="1"
           >Anhängige Verfahren</Tab
