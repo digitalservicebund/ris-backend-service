@@ -6,7 +6,7 @@ import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
+import DecisionSearch from "@/components/search/DecisionSearch.vue"
 import { Court } from "@/domain/court"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import authService from "@/services/authService"
@@ -36,7 +36,7 @@ function renderComponent(
   })
   return {
     user,
-    ...render(DocumentUnitSearch, {
+    ...render(DecisionSearch, {
       global: {
         directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
