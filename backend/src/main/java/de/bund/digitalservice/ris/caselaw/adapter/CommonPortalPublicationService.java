@@ -141,9 +141,9 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
    */
   public PortalPublicationResult deleteDocumentationUnit(String documentNumber) {
     try {
-      var fileLocation = documentNumber + "/" + documentNumber + ".xml";
-      portalBucket.delete(fileLocation);
-      return new PortalPublicationResult(List.of(), List.of(fileLocation));
+      var deletableFiles = portalBucket.getAllFilenamesByPath(documentNumber + "/");
+      deletableFiles.forEach(portalBucket::delete);
+      return new PortalPublicationResult(List.of(), deletableFiles);
     } catch (BucketException e) {
       throw new PublishException("Could not delete LDML from bucket.", e);
     }

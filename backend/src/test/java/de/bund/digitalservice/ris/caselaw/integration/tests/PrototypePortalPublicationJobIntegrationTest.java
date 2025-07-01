@@ -57,8 +57,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Import(PrototypePortalPublicationJobIntegrationTest.PortalPublicationConfig.class)
 class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
@@ -167,6 +170,12 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         List.of(
             createPublicationJob(dto, PortalPublicationTaskType.PUBLISH),
             createPublicationJob(dto2, PortalPublicationTaskType.DELETE)));
+
+    when(s3Client.listObjectsV2(any(ListObjectsV2Request.class)))
+        .thenReturn(
+            ListObjectsV2Response.builder()
+                .contents(S3Object.builder().key("1/1.xml").build())
+                .build());
 
     portalPublicationJobService.executePendingJobs();
 

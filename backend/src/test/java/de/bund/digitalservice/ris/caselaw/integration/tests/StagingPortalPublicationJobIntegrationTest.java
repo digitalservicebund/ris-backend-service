@@ -58,8 +58,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Import({StagingPortalPublicationJobIntegrationTest.PortalPublicationConfig.class})
 class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
@@ -176,6 +179,20 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
             createPublicationJob(dto1, PortalPublicationTaskType.DELETE),
             createPublicationJob(dto2, PortalPublicationTaskType.PUBLISH)));
 
+    when(s3Client.listObjectsV2(
+            ListObjectsV2Request.builder().bucket("no-bucket").prefix("1/").build()))
+        .thenReturn(
+            ListObjectsV2Response.builder()
+                .contents(S3Object.builder().key("1/1.xml").build())
+                .build());
+
+    when(s3Client.listObjectsV2(
+            ListObjectsV2Request.builder().bucket("no-bucket").prefix("2/").build()))
+        .thenReturn(
+            ListObjectsV2Response.builder()
+                .contents(S3Object.builder().key("2/2.xml").build())
+                .build());
+
     portalPublicationJobService.executePendingJobs();
 
     ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
@@ -189,6 +206,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     verify(s3Client, times(5)).putObject(putCaptor.capture(), bodyCaptor.capture());
 
     var capturedPutRequests = putCaptor.getAllValues();
+    var capturedDeleteRequests = deleteCaptor.getAllValues();
     var changelogContent =
         new String(
             bodyCaptor.getAllValues().get(4).contentStreamProvider().newStream().readAllBytes(),
@@ -199,6 +217,8 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     assertThat(capturedPutRequests.get(2).key()).isEqualTo("2/2.xml");
     assertThat(capturedPutRequests.get(3).key()).isEqualTo("2/2.xml");
     assertThat(capturedPutRequests.get(4).key()).contains("changelogs/");
+    assertThat(capturedDeleteRequests.get(0).key()).isEqualTo("2/2.xml");
+    assertThat(capturedDeleteRequests.get(1).key()).isEqualTo("1/1.xml");
     //     ensure that each document number only appears either in changed or deleted section
     assertThat(changelogContent)
         .isEqualTo(
@@ -226,6 +246,12 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         List.of(
             createPublicationJob(dto, PortalPublicationTaskType.PUBLISH),
             createPublicationJob(dto2, PortalPublicationTaskType.DELETE)));
+
+    when(s3Client.listObjectsV2(any(ListObjectsV2Request.class)))
+        .thenReturn(
+            ListObjectsV2Response.builder()
+                .contents(S3Object.builder().key("1/1.xml").build())
+                .build());
 
     portalPublicationJobService.executePendingJobs();
 

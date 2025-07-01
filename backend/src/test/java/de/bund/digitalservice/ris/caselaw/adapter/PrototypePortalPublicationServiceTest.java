@@ -206,6 +206,8 @@ class PrototypePortalPublicationServiceTest {
 
   @Test
   void delete_shouldDeleteFromBucket() {
+    when(prototypePortalBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
     subject.deleteDocumentationUnit(testDocumentNumber);
 
     verify(prototypePortalBucket, times(1))
@@ -214,6 +216,8 @@ class PrototypePortalPublicationServiceTest {
 
   @Test
   void delete_shouldThrow() {
+    when(prototypePortalBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
     doThrow(BucketException.class)
         .when(prototypePortalBucket)
         .delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
@@ -250,6 +254,7 @@ class PrototypePortalPublicationServiceTest {
         .thenReturn(
             """
                 {"deleted":["789/789.xml"]}""");
+    when(prototypePortalBucket.getAllFilenamesByPath("789/")).thenReturn(List.of("789/789.xml"));
 
     subject.logPortalPublicationSanityCheck();
 
