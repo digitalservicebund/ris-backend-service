@@ -56,6 +56,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -170,7 +171,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     portalPublicationJobService.executePendingJobs();
 
     // DELETE is called even after fail
-    verify(s3Client, times(1)).deleteObject(any(Consumer.class));
+    verify(s3Client, times(1)).deleteObject(any(DeleteObjectRequest.class));
     // PUT 1.xml (fails) ((+ PUT changelog)) //currently disabled
     verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
 

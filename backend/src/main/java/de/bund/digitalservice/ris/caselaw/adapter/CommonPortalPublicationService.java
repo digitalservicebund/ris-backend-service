@@ -62,10 +62,7 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       throws DocumentationUnitNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
-    List<AttachmentDTO> attachmentDTOS =
-        attachmentRepository.findAllByDocumentationUnitId(documentationUnitId);
-
-    var result = publishToBucket(documentationUnit, attachmentDTOS);
+    var result = publishToBucket(documentationUnit);
     try {
       uploadChangelog(result.changedPaths(), result.deletedPaths());
     } catch (Exception e) {
@@ -90,15 +87,16 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       throws DocumentationUnitNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByDocumentNumber(documentNumber);
-    return publishToBucket(documentationUnit, List.of());
+    return publishToBucket(documentationUnit);
   }
 
-  private PortalPublicationResult publishToBucket(
-      DocumentationUnit documentationUnit, List<AttachmentDTO> attachments) {
+  private PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {
     if (!(documentationUnit instanceof Decision decision)) {
       // for now pending proceedings can not be transformed to LDML, so they are ignored.
       return null;
     }
+    List<AttachmentDTO> attachments =
+        attachmentRepository.findAllByDocumentationUnitId(documentationUnit.uuid());
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(decision);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {

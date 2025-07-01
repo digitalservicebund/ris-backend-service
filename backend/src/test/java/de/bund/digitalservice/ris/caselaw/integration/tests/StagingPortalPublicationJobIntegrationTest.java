@@ -180,8 +180,8 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
     ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
-    ArgumentCaptor<Consumer<DeleteObjectRequest.Builder>> deleteCaptor =
-        ArgumentCaptor.forClass(Consumer.class);
+    ArgumentCaptor<DeleteObjectRequest> deleteCaptor =
+        ArgumentCaptor.forClass(DeleteObjectRequest.class);
 
     // TWO DELETE JOBS
     verify(s3Client, times(2)).deleteObject(deleteCaptor.capture());
@@ -230,7 +230,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     portalPublicationJobService.executePendingJobs();
 
     // DELETE is called even after fail
-    verify(s3Client, times(1)).deleteObject(any(Consumer.class));
+    verify(s3Client, times(1)).deleteObject(any(DeleteObjectRequest.class));
     // PUT 1.xml (fails) + PUT changelog
     verify(s3Client, times(2)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
 
