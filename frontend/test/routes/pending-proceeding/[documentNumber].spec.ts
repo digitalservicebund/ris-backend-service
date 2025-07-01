@@ -3,7 +3,6 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createHead } from "@unhead/vue/client"
 import { createRouter, createWebHistory } from "vue-router"
-import { Decision } from "@/domain/decision"
 import PendingProceeding from "@/domain/pendingProceeding"
 import categories from "@/routes/caselaw/pending-proceeding/[documentNumber]/categories.vue"
 import DocumentNumber from "@/routes/caselaw/pending-proceeding/[documentNumber].vue"
@@ -48,7 +47,7 @@ function renderComponent() {
         name: "caselaw-pending-proceeding-documentNumber-managementdata",
         component: {
           template:
-            "<div data-testid='managementdata'>Fundstellen<input aria-label=\"Fundstellen\"/></div>",
+            "<div data-testid='managementdata'>Verwaltungsdaten<input aria-label=\"Verwaltungsdaten\"/></div>",
         },
       },
     ],
@@ -189,7 +188,7 @@ describe("Document Number Route", () => {
       expect(screen.getByTestId("managementdata")).toBeInTheDocument()
     })
 
-    test("should render preview without side panels and header", async () => {
+    test("should render preview without side panel and header", async () => {
       const { router } = renderComponent()
       await router.push({
         path: "/caselaw/pendingProceeding/1234567891234/preview",
@@ -223,7 +222,7 @@ describe("Document Number Route", () => {
             status: 404,
             data: undefined,
             error: { title: "Backend_Error_Title" },
-          } as ServiceResponse<Decision>),
+          } as ServiceResponse<PendingProceeding>),
       )
 
       const { router } = renderComponent()

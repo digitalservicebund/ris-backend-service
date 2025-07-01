@@ -142,10 +142,8 @@ const handleKeyDown = (event: KeyboardEvent) => {
       extraContentSidePanelStore.setSidePanelMode("preview")
       break
     case "r":
-      if (props.kind === Kind.DECISION) {
-        extraContentSidePanelStore.togglePanel(true)
-        extraContentSidePanelStore.setSidePanelMode("category-import")
-      }
+      extraContentSidePanelStore.togglePanel(true)
+      extraContentSidePanelStore.setSidePanelMode("category-import")
       break
     case "t":
       if (!textCheck.value && props.kind === Kind.DECISION) break
@@ -192,7 +190,6 @@ onMounted(async () => {
         :is-expanded="showNavigationPanelRef"
         label="Navigation"
         tabindex="0"
-        test-id="side-toggle-navigation"
         @update:is-expanded="toggleNavigationPanel"
       >
         <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
