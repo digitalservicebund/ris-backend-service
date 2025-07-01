@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DecisionPrototypePortalTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DecisionPublicLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -49,19 +49,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DecisionPrototypePortalTransformerTest {
+class DecisionPublicLdmlTransformerTest {
 
   private static Decision testDocumentUnit;
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
 
-  private static DecisionPrototypePortalTransformer subject;
+  private static DecisionPublicLdmlTransformer subject;
   private static UUID documentationUnitId;
 
   @BeforeAll
   static void setUpBeforeClass() {
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-    subject = new DecisionPrototypePortalTransformer(documentBuilderFactory);
+    subject = new DecisionPublicLdmlTransformer(documentBuilderFactory);
     documentationUnitId = UUID.randomUUID();
     createTestDocumentationUnit();
   }

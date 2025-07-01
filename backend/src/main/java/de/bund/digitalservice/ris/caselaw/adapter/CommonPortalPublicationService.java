@@ -86,11 +86,11 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
   }
 
   private void publishToBucket(DocumentationUnit documentationUnit) {
-    if (!(documentationUnit instanceof Decision decision)) {
-      // for now pending proceedings can not be transformed to LDML, so they are ignored.
+    if (!(documentationUnit instanceof Decision)) {
+      // for now pending proceedings can not be processed by the portal, so they are ignored.
       return;
     }
-    CaseLawLdml ldml = ldmlTransformer.transformToLdml(decision);
+    CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
     if (fileContent.isEmpty()) {
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);

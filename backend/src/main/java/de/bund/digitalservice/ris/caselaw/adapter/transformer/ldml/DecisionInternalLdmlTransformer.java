@@ -30,13 +30,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Transformer for converting documentation units to LDML format for internal portal use. Includes
- * additional metadata like classification and keywords for internal processing.
+ * Transformer for converting decisions to LDML format for internal portal use. Includes additional
+ * metadata like classification and keywords for internal processing.
  */
 @Slf4j
-public class DecisionPortalTransformer extends DecisionCommonPortalTransformer {
+public class DecisionInternalLdmlTransformer extends DecisionCommonLdmlTransformer {
 
-  public DecisionPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public DecisionInternalLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 

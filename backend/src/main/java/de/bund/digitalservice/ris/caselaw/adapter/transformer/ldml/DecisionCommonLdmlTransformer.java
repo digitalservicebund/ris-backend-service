@@ -6,7 +6,6 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validate;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
-import de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
@@ -53,15 +52,16 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Abstract base class for transforming documentation units into LDML case law format. Provides
- * common transformation logic and helper methods.
+ * Abstract base class for transforming decisions into LDML case law format. Provides common
+ * transformation logic and helper methods.
  */
 @Slf4j
-public abstract class DecisionCommonPortalTransformer implements PortalTransformer {
+public abstract class DecisionCommonLdmlTransformer
+    implements DocumentationUnitLdmlTransformer<Decision> {
 
   private final DocumentBuilderFactory documentBuilderFactory;
 
-  protected DecisionCommonPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  protected DecisionCommonLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     this.documentBuilderFactory = documentBuilderFactory;
   }
 

@@ -18,13 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Transformer for converting documentation units to LDML format for public portal use. Implements
- * specific meta-data mapping for public access.
+ * Transformer for converting decisions to LDML format for public portal use. Implements specific
+ * meta-data mapping for public access.
  */
 @Slf4j
-public class DecisionPrototypePortalTransformer extends DecisionCommonPortalTransformer {
+public class DecisionPublicLdmlTransformer extends DecisionCommonLdmlTransformer {
 
-  public DecisionPrototypePortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public DecisionPublicLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 
