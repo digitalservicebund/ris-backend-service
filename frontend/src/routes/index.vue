@@ -5,7 +5,7 @@ import { useRouter } from "vue-router"
 const router = useRouter()
 onBeforeMount(async () => {
   await router.push({
-    name: "caselaw",
+    name: "caselaw-search",
   })
 })
 </script>

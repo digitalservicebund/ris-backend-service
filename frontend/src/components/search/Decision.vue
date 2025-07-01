@@ -2,7 +2,7 @@
 import Button from "primevue/button"
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
-import DateUtil from "../utils/dateUtil"
+import DateUtil from "../../utils/dateUtil"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
 import InfoModal from "@/components/InfoModal.vue"
