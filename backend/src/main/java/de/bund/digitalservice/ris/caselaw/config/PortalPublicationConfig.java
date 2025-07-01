@@ -66,8 +66,7 @@ public class PortalPublicationConfig {
 
   @Bean
   @Profile({"staging", "local"})
-  public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer stagingPortalTransformer(
-      DocumentBuilderFactory documentBuilderFactory) {
+  public PortalTransformer stagingPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
     return new InternalLdmlTransformer(documentBuilderFactory);
   }
 

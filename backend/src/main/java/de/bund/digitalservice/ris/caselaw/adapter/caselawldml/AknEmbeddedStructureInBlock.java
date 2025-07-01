@@ -139,4 +139,22 @@ public abstract class AknEmbeddedStructureInBlock extends AknBlock {
       return NAME;
     }
   }
+
+  @NoArgsConstructor
+  @XmlDiscriminatorValue(ResolutionNote.NAME)
+  public static class ResolutionNote extends AknEmbeddedStructureInBlock {
+    public static final String NAME = "Erledigungsmitteilung";
+
+    public ResolutionNote(JaxbHtml content) {
+      this.content = content;
+    }
+
+    public static OtherLongText build(JaxbHtml content) {
+      return content == null ? null : new OtherLongText(content);
+    }
+
+    public String getName() {
+      return NAME;
+    }
+  }
 }
