@@ -6,9 +6,11 @@
     <springProfile name="staging,production,uat">
         <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
         <include resource="org/springframework/boot/logging/logback/structured-console-appender.xml"/>
+        <include resource="org/springframework/boot/logging/logback/structured-file-appender.xml" />
         <appender name="SENTRY" class="io.sentry.logback.SentryAppender" />
         <root level="INFO">
             <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
             <appender-ref ref="SENTRY"/>
         </root>
     </springProfile>
