@@ -127,10 +127,11 @@ public class S3AttachmentService implements AttachmentService {
         .findByDocumentationUnitIdAndFilename(documentationUnitId, imageName)
         .map(
             attachmentDTO ->
-                new Image(
-                    attachmentDTO.getContent(),
-                    attachmentDTO.getFormat(),
-                    attachmentDTO.getFilename()));
+                Image.builder()
+                    .content(attachmentDTO.getContent())
+                    .contentType(attachmentDTO.getFormat())
+                    .name(attachmentDTO.getFilename())
+                    .build());
   }
 
   void checkDocx(ByteBuffer byteBuffer) {
