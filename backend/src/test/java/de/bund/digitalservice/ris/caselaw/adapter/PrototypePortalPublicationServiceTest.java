@@ -119,7 +119,6 @@ class PrototypePortalPublicationServiceTest {
     subject =
         new PrototypePortalPublicationService(
             documentationUnitRepository,
-            attachmentRepository,
             xmlUtilService,
             prototypePortalBucket,
             objectMapper,

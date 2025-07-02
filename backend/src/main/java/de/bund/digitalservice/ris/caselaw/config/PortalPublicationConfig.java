@@ -25,7 +25,6 @@ public class PortalPublicationConfig {
   @Profile({"production"})
   public PortalPublicationService prototypePortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
-      AttachmentRepository attachmentRepository,
       XmlUtilService xmlUtilService,
       PrototypePortalBucket prototypePortalBucket,
       ObjectMapper objectMapper,
@@ -33,7 +32,6 @@ public class PortalPublicationConfig {
       RiiService riiService) {
     return new PrototypePortalPublicationService(
         documentationUnitRepository,
-        attachmentRepository,
         xmlUtilService,
         prototypePortalBucket,
         objectMapper,
