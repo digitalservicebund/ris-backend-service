@@ -418,6 +418,7 @@ public class DocumentationUnitService {
 
     DocumentationUnit existingDocumentationUnit = getByUuid(documentationUnitId, user);
 
+    DocumentationUnit patchedDocumentationUnitWithBase64Images;
     long newVersion = 1L;
     if (existingDocumentationUnit.version() != null) {
       newVersion = existingDocumentationUnit.version() + 1;
@@ -447,30 +448,29 @@ public class DocumentationUnitService {
 
       if (!toUpdate.getOperations().isEmpty()) {
         toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
+        patchedDocumentationUnitWithBase64Images =
+            patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
+        toUpdate =
+            patchMapperService.extractAndStoreBase64Images(
+                toUpdate, existingDocumentationUnit, null);
 
         DocumentationUnit patchedDocumentationUnit =
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
 
-        if (patchedDocumentationUnit instanceof Decision docUnit) {
-          patchedDocumentationUnit = docUnit.toBuilder().version(newVersion).build();
-        } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
-          patchedDocumentationUnit = pendingProceeding.toBuilder().version(newVersion).build();
-        }
+        patchedDocumentationUnit =
+            updateDocumentationUnitVersion(patchedDocumentationUnit, newVersion);
+
+        patchedDocumentationUnitWithBase64Images =
+            updateDocumentationUnitVersion(patchedDocumentationUnitWithBase64Images, newVersion);
 
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
-        DocumentationUnit updatedDocumentationUnit = null;
-        if (patchedDocumentationUnit instanceof Decision docUnit) {
-          updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
-        } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
-          updatedDocumentationUnit = updatePendingProceeding(pendingProceeding, user);
-        } else {
-          throw new UnsupportedOperationException(
-              "Update not supported for Documentable type: " + patchedDocumentationUnit.getClass());
-        }
+        DocumentationUnit updatedDocumentationUnit =
+            updateDocumentationUnit(user, patchedDocumentationUnit, duplicateCheckStatus);
 
         toFrontendJsonPatch =
-            patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
+            patchMapperService.getDiffPatch(
+                patchedDocumentationUnitWithBase64Images, updatedDocumentationUnit);
 
         log.debug(
             "version {} - raw to frontend patch: {}",
@@ -518,6 +518,35 @@ public class DocumentationUnitService {
     }
 
     return toFrontend;
+  }
+
+  /** Return a documentation unit with a new version */
+  private static DocumentationUnit updateDocumentationUnitVersion(
+      DocumentationUnit documentationUnit, long newVersion) {
+    if (documentationUnit instanceof Decision docUnit) {
+      documentationUnit = docUnit.toBuilder().version(newVersion).build();
+
+    } else if (documentationUnit instanceof PendingProceeding pendingProceeding) {
+      documentationUnit = pendingProceeding.toBuilder().version(newVersion).build();
+    }
+    return documentationUnit;
+  }
+
+  private DocumentationUnit updateDocumentationUnit(
+      User user,
+      DocumentationUnit patchedDocumentationUnit,
+      DuplicateCheckStatus duplicateCheckStatus)
+      throws DocumentationUnitNotExistsException {
+    DocumentationUnit updatedDocumentationUnit;
+    if (patchedDocumentationUnit instanceof Decision docUnit) {
+      updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
+    } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
+      updatedDocumentationUnit = updatePendingProceeding(pendingProceeding, user);
+    } else {
+      throw new UnsupportedOperationException(
+          "Update not supported for Documentable type: " + patchedDocumentationUnit.getClass());
+    }
+    return updatedDocumentationUnit;
   }
 
   public Decision updateDocumentationUnit(Decision decision)

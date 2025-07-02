@@ -15,8 +15,12 @@ import com.gravity9.jsonpatch.ReplaceOperation;
 import com.gravity9.jsonpatch.diff.JsonDiff;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.ImageServiceUtil;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import java.util.ArrayList;
@@ -28,6 +32,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,11 +49,15 @@ public class DatabasePatchMapperService implements PatchMapperService {
 
   private final ObjectMapper objectMapper;
   private final DatabaseDocumentationUnitPatchRepository repository;
+  private final AttachmentService attachmentService;
 
   public DatabasePatchMapperService(
-      ObjectMapper objectMapper, DatabaseDocumentationUnitPatchRepository repository) {
+      ObjectMapper objectMapper,
+      DatabaseDocumentationUnitPatchRepository repository,
+      AttachmentService attachmentService) {
     this.objectMapper = objectMapper;
     this.repository = repository;
+    this.attachmentService = attachmentService;
   }
 
   @Override
@@ -201,6 +215,66 @@ public class DatabasePatchMapperService implements PatchMapperService {
                   operations.add(
                       new ReplaceOperation(
                           valueOperation.getPath(), new TextNode(builder.toString())));
+                }
+              } else {
+                operations.add(operation);
+              }
+            });
+
+    return new JsonPatch(operations);
+  }
+
+  /**
+   * Extracts base64 images from HTML content in the given JSON patch, stores them as attachments,
+   * and replaces the image sources with URLs pointing to the stored images.
+   */
+  @Override
+  public JsonPatch extractAndStoreBase64Images(
+      JsonPatch patch, DocumentationUnit documentationUnit, User user) {
+    List<JsonPatchOperation> operations = new ArrayList<>();
+
+    patch
+        .getOperations()
+        .forEach(
+            operation -> {
+              if (operation instanceof PathValueOperation valueOperation
+                  && valueOperation.getValue() instanceof TextNode valueNode) {
+                try {
+                  String originalText = valueNode.textValue();
+                  Document document = Jsoup.parse(originalText);
+                  document.outputSettings().prettyPrint(false);
+
+                  var elements = ImageServiceUtil.extractBase64ImageTags(document);
+
+                  for (Element base64ImageTag : elements) {
+                    HttpHeaders headers = new HttpHeaders();
+                    String fileName = "." + ImageServiceUtil.getFileExtension(base64ImageTag);
+                    headers.set("X-Filename", fileName);
+
+                    MediaType contentType = MediaTypeFactory.getMediaType(fileName).orElse(null);
+                    headers.setContentType(contentType);
+
+                    var byteBuffer = ImageServiceUtil.encodeToBytes(base64ImageTag);
+                    Attachment attachment =
+                        attachmentService.attachFileToDocumentationUnit(
+                            documentationUnit.uuid(), byteBuffer, headers, null);
+
+                    base64ImageTag.replaceWith(
+                        ImageServiceUtil.createImageElementWithNewSrc(
+                            base64ImageTag, attachment.name(), documentationUnit.documentNumber()));
+                  }
+                  if (operation instanceof AddOperation) {
+                    operations.add(
+                        new AddOperation(
+                            valueOperation.getPath(), new TextNode(document.body().html())));
+                  } else if (operation instanceof ReplaceOperation) {
+                    operations.add(
+                        new ReplaceOperation(
+                            valueOperation.getPath(), new TextNode(document.body().html())));
+                  }
+                } catch (Exception e) {
+                  log.info("Could not process image: ", e);
+                  operations.add(operation);
                 }
               } else {
                 operations.add(operation);

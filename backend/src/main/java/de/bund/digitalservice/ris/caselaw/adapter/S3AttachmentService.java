@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
+import de.bund.digitalservice.ris.caselaw.domain.ImageServiceUtil;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.io.ByteArrayInputStream;
@@ -48,8 +49,17 @@ public class S3AttachmentService implements AttachmentService {
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
 
+  private final MediaType wordMediaType =
+      MediaType.parseMediaType(
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
+
+  public static boolean equalsMediaType(MediaType expected, MediaType actual) {
+    return expected.getType().equalsIgnoreCase(actual.getType())
+        && expected.getSubtype().equalsIgnoreCase(actual.getSubtype());
+  }
 
   public S3AttachmentService(
       AttachmentRepository repository,
@@ -69,12 +79,62 @@ public class S3AttachmentService implements AttachmentService {
             ? httpHeaders.getFirst("X-Filename")
             : "Kein Dateiname gefunden";
 
-    checkDocx(byteBuffer);
-
     DocumentationUnitDTO documentationUnit =
         documentationUnitRepository.findById(documentationUnitId).orElseThrow();
 
-    AttachmentDTO attachmentDTO =
+    MediaType contentType = httpHeaders.getContentType();
+
+    if (contentType == null) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Missing / invalid Content-Type header");
+    }
+
+    if (equalsMediaType(wordMediaType, contentType)) {
+      return attachDocx(
+          documentationUnitId, byteBuffer, httpHeaders, user, documentationUnit, fileName);
+    } else if (ImageServiceUtil.getSupportedMediaTypes().stream()
+        .anyMatch(type -> equalsMediaType(type, contentType))) {
+
+      return attachImage(byteBuffer, contentType, documentationUnit);
+
+    } else {
+      throw new ResponseStatusException(
+          HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Only images and docx are supported");
+    }
+  }
+
+  private Attachment attachImage(
+      ByteBuffer byteBuffer, MediaType contentType, DocumentationUnitDTO documentationUnit) {
+    AttachmentDTO attachmentDTO;
+    attachmentDTO =
+        AttachmentDTO.builder()
+            .s3ObjectPath(null)
+            .content(byteBuffer.array())
+            .documentationUnit(documentationUnit)
+            .format(contentType.getSubtype().toLowerCase())
+            .filename("unknown yet")
+            .uploadTimestamp(Instant.now())
+            .build();
+
+    attachmentDTO = repository.save(attachmentDTO);
+    attachmentDTO.setFilename(attachmentDTO.getId() + "." + attachmentDTO.getFormat());
+
+    // TODO: clarify : code review log update doc is redundant on long text / short update, only on
+    // upload page
+    return AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
+  }
+
+  private Attachment attachDocx(
+      UUID documentationUnitId,
+      ByteBuffer byteBuffer,
+      HttpHeaders httpHeaders,
+      User user,
+      DocumentationUnitDTO documentationUnit,
+      String fileName) {
+    AttachmentDTO attachmentDTO;
+    checkDocx(byteBuffer);
+
+    attachmentDTO =
         AttachmentDTO.builder()
             .s3ObjectPath("unknown yet")
             .documentationUnit(documentationUnit)
