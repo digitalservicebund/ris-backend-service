@@ -51,7 +51,7 @@ public class DatabaseDocumentUnitConsistencyService {
             docIds);
       }
     } catch (Exception e) {
-      log.error("Error while checking doc unit inheritance consistency", e);
+      log.error("Error while checking doc unit inheritance consistency XXX", e);
     }
   }
 
