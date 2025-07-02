@@ -519,6 +519,7 @@ public class DocumentationUnitController {
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(getMediaType(contentType));
       headers.setContentLength(imageBytes.length);
+      headers.setCacheControl(CacheControl.maxAge(Duration.ofDays(1)));
 
       return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     } catch (DocumentationUnitNotExistsException e) {
