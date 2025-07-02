@@ -175,8 +175,7 @@ class PrototypePortalPublicationServiceTest {
 
     subject.publishDocumentationUnit(testDocumentNumber);
 
-    verify(prototypePortalBucket, times(1))
-        .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
+    verify(prototypePortalBucket, times(1)).save(testDocumentNumber + ".xml", transformed);
   }
 
   @Test
@@ -206,21 +205,14 @@ class PrototypePortalPublicationServiceTest {
 
   @Test
   void delete_shouldDeleteFromBucket() {
-    when(prototypePortalBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
-        .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
     subject.deleteDocumentationUnit(testDocumentNumber);
 
-    verify(prototypePortalBucket, times(1))
-        .delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
+    verify(prototypePortalBucket, times(1)).delete(testDocumentNumber + ".xml");
   }
 
   @Test
   void delete_shouldThrow() {
-    when(prototypePortalBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
-        .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
-    doThrow(BucketException.class)
-        .when(prototypePortalBucket)
-        .delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
+    doThrow(BucketException.class).when(prototypePortalBucket).delete(testDocumentNumber + ".xml");
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.deleteDocumentationUnit(testDocumentNumber))
@@ -247,23 +239,22 @@ class PrototypePortalPublicationServiceTest {
   void sanityCheck_shouldDeleteDocumentNumbersInPortalButNotInRii() throws JsonProcessingException {
     when(riiService.fetchRiiDocumentNumbers()).thenReturn(List.of("123", "456"));
     when(prototypePortalBucket.getAllFilenames())
-        .thenReturn(List.of("123/123.xml", "456/456.xml", "789/789.xml"));
+        .thenReturn(List.of("123.xml", "456.xml", "789.xml"));
     ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> fileContentCaptor = ArgumentCaptor.forClass(String.class);
-    when(objectMapper.writeValueAsString(new ChangelogUpdateDelete(null, List.of("789/789.xml"))))
+    when(objectMapper.writeValueAsString(new ChangelogUpdateDelete(null, List.of("789.xml"))))
         .thenReturn(
             """
-                {"deleted":["789/789.xml"]}""");
-    when(prototypePortalBucket.getAllFilenamesByPath("789/")).thenReturn(List.of("789/789.xml"));
+                {"deleted":["789.xml"]}""");
 
     subject.logPortalPublicationSanityCheck();
 
-    verify(prototypePortalBucket).delete("789/789.xml");
+    verify(prototypePortalBucket).delete("789.xml");
     verify(prototypePortalBucket).save(fileNameCaptor.capture(), fileContentCaptor.capture());
     assertThat(fileNameCaptor.getValue()).contains("changelogs");
     assertThat(fileContentCaptor.getValue())
         .isEqualTo(
             """
-                {"deleted":["789/789.xml"]}""");
+                {"deleted":["789.xml"]}""");
   }
 }

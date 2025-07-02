@@ -145,8 +145,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
             bodyCaptor.getValue().contentStreamProvider().newStream().readAllBytes(),
             StandardCharsets.UTF_8);
 
-    assertThat(putRequest.key())
-        .isEqualTo(dto.getDocumentNumber() + "/" + dto.getDocumentNumber() + ".xml");
+    assertThat(putRequest.key()).isEqualTo(dto.getDocumentNumber() + ".xml");
     assertThat(ldmlContent)
         .contains("gruende test")
         .doesNotContain("entscheidungsname test")
