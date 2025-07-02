@@ -25,8 +25,7 @@ public class ImageBase64Util {
     }
 
     var src = "/api/v1/caselaw/documentunits/" + documentNumber + "/image/" + fileName;
-    oldElement.attr("src", src);
-    return oldElement;
+    return oldElement.clone().attr("src", src);
   }
 
   public static void assertHasValidImageExtension(String fileName) {
