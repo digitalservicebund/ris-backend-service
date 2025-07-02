@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -289,7 +288,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
 
     ListObjectsV2Request request =
         ListObjectsV2Request.builder().bucket("no-bucket").prefix("1234567890123/").build();
-    when(s3Client.listObjectsV2(eq(request))).thenReturn(response);
+    when(s3Client.listObjectsV2(request)).thenReturn(response);
 
     risWebTestClient
         .withDefaultLogin()

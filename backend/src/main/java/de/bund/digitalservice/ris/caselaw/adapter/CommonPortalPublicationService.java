@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class CommonPortalPublicationService implements PortalPublicationService {
 
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final AttachmentRepository attachmentRepository;
   private final S3Bucket portalBucket;
   private final ObjectMapper objectMapper;
   private final XmlUtilService xmlUtilService;
@@ -36,7 +35,6 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       PortalTransformer portalTransformer) {
 
     this.documentationUnitRepository = documentationUnitRepository;
-    this.attachmentRepository = attachmentRepository;
     this.portalBucket = portalBucket;
     this.objectMapper = objectMapper;
     this.xmlUtilService = xmlUtilService;
