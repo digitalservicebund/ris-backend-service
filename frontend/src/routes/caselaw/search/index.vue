@@ -42,16 +42,24 @@ watch(value, async (newVal) => {
     })
   }
 })
+
+// Function to push the correct route, depending on the active document kind tab
+const handleNewDocumentationUnitClick = async () => {
+  if (value.value === "0") {
+    await router.push({ name: "caselaw-documentUnit-new" })
+  } else if (value.value === "1") {
+    await router.push({ name: "caselaw-pending-proceeding-new" })
+  }
+}
 </script>
 
 <template>
   <div class="m-24 flex flex-col">
-    <!-- Todo: conditionally add correct depending on active tab -->
     <div class="mb-16 flex w-full justify-end">
       <Button
         v-if="isInternalUser"
         label="Neue Dokumentationseinheit"
-        @click="router.push({ name: 'caselaw-documentUnit-new' })"
+        @click="handleNewDocumentationUnitClick"
       ></Button>
     </div>
     <Tabs v-model:value="value" lazy>
