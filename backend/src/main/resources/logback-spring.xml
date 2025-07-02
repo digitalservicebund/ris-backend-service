@@ -4,14 +4,10 @@
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
     </springProfile>
     <springProfile name="staging,production,uat">
-        <!-- The structured format value from application.yaml is not available here. Unclear why. -->
-        <property name="CONSOLE_LOG_STRUCTURED_FORMAT"
-                  value="${CONSOLE_LOG_STRUCTURED_FORMAT:-logstash}"/>
-        <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-        <include resource="org/springframework/boot/logging/logback/structured-console-appender.xml"/>
+        <include resource="org/springframework/boot/logging/logback/base.xml"/>
         <appender name="SENTRY" class="io.sentry.logback.SentryAppender" />
         <root level="INFO">
-            <appender-ref ref="CONSOLE" />
+            <!-- <appender-ref ref="LOKI" /> -->.
             <appender-ref ref="SENTRY"/>
         </root>
     </springProfile>
