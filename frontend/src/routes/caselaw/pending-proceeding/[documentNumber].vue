@@ -11,9 +11,6 @@ defineProps<{
 <template>
   <DocumentViewer
     :document-number="documentNumber"
-    :extra-content-side-panel-props="{
-      sidePanelMode: 'preview',
-    }"
     :kind="Kind.PENDING_PROCEEDING"
   >
     <template #default="{ registerTextEditorRef, jumpToMatch: jumpToMatch }">

@@ -85,13 +85,15 @@ function togglePanel(expand?: boolean): boolean {
 
 function setDefaultState() {
   if (props.sidePanelMode) {
-    store.setSidePanelMode(props.sidePanelMode)
+    setSidePanelMode(props.sidePanelMode)
   } else if (
     isDecision(props.documentUnit) &&
     !props.documentUnit!.note &&
     props.documentUnit!.hasAttachments
   ) {
     selectAttachments()
+  } else if (isPendingProceeding(props.documentUnit)) {
+    setSidePanelMode("preview")
   } else {
     setSidePanelMode("note")
   }

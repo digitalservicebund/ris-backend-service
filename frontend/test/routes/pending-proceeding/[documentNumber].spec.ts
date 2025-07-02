@@ -255,12 +255,26 @@ describe("Document Number Route", () => {
 
   describe("Shortcuts", () => {
     it('detects "v" keypress and opens preview', async () => {
-      const { router } = renderComponent()
+      const { user, router } = renderComponent()
+      await router.push({
+        path: "/caselaw/pendingProceeding/1234567891234/categories?showAttachmentPanel=false",
+      })
+      await user.keyboard("r") // is needed as preview is displayed as default for pending proceedings
+
+      expect(screen.queryByTestId("preview")).not.toBeInTheDocument()
+      await user.keyboard("v")
+      expect(screen.getByTestId("preview")).toBeInTheDocument()
+    })
+
+    it('detects "r" keypress and opens category import', async () => {
+      const { user, router } = renderComponent()
       await router.push({
         path: "/caselaw/pendingProceeding/1234567891234/categories?showAttachmentPanel=false",
       })
 
-      expect(screen.getByTestId("preview")).toBeInTheDocument()
+      expect(screen.queryByTestId("category-import")).not.toBeInTheDocument()
+      await user.keyboard("r")
+      expect(screen.getByTestId("category-import")).toBeInTheDocument()
     })
 
     it('detects ">" keypress and opens both panels', async () => {

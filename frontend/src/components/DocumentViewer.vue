@@ -6,7 +6,6 @@ import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
-import { ExtraContentSidePanelProps } from "@/components/input/types"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import SideToggle from "@/components/SideToggle.vue"
@@ -27,7 +26,6 @@ import { Match } from "@/types/textCheck"
 const props = defineProps<{
   documentNumber: string
   kind: Kind
-  extraContentSidePanelProps?: ExtraContentSidePanelProps
 }>()
 
 const emit = defineEmits<{
@@ -216,7 +214,7 @@ onMounted(async () => {
               !route.path.includes('handover') &&
               !route.path.includes('preview')
             "
-            v-bind="{ jumpToMatch, ...extraContentSidePanelProps }"
+            v-bind="{ jumpToMatch }"
             :document-unit="documentUnit"
           />
           <slot
