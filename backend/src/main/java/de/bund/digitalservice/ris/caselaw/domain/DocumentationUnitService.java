@@ -543,7 +543,7 @@ public class DocumentationUnitService {
     } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
       updatedDocumentationUnit = updatePendingProceeding(pendingProceeding, user);
     } else {
-      throw new UnsupportedOperationException(
+      throw new DocumentationUnitException(
           "Update not supported for Documentable type: " + patchedDocumentationUnit.getClass());
     }
     return updatedDocumentationUnit;
