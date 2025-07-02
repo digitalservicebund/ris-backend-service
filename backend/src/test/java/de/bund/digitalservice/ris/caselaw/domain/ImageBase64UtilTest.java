@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-class ImageServiceUtilTest {
+class ImageBase64UtilTest {
 
   private static final String base64PNGSourceSrcTag =
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII";
@@ -31,7 +31,7 @@ class ImageServiceUtilTest {
   @Test
   void test_extractBase64ImageTags() {
     var html = "<p>" + getDefaultImageTag().outerHtml() + "</p>";
-    var results = ImageServiceUtil.extractBase64ImageTags(Jsoup.parse(html));
+    var results = ImageBase64Util.extractBase64ImageTags(Jsoup.parse(html));
     Assertions.assertFalse(results.isEmpty());
   }
 
@@ -44,7 +44,7 @@ class ImageServiceUtilTest {
 
     Assertions.assertNotNull(imageTag);
     Element updatedImageTag =
-        ImageServiceUtil.createImageElementWithNewSrc(
+        ImageBase64Util.createImageElementWithNewSrc(
             imageTag, "26883193-d749-4003-9940-432b3d87e435.png", "YYTestDoc0001");
 
     Assertions.assertNotNull(updatedImageTag);
@@ -63,7 +63,7 @@ class ImageServiceUtilTest {
     IllegalArgumentException thrown =
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> ImageServiceUtil.createImageElementWithNewSrc(imageTag, "123.png", null));
+            () -> ImageBase64Util.createImageElementWithNewSrc(imageTag, "123.png", null));
 
     Assertions.assertEquals(
         "Documentation unit number can't be null or blank", thrown.getMessage());
@@ -76,7 +76,7 @@ class ImageServiceUtilTest {
     IllegalArgumentException thrown =
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> ImageServiceUtil.createImageElementWithNewSrc(imageTag, null, "YYTestDoc0001"));
+            () -> ImageBase64Util.createImageElementWithNewSrc(imageTag, null, "YYTestDoc0001"));
 
     Assertions.assertEquals("File name must have a valid image extension", thrown.getMessage());
   }
@@ -89,7 +89,7 @@ class ImageServiceUtilTest {
         Assertions.assertThrows(
             IllegalArgumentException.class,
             () ->
-                ImageServiceUtil.createImageElementWithNewSrc(
+                ImageBase64Util.createImageElementWithNewSrc(
                     imageTag, "fileNameWithoutExtension", "YYTestDoc0001"));
 
     Assertions.assertEquals("File name must have a valid image extension", thrown.getMessage());
@@ -98,7 +98,7 @@ class ImageServiceUtilTest {
   @ParameterizedTest
   @MethodSource("imageFormatsWithFileMagicNumbers")
   void testBase64ToByteEncoder(String base64, byte[] expectedHeader) {
-    ByteBuffer result = ImageServiceUtil.encodeToBytes(base64);
+    ByteBuffer result = ImageBase64Util.encodeToBytes(base64);
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.remaining() > 0, "Decoded buffer should not be empty");
 
@@ -146,6 +146,6 @@ class ImageServiceUtilTest {
     "jpeg, data:image/JPEG;base64,/9j/4AAQSkZJRgABAQEAYABgAAD",
   })
   void testGetFileExtension(String extension, String src) {
-    Assertions.assertEquals(extension, ImageServiceUtil.getFileExtension(src));
+    Assertions.assertEquals(extension, ImageBase64Util.getFileExtension(src));
   }
 }

@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 import org.springframework.http.MediaType;
 
 @UtilityClass
-public class ImageServiceUtil {
+public class ImageBase64Util {
 
   public static Elements extractBase64ImageTags(Document document) {
     return document.select("img[src^=data:image/]");
