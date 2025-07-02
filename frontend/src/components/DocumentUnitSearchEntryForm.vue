@@ -3,7 +3,7 @@ import Button from "primevue/button"
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import InputSelect from "primevue/select"
-import { computed, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
@@ -22,7 +22,7 @@ const emit = defineEmits<{
 }>()
 
 const validationStore = useValidationStore<DocumentationUnitSearchParameter>()
-const { getQueryFromRoute, pushQueryToRoute } =
+const { route, getQueryFromRoute, pushQueryToRoute } =
   useQuery<DocumentationUnitSearchParameter>()
 const query = ref(getQueryFromRoute())
 
@@ -206,6 +206,14 @@ function handleSearch() {
     resetSearch()
   }
 }
+
+watch(
+  route,
+  () => {
+    handleSearch()
+  },
+  { deep: true },
+)
 </script>
 
 <template>
