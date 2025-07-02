@@ -19,15 +19,13 @@ const sessionStore = useSessionStore()
 const documentationOfficeAbbreviation =
   sessionStore.user?.documentationOffice?.abbreviation
 
-const tabParam = computed(
-  () => (route.params.tab as string) ?? "entscheidungen",
-)
+const tabParam = computed(() => (route.params.tab as string) ?? "decisions")
 
 const value = ref()
 
 const tabMap: Record<string, string> = {
-  entscheidungen: "0",
-  "anhaengige-verfahren": "1",
+  decisions: "0",
+  "pending-proceedings": "1",
 }
 
 onMounted(() => {
@@ -36,8 +34,7 @@ onMounted(() => {
 
 watch(value, async (newVal) => {
   const pathKey =
-    Object.entries(tabMap).find(([, v]) => v === newVal)?.[0] ??
-    "entscheidungen"
+    Object.entries(tabMap).find(([, v]) => v === newVal)?.[0] ?? "decisions"
   if (pathKey !== tabParam.value) {
     await router.replace({
       name: "caselaw-search-tab",
@@ -49,6 +46,7 @@ watch(value, async (newVal) => {
 
 <template>
   <div class="m-24 flex flex-col">
+    <!-- Todo: conditionally add correct depending on active tab -->
     <div class="mb-16 flex w-full justify-end">
       <Button
         v-if="isInternalUser"
@@ -58,7 +56,7 @@ watch(value, async (newVal) => {
     </div>
     <Tabs v-model:value="value" lazy>
       <!-- Todo: for development not yet hidden for BFH, hide the TabList
-      v-if="documentationOfficeAbbreviation !== 'BFH' -->
+      v-if="documentationOfficeAbbreviation === 'BFH' -->
       <TabList v-if="documentationOfficeAbbreviation !== 'BFH'">
         <Tab data-testid="search-tab-caselaw" value="0">Rechtsprechung</Tab>
         <Tab data-testid="search-tab-pending-proceeding" value="1"
