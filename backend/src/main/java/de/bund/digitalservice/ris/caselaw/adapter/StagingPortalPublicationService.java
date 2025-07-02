@@ -31,12 +31,7 @@ public class StagingPortalPublicationService extends CommonPortalPublicationServ
       ObjectMapper objectMapper,
       PortalTransformer portalTransformer) {
     super(
-        documentationUnitRepository,
-        attachmentRepository,
-        xmlUtilService,
-        portalBucket,
-        objectMapper,
-        portalTransformer);
+        documentationUnitRepository, xmlUtilService, portalBucket, objectMapper, portalTransformer);
     this.portalBucket = portalBucket;
     this.attachmentRepository = attachmentRepository;
     this.ldmlTransformer = portalTransformer;

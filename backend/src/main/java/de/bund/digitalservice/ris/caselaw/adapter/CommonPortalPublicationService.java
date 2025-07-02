@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
@@ -28,7 +27,6 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
 
   protected CommonPortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
-      AttachmentRepository attachmentRepository,
       XmlUtilService xmlUtilService,
       S3Bucket portalBucket,
       ObjectMapper objectMapper,

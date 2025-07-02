@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import java.util.List;
@@ -21,7 +20,6 @@ public class PrototypePortalPublicationService extends CommonPortalPublicationSe
 
   public PrototypePortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
-      AttachmentRepository attachmentRepository,
       XmlUtilService xmlUtilService,
       PrototypePortalBucket prototypePortalBucket,
       ObjectMapper objectMapper,
@@ -29,7 +27,6 @@ public class PrototypePortalPublicationService extends CommonPortalPublicationSe
       RiiService riiService) {
     super(
         documentationUnitRepository,
-        attachmentRepository,
         xmlUtilService,
         prototypePortalBucket,
         objectMapper,
