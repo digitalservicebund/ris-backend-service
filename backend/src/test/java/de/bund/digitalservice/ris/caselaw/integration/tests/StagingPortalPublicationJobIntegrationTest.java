@@ -135,7 +135,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     portalPublicationJobService.executePendingJobs();
 
-    verify(s3Client, times(1)).putObject(putCaptor.capture(), bodyCaptor.capture());
+    verify(s3Client, times(2)).putObject(putCaptor.capture(), bodyCaptor.capture());
 
     var fileNameRequests = putCaptor.getAllValues();
     var bodyRequests = bodyCaptor.getAllValues();
@@ -143,10 +143,10 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         new String(
             bodyRequests.getFirst().contentStreamProvider().newStream().readAllBytes(),
             StandardCharsets.UTF_8);
-    //    var changelogContent =
-    //        new String(
-    //            bodyRequests.get(1).contentStreamProvider().newStream().readAllBytes(),
-    //            StandardCharsets.UTF_8);
+    var changelogContent =
+        new String(
+            bodyRequests.get(1).contentStreamProvider().newStream().readAllBytes(),
+            StandardCharsets.UTF_8);
 
     assertThat(fileNameRequests.getFirst().key())
         .isEqualTo(dto.getDocumentNumber() + "/" + dto.getDocumentNumber() + ".xml");
@@ -154,15 +154,15 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         .contains("gruende test")
         .contains("entscheidungsname test")
         .contains("orientierungssatz test");
-    //    assertThat(fileNameRequests.get(1).key()).contains("changelog");
-    //    assertThat(changelogContent)
-    //        .isEqualTo(
-    //            """
-    //                {"changed":["1/1.xml"],"deleted":[]}""");
+    assertThat(fileNameRequests.get(1).key()).contains("changelog");
+    assertThat(changelogContent)
+        .isEqualTo(
+            """
+                    {"changed":["1/1.xml"],"deleted":[]}""");
   }
 
   @Test
-  void shouldOnlyAddDocumentNumberToChangelogForLatestKindOfJob() {
+  void shouldOnlyAddDocumentNumberToChangelogForLatestKindOfJob() throws IOException {
     DocumentationUnitDTO dto1 =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, buildValidDocumentationUnit("1"));
@@ -202,29 +202,28 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     // TWO DELETE JOBS
     verify(s3Client, times(2)).deleteObject(deleteCaptor.capture());
-    // PUT 4 PUBLISH JOBS (+ PUT changelog)
-    verify(s3Client, times(4)).putObject(putCaptor.capture(), bodyCaptor.capture());
+    // PUT 4 PUBLISH JOBS + PUT changelog
+    verify(s3Client, times(5)).putObject(putCaptor.capture(), bodyCaptor.capture());
 
     var capturedPutRequests = putCaptor.getAllValues();
     var capturedDeleteRequests = deleteCaptor.getAllValues();
-    //    var changelogContent =
-    //        new String(
-    //
-    // bodyCaptor.getAllValues().get(4).contentStreamProvider().newStream().readAllBytes(),
-    //            StandardCharsets.UTF_8);
+    var changelogContent =
+        new String(
+            bodyCaptor.getAllValues().get(4).contentStreamProvider().newStream().readAllBytes(),
+            StandardCharsets.UTF_8);
 
     assertThat(capturedPutRequests.get(0).key()).isEqualTo("1/1.xml");
     assertThat(capturedPutRequests.get(1).key()).isEqualTo("1/1.xml");
     assertThat(capturedPutRequests.get(2).key()).isEqualTo("2/2.xml");
     assertThat(capturedPutRequests.get(3).key()).isEqualTo("2/2.xml");
-    //    assertThat(capturedPutRequests.get(4).key()).contains("changelogs/");
+    assertThat(capturedPutRequests.get(4).key()).contains("changelogs/");
     assertThat(capturedDeleteRequests.get(0).key()).isEqualTo("2/2.xml");
     assertThat(capturedDeleteRequests.get(1).key()).isEqualTo("1/1.xml");
-    //     ensure that each document number only appears either in changed or deleted section
-    //    assertThat(changelogContent)
-    //        .isEqualTo(
-    //            """
-    //                      {"changed":["2/2.xml"],"deleted":["1/1.xml"]}""");
+    //         ensure that each document number only appears either in changed or deleted section
+    assertThat(changelogContent)
+        .isEqualTo(
+            """
+                          {"changed":["2/2.xml"],"deleted":["1/1.xml"]}""");
 
     assertThat(portalPublicationJobRepository.findAll())
         .allMatch(job -> job.getPublicationStatus() == SUCCESS);
@@ -258,8 +257,8 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     // DELETE is called even after fail
     verify(s3Client, times(1)).deleteObject(any(DeleteObjectRequest.class));
-    // PUT 1.xml (fails) (+ PUT changelog)
-    verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+    // PUT 1.xml (fails) + PUT changelog
+    verify(s3Client, times(2)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
 
     assertThat(
             portalPublicationJobRepository.findAll().stream()

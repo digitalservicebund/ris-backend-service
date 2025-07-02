@@ -44,12 +44,6 @@ public class StagingPortalPublicationService extends CommonPortalPublicationServ
   }
 
   @Override
-  public void uploadChangelog(
-      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers) {
-    // no-op - all changelogs currently disabled
-  }
-
-  @Override
   protected PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {
     if (!(documentationUnit instanceof Decision decision)) {
       // for now pending proceedings can not be transformed to LDML, so they are ignored.
