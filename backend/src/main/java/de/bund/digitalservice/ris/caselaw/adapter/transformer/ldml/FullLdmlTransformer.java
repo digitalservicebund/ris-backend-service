@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml;
 
 import de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision.DecisionInternalLdmlTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding.PendingProceedingInternalLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision.DecisionFullLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding.PendingProceedingFullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
@@ -15,24 +15,23 @@ import lombok.extern.slf4j.Slf4j;
  * additional metadata like classification and keywords for internal processing.
  */
 @Slf4j
-public class InternalLdmlTransformer implements PortalTransformer {
+public class FullLdmlTransformer implements PortalTransformer {
 
-  private final DecisionInternalLdmlTransformer decisionInternalLdmlTransformer;
-  private final PendingProceedingInternalLdmlTransformer pendingProceedingInternalLdmlTransformer;
+  private final DecisionFullLdmlTransformer decisionFullLdmlTransformer;
+  private final PendingProceedingFullLdmlTransformer pendingProceedingFullLdmlTransformer;
 
-  public InternalLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
-    this.decisionInternalLdmlTransformer =
-        new DecisionInternalLdmlTransformer(documentBuilderFactory);
-    this.pendingProceedingInternalLdmlTransformer =
-        new PendingProceedingInternalLdmlTransformer(documentBuilderFactory);
+  public FullLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
+    this.decisionFullLdmlTransformer = new DecisionFullLdmlTransformer(documentBuilderFactory);
+    this.pendingProceedingFullLdmlTransformer =
+        new PendingProceedingFullLdmlTransformer(documentBuilderFactory);
   }
 
   @Override
   public CaseLawLdml transformToLdml(DocumentationUnit documentationUnit) {
     if (documentationUnit instanceof Decision decision) {
-      return decisionInternalLdmlTransformer.transformToLdml(decision);
+      return decisionFullLdmlTransformer.transformToLdml(decision);
     } else if (documentationUnit instanceof PendingProceeding pendingProceeding) {
-      return pendingProceedingInternalLdmlTransformer.transformToLdml(pendingProceeding);
+      return pendingProceedingFullLdmlTransformer.transformToLdml(pendingProceeding);
     } else {
       throw new IllegalArgumentException(
           "Unsupported documentation unit type: " + documentationUnit.kind());

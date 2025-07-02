@@ -5,10 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 
 /** Transformer for converting pending proceedings to LDML format for internal portal use. */
 @Slf4j
-public class PendingProceedingInternalLdmlTransformer
-    extends PendingProceedingCommonLdmlTransformer {
+public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommonLdmlTransformer {
 
-  public PendingProceedingInternalLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public PendingProceedingFullLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 }

@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml;
 
 import de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision.DecisionPublicLdmlTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding.PendingProceedingPublicLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision.DecisionReducedLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding.PendingProceedingReducedLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
@@ -12,18 +12,18 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Transformer for converting documentation units to LDML format for public portal use. Implements
- * specific meta-data mapping for public access.
+ * reduced meta-data mapping for public access.
  */
 @Slf4j
-public class PublicLdmlTransformer implements PortalTransformer {
+public class ReducedLdmlTransformer implements PortalTransformer {
 
-  private final DecisionPublicLdmlTransformer decisionPublicLdmlTransformer;
-  private final PendingProceedingPublicLdmlTransformer pendingProceedingPublicLdmlTransformer;
+  private final DecisionReducedLdmlTransformer decisionPublicLdmlTransformer;
+  private final PendingProceedingReducedLdmlTransformer pendingProceedingReducedLdmlTransformer;
 
-  public PublicLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
-    this.decisionPublicLdmlTransformer = new DecisionPublicLdmlTransformer(documentBuilderFactory);
-    this.pendingProceedingPublicLdmlTransformer =
-        new PendingProceedingPublicLdmlTransformer(documentBuilderFactory);
+  public ReducedLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
+    this.decisionPublicLdmlTransformer = new DecisionReducedLdmlTransformer(documentBuilderFactory);
+    this.pendingProceedingReducedLdmlTransformer =
+        new PendingProceedingReducedLdmlTransformer(documentBuilderFactory);
   }
 
   @Override
@@ -31,7 +31,7 @@ public class PublicLdmlTransformer implements PortalTransformer {
     if (documentationUnit instanceof Decision decision) {
       return decisionPublicLdmlTransformer.transformToLdml(decision);
     } else if (documentationUnit instanceof PendingProceeding pendingProceeding) {
-      return pendingProceedingPublicLdmlTransformer.transformToLdml(pendingProceeding);
+      return pendingProceedingReducedLdmlTransformer.transformToLdml(pendingProceeding);
     } else {
       throw new IllegalArgumentException(
           "Unsupported documentation unit type: " + documentationUnit.kind());

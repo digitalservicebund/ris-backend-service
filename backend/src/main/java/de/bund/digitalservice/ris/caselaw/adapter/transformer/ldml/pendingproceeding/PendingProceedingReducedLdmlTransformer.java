@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Transformer for converting pending proceedings to LDML format for public portal use. Implements
- * specific meta-data mapping for public access.
+ * reduced meta-data mapping for public access.
  */
 @Slf4j
-public class PendingProceedingPublicLdmlTransformer extends PendingProceedingCommonLdmlTransformer {
+public class PendingProceedingReducedLdmlTransformer
+    extends PendingProceedingCommonLdmlTransformer {
 
-  public PendingProceedingPublicLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public PendingProceedingReducedLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 }

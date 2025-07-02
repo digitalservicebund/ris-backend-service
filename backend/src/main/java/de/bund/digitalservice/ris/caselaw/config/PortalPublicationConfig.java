@@ -10,8 +10,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalPublicationServ
 import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.InternalLdmlTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PublicLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.ReducedLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.springframework.context.annotation.Bean;
@@ -61,18 +61,18 @@ public class PortalPublicationConfig {
   @Profile({"production"})
   public PortalTransformer prototypePortalTransformer(
       DocumentBuilderFactory documentBuilderFactory) {
-    return new PublicLdmlTransformer(documentBuilderFactory);
+    return new ReducedLdmlTransformer(documentBuilderFactory);
   }
 
   @Bean
   @Profile({"staging", "local"})
   public PortalTransformer stagingPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
-    return new InternalLdmlTransformer(documentBuilderFactory);
+    return new FullLdmlTransformer(documentBuilderFactory);
   }
 
   @Bean
   @Profile({"!staging & !production & !local"})
   public PortalTransformer defaultPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
-    return new PublicLdmlTransformer(documentBuilderFactory);
+    return new ReducedLdmlTransformer(documentBuilderFactory);
   }
 }

@@ -22,9 +22,9 @@ import org.apache.commons.lang3.StringUtils;
  * meta-data mapping for public access.
  */
 @Slf4j
-public class DecisionPublicLdmlTransformer extends DecisionCommonLdmlTransformer {
+public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransformer {
 
-  public DecisionPublicLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public DecisionReducedLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 

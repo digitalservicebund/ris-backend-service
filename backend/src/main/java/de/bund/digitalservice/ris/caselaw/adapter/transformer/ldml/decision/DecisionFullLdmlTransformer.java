@@ -34,9 +34,9 @@ import org.apache.commons.lang3.StringUtils;
  * metadata like classification and keywords for internal processing.
  */
 @Slf4j
-public class DecisionInternalLdmlTransformer extends DecisionCommonLdmlTransformer {
+public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
-  public DecisionInternalLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public DecisionFullLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 
