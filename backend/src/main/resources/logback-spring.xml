@@ -4,10 +4,11 @@
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
     </springProfile>
     <springProfile name="staging,production,uat">
-        <include resource="org/springframework/boot/logging/logback/base.xml"/>
+        <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+        <include resource="org/springframework/boot/logging/logback/structured-console-appender.xml"/>
         <appender name="SENTRY" class="io.sentry.logback.SentryAppender" />
         <root level="INFO">
-            <!-- <appender-ref ref="LOKI" /> -->.
+            <appender-ref ref="CONSOLE" />
             <appender-ref ref="SENTRY"/>
         </root>
     </springProfile>
