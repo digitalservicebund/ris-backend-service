@@ -222,7 +222,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
-    implementation("io.getunleash:unleash-client-java:11.0.0")
+    implementation("io.getunleash:unleash-client-java:11.0.1")
     implementation("org.apache.commons:commons-text:1.13.1")
     implementation("org.jsoup:jsoup:1.21.1")
 
@@ -230,7 +230,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.0")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.14.0")
+    implementation("com.squareup.okio:okio-jvm:3.15.0")
 
     val flywayCore = "org.flywaydb:flyway-core:11.10.0"
     implementation(flywayCore)

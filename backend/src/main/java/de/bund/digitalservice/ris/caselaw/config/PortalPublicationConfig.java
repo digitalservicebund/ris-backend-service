@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalPublicationServ
 import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.ReducedLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -43,12 +44,18 @@ public class PortalPublicationConfig {
   @Profile({"staging", "local"})
   public PortalPublicationService stagingPortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
+      AttachmentRepository attachmentRepository,
       XmlUtilService xmlUtilService,
       PortalBucket portalBucket,
       ObjectMapper objectMapper,
       PortalTransformer portalTransformer) {
     return new StagingPortalPublicationService(
-        documentationUnitRepository, xmlUtilService, portalBucket, objectMapper, portalTransformer);
+        documentationUnitRepository,
+        attachmentRepository,
+        xmlUtilService,
+        portalBucket,
+        objectMapper,
+        portalTransformer);
   }
 
   @Bean

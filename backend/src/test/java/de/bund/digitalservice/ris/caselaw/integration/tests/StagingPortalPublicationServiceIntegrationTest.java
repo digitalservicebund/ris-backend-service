@@ -14,6 +14,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -29,7 +31,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTrans
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,8 +49,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Import({StagingPortalPublicationServiceIntegrationTest.PortalPublicationConfig.class})
 class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest {
@@ -57,12 +65,14 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
     @Primary
     public PortalPublicationService stagingPortalPublicationService(
         DocumentationUnitRepository documentationUnitRepository,
+        AttachmentRepository attachmentRepository,
         XmlUtilService xmlUtilService,
         PortalBucket portalBucket,
         ObjectMapper objectMapper,
         de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer portalTransformer) {
       return new StagingPortalPublicationService(
           documentationUnitRepository,
+          attachmentRepository,
           xmlUtilService,
           portalBucket,
           objectMapper,
@@ -187,7 +197,140 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
                     .contains("Could not save LDML to bucket."));
   }
 
+  @Test
+  void testPublishWithAttachmentsSuccessfully() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            buildValidDocumentationUnit(
+                List.of(
+                    AttachmentDTO.builder()
+                        .content(new byte[] {1, 2, 3})
+                        .filename("bild1.png")
+                        .format("png")
+                        .uploadTimestamp(Instant.now())
+                        .build())));
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
+
+    verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
+
+    var capturedRequests = captor.getAllValues();
+    assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
+    assertThat(capturedRequests.get(1).key()).isEqualTo("1234567890123/bild1.png");
+    //    assertThat(capturedRequests.get(2).key()).contains("changelogs/");
+  }
+
+  @Test
+  void publishTwice_andRemoveAttachment_shouldPublishSuccessfullyAndDeleteAttachment() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            buildValidDocumentationUnit(
+                List.of(
+                    AttachmentDTO.builder()
+                        .content(new byte[] {1, 2, 3})
+                        .filename("bild1.png")
+                        .format("png")
+                        .uploadTimestamp(Instant.now())
+                        .build(),
+                    AttachmentDTO.builder()
+                        .content(new byte[] {1, 2, 3})
+                        .filename("bild2.png")
+                        .format("png")
+                        .uploadTimestamp(Instant.now())
+                        .build())));
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
+
+    verify(s3Client, times(3)).putObject(captor.capture(), any(RequestBody.class));
+
+    var capturedRequests = captor.getAllValues();
+    assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
+    assertThat(capturedRequests.get(1).key()).isEqualTo("1234567890123/bild1.png");
+    assertThat(capturedRequests.get(2).key()).isEqualTo("1234567890123/bild2.png");
+    //    assertThat(capturedRequests.get(3).key()).contains("changelogs/");
+
+    dto.setAttachments(
+        List.of(
+            AttachmentDTO.builder()
+                .content(new byte[] {1, 2, 3})
+                .filename("bild1.png")
+                .format("png")
+                .uploadTimestamp(Instant.now())
+                .documentationUnit(dto)
+                .build()));
+    dto = repository.save(dto);
+
+    var response =
+        ListObjectsV2Response.builder()
+            .contents(
+                S3Object.builder().key("1234567890123/1234567890123.xml").build(),
+                S3Object.builder().key("1234567890123/bild1.png").build(),
+                S3Object.builder().key("1234567890123/bild2.png").build())
+            .build();
+
+    ListObjectsV2Request request =
+        ListObjectsV2Request.builder().bucket("no-bucket").prefix("1234567890123/").build();
+    when(s3Client.listObjectsV2(request)).thenReturn(response);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    ArgumentCaptor<PutObjectRequest> updateCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+    ArgumentCaptor<DeleteObjectRequest> deleteCaptor =
+        ArgumentCaptor.forClass(DeleteObjectRequest.class);
+    ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
+
+    verify(s3Client, times(5)).putObject(updateCaptor.capture(), bodyCaptor.capture());
+    verify(s3Client, times(1)).deleteObject(deleteCaptor.capture());
+
+    //    var changelogContent =
+    //        new String(
+    //
+    // bodyCaptor.getAllValues().get(6).contentStreamProvider().newStream().readAllBytes(),
+    //            StandardCharsets.UTF_8);
+
+    var updateCapturedRequests = updateCaptor.getAllValues();
+    var deleteCapturedRequests = deleteCaptor.getAllValues();
+    assertThat(updateCapturedRequests.get(3).key()).isEqualTo("1234567890123/1234567890123.xml");
+    assertThat(updateCapturedRequests.get(4).key()).isEqualTo("1234567890123/bild1.png");
+    //    assertThat(updateCapturedRequests.get(6).key()).contains("changelogs/");
+    assertThat(deleteCapturedRequests.get(0).key()).isEqualTo("1234567890123/bild2.png");
+    //    assertThat(changelogContent)
+    //        .isEqualTo(
+    //            """
+    //
+    // {"changed":["1234567890123/1234567890123.xml","1234567890123/bild1.png"],"deleted":["1234567890123/bild2.png"]}""");
+  }
+
   private DecisionDTO.DecisionDTOBuilder<?, ?> buildValidDocumentationUnit() {
+    return buildValidDocumentationUnit(Collections.emptyList());
+  }
+
+  private DecisionDTO.DecisionDTOBuilder<?, ?> buildValidDocumentationUnit(
+      List<AttachmentDTO> attachments) {
     CourtDTO court =
         databaseCourtRepository.saveAndFlush(
             CourtDTO.builder()
@@ -210,6 +353,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
         .date(LocalDate.now())
         .legalEffect(LegalEffectDTO.JA)
         .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
+        .attachments(attachments)
         .grounds("lorem ipsum dolor sit amet");
   }
 }

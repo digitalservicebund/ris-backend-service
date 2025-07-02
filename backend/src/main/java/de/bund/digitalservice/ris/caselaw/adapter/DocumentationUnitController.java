@@ -509,16 +509,17 @@ public class DocumentationUnitController {
     try {
       Image imageResult = service.getImageBytes(documentNumber, imageName);
 
-      if (imageResult == null || imageResult.content() == null) {
+      if (imageResult == null || imageResult.getContent() == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
 
-      byte[] imageBytes = imageResult.content();
-      String contentType = imageResult.contentType();
+      byte[] imageBytes = imageResult.getContent();
+      String contentType = imageResult.getContentType();
 
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(getMediaType(contentType));
       headers.setContentLength(imageBytes.length);
+      headers.setCacheControl(CacheControl.maxAge(Duration.ofDays(1)));
 
       return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     } catch (DocumentationUnitNotExistsException e) {

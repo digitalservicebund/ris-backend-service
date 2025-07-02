@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.webtestclient;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
+import java.time.Duration;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -22,6 +23,16 @@ public class RisHeaderAssertions {
       throw new RuntimeException(e);
     }
 
+    return responseSpec;
+  }
+
+  public RisResponseSpec cacheControl(Duration duration) {
+    String expectedValuePart = "max-age=" + duration.getSeconds();
+    try {
+      resultActions.andExpect(header().string("Cache-Control", expectedValuePart));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
     return responseSpec;
   }
 

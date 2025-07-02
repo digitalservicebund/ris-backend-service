@@ -10,9 +10,10 @@ public interface PortalPublicationService {
   void publishDocumentationUnitWithChangelog(UUID documentationUnitId)
       throws DocumentationUnitNotExistsException;
 
-  void publishDocumentationUnit(String documentNumber) throws DocumentationUnitNotExistsException;
+  PortalPublicationResult publishDocumentationUnit(String documentNumber)
+      throws DocumentationUnitNotExistsException;
 
-  void deleteDocumentationUnit(String documentNumber);
+  PortalPublicationResult deleteDocumentationUnit(String documentNumber);
 
   void uploadChangelog(List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
       throws JsonProcessingException;

@@ -14,13 +14,15 @@ public class NoOpPortalPublicationService implements PortalPublicationService {
   }
 
   @Override
-  public void publishDocumentationUnit(String documentNumber) {
+  public PortalPublicationResult publishDocumentationUnit(String documentNumber) {
     // no-op
+    return new PortalPublicationResult(List.of(), List.of());
   }
 
   @Override
-  public void deleteDocumentationUnit(String documentNumber) {
+  public PortalPublicationResult deleteDocumentationUnit(String documentNumber) {
     // no-op
+    return new PortalPublicationResult(List.of(), List.of());
   }
 
   @Override
