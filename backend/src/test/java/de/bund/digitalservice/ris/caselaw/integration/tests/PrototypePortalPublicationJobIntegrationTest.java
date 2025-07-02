@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -55,8 +56,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Import(PrototypePortalPublicationJobIntegrationTest.PortalPublicationConfig.class)
 class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
@@ -68,6 +73,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     @Primary
     public PortalPublicationService prototypePortalPublicationService(
         DocumentationUnitRepository documentationUnitRepository,
+        AttachmentRepository attachmentRepository,
         XmlUtilService xmlUtilService,
         PrototypePortalBucket prototypePortalBucket,
         ObjectMapper objectMapper,
@@ -75,6 +81,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         RiiService riiService) {
       return new PrototypePortalPublicationService(
           documentationUnitRepository,
+          attachmentRepository,
           xmlUtilService,
           prototypePortalBucket,
           objectMapper,
@@ -163,10 +170,16 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
             createPublicationJob(dto, PortalPublicationTaskType.PUBLISH),
             createPublicationJob(dto2, PortalPublicationTaskType.DELETE)));
 
+    when(s3Client.listObjectsV2(any(ListObjectsV2Request.class)))
+        .thenReturn(
+            ListObjectsV2Response.builder()
+                .contents(S3Object.builder().key("1/1.xml").build())
+                .build());
+
     portalPublicationJobService.executePendingJobs();
 
     // DELETE is called even after fail
-    verify(s3Client, times(1)).deleteObject(any(Consumer.class));
+    verify(s3Client, times(1)).deleteObject(any(DeleteObjectRequest.class));
     // PUT 1.xml (fails) ((+ PUT changelog)) //currently disabled
     verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
 

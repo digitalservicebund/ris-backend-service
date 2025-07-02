@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrThis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
@@ -48,6 +49,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class PrototypePortalPublicationServiceTest {
 
   @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean private AttachmentRepository attachmentRepository;
   @MockitoBean private PrototypePortalBucket prototypePortalBucket;
   @MockitoBean private XmlUtilService xmlUtilService;
   @MockitoBean private ObjectMapper objectMapper;
@@ -117,6 +119,7 @@ class PrototypePortalPublicationServiceTest {
     subject =
         new PrototypePortalPublicationService(
             documentationUnitRepository,
+            attachmentRepository,
             xmlUtilService,
             prototypePortalBucket,
             objectMapper,
