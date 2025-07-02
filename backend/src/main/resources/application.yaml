@@ -51,7 +51,6 @@ logging:
   structured:
     format:
       console: logstash
-      file: logstash
 #  level:
 #    org.springframework: DEBUG
 #    org.hibernate.SQL: DEBUG
