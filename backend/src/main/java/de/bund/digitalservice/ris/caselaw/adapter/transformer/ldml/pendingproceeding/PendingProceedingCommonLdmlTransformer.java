@@ -52,8 +52,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Abstract base class for transforming decisions into LDML case law format. Provides common
- * transformation logic and helper methods.
+ * Abstract base class for transforming pending proceedings into LDML case law format. Provides
+ * common transformation logic and helper methods.
  */
 @Slf4j
 public abstract class PendingProceedingCommonLdmlTransformer
@@ -192,10 +192,9 @@ public abstract class PendingProceedingCommonLdmlTransformer
     String uniqueId = pendingProceeding.documentNumber();
     FrbrDate frbrDate =
         new FrbrDate(
-            // FIXME Should this be createdAt? (compare "Aufnahme in die Datenbank am")
             DateUtils.toDateString(
-                nullSafeGet(pendingProceeding.coreData(), CoreData::resolutionDate)),
-            "mitteilungsdatum");
+                nullSafeGet(pendingProceeding.coreData(), CoreData::decisionDate)),
+            "Mitteilungsdatum");
     FrbrAuthor frbrAuthor = new FrbrAuthor();
 
     List<FrbrAlias> aliases = generateAliases(pendingProceeding);
