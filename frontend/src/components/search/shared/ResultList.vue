@@ -20,7 +20,6 @@ const props = defineProps<{
   pageEntries?: Page<DocumentUnitListEntry>
   error?: ResponseError
   loading?: boolean
-  emptyText?: string
 }>()
 const emit = defineEmits<{
   updatePage: [number]
@@ -61,7 +60,9 @@ function onDelete() {
 
 watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
 
-const emptyText = computed(() => (props.loading ? "" : props.emptyText))
+defineSlots<{
+  "empty-state-content"?: (props: Record<string, never>) => unknown
+}>()
 </script>
 
 <template>
@@ -202,7 +203,11 @@ const emptyText = computed(() => (props.loading ? "" : props.emptyText))
             </div>
           </template>
         </Column>
-        <template #empty> {{ emptyText }} </template>
+        <template #empty>
+          <div class="mt-40 grid justify-items-center bg-white">
+            <slot name="empty-state-content"></slot>
+          </div>
+        </template>
       </DataTable>
     </Pagination>
   </div>

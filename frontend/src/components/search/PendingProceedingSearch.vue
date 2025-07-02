@@ -1,5 +1,8 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
+import Button from "primevue/button"
 import { computed, ref } from "vue"
+import { useRouter } from "vue-router"
 import ResultList from "./shared/ResultList.vue"
 import SearchForm from "./shared/SearchForm.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
@@ -7,10 +10,14 @@ import InfoModal from "@/components/InfoModal.vue"
 import { Page } from "@/components/Pagination.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { Query } from "@/composables/useQueryFromRoute"
+import { Court } from "@/domain/court"
+import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import errorMessages from "@/i18n/errors.json"
+import ComboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
+import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
 import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
 const isLoading = ref(false)
@@ -18,106 +25,169 @@ const pageNumber = ref<number>(0)
 const itemsPerPage = 100
 const searchQuery = ref<Query<DocumentationUnitSearchParameter>>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()
-const serviceError = ref<ResponseError>()
+const serviceError = ref<ResponseError | undefined>(undefined)
 const isInternalUser = useInternalUser()
+const router = useRouter()
 
-const emptyStateLabel = computed(() => {
+const emptyStateMessage = computed(() => {
   if (!currentPage.value?.content) {
-    if (isInternalUser.value) {
-      return "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
-    } else {
-      return "Starten Sie die Suche."
-    }
-  } else if (
-    currentPage.value?.content &&
-    currentPage.value.content.length === 0
-  ) {
+    return isInternalUser.value
+      ? "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
+      : "Starten Sie die Suche."
+  }
+  if (currentPage.value.content.length === 0) {
     return errorMessages.SEARCH_RESULTS_NOT_FOUND.title
   }
   return undefined
 })
 
-/**
- * Searches all documentation units by given input and updates the local
- * documentunit list entries, the currentPage for pagination and catches errors
- * if they happen. When no results found, but a court was given, the court input
- * is validated against the court table, in order to be able to create a new
- * documentation unit from search the given search input, if the user wants to.
- */
+const fileNumberFromQuery = computed(() =>
+  searchQuery.value?.fileNumber?.trim(),
+)
+
+const dateFromQuery = computed(() => {
+  if (
+    (searchQuery.value?.decisionDateEnd != undefined &&
+      searchQuery.value?.decisionDateEnd != searchQuery.value?.decisionDate) ||
+    searchQuery.value?.decisionDate == undefined
+  )
+    return undefined
+  return searchQuery.value?.decisionDate
+})
+
+const isSearchCompletedWithNoResults = computed(
+  () => currentPage.value?.content && currentPage.value.content.length === 0,
+)
+
+const courtFilter = ref("")
+const { data: courts, execute: fetchCourts } =
+  ComboboxItemService.getCourts(courtFilter)
+const courtFromQuery = ref<Court | undefined>()
+
+const hasRequiredCreateParams = computed(() => {
+  const query = searchQuery.value
+  return (
+    !!query &&
+    (!!query.courtType || !!query.courtLocation) &&
+    !!query.fileNumber &&
+    !!query.decisionDate
+  )
+})
+
+const showCreateFromParamsButton = computed(
+  () =>
+    isInternalUser.value &&
+    isSearchCompletedWithNoResults.value &&
+    hasRequiredCreateParams.value,
+)
+
+async function validateAndSetCourtFromQuery() {
+  if (isSearchCompletedWithNoResults.value && searchQuery.value?.courtType) {
+    let courtFilterValue = searchQuery.value.courtType
+    if (searchQuery.value.courtLocation) {
+      courtFilterValue += ` ${searchQuery.value.courtLocation}`
+    }
+    courtFilter.value = courtFilterValue
+    await fetchCourts()
+
+    const matches = courts.value?.filter(
+      (item) => item.label === courtFilter.value,
+    )
+    courtFromQuery.value =
+      matches?.length === 1 ? (matches[0].value as Court) : undefined
+  } else {
+    courtFromQuery.value = undefined
+  }
+}
+
 async function search() {
   isLoading.value = true
-  if (currentPage.value) currentPage.value.content = []
+  currentPage.value = undefined
 
-  const response = await service.searchByDocumentUnitSearchInput({
-    ...(pageNumber.value != undefined
-      ? { pg: pageNumber.value.toString() }
-      : {}),
-    ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
+  const params = {
+    pg: pageNumber.value.toString(),
+    sz: itemsPerPage.toString(),
     ...searchQuery.value,
     kind: "PENDING_PROCEEDING",
-  })
+  }
+
+  const response = await service.searchByDocumentUnitSearchInput(params)
+
   if (response.data) {
     currentPage.value = response.data
     serviceError.value = undefined
-  }
-  if (response.error) {
+  } else if (response.error) {
     serviceError.value = response.error
   }
+
+  await validateAndSetCourtFromQuery()
   isLoading.value = false
 }
 
-/**
- * Deletes a documentation unit
- * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be removed
- */
-async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
-  if (currentPage.value?.content) {
-    const response = await service.delete(documentUnitListEntry.uuid as string)
-    if (response.status === 200) {
-      if (currentPage.value.content.length === 1) {
-        await search()
-        return
-      }
-      const newEntries = currentPage.value.content.filter(
-        (item: DocumentUnitListEntry) => item != documentUnitListEntry,
+async function handleDelete(documentUnit: DocumentUnitListEntry) {
+  if (!documentUnit.uuid) return
+
+  const response = await service.delete(documentUnit.uuid)
+  if (response.status === 200) {
+    if (currentPage.value?.content?.length === 1) {
+      await search() // Re-fetch if the last item on the page was deleted
+    } else if (currentPage.value?.content) {
+      currentPage.value.content = currentPage.value.content.filter(
+        (item) => item.uuid !== documentUnit.uuid,
       )
-      currentPage.value.content = newEntries
-      currentPage.value.numberOfElements = newEntries.length
-      currentPage.value.empty = newEntries.length == 0
-    } else {
-      alert("Fehler beim Löschen der Dokumentationseinheit: " + response.data)
+      currentPage.value.numberOfElements = currentPage.value.content.length
+      currentPage.value.empty = currentPage.value.content.length === 0
+    }
+  } else {
+    serviceError.value = response.error || {
+      title: "Error",
+      description: "Fehler beim Löschen der Dokumentationseinheit.",
     }
   }
 }
 
-/**
- * When using the navigation a new page number is set, the search is triggered,
- * with the given page number.
- * @param {number} page - The page to be updated
- */
 async function updatePage(page: number) {
   pageNumber.value = page
   await search()
 }
 
-/**
- * The search form emits an event, when clicking the search button and is
- * triggering the search with the updated query here.
- * It will always reset the pagination to the first page.
- * @param {Query<DocumentationUnitSearchParameter>} value - The page to be updated
- */
 async function updateQuery(value: Query<DocumentationUnitSearchParameter>) {
   searchQuery.value = value
   pageNumber.value = 0
   await search()
 }
 
-/**
- * The search form emits an event, when resetting the search,
- * which empties the document unit list and resets the pagination.
- */
-async function handleReset() {
+function handleReset() {
   currentPage.value = undefined
+  serviceError.value = undefined
+  courtFromQuery.value = undefined
+}
+
+async function createNewFromSearch() {
+  if (!searchQuery.value || !courtFromQuery.value) {
+    return
+  }
+
+  const requestBodyParameters: DocumentationUnitCreationParameters = {
+    fileNumber: searchQuery.value.fileNumber,
+    decisionDate: searchQuery.value.decisionDate,
+    court: courtFromQuery.value,
+  }
+
+  const createResponse = await service.createNew(requestBodyParameters, {
+    kind: Kind.PENDING_PROCEEDING,
+  })
+
+  if (createResponse.error) {
+    serviceError.value = createResponse.error
+    return
+  }
+
+  const routeData = router.resolve({
+    name: "caselaw-pending-proceeding-documentNumber-categories",
+    params: { documentNumber: createResponse.data.documentNumber },
+  })
+  window.open(routeData.href, "_blank")
 }
 </script>
 
@@ -128,6 +198,7 @@ async function handleReset() {
       @reset-search-results="handleReset"
       @search="updateQuery"
     />
+
     <InfoModal
       v-if="serviceError"
       class="my-16"
@@ -136,12 +207,53 @@ async function handleReset() {
       :status="InfoStatus.ERROR"
       :title="serviceError.title"
     />
+
     <ResultList
-      :empty-text="emptyStateLabel"
       :loading="isLoading"
       :page-entries="currentPage"
       @delete-documentation-unit="handleDelete"
       @update-page="updatePage"
-    />
+    >
+      <template v-if="isInternalUser" #empty-state-content>
+        <div class="flex flex-col gap-16">
+          <p>{{ emptyStateMessage }}</p>
+
+          <div v-if="showCreateFromParamsButton">
+            <p>
+              Sie können die folgenden Stammdaten übernehmen und eine neue<br />Dokumentationseinheit
+              erstellen:
+            </p>
+            <p class="ris-label1-bold mb-16 text-center">
+              <span :class="{ 'text-gray-800': !fileNumberFromQuery }"
+                >{{ fileNumberFromQuery ?? "Aktenzeichen unbekannt" }},
+              </span>
+              <span :class="{ 'text-gray-800': !courtFromQuery }"
+                >{{ courtFromQuery?.label ?? "Gericht unbekannt" }},
+              </span>
+              <span :class="{ 'text-gray-800': !dateFromQuery }">
+                {{
+                  dayjs(dateFromQuery).format("DD.MM.YYYY") ?? "Datum unbekannt"
+                }}
+              </span>
+            </p>
+            <Button
+              class="justify-self-center"
+              label="Übernehmen und fortfahren"
+              severity="secondary"
+              size="small"
+              @click="createNewFromSearch"
+            />
+          </div>
+          <div v-else>
+            <Button
+              aria-label="Neue Dokumentationseinheit erstellen"
+              label="Neue Dokumentationseinheit erstellen"
+              severity="secondary"
+              @click="router.push({ name: 'caselaw-pending-proceeding-new' })"
+            />
+          </div>
+        </div>
+      </template>
+    </ResultList>
   </div>
 </template>
