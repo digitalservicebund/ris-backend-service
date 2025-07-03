@@ -186,6 +186,7 @@ class PendingProceedingFullLdmlTransformerTest {
   }
 
   @Test
+  @DisplayName("Entire LDML of unresolved pending proceeding")
   void testEntireLdml() {
     var documentationUnit = getEntireDocumentationUnit();
     var expected =
@@ -274,6 +275,18 @@ class PendingProceedingFullLdmlTransformerTest {
          <akn:motivation>
             <akn:p alternativeTo="textWrapper">Rechtsfrage</akn:p>
          </akn:motivation>
+         <akn:introduction>
+            <akn:block name="Rechtsmittelführer">
+               <akn:embeddedStructure>
+                  <akn:p alternativeTo="textWrapper">Rechtsmittelführer</akn:p>
+               </akn:embeddedStructure>
+            </akn:block>
+            <akn:block name="Rechtsmittelzulassung">
+               <akn:embeddedStructure>
+                  <akn:p alternativeTo="textWrapper">Rechtsmittelzulassung</akn:p>
+               </akn:embeddedStructure>
+            </akn:block>
+         </akn:introduction>
       </akn:judgmentBody>
    </akn:judgment>
 </akn:akomaNtoso>

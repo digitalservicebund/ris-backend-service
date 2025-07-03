@@ -152,7 +152,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
             JaxbHtml.build(
                 htmlStringToObjectList(
                     nullSafeGet(shortTexts, PendingProceedingShortTexts::legalIssue))))
-        .introduction(null)
+        .introduction(buildIntroduction(pendingProceeding))
         .background(null)
         .decision(buildDecision(pendingProceeding));
 
@@ -166,6 +166,26 @@ public abstract class PendingProceedingCommonLdmlTransformer
     }
 
     return judgmentBody;
+  }
+
+  private AknMultipleBlock buildIntroduction(PendingProceeding pendingProceeding) {
+    var shortTexts = pendingProceeding.shortTexts();
+
+    var admissionOfAppeal = nullSafeGet(shortTexts, PendingProceedingShortTexts::admissionOfAppeal);
+    var appellant = nullSafeGet(shortTexts, PendingProceedingShortTexts::appellant);
+
+    if (StringUtils.isNotEmpty(admissionOfAppeal) && StringUtils.isNotEmpty(appellant)) {
+      return new AknMultipleBlock()
+          .withBlock(
+              AknEmbeddedStructureInBlock.Appellant.NAME,
+              AknEmbeddedStructureInBlock.Appellant.build(
+                  JaxbHtml.build(htmlStringToObjectList(appellant))))
+          .withBlock(
+              AknEmbeddedStructureInBlock.AdmissionOfAppeal.NAME,
+              AknEmbeddedStructureInBlock.AdmissionOfAppeal.build(
+                  JaxbHtml.build(htmlStringToObjectList(admissionOfAppeal))));
+    }
+    return null;
   }
 
   private AknMultipleBlock buildDecision(PendingProceeding pendingProceeding) {
