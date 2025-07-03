@@ -22,6 +22,7 @@ const documentationOfficeAbbreviation =
 const tabParam = computed(() => (route.params.tab as string) ?? "decisions")
 
 const value = ref()
+const buttonLabel = ref()
 
 const tabMap: Record<string, string> = {
   decisions: "0",
@@ -33,6 +34,10 @@ onMounted(() => {
 })
 
 watch(value, async (newVal) => {
+  buttonLabel.value =
+    value.value == 0
+      ? "Neue Dokumentationseinheit"
+      : "Neues Anhängiges Verfahren"
   const pathKey =
     Object.entries(tabMap).find(([, v]) => v === newVal)?.[0] ?? "decisions"
   if (pathKey !== tabParam.value) {
@@ -58,14 +63,12 @@ const handleNewDocumentationUnitClick = async () => {
     <div class="mb-16 flex w-full justify-end">
       <Button
         v-if="isInternalUser"
-        label="Neue Dokumentationseinheit"
+        :label="buttonLabel"
         @click="handleNewDocumentationUnitClick"
       ></Button>
     </div>
     <Tabs v-model:value="value" lazy>
-      <!-- Todo: for development not yet hidden for BFH, hide the TabList
-      v-if="documentationOfficeAbbreviation === 'BFH' -->
-      <TabList v-if="documentationOfficeAbbreviation !== 'BFH'">
+      <TabList v-if="documentationOfficeAbbreviation === 'BFH'">
         <Tab data-testid="search-tab-caselaw" value="0">Rechtsprechung</Tab>
         <Tab data-testid="search-tab-pending-proceeding" value="1"
           >Anhängige Verfahren</Tab

@@ -31,18 +31,6 @@ const isEmptySearch = computed(() => {
 
 const submitButtonError = ref()
 
-const scheduledOnly = computed({
-  get: () =>
-    query.value?.scheduledOnly ? JSON.parse(query.value.scheduledOnly) : false,
-  set: (data) => {
-    if (!data) {
-      delete query.value.scheduledOnly
-    } else {
-      query.value.scheduledOnly = "true"
-    }
-  },
-})
-
 const isResolved = computed({
   get: () =>
     query.value?.isResolved ? JSON.parse(query.value.isResolved) : false,
@@ -325,7 +313,7 @@ watch(
       <div
         class="ris-body1-regular flex flex-row items-center [grid-area:date-label]"
       >
-        Datum
+        Mitteilungsdatum
       </div>
       <div
         class="ris-body1-regular flex flex-row items-center pl-24 [grid-area:resolution-date-label] lg:pl-48"
@@ -337,14 +325,14 @@ watch(
           id="decisionDate"
           v-slot="{ id, hasError }"
           data-testid="decision-date-input"
-          label="Entscheidungsdatum"
+          label="Mitteilungsdatum"
           :validation-error="validationStore.getByField('decisionDate')"
           visually-hide-label
         >
           <DateInput
             :id="id"
             v-model="query.decisionDate"
-            aria-label="Entscheidungsdatum Suche"
+            aria-label="Mitteilungsdatum Suche"
             :has-error="hasError"
             @blur="validateSearchInput"
             @focus="resetErrors(id as DocumentationUnitSearchParameter)"
@@ -359,14 +347,14 @@ watch(
           id="decisionDateEnd"
           v-slot="{ id, hasError }"
           data-testid="decision-date-end-input"
-          label="Entscheidungsdatum Ende"
+          label="Mitteilungsdatum Ende"
           :validation-error="validationStore.getByField('decisionDateEnd')"
           visually-hide-label
         >
           <DateInput
             :id="id"
             v-model="query.decisionDateEnd"
-            aria-label="Entscheidungsdatum Suche Ende"
+            aria-label="Mitteilungsdatum Suche Ende"
             :has-error="hasError"
             placeholder="TT.MM.JJJJ (optional)"
             @blur="validateSearchInput"
@@ -383,7 +371,7 @@ watch(
         <InputField
           id="resolutionDate"
           v-slot="{ id, hasError }"
-          data-testid="decision-date-input"
+          data-testid="resolution-date-input"
           label="Erledigungsmitteilung"
           :validation-error="validationStore.getByField('resolutionDate')"
           visually-hide-label
@@ -391,7 +379,7 @@ watch(
           <DateInput
             :id="id"
             v-model="query.resolutionDate"
-            aria-label="Entscheidungsdatum Suche"
+            aria-label="Erledigungsmitteilung Suche"
             :has-error="hasError"
             @blur="validateSearchInput"
             @focus="resetErrors(id as DocumentationUnitSearchParameter)"
@@ -405,7 +393,7 @@ watch(
         <InputField
           id="resolutionDateEnd"
           v-slot="{ id, hasError }"
-          data-testid="decision-date-end-input"
+          data-testid="resolution-date-end-input"
           label="Erledigungsmitteilung Ende"
           :validation-error="validationStore.getByField('resolutionDateEnd')"
           visually-hide-label
@@ -413,7 +401,7 @@ watch(
           <DateInput
             :id="id"
             v-model="query.resolutionDateEnd"
-            aria-label="Entscheidungsdatum Suche Ende"
+            aria-label="Erledigungsmitteilung Suche Ende"
             :has-error="hasError"
             placeholder="TT.MM.JJJJ (optional)"
             @blur="validateSearchInput"
@@ -423,51 +411,6 @@ watch(
                 handleLocalInputError(validationError, id)
             "
           ></DateInput>
-        </InputField>
-      </div>
-      <div
-        class="ris-body1-regular flex flex-row items-center [grid-area:publication-label]"
-      >
-        Abgabe
-      </div>
-      <div class="flex flex-row gap-[26px] [grid-area:publication-input]">
-        <InputField
-          id="publicationDate"
-          v-slot="{ id, hasError }"
-          data-testid="publication-date-input"
-          label="jDV Übergabedatum"
-          :validation-error="validationStore.getByField('publicationDate')"
-          visually-hide-label
-        >
-          <DateInput
-            :id="id"
-            v-model="query.publicationDate"
-            aria-label="jDV Übergabedatum Suche"
-            disabled
-            :has-error="hasError"
-            is-future-date
-            @blur="validateSearchInput"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-            @update:validation-error="
-              (validationError: ValidationError | undefined) =>
-                handleLocalInputError(validationError, id)
-            "
-          ></DateInput>
-        </InputField>
-        <InputField
-          id="scheduled"
-          v-slot="{ id }"
-          label="Nur terminiert"
-          label-class="ris-label1-regular"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <Checkbox
-            v-model="scheduledOnly"
-            aria-label="Terminiert Filter"
-            binary
-            disabled
-            :input-id="id"
-          />
         </InputField>
       </div>
       <div class="flex flex-row [grid-area:resolution-input]">
@@ -491,7 +434,7 @@ watch(
         <div class="flex flex-col gap-8">
           <!-- ":loading" disables button while request is running. Needed as long as we cannot cancel requests -->
           <Button
-            aria-label="Nach Dokumentationseinheiten suchen"
+            aria-label="Nach Anhängigen Verfahren suchen"
             class="self-start"
             label="Ergebnisse anzeigen"
             :loading="props.isLoading"

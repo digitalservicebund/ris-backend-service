@@ -32,7 +32,7 @@ const router = useRouter()
 const emptyStateMessage = computed(() => {
   if (!currentPage.value?.content) {
     return isInternalUser.value
-      ? "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
+      ? "Starten Sie die Suche oder erstellen Sie ein neues Anhängiges Verfahren."
       : "Starten Sie die Suche."
   }
   if (currentPage.value.content.length === 0) {
@@ -141,7 +141,7 @@ async function handleDelete(documentUnit: DocumentUnitListEntry) {
   } else {
     serviceError.value = response.error || {
       title: "Error",
-      description: "Fehler beim Löschen der Dokumentationseinheit.",
+      description: "Fehler beim Löschen des Anhängigen Verfahrens.",
     }
   }
 }
@@ -192,7 +192,7 @@ async function createNewFromSearch() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-24" data-testId="eu-inbox">
+  <div class="flex flex-col gap-24" data-testId="pending-proceeding-search">
     <SearchForm
       :is-loading="isLoading"
       @reset-search-results="handleReset"
@@ -220,8 +220,8 @@ async function createNewFromSearch() {
 
           <div v-if="showCreateFromParamsButton">
             <p>
-              Sie können die folgenden Stammdaten übernehmen und eine neue<br />Dokumentationseinheit
-              erstellen:
+              Sie können die folgenden Stammdaten übernehmen und ein neues<br />Anhängiges
+              Verfahren erstellen:
             </p>
             <p class="ris-label1-bold mb-16 text-center">
               <span :class="{ 'text-gray-800': !fileNumberFromQuery }"
@@ -246,8 +246,8 @@ async function createNewFromSearch() {
           </div>
           <div v-else>
             <Button
-              aria-label="Neue Dokumentationseinheit erstellen"
-              label="Neue Dokumentationseinheit erstellen"
+              aria-label="Neues Anhängiges Verfahren erstellen"
+              label="Neue Anhängiges Verfahren erstellen"
               severity="secondary"
               @click="router.push({ name: 'caselaw-pending-proceeding-new' })"
             />
