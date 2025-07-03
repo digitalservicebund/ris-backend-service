@@ -71,6 +71,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -1185,6 +1186,8 @@ class DocumentationUnitControllerTest {
         .isOk()
         .expectHeader()
         .contentType(MediaType.parseMediaType("image/jpg"))
+        .expectHeader()
+        .cacheControl(Duration.ofDays(1))
         .expectBody(byte[].class);
 
     // once by the AuthService and once by the controller asking the service

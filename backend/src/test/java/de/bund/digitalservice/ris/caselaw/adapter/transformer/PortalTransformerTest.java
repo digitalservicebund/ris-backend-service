@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -371,18 +372,18 @@ class PortalTransformerTest {
 
   static Stream<Arguments> provideTagFormattingTestCases() {
     return Stream.of(
-        // Image with closing tag
+        // Image with closing tag should only keep last path part (/my/path/to/img.png -> image.png)
         Arguments.of(
             "<p><img alt=\"alt text\" height=\"70\" src=\"path/to/image\" /></p>",
-            "<akn:p><akn:imgalt=\"alttext\"height=\"70\"src=\"path/to/image\"/></akn:p>"),
+            "<akn:p><akn:imgsrc=\"image\"alt=\"alttext\"height=\"70\"/></akn:p>"),
         // Image without closing tag
         Arguments.of(
             "<p><img alt=\"alt text\" height=\"70\" src=\"path/to/image\"></p>",
-            "<akn:p><akn:img alt=\"alt text\" height=\"70\" src=\"path/to/image\"/></akn:p>"),
+            "<akn:p><akn:img src=\"image\" alt=\"alt text\" height=\"70\" /></akn:p>"),
         // Self-closing break not inside block element
         // Arguments.of("<br />", "<akn:p><akn:br/></akn:p>"),
         // Self-closing break inside block element
-        // Arguments.of("<p><br /></p>", "<akn:p><akn:br/></akn:p>"),
+        Arguments.of("<p><br /></p>", "<akn:p><akn:br/></akn:p>"),
         // Non-self-closing break not inside block element
         // Arguments.of("<br>", "<akn:p><akn:br/></akn:p>"),
         // Non-self-closing break inside block element

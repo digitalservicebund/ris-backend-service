@@ -56,15 +56,14 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       throws DocumentationUnitNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
-    publishToBucket(documentationUnit);
-    // uploading changelog temporarily disabled
-    //    try {
-    //      uploadChangelog(List.of(documentationUnit.documentNumber() + ".xml"), null);
-    //    } catch (Exception e) {
-    //      log.error("Could not upload changelog file.");
-    //      deleteDocumentationUnit(documentationUnit.documentNumber());
-    //      throw new PublishException("Could not save changelog to bucket.", e);
-    //    }
+    var result = publishToBucket(documentationUnit);
+    try {
+      uploadChangelog(result.changedPaths(), result.deletedPaths());
+    } catch (Exception e) {
+      log.error("Could not upload changelog file.");
+      deleteDocumentationUnit(documentationUnit.documentNumber());
+      throw new PublishException("Could not save changelog to bucket.", e);
+    }
   }
 
   /**
@@ -78,17 +77,17 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
    *     LDML
    * @throws PublishException if the LDML file could not be saved in the bucket
    */
-  public void publishDocumentationUnit(String documentNumber)
+  public PortalPublicationResult publishDocumentationUnit(String documentNumber)
       throws DocumentationUnitNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByDocumentNumber(documentNumber);
-    publishToBucket(documentationUnit);
+    return publishToBucket(documentationUnit);
   }
 
-  private void publishToBucket(DocumentationUnit documentationUnit) {
+  protected PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {
     if (!(documentationUnit instanceof Decision decision)) {
       // for now pending proceedings can not be transformed to LDML, so they are ignored.
-      return;
+      return null;
     }
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(decision);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
@@ -96,13 +95,13 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
     }
 
-    saveToBucket(ldml.getUniqueId(), ldml.getFileName(), fileContent.get());
+    return saveToBucket(ldml.getFileName(), fileContent.get());
   }
 
-  @SuppressWarnings("java:S1172")
-  protected void saveToBucket(String uniqueId, String filename, String filecontent) {
+  private PortalPublicationResult saveToBucket(String fileName, String fileContent) {
     try {
-      portalBucket.save(filename, filecontent);
+      portalBucket.save(fileName, fileContent);
+      return new PortalPublicationResult(List.of(fileName), List.of());
     } catch (BucketException e) {
       throw new PublishException("Could not save LDML to bucket.", e);
     }
@@ -113,9 +112,10 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
    *
    * @param documentNumber the document number of the documentation unit to be deleted.
    */
-  public void deleteDocumentationUnit(String documentNumber) {
+  public PortalPublicationResult deleteDocumentationUnit(String documentNumber) {
     try {
       portalBucket.delete(documentNumber + ".xml");
+      return new PortalPublicationResult(List.of(), List.of(documentNumber));
     } catch (BucketException e) {
       throw new PublishException("Could not delete LDML from bucket.", e);
     }
