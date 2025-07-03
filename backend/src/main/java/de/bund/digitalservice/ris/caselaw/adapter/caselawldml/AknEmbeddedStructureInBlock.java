@@ -149,8 +149,8 @@ public abstract class AknEmbeddedStructureInBlock extends AknBlock {
       this.content = content;
     }
 
-    public static OtherLongText build(JaxbHtml content) {
-      return content == null ? null : new OtherLongText(content);
+    public static ResolutionNote build(JaxbHtml content) {
+      return content == null ? null : new ResolutionNote(content);
     }
 
     public String getName() {

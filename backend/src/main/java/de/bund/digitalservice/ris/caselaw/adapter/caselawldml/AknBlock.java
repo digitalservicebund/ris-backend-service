@@ -14,7 +14,8 @@ import org.eclipse.persistence.oxm.annotations.XmlDiscriminatorNode;
   AknEmbeddedStructureInBlock.Tenor.class,
   AknEmbeddedStructureInBlock.DecisionReasons.class,
   AknEmbeddedStructureInBlock.Reasons.class,
-  AknEmbeddedStructureInBlock.OtherLongText.class
+  AknEmbeddedStructureInBlock.OtherLongText.class,
+  AknEmbeddedStructureInBlock.ResolutionNote.class
 })
 public abstract class AknBlock {
   public abstract String getName();

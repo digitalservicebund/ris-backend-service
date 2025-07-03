@@ -21,7 +21,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -88,7 +87,13 @@ public abstract class PendingProceedingCommonLdmlTransformer
     validateCoreData(pendingProceeding);
     var coreData = pendingProceeding.coreData();
     String fallbackTitle =
-        "<p>" + coreData.court().label() + ", " + coreData.fileNumbers().getFirst() + "</p>";
+        "<p>"
+            + coreData.court().label()
+            + ", "
+            + DateUtils.toFormattedDateString(coreData.decisionDate())
+            + ", "
+            + coreData.fileNumbers().getFirst()
+            + "</p>";
     String title =
         ObjectUtils.defaultIfNull(
             nullSafeGet(pendingProceeding.shortTexts(), PendingProceedingShortTexts::headline),
@@ -120,6 +125,16 @@ public abstract class PendingProceedingCommonLdmlTransformer
               .filter(Objects::nonNull)
               .toList(),
           builder::legalForce);
+    }
+
+    var coreData = pendingProceeding.coreData();
+    if (coreData != null) {
+      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
+
+      builder
+          .documentType(coreData.documentType().label())
+          .courtLocation(nullSafeGet(coreData.court(), Court::location))
+          .courtType(nullSafeGet(coreData.court(), Court::type));
     }
 
     return builder;
@@ -279,29 +294,5 @@ public abstract class PendingProceedingCommonLdmlTransformer
     }
   }
 
-  protected Meta buildMeta(PendingProceeding pendingProceeding) throws ValidationException {
-    validateCoreData(pendingProceeding);
-
-    Meta.MetaBuilder builder = Meta.builder();
-
-    return builder
-        .identification(buildIdentification(pendingProceeding))
-        .proprietary(Proprietary.builder().meta(buildRisMeta(pendingProceeding)).build())
-        .build();
-  }
-
-  private RisMeta buildRisMeta(PendingProceeding pendingProceeding) {
-    var builder = buildCommonRisMeta(pendingProceeding);
-
-    var coreData = pendingProceeding.coreData();
-    if (coreData != null) {
-      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
-
-      builder
-          .documentType(coreData.documentType().label())
-          .courtLocation(nullSafeGet(coreData.court(), Court::location))
-          .courtType(nullSafeGet(coreData.court(), Court::type));
-    }
-    return builder.build();
-  }
+  protected abstract Meta buildMeta(PendingProceeding pendingProceeding) throws ValidationException;
 }
