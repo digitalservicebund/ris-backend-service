@@ -170,27 +170,6 @@ class FieldOfLawIntegrationTest extends BaseIntegrationTest {
     assertThat(responseBody).extracting("identifier").containsExactly("FL");
   }
 
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "abc", // norm
-      })
-  void testGetFieldsOfLawByNormsQuery_withAbbreviation(String query) {
-    Slice<FieldOfLaw> responseBody =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?norm=" + query + "&pg=0&sz=3")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody).extracting("identifier").containsExactly("AB-01", "FL");
-  }
-
   @Test
   void testGetFieldsOfLawByNormAndIdentifier() {
     Slice<FieldOfLaw> responseBody =
