@@ -156,7 +156,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  void shouldPublishAndDeleteAtRootAndPrefixLevel() throws IOException {
+  void shouldPublishAndDeleteAtRootAndPrefixLevel() {
     DocumentationUnitDTO dto1 =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, buildValidDocumentationUnit("1"));
