@@ -23,13 +23,15 @@ export const navigateToSearch = async (
 ) => {
   await test.step("Navigate to 'Suche'", async () => {
     if (navigationBy === "url") {
-      await page.goto(`/caselaw`, { waitUntil: "domcontentloaded" })
+      await page.goto(`/caselaw/search`, { waitUntil: "domcontentloaded" })
     } else {
       await page.getByTestId("search-navbar-button").click()
     }
-    await page.waitForURL("/caselaw")
+    await page.waitForURL("/caselaw/search")
 
-    await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible({
+    await expect(
+      page.getByTestId("document-unit-search-entry-form"),
+    ).toBeVisible({
       timeout: 15000, // for backend warm up
     })
   })

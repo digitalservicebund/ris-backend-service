@@ -20,14 +20,15 @@ import { ResponseError } from "@/services/httpClient"
 import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
 import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
-const isLoading = ref(false)
+const router = useRouter()
+const currentPage = ref<Page<DocumentUnitListEntry>>()
+
 const pageNumber = ref<number>(0)
 const itemsPerPage = 100
-const searchQuery = ref<Query<DocumentationUnitSearchParameter>>()
-const currentPage = ref<Page<DocumentUnitListEntry>>()
 const serviceError = ref<ResponseError | undefined>(undefined)
+const isLoading = ref(false)
+const searchQuery = ref<Query<DocumentationUnitSearchParameter>>()
 const isInternalUser = useInternalUser()
-const router = useRouter()
 
 const emptyStateMessage = computed(() => {
   if (!currentPage.value?.content) {
@@ -163,6 +164,11 @@ function handleReset() {
   courtFromQuery.value = undefined
 }
 
+const createNew = async () => {
+  const routeData = router.resolve({ name: "caselaw-pending-proceeding-new" })
+  window.open(routeData.href, "_blank")
+}
+
 async function createNewFromSearch() {
   if (!searchQuery.value || !courtFromQuery.value) {
     return
@@ -215,7 +221,7 @@ async function createNewFromSearch() {
       @update-page="updatePage"
     >
       <template v-if="isInternalUser" #empty-state-content>
-        <div class="flex flex-col gap-16">
+        <div class="flex flex-col gap-16 text-black">
           <p>{{ emptyStateMessage }}</p>
 
           <div v-if="showCreateFromParamsButton">
@@ -247,9 +253,9 @@ async function createNewFromSearch() {
           <div v-else>
             <Button
               aria-label="Neues Anhängiges Verfahren erstellen"
-              label="Neue Anhängiges Verfahren erstellen"
-              severity="secondary"
-              @click="router.push({ name: 'caselaw-pending-proceeding-new' })"
+              label="Neues Anhängiges Verfahren erstellen"
+              text
+              @click="createNew"
             />
           </div>
         </div>

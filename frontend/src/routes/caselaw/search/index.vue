@@ -35,7 +35,7 @@ onMounted(() => {
 
 watch(value, async (newVal) => {
   buttonLabel.value =
-    value.value == 0
+    value.value === "0"
       ? "Neue Dokumentationseinheit"
       : "Neues Anhängiges Verfahren"
   const pathKey =

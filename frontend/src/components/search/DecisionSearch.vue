@@ -156,6 +156,10 @@ async function handleReset() {
 }
 
 const createFromSearchQueryResponseError = ref<ResponseError | undefined>()
+const createNew = async () => {
+  const routeData = router.resolve({ name: "caselaw-documentUnit-new" })
+  window.open(routeData.href, "_blank")
+}
 
 /**
  * When a search returns no results and at least one valid search parameter
@@ -163,7 +167,7 @@ const createFromSearchQueryResponseError = ref<ResponseError | undefined>()
  * a new documentation unit can be created with fileNumber, court and/ or date
  * from the current search query.
  */
-async function createFromSearchQuery() {
+async function createNewFromSearch() {
   isLoading.value = true
   createFromSearchQueryResponseError.value = undefined
   const createResponse = await service.createNew()
@@ -273,7 +277,7 @@ const showDefaultLink = computed(() => {
             aria-label="Neue Dokumentationseinheit erstellen"
             label="Neue Dokumentationseinheit erstellen"
             text
-            @click="router.push({ name: 'caselaw-documentUnit-new' })"
+            @click="createNew"
           ></Button>
           <div v-else class="space-y-16 text-center">
             <div v-if="createFromSearchQueryResponseError" class="mb-24">
@@ -303,7 +307,7 @@ const showDefaultLink = computed(() => {
                 label="Übernehmen und fortfahren"
                 severity="secondary"
                 size="small"
-                @click="createFromSearchQuery"
+                @click="createNewFromSearch"
               ></Button>
             </template>
           </div>

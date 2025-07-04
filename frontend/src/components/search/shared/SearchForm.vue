@@ -12,7 +12,7 @@ import { useValidationStore } from "@/composables/useValidationStore"
 import { PublicationState } from "@/domain/publicationStatus"
 import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
-const props = defineProps<{
+defineProps<{
   isLoading?: boolean
 }>()
 
@@ -22,7 +22,8 @@ const emit = defineEmits<{
 }>()
 
 const validationStore = useValidationStore<DocumentationUnitSearchParameter>()
-const { route, getQueryFromRoute, pushQueryToRoute } = useQuery()
+const { route, getQueryFromRoute, pushQueryToRoute } =
+  useQuery<DocumentationUnitSearchParameter>()
 const query = ref(getQueryFromRoute())
 
 const isEmptySearch = computed(() => {
@@ -64,6 +65,11 @@ function resetErrors(id?: DocumentationUnitSearchParameter) {
 }
 
 function isSearchInputInvalid() {
+  if (isEmptySearch.value) {
+    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
+    return true
+  }
+
   if (hasValidationErrors()) {
     submitButtonError.value = "Fehler in Suchkriterien"
     return true
@@ -179,7 +185,11 @@ function handleSearchButtonClicked() {
 }
 
 function handleSearch() {
-  emit("search", getQueryFromRoute())
+  if (!isEmptySearch.value) {
+    emit("search", getQueryFromRoute())
+  } else {
+    resetSearch()
+  }
 }
 
 watch(
@@ -366,7 +376,6 @@ watch(
           ></DateInput>
         </InputField>
       </div>
-
       <div class="flex flex-row gap-10 [grid-area:resolution-date-input]">
         <InputField
           id="resolutionDate"
@@ -429,15 +438,14 @@ watch(
           />
         </InputField>
       </div>
-
       <div class="flex flex-row [grid-area:search-button]">
         <div class="flex flex-col gap-8">
           <!-- ":loading" disables button while request is running. Needed as long as we cannot cancel requests -->
           <Button
             aria-label="Nach Anhängigen Verfahren suchen"
             class="self-start"
+            :disabled="isLoading"
             label="Ergebnisse anzeigen"
-            :loading="props.isLoading"
             size="small"
             @click="handleSearchButtonClicked"
           ></Button>
