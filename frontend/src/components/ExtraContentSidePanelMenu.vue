@@ -16,11 +16,10 @@ import IconImportCategories from "~icons/material-symbols/text-select-move-back-
 
 const props = defineProps<{
   panelMode?: SelectablePanelContent
-  documentUnit: DocumentationUnit
+  documentUnit?: DocumentationUnit
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   currentAttachmentIndex: number
-  hidePreviewInNewTab?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -42,7 +41,7 @@ function emitAttachmentIndex(value: number) {
 <template>
   <div class="m-24 flex flex-row justify-between">
     <div v-if="!hidePanelModeBar" class="flex flex-row -space-x-2">
-      <Tooltip shortcut="n" text="Notiz">
+      <Tooltip v-if="isDecision(documentUnit)" shortcut="n" text="Notiz">
         <Button
           id="note"
           aria-label="Notiz anzeigen"
@@ -57,7 +56,7 @@ function emitAttachmentIndex(value: number) {
           </template>
         </Button>
       </Tooltip>
-      <Tooltip shortcut="d" text="Datei">
+      <Tooltip v-if="isDecision(documentUnit)" shortcut="d" text="Datei">
         <Button
           id="attachments"
           aria-label="Dokumente anzeigen"
@@ -104,7 +103,11 @@ function emitAttachmentIndex(value: number) {
           </template>
         </Button>
       </Tooltip>
-      <Tooltip v-if="textCheckAll" shortcut="t" text="Rechtschreibprüfung">
+      <Tooltip
+        v-if="textCheckAll && isDecision(documentUnit)"
+        shortcut="t"
+        text="Rechtschreibprüfung"
+      >
         <Button
           id="text-check"
           aria-label="Rechtschreibprüfung"
@@ -136,12 +139,21 @@ function emitAttachmentIndex(value: number) {
         <router-link
           aria-label="Dokumentationseinheit in einem neuen Tab bearbeiten"
           target="_blank"
-          :to="{
-            name: 'caselaw-documentUnit-documentNumber-categories',
-            params: {
-              documentNumber: props.documentUnit.documentNumber,
-            },
-          }"
+          :to="
+            isDecision(documentUnit)
+              ? {
+                  name: 'caselaw-documentUnit-documentNumber-categories',
+                  params: {
+                    documentNumber: props.documentUnit!.documentNumber,
+                  },
+                }
+              : {
+                  name: 'caselaw-pending-proceeding-documentNumber-categories',
+                  params: {
+                    documentNumber: props.documentUnit!.documentNumber,
+                  },
+                }
+          "
         >
           <Button text>
             <template #icon>
@@ -150,16 +162,25 @@ function emitAttachmentIndex(value: number) {
           </Button>
         </router-link>
       </Tooltip>
-      <Tooltip v-if="!props.hidePreviewInNewTab" text="In neuem Tab öffnen">
+      <Tooltip text="In neuem Tab öffnen">
         <router-link
           aria-label="Vorschau in neuem Tab öffnen"
           target="_blank"
-          :to="{
-            name: 'caselaw-documentUnit-documentNumber-preview',
-            params: {
-              documentNumber: props.documentUnit.documentNumber,
-            },
-          }"
+          :to="
+            isDecision(documentUnit)
+              ? {
+                  name: 'caselaw-documentUnit-documentNumber-preview',
+                  params: {
+                    documentNumber: props.documentUnit!.documentNumber,
+                  },
+                }
+              : {
+                  name: 'caselaw-pending-proceeding-documentNumber-preview',
+                  params: {
+                    documentNumber: props.documentUnit!.documentNumber,
+                  },
+                }
+          "
         >
           <Button text>
             <template #icon>

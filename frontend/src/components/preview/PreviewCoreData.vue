@@ -142,7 +142,7 @@ const sourceValue = computed(() =>
     <PreviewRow v-if="coreData.resolutionDate">
       <PreviewCategory>Erledigungsmitteilung</PreviewCategory>
       <PreviewContent>
-        {{ coreData.resolutionDate }}
+        {{ dayjs(coreData.resolutionDate).format("DD.MM.YYYY") }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.court?.jurisdictionType">

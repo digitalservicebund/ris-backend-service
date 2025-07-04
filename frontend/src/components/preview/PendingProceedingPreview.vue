@@ -106,7 +106,9 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="pendingProceeding.shortTexts.resolutionNote">
-      <PreviewCategory>Erledigungsvermerk</PreviewCategory>
+      <PreviewCategory>{{
+        pendingProceedingLabels.resolutionNote
+      }}</PreviewCategory>
       <PreviewContent>
         <TextEditor
           id="previewResolutionNote"

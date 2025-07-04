@@ -2,34 +2,37 @@
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import InputText from "primevue/inputtext"
-import { onMounted, Ref, ref, watch } from "vue"
+import { computed, onMounted, Ref, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
-import { Decision, longTextLabels, shortTextLabels } from "@/domain/decision"
+import { allLabels, contentRelatedIndexingLabels } from "@/domain/decision"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import Reference from "@/domain/reference"
 import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { isDecision } from "@/utils/typeGuards"
+import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 import IconSearch from "~icons/ic/baseline-search"
 
 const props = defineProps<{
   documentNumber?: string
 }>()
 const store = useDocumentUnitStore()
-const { documentUnit: decision } = storeToRefs(store) as {
-  documentUnit: Ref<Decision | undefined>
+const { documentUnit: targetDocumentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentationUnit | null | undefined>
 }
-const validationStore = useValidationStore<keyof typeof labels>()
+const validationStore = useValidationStore<keyof typeof allLabels>()
 
 const documentNumber = ref<string>(props.documentNumber ?? "")
-const decisionToImport = ref<Decision | undefined>(undefined)
+const sourceDocumentUnit = ref<DocumentationUnit | undefined>(undefined) as Ref<
+  DocumentationUnit | null | undefined
+>
 const errorMessage = ref<string | undefined>(undefined)
 const router = useRouter()
 
@@ -41,46 +44,45 @@ async function searchForDocumentUnit() {
   const response = await documentUnitService.getByDocumentNumber(
     documentNumber.value,
   )
-  if (isDecision(response.data)) {
-    decisionToImport.value = response.data
-    errorMessage.value = undefined
-  } else {
-    decisionToImport.value = undefined
+  sourceDocumentUnit.value = undefined
+  errorMessage.value = undefined
+
+  if (!response.data) {
     errorMessage.value = "Keine Dokumentationseinheit gefunden."
+    return
   }
+
+  if (
+    isPendingProceeding(response.data) &&
+    isPendingProceeding(targetDocumentUnit.value)
+  ) {
+    errorMessage.value = "Import zwischen anhängigen Verfahren nicht möglich."
+    return
+  }
+
+  sourceDocumentUnit.value = response.data
 }
 
-const labels = {
-  caselawReferences: "Rechtsprechungsfundstellen",
-  literatureReferences: "Literaturfundstellen",
-  keywords: "Schlagwörter",
-  fieldsOfLaw: "Sachgebiete",
-  norms: "Normen",
-  activeCitations: "Aktivzitierung",
-  ...shortTextLabels,
-  ...longTextLabels,
-}
+const labels = computed(() => {
+  return isDecision(targetDocumentUnit.value) &&
+    isDecision(sourceDocumentUnit.value)
+    ? allLabels
+    : contentRelatedIndexingLabels
+})
 
-const hasContent = (key: keyof typeof labels): boolean => {
-  if (decisionToImport.value)
+const hasContent = (key: keyof typeof allLabels): boolean => {
+  if (isDecision(sourceDocumentUnit.value)) {
     if (key == "caselawReferences" || key == "literatureReferences") {
-      const object = decisionToImport.value[key]
+      const object = sourceDocumentUnit.value[key]
       return !!(Array.isArray(object) && object.length > 0)
-    } else if (key in decisionToImport.value.contentRelatedIndexing) {
-      const object =
-        decisionToImport.value.contentRelatedIndexing[
-          key as keyof typeof decisionToImport.value.contentRelatedIndexing
-        ]
-
-      return !!(Array.isArray(object) && object.length > 0)
-    } else if (key in decisionToImport.value.shortTexts) {
-      return !!decisionToImport.value.shortTexts[
-        key as keyof typeof decisionToImport.value.shortTexts
+    } else if (key in sourceDocumentUnit.value.shortTexts) {
+      return !!sourceDocumentUnit.value.shortTexts[
+        key as keyof typeof sourceDocumentUnit.value.shortTexts
       ]
-    } else if (key in decisionToImport.value.longTexts) {
+    } else if (key in sourceDocumentUnit.value.longTexts) {
       const sourceLongText =
-        decisionToImport.value.longTexts[
-          key as keyof typeof decisionToImport.value.longTexts
+        sourceDocumentUnit.value.longTexts[
+          key as keyof typeof sourceDocumentUnit.value.longTexts
         ]
 
       return (
@@ -88,19 +90,34 @@ const hasContent = (key: keyof typeof labels): boolean => {
         (!Array.isArray(sourceLongText) || sourceLongText.length > 0)
       )
     }
+  }
+  if (
+    sourceDocumentUnit.value &&
+    key in sourceDocumentUnit.value.contentRelatedIndexing
+  ) {
+    const object =
+      sourceDocumentUnit.value.contentRelatedIndexing[
+        key as keyof typeof sourceDocumentUnit.value.contentRelatedIndexing
+      ]
+
+    return !!(Array.isArray(object) && object.length > 0)
+  }
   return false
 }
 
-const isImportable = (key: keyof typeof labels): boolean => {
-  if (decisionToImport.value)
-    if (key in decisionToImport.value.shortTexts) {
-      return !decision.value!.shortTexts[
-        key as keyof typeof decisionToImport.value.shortTexts
+const isImportable = (key: keyof typeof allLabels): boolean => {
+  if (
+    isDecision(targetDocumentUnit.value) &&
+    isDecision(sourceDocumentUnit.value)
+  )
+    if (key in sourceDocumentUnit.value.shortTexts) {
+      return !targetDocumentUnit.value!.shortTexts[
+        key as keyof typeof sourceDocumentUnit.value.shortTexts
       ]
-    } else if (key in decisionToImport.value.longTexts) {
+    } else if (key in sourceDocumentUnit.value.longTexts) {
       const targetLongText =
-        decision.value!.longTexts[
-          key as keyof typeof decisionToImport.value.longTexts
+        targetDocumentUnit.value!.longTexts[
+          key as keyof typeof sourceDocumentUnit.value.longTexts
         ]
 
       const isEmptyText =
@@ -113,7 +130,7 @@ const isImportable = (key: keyof typeof labels): boolean => {
 }
 
 // Handle import logic
-const handleImport = async (key: keyof typeof labels) => {
+const handleImport = async (key: keyof typeof allLabels) => {
   validationStore.reset()
 
   switch (key) {
@@ -155,7 +172,7 @@ const handleImport = async (key: keyof typeof labels) => {
 
   const updateResponse = await store.updateDocumentUnit()
   if (updateResponse.error) {
-    validationStore.add("Fehler beim Speichern der " + labels[key], key) // add an errormessage to the validationstore field with the key
+    validationStore.add("Fehler beim Speichern der " + allLabels[key], key) // add an errormessage to the validationstore field with the key
   } else if (key == "caselawReferences" || key == "literatureReferences") {
     await router.push({
       name: "caselaw-documentUnit-documentNumber-references",
@@ -166,68 +183,72 @@ const handleImport = async (key: keyof typeof labels) => {
 }
 
 function importReferences(key: "caselawReferences" | "literatureReferences") {
-  const source = decisionToImport.value?.[key]
-  if (!source) return
+  const source = sourceDocumentUnit.value?.[key]
+  if (source && isDecision(targetDocumentUnit.value)) {
+    const targetReferences = targetDocumentUnit.value![key]
 
-  const targetReferences = decision.value![key]
+    if (targetReferences) {
+      const isDuplicate = (
+        entry: Reference,
+        reference: Reference,
+        key: string,
+      ) => {
+        const sameLegalPeriodical =
+          entry.legalPeriodical?.uuid === reference.legalPeriodical?.uuid ||
+          entry.legalPeriodicalRawValue === reference.legalPeriodicalRawValue
 
-  if (targetReferences) {
-    const isDuplicate = (
-      entry: Reference,
-      reference: Reference,
-      key: string,
-    ) => {
-      const sameLegalPeriodical =
-        entry.legalPeriodical?.uuid === reference.legalPeriodical?.uuid ||
-        entry.legalPeriodicalRawValue === reference.legalPeriodicalRawValue
+        const sameCitation = entry.citation === reference.citation
 
-      const sameCitation = entry.citation === reference.citation
+        const sameReferenceSupplement =
+          key !== "caselawReferences" ||
+          entry.referenceSupplement === reference.referenceSupplement
 
-      const sameReferenceSupplement =
-        key !== "caselawReferences" ||
-        entry.referenceSupplement === reference.referenceSupplement
+        const sameAuthor =
+          key !== "literatureReferences" || entry.author === reference.author
 
-      const sameAuthor =
-        key !== "literatureReferences" || entry.author === reference.author
+        const sameDocumentType =
+          key !== "literatureReferences" ||
+          entry.documentType?.uuid === reference.documentType?.uuid
 
-      const sameDocumentType =
-        key !== "literatureReferences" ||
-        entry.documentType?.uuid === reference.documentType?.uuid
+        return (
+          sameLegalPeriodical &&
+          sameCitation &&
+          sameReferenceSupplement &&
+          sameAuthor &&
+          sameDocumentType
+        )
+      }
+      const uniqueImportableReferences = source
+        .filter(
+          (reference) =>
+            !targetReferences.find((entry) =>
+              isDuplicate(entry, reference, key),
+            ),
+        )
+        .map(
+          (reference) =>
+            new Reference({ ...reference, id: crypto.randomUUID() }),
+        )
 
-      return (
-        sameLegalPeriodical &&
-        sameCitation &&
-        sameReferenceSupplement &&
-        sameAuthor &&
-        sameDocumentType
+      targetReferences.push(...uniqueImportableReferences)
+    } else {
+      targetDocumentUnit.value![key] = source.map(
+        (reference) =>
+          new Reference({
+            ...reference,
+            id: crypto.randomUUID(),
+          }),
       )
     }
-    const uniqueImportableReferences = source
-      .filter(
-        (reference) =>
-          !targetReferences.find((entry) => isDuplicate(entry, reference, key)),
-      )
-      .map(
-        (reference) => new Reference({ ...reference, id: crypto.randomUUID() }),
-      )
-
-    targetReferences.push(...uniqueImportableReferences)
-  } else {
-    decision.value![key] = source.map(
-      (reference) =>
-        new Reference({
-          ...reference,
-          id: crypto.randomUUID(),
-        }),
-    )
   }
 }
 
 function importKeywords() {
-  const source = decisionToImport.value?.contentRelatedIndexing.keywords
+  const source = sourceDocumentUnit.value?.contentRelatedIndexing.keywords
   if (!source) return
 
-  const targetKeywords = decision.value!.contentRelatedIndexing.keywords
+  const targetKeywords =
+    targetDocumentUnit.value!.contentRelatedIndexing.keywords
 
   if (targetKeywords) {
     const uniqueImportableKeywords = source.filter(
@@ -235,15 +256,16 @@ function importKeywords() {
     )
     targetKeywords.push(...uniqueImportableKeywords)
   } else {
-    decision.value!.contentRelatedIndexing.keywords = [...source]
+    targetDocumentUnit.value!.contentRelatedIndexing.keywords = [...source]
   }
 }
 
 function importFieldsOfLaw() {
-  const source = decisionToImport.value?.contentRelatedIndexing.fieldsOfLaw
+  const source = sourceDocumentUnit.value?.contentRelatedIndexing.fieldsOfLaw
   if (!source) return
 
-  const targetFieldsOfLaw = decision.value!.contentRelatedIndexing.fieldsOfLaw
+  const targetFieldsOfLaw =
+    targetDocumentUnit.value!.contentRelatedIndexing.fieldsOfLaw
   if (targetFieldsOfLaw) {
     const uniqueImportableFieldsOfLaw = source.filter(
       (fieldOfLaw) =>
@@ -253,15 +275,15 @@ function importFieldsOfLaw() {
     )
     targetFieldsOfLaw.push(...uniqueImportableFieldsOfLaw)
   } else {
-    decision.value!.contentRelatedIndexing.fieldsOfLaw = [...source]
+    targetDocumentUnit.value!.contentRelatedIndexing.fieldsOfLaw = [...source]
   }
 }
 
 function importNorms() {
-  const source = decisionToImport.value?.contentRelatedIndexing.norms
+  const source = sourceDocumentUnit.value?.contentRelatedIndexing.norms
   if (!source) return
 
-  const targetNorms = decision.value!.contentRelatedIndexing.norms
+  const targetNorms = targetDocumentUnit.value!.contentRelatedIndexing.norms
   if (targetNorms) {
     source.forEach((importableNorm) => {
       // first check for abbreviation, then for raw value
@@ -307,11 +329,12 @@ function importNorms() {
 }
 
 function importActiveCitations() {
-  const source = decisionToImport.value?.contentRelatedIndexing.activeCitations
+  const source =
+    sourceDocumentUnit.value?.contentRelatedIndexing.activeCitations
   if (!source) return
 
   const targetActiveCitations =
-    decision.value!.contentRelatedIndexing.activeCitations ?? []
+    targetDocumentUnit.value!.contentRelatedIndexing.activeCitations ?? []
 
   const uniqueImportableFieldsOfLaw = source
     .filter(
@@ -328,32 +351,39 @@ function importActiveCitations() {
       newEntry: true,
     }))
 
-  decision.value!.contentRelatedIndexing.activeCitations = [
+  targetDocumentUnit.value!.contentRelatedIndexing.activeCitations = [
     ...targetActiveCitations,
     ...uniqueImportableFieldsOfLaw,
   ] as ActiveCitation[]
 }
 
 function importParticipatingJudges() {
-  const source = decisionToImport.value?.longTexts["participatingJudges"]
-  if (!source) return
+  if (
+    isDecision(targetDocumentUnit.value) &&
+    isDecision(sourceDocumentUnit.value)
+  ) {
+    const source = sourceDocumentUnit.value?.longTexts["participatingJudges"]
+    if (!source) return
+    source.forEach((judge) => (judge.id = undefined))
 
-  source.forEach((judge) => (judge.id = undefined))
-
-  decision.value!.longTexts["participatingJudges"] = [
-    ...source,
-  ] as ParticipatingJudge[]
+    targetDocumentUnit.value!.longTexts["participatingJudges"] = [
+      ...source,
+    ] as ParticipatingJudge[]
+  }
 }
 
 function importShortTexts(key: string) {
-  const source =
-    decisionToImport.value?.shortTexts[
-      key as keyof typeof decisionToImport.value.shortTexts
-    ]
+  if (isDecision(targetDocumentUnit.value)) {
+    const source =
+      sourceDocumentUnit.value?.shortTexts[
+        key as keyof typeof sourceDocumentUnit.value.shortTexts
+      ]
 
-  if (decision.value)
-    decision.value.shortTexts[key as keyof typeof decision.value.shortTexts] =
-      source
+    if (targetDocumentUnit.value)
+      targetDocumentUnit.value.shortTexts[
+        key as keyof typeof targetDocumentUnit.value.shortTexts
+      ] = source
+  }
 }
 
 // By narrowing the type of key to exclude "participatingJudges", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.longTexts[key].
@@ -367,10 +397,15 @@ type StringKeys =
   | "outline"
 
 function importLongTexts(key: StringKeys) {
-  const source = decisionToImport.value?.longTexts[key]
+  if (
+    isDecision(targetDocumentUnit.value) &&
+    isDecision(sourceDocumentUnit.value)
+  ) {
+    const source = sourceDocumentUnit.value?.longTexts[key]
 
-  if (decision.value) {
-    decision.value.longTexts[key] = source as string
+    if (targetDocumentUnit.value) {
+      targetDocumentUnit.value.longTexts[key] = source as string
+    }
   }
 }
 
@@ -446,13 +481,13 @@ onMounted(() => {
     }}</span>
 
     <div
-      v-if="decisionToImport"
+      v-if="sourceDocumentUnit"
       class="ris-label1-regular mt-24 flex flex-col gap-16 bg-blue-100 p-16"
     >
       <DecisionSummary
-        :document-number="decisionToImport.documentNumber"
-        :status="decisionToImport.status"
-        :summary="decisionToImport.renderSummary"
+        :document-number="sourceDocumentUnit.documentNumber"
+        :status="sourceDocumentUnit.status"
+        :summary="sourceDocumentUnit.renderSummary"
       />
       <div v-for="(value, key) in labels" :key="key">
         <SingleCategory

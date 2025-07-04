@@ -834,7 +834,8 @@ INSERT INTO
     is_resolved,
     legal_issue,
     admission_of_appeal,
-    appellant
+    appellant,
+    resolution_date
 )
 VALUES
     (
@@ -849,7 +850,8 @@ VALUES
         true,
         '<p>Gewerbesteuerpflicht des Bäderbetriebs einer Gemeinde als Betrieb gewerblicher Art (Gewinnerzielungsabsicht)? Ist ein Betrieb gewerblicher Art einer juristischen Person des öffentlichen Rechts nur gewerbesteuerpflichtig, wenn er mit der Absicht der Gewinnerzielung betrieben wird?</p>',
         'Zulassung durch BFH',
-        'Verwaltung'
+        'Verwaltung',
+        '2025-06-06'
     ),
     (
         (SELECT
@@ -862,6 +864,7 @@ VALUES
         NULL,
         false,
         '<p>Unveröffentlichtes anhängiges Verfahren</p>',
+        NULL,
         NULL,
         NULL
     );

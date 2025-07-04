@@ -85,13 +85,15 @@ function togglePanel(expand?: boolean): boolean {
 
 function setDefaultState() {
   if (props.sidePanelMode) {
-    store.setSidePanelMode(props.sidePanelMode)
+    setSidePanelMode(props.sidePanelMode)
   } else if (
     isDecision(props.documentUnit) &&
     !props.documentUnit!.note &&
     props.documentUnit!.hasAttachments
   ) {
     selectAttachments()
+  } else if (isPendingProceeding(props.documentUnit)) {
+    setSidePanelMode("preview")
   } else {
     setSidePanelMode("note")
   }
@@ -133,11 +135,9 @@ onMounted(() => {
       @update:is-expanded="togglePanel"
     >
       <ExtraContentExtraContentSidePanelMenu
-        v-if="isDecision(props.documentUnit)"
         :current-attachment-index="currentAttachmentIndex"
         :document-unit="props.documentUnit"
         :hide-panel-mode-bar="props.hidePanelModeBar"
-        :hide-preview-in-new-tab="props.hidePreviewInNewTab"
         :panel-mode="panelMode"
         :show-edit-button="props.showEditButton"
         @attachment-index:update="handleOnSelectAttachment"
@@ -196,9 +196,7 @@ onMounted(() => {
         </div>
 
         <CategoryImport
-          v-else-if="
-            panelMode === 'category-import' && isDecision(props.documentUnit)
-          "
+          v-else-if="panelMode === 'category-import'"
           :document-number="importDocumentNumber"
         />
 

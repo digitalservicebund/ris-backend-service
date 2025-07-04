@@ -233,7 +233,6 @@ export type ExtraContentSidePanelProps = {
   documentUnit?: DocumentationUnit
   showEditButton?: boolean
   hidePanelModeBar?: boolean
-  hidePreviewInNewTab?: boolean
   sidePanelMode?: SelectablePanelContent
   sidePanelShortcut?: string
   icon?: Component
