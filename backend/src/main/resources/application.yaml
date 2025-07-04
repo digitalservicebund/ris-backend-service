@@ -47,7 +47,10 @@ server:
         max-age: 43200 # 12*60*60
         http-only: false
       timeout: 43200 # 12*60*60
-#logging:
+logging:
+  structured:
+    format:
+      console: logstash
 #  level:
 #    org.springframework: DEBUG
 #    org.hibernate.SQL: DEBUG
