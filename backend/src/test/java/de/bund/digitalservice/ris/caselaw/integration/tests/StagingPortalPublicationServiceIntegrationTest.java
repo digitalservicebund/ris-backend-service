@@ -116,8 +116,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
   @Test
   void testPublishSuccessfully() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit());
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
 
     risWebTestClient
         .withDefaultLogin()
@@ -139,8 +138,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
   @Test
   void testPublishFailsWithMissingMandatoryFields() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, documentationOffice);
+        EntityBuilderTestUtil.createAndSaveDecision(repository, documentationOffice);
 
     risWebTestClient
         .withDefaultLogin()
@@ -159,7 +157,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
   @Test
   void testPublishFailsWhenLDMLValidationFails() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, buildValidDocumentationUnit().grounds(null));
 
     risWebTestClient
@@ -179,8 +177,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
   @Test
   void testPublishFailsWhenS3ClientThrowsException() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit());
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
 
     when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
         .thenThrow(S3Exception.class);
@@ -202,7 +199,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
   @Test
   void testPublishWithAttachmentsSuccessfully() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             buildValidDocumentationUnit(
                 List.of(
@@ -235,7 +232,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
   void publishTwice_andRemoveAttachment_shouldPublishSuccessfullyAndDeleteAttachment()
       throws IOException {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             buildValidDocumentationUnit(
                 List.of(

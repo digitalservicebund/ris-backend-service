@@ -254,9 +254,12 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
 
   @Override
   @Nullable
+  /*
+   Default implementation for non-PendingProceedingDTOs, needed by
+  * DocumentationUnitListItemDTO
+  */
   public LocalDate getResolutionDate() {
-    return null; // Default implementation for non-PendingProceedingDTOs, needed by
-    // DocumentationUnitListItemDTO
+    return null;
   }
 
   @Override

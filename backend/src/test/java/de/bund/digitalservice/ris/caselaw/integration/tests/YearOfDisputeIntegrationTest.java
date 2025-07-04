@@ -42,7 +42,7 @@ class YearOfDisputeIntegrationTest extends BaseIntegrationTest {
   @Test
   void testDuplicatedYearsAreNotAllowed() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, DEFAULT_DOCUMENT_NUMBER);
 
     List<Year> years = List.of(Year.now(), Year.now());
@@ -76,7 +76,7 @@ class YearOfDisputeIntegrationTest extends BaseIntegrationTest {
   @Test
   void testYearsSorting() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, DEFAULT_DOCUMENT_NUMBER);
 
     var firstYear = Year.parse("2022");
@@ -118,7 +118,7 @@ class YearOfDisputeIntegrationTest extends BaseIntegrationTest {
   @Test
   void testFutureYearsAreNotAllowed() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, DEFAULT_DOCUMENT_NUMBER);
 
     var futureYear = Year.now().plusYears(1);

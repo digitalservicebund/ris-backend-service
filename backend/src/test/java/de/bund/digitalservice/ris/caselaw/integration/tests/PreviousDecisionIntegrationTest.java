@@ -98,7 +98,7 @@ class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
   void
       testGetDocumentationUnit_withPreviousDecision_shouldReturnDocumentationUnitWithListOfExistingPreviousDecsion() {
 
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentationOffice(documentationOfficeDTO)
@@ -134,7 +134,7 @@ class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
   @Test
   void testAddPreviousDecisionToEmptyPreviousDecisionList_shouldContainTheNewEntry() {
     DocumentationUnitDTO parentDocumentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOfficeDTO, "documntnumber");
 
     Decision decision =
@@ -164,7 +164,7 @@ class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
   @Test
   void testLinkExistingPreviousDecision() {
     DocumentationUnitDTO parentDocumentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOfficeDTO, "1234567890123");
 
     var childDocumentationUnitDTO =
@@ -211,7 +211,7 @@ class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
   @Test
   void testRemovePreviousDecision_withEmptyList_shouldRemoveAllPreviousDecisions() {
     DocumentationUnitDTO parentDocumentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentationOffice(documentationOfficeDTO)
@@ -243,7 +243,7 @@ class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
   @Test
   void testLinkTheSameDocumentationUnitsTwice() {
     DocumentationUnitDTO parentDocumentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOfficeDTO, "1234567890123");
 
     Decision decision =
@@ -481,7 +481,7 @@ class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
         documentationOfficeRepository.findByAbbreviation(documentOfficeLabel);
     assertThat(documentOffice).isNotNull();
 
-    return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    return EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentationOffice(documentOffice)
