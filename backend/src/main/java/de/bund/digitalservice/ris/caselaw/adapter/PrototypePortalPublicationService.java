@@ -93,12 +93,16 @@ public class PrototypePortalPublicationService extends CommonPortalPublicationSe
       addedFiles.add(path + fileName);
 
       if (!attachments.isEmpty()) {
-        attachments.forEach(
-            attachment -> {
-              prototypePortalBucket.saveBytes(
-                  path + attachment.getFilename(), attachment.getContent());
-              addedFiles.add(path + attachment.getFilename());
-            });
+        attachments.stream()
+            .filter(
+                attachment ->
+                    !attachment.getFormat().equals("docx") && !attachment.getFormat().equals("fmx"))
+            .forEach(
+                attachment -> {
+                  prototypePortalBucket.saveBytes(
+                      path + attachment.getFilename(), attachment.getContent());
+                  addedFiles.add(path + attachment.getFilename());
+                });
       }
 
       // Check for files that are not part of this update and remove them (e.g. removed images)

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -19,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrThis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -33,6 +35,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -178,6 +181,39 @@ class PrototypePortalPublicationServiceTest {
     verify(portalBucket, times(1)).save(testDocumentNumber + ".xml", transformed);
     verify(portalBucket, times(1))
         .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
+  }
+
+  @Test
+  void publish_withAttachments_shouldSaveToBucket() throws DocumentationUnitNotExistsException {
+    String transformed = "ldml";
+    when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
+        .thenReturn(testDocumentUnit);
+    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+    when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
+    var content = new byte[] {1};
+    when(attachmentRepository.findAllByDocumentationUnitId(testDocumentUnit.uuid()))
+        .thenReturn(
+            List.of(
+                AttachmentDTO.builder()
+                    .filename("originalentscheidung")
+                    .format("docx")
+                    .uploadTimestamp(Instant.now())
+                    .build(),
+                AttachmentDTO.builder()
+                    .filename("bild1.png")
+                    .format("png")
+                    .content(content)
+                    .uploadTimestamp(Instant.now())
+                    .build()));
+
+    subject.publishDocumentationUnit(testDocumentNumber);
+
+    verify(portalBucket, times(1)).save(testDocumentNumber + ".xml", transformed);
+    verify(portalBucket, times(1))
+        .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
+    verify(portalBucket, times(1)).saveBytes(testDocumentNumber + "/bild1.png", content);
+    verify(portalBucket, never())
+        .saveBytes(eq(testDocumentNumber + "/originalenscheidung"), any(byte[].class));
   }
 
   @Test
