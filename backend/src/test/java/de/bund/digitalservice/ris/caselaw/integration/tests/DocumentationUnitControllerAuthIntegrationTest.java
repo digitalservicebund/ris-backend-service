@@ -81,7 +81,7 @@ class DocumentationUnitControllerAuthIntegrationTest extends BaseIntegrationTest
     }
 
     DecisionDTO documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, createNewDocumentationUnitDTO(docUnitOffice), publicationStatus);
 
     Slice<DocumentationUnitListItem> docUnitsSearchResult =
@@ -127,7 +127,7 @@ class DocumentationUnitControllerAuthIntegrationTest extends BaseIntegrationTest
     }
 
     DocumentationUnitDTO documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, createNewDocumentationUnitDTO(docUnitOffice), publicationStatus);
 
     Slice<DocumentationUnitListItem> docUnitsSearchResult =
@@ -157,7 +157,7 @@ class DocumentationUnitControllerAuthIntegrationTest extends BaseIntegrationTest
   @Test
   void testUnpublishedDocumentationUnitIsForbiddenForOtherOffice() {
     DecisionDTO documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, createNewDocumentationUnitDTO(ccRisOffice), UNPUBLISHED);
 
     // Documentation Office 1

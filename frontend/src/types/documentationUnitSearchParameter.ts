@@ -11,3 +11,6 @@ export type DocumentationUnitSearchParameter =
   | "withError"
   | "myDocOfficeOnly"
   | "withDuplicateWarning"
+  | "resolutionDate"
+  | "resolutionDateEnd"
+  | "isResolved"

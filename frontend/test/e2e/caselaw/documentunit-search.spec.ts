@@ -25,10 +25,6 @@ test.describe("search", () => {
       }),
     ).toBeVisible()
 
-    await expect(
-      page.getByRole("heading", { name: "Übersicht Rechtsprechung" }),
-    ).toBeVisible()
-
     await expect(page.getByLabel("Aktenzeichen Suche")).toBeVisible()
     await expect(page.getByLabel("Gerichtstyp Suche")).toBeVisible()
     await expect(page.getByLabel("Gerichtsort Suche")).toBeVisible()

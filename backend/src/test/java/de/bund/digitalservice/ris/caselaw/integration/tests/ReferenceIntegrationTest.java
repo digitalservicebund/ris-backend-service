@@ -91,8 +91,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
   @Test
   void testReferencesCanBeSaved() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, documentationOffice);
+        EntityBuilderTestUtil.createAndSaveDecision(repository, documentationOffice);
 
     UUID referenceId = UUID.randomUUID();
     Decision decisionFromFrontend =
@@ -145,8 +144,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
   @Test
   void testLiteratureReferencesCanBeSaved() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, documentationOffice);
+        EntityBuilderTestUtil.createAndSaveDecision(repository, documentationOffice);
 
     UUID referenceId = UUID.randomUUID();
     Decision decisionFromFrontend =
@@ -199,9 +197,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
   @Test
   void testReferencesAndLiteratureCitationsCanBeDeleted() {
     DecisionDTO dto =
-        (DecisionDTO)
-            EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-                repository, documentationOffice);
+        (DecisionDTO) EntityBuilderTestUtil.createAndSaveDecision(repository, documentationOffice);
 
     UUID referenceId = UUID.randomUUID();
     UUID literatureCitationId = UUID.randomUUID();
@@ -265,8 +261,7 @@ class ReferenceIntegrationTest extends BaseIntegrationTest {
   @Test
   void testReferencesAndLiteratureCitationsOriginatedFromEditionCanBeDeleted() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, documentationOffice);
+        EntityBuilderTestUtil.createAndSaveDecision(repository, documentationOffice);
 
     UUID referenceId = UUID.randomUUID();
     UUID literatureCitationId = UUID.randomUUID();

@@ -94,8 +94,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     mockS3ClientToReturnFile(attachment);
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, dsDocOffice, "1234567890123");
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
         .withDefaultLogin()
@@ -130,8 +129,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     mockS3ClientToReturnFile(attachment);
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, dsDocOffice, "1234567890123");
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
         .withDefaultLogin()
@@ -171,8 +169,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     mockS3ClientToReturnFile(attachment);
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, dsDocOffice, "1234567890123");
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
         .withDefaultLogin()
@@ -211,8 +208,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     mockS3ClientToReturnFile(attachment);
 
     DocumentationUnitDTO documentationUnitDto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, dsDocOffice, "1234567890123");
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
         .withDefaultLogin()
@@ -273,8 +269,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     mockS3ClientToReturnFile(attachmentWithEcli);
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, dsDocOffice, "1234567890123");
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
         .withDefaultLogin()
@@ -308,7 +303,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     mockS3ClientToReturnFile(attachmentWithEcli);
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -350,7 +345,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     mockS3ClientToReturnFile(attachmentWithMetadata);
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -406,8 +401,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
         .thenReturn(DeleteObjectResponse.builder().build());
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, dsDocOffice, "1234567890123");
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     attachmentRepository.save(
         AttachmentDTO.builder()
@@ -464,8 +458,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
         .thenReturn(DeleteObjectResponse.builder().build());
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, dsDocOffice, "1234567890123");
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     attachmentRepository.save(
         AttachmentDTO.builder()
@@ -513,8 +506,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     mockS3ClientToReturnFile(attachment);
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, dsDocOffice, "1234567890123");
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
         .withExternalLogin()
@@ -548,8 +540,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
         .thenReturn(DeleteObjectResponse.builder().build());
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, dsDocOffice, "1234567890123");
+        EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     attachmentRepository.save(
         AttachmentDTO.builder()

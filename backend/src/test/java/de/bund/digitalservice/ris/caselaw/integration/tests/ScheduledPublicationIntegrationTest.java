@@ -52,7 +52,7 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
   void shouldPublishOnlyDueDocUnitsAndSendErrorNotificationOnSchedule() {
     // Valid doc unit -> publication will succeed
     DocumentationUnitDTO docUnitDueNow =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             docUnitRepository,
             DecisionDTO.builder()
                 .documentationOffice(documentationOffice)
@@ -63,7 +63,7 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
 
     // Doc unit is not yet due -> will not be touched
     DocumentationUnitDTO docUnitScheduledForFuture =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             docUnitRepository,
             DecisionDTO.builder()
                 .documentationOffice(documentationOffice)
@@ -74,7 +74,7 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
 
     // Invalid doc unit will be unscheduled + send error notification
     DocumentationUnitDTO docUnitWithFailingXmlExport =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             docUnitRepository,
             DecisionDTO.builder()
                 .documentationOffice(documentationOffice)

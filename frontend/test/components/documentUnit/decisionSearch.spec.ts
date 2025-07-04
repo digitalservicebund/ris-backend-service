@@ -5,8 +5,9 @@ import { config } from "@vue/test-utils"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
+import { afterEach, beforeEach, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
+import DecisionSearch from "@/components/search/DecisionSearch.vue"
 import { Court } from "@/domain/court"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import authService from "@/services/authService"
@@ -36,7 +37,7 @@ function renderComponent(
   })
   return {
     user,
-    ...render(DocumentUnitSearch, {
+    ...render(DecisionSearch, {
       global: {
         directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
@@ -51,6 +52,7 @@ function renderComponent(
         ],
       },
     }),
+    router: router,
   }
 }
 
@@ -175,7 +177,9 @@ describe("Documentunit Search", () => {
         },
       }),
     )
-    const { user } = renderComponent()
+    const { user, router } = renderComponent()
+    // we need to reset the query in order to make sure the test works together with the other tests
+    await router.push({ path: "/", query: {} })
 
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
     await user.click(screen.getByLabelText("Terminiert Filter"))
@@ -211,7 +215,9 @@ describe("Documentunit Search", () => {
         },
       }),
     )
-    const { user } = renderComponent()
+    const { user, router } = renderComponent()
+    // we need to reset the query in order to make sure the test works together with the other tests
+    await router.push({ path: "/", query: {} })
 
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
     await user.type(
@@ -308,7 +314,9 @@ describe("Documentunit Search", () => {
       }),
     )
 
-    const { user } = renderComponent()
+    const { user, router } = renderComponent()
+    // we need to reset the query in order to make sure the test works together with the other tests
+    await router.push({ path: "/", query: {} })
 
     await user.type(screen.getByLabelText("Gerichtstyp Suche"), "AG")
     expect(screen.getByLabelText("Gerichtstyp Suche")).toHaveValue("AG")
@@ -373,7 +381,9 @@ describe("Documentunit Search", () => {
       }),
     )
 
-    const { user } = renderComponent({ isInternal: false })
+    const { user, router } = renderComponent({ isInternal: false })
+    // we need to reset the query in order to make sure the test works together with the other tests
+    await router.push({ path: "/", query: {} })
 
     await user.type(screen.getByLabelText("Aktenzeichen Suche"), "ABCD")
     expect(screen.getByLabelText("Aktenzeichen Suche")).toHaveValue("ABCD")

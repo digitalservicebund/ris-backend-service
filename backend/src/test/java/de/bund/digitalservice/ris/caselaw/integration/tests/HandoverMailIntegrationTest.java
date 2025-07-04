@@ -108,7 +108,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
     String identifier = "docnr22345678";
 
     DocumentationUnitDTO savedDocumentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentationOffice(docOffice)
@@ -149,7 +149,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
     String identifier = "docnr32345678";
 
     DocumentationUnitDTO savedDocumentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentationOffice(docOffice)
@@ -203,7 +203,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
     String identifier = "docnr12345678";
 
     DocumentationUnitDTO savedDocumentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentationOffice(docOffice)
@@ -342,8 +342,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
 
     if (entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)) {
       DocumentationUnitDTO documentationUnitDTO =
-          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-              repository, docOffice, "docnr12345678");
+          EntityBuilderTestUtil.createAndSaveDecision(repository, docOffice, "docnr12345678");
 
       assertThat(repository.findAll()).hasSize(1);
       entityId = documentationUnitDTO.getId();
@@ -472,7 +471,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
     UUID entityId = UUID.randomUUID();
     if (entityType == HandoverEntityType.DOCUMENTATION_UNIT) {
       entityId =
-          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          EntityBuilderTestUtil.createAndSaveDecision(
                   repository,
                   DecisionDTO.builder()
                       .documentationOffice(docOffice)

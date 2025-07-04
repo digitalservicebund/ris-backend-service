@@ -36,6 +36,7 @@ public record DocumentationUnitListItem(
     String fileNumber,
     Boolean hasAttachments,
     LocalDate decisionDate,
+    LocalDate resolutionDate,
     Instant createdAt,
     LocalDateTime lastPublicationDateTime,
     LocalDateTime scheduledPublicationDateTime,

@@ -19,5 +19,8 @@ public record DocumentationUnitSearchInput(
     Status status,
     boolean myDocOfficeOnly,
     boolean withDuplicateWarning,
+    LocalDate resolutionDate,
+    LocalDate resolutionDateEnd,
+    boolean isResolved,
     InboxStatus inboxStatus,
     Kind kind) {}

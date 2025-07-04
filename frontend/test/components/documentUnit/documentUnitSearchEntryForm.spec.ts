@@ -96,7 +96,9 @@ describe("Documentunit search form", () => {
   })
 
   test("click on 'Ergebnisse anzeigen' with the same search entry, emits search event again", async () => {
-    const { emitted, user } = await renderComponent()
+    const { emitted, user, router } = await renderComponent()
+    // we need to reset the query in order to make sure the test works together with the other tests
+    await router.push({ path: "/", query: {} })
 
     await user.type(
       screen.getByLabelText("Entscheidungsdatum Suche"),

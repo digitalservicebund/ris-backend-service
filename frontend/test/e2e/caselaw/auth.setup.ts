@@ -12,7 +12,7 @@ function authenticateUser(user: {
     await page.locator("input#kc-login").click()
 
     await page.goto(process.env.E2E_BASE_URL ?? "http://127.0.0.1")
-    await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible()
+    await expect(page.getByText("Rechtsinformationen")).toBeVisible()
 
     await page
       .context()

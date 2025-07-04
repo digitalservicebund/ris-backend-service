@@ -182,7 +182,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
     UUID existingLiteratureCitationId = UUID.randomUUID();
 
     var docUnit =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository,
             documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
             "DOC_NUMBER");
@@ -384,7 +384,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
       throws DocumentationUnitNotExistsException {
 
     var docUnit =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository,
             documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
             "DOC_NUMBER");
@@ -548,7 +548,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
     var referenceId = UUID.randomUUID();
 
     var docUnit =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository,
             documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
             "DOC_NUMBER");
@@ -645,7 +645,7 @@ class LegalPeriodicalEditionIntegrationTest extends BaseIntegrationTest {
 
     // create skeleton doc unit to retrieve ID
     var docUnit =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository,
             documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
             "DOC_NUMBER");

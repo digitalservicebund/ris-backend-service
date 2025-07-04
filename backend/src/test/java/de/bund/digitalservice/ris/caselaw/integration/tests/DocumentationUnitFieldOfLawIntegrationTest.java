@@ -47,7 +47,7 @@ class DocumentationUnitFieldOfLawIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testGetAllFieldsOfLawForDocumentationUnit_withoutFieldOfLawLinked_shouldReturnEmptyList() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     risWebTestClient
@@ -69,7 +69,7 @@ class DocumentationUnitFieldOfLawIntegrationTest extends BaseIntegrationTest {
       testGetAllFieldsOfLawForDocumentationUnit_withFirstFieldOfLawLinked_shouldReturnListWithLinkedFieldOfLaw() {
 
     var documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO =
@@ -102,7 +102,7 @@ class DocumentationUnitFieldOfLawIntegrationTest extends BaseIntegrationTest {
   @Test
   void testGetAllFieldsOfLawForDocumentationUnit_shouldReturnSortedList() {
     var documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO1 =
@@ -164,7 +164,7 @@ class DocumentationUnitFieldOfLawIntegrationTest extends BaseIntegrationTest {
   @Test
   void testAddFieldsOfLawForDocumentationUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
     var documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     Decision decision =
@@ -207,7 +207,7 @@ class DocumentationUnitFieldOfLawIntegrationTest extends BaseIntegrationTest {
   void
       testAddFieldsOfLawForDocumentationUnit_withNotExistingFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
     var documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     Decision decision =
@@ -240,7 +240,7 @@ class DocumentationUnitFieldOfLawIntegrationTest extends BaseIntegrationTest {
   @Test
   void testRemoveFieldsOfLawForDocumentationUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
     var documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO =
