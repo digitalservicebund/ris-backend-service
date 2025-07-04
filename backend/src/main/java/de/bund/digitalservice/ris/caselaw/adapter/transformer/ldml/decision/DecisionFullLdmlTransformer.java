@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml;
+package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
@@ -30,13 +30,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Transformer for converting documentation units to LDML format for internal portal use. Includes
- * additional metadata like classification and keywords for internal processing.
+ * Transformer for converting decisions to LDML format for internal portal use. Includes additional
+ * metadata like classification and keywords for internal processing.
  */
 @Slf4j
-public class PortalTransformer extends CommonPortalTransformer {
+public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
-  public PortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public DecisionFullLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 

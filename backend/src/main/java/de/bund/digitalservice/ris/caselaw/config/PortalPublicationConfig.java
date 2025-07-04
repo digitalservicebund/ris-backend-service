@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.NoOpPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationService;
+import de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PrototypePortalTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.ReducedLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +30,7 @@ public class PortalPublicationConfig {
       XmlUtilService xmlUtilService,
       PrototypePortalBucket prototypePortalBucket,
       ObjectMapper objectMapper,
-      de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer portalTransformer,
+      PortalTransformer portalTransformer,
       RiiService riiService) {
     return new PrototypePortalPublicationService(
         documentationUnitRepository,
@@ -49,7 +50,7 @@ public class PortalPublicationConfig {
       XmlUtilService xmlUtilService,
       PortalBucket portalBucket,
       ObjectMapper objectMapper,
-      de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer portalTransformer) {
+      PortalTransformer portalTransformer) {
     return new StagingPortalPublicationService(
         documentationUnitRepository,
         attachmentRepository,
@@ -67,22 +68,20 @@ public class PortalPublicationConfig {
 
   @Bean
   @Profile({"production"})
-  public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer prototypePortalTransformer(
+  public PortalTransformer prototypePortalTransformer(
       DocumentBuilderFactory documentBuilderFactory) {
-    return new PrototypePortalTransformer(documentBuilderFactory);
+    return new ReducedLdmlTransformer(documentBuilderFactory);
   }
 
   @Bean
   @Profile({"staging", "local"})
-  public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer stagingPortalTransformer(
-      DocumentBuilderFactory documentBuilderFactory) {
-    return new PortalTransformer(documentBuilderFactory);
+  public PortalTransformer stagingPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+    return new FullLdmlTransformer(documentBuilderFactory);
   }
 
   @Bean
   @Profile({"!staging & !production & !local"})
-  public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer defaultPortalTransformer(
-      DocumentBuilderFactory documentBuilderFactory) {
-    return new PrototypePortalTransformer(documentBuilderFactory);
+  public PortalTransformer defaultPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+    return new ReducedLdmlTransformer(documentBuilderFactory);
   }
 }

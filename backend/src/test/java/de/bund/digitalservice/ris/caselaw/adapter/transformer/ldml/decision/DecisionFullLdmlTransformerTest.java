@@ -1,10 +1,9 @@
-package de.bund.digitalservice.ris.caselaw.adapter.transformer;
+package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -52,19 +51,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class PortalTransformerTest {
+class DecisionFullLdmlTransformerTest {
 
   private static Decision testDocumentUnit;
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
 
-  private static PortalTransformer subject;
+  private static DecisionFullLdmlTransformer subject;
   private static UUID documentationUnitId;
 
   @BeforeAll
   static void setUpBeforeClass() {
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-    subject = new PortalTransformer(documentBuilderFactory);
+    subject = new DecisionFullLdmlTransformer(documentBuilderFactory);
 
     documentationUnitId = UUID.randomUUID();
 
@@ -493,7 +492,9 @@ class PortalTransformerTest {
                   <ris:legalForce>legalForce test</ris:legalForce>
                </ris:legalForces>
                <ris:legalEffect>ja</ris:legalEffect>
-               <ris:fieldOfLaws/>
+               <ris:fieldOfLaws>
+                  <ris:fieldOfLaw>fieldOfLaw test</ris:fieldOfLaw>
+               </ris:fieldOfLaws>
                <ris:judicialBody>appraisalBody test</ris:judicialBody>
                <ris:deviatingCourts>
                   <ris:deviatingCourt>deviating court</ris:deviatingCourt>
@@ -692,7 +693,7 @@ class PortalTransformerTest {
                             .citationType(CitationType.builder().label("citation test").build())
                             .build()))
                 .keywords(List.of("keyword test"))
-                .fieldsOfLaw(List.of(FieldOfLaw.builder().identifier("fieldOfLaw test").build()))
+                .fieldsOfLaw(List.of(FieldOfLaw.builder().text("fieldOfLaw test").build()))
                 .norms(
                     List.of(
                         NormReference.builder()

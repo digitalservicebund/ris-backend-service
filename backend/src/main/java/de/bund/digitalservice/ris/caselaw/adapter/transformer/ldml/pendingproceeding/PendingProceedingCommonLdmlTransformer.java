@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml;
+package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
@@ -6,7 +6,6 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validate;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
-import de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
@@ -22,16 +21,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Opinions;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
-import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
 import java.io.IOException;
@@ -53,21 +51,22 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Abstract base class for transforming documentation units into LDML case law format. Provides
+ * Abstract base class for transforming pending proceedings into LDML case law format. Provides
  * common transformation logic and helper methods.
  */
 @Slf4j
-public abstract class CommonPortalTransformer implements PortalTransformer {
+public abstract class PendingProceedingCommonLdmlTransformer
+    implements DocumentationUnitLdmlTransformer<PendingProceeding> {
 
   private final DocumentBuilderFactory documentBuilderFactory;
 
-  protected CommonPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  protected PendingProceedingCommonLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     this.documentBuilderFactory = documentBuilderFactory;
   }
 
-  public CaseLawLdml transformToLdml(Decision decision) {
+  public CaseLawLdml transformToLdml(PendingProceeding pendingProceeding) {
     try {
-      return CaseLawLdml.builder().judgment(buildJudgment(decision)).build();
+      return CaseLawLdml.builder().judgment(buildJudgment(pendingProceeding)).build();
     } catch (ValidationException e) {
       if (e.getMessage().contains("Empty judgment body")) {
         throw new LdmlTransformationException("Missing judgment body.", e);
@@ -76,17 +75,17 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
     }
   }
 
-  private Judgment buildJudgment(Decision decision) throws ValidationException {
+  private Judgment buildJudgment(PendingProceeding pendingProceeding) throws ValidationException {
     return Judgment.builder()
-        .header(buildHeader(decision))
-        .meta(buildMeta(decision))
-        .judgmentBody(buildJudgmentBody(decision))
+        .header(buildHeader(pendingProceeding))
+        .meta(buildMeta(pendingProceeding))
+        .judgmentBody(buildJudgmentBody(pendingProceeding))
         .build();
   }
 
-  private JaxbHtml buildHeader(Decision decision) throws ValidationException {
-    validateCoreData(decision);
-    var coreData = decision.coreData();
+  private JaxbHtml buildHeader(PendingProceeding pendingProceeding) throws ValidationException {
+    validateCoreData(pendingProceeding);
+    var coreData = pendingProceeding.coreData();
     String fallbackTitle =
         "<p>"
             + coreData.court().label()
@@ -97,28 +96,22 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
             + "</p>";
     String title =
         ObjectUtils.defaultIfNull(
-            nullSafeGet(decision.shortTexts(), ShortTexts::headline), fallbackTitle);
+            nullSafeGet(pendingProceeding.shortTexts(), PendingProceedingShortTexts::headline),
+            fallbackTitle);
 
     validateNotNull(title, "Title missing");
     return JaxbHtml.build(htmlStringToObjectList(title));
   }
 
-  protected abstract Meta buildMeta(Decision decision) throws ValidationException;
-
-  protected abstract AknMultipleBlock buildIntroduction(Decision decision);
-
-  protected RisMeta.RisMetaBuilder buildCommonRisMeta(Decision decision) {
+  protected RisMeta.RisMetaBuilder buildCommonRisMeta(PendingProceeding pendingProceeding) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
-    if (decision.previousDecisions() != null) {
+    if (pendingProceeding.previousDecisions() != null) {
       applyIfNotEmpty(
-          buildRelatedDecisions(decision.previousDecisions()), builder::previousDecision);
-    }
-    if (decision.ensuingDecisions() != null) {
-      applyIfNotEmpty(buildRelatedDecisions(decision.ensuingDecisions()), builder::ensuingDecision);
+          buildRelatedDecisions(pendingProceeding.previousDecisions()), builder::previousDecision);
     }
 
-    var contentRelatedIndexing = decision.contentRelatedIndexing();
+    var contentRelatedIndexing = pendingProceeding.contentRelatedIndexing();
     if (contentRelatedIndexing != null && contentRelatedIndexing.norms() != null) {
       applyIfNotEmpty(
           contentRelatedIndexing.norms().stream()
@@ -134,31 +127,34 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
           builder::legalForce);
     }
 
+    var coreData = pendingProceeding.coreData();
+    if (coreData != null) {
+      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
+
+      builder
+          .documentType(coreData.documentType().label())
+          .courtLocation(nullSafeGet(coreData.court(), Court::location))
+          .courtType(nullSafeGet(coreData.court(), Court::type));
+    }
+
     return builder;
   }
 
-  private JudgmentBody buildJudgmentBody(Decision decision) throws ValidationException {
+  private JudgmentBody buildJudgmentBody(PendingProceeding pendingProceeding)
+      throws ValidationException {
 
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
-    var shortTexts = decision.shortTexts();
-    var longTexts = decision.longTexts();
+    var shortTexts = pendingProceeding.shortTexts();
 
     builder
-        // set guidingPrinciple/Leitsatz
         .motivation(
             JaxbHtml.build(
-                htmlStringToObjectList(nullSafeGet(shortTexts, ShortTexts::guidingPrinciple))))
-        // set headnote/Orientierungssatz, "other headnote"/"Sonstiger Orientierungssatz",
-        // Outline/Gliederung, Tenor/Tenor
-        .introduction(buildIntroduction(decision))
-        // set caseFacts/Tatbestand
-        .background(
-            JaxbHtml.build(htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::caseFacts))))
-        // set decisionReasons/Entscheidungsgründe, reasons/Gründe, otherLongText/"Sonstiger,
-        // dissentingOpinion/"Abweichende Meinung"
-        // Langtext"
-        .decision(buildDecision(decision));
+                htmlStringToObjectList(
+                    nullSafeGet(shortTexts, PendingProceedingShortTexts::legalIssue))))
+        .introduction(buildIntroduction(pendingProceeding))
+        .background(null)
+        .decision(buildDecision(pendingProceeding));
 
     var judgmentBody = builder.build();
 
@@ -172,32 +168,37 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
     return judgmentBody;
   }
 
-  private AknMultipleBlock buildDecision(Decision decision) {
-    var longTexts = decision.longTexts();
+  private AknMultipleBlock buildIntroduction(PendingProceeding pendingProceeding) {
+    var shortTexts = pendingProceeding.shortTexts();
 
-    var decisionReasons = nullSafeGet(longTexts, LongTexts::decisionReasons);
-    var reasons = nullSafeGet(longTexts, LongTexts::reasons);
-    var otherLongText = nullSafeGet(longTexts, LongTexts::otherLongText);
-    var dissentingOpinion = nullSafeGet(longTexts, LongTexts::dissentingOpinion);
+    var admissionOfAppeal = nullSafeGet(shortTexts, PendingProceedingShortTexts::admissionOfAppeal);
+    var appellant = nullSafeGet(shortTexts, PendingProceedingShortTexts::appellant);
 
-    if (StringUtils.isNotEmpty(decisionReasons)
-        || StringUtils.isNotEmpty(reasons)
-        || StringUtils.isNotEmpty(otherLongText)
-        || StringUtils.isNotEmpty(dissentingOpinion)) {
+    if (StringUtils.isNotEmpty(admissionOfAppeal) && StringUtils.isNotEmpty(appellant)) {
       return new AknMultipleBlock()
           .withBlock(
-              AknEmbeddedStructureInBlock.DecisionReasons.NAME,
-              AknEmbeddedStructureInBlock.DecisionReasons.build(
-                  JaxbHtml.build(htmlStringToObjectList(decisionReasons))))
+              AknEmbeddedStructureInBlock.Appellant.NAME,
+              AknEmbeddedStructureInBlock.Appellant.build(
+                  JaxbHtml.build(htmlStringToObjectList(appellant))))
           .withBlock(
-              AknEmbeddedStructureInBlock.Reasons.NAME,
-              AknEmbeddedStructureInBlock.Reasons.build(
-                  JaxbHtml.build(htmlStringToObjectList(reasons))))
+              AknEmbeddedStructureInBlock.AdmissionOfAppeal.NAME,
+              AknEmbeddedStructureInBlock.AdmissionOfAppeal.build(
+                  JaxbHtml.build(htmlStringToObjectList(admissionOfAppeal))));
+    }
+    return null;
+  }
+
+  private AknMultipleBlock buildDecision(PendingProceeding pendingProceeding) {
+    var shortTexts = pendingProceeding.shortTexts();
+
+    var resolutionNote = nullSafeGet(shortTexts, PendingProceedingShortTexts::resolutionNote);
+
+    if (StringUtils.isNotEmpty(resolutionNote)) {
+      return new AknMultipleBlock()
           .withBlock(
-              AknEmbeddedStructureInBlock.OtherLongText.NAME,
-              AknEmbeddedStructureInBlock.OtherLongText.build(
-                  JaxbHtml.build(htmlStringToObjectList(otherLongText))))
-          .withBlock(Opinions.NAME, Opinions.build(htmlStringToObjectList(dissentingOpinion)));
+              AknEmbeddedStructureInBlock.ResolutionNote.NAME,
+              AknEmbeddedStructureInBlock.ResolutionNote.build(
+                  JaxbHtml.build(htmlStringToObjectList(resolutionNote))));
     }
     return null;
   }
@@ -206,32 +207,32 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
       List<? extends RelatedDocumentationUnit> relatedDecisions) {
     List<RelatedDecision> previousDecision = new ArrayList<>();
     for (RelatedDocumentationUnit current : relatedDecisions) {
-      RelatedDecision decision =
+      RelatedDecision pendingProceeding =
           RelatedDecision.builder()
               .date(DateUtils.toDateString(current.getDecisionDate()))
               .documentNumber(current.getDocumentNumber())
               .fileNumber(current.getFileNumber())
               .courtType(nullSafeGet(current.getCourt(), Court::type))
               .build();
-      previousDecision.add(decision);
+      previousDecision.add(pendingProceeding);
     }
     return previousDecision;
   }
 
-  protected Identification buildIdentification(Decision decision) throws ValidationException {
-    validateNotNull(decision.documentNumber(), "Unique identifier missing");
-    validateNotNull(decision.uuid(), "Caselaw UUID missing");
-    validateNotNull(
-        nullSafeGet(decision.coreData(), CoreData::decisionDate), "DecisionDate missing");
+  protected Identification buildIdentification(PendingProceeding pendingProceeding)
+      throws ValidationException {
+    validateNotNull(pendingProceeding.documentNumber(), "Unique identifier missing");
+    validateNotNull(pendingProceeding.uuid(), "Caselaw UUID missing");
 
-    // Case law handover: When we always have an ecli, use that instead for the uniqueId
-    String uniqueId = decision.documentNumber();
+    String uniqueId = pendingProceeding.documentNumber();
     FrbrDate frbrDate =
         new FrbrDate(
-            DateUtils.toDateString(nullSafeGet(decision.coreData(), CoreData::decisionDate)));
+            DateUtils.toDateString(
+                nullSafeGet(pendingProceeding.coreData(), CoreData::decisionDate)),
+            "Mitteilungsdatum");
     FrbrAuthor frbrAuthor = new FrbrAuthor();
 
-    List<FrbrAlias> aliases = generateAliases(decision);
+    List<FrbrAlias> aliases = generateAliases(pendingProceeding);
 
     FrbrElement work =
         FrbrElement.builder()
@@ -264,23 +265,8 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
         .build();
   }
 
-  protected List<FrbrAlias> generateAliases(Decision decision) {
-    List<FrbrAlias> aliases = new ArrayList<>();
-
-    aliases.add(new FrbrAlias("uebergreifende-id", decision.uuid().toString()));
-
-    if (decision.coreData() != null && decision.coreData().ecli() != null) {
-      aliases.add(new FrbrAlias("ecli", decision.coreData().ecli()));
-    }
-
-    return aliases;
-  }
-
-  protected String nullIfEmpty(String input) {
-    if (StringUtils.isEmpty(input)) {
-      return null;
-    }
-    return input;
+  protected List<FrbrAlias> generateAliases(PendingProceeding pendingProceeding) {
+    return List.of(new FrbrAlias("uebergreifende-id", pendingProceeding.uuid().toString()));
   }
 
   protected List<Object> htmlStringToObjectList(String html) {
@@ -314,18 +300,19 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
     }
   }
 
-  protected void validateCoreData(Decision decision) throws ValidationException {
-    if (decision.coreData() != null) {
-      validateNotNull(decision.coreData().court(), "Court missing");
-      if (decision.coreData().court() != null) {
-        validateNotNull(decision.coreData().court().type(), "CourtType missing");
-        validateNotNull(decision.coreData().court().type(), "CourtLabel missing");
+  protected void validateCoreData(PendingProceeding pendingProceeding) throws ValidationException {
+    if (pendingProceeding.coreData() != null) {
+      validateNotNull(pendingProceeding.coreData().court(), "Court missing");
+      if (pendingProceeding.coreData().court() != null) {
+        validateNotNull(pendingProceeding.coreData().court().type(), "CourtType missing");
+        validateNotNull(pendingProceeding.coreData().court().type(), "CourtLabel missing");
       }
-      validateNotNull(decision.coreData().documentType(), "DocumentType missing");
-      validate(!decision.coreData().fileNumbers().isEmpty(), "FileNumber missing");
-      validateNotNull(decision.coreData().decisionDate(), "DecisionDate missing");
+      validateNotNull(pendingProceeding.coreData().documentType(), "DocumentType missing");
+      validate(!pendingProceeding.coreData().fileNumbers().isEmpty(), "FileNumber missing");
     } else {
       throw new ValidationException("Core data is null");
     }
   }
+
+  protected abstract Meta buildMeta(PendingProceeding pendingProceeding) throws ValidationException;
 }
