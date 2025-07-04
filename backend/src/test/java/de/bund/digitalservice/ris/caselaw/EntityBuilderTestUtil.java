@@ -198,21 +198,11 @@ public class EntityBuilderTestUtil {
             .build());
   }
 
-  public static PendingProceedingDTO createAndSavePendingProceeding(
-      DatabaseDocumentationUnitRepository repository, DocumentationOfficeDTO documentationOffice) {
-    return createAndSavePendingProceeding(
-        repository,
-        PendingProceedingDTO.builder()
-            .documentNumber(DEFAULT_DOCUMENT_NUMBER)
-            .documentationOffice(documentationOffice),
-        null);
-  }
-
-  public static PendingProceedingDTO createAndSavePendingProceeding(
+  public static void createAndSavePendingProceeding(
       DatabaseDocumentationUnitRepository repository,
       DocumentationOfficeDTO documentationOffice,
       String documentNumber) {
-    return createAndSavePendingProceeding(
+    createAndSavePendingProceeding(
         repository,
         PendingProceedingDTO.builder()
             .documentNumber(documentNumber)
@@ -220,20 +210,20 @@ public class EntityBuilderTestUtil {
         null);
   }
 
-  public static PendingProceedingDTO createAndSavePendingProceeding(
+  public static void createAndSavePendingProceeding(
       DatabaseDocumentationUnitRepository repository,
       PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> builder) {
-    return createAndSavePendingProceeding(repository, builder, null, false);
+    createAndSavePendingProceeding(repository, builder, null, false);
   }
 
-  public static PendingProceedingDTO createAndSavePendingProceeding(
+  public static void createAndSavePendingProceeding(
       DatabaseDocumentationUnitRepository repository,
       PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> builder,
       PublicationStatus publicationStatus) {
-    return createAndSavePendingProceeding(repository, builder, publicationStatus, false);
+    createAndSavePendingProceeding(repository, builder, publicationStatus, false);
   }
 
-  public static PendingProceedingDTO createAndSavePendingProceeding(
+  public static void createAndSavePendingProceeding(
       DatabaseDocumentationUnitRepository repository,
       PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> builder,
       PublicationStatus publicationStatus,
@@ -254,7 +244,7 @@ public class EntityBuilderTestUtil {
     dto.setFileNumbers(fileNumbers);
     dto.setDeviatingFileNumbers(deviatingFileNumbers);
 
-    return repository.save(
+    repository.save(
         dto.toBuilder()
             .status(
                 StatusDTO.builder()
