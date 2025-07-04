@@ -50,7 +50,7 @@ class PrototypePortalPublicationServiceTest {
 
   @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
   @MockitoBean private AttachmentRepository attachmentRepository;
-  @MockitoBean private PrototypePortalBucket prototypePortalBucket;
+  @MockitoBean private PrototypePortalBucket portalBucket;
   @MockitoBean private XmlUtilService xmlUtilService;
   @MockitoBean private ObjectMapper objectMapper;
   @MockitoBean private PortalTransformer portalTransformer;
@@ -119,8 +119,9 @@ class PrototypePortalPublicationServiceTest {
     subject =
         new PrototypePortalPublicationService(
             documentationUnitRepository,
+            attachmentRepository,
             xmlUtilService,
-            prototypePortalBucket,
+            portalBucket,
             objectMapper,
             portalTransformer,
             riiService);
@@ -174,7 +175,9 @@ class PrototypePortalPublicationServiceTest {
 
     subject.publishDocumentationUnit(testDocumentNumber);
 
-    verify(prototypePortalBucket, times(1)).save(testDocumentNumber + ".xml", transformed);
+    verify(portalBucket, times(1)).save(testDocumentNumber + ".xml", transformed);
+    verify(portalBucket, times(1))
+        .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
   }
 
   @Test
@@ -185,7 +188,7 @@ class PrototypePortalPublicationServiceTest {
         .thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
-    doThrow(BucketException.class).when(prototypePortalBucket).save(anyString(), anyString());
+    doThrow(BucketException.class).when(portalBucket).save(anyString(), anyString());
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.publishDocumentationUnit(testDocumentNumber))
@@ -198,20 +201,39 @@ class PrototypePortalPublicationServiceTest {
     when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
         .thenReturn(pendingProceeding);
 
-    verify(prototypePortalBucket, never()).save(anyString(), anyString());
+    subject.publishDocumentationUnit(testDocumentNumber);
+
+    verify(portalBucket, never()).save(anyString(), anyString());
     verify(xmlUtilService, never()).ldmlToString(any());
   }
 
   @Test
   void delete_shouldDeleteFromBucket() {
+    when(portalBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
     subject.deleteDocumentationUnit(testDocumentNumber);
 
-    verify(prototypePortalBucket, times(1)).delete(testDocumentNumber + ".xml");
+    verify(portalBucket, times(1)).delete(testDocumentNumber + ".xml");
+    verify(portalBucket, times(1)).delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
   }
 
   @Test
   void delete_shouldThrow() {
-    doThrow(BucketException.class).when(prototypePortalBucket).delete(testDocumentNumber + ".xml");
+    subject.deleteDocumentationUnit(testDocumentNumber);
+    when(portalBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
+    doThrow(BucketException.class)
+        .when(portalBucket)
+        .delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
+
+    assertThatExceptionOfType(PublishException.class)
+        .isThrownBy(() -> subject.deleteDocumentationUnit(testDocumentNumber))
+        .withMessageContaining("Could not delete LDML from bucket.");
+  }
+
+  @Test
+  void delete_shouldThrowTemp() {
+    doThrow(BucketException.class).when(portalBucket).delete(testDocumentNumber + ".xml");
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.deleteDocumentationUnit(testDocumentNumber))
@@ -222,7 +244,7 @@ class PrototypePortalPublicationServiceTest {
   void uploadChangelog_shouldDoNothing() {
     subject.uploadChangelog(List.of(), List.of());
 
-    verify(prototypePortalBucket, never()).save(contains("changelogs/"), anyString());
+    verify(portalBucket, never()).save(contains("changelogs/"), anyString());
   }
 
   // currently disabled for prototype
@@ -237,8 +259,7 @@ class PrototypePortalPublicationServiceTest {
   @Test
   void sanityCheck_shouldDeleteDocumentNumbersInPortalButNotInRii() throws JsonProcessingException {
     when(riiService.fetchRiiDocumentNumbers()).thenReturn(List.of("123", "456"));
-    when(prototypePortalBucket.getAllFilenames())
-        .thenReturn(List.of("123.xml", "456.xml", "789.xml"));
+    when(portalBucket.getAllFilenames()).thenReturn(List.of("123.xml", "456.xml", "789.xml"));
     ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> fileContentCaptor = ArgumentCaptor.forClass(String.class);
     when(objectMapper.writeValueAsString(new ChangelogUpdateDelete(null, List.of("789.xml"))))
@@ -248,8 +269,8 @@ class PrototypePortalPublicationServiceTest {
 
     subject.logPortalPublicationSanityCheck();
 
-    verify(prototypePortalBucket).delete("789.xml");
-    verify(prototypePortalBucket).save(fileNameCaptor.capture(), fileContentCaptor.capture());
+    verify(portalBucket).delete("789.xml");
+    verify(portalBucket).save(fileNameCaptor.capture(), fileContentCaptor.capture());
     assertThat(fileNameCaptor.getValue()).contains("changelogs");
     assertThat(fileContentCaptor.getValue())
         .isEqualTo(

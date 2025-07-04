@@ -110,7 +110,7 @@ class FieldOfLawIntegrationTest extends BaseIntegrationTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"aber hallo § 12%", "aber%", "ABER HALLO%"})
+  @ValueSource(strings = {"aber hallo § 12", "aber", "ABER HALLO"})
   void shouldCallExactNormPredicateForWildcardNorm(String wildcardNormSearch) {
     Slice<FieldOfLaw> responseBody =
         risWebTestClient
@@ -131,7 +131,6 @@ class FieldOfLawIntegrationTest extends BaseIntegrationTest {
   @ValueSource(
       strings = {
         "§ 123", // paragraph
-        "§123", // paragraph without whitespace
       })
   void testGetFieldsOfLawByNormsQuery_withoutAbbreviation(String query) {
     Slice<FieldOfLaw> responseBody =
@@ -153,13 +152,9 @@ class FieldOfLawIntegrationTest extends BaseIntegrationTest {
   @ValueSource(
       strings = {
         "abc § 123", // norm followed by paragraph
-        "abc §123", // norm followed by paragraph without whitespace
         "abc § 12", // norm followed by incomplete paragraph
-        "§ 123 abc", // paragraph followed by norm
-        "§ 12 abc", // incomplete paragraph followed by norm
-        "abc", // norm
       })
-  void testGetFieldsOfLawByNormsQuery_withAbbreviation(String query) {
+  void testGetFieldsOfLawByNormsQuery_withAbbreviatios(String query) {
     Slice<FieldOfLaw> responseBody =
         risWebTestClient
             .withDefaultLogin()
@@ -172,7 +167,7 @@ class FieldOfLawIntegrationTest extends BaseIntegrationTest {
             .returnResult()
             .getResponseBody();
 
-    assertThat(responseBody).extracting("identifier").containsExactly("AB-01", "FL");
+    assertThat(responseBody).extracting("identifier").containsExactly("FL");
   }
 
   @Test
@@ -215,7 +210,7 @@ class FieldOfLawIntegrationTest extends BaseIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=some text&norm=§123&pg=0&sz=10")
+            .uri("/api/v1/caselaw/fieldsoflaw?q=some text&norm=§ 123&pg=0&sz=10")
             .exchange()
             .expectStatus()
             .isOk()

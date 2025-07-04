@@ -56,7 +56,7 @@ class EurLexSearchResultTransformerTest {
             .ecli("ecli")
             .fileNumber("T-123/45")
             .date(LocalDate.of(2024, Month.DECEMBER, 24))
-            .publicationDate(LocalDate.ofInstant(now, ZoneId.systemDefault()))
+            .publicationDate(LocalDate.ofInstant(now, ZoneId.of("Europe/Berlin")))
             .build();
 
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
