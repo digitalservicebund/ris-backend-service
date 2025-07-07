@@ -105,7 +105,10 @@ public interface PatchMapperService {
    */
   JsonPatch removeTextCheckTags(JsonPatch patch);
 
-  /** Remove all base64 image src tags and import to database */
+  /**
+   * Saves all base64 encoded images in src attributes of img tags as attachments and replace the
+   * src attribute with the respective api path
+   */
   JsonPatch extractAndStoreBase64Images(
       JsonPatch patch, DocumentationUnit documentationUnit, User user);
 }

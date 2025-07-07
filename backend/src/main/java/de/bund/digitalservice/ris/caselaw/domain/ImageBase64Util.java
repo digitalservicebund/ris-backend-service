@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import jakarta.validation.constraints.NotNull;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 import java.util.List;
@@ -18,7 +17,7 @@ public class ImageBase64Util {
   }
 
   public static Element createImageElementWithNewSrc(
-      Element oldElement, @NotNull String fileName, @NotNull String documentNumber) {
+          Element oldElement,  String fileName,  String documentNumber) {
     assertHasValidImageExtension(fileName);
     if (StringUtils.isNullOrBlank(documentNumber)) {
       throw new IllegalArgumentException("Documentation unit number can't be null or blank");

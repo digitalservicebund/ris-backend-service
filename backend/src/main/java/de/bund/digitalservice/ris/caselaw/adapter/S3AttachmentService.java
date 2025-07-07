@@ -131,10 +131,9 @@ public class S3AttachmentService implements AttachmentService {
       User user,
       DocumentationUnitDTO documentationUnit,
       String fileName) {
-    AttachmentDTO attachmentDTO;
     checkDocx(byteBuffer);
 
-    attachmentDTO =
+    AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()
             .s3ObjectPath("unknown yet")
             .documentationUnit(documentationUnit)

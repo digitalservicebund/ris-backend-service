@@ -448,8 +448,13 @@ public class DocumentationUnitService {
 
       if (!toUpdate.getOperations().isEmpty()) {
         toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
+
+        // Saving a return patch including the base64 images as src attributes with an api path.
         patchedDocumentationUnitWithBase64Images =
-            patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
+            updateDocumentationUnitVersion(
+                patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit),
+                newVersion);
+
         toUpdate =
             patchMapperService.extractAndStoreBase64Images(
                 toUpdate, existingDocumentationUnit, null);
@@ -459,9 +464,6 @@ public class DocumentationUnitService {
 
         patchedDocumentationUnit =
             updateDocumentationUnitVersion(patchedDocumentationUnit, newVersion);
-
-        patchedDocumentationUnitWithBase64Images =
-            updateDocumentationUnitVersion(patchedDocumentationUnitWithBase64Images, newVersion);
 
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
@@ -525,11 +527,11 @@ public class DocumentationUnitService {
       DocumentationUnit documentationUnit, long newVersion) {
     if (documentationUnit instanceof Decision docUnit) {
       documentationUnit = docUnit.toBuilder().version(newVersion).build();
-
     } else if (documentationUnit instanceof PendingProceeding pendingProceeding) {
       documentationUnit = pendingProceeding.toBuilder().version(newVersion).build();
     }
-    return documentationUnit;
+    throw new DocumentationUnitException(
+        "Update not supported for Documentable type: " + documentationUnit.getClass());
   }
 
   private DocumentationUnit updateDocumentationUnit(

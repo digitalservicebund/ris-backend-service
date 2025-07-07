@@ -107,25 +107,28 @@ class ImageBase64UtilTest {
     Assertions.assertArrayEquals(expectedHeader, actualHeader);
   }
 
+  /**
+   * See {@link <a href="https://gist.github.com/leommoore/f9e57ba2aa4bf197ebc5#image-files">File
+   * Magic Numbers</a>}.
+   */
   static Stream<org.junit.jupiter.params.provider.Arguments> imageFormatsWithFileMagicNumbers() {
+
+    var expectedJPEGFileTypeStructure = new byte[] {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
+
     return Stream.of(
         // PNG
         org.junit.jupiter.params.provider.Arguments.of(
             "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
             new byte[] {(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}),
-        // JPEG, JFIF
+        // JPEG
         org.junit.jupiter.params.provider.Arguments.of(
-            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD",
-            new byte[] {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF}),
-        // JPG / JPEG
+            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD", expectedJPEGFileTypeStructure),
+        // JPG
         org.junit.jupiter.params.provider.Arguments.of(
-            "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD",
-            new byte[] {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF}),
+            "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD", expectedJPEGFileTypeStructure),
         // GIF
         org.junit.jupiter.params.provider.Arguments.of(
-            "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBA==",
-            new byte[] {0x47, 0x49, 0x46, 0x38} // GIF8
-            ));
+            "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBA==", new byte[] {0x47, 0x49, 0x46, 0x38}));
   }
 
   @ParameterizedTest

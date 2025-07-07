@@ -60,7 +60,7 @@ class DatabasePatchMapperServiceTest {
 
   @Test
   void extractAndStoreBase64Images_shouldExtractAndReplaceBase64ImageWithApiUrl() {
-    String html = "<p>Text</p>" + getDefaultImageTag().outerHtml() + "</p>";
+    String html = "<p>" + getDefaultImageTag().outerHtml() + "</p>";
     JsonPatch patch = new JsonPatch(List.of(new ReplaceOperation("/foo", new TextNode(html))));
 
     DocumentationUnit docUnit =
@@ -82,10 +82,9 @@ class DatabasePatchMapperServiceTest {
     String newHtml = ((PathValueOperation) op).getValue().textValue();
 
     assertThat(newHtml).doesNotContain("data:image");
-    assertThat(newHtml).doesNotContain("data:image");
 
     assertEquals(
-        "<p>Text</p><img class=\"inline align-baseline\" src=\"/api/v1/caselaw/documentunits/YYTestDoc0001/image/2e7e7908-faa3-4aca-a0ff-4bfa4dcf316a.png\" alt=\"Smallest base64 image\" width=\"82\" height=\"80\"><p></p>",
+        "<p><img class=\"inline align-baseline\" src=\"/api/v1/caselaw/documentunits/YYTestDoc0001/image/2e7e7908-faa3-4aca-a0ff-4bfa4dcf316a.png\" alt=\"Smallest base64 image\" width=\"82\" height=\"80\"></p>",
         newHtml);
   }
 
