@@ -32,6 +32,11 @@ function authenticateUser(user: {
     password: process.env.E2E_TEST_PASSWORD_BGH as string,
   },
   {
+    name: "user_bfh",
+    email: process.env.E2E_TEST_USER_BFH as string,
+    password: process.env.E2E_TEST_PASSWORD_BFH as string,
+  },
+  {
     name: "user_external",
     email: process.env.E2E_TEST_USER_EXTERNAL as string,
     password: process.env.E2E_TEST_PASSWORD_EXTERNAL as string,

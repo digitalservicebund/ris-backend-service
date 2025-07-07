@@ -73,6 +73,8 @@ jobs:
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
           E2E_TEST_USER_BGH: ${{ secrets.E2E_TEST_USER_BGH }}
           E2E_TEST_PASSWORD_BGH: ${{ secrets.E2E_TEST_PASSWORD_BGH }}
+          E2E_TEST_USER_BFH: ${{ secrets.E2E_TEST_USER_BFH }}
+          E2E_TEST_PASSWORD_BFH: ${{ secrets.E2E_TEST_PASSWORD_BFH }}
           E2E_TEST_USER_EXTERNAL: ${{ secrets.E2E_TEST_USER_EXTERNAL }}
           E2E_TEST_PASSWORD_EXTERNAL: ${{ secrets.E2E_TEST_PASSWORD_EXTERNAL }}
           E2E_TEST_BASIC_AUTH_USER: ${{ secrets.E2E_TEST_BASIC_AUTH_USER }}
