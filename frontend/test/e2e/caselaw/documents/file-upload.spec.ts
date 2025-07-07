@@ -14,8 +14,6 @@ test.describe("upload an original document to a doc unit", () => {
 
   test("upload and delete docx file per file chooser", async ({ page }) => {
     await uploadTestfile(page, "sample.docx")
-    await expect(page.getByText("Hochgeladen am")).toBeVisible()
-    await expect(page.getByText("sample.docx")).toBeVisible()
 
     const tableView = page.getByRole("cell", {
       name: "Dateiname",
@@ -111,7 +109,7 @@ test.describe("upload an original document to a doc unit", () => {
   })
 
   test("upload non-docx file per file chooser", async ({ page }) => {
-    await uploadTestfile(page, "sample.png")
+    await uploadTestfile(page, "sample.png", { skipAssert: true })
     await expect(
       page.getByText(
         "sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",

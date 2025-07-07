@@ -22,10 +22,12 @@ test.describe(
         await uploadTestfile(page, "sample-image-formats.docx")
       })
 
-      await test.step("Copy image from docx  to Orientierungssatz", async () => {
+      await test.step("Navigate to categories", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
         await expect(page.getByLabel("Dokumente anzeigen")).toBeVisible()
+      })
 
+      await test.step("Copy image from docx  to Orientierungssatz", async () => {
         const imgSrc = await page
           .getByTestId("Dokumentenvorschau")
           .locator("img")

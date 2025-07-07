@@ -33,7 +33,6 @@ test("copy-paste text with different styles and alignments from side panel", asy
 
   await test.step("upload document", async () => {
     await uploadTestfile(page, "some-text-aligment.docx")
-    await expect(page.getByText("some-text-aligment.docx")).toBeVisible()
     await expect(page.getByLabel(`Datei löschen`)).toBeVisible()
     await expect(page.getByLabel("Ladestatus")).toBeHidden()
     await expect(page.getByText(leftAlignText)).toBeVisible()
@@ -96,7 +95,6 @@ test(
 
     await test.step("upload document", async () => {
       await uploadTestfile(page, "some-indentations.docx")
-      await expect(page.getByText("some-indentations.docx")).toBeVisible()
       await expect(page.getByLabel(`Datei löschen`)).toBeVisible()
       await expect(page.getByLabel("Ladestatus")).toBeHidden()
       await expect(page.getByText(noIndentationText)).toBeVisible()
@@ -157,7 +155,6 @@ test(
 
     await test.step("upload test file", async () => {
       await uploadTestfile(page, "some-lists.docx")
-      await expect(page.getByText("some-lists.docx")).toBeVisible()
       await expect(page.getByLabel(`Datei löschen`)).toBeVisible()
       await expect(page.getByLabel("Ladestatus")).toBeHidden()
       await expect(page.getByText(bulletListItemText)).toBeVisible()

@@ -31,7 +31,6 @@ test.describe(
 
         await test.step("upload file with Aktenzeichen, Rechtskraft, Gericht and Spruchkoerper metadata", async () => {
           await uploadTestfile(page, "with_metadata.docx")
-          await expect(page.getByText("Hochgeladen am")).toBeVisible()
         })
 
         await test.step("open preview in sidepanel and check if metadata is filled", async () => {
@@ -78,7 +77,6 @@ test.describe(
 
         await test.step("upload file with all metadata", async () => {
           await uploadTestfile(page, "with_metadata.docx")
-          await expect(page.getByText("Hochgeladen am")).toBeVisible()
         })
 
         await test.step("check in preview if previously empty fields ECLI and legal effect have been added", async () => {
