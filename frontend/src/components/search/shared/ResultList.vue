@@ -123,7 +123,7 @@ defineSlots<{
           <template #body="{ data: item }">
             {{
               item.resolutionDate
-                ? dayjs(item.decisionresolutionDateDate).format("DD.MM.YYYY")
+                ? dayjs(item.resolutionDate).format("DD.MM.YYYY")
                 : "-"
             }}
           </template>
@@ -170,6 +170,7 @@ defineSlots<{
                     appendTo: 'body',
                   }"
                   aria-label="Dokumentationseinheit ansehen"
+                  class="z-10"
                   severity="secondary"
                   size="small"
                 >
@@ -178,7 +179,6 @@ defineSlots<{
                   </template>
                 </Button>
               </router-link>
-
               <Button
                 v-tooltip.bottom="{
                   value: 'Löschen',
