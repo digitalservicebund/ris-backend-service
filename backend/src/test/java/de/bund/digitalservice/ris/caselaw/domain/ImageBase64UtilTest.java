@@ -15,14 +15,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 class ImageBase64UtilTest {
 
-  private static final String base64PNGSourceSrcTag =
+  private static final String BASE64_PNG_SOURCE_SRC_TAG =
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII";
 
   public static Element getDefaultImageTag() {
     return new Element("img")
         .addClass("inline")
         .addClass("align-baseline")
-        .attr("src", base64PNGSourceSrcTag)
+        .attr("src", BASE64_PNG_SOURCE_SRC_TAG)
         .attr("alt", "Smallest base64 image")
         .attr("width", "82")
         .attr("height", "80");

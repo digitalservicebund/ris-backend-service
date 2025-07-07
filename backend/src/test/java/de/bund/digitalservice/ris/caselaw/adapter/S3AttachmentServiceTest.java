@@ -227,20 +227,19 @@ class S3AttachmentServiceTest {
     var headerMap = new LinkedMultiValueMap<String, String>();
     headerMap.put("Content-Type", List.of(DOCX_MEDIA_TYPE));
 
+    var headers = HttpHeaders.readOnlyHttpHeaders(headerMap);
+    var user = User.builder().build();
+    var documentationUnitDTOId = documentationUnitDTO.getId();
+
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
         .thenThrow(SdkException.create("exception", null));
-    var documentationUnitDTOId = documentationUnitDTO.getId();
 
-    var user = User.builder().build();
     assertThrows(
         SdkException.class,
         () ->
             service.attachFileToDocumentationUnit(
-                documentationUnitDTOId,
-                byteBuffer,
-                HttpHeaders.readOnlyHttpHeaders(headerMap),
-                user));
+                documentationUnitDTOId, byteBuffer, headers, user));
 
     verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
   }
@@ -252,14 +251,16 @@ class S3AttachmentServiceTest {
     void testAttachImageToDocumentationUnit_withUnsupportedType() {
       var byteBuffer = ByteBuffer.wrap(new byte[] {0x01});
       var headers = new HttpHeaders();
+      var user = User.builder().build();
       headers.setContentType(MediaType.APPLICATION_JSON);
+      var documentationUnitDTOId = documentationUnitDTO.getId();
 
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class,
               () ->
                   service.attachFileToDocumentationUnit(
-                      documentationUnitDTO.getId(), byteBuffer, headers, User.builder().build()));
+                      documentationUnitDTOId, byteBuffer, headers, user));
 
       assertEquals("Only images and docx are supported", exception.getReason());
 
