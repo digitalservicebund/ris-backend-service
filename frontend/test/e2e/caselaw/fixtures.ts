@@ -1056,6 +1056,8 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
   },
 
+  // These are the pending proceedings that will be created by the fixture pendingProceedingsFromOptions.
+  // By default, it is empty. Can be overridden by the test to create specific pending proceedings.
   pendingProceedingsToBeCreated: [[], { option: true }],
 
   pendingProceedingsFromOptions: async (
