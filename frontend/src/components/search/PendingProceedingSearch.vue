@@ -170,7 +170,7 @@ const createNew = async () => {
 }
 
 async function createNewFromSearch() {
-  if (!searchQuery.value || !courtFromQuery.value) {
+  if (!searchQuery.value) {
     return
   }
 
@@ -220,7 +220,7 @@ async function createNewFromSearch() {
       @delete-documentation-unit="handleDelete"
       @update-page="updatePage"
     >
-      <template v-if="isInternalUser" #empty-state-content>
+      <template #empty-state-content>
         <div class="flex flex-col gap-16 text-black">
           <p>{{ emptyStateMessage }}</p>
 
@@ -250,7 +250,7 @@ async function createNewFromSearch() {
               @click="createNewFromSearch"
             />
           </div>
-          <div v-else>
+          <div v-else-if="isInternalUser">
             <Button
               aria-label="Neues Anhängiges Verfahren erstellen"
               label="Neues Anhängiges Verfahren erstellen"

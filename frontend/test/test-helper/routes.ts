@@ -20,6 +20,11 @@ const routes = [
     component: {},
   },
   {
+    path: "/caselaw/pendingProceeding/new",
+    name: "caselaw-pending-proceeding-new",
+    component: {},
+  },
+  {
     path: "/caselaw/documentUnit/:documentNumber/preview",
     name: "caselaw-documentUnit-documentNumber-preview",
     component: {},
