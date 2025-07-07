@@ -451,7 +451,7 @@ public class DocumentationUnitService {
 
         // Saving a return patch including the base64 images as src attributes with an api path.
         patchedDocumentationUnitWithBase64Images =
-            updateDocumentationUnitVersion(
+            cloneDocumentationUnitWithNewVersion(
                 patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit),
                 newVersion);
 
@@ -463,7 +463,7 @@ public class DocumentationUnitService {
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
 
         patchedDocumentationUnit =
-            updateDocumentationUnitVersion(patchedDocumentationUnit, newVersion);
+            cloneDocumentationUnitWithNewVersion(patchedDocumentationUnit, newVersion);
 
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
@@ -523,12 +523,12 @@ public class DocumentationUnitService {
   }
 
   /** Return a documentation unit with a new version */
-  private static DocumentationUnit updateDocumentationUnitVersion(
+  private static DocumentationUnit cloneDocumentationUnitWithNewVersion(
       DocumentationUnit documentationUnit, long newVersion) {
     if (documentationUnit instanceof Decision docUnit) {
-      documentationUnit = docUnit.toBuilder().version(newVersion).build();
+      return docUnit.toBuilder().version(newVersion).build();
     } else if (documentationUnit instanceof PendingProceeding pendingProceeding) {
-      documentationUnit = pendingProceeding.toBuilder().version(newVersion).build();
+      return pendingProceeding.toBuilder().version(newVersion).build();
     }
     throw new DocumentationUnitException(
         "Update not supported for Documentable type: " + documentationUnit.getClass());
