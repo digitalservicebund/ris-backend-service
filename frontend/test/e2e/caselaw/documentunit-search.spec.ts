@@ -278,7 +278,7 @@ test.describe("search", () => {
 
     await expect
       .poll(async () => page.getByText("Unveröffentlicht").count())
-      .toBe(7)
+      .toBe(6)
 
     await page.getByLabel("Status Suche").click()
     await page
@@ -298,7 +298,7 @@ test.describe("search", () => {
   })
 
   test(
-    "pending proceedings can be found",
+    "pending proceedings cannot be found in decision list",
     {
       annotation: {
         type: "story",
@@ -306,57 +306,16 @@ test.describe("search", () => {
           "https://digitalservicebund.atlassian.net/browse/RISDEV-6109",
       },
     },
-    async ({ page, pageWithBghUser }) => {
+    async ({ page }) => {
       await test.step("pending proceedings of own doc office appear in search by default", async () => {
         await navigateToSearch(page)
 
         await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
         await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
-        await expect(page.getByText("YYTestDoc0017")).toBeVisible() // show published pending proceeding
-        await expect(page.getByText("YYTestDoc0018")).toBeVisible() // show unpublished pending proceeding
-      })
-
-      await test.step("only published pending proceedings appear when filtered by published", async () => {
-        await page.getByLabel("Status Suche").click()
-        await page
-          .getByRole("option", {
-            name: "Veröffentlicht",
-            exact: true,
-          })
-          .click()
-        await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-        await expect(page.getByText("YYTestDoc0017")).toBeVisible() // show published pending proceeding
-        await expect(page.getByText("YYTestDoc0018")).toBeHidden() // hide unpublished pending proceeding
-      })
-
-      await test.step("only unpublished pending proceedings appear when filtered by published", async () => {
-        await page.getByLabel("Status Suche").click()
-        await page
-          .getByRole("option", {
-            name: "Unveröffentlicht",
-          })
-          .click()
-
-        await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-        await expect(page.getByText("YYTestDoc0017")).toBeHidden() // hide published pending proceeding
-        await expect(page.getByText("YYTestDoc0018")).toBeVisible() // show unpublished pending proceeding
-      })
-
-      await test.step("only published pending proceedings are shown to other doc office", async () => {
-        await navigateToSearch(pageWithBghUser)
-
-        await pageWithBghUser
-          .getByLabel("Dokumentnummer Suche")
-          .fill("YYTestDoc")
-        await pageWithBghUser
-          .getByLabel("Nach Dokumentationseinheiten suchen")
-          .click()
-
-        await expect(pageWithBghUser.getByText("YYTestDoc0017")).toBeVisible() // show published pending proceeding
-        await expect(pageWithBghUser.getByText("YYTestDoc0018")).toBeHidden() // hide unpublished pending proceeding
+        await expect(page.getByText("YYTestDoc0001")).toBeVisible() // result list is present
+        await expect(page.getByText("YYTestDoc0017")).toBeHidden() // published pending proceeding is not in list
+        await expect(page.getByText("YYTestDoc0018")).toBeHidden() // unpublished pending proceeding is not in list
       })
     },
   )
@@ -367,7 +326,7 @@ test.describe("search", () => {
     await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     //16 + table header
-    await expect.poll(async () => page.locator(".table-row").count()).toBe(19)
+    await expect.poll(async () => page.locator(".table-row").count()).toBe(17)
 
     const docofficeOnly = page.getByLabel("Nur meine Dokstelle Filter")
     await docofficeOnly.click()
