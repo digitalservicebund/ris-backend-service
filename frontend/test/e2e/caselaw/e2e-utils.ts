@@ -266,7 +266,8 @@ export const uploadTestfile = async (
   await expect(page.getByText("Hochgeladen am")).toBeVisible()
 
   for (const file of fileNames) {
-    await expect(page.getByText(file)).toBeVisible()
+    const lastFileName = page.getByRole("cell", { name: file }).last()
+    await expect(lastFileName).toBeVisible()
   }
 }
 
