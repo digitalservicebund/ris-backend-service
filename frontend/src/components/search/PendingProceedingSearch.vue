@@ -51,8 +51,9 @@ const dateFromQuery = computed(() => {
     (searchQuery.value?.decisionDateEnd != undefined &&
       searchQuery.value?.decisionDateEnd != searchQuery.value?.decisionDate) ||
     searchQuery.value?.decisionDate == undefined
-  )
+  ) {
     return undefined
+  }
   return searchQuery.value?.decisionDate
 })
 

@@ -10,6 +10,11 @@ const routes = [
     component: {},
   },
   {
+    path: "/caselaw/search/decisions",
+    name: "caselaw-search-decisions",
+    component: {},
+  },
+  {
     path: "/caselaw/documentUnit/:documentNumber/categories",
     name: "caselaw-documentUnit-documentNumber-categories",
     component: {},
@@ -22,6 +27,11 @@ const routes = [
   {
     path: "/caselaw/pendingProceeding/new",
     name: "caselaw-pending-proceeding-new",
+    component: {},
+  },
+  {
+    path: "/caselaw/search/pendingProceedings",
+    name: "caselaw-search-pending-proceedings",
     component: {},
   },
   {
