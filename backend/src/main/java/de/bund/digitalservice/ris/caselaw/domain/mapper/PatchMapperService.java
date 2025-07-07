@@ -4,6 +4,7 @@ import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.List;
 import java.util.UUID;
 
@@ -103,4 +104,11 @@ public interface PatchMapperService {
    * @return patch without text check tags.
    */
   JsonPatch removeTextCheckTags(JsonPatch patch);
+
+  /**
+   * Saves all base64 encoded images in src attributes of img tags as attachments and replace the
+   * src attribute with the respective api path
+   */
+  JsonPatch extractAndStoreBase64Images(
+      JsonPatch patch, DocumentationUnit documentationUnit, User user);
 }
