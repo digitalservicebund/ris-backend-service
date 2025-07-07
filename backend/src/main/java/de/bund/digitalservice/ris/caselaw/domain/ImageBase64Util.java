@@ -17,7 +17,7 @@ public class ImageBase64Util {
   }
 
   public static Element createImageElementWithNewSrc(
-          Element oldElement,  String fileName,  String documentNumber) {
+      Element oldElement, String fileName, String documentNumber) {
     assertHasValidImageExtension(fileName);
     if (StringUtils.isNullOrBlank(documentNumber)) {
       throw new IllegalArgumentException("Documentation unit number can't be null or blank");
