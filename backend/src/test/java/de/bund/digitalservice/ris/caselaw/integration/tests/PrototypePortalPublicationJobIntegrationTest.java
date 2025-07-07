@@ -138,7 +138,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     portalPublicationJobService.executePendingJobs();
 
-    verify(s3Client, times(2)).putObject(putCaptor.capture(), bodyCaptor.capture());
+    verify(s3Client, times(1)).putObject(putCaptor.capture(), bodyCaptor.capture());
 
     var putRequest = putCaptor.getAllValues();
     var ldmlContent =
@@ -148,7 +148,6 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     assertThat(putRequest.get(0).key())
         .isEqualTo(dto.getDocumentNumber() + "/" + dto.getDocumentNumber() + ".xml");
-    assertThat(putRequest.get(1).key()).isEqualTo(dto.getDocumentNumber() + ".xml");
     assertThat(ldmlContent)
         .contains("gruende test")
         .doesNotContain("entscheidungsname test")
@@ -156,7 +155,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  void shouldPublishAndDeleteAtRootAndPrefixLevel() {
+  void shouldPublishAndDeleteAtPrefixLevel() {
     DocumentationUnitDTO dto1 =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, buildValidDocumentationUnit("1"));
@@ -195,25 +194,19 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         ArgumentCaptor.forClass(DeleteObjectRequest.class);
 
     // TWO DELETE JOBS (currently deleting documents at the prefix and root level)
-    verify(s3Client, times(4)).deleteObject(deleteCaptor.capture());
+    verify(s3Client, times(2)).deleteObject(deleteCaptor.capture());
     // PUT 4 PUBLISH JOBS (currently adding documents at the prefix and root level)
-    verify(s3Client, times(8)).putObject(putCaptor.capture(), bodyCaptor.capture());
+    verify(s3Client, times(4)).putObject(putCaptor.capture(), bodyCaptor.capture());
 
     var capturedPutRequests = putCaptor.getAllValues();
     var capturedDeleteRequests = deleteCaptor.getAllValues();
 
     assertThat(capturedPutRequests.get(0).key()).isEqualTo("1/1.xml");
-    assertThat(capturedPutRequests.get(1).key()).isEqualTo("1.xml");
-    assertThat(capturedPutRequests.get(2).key()).isEqualTo("1/1.xml");
-    assertThat(capturedPutRequests.get(3).key()).isEqualTo("1.xml");
-    assertThat(capturedPutRequests.get(4).key()).isEqualTo("2/2.xml");
-    assertThat(capturedPutRequests.get(5).key()).isEqualTo("2.xml");
-    assertThat(capturedPutRequests.get(6).key()).isEqualTo("2/2.xml");
-    assertThat(capturedPutRequests.get(7).key()).isEqualTo("2.xml");
+    assertThat(capturedPutRequests.get(1).key()).isEqualTo("1/1.xml");
+    assertThat(capturedPutRequests.get(2).key()).isEqualTo("2/2.xml");
+    assertThat(capturedPutRequests.get(3).key()).isEqualTo("2/2.xml");
     assertThat(capturedDeleteRequests.get(0).key()).isEqualTo("2/2.xml");
-    assertThat(capturedDeleteRequests.get(1).key()).isEqualTo("2.xml");
-    assertThat(capturedDeleteRequests.get(2).key()).isEqualTo("1/1.xml");
-    assertThat(capturedDeleteRequests.get(3).key()).isEqualTo("1.xml");
+    assertThat(capturedDeleteRequests.get(1).key()).isEqualTo("1/1.xml");
 
     assertThat(portalPublicationJobRepository.findAll())
         .allMatch(job -> job.getPublicationStatus() == SUCCESS);
@@ -246,7 +239,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     portalPublicationJobService.executePendingJobs();
 
     // DELETE is called even after fail
-    verify(s3Client, times(2)).deleteObject(any(DeleteObjectRequest.class));
+    verify(s3Client, times(1)).deleteObject(any(DeleteObjectRequest.class));
     // PUT 1.xml (fails) ((+ PUT changelog)) //currently disabled
     verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
 

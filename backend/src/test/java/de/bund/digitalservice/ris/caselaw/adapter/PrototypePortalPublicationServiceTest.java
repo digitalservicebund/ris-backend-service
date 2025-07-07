@@ -178,7 +178,6 @@ class PrototypePortalPublicationServiceTest {
 
     subject.publishDocumentationUnit(testDocumentNumber);
 
-    verify(portalBucket, times(1)).save(testDocumentNumber + ".xml", transformed);
     verify(portalBucket, times(1))
         .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
   }
@@ -208,7 +207,6 @@ class PrototypePortalPublicationServiceTest {
 
     subject.publishDocumentationUnit(testDocumentNumber);
 
-    verify(portalBucket, times(1)).save(testDocumentNumber + ".xml", transformed);
     verify(portalBucket, times(1))
         .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
     verify(portalBucket, times(1)).saveBytes(testDocumentNumber + "/bild1.png", content);
@@ -249,7 +247,6 @@ class PrototypePortalPublicationServiceTest {
         .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
     subject.deleteDocumentationUnit(testDocumentNumber);
 
-    verify(portalBucket, times(1)).delete(testDocumentNumber + ".xml");
     verify(portalBucket, times(1)).delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
   }
 
@@ -261,15 +258,6 @@ class PrototypePortalPublicationServiceTest {
     doThrow(BucketException.class)
         .when(portalBucket)
         .delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
-
-    assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> subject.deleteDocumentationUnit(testDocumentNumber))
-        .withMessageContaining("Could not delete LDML from bucket.");
-  }
-
-  @Test
-  void delete_shouldThrowTemp() {
-    doThrow(BucketException.class).when(portalBucket).delete(testDocumentNumber + ".xml");
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.deleteDocumentationUnit(testDocumentNumber))
@@ -305,7 +293,6 @@ class PrototypePortalPublicationServiceTest {
 
     subject.logPortalPublicationSanityCheck();
 
-    verify(portalBucket).delete("789.xml");
     verify(portalBucket).save(fileNameCaptor.capture(), fileContentCaptor.capture());
     assertThat(fileNameCaptor.getValue()).contains("changelogs");
     assertThat(fileContentCaptor.getValue())
