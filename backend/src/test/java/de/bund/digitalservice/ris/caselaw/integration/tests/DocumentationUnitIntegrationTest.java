@@ -810,6 +810,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("java:S5961") // Ignore Sonar complexity warning
   void testSearchByDecisionSearchInput() {
     UUID otherDocOfficeUuid = documentationOfficeRepository.findByAbbreviation("BGH").getId();
 
@@ -978,6 +979,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("java:S5961") // Ignore Sonar complexity warning
   void testSearchByPendingProceedingSearchInput() {
     UUID otherDocOfficeUuid = documentationOfficeRepository.findByAbbreviation("BGH").getId();
 
