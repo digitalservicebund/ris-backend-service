@@ -100,7 +100,7 @@ test.describe(
       })
 
       await test.step("Nach erfolgreichem Zuweisen wird zur Startseite weitergeleitet", async () => {
-        await expect(page).toHaveURL("/caselaw")
+        await expect(page).toHaveURL("/caselaw/search")
       })
 
       await test.step("Toast für erfolgreiches Zuweisen wird angezeigt", async () => {
