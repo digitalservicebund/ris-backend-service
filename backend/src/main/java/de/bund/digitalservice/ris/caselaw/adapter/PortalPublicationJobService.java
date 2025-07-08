@@ -68,7 +68,7 @@ public class PortalPublicationJobService {
     publicationJobRepository.saveAll(pendingJobs);
 
     log.info(
-        "Portal publication jobs successfully executed: {} units published, {} units deleted.",
+        "Portal publication jobs successfully executed: {} files published, {} files deleted.",
         publicationResult.publishedCount,
         publicationResult.deletedCount);
   }

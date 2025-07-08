@@ -52,7 +52,7 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     documentNumber,
   }) => {
     await navigateToAttachments(page, documentNumber)
-    await uploadTestfile(page, "sample.png")
+    await uploadTestfile(page, "sample.png", { skipAssert: true })
     await expect(
       page.locator(
         "text=sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",

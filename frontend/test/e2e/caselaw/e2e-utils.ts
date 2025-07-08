@@ -242,21 +242,33 @@ export const handoverDocumentationUnit = async (
 export const uploadTestfile = async (
   page: Page,
   filename: string | string[],
+  options?: {
+    skipAssert?: boolean
+  },
 ) => {
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
     page.getByText("Oder hier auswählen").click(),
   ])
-  if (Array.isArray(filename)) {
-    await fileChooser.setFiles(
-      filename.map((file) => "./test/e2e/caselaw/testfiles/" + file),
-    )
-  } else {
-    await fileChooser.setFiles("./test/e2e/caselaw/testfiles/" + filename)
-  }
+  const fileNames = Array.isArray(filename) ? filename : [filename]
+  await fileChooser.setFiles(
+    fileNames.map((file) => "./test/e2e/caselaw/testfiles/" + file),
+  )
+  await fileChooser.setFiles(
+    fileNames.map((file) => "./test/e2e/caselaw/testfiles/" + file),
+  )
   await expect(async () => {
     await expect(page.getByLabel("Ladestatus")).not.toBeAttached()
   }).toPass({ timeout: 15000 })
+
+  // Assert upload block
+  if (options?.skipAssert) return
+  await expect(page.getByText("Hochgeladen am")).toBeVisible()
+
+  for (const file of fileNames) {
+    const lastFileName = page.getByRole("cell", { name: file }).last()
+    await expect(lastFileName).toBeVisible()
+  }
 }
 
 export async function save(page: Page) {

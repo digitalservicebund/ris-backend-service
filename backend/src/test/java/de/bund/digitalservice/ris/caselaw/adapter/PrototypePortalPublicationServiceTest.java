@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -19,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrThis;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
@@ -33,6 +35,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +53,7 @@ class PrototypePortalPublicationServiceTest {
 
   @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
   @MockitoBean private AttachmentRepository attachmentRepository;
-  @MockitoBean private PrototypePortalBucket prototypePortalBucket;
+  @MockitoBean private PrototypePortalBucket portalBucket;
   @MockitoBean private XmlUtilService xmlUtilService;
   @MockitoBean private ObjectMapper objectMapper;
   @MockitoBean private PortalTransformer portalTransformer;
@@ -119,8 +122,9 @@ class PrototypePortalPublicationServiceTest {
     subject =
         new PrototypePortalPublicationService(
             documentationUnitRepository,
+            attachmentRepository,
             xmlUtilService,
-            prototypePortalBucket,
+            portalBucket,
             objectMapper,
             portalTransformer,
             riiService);
@@ -174,7 +178,40 @@ class PrototypePortalPublicationServiceTest {
 
     subject.publishDocumentationUnit(testDocumentNumber);
 
-    verify(prototypePortalBucket, times(1)).save(testDocumentNumber + ".xml", transformed);
+    verify(portalBucket, times(1))
+        .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
+  }
+
+  @Test
+  void publish_withAttachments_shouldSaveToBucket() throws DocumentationUnitNotExistsException {
+    String transformed = "ldml";
+    when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
+        .thenReturn(testDocumentUnit);
+    when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+    when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
+    var content = new byte[] {1};
+    when(attachmentRepository.findAllByDocumentationUnitId(testDocumentUnit.uuid()))
+        .thenReturn(
+            List.of(
+                AttachmentDTO.builder()
+                    .filename("originalentscheidung")
+                    .format("docx")
+                    .uploadTimestamp(Instant.now())
+                    .build(),
+                AttachmentDTO.builder()
+                    .filename("bild1.png")
+                    .format("png")
+                    .content(content)
+                    .uploadTimestamp(Instant.now())
+                    .build()));
+
+    subject.publishDocumentationUnit(testDocumentNumber);
+
+    verify(portalBucket, times(1))
+        .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
+    verify(portalBucket, times(1)).saveBytes(testDocumentNumber + "/bild1.png", content);
+    verify(portalBucket, never())
+        .saveBytes(eq(testDocumentNumber + "/originalenscheidung"), any(byte[].class));
   }
 
   @Test
@@ -185,7 +222,7 @@ class PrototypePortalPublicationServiceTest {
         .thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
-    doThrow(BucketException.class).when(prototypePortalBucket).save(anyString(), anyString());
+    doThrow(BucketException.class).when(portalBucket).save(anyString(), anyString());
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.publishDocumentationUnit(testDocumentNumber))
@@ -198,20 +235,29 @@ class PrototypePortalPublicationServiceTest {
     when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
         .thenReturn(pendingProceeding);
 
-    verify(prototypePortalBucket, never()).save(anyString(), anyString());
+    subject.publishDocumentationUnit(testDocumentNumber);
+
+    verify(portalBucket, never()).save(anyString(), anyString());
     verify(xmlUtilService, never()).ldmlToString(any());
   }
 
   @Test
   void delete_shouldDeleteFromBucket() {
+    when(portalBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
     subject.deleteDocumentationUnit(testDocumentNumber);
 
-    verify(prototypePortalBucket, times(1)).delete(testDocumentNumber + ".xml");
+    verify(portalBucket, times(1)).delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
   }
 
   @Test
   void delete_shouldThrow() {
-    doThrow(BucketException.class).when(prototypePortalBucket).delete(testDocumentNumber + ".xml");
+    subject.deleteDocumentationUnit(testDocumentNumber);
+    when(portalBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
+    doThrow(BucketException.class)
+        .when(portalBucket)
+        .delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.deleteDocumentationUnit(testDocumentNumber))
@@ -222,7 +268,7 @@ class PrototypePortalPublicationServiceTest {
   void uploadChangelog_shouldDoNothing() {
     subject.uploadChangelog(List.of(), List.of());
 
-    verify(prototypePortalBucket, never()).save(contains("changelogs/"), anyString());
+    verify(portalBucket, never()).save(contains("changelogs/"), anyString());
   }
 
   // currently disabled for prototype
@@ -237,8 +283,7 @@ class PrototypePortalPublicationServiceTest {
   @Test
   void sanityCheck_shouldDeleteDocumentNumbersInPortalButNotInRii() throws JsonProcessingException {
     when(riiService.fetchRiiDocumentNumbers()).thenReturn(List.of("123", "456"));
-    when(prototypePortalBucket.getAllFilenames())
-        .thenReturn(List.of("123.xml", "456.xml", "789.xml"));
+    when(portalBucket.getAllFilenames()).thenReturn(List.of("123.xml", "456.xml", "789.xml"));
     ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> fileContentCaptor = ArgumentCaptor.forClass(String.class);
     when(objectMapper.writeValueAsString(new ChangelogUpdateDelete(null, List.of("789.xml"))))
@@ -248,8 +293,7 @@ class PrototypePortalPublicationServiceTest {
 
     subject.logPortalPublicationSanityCheck();
 
-    verify(prototypePortalBucket).delete("789.xml");
-    verify(prototypePortalBucket).save(fileNameCaptor.capture(), fileContentCaptor.capture());
+    verify(portalBucket).save(fileNameCaptor.capture(), fileContentCaptor.capture());
     assertThat(fileNameCaptor.getValue()).contains("changelogs");
     assertThat(fileContentCaptor.getValue())
         .isEqualTo(

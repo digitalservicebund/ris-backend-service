@@ -30,6 +30,7 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,6 +40,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -70,6 +72,9 @@ class S3AttachmentServiceTest {
 
   private DocumentationUnitDTO documentationUnitDTO;
 
+  private static final String DOCX_MEDIA_TYPE =
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
   @BeforeEach
   void setup() {
     documentationUnitDTO = DecisionDTO.builder().id(UUID.randomUUID()).build();
@@ -88,42 +93,68 @@ class S3AttachmentServiceTest {
             });
   }
 
-  @Test
-  void testAttachFileToDocumentationUnit() {
-    var byteBuffer = ByteBuffer.wrap(new byte[] {});
-    var headerMap = new LinkedMultiValueMap<String, String>();
-    headerMap.put("Content-Type", List.of("content/extension"));
-    headerMap.put("X-Filename", List.of("testfile.docx"));
-    var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
-    doNothing().when(service).checkDocx(any(ByteBuffer.class));
+  @Nested
+  class DocxTest {
+    @Test
+    void testAttachFileToDocumentationUnit() {
+      var byteBuffer = ByteBuffer.wrap(new byte[] {});
+      var headerMap = new LinkedMultiValueMap<String, String>();
+      headerMap.put("Content-Type", List.of(DOCX_MEDIA_TYPE));
+      headerMap.put("X-Filename", List.of("testfile.docx"));
+      var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
+      doNothing().when(service).checkDocx(any(ByteBuffer.class));
 
-    service.attachFileToDocumentationUnit(
-        documentationUnitDTO.getId(), byteBuffer, httpHeaders, User.builder().build());
+      service.attachFileToDocumentationUnit(
+          documentationUnitDTO.getId(), byteBuffer, httpHeaders, User.builder().build());
 
-    // s3 interaction
-    var putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
-    var requestBodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
-    verify(s3Client).putObject(putObjectRequestCaptor.capture(), requestBodyCaptor.capture());
-    assertEquals("testBucket", putObjectRequestCaptor.getValue().bucket());
-    assertEquals("content/extension", putObjectRequestCaptor.getValue().contentType());
-    var value = requestBodyCaptor.getValue();
-    var expected = RequestBody.fromByteBuffer(ByteBuffer.wrap(new byte[] {}));
-    assertEquals(
-        expected.optionalContentLength().orElse(0L), value.optionalContentLength().orElse(0L));
-    assertEquals(expected.contentType(), value.contentType());
+      // s3 interaction
+      var putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+      var requestBodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
+      verify(s3Client).putObject(putObjectRequestCaptor.capture(), requestBodyCaptor.capture());
+      assertEquals("testBucket", putObjectRequestCaptor.getValue().bucket());
+      assertEquals(DOCX_MEDIA_TYPE, putObjectRequestCaptor.getValue().contentType());
+      var value = requestBodyCaptor.getValue();
+      var expected = RequestBody.fromByteBuffer(ByteBuffer.wrap(new byte[] {}));
+      assertEquals(
+          expected.optionalContentLength().orElse(0L), value.optionalContentLength().orElse(0L));
+      assertEquals(expected.contentType(), value.contentType());
 
-    // repo interaction
-    var attachmentDtoCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);
-    verify(repository, times(2)).save(attachmentDtoCaptor.capture());
-    assertEquals("testfile.docx", attachmentDtoCaptor.getValue().getFilename());
-    assertEquals("docx", attachmentDtoCaptor.getValue().getFormat());
+      // repo interaction
+      var attachmentDtoCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);
+      verify(repository, times(2)).save(attachmentDtoCaptor.capture());
+      assertEquals("testfile.docx", attachmentDtoCaptor.getValue().getFilename());
+      assertEquals("docx", attachmentDtoCaptor.getValue().getFormat());
+    }
+
+    @Test
+    void testCheckDocx_withValidDocument() {
+      ByteBuffer byteBuffer = buildBuffer("word/document.xml");
+      assertDoesNotThrow(() -> service.checkDocx(byteBuffer));
+    }
+
+    @Test
+    void testCheckDocx_withCorruptedDocx() {
+      byte[] corruptedData = new byte[1024];
+      new Random().nextBytes(corruptedData);
+      ByteBuffer byteBuffer = ByteBuffer.wrap(corruptedData);
+
+      assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
+    }
+
+    @Test
+    void testCheckDocx_withEmptyBuffer() {
+      byte[] emptyData = new byte[] {};
+      ByteBuffer byteBuffer = ByteBuffer.wrap(emptyData);
+
+      assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
+    }
   }
 
   @Test
   void testAttachFileToDocumentationUnit_withoutFileName() {
     var byteBuffer = ByteBuffer.wrap(new byte[] {});
     var headerMap = new LinkedMultiValueMap<String, String>();
-    headerMap.put("Content-Type", List.of("content/extension"));
+    headerMap.put("Content-Type", List.of(DOCX_MEDIA_TYPE));
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
 
@@ -185,51 +216,88 @@ class S3AttachmentServiceTest {
   }
 
   @Test
-  void testCheckDocx_withValidDocument() {
-    ByteBuffer byteBuffer = buildBuffer("word/document.xml");
-    assertDoesNotThrow(() -> service.checkDocx(byteBuffer));
-  }
-
-  @Test
   void testCheckDocx_withInvalidFormat() {
     ByteBuffer byteBuffer = buildBuffer("word/document.csv");
     assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
   }
 
   @Test
-  void testCheckDocx_withCorruptedDocx() {
-    byte[] corruptedData = new byte[1024];
-    new Random().nextBytes(corruptedData);
-    ByteBuffer byteBuffer = ByteBuffer.wrap(corruptedData);
-
-    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
-  }
-
-  @Test
-  void testCheckDocx_withEmptyBuffer() {
-    byte[] emptyData = new byte[] {};
-    ByteBuffer byteBuffer = ByteBuffer.wrap(emptyData);
-
-    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
-  }
-
-  @Test
   void testGenerateNewDocumentationUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
     var byteBuffer = ByteBuffer.wrap(new byte[] {});
+    var headerMap = new LinkedMultiValueMap<String, String>();
+    headerMap.put("Content-Type", List.of(DOCX_MEDIA_TYPE));
+
+    var headers = HttpHeaders.readOnlyHttpHeaders(headerMap);
+    var user = User.builder().build();
+    var documentationUnitDTOId = documentationUnitDTO.getId();
 
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
         .thenThrow(SdkException.create("exception", null));
-    var documentationUnitDTOId = documentationUnitDTO.getId();
 
-    var user = User.builder().build();
     assertThrows(
         SdkException.class,
         () ->
             service.attachFileToDocumentationUnit(
-                documentationUnitDTOId, byteBuffer, HttpHeaders.EMPTY, user));
+                documentationUnitDTOId, byteBuffer, headers, user));
 
     verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+  }
+
+  @Nested
+  class ImageTest {
+
+    @Test
+    void testAttachImageToDocumentationUnit_withUnsupportedType() {
+      var byteBuffer = ByteBuffer.wrap(new byte[] {0x01});
+      var headers = new HttpHeaders();
+      var user = User.builder().build();
+      headers.setContentType(MediaType.APPLICATION_JSON);
+      var documentationUnitDTOId = documentationUnitDTO.getId();
+
+      ResponseStatusException exception =
+          assertThrows(
+              ResponseStatusException.class,
+              () ->
+                  service.attachFileToDocumentationUnit(
+                      documentationUnitDTOId, byteBuffer, headers, user));
+
+      assertEquals("Only images and docx are supported", exception.getReason());
+
+      verify(repository, never()).save(any());
+    }
+
+    @Test
+    void testAttachImageToDocumentationUnit_withSupportedType() {
+      byte[] imageBytes = new byte[] {1, 2, 3, 4}; // Mock image data
+      ByteBuffer byteBuffer = ByteBuffer.wrap(imageBytes);
+
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.IMAGE_PNG);
+      headers.set("X-Filename", "test-image.png");
+
+      UUID id = UUID.randomUUID();
+      AttachmentDTO savedDto =
+          AttachmentDTO.builder()
+              .id(id)
+              .content(imageBytes)
+              .documentationUnit(documentationUnitDTO)
+              .format("png")
+              .filename("test-image.png")
+              .build();
+
+      when(repository.save(any(AttachmentDTO.class))).thenReturn(savedDto);
+
+      // Run
+      var result =
+          service.attachFileToDocumentationUnit(
+              documentationUnitDTO.getId(), byteBuffer, headers, User.builder().build());
+
+      verify(repository, times(2)).save(any()); // initial + filename update
+
+      assertEquals("png", result.format());
+      assertEquals(id + ".png", result.name());
+    }
   }
 
   private ByteBuffer buildBuffer(String entry) {

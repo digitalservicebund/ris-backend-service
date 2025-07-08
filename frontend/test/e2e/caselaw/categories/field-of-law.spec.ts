@@ -389,7 +389,7 @@ test.describe("field of law", () => {
     await page
       .getByLabel("Sachgebietsbezeichnung", { exact: true })
       .fill("Gewinn")
-    await page.getByLabel("Sachgebietsnorm", { exact: true }).fill("§ 252 BGB")
+    await page.getByLabel("Sachgebietsnorm", { exact: true }).fill("BGB § 252")
     await page.keyboard.press("Enter")
 
     await expect(page.getByLabel("BR-05-01-06 hinzufügen")).toBeVisible()
@@ -410,7 +410,7 @@ test.describe("field of law", () => {
     await page
       .getByLabel("Sachgebietsbezeichnung", { exact: true })
       .fill("Gewinn")
-    await page.getByLabel("Sachgebietsnorm", { exact: true }).fill("§ 252 BGB")
+    await page.getByLabel("Sachgebietsnorm", { exact: true }).fill("BGB § 252")
     await page.keyboard.press("Enter")
 
     await expect(page.getByLabel("BR-05-01-06 hinzufügen")).toBeVisible()

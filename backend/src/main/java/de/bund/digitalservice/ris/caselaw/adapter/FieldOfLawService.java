@@ -63,16 +63,14 @@ public class FieldOfLawService {
       Pageable pageable) {
 
     String normString = norm.orElse(null);
-    boolean isPrefixNormSearch = false;
 
     if (!StringUtils.isNullOrBlank(normString) && normString.endsWith("%")) {
       normString = normString.substring(0, norm.get().length() - 1);
-      isPrefixNormSearch = true;
     }
 
     List<FieldOfLaw> unorderedList =
         repository.findByCombinedCriteria(
-            identifier.orElse(null), description.orElse(null), normString, isPrefixNormSearch);
+            identifier.orElse(null), description.orElse(null), normString);
 
     // If no results found, return an empty page
     if (unorderedList.isEmpty()) {

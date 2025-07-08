@@ -514,17 +514,17 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         const documentationUnit = {
           ...prefilledDocumentUnit,
           shortTexts: {
-            headline: text,
-            guidingPrinciple: text,
-            headnote: text,
+            headline: undefined,
+            guidingPrinciple: undefined,
+            headnote: undefined,
             otherHeadnote: text,
           },
           longTexts: {
             tenor: text,
-            caseFacts: text,
-            decisionReasons: text,
-            otherLongText: text,
-            dissentingOpinion: text,
+            caseFacts: undefined,
+            decisionReasons: undefined,
+            otherLongText: undefined,
+            dissentingOpinion: undefined,
           },
         } as Decision
         await updateDocumentationUnit(page, documentationUnit, request)

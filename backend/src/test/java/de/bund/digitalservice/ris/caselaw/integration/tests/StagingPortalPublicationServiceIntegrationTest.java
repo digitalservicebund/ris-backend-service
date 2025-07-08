@@ -31,6 +31,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTrans
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -127,11 +129,11 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
 
     ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
-    verify(s3Client, times(1)).putObject(captor.capture(), any(RequestBody.class));
+    verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
 
     var capturedRequests = captor.getAllValues();
     assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
-    //    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
+    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
   }
 
   @Test
@@ -221,16 +223,17 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
 
     ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
-    verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
+    verify(s3Client, times(3)).putObject(captor.capture(), any(RequestBody.class));
 
     var capturedRequests = captor.getAllValues();
     assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
     assertThat(capturedRequests.get(1).key()).isEqualTo("1234567890123/bild1.png");
-    //    assertThat(capturedRequests.get(2).key()).contains("changelogs/");
+    assertThat(capturedRequests.get(2).key()).contains("changelogs/");
   }
 
   @Test
-  void publishTwice_andRemoveAttachment_shouldPublishSuccessfullyAndDeleteAttachment() {
+  void publishTwice_andRemoveAttachment_shouldPublishSuccessfullyAndDeleteAttachment()
+      throws IOException {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository,
@@ -259,13 +262,13 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
 
     ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
 
-    verify(s3Client, times(3)).putObject(captor.capture(), any(RequestBody.class));
+    verify(s3Client, times(4)).putObject(captor.capture(), any(RequestBody.class));
 
     var capturedRequests = captor.getAllValues();
     assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
     assertThat(capturedRequests.get(1).key()).isEqualTo("1234567890123/bild1.png");
     assertThat(capturedRequests.get(2).key()).isEqualTo("1234567890123/bild2.png");
-    //    assertThat(capturedRequests.get(3).key()).contains("changelogs/");
+    assertThat(capturedRequests.get(3).key()).contains("changelogs/");
 
     dto.setAttachments(
         List.of(
@@ -303,26 +306,24 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
         ArgumentCaptor.forClass(DeleteObjectRequest.class);
     ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
 
-    verify(s3Client, times(5)).putObject(updateCaptor.capture(), bodyCaptor.capture());
+    verify(s3Client, times(7)).putObject(updateCaptor.capture(), bodyCaptor.capture());
     verify(s3Client, times(1)).deleteObject(deleteCaptor.capture());
 
-    //    var changelogContent =
-    //        new String(
-    //
-    // bodyCaptor.getAllValues().get(6).contentStreamProvider().newStream().readAllBytes(),
-    //            StandardCharsets.UTF_8);
+    var changelogContent =
+        new String(
+            bodyCaptor.getAllValues().get(6).contentStreamProvider().newStream().readAllBytes(),
+            StandardCharsets.UTF_8);
 
     var updateCapturedRequests = updateCaptor.getAllValues();
     var deleteCapturedRequests = deleteCaptor.getAllValues();
-    assertThat(updateCapturedRequests.get(3).key()).isEqualTo("1234567890123/1234567890123.xml");
-    assertThat(updateCapturedRequests.get(4).key()).isEqualTo("1234567890123/bild1.png");
-    //    assertThat(updateCapturedRequests.get(6).key()).contains("changelogs/");
+    assertThat(updateCapturedRequests.get(4).key()).isEqualTo("1234567890123/1234567890123.xml");
+    assertThat(updateCapturedRequests.get(5).key()).isEqualTo("1234567890123/bild1.png");
+    assertThat(updateCapturedRequests.get(6).key()).contains("changelogs/");
     assertThat(deleteCapturedRequests.get(0).key()).isEqualTo("1234567890123/bild2.png");
-    //    assertThat(changelogContent)
-    //        .isEqualTo(
-    //            """
-    //
-    // {"changed":["1234567890123/1234567890123.xml","1234567890123/bild1.png"],"deleted":["1234567890123/bild2.png"]}""");
+    assertThat(changelogContent)
+        .isEqualTo(
+            """
+     {"changed":["1234567890123/1234567890123.xml","1234567890123/bild1.png"],"deleted":["1234567890123/bild2.png"]}""");
   }
 
   private DecisionDTO.DecisionDTOBuilder<?, ?> buildValidDocumentationUnit() {
