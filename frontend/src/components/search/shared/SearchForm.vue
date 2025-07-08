@@ -82,40 +82,7 @@ function hasValidationErrors() {
   return validationStore.getAll().length > 0
 }
 
-function validateSearchInput() {
-  //Startdatum fehlt für Mitteilungsdatum
-  if (
-    query.value?.decisionDateEnd &&
-    !query.value?.decisionDate &&
-    !validationStore.getByField("decisionDate")
-  ) {
-    validationStore.add("Startdatum fehlt", "decisionDate")
-  } else if (
-    !query.value.decisionDateEnd &&
-    validationStore.getByMessage("Startdatum fehlt").length === 1
-  ) {
-    validationStore.remove("decisionDate")
-  }
-
-  //Enddatum darf nicht vor Startdatum liegen für Mitteilungsdatum
-  if (
-    query.value?.decisionDateEnd &&
-    query.value?.decisionDate &&
-    new Date(query.value.decisionDate) > new Date(query.value.decisionDateEnd)
-  ) {
-    if (!validationStore.getByField("decisionDateEnd")) {
-      validationStore.add(
-        "Enddatum darf nicht vor Startdatum liegen",
-        "decisionDateEnd",
-      )
-    }
-  } else if (
-    validationStore.getByMessage("Enddatum darf nicht vor Startdatum liegen")
-      .length === 1
-  ) {
-    validationStore.remove("decisionDateEnd")
-  }
-
+function validateResolutionDates() {
   //Startdatum fehlt für Erledigungsvermerk
   if (
     query.value?.resolutionDateEnd &&
@@ -149,6 +116,46 @@ function validateSearchInput() {
   ) {
     validationStore.remove("resolutionDateEnd")
   }
+}
+
+function validateDecisionDates() {
+  //Startdatum fehlt für Mitteilungsdatum
+  if (
+    query.value?.decisionDateEnd &&
+    !query.value?.decisionDate &&
+    !validationStore.getByField("decisionDate")
+  ) {
+    validationStore.add("Startdatum fehlt", "decisionDate")
+  } else if (
+    !query.value.decisionDateEnd &&
+    validationStore.getByMessage("Startdatum fehlt").length === 1
+  ) {
+    validationStore.remove("decisionDate")
+  }
+
+  //Enddatum darf nicht vor Startdatum liegen für Mitteilungsdatum
+  if (
+    query.value?.decisionDateEnd &&
+    query.value?.decisionDate &&
+    new Date(query.value.decisionDate) > new Date(query.value.decisionDateEnd)
+  ) {
+    if (!validationStore.getByField("decisionDateEnd")) {
+      validationStore.add(
+        "Enddatum darf nicht vor Startdatum liegen",
+        "decisionDateEnd",
+      )
+    }
+  } else if (
+    validationStore.getByMessage("Enddatum darf nicht vor Startdatum liegen")
+      .length === 1
+  ) {
+    validationStore.remove("decisionDateEnd")
+  }
+}
+
+function validateSearchInput() {
+  validateDecisionDates()
+  validateResolutionDates()
 }
 
 function handleLocalInputError(error: ValidationError | undefined, id: string) {

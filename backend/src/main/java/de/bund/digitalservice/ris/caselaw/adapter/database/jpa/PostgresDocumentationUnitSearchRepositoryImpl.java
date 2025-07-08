@@ -215,8 +215,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       // Use cb.treat() to downcast the root to PendingProceedingDTO
       Root<PendingProceedingDTO> pendingProceedingRoot = cb.treat(root, PendingProceedingDTO.class);
       Predicate isResolvedPredicate =
-          cb.equal(
-              pendingProceedingRoot.get(PendingProceedingDTO_.isResolved), parameters.isResolved);
+          cb.equal(pendingProceedingRoot.get(PendingProceedingDTO_.isResolved), true);
       predicates.add(isResolvedPredicate);
     }
     return predicates;
