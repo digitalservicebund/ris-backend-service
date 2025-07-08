@@ -727,7 +727,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
 
   foreignDocumentationUnit: async ({ request }, use) => {
     const foreignDocumentUnitSearchResponse = await request.get(
-      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
+      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001&kind=DECISION`,
     )
 
     const foreignDocumentUnitPage =
@@ -752,7 +752,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
 
     const foreignDocumentUnitSearchResponse = await request.get(
-      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
+      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001&kind=DECISION`,
     )
 
     const eanDocType = (
@@ -894,7 +894,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
 
     const foreignDocumentUnitSearchResponse = await request.get(
-      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
+      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001&kind=DECISION`,
     )
 
     const foreignDocumentUnitPage =

@@ -177,7 +177,7 @@ async function runTestMultipleTimes(
   }
 
   const url =
-    "/api/v1/caselaw/documentunits/search?pg=0&sz=100" +
+    "/api/v1/caselaw/documentunits/search?pg=0&sz=100&kind=DECISION" +
     getUrlParams(search.parameter)
   const request = await getRequest(url, page)
 
