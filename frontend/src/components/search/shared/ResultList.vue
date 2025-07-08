@@ -12,6 +12,7 @@ import { useStatusBadge } from "@/composables/useStatusBadge"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { ResponseError } from "@/services/httpClient"
 import IconDelete from "~icons/ic/baseline-close"
+import IconError from "~icons/ic/baseline-error"
 import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
 import IconArrowDown from "~icons/mdi/arrow-down-drop"
@@ -91,7 +92,13 @@ defineSlots<{
             </div>
           </template>
         </Column>
-        <Column field="court.type" header="Gerichtstyp" />
+        <Column field="court.type" header="Gerichtstyp">
+          <template #body="{ data: item }">
+            <div class="flex flex-row items-center gap-8">
+              <div>{{ item.court?.type ?? "-" }}</div>
+            </div>
+          </template>
+        </Column>
         <Column field="decisionDate">
           <template #header>
             <div class="flex flex-row">
@@ -117,6 +124,20 @@ defineSlots<{
               v-bind="useStatusBadge(item.status).value"
               data-testid="publication-status"
             />
+          </template>
+        </Column>
+        <Column header="Fehler">
+          <template #body="{ data: item }">
+            <IconBadge
+              v-if="item.status?.withError"
+              background-color="bg-red-300"
+              class="inline-flex"
+              color="text-red-900"
+              data-testid="publication-error"
+              :icon="IconError"
+              label="Fehler"
+            />
+            <span v-else>-</span>
           </template>
         </Column>
         <Column field="resolutionDate" header="Erledigungsmitteilung">

@@ -30,6 +30,10 @@ const mockEntries = [
     note: "",
     isDeletable: false,
     isEditable: false,
+    status: {
+      publicationStatus: PublicationState.UNPUBLISHED,
+      withError: true,
+    },
     resolutionDate: "2000-04-06",
   }),
 ]
