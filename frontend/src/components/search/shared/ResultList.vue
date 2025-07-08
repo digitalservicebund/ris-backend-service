@@ -115,7 +115,13 @@ defineSlots<{
             }}
           </template>
         </Column>
-        <Column field="fileNumber" header="Aktenzeichen" />
+        <Column field="fileNumber" header="Aktenzeichen">
+          <template #body="{ data: item }">
+            <div class="flex flex-row items-center gap-8">
+              <div>{{ item.fileNumber ?? "-" }}</div>
+            </div>
+          </template>
+        </Column>
         <Column header="Status">
           <template #body="{ data: item }">
             <IconBadge
