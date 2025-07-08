@@ -304,40 +304,37 @@ test.describe(
           pageWithBfhUser.getByText(`${fileNumber}, BFH, 05.07.2022`),
         ).toBeVisible()
       })
-      let newPendingProceedingPage: Page
       await test.step("Klicke 'Übernehmen und fortfahren'", async () => {
-        const pagePromise = pageWithBfhUser.context().waitForEvent("page")
         await pageWithBfhUser
           .getByRole("button", { name: "Übernehmen und fortfahren" })
           .click()
-        newPendingProceedingPage = await pagePromise
       })
       await test.step("Öffnet Rubriken von neuem Anhängigem Verfahren", async () => {
-        await expect(newPendingProceedingPage).toHaveURL(
+        await expect(pageWithBfhUser).toHaveURL(
           /\/caselaw\/pending-proceeding\/[A-Z0-9]{13}\/categories$/,
         )
         documentNumberToBeDeleted =
           /caselaw\/pending-proceeding\/(.*)\/categories/g.exec(
-            newPendingProceedingPage.url(),
+            pageWithBfhUser.url(),
           )?.[1] as string
         await expect(
-          newPendingProceedingPage.getByRole("heading", {
+          pageWithBfhUser.getByRole("heading", {
             name: documentNumberToBeDeleted,
           }),
         ).toBeVisible()
       })
       await test.step("Rubriken sind bereits mit Suchparametern befüllt", async () => {
         await expect(
-          newPendingProceedingPage.getByLabel("Gericht", { exact: true }),
+          pageWithBfhUser.getByLabel("Gericht", { exact: true }),
         ).toHaveValue("BFH")
         await expect(
-          newPendingProceedingPage.getByRole("textbox", {
+          pageWithBfhUser.getByRole("textbox", {
             name: "Entscheidungsdatum",
             exact: true,
           }),
         ).toHaveValue("05.07.2022")
         await expect(
-          newPendingProceedingPage
+          pageWithBfhUser
             .getByTestId("chips-input-wrapper_fileNumber")
             .getByTestId("chip-value"),
         ).toHaveText(fileNumber)
@@ -431,14 +428,15 @@ async function checkContentOfResultRow(
   const decisionDateCell = listRow.getByRole("cell").nth(2)
   const fileNumberCell = listRow.getByRole("cell").nth(3)
   const statusCell = listRow.getByRole("cell").nth(4)
-  const resolutionDateCell = listRow.getByRole("cell").nth(5)
+  const errorCell = listRow.getByRole("cell").nth(5)
+  const resolutionDateCell = listRow.getByRole("cell").nth(6)
 
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
   await test.step("Gerichtstyp", async () => {
     await expect(courtTypeCell).toHaveText(
-      expectedItem.coreData.court?.type ?? "",
+      expectedItem.coreData.court?.type ?? "-",
     )
   })
   await test.step("Mitteilungsdatum", async () => {
@@ -455,6 +453,9 @@ async function checkContentOfResultRow(
   })
   await test.step("Veröffentlichungsstatus", async () => {
     await expect(statusCell).toHaveText("Unveröffentlicht")
+  })
+  await test.step("Fehler", async () => {
+    await expect(errorCell).toHaveText("-")
   })
   await test.step("Erledigungsmitteilung", async () => {
     // eslint-disable-next-line playwright/no-conditional-in-test
