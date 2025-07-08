@@ -49,8 +49,8 @@ EOF
 }
 
 _init() {
-#  _setup_git_hooks
-#  _setup_direnv
+  _setup_git_hooks
+  _setup_direnv
   _env
 }
 
