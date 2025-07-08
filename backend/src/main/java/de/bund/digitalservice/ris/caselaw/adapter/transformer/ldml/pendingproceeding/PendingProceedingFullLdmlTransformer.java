@@ -20,7 +20,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
-/** Transformer for converting pending proceedings to LDML format for internal portal use. */
+/** Transformer for converting pending proceedings to full LDML format. */
 @Slf4j
 public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommonLdmlTransformer {
 

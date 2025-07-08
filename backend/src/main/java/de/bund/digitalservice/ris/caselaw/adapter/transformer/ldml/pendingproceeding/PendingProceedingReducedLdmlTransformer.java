@@ -8,10 +8,7 @@ import jakarta.xml.bind.ValidationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Transformer for converting pending proceedings to LDML format for public portal use. Implements
- * reduced meta-data mapping for public access.
- */
+/** Transformer for converting pending proceedings to the reduced LDML format */
 @Slf4j
 public class PendingProceedingReducedLdmlTransformer
     extends PendingProceedingCommonLdmlTransformer {

@@ -6,7 +6,6 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validate;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
-import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
@@ -25,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
@@ -32,23 +32,13 @@ import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.mapping.MappingException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Abstract base class for transforming pending proceedings into LDML case law format. Provides
@@ -58,10 +48,10 @@ import org.xml.sax.SAXException;
 public abstract class PendingProceedingCommonLdmlTransformer
     implements DocumentationUnitLdmlTransformer<PendingProceeding> {
 
-  private final DocumentBuilderFactory documentBuilderFactory;
+  protected final HtmlTransformer htmlTransformer;
 
   protected PendingProceedingCommonLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
-    this.documentBuilderFactory = documentBuilderFactory;
+    this.htmlTransformer = new HtmlTransformer(documentBuilderFactory);
   }
 
   public CaseLawLdml transformToLdml(PendingProceeding pendingProceeding) {
@@ -100,7 +90,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
             fallbackTitle);
 
     validateNotNull(title, "Title missing");
-    return JaxbHtml.build(htmlStringToObjectList(title));
+    return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(title));
   }
 
   protected RisMeta.RisMetaBuilder buildCommonRisMeta(PendingProceeding pendingProceeding) {
@@ -150,7 +140,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
     builder
         .motivation(
             JaxbHtml.build(
-                htmlStringToObjectList(
+                htmlTransformer.htmlStringToObjectList(
                     nullSafeGet(shortTexts, PendingProceedingShortTexts::legalIssue))))
         .introduction(buildIntroduction(pendingProceeding))
         .background(null)
@@ -179,11 +169,11 @@ public abstract class PendingProceedingCommonLdmlTransformer
           .withBlock(
               AknEmbeddedStructureInBlock.Appellant.NAME,
               AknEmbeddedStructureInBlock.Appellant.build(
-                  JaxbHtml.build(htmlStringToObjectList(appellant))))
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(appellant))))
           .withBlock(
               AknEmbeddedStructureInBlock.AdmissionOfAppeal.NAME,
               AknEmbeddedStructureInBlock.AdmissionOfAppeal.build(
-                  JaxbHtml.build(htmlStringToObjectList(admissionOfAppeal))));
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(admissionOfAppeal))));
     }
     return null;
   }
@@ -198,7 +188,7 @@ public abstract class PendingProceedingCommonLdmlTransformer
           .withBlock(
               AknEmbeddedStructureInBlock.ResolutionNote.NAME,
               AknEmbeddedStructureInBlock.ResolutionNote.build(
-                  JaxbHtml.build(htmlStringToObjectList(resolutionNote))));
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(resolutionNote))));
     }
     return null;
   }
@@ -267,37 +257,6 @@ public abstract class PendingProceedingCommonLdmlTransformer
 
   protected List<FrbrAlias> generateAliases(PendingProceeding pendingProceeding) {
     return List.of(new FrbrAlias("uebergreifende-id", pendingProceeding.uuid().toString()));
-  }
-
-  protected List<Object> htmlStringToObjectList(String html) {
-    if (StringUtils.isBlank(html)) {
-      return Collections.emptyList();
-    }
-
-    html = html.replace("&nbsp;", "&#160;");
-
-    // Pre-process:
-    // HTML allows tags that are not closed. However, XML does not. That's why we do
-    // this string-manipulation based workaround of closing the img and br tag.
-    // Colgroup are style elements for columns in table and are not needed */
-    html =
-        html.replaceAll("(<img\\b[^>]*?)(?<!/)>", "$1/>")
-            .replaceAll("<\\s*br\\s*>(?!\\s*<\\s*/\\s*br\\s*>)", "<br/>")
-            .replaceAll("<colgroup[^>]*>.*?</colgroup>", "");
-
-    try {
-      String wrapped = "<wrapper>" + html + "</wrapper>";
-
-      DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-      Document doc = builder.parse(new InputSource(new StringReader(wrapped)));
-
-      NodeList childNodes = doc.getDocumentElement().getChildNodes();
-
-      return XmlUtilService.toList(childNodes).stream().map(e -> (Object) e).toList();
-    } catch (ParserConfigurationException | IOException | SAXException e) {
-      log.error("Xml transformation error.", e);
-      throw new MappingException(e.getMessage());
-    }
   }
 
   protected void validateCoreData(PendingProceeding pendingProceeding) throws ValidationException {
