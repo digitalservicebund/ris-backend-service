@@ -166,8 +166,7 @@ function handleReset() {
 }
 
 const createNew = async () => {
-  const routeData = router.resolve({ name: "caselaw-pending-proceeding-new" })
-  window.open(routeData.href, "_blank")
+  await router.push({ name: "caselaw-pending-proceeding-new" })
 }
 
 async function createNewFromSearch() {
@@ -190,11 +189,10 @@ async function createNewFromSearch() {
     return
   }
 
-  const routeData = router.resolve({
+  await router.push({
     name: "caselaw-pending-proceeding-documentNumber-categories",
     params: { documentNumber: createResponse.data.documentNumber },
   })
-  window.open(routeData.href, "_blank")
 }
 </script>
 

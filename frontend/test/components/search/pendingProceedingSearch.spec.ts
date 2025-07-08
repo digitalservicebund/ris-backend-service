@@ -60,6 +60,7 @@ function renderComponent(
         stubs: stubs ?? undefined,
       },
     }),
+    router: router,
   }
 }
 
@@ -145,11 +146,10 @@ describe("Pending Proceeding Search", () => {
     expect(screen.getByText("Etwas ist schiefgelaufen")).toBeInTheDocument()
   })
 
-  it("opens new tab when 'Neues Anhängiges Verfahren erstellen' is clicked", async () => {
+  it("opens new document when 'Neues Anhängiges Verfahren erstellen' is clicked", async () => {
     // Arrange
-    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null)
-
-    const { user } = renderComponent()
+    mockNoSearchResult()
+    const { user, router } = renderComponent()
     expect(
       screen.getByText(
         "Starten Sie die Suche oder erstellen Sie ein neues Anhängiges Verfahren.",
@@ -165,13 +165,12 @@ describe("Pending Proceeding Search", () => {
     await user.click(screen.getByText("Neues Anhängiges Verfahren erstellen"))
 
     // Assert
-    expect(openSpy).toHaveBeenCalledWith(
+    expect(router.currentRoute.value.fullPath).toBe(
       "/caselaw/pendingProceeding/new",
-      "_blank",
     )
   })
 
-  it("opens new tab when 'Übernehmen und fortfahren' is clicked", async () => {
+  it("opens new document when 'Übernehmen und fortfahren' is clicked", async () => {
     // Arrange
     mockNoSearchResult()
     vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
@@ -182,9 +181,8 @@ describe("Pending Proceeding Search", () => {
         }),
       }),
     )
-    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null)
 
-    const { user } = renderComponent()
+    const { user, router } = renderComponent()
     await user.type(
       screen.getByLabelText("Aktenzeichen Suche"),
       "TEST Aktenzeigen",
@@ -207,12 +205,9 @@ describe("Pending Proceeding Search", () => {
     await user.click(screen.getByText("Übernehmen und fortfahren"))
 
     // Assert
-    expect(openSpy).toHaveBeenCalledWith(
+    expect(router.currentRoute.value.fullPath).toBe(
       "/caselaw/pendingProceeding/1234567891234/categories",
-      "_blank",
     )
-    // Needs to be reset in order to clean data for next tests
-    await user.click(screen.getByText("Suche zurücksetzen"))
   })
 
   it("hides create new button for external users", async () => {

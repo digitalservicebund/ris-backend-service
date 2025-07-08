@@ -157,8 +157,7 @@ async function handleReset() {
 
 const createFromSearchQueryResponseError = ref<ResponseError | undefined>()
 const createNew = async () => {
-  const routeData = router.resolve({ name: "caselaw-documentUnit-new" })
-  window.open(routeData.href, "_blank")
+  await router.push({ name: "caselaw-documentUnit-new" })
 }
 
 /**
