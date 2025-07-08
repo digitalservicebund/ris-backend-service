@@ -68,7 +68,7 @@ const handleNewDocumentationUnitClick = async () => {
       ></Button>
     </div>
     <Tabs v-model:value="value" lazy>
-      <TabList v-if="documentationOfficeAbbreviation === 'BFH'">
+      <TabList v-if="documentationOfficeAbbreviation === 'BFH'" class="-mt-64">
         <Tab data-testid="search-tab-caselaw" value="0">Rechtsprechung</Tab>
         <Tab data-testid="search-tab-pending-proceeding" value="1"
           >Anhängige Verfahren</Tab
