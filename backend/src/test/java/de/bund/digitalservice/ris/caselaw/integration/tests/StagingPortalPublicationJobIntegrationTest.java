@@ -125,8 +125,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   @Test
   void shouldPublishWithAllowedStagingData() throws IOException {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("1"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("1"));
     ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
     ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
 
@@ -164,11 +163,9 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   @Test
   void shouldOnlyAddDocumentNumberToChangelogForLatestKindOfJob() throws IOException {
     DocumentationUnitDTO dto1 =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("1"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("1"));
     DocumentationUnitDTO dto2 =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("2"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("2"));
 
     portalPublicationJobRepository.saveAll(
         List.of(
@@ -232,11 +229,9 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   @Test
   void shouldContinueExecutionOnError() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("1"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("1"));
     DocumentationUnitDTO dto2 =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("2"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("2"));
 
     // PUBLISH job and upload changelog will fail
     when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
@@ -272,8 +267,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   // receive deletion jobs for non-existing documents -> we ignore them by marking them as success
   void executePendingJobs_withFailedDeletionJob_shouldMarkJobAsSuccess() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("1"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("1"));
 
     // DELETE job will fail as the file is missing
     doThrow(NoSuchKeyException.class).when(s3Client).deleteObject(any(Consumer.class));

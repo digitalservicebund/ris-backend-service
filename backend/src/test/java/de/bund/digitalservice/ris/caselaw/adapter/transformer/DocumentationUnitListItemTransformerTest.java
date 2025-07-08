@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
@@ -25,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 class DocumentationUnitListItemTransformerTest {
   @Test
-  void testTransformToDomain_shouldTransformAllFields() {
+  void testTransformToDomain_withDecision_shouldTransformAllFields() {
     UUID id = UUID.randomUUID();
     DocumentationUnitListItemDTO currentDto =
         DecisionDTO.builder()
@@ -85,6 +86,62 @@ class DocumentationUnitListItemTransformerTest {
     assertThat(documentationUnitListItem.status().publicationStatus())
         .isEqualTo(PublicationStatus.PUBLISHED);
     assertThat(documentationUnitListItem.status().withError()).isFalse();
+  }
+
+  @Test
+  void testTransformToDomain_withPendingProceeding_shouldTransformAllFields() {
+    UUID id = UUID.randomUUID();
+    DocumentationUnitListItemDTO currentDto =
+        PendingProceedingDTO.builder()
+            .id(id)
+            .court(CourtDTO.builder().type("LG").location("Berlin").build())
+            .documentType(DocumentTypeDTO.builder().abbreviation("Urt").build())
+            .fileNumbers(List.of(FileNumberDTO.builder().value("1 BvR 1234/19").build()))
+            .date(LocalDate.parse("2021-01-01"))
+            .judicialBody("1. Senat")
+            .resolutionNote("resolutionNode")
+            .scheduledPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
+            .lastPublicationDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
+            .isResolved(true)
+            .legalIssue("legalIssue")
+            .admissionOfAppeal("admissionOfAppeal")
+            .appellant("appellant")
+            .resolutionDate(LocalDate.parse("2025-07-01"))
+            .status(
+                StatusDTO.builder()
+                    .createdAt(Instant.now())
+                    .publicationStatus(PublicationStatus.PUBLISHED)
+                    .withError(false)
+                    .build())
+            .build();
+
+    DocumentationUnitListItem documentationUnitListItem =
+        DocumentationUnitListItemTransformer.transformToDomain(currentDto);
+
+    // basic data
+    assertThat(documentationUnitListItem.court())
+        .isEqualTo(
+            Court.builder()
+                .type("LG")
+                .location("Berlin")
+                .label("LG Berlin")
+                .jurisdictionType("")
+                .region("")
+                .build());
+    assertThat(documentationUnitListItem.documentType())
+        .isEqualTo(DocumentType.builder().jurisShortcut("Urt").build());
+    assertThat(documentationUnitListItem.fileNumber()).isEqualTo("1 BvR 1234/19");
+    assertThat(documentationUnitListItem.decisionDate()).isEqualTo(LocalDate.parse("2021-01-01"));
+    assertThat(documentationUnitListItem.scheduledPublicationDateTime()).isNull();
+    assertThat(documentationUnitListItem.lastPublicationDateTime()).isNull();
+    assertThat(documentationUnitListItem.appraisalBody()).isEqualTo("1. Senat");
+    assertThat(documentationUnitListItem.hasHeadnoteOrPrinciple()).isFalse();
+    // status
+    assertThat(documentationUnitListItem.status().publicationStatus())
+        .isEqualTo(PublicationStatus.PUBLISHED);
+    assertThat(documentationUnitListItem.status().withError()).isFalse();
+    // resolution Date
+    assertThat(documentationUnitListItem.resolutionDate()).isEqualTo("2025-07-01");
   }
 
   @Test

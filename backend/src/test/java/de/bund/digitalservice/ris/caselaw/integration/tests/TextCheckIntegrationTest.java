@@ -42,7 +42,7 @@ class TextCheckIntegrationTest extends BaseIntegrationTest {
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
     documentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository,
             documentationOffice,
             DEFAULT_DOCUMENT_NUMBER + Math.random() * 1000);

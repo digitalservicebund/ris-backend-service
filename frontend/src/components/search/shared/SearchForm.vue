@@ -32,6 +32,14 @@ const isEmptySearch = computed(() => {
 
 const submitButtonError = ref()
 
+const isResolved = computed({
+  get: () =>
+    query.value?.isResolved ? JSON.parse(query.value.isResolved) : false,
+  set: (data) => {
+    query.value.isResolved = data
+  },
+})
+
 const dropdownItems: DropdownItem[] = [
   { label: "Alle", value: "" },
   { label: "Veröffentlicht", value: PublicationState.PUBLISHED },
@@ -42,63 +50,6 @@ const dropdownItems: DropdownItem[] = [
   { label: "Löschen", value: PublicationState.DELETING },
   { label: "Fremdanlage", value: PublicationState.EXTERNAL_HANDOVER_PENDING },
 ]
-
-const myDocOfficeOnly = computed({
-  get: () =>
-    query.value?.myDocOfficeOnly
-      ? JSON.parse(query.value.myDocOfficeOnly)
-      : false,
-  set: (data) => {
-    if (!data) {
-      delete query.value.withError
-      delete query.value.withDuplicateWarning
-      delete query.value.myDocOfficeOnly
-      delete query.value.scheduledOnly
-      delete query.value.publicationDate
-      resetErrors("publicationDate")
-    } else {
-      query.value.myDocOfficeOnly = "true"
-    }
-  },
-})
-
-const scheduledOnly = computed({
-  get: () =>
-    query.value?.scheduledOnly ? JSON.parse(query.value.scheduledOnly) : false,
-  set: (data) => {
-    if (!data) {
-      delete query.value.scheduledOnly
-    } else {
-      query.value.scheduledOnly = "true"
-    }
-  },
-})
-
-const withError = computed({
-  get: () =>
-    query.value?.withError ? JSON.parse(query.value.withError) : false,
-  set: (data) => {
-    if (!data) {
-      delete query.value.withError
-    } else {
-      query.value.withError = "true"
-    }
-  },
-})
-
-const withDuplicateWarning = computed({
-  get: () =>
-    query.value?.withDuplicateWarning
-      ? JSON.parse(query.value.withDuplicateWarning)
-      : false,
-  set: (data) => {
-    if (!data) {
-      delete query.value.withDuplicateWarning
-    } else {
-      query.value.withDuplicateWarning = "true"
-    }
-  },
-})
 
 function resetSearch() {
   validationStore.reset()
@@ -131,8 +82,44 @@ function hasValidationErrors() {
   return validationStore.getAll().length > 0
 }
 
-function validateSearchInput() {
-  //Startdatum fehlt
+function validateResolutionDates() {
+  //Startdatum fehlt für Erledigungsvermerk
+  if (
+    query.value?.resolutionDateEnd &&
+    !query.value?.resolutionDate &&
+    !validationStore.getByField("resolutionDate")
+  ) {
+    validationStore.add("Startdatum fehlt", "resolutionDate")
+  } else if (
+    !query.value.resolutionDateEnd &&
+    validationStore.getByMessage("Startdatum fehlt").length === 1
+  ) {
+    validationStore.remove("resolutionDate")
+  }
+
+  //Enddatum darf nicht vor Startdatum liegen für Mitteilungsdatum
+  if (
+    query.value?.resolutionDateEnd &&
+    query.value?.resolutionDate &&
+    new Date(query.value.resolutionDate) >
+      new Date(query.value.resolutionDateEnd)
+  ) {
+    if (!validationStore.getByField("resolutionDateEnd")) {
+      validationStore.add(
+        "Enddatum darf nicht vor Startdatum liegen",
+        "resolutionDateEnd",
+      )
+    }
+  } else if (
+    validationStore.getByMessage("Enddatum darf nicht vor Startdatum liegen")
+      .length === 1
+  ) {
+    validationStore.remove("resolutionDateEnd")
+  }
+}
+
+function validateDecisionDates() {
+  //Startdatum fehlt für Mitteilungsdatum
   if (
     query.value?.decisionDateEnd &&
     !query.value?.decisionDate &&
@@ -146,7 +133,7 @@ function validateSearchInput() {
     validationStore.remove("decisionDate")
   }
 
-  //Enddatum darf nicht vor Startdatum liegen
+  //Enddatum darf nicht vor Startdatum liegen für Mitteilungsdatum
   if (
     query.value?.decisionDateEnd &&
     query.value?.decisionDate &&
@@ -164,6 +151,11 @@ function validateSearchInput() {
   ) {
     validationStore.remove("decisionDateEnd")
   }
+}
+
+function validateSearchInput() {
+  validateDecisionDates()
+  validateResolutionDates()
 }
 
 function handleLocalInputError(error: ValidationError | undefined, id: string) {
@@ -220,28 +212,23 @@ watch(
 <template>
   <div
     v-ctrl-enter="handleSearchButtonClicked"
-    class="pyb-24 mb-32 flex flex-col bg-blue-200"
-    data-testid="document-unit-search-entry-form"
+    class="flex flex-col bg-blue-200"
   >
     <div
-      class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
+      class="m-40 grid grid-cols-[100px_1fr_200px_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-x-12 gap-y-20 [grid-template-areas:'az-label_az-input_docnumber-label_docnumber-input''court-label_court-input_status-label_status-input''date-label_date-input_resolution-date-label_resolution-date-input''publication-label_publication-input_._resolution-input''._._._search-button'] lg:gap-x-32"
     >
-      <!-- Column 1 -->
-      <div class="ris-body1-regular ml-3 flex flex-row items-center">
+      <div
+        class="ris-body1-regular ml-3 flex flex-row items-center [grid-area:az-label]"
+      >
         Aktenzeichen
       </div>
-      <div class="ris-body1-regular flex flex-row items-center">Gericht</div>
-      <div class="ris-body1-regular flex flex-row items-center">Datum</div>
       <div
-        v-if="myDocOfficeOnly"
-        class="ris-body1-regular flex flex-row items-center"
+        class="ris-body1-regular flex flex-row items-center [grid-area:court-label]"
       >
-        jDV Übergabe
+        Gericht
       </div>
-      <div v-if="!myDocOfficeOnly" />
-      <div></div>
-      <!-- Column 2 -->
-      <div>
+
+      <div class="[grid-area:az-input]">
         <InputField
           id="fileNumber"
           v-slot="{ id }"
@@ -258,7 +245,7 @@ watch(
           ></InputText>
         </InputField>
       </div>
-      <div class="flex flex-row gap-10">
+      <div class="flex flex-row gap-10 [grid-area:court-input]">
         <InputField
           id="courtType"
           v-slot="{ id }"
@@ -293,104 +280,17 @@ watch(
           ></InputText>
         </InputField>
       </div>
-      <div class="flex flex-row gap-10">
-        <InputField
-          id="decisionDate"
-          v-slot="{ id, hasError }"
-          data-testid="decision-date-input"
-          label="Entscheidungsdatum"
-          :validation-error="validationStore.getByField('decisionDate')"
-          visually-hide-label
-        >
-          <DateInput
-            :id="id"
-            v-model="query.decisionDate"
-            aria-label="Entscheidungsdatum Suche"
-            :has-error="hasError"
-            @blur="validateSearchInput"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-            @update:validation-error="
-              (validationError: ValidationError | undefined) =>
-                handleLocalInputError(validationError, id)
-            "
-          ></DateInput>
-        </InputField>
-        <span class="pt-6">-</span>
-        <InputField
-          id="decisionDateEnd"
-          v-slot="{ id, hasError }"
-          data-testid="decision-date-end-input"
-          label="Entscheidungsdatum Ende"
-          :validation-error="validationStore.getByField('decisionDateEnd')"
-          visually-hide-label
-        >
-          <DateInput
-            :id="id"
-            v-model="query.decisionDateEnd"
-            aria-label="Entscheidungsdatum Suche Ende"
-            :has-error="hasError"
-            placeholder="TT.MM.JJJJ (optional)"
-            @blur="validateSearchInput"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-            @update:validation-error="
-              (validationError: ValidationError | undefined) =>
-                handleLocalInputError(validationError, id)
-            "
-          ></DateInput>
-        </InputField>
-      </div>
-      <div v-if="myDocOfficeOnly" class="flex flex-row gap-20">
-        <InputField
-          id="publicationDate"
-          v-slot="{ id, hasError }"
-          data-testid="publication-date-input"
-          label="jDV Übergabedatum"
-          :validation-error="validationStore.getByField('publicationDate')"
-          visually-hide-label
-        >
-          <DateInput
-            :id="id"
-            v-model="query.publicationDate"
-            aria-label="jDV Übergabedatum Suche"
-            :has-error="hasError"
-            is-future-date
-            @blur="validateSearchInput"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-            @update:validation-error="
-              (validationError: ValidationError | undefined) =>
-                handleLocalInputError(validationError, id)
-            "
-          ></DateInput>
-        </InputField>
-        <InputField
-          id="scheduled"
-          v-slot="{ id }"
-          label="Nur terminiert"
-          label-class="ris-label1-regular"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <Checkbox
-            v-model="scheduledOnly"
-            aria-label="Terminiert Filter"
-            binary
-            :input-id="id"
-          />
-        </InputField>
-      </div>
-      <div v-if="!myDocOfficeOnly" />
-      <div class="pl-32"></div>
-      <!-- Column 3 -->
-      <div class="ris-body1-regular flex flex-row items-center pl-24 lg:pl-48">
+      <div
+        class="ris-body1-regular flex flex-row items-center pl-24 [grid-area:docnumber-label] lg:pl-48"
+      >
         Dokumentnummer
       </div>
-      <div class="ris-body1-regular flex flex-row items-center pl-24 lg:pl-48">
+      <div
+        class="ris-body1-regular flex flex-row items-center pl-24 [grid-area:status-label] lg:pl-48"
+      >
         Status
       </div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <!-- Column 4 -->
-      <div class="">
+      <div class="[grid-area:docnumber-input]">
         <InputField
           id="documentNumber"
           v-slot="{ id }"
@@ -407,7 +307,7 @@ watch(
           ></InputText>
         </InputField>
       </div>
-      <div class="">
+      <div class="flex flex-row gap-10 [grid-area:status-input]">
         <InputField
           id="status"
           v-slot="{ id }"
@@ -427,58 +327,129 @@ watch(
           />
         </InputField>
       </div>
-      <div class="flex flex-row gap-20">
-        <InputField
-          id="documentationOffice"
-          v-slot="{ id }"
-          label="Nur meine Dokstelle"
-          label-class="ris-label1-regular"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <Checkbox
-            v-model="myDocOfficeOnly"
-            aria-label="Nur meine Dokstelle Filter"
-            binary
-            :input-id="id"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-          />
-        </InputField>
-        <InputField
-          v-if="myDocOfficeOnly"
-          id="withErrorsOnly"
-          v-slot="{ id }"
-          label="Nur Fehler"
-          label-class="ris-label1-regular"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <Checkbox
-            v-model="withError"
-            aria-label="Nur fehlerhafte Dokumentationseinheiten"
-            binary
-            :input-id="id"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-          />
-        </InputField>
-        <InputField
-          v-if="myDocOfficeOnly"
-          id="withDuplicateWaring"
-          v-slot="{ id }"
-          label="Dublettenverdacht"
-          label-class="ris-label1-regular"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <Checkbox
-            v-model="withDuplicateWarning"
-            aria-label="Dokumentationseinheiten mit Dublettenverdacht"
-            binary
-            :input-id="id"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-        /></InputField>
+      <div
+        class="ris-body1-regular flex flex-row items-center [grid-area:date-label]"
+      >
+        Mitteilungsdatum
       </div>
-      <div class="flex flex-row">
+      <div
+        class="ris-body1-regular flex flex-row items-center pl-24 [grid-area:resolution-date-label] lg:pl-48"
+      >
+        Erledigungsmitteilung
+      </div>
+      <div class="flex flex-row gap-10 [grid-area:date-input]">
+        <InputField
+          id="decisionDate"
+          v-slot="{ id, hasError }"
+          data-testid="decision-date-input"
+          label="Mitteilungsdatum"
+          :validation-error="validationStore.getByField('decisionDate')"
+          visually-hide-label
+        >
+          <DateInput
+            :id="id"
+            v-model="query.decisionDate"
+            aria-label="Mitteilungsdatum Suche"
+            :has-error="hasError"
+            @blur="validateSearchInput"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+            @update:validation-error="
+              (validationError: ValidationError | undefined) =>
+                handleLocalInputError(validationError, id)
+            "
+          ></DateInput>
+        </InputField>
+        <span class="pt-6">-</span>
+        <InputField
+          id="decisionDateEnd"
+          v-slot="{ id, hasError }"
+          data-testid="decision-date-end-input"
+          label="Mitteilungsdatum Ende"
+          :validation-error="validationStore.getByField('decisionDateEnd')"
+          visually-hide-label
+        >
+          <DateInput
+            :id="id"
+            v-model="query.decisionDateEnd"
+            aria-label="Mitteilungsdatum Suche Ende"
+            :has-error="hasError"
+            placeholder="TT.MM.JJJJ (optional)"
+            @blur="validateSearchInput"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+            @update:validation-error="
+              (validationError: ValidationError | undefined) =>
+                handleLocalInputError(validationError, id)
+            "
+          ></DateInput>
+        </InputField>
+      </div>
+      <div class="flex flex-row gap-10 [grid-area:resolution-date-input]">
+        <InputField
+          id="resolutionDate"
+          v-slot="{ id, hasError }"
+          data-testid="resolution-date-input"
+          label="Erledigungsmitteilung"
+          :validation-error="validationStore.getByField('resolutionDate')"
+          visually-hide-label
+        >
+          <DateInput
+            :id="id"
+            v-model="query.resolutionDate"
+            aria-label="Erledigungsmitteilung Suche"
+            :has-error="hasError"
+            @blur="validateSearchInput"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+            @update:validation-error="
+              (validationError: ValidationError | undefined) =>
+                handleLocalInputError(validationError, id)
+            "
+          ></DateInput>
+        </InputField>
+        <span class="pt-6">-</span>
+        <InputField
+          id="resolutionDateEnd"
+          v-slot="{ id, hasError }"
+          data-testid="resolution-date-end-input"
+          label="Erledigungsmitteilung Ende"
+          :validation-error="validationStore.getByField('resolutionDateEnd')"
+          visually-hide-label
+        >
+          <DateInput
+            :id="id"
+            v-model="query.resolutionDateEnd"
+            aria-label="Erledigungsmitteilung Suche Ende"
+            :has-error="hasError"
+            placeholder="TT.MM.JJJJ (optional)"
+            @blur="validateSearchInput"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+            @update:validation-error="
+              (validationError: ValidationError | undefined) =>
+                handleLocalInputError(validationError, id)
+            "
+          ></DateInput>
+        </InputField>
+      </div>
+      <div class="flex flex-row [grid-area:resolution-input]">
+        <InputField
+          id="resolved"
+          v-slot="{ id }"
+          label="Erledigt"
+          label-class="ris-label1-regular"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <Checkbox
+            v-model="isResolved"
+            aria-label="Erledigt Filter"
+            binary
+            :input-id="id"
+          />
+        </InputField>
+      </div>
+      <div class="flex flex-row [grid-area:search-button]">
         <div class="flex flex-col gap-8">
+          <!-- ":loading" disables button while request is running. Needed as long as we cannot cancel requests -->
           <Button
-            aria-label="Nach Dokumentationseinheiten suchen"
+            aria-label="Nach Anhängigen Verfahren suchen"
             class="self-start"
             :disabled="isLoading"
             label="Ergebnisse anzeigen"
