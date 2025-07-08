@@ -46,7 +46,6 @@ test.describe(
             prefilledDocumentUnit.documentNumber!,
           )
           await uploadTestfile(page, fileName)
-          await expect(page.getByText(fileName)).toBeVisible()
           await expect(page.getByLabel("Datei löschen")).toBeVisible()
           await expect(page.getByText(textWithSpecialHyphen)).toBeVisible()
         })

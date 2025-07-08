@@ -68,7 +68,7 @@ public class PortalPublicationJobService {
     publicationJobRepository.saveAll(pendingJobs);
 
     log.info(
-        "Portal publication jobs successfully executed: {} units published, {} units deleted.",
+        "Portal publication jobs successfully executed: {} files published, {} files deleted.",
         publicationResult.publishedCount,
         publicationResult.deletedCount);
   }
@@ -121,10 +121,10 @@ public class PortalPublicationJobService {
           deletedDocNumbers.addAll(result.deletedPaths());
         });
 
-    var duplicates = new ArrayList<>(publishDocNumbers);
-    duplicates.retainAll(deletedDocNumbers);
+    var changedAndDeletedDocNumbers = new ArrayList<>(publishDocNumbers);
+    changedAndDeletedDocNumbers.retainAll(deletedDocNumbers);
 
-    duplicates.forEach(
+    changedAndDeletedDocNumbers.forEach(
         duplicate -> {
           var job = jobsWithoutDuplicates.get(duplicate);
           if (job == null) {

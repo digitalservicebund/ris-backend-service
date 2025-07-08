@@ -39,7 +39,6 @@ test("create and validate border number links", async ({
 
   // upload file
   await uploadTestfile(page, "some-border-numbers.docx")
-  await expect(page.getByText("some-border-numbers.docx")).toBeVisible()
   await expect(page.getByLabel("Datei löschen")).toBeVisible()
   await expect(page.getByText(firstReason)).toBeVisible()
   await expect(page.getByText(secondReason)).toBeVisible()

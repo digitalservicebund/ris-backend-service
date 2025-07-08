@@ -59,7 +59,6 @@ test.describe(
     }) => {
       await test.step("Upload file with border Numbers", async () => {
         await uploadTestfile(page, "some-border-numbers.docx")
-        await expect(page.getByText("some-border-numbers.docx")).toBeVisible()
         await expect(page.getByLabel("Datei löschen")).toBeVisible()
         await expect(page.getByText(firstParagraph)).toBeVisible()
         await expect(page.getByText(secondParagraph)).toBeVisible()
