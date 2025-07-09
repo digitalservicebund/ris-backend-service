@@ -182,7 +182,7 @@ dependencies {
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.43")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.51"))
+    implementation(platform("software.amazon.awssdk:bom:2.31.77"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
