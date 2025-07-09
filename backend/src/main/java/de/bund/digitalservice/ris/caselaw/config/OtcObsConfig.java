@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.checksums.RequestChecksumCalculation;
-import software.amazon.awssdk.core.checksums.ResponseChecksumValidation;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
@@ -49,8 +47,6 @@ public class OtcObsConfig {
                 AwsBasicCredentials.create(docxAccessKeyId, docxSecretAccessKey)))
         .endpointOverride(new URI(endpoint))
         .region(Region.of(EU_DE))
-        .responseChecksumValidation(ResponseChecksumValidation.WHEN_REQUIRED)
-        .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
         .build();
   }
 
@@ -63,8 +59,6 @@ public class OtcObsConfig {
                 AwsBasicCredentials.create(portalAccessKeyId, portalSecretAccessKey)))
         .endpointOverride(new URI(endpoint))
         .region(Region.of(EU_DE))
-        .responseChecksumValidation(ResponseChecksumValidation.WHEN_REQUIRED)
-        .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
         .build();
   }
 
@@ -83,8 +77,6 @@ public class OtcObsConfig {
                 AwsBasicCredentials.create(prototypePortalAccessKeyId, prototypePortalAccessKey)))
         .endpointOverride(new URI(endpoint))
         .region(Region.of(EU_DE))
-        .responseChecksumValidation(ResponseChecksumValidation.WHEN_REQUIRED)
-        .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
         .build();
   }
 
