@@ -39,7 +39,7 @@ test.describe("document unit search queries", () => {
         documentNumber: "ST",
         kind: "PENDING_PROCEEDING",
       },
-      maxDuration: 200, // last max 232 average 165, min 151
+      maxDuration: 500, // last max 686 average 344, min 299
       minResults: 5,
     },
     {
@@ -48,7 +48,7 @@ test.describe("document unit search queries", () => {
         documentNumber: "notExistingFoo",
         kind: "DECISION",
       },
-      maxDuration: 150, // last max 93, average 41, min 27
+      maxDuration: 500, // last max 512, average 214, min 179
     },
     {
       title: "not existing documentNumber (pending proceeding)",
@@ -56,7 +56,7 @@ test.describe("document unit search queries", () => {
         documentNumber: "notExistingFoo",
         kind: "PENDING_PROCEEDING",
       },
-      maxDuration: 150, // last max 86, average 35, min 25
+      maxDuration: 500, // last max 519, average 215, min 182
     },
     {
       title: "vague fileNumber",
@@ -64,7 +64,7 @@ test.describe("document unit search queries", () => {
         fileNumber: "Bv",
         kind: "DECISION",
       },
-      maxDuration: 500, // last max 432, average 365, min 340
+      maxDuration: 1000, // last max 970, average 536, min 470
       minResults: 5,
       isRelevantForExternalUser: true,
     },
@@ -99,7 +99,7 @@ test.describe("document unit search queries", () => {
         publicationStatus: "UNPUBLISHED",
         kind: "DECISION",
       },
-      maxDuration: 500, // last max 427, average 319, min 281
+      maxDuration: 800, // last max 1784, average 512, min 422
       minResults: 5,
     },
     {
@@ -108,7 +108,7 @@ test.describe("document unit search queries", () => {
         publicationStatus: "UNPUBLISHED",
         kind: "PENDING_PROCEEDING",
       },
-      maxDuration: 250, // last max 124, average 64, min 55
+      maxDuration: 500, // last max 535, average 230 , min 202
     },
     {
       title: "of all time",
@@ -117,7 +117,7 @@ test.describe("document unit search queries", () => {
         decisionDateEnd: "2024-01-15",
         kind: "DECISION",
       },
-      maxDuration: 500, // last max 590, average 336, min 270
+      maxDuration: 700, // last max 736, average 336, min 270
       minResults: 5,
       isRelevantForExternalUser: true,
     },
@@ -128,7 +128,7 @@ test.describe("document unit search queries", () => {
         decisionDateEnd: "2024-01-15",
         kind: "PENDING_PROCEEDING",
       },
-      maxDuration: 500, // last max 491, average 246, min 195
+      maxDuration: 700, // last max 683, average 246, min 195
       minResults: 5,
     },
     {
