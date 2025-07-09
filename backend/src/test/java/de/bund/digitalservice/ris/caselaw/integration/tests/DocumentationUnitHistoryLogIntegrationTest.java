@@ -56,7 +56,7 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
   @Test
   void getHistoryLogs_fromExistingDocumentationUnit() {
     UUID entityId =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
                 repository,
                 DecisionDTO.builder()
                     .documentationOffice(documentationOffice)
@@ -112,7 +112,7 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
   @Test
   void saveHistoryLogs_multipleUpdateEventsAreMerged() throws DocumentationUnitNotExistsException {
     var docUnit =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentationOffice(documentationOffice)
@@ -177,7 +177,7 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
   @Test
   void getHistoryLogs_returnsEmptyList_whenNoLogsExist() {
     UUID entityId =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
                 repository,
                 DecisionDTO.builder()
                     .documentationOffice(documentationOffice)

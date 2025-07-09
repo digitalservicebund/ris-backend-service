@@ -109,9 +109,9 @@ public class EntityBuilderTestUtil {
         .build();
   }
 
-  public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
+  public static DocumentationUnitDTO createAndSaveDecision(
       DatabaseDocumentationUnitRepository repository, DocumentationOfficeDTO documentationOffice) {
-    return createAndSavePublishedDocumentationUnit(
+    return createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber(DEFAULT_DOCUMENT_NUMBER)
@@ -119,13 +119,13 @@ public class EntityBuilderTestUtil {
         null);
   }
 
-  public static DocumentationUnitDTO createAndSavePendingDocumentationUnit(
+  public static DocumentationUnitDTO createAndSaveDecision(
       DatabaseDocumentationUnitRepository repository,
       DocumentationOfficeDTO documentationOffice,
       DocumentationOfficeDTO creatingDocumentationOffice,
       String documentNumber) {
 
-    return createAndSavePublishedDocumentationUnit(
+    return createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber(documentNumber)
@@ -134,11 +134,11 @@ public class EntityBuilderTestUtil {
         EXTERNAL_HANDOVER_PENDING);
   }
 
-  public static DecisionDTO createAndSavePublishedDocumentationUnit(
+  public static DecisionDTO createAndSaveDecision(
       DatabaseDocumentationUnitRepository repository,
       DocumentationOfficeDTO documentationOffice,
       String documentNumber) {
-    return createAndSavePublishedDocumentationUnit(
+    return createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber(documentNumber)
@@ -146,20 +146,20 @@ public class EntityBuilderTestUtil {
         null);
   }
 
-  public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
+  public static DocumentationUnitDTO createAndSaveDecision(
       DatabaseDocumentationUnitRepository repository,
       DecisionDTO.DecisionDTOBuilder<?, ?> builder) {
-    return createAndSavePublishedDocumentationUnit(repository, builder, null);
+    return createAndSaveDecision(repository, builder, null);
   }
 
-  public static DecisionDTO createAndSavePublishedDocumentationUnit(
+  public static DecisionDTO createAndSaveDecision(
       DatabaseDocumentationUnitRepository repository,
       DecisionDTO.DecisionDTOBuilder<?, ?> builder,
       PublicationStatus publicationStatus) {
-    return createAndSavePublishedDocumentationUnit(repository, builder, publicationStatus, false);
+    return createAndSaveDecision(repository, builder, publicationStatus, false);
   }
 
-  public static DecisionDTO createAndSavePublishedDocumentationUnit(
+  public static DecisionDTO createAndSaveDecision(
       DatabaseDocumentationUnitRepository repository,
       DecisionDTO.DecisionDTOBuilder<?, ?> builder,
       PublicationStatus publicationStatus,
@@ -167,18 +167,23 @@ public class EntityBuilderTestUtil {
 
     var dtoBeforeSave = builder.build();
 
-    // FileNumbers need back reference to docUnit -> needs to be saved first without them
+    // FileNumbers and attachments need back reference to docUnit -> needs to be saved first without
+    // them
     var fileNumbers = dtoBeforeSave.getFileNumbers();
     dtoBeforeSave.setFileNumbers(null);
     var deviatingFileNumbers = dtoBeforeSave.getDeviatingFileNumbers();
     dtoBeforeSave.setDeviatingFileNumbers(null);
+    var attachments = dtoBeforeSave.getAttachments();
+    dtoBeforeSave.setAttachments(null);
 
     DecisionDTO dto = repository.save(dtoBeforeSave);
 
     fileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
     deviatingFileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
+    attachments.forEach(a -> a.setDocumentationUnit(dto));
     dto.setFileNumbers(fileNumbers);
     dto.setDeviatingFileNumbers(deviatingFileNumbers);
+    dto.setAttachments(attachments);
 
     return repository.save(
         dto.toBuilder()
@@ -193,13 +198,32 @@ public class EntityBuilderTestUtil {
             .build());
   }
 
-  public static PendingProceedingDTO createAndSavePublishedPendingProceeding(
+  public static void createAndSavePendingProceeding(
       DatabaseDocumentationUnitRepository repository,
-      PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> builder) {
-    return createAndSavePublishedPendingProceeding(repository, builder, null, false);
+      DocumentationOfficeDTO documentationOffice,
+      String documentNumber) {
+    createAndSavePendingProceeding(
+        repository,
+        PendingProceedingDTO.builder()
+            .documentNumber(documentNumber)
+            .documentationOffice(documentationOffice),
+        null);
   }
 
-  public static PendingProceedingDTO createAndSavePublishedPendingProceeding(
+  public static void createAndSavePendingProceeding(
+      DatabaseDocumentationUnitRepository repository,
+      PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> builder) {
+    createAndSavePendingProceeding(repository, builder, null, false);
+  }
+
+  public static void createAndSavePendingProceeding(
+      DatabaseDocumentationUnitRepository repository,
+      PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> builder,
+      PublicationStatus publicationStatus) {
+    createAndSavePendingProceeding(repository, builder, publicationStatus, false);
+  }
+
+  public static void createAndSavePendingProceeding(
       DatabaseDocumentationUnitRepository repository,
       PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> builder,
       PublicationStatus publicationStatus,
@@ -220,7 +244,7 @@ public class EntityBuilderTestUtil {
     dto.setFileNumbers(fileNumbers);
     dto.setDeviatingFileNumbers(deviatingFileNumbers);
 
-    return repository.save(
+    repository.save(
         dto.toBuilder()
             .status(
                 StatusDTO.builder()

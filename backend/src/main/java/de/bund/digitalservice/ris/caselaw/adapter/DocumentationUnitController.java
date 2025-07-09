@@ -273,6 +273,9 @@ public class DocumentationUnitController {
       @RequestParam(value = "withError") Optional<Boolean> withError,
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
       @RequestParam(value = "withDuplicateWarning") Optional<Boolean> withDuplicateWarning,
+      @RequestParam(value = "resolutionDate") Optional<LocalDate> resolutionDate,
+      @RequestParam(value = "resolutionDateEnd") Optional<LocalDate> resolutionDateEnd,
+      @RequestParam(value = "isResolved") Optional<Boolean> isResolved,
       @RequestParam(value = "inboxStatus") Optional<InboxStatus> inboxStatus,
       @RequestParam(value = "kind") Optional<Kind> kind,
       @AuthenticationPrincipal OidcUser oidcUser) {
@@ -292,6 +295,9 @@ public class DocumentationUnitController {
         withError,
         myDocOfficeOnly,
         withDuplicateWarning,
+        resolutionDate,
+        resolutionDateEnd,
+        isResolved,
         inboxStatus,
         kind);
   }
@@ -519,6 +525,7 @@ public class DocumentationUnitController {
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(getMediaType(contentType));
       headers.setContentLength(imageBytes.length);
+      headers.setCacheControl(CacheControl.maxAge(Duration.ofDays(1)));
 
       return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     } catch (DocumentationUnitNotExistsException e) {

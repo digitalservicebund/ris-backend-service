@@ -14,7 +14,6 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.data.domain.Pageable;
@@ -82,7 +81,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   @Transactional
   public List<FieldOfLaw> findByCombinedCriteria(
-      String identifier, String descriptionSearchTerms, String norm, boolean isPrefixNormSearch) {
+      String identifier, String descriptionSearchTerms, String norm) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<FieldOfLawDTO> cq = cb.createQuery(FieldOfLawDTO.class);
     Root<FieldOfLawDTO> fieldOfLawRoot = cq.from(FieldOfLawDTO.class);
@@ -105,11 +104,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     }
 
     if (!StringUtils.isNullOrBlank(norm)) {
-      if (isPrefixNormSearch) {
-        predicates.add(getExactNormPredicate(norm, fieldOfLawRoot, cb));
-      } else {
-        predicates.addAll(getAllFieldsSearchNormsPredicates(fieldOfLawRoot, cb, norm));
-      }
+      predicates.add(getExactNormPredicate(norm, fieldOfLawRoot, cb));
     }
 
     cq.select(fieldOfLawRoot).where(predicates.toArray(Predicate[]::new));
@@ -125,31 +120,6 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .toList();
   }
 
-  private static List<Predicate> getAllFieldsSearchNormsPredicates(
-      Root<FieldOfLawDTO> fieldOfLawRoot, CriteriaBuilder cb, String normStr) {
-    var normSearchTerms = StringUtils.splitSearchTerms(normStr.replace("§", "").trim());
-
-    if (normSearchTerms != null && normSearchTerms.length > 0) {
-      List<Predicate> predicates = new ArrayList<>();
-
-      fieldOfLawRoot.fetch(NORMS, JoinType.LEFT);
-      for (String searchTerm : normSearchTerms) {
-        Predicate normAbbreviationPredicate =
-            cb.like(
-                cb.lower(fieldOfLawRoot.get(NORMS).get("abbreviation")),
-                "%" + searchTerm.toLowerCase() + "%");
-        Predicate singleNormPredicate =
-            cb.like(
-                cb.lower(fieldOfLawRoot.get(NORMS).get("singleNormDescription")),
-                "%" + searchTerm.toLowerCase() + "%");
-        Predicate combined = cb.or(normAbbreviationPredicate, singleNormPredicate);
-        predicates.add(combined);
-      }
-      return predicates;
-    }
-    return Collections.emptyList();
-  }
-
   private Predicate getExactNormPredicate(
       String normsString, Root<FieldOfLawDTO> fieldOfLawRoot, CriteriaBuilder cb) {
     Join<FieldOfLawDTO, ?> normsJoin = fieldOfLawRoot.join(NORMS, JoinType.LEFT);
@@ -159,7 +129,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
             cb.concat(cb.lower(normsJoin.get("abbreviation")), " "),
             cb.lower(normsJoin.get("singleNormDescription")));
 
-    return cb.like(combinedNorm, normsString.toLowerCase() + "%");
+    return cb.like(combinedNorm, "%" + normsString.toLowerCase() + "%");
   }
 
   @Override

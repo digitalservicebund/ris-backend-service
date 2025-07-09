@@ -246,9 +246,38 @@
         </akn:b>
     </xsl:template>
 
+    <xsl:template match="img">
+        <xsl:element name="akn:img">
+            <xsl:attribute name="src">
+                <xsl:call-template name="substring-after-last">
+                    <xsl:with-param name="string" select="@src"/>
+                    <xsl:with-param name="char" select="'/'"/>
+                </xsl:call-template>
+            </xsl:attribute>
+            <xsl:apply-templates select="@*[not(name()='src')] | node()"/>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template name="substring-after-last">
+        <xsl:param name="string"/>
+        <xsl:param name="char"/>
+
+        <xsl:choose>
+            <xsl:when test="contains($string, $char)">
+                <xsl:call-template name="substring-after-last">
+                    <xsl:with-param name="string" select="substring-after($string, $char)"/>
+                    <xsl:with-param name="char" select="$char"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$string"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <!--Simple renames to akn namespace. Note: some of these (like br) only apply when they don't match
     the more specific rule wrapping them when they occur in an unsupported location-->
-    <xsl:template match="a|sub|sup|span|p|div|i|b|u|del|br|ol|ul|li|img">
+    <xsl:template match="a|sub|sup|span|p|div|i|b|u|del|br|ol|ul|li">
         <xsl:element name="akn:{name()}">
             <xsl:apply-templates select="@* | node()"/>
         </xsl:element>

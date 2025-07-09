@@ -12,7 +12,9 @@ function authenticateUser(user: {
     await page.locator("input#kc-login").click()
 
     await page.goto(process.env.E2E_BASE_URL ?? "http://127.0.0.1")
-    await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible()
+    // Caution: The test needs to wait for the page to load completely
+    // Otherwise, the location cookie might not be unset and redirect to '/' on page load
+    await expect(page.getByText("Starten Sie die Suche")).toBeVisible()
 
     await page
       .context()
@@ -30,6 +32,11 @@ function authenticateUser(user: {
     name: "user_bgh",
     email: process.env.E2E_TEST_USER_BGH as string,
     password: process.env.E2E_TEST_PASSWORD_BGH as string,
+  },
+  {
+    name: "user_bfh",
+    email: process.env.E2E_TEST_USER_BFH as string,
+    password: process.env.E2E_TEST_PASSWORD_BFH as string,
   },
   {
     name: "user_external",

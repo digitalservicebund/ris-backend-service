@@ -275,6 +275,9 @@ public class DocumentationUnitService {
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly,
       Optional<Boolean> withDuplicateWarning,
+      Optional<LocalDate> resolutionDate,
+      Optional<LocalDate> resolutionDateEnd,
+      Optional<Boolean> isResolved,
       Optional<InboxStatus> inboxStatus,
       Optional<Kind> kind) {
 
@@ -299,6 +302,9 @@ public class DocumentationUnitService {
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .withDuplicateWarning(withDuplicateWarning.orElse(false))
             .inboxStatus(inboxStatus.orElse(null))
+            .resolutionDate(resolutionDate.orElse(null))
+            .resolutionDateEnd(resolutionDateEnd.orElse(null))
+            .isResolved(isResolved.orElse(false))
             .kind(kind.orElse(null))
             .build();
 
@@ -475,6 +481,7 @@ public class DocumentationUnitService {
 
     DocumentationUnit existingDocumentationUnit = getByUuid(documentationUnitId, user);
 
+    DocumentationUnit patchedDocumentationUnitWithBase64Images;
     long newVersion = 1L;
     if (existingDocumentationUnit.version() != null) {
       newVersion = existingDocumentationUnit.version() + 1;
@@ -505,29 +512,30 @@ public class DocumentationUnitService {
       if (!toUpdate.getOperations().isEmpty()) {
         toUpdate = patchMapperService.removeTextCheckTags(toUpdate);
 
+        // Saving a return patch including the base64 images as src attributes with an api path.
+        patchedDocumentationUnitWithBase64Images =
+            cloneDocumentationUnitWithNewVersion(
+                patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit),
+                newVersion);
+
+        toUpdate =
+            patchMapperService.extractAndStoreBase64Images(
+                toUpdate, existingDocumentationUnit, null);
+
         DocumentationUnit patchedDocumentationUnit =
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
 
-        if (patchedDocumentationUnit instanceof Decision docUnit) {
-          patchedDocumentationUnit = docUnit.toBuilder().version(newVersion).build();
-        } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
-          patchedDocumentationUnit = pendingProceeding.toBuilder().version(newVersion).build();
-        }
+        patchedDocumentationUnit =
+            cloneDocumentationUnitWithNewVersion(patchedDocumentationUnit, newVersion);
 
         DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
-        DocumentationUnit updatedDocumentationUnit = null;
-        if (patchedDocumentationUnit instanceof Decision docUnit) {
-          updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
-        } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
-          updatedDocumentationUnit = updatePendingProceeding(pendingProceeding, user);
-        } else {
-          throw new UnsupportedOperationException(
-              "Update not supported for Documentable type: " + patchedDocumentationUnit.getClass());
-        }
+        DocumentationUnit updatedDocumentationUnit =
+            updateDocumentationUnit(user, patchedDocumentationUnit, duplicateCheckStatus);
 
         toFrontendJsonPatch =
-            patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
+            patchMapperService.getDiffPatch(
+                patchedDocumentationUnitWithBase64Images, updatedDocumentationUnit);
 
         log.debug(
             "version {} - raw to frontend patch: {}",
@@ -575,6 +583,35 @@ public class DocumentationUnitService {
     }
 
     return toFrontend;
+  }
+
+  /** Return a documentation unit with a new version */
+  private static DocumentationUnit cloneDocumentationUnitWithNewVersion(
+      DocumentationUnit documentationUnit, long newVersion) {
+    if (documentationUnit instanceof Decision docUnit) {
+      return docUnit.toBuilder().version(newVersion).build();
+    } else if (documentationUnit instanceof PendingProceeding pendingProceeding) {
+      return pendingProceeding.toBuilder().version(newVersion).build();
+    }
+    throw new DocumentationUnitException(
+        "Update not supported for Documentable type: " + documentationUnit.getClass());
+  }
+
+  private DocumentationUnit updateDocumentationUnit(
+      User user,
+      DocumentationUnit patchedDocumentationUnit,
+      DuplicateCheckStatus duplicateCheckStatus)
+      throws DocumentationUnitNotExistsException {
+    DocumentationUnit updatedDocumentationUnit;
+    if (patchedDocumentationUnit instanceof Decision docUnit) {
+      updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
+    } else if (patchedDocumentationUnit instanceof PendingProceeding pendingProceeding) {
+      updatedDocumentationUnit = updatePendingProceeding(pendingProceeding, user);
+    } else {
+      throw new DocumentationUnitException(
+          "Update not supported for Documentable type: " + patchedDocumentationUnit.getClass());
+    }
+    return updatedDocumentationUnit;
   }
 
   public Decision updateDocumentationUnit(Decision decision)

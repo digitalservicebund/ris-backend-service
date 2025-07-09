@@ -28,7 +28,7 @@ function renderComponent(options?: { env?: Env; activeUser?: User }) {
           routes: [
             {
               path: "",
-              name: "caselaw",
+              name: "caselaw-search",
               component: {},
             },
             {
@@ -41,11 +41,7 @@ function renderComponent(options?: { env?: Env; activeUser?: User }) {
               name: "caselaw-periodical-evaluation",
               component: {},
             },
-            {
-              path: "",
-              name: "search",
-              component: {},
-            },
+
             {
               path: "",
               name: "caselaw-inbox",

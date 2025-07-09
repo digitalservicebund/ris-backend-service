@@ -33,4 +33,8 @@ public class RisResponseSpec {
   public RisHeaderAssertions expectHeader() {
     return new RisHeaderAssertions(resultActions, this);
   }
+
+  public RisHeaderAssertions and() {
+    return new RisHeaderAssertions(resultActions, this);
+  }
 }

@@ -86,6 +86,8 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     predicates.addAll(getPublicationDatePredicates(parameters, cb, root));
     predicates.addAll(getInboxStatusPredicates(parameters, cb, root));
     predicates.addAll(getDuplicateWarningPredicates(parameters, cq, cb, root));
+    predicates.addAll(getResolutionDatePredicates(parameters, cb, root));
+    predicates.addAll(getIsResolvedPredicates(parameters, cb, root));
     predicates.addAll(getFileNumberPredicates(parameters, cq, cb, root));
     predicates.addAll(getDocUnitKindPredicates(parameters, cb, root));
 
@@ -176,6 +178,45 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
             cb.equal(root.get(DocumentationUnitDTO_.date), parameters.decisionDate.get());
       }
       predicates.add(decisionDatePredicate);
+    }
+    return predicates;
+  }
+
+  private List<Predicate> getResolutionDatePredicates(
+      SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
+    List<Predicate> predicates = new ArrayList<>();
+
+    if (parameters.resolutionDate.isPresent()) {
+      // Use cb.treat() to downcast the root to PendingProceedingDTO
+      Root<PendingProceedingDTO> pendingProceedingRoot = cb.treat(root, PendingProceedingDTO.class);
+
+      Predicate resolutionDatePredicate;
+      if (parameters.resolutionDateEnd.isPresent()) {
+        resolutionDatePredicate =
+            cb.between(
+                pendingProceedingRoot.get(PendingProceedingDTO_.resolutionDate),
+                parameters.resolutionDate.get(),
+                parameters.resolutionDateEnd.get());
+      } else {
+        resolutionDatePredicate =
+            cb.equal(
+                pendingProceedingRoot.get(PendingProceedingDTO_.resolutionDate),
+                parameters.resolutionDate.get());
+      }
+      predicates.add(resolutionDatePredicate);
+    }
+    return predicates;
+  }
+
+  private List<Predicate> getIsResolvedPredicates(
+      SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
+    List<Predicate> predicates = new ArrayList<>();
+    if (parameters.isResolved) {
+      // Use cb.treat() to downcast the root to PendingProceedingDTO
+      Root<PendingProceedingDTO> pendingProceedingRoot = cb.treat(root, PendingProceedingDTO.class);
+      Predicate isResolvedPredicate =
+          cb.equal(pendingProceedingRoot.get(PendingProceedingDTO_.isResolved), true);
+      predicates.add(isResolvedPredicate);
     }
     return predicates;
   }
@@ -436,6 +477,9 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .withError(withError)
         .myDocOfficeOnly(searchInput.myDocOfficeOnly())
         .withDuplicateWarning(searchInput.withDuplicateWarning())
+        .resolutionDate(Optional.ofNullable(searchInput.resolutionDate()))
+        .resolutionDateEnd(Optional.ofNullable(searchInput.resolutionDateEnd()))
+        .isResolved(searchInput.isResolved())
         .inboxStatus(Optional.ofNullable(searchInput.inboxStatus()))
         .documentationOfficeDTO(documentationOfficeDTO)
         .kind(Optional.ofNullable(searchInput.kind()))
@@ -456,6 +500,9 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       boolean withError,
       boolean myDocOfficeOnly,
       boolean withDuplicateWarning,
+      Optional<LocalDate> resolutionDate,
+      Optional<LocalDate> resolutionDateEnd,
+      boolean isResolved,
       Optional<InboxStatus> inboxStatus,
       DocumentationOfficeDTO documentationOfficeDTO,
       Optional<Kind> kind) {}

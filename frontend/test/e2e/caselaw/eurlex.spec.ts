@@ -3,7 +3,7 @@ import {
   addEurlexDecisions,
   cleanUpEurlexDecisions,
 } from "./utils/documentation-unit-api-util"
-import { navigateToInbox } from "~/e2e/caselaw/e2e-utils"
+import { navigateToInbox, navigateToProcedures } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
@@ -253,8 +253,14 @@ test.describe("eurlex", () => {
           .click()
 
         await expect(page.getByText("Hinzufügen erfolgreich")).toBeVisible()
-
         await expect(row).toBeHidden()
+
+        // document can be found in procedures
+        await navigateToProcedures(page, procedureName)
+        const listItems = page.getByLabel("Vorgang Listenelement")
+        await expect(listItems).toHaveCount(1)
+        await listItems.click()
+        await expect(page.getByText("C-538/23")).toBeVisible()
       })
     },
   )

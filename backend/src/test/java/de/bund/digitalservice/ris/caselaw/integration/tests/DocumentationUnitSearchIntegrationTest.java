@@ -86,14 +86,14 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
   @Test
   void testForCorrectResponseWhenRequestingAll() {
 
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("MIGR202200012")
             .documentationOffice(docOfficeDTO)
             .fileNumbers(List.of(FileNumberDTO.builder().value("AkteM").rank(0L).build())));
 
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("NEUR202300008")
@@ -127,21 +127,21 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void shouldFilterByInboxStatus() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("ABCD202200001")
             .documentationOffice(docOfficeDTO)
             .inboxStatus(null));
 
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("ABCD202200002")
             .documentationOffice(docOfficeDTO)
             .inboxStatus(InboxStatus.EU));
 
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("ABCD202200003")
@@ -199,11 +199,11 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void shouldFilterByDocUnitKind() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder().documentNumber("ABCD202200001").documentationOffice(docOfficeDTO));
 
-    EntityBuilderTestUtil.createAndSavePublishedPendingProceeding(
+    EntityBuilderTestUtil.createAndSavePendingProceeding(
         repository,
         PendingProceedingDTO.builder()
             .documentationOffice(docOfficeDTO)
@@ -280,7 +280,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
             LocalDate.of(2023, 6, 7));
 
     for (LocalDate date : dates) {
-      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+      EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13).toUpperCase())
@@ -330,7 +330,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
             LocalDateTime.of(2022, 1, 23, 10, 4));
 
     for (LocalDateTime date : scheduledPublicationDates) {
-      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+      EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
@@ -376,7 +376,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
             LocalDateTime.of(2022, 1, 23, 10, 4));
 
     for (LocalDateTime date : scheduledPublicationDates) {
-      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+      EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
@@ -430,7 +430,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
     var index = 0;
 
     for (LocalDateTime date : lastPublicationDates) {
-      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+      EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
@@ -486,11 +486,9 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testForCorrectPagination() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "1234567801");
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "1234567801");
 
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "1234567802");
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "1234567802");
 
     risWebTestClient
         .withDefaultLogin()
@@ -526,7 +524,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
   @Test
   void testForCompleteResultListWhenSearchingForFileNumber() {
     for (int i = 0; i < 10; i++) {
-      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+      EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
               // index 0-4 get a "AB" docNumber
@@ -547,7 +545,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
     }
 
     // Doc unit with different file numbers will not match the search criteria
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("NE1234567800")
@@ -618,8 +616,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testTrim() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "AB1234567802");
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "AB1234567802");
 
     risWebTestClient
         .withDefaultLogin()
@@ -638,8 +635,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testSearch_withInternalUser_shouldReturnEditableAndDeletableDocumentationUnit() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "AB1234567802");
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "AB1234567802");
 
     risWebTestClient
         .withDefaultLogin()
@@ -663,23 +659,21 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
   @Test
   void shouldFilterOutUnpublishedDocUnitsOfOtherDocOffices() {
     // Published doc unit of BGH office should be returned
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, bghOfficeDTO, "AB1234567800");
+    EntityBuilderTestUtil.createAndSaveDecision(repository, bghOfficeDTO, "AB1234567800");
     // Published doc unit of own office should be returned
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "AB1234567801");
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "AB1234567801");
     // Published doc unit of own office should be returned
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder().documentNumber("AB1234567802").documentationOffice(docOfficeDTO),
         PublicationStatus.UNPUBLISHED);
     // Publishing doc unit of BGH office should be returned
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder().documentNumber("AB1234567803").documentationOffice(bghOfficeDTO),
         PublicationStatus.PUBLISHING);
     // Unpublished doc unit of BGH office should not be returned
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder().documentNumber("XX1234567801").documentationOffice(bghOfficeDTO),
         PublicationStatus.UNPUBLISHED);
@@ -702,17 +696,16 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void shouldFilterByPublicationStatus() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "AB1234567800");
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "AB1234567800");
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder().documentNumber("AB1234567801").documentationOffice(docOfficeDTO),
         PublicationStatus.UNPUBLISHED);
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder().documentNumber("AB1234567802").documentationOffice(docOfficeDTO),
         PublicationStatus.PUBLISHING);
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder().documentNumber("AB1234567803").documentationOffice(bghOfficeDTO),
         PublicationStatus.UNPUBLISHED);
@@ -734,21 +727,20 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void shouldFilterByErrorStatus() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "AB1234567800");
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "AB1234567800");
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder().documentNumber("AB1234567801").documentationOffice(docOfficeDTO),
         PublicationStatus.UNPUBLISHED,
         true);
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder().documentNumber("AB1234567802").documentationOffice(docOfficeDTO),
         PublicationStatus.PUBLISHING,
         true);
     // Error filtering only works for own doc office -> published bgh decision with error will not
     // be returned
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder().documentNumber("AB1234567803").documentationOffice(bghOfficeDTO),
         PublicationStatus.PUBLISHED,
@@ -771,15 +763,14 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void shouldFilterByDuplicateWarning() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "AB1234567800");
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "AB1234567800");
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .ecli("same")
             .documentNumber("AB1234567801")
             .documentationOffice(docOfficeDTO));
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .ecli("same")
@@ -787,7 +778,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
             .documentationOffice(docOfficeDTO));
     // Duplicate filtering only works for own doc office -> published bgh decision with duplicate
     // will not be returned
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .ecli("same")
@@ -814,11 +805,9 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
   @Test
   void shouldFilterForOwnDocOffice() {
     // Published doc unit of BGH office should not be returned
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, bghOfficeDTO, "AB1234567800");
+    EntityBuilderTestUtil.createAndSaveDecision(repository, bghOfficeDTO, "AB1234567800");
     // Published doc unit of own office should be returned
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "AB1234567801");
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "AB1234567801");
 
     risWebTestClient
         .withExternalLogin()
@@ -837,13 +826,13 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void shouldFilterForCourtType() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .court(courtAgAachen)
             .documentNumber("AB1234567800")
             .documentationOffice(docOfficeDTO));
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .court(courtOlgDresden)
@@ -867,13 +856,13 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void shouldFilterForCourtLocation() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .court(courtAgAachen)
             .documentNumber("AB1234567800")
             .documentationOffice(docOfficeDTO));
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .court(courtOlgDresden)
@@ -898,11 +887,9 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
   @Test
   void
       testSearch_withExternalUnassignedUser_shouldReturnNotEditableAndNotDeletableDocumentationUnit() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "AB1234567802");
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "AB1234567802");
     // Second doc unit won't match
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository, docOfficeDTO, "XX1234567802");
+    EntityBuilderTestUtil.createAndSaveDecision(repository, docOfficeDTO, "XX1234567802");
 
     risWebTestClient
         .withExternalLogin()

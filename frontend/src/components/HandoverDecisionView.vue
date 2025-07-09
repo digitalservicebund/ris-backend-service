@@ -335,13 +335,18 @@ const isScheduled = computed<boolean>(
   () => !!decision.value!.managementData.scheduledPublicationDateTime,
 )
 
+const hasImages = computed<boolean>(
+  () => !!preview.value?.xml?.includes("<img"),
+)
+
 const isPublishable = computed<boolean>(
   () =>
     !isOutlineInvalid.value &&
     !fieldsMissing.value &&
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
-    !!preview.value?.success,
+    !!preview.value?.success &&
+    !hasImages.value,
 )
 </script>
 
@@ -670,6 +675,15 @@ const isPublishable = computed<boolean>(
         ]"
         :status="InfoStatus.INFO"
         title="UAT Testmodus für die Übergabe an die jDV"
+      />
+
+      <InfoModal
+        v-if="hasImages"
+        aria-label="Übergabe an die jDV nicht möglich"
+        class="mt-8"
+        description="Diese Entscheidung enthält Bilder und kann deshalb nicht an die jDV übergeben werden"
+        :status="InfoStatus.INFO"
+        title="Übergabe an die jDV nicht möglich"
       />
 
       <div>

@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationJobService;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -57,8 +58,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Import({StagingPortalPublicationJobIntegrationTest.PortalPublicationConfig.class})
 class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
@@ -69,12 +73,14 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     @Primary
     public PortalPublicationService stagingPortalPublicationService(
         DocumentationUnitRepository documentationUnitRepository,
+        AttachmentRepository attachmentRepository,
         XmlUtilService xmlUtilService,
         PortalBucket portalBucket,
         ObjectMapper objectMapper,
         de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer portalTransformer) {
       return new StagingPortalPublicationService(
           documentationUnitRepository,
+          attachmentRepository,
           xmlUtilService,
           portalBucket,
           objectMapper,
@@ -119,8 +125,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   @Test
   void shouldPublishWithAllowedStagingData() throws IOException {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("1"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("1"));
     ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
     ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
 
@@ -129,7 +134,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     portalPublicationJobService.executePendingJobs();
 
-    verify(s3Client, times(1)).putObject(putCaptor.capture(), bodyCaptor.capture());
+    verify(s3Client, times(2)).putObject(putCaptor.capture(), bodyCaptor.capture());
 
     var fileNameRequests = putCaptor.getAllValues();
     var bodyRequests = bodyCaptor.getAllValues();
@@ -137,10 +142,10 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         new String(
             bodyRequests.getFirst().contentStreamProvider().newStream().readAllBytes(),
             StandardCharsets.UTF_8);
-    //    var changelogContent =
-    //        new String(
-    //            bodyRequests.get(1).contentStreamProvider().newStream().readAllBytes(),
-    //            StandardCharsets.UTF_8);
+    var changelogContent =
+        new String(
+            bodyRequests.get(1).contentStreamProvider().newStream().readAllBytes(),
+            StandardCharsets.UTF_8);
 
     assertThat(fileNameRequests.getFirst().key())
         .isEqualTo(dto.getDocumentNumber() + "/" + dto.getDocumentNumber() + ".xml");
@@ -148,21 +153,19 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         .contains("gruende test")
         .contains("entscheidungsname test")
         .contains("orientierungssatz test");
-    //    assertThat(fileNameRequests.get(1).key()).contains("changelog");
-    //    assertThat(changelogContent)
-    //        .isEqualTo(
-    //            """
-    //            {"changed":["1.xml"],"deleted":[]}""");
+    assertThat(fileNameRequests.get(1).key()).contains("changelog");
+    assertThat(changelogContent)
+        .isEqualTo(
+            """
+                    {"changed":["1/1.xml"],"deleted":[]}""");
   }
 
   @Test
-  void shouldOnlyAddDocumentNumberToChangelogForLatestKindOfJob() {
+  void shouldOnlyAddDocumentNumberToChangelogForLatestKindOfJob() throws IOException {
     DocumentationUnitDTO dto1 =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("1"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("1"));
     DocumentationUnitDTO dto2 =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("2"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("2"));
 
     portalPublicationJobRepository.saveAll(
         List.of(
@@ -173,35 +176,51 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
             createPublicationJob(dto1, PortalPublicationTaskType.DELETE),
             createPublicationJob(dto2, PortalPublicationTaskType.PUBLISH)));
 
+    when(s3Client.listObjectsV2(
+            ListObjectsV2Request.builder().bucket("no-bucket").prefix("1/").build()))
+        .thenReturn(
+            ListObjectsV2Response.builder()
+                .contents(S3Object.builder().key("1/1.xml").build())
+                .build());
+
+    when(s3Client.listObjectsV2(
+            ListObjectsV2Request.builder().bucket("no-bucket").prefix("2/").build()))
+        .thenReturn(
+            ListObjectsV2Response.builder()
+                .contents(S3Object.builder().key("2/2.xml").build())
+                .build());
+
     portalPublicationJobService.executePendingJobs();
 
     ArgumentCaptor<PutObjectRequest> putCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
     ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
-    ArgumentCaptor<Consumer<DeleteObjectRequest.Builder>> deleteCaptor =
-        ArgumentCaptor.forClass(Consumer.class);
+    ArgumentCaptor<DeleteObjectRequest> deleteCaptor =
+        ArgumentCaptor.forClass(DeleteObjectRequest.class);
 
     // TWO DELETE JOBS
     verify(s3Client, times(2)).deleteObject(deleteCaptor.capture());
-    // PUT 4 PUBLISH JOBS ( + PUT changelog )
-    verify(s3Client, times(4)).putObject(putCaptor.capture(), bodyCaptor.capture());
+    // PUT 4 PUBLISH JOBS + PUT changelog
+    verify(s3Client, times(5)).putObject(putCaptor.capture(), bodyCaptor.capture());
 
     var capturedPutRequests = putCaptor.getAllValues();
-    //    var changelogContent =
-    //        new String(
-    //
-    // bodyCaptor.getAllValues().get(4).contentStreamProvider().newStream().readAllBytes(),
-    //            StandardCharsets.UTF_8);
+    var capturedDeleteRequests = deleteCaptor.getAllValues();
+    var changelogContent =
+        new String(
+            bodyCaptor.getAllValues().get(4).contentStreamProvider().newStream().readAllBytes(),
+            StandardCharsets.UTF_8);
 
     assertThat(capturedPutRequests.get(0).key()).isEqualTo("1/1.xml");
     assertThat(capturedPutRequests.get(1).key()).isEqualTo("1/1.xml");
     assertThat(capturedPutRequests.get(2).key()).isEqualTo("2/2.xml");
     assertThat(capturedPutRequests.get(3).key()).isEqualTo("2/2.xml");
-    //    assertThat(capturedPutRequests.get(4).key()).contains("changelogs/");
-    // ensure that each document number only appears either in changed or deleted section
-    //    assertThat(changelogContent)
-    //        .isEqualTo(
-    //            """
-    //                  {"changed":["2.xml"],"deleted":["1.xml"]}""");
+    assertThat(capturedPutRequests.get(4).key()).contains("changelogs/");
+    assertThat(capturedDeleteRequests.get(0).key()).isEqualTo("2/2.xml");
+    assertThat(capturedDeleteRequests.get(1).key()).isEqualTo("1/1.xml");
+    //         ensure that each document number only appears either in changed or deleted section
+    assertThat(changelogContent)
+        .isEqualTo(
+            """
+                          {"changed":["2/2.xml"],"deleted":["1/1.xml"]}""");
 
     assertThat(portalPublicationJobRepository.findAll())
         .allMatch(job -> job.getPublicationStatus() == SUCCESS);
@@ -210,11 +229,9 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   @Test
   void shouldContinueExecutionOnError() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("1"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("1"));
     DocumentationUnitDTO dto2 =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("2"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("2"));
 
     // PUBLISH job and upload changelog will fail
     when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
@@ -225,12 +242,18 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
             createPublicationJob(dto, PortalPublicationTaskType.PUBLISH),
             createPublicationJob(dto2, PortalPublicationTaskType.DELETE)));
 
+    when(s3Client.listObjectsV2(any(ListObjectsV2Request.class)))
+        .thenReturn(
+            ListObjectsV2Response.builder()
+                .contents(S3Object.builder().key("1/1.xml").build())
+                .build());
+
     portalPublicationJobService.executePendingJobs();
 
     // DELETE is called even after fail
-    verify(s3Client, times(1)).deleteObject(any(Consumer.class));
-    // PUT 1.xml (fails) (+ PUT changelog)
-    verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+    verify(s3Client, times(1)).deleteObject(any(DeleteObjectRequest.class));
+    // PUT 1.xml (fails) + PUT changelog
+    verify(s3Client, times(2)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
 
     assertThat(
             portalPublicationJobRepository.findAll().stream()
@@ -244,8 +267,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   // receive deletion jobs for non-existing documents -> we ignore them by marking them as success
   void executePendingJobs_withFailedDeletionJob_shouldMarkJobAsSuccess() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, buildValidDocumentationUnit("1"));
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit("1"));
 
     // DELETE job will fail as the file is missing
     doThrow(NoSuchKeyException.class).when(s3Client).deleteObject(any(Consumer.class));
