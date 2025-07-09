@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import Button from "primevue/button"
+import { computed } from "vue"
+import { RouteLocationRaw } from "vue-router"
 import FileNavigator from "@/components/FileNavigator.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
@@ -26,6 +28,18 @@ const emit = defineEmits<{
   "panelMode:update": [value: SelectablePanelContent]
   "attachmentIndex:update": [value: number]
 }>()
+
+const getRouterLinkTo = (suffix: "categories" | "preview") =>
+  computed(() => {
+    return {
+      name: isDecision(props.documentUnit)
+        ? `caselaw-documentUnit-documentNumber-${suffix}`
+        : `caselaw-pending-proceeding-documentNumber-${suffix}`,
+      params: {
+        documentNumber: props.documentUnit?.documentNumber ?? "undefined",
+      },
+    }
+  })
 
 const textCheckAll = useFeatureToggle("neuris.text-check-side-panel")
 
@@ -125,35 +139,21 @@ function emitAttachmentIndex(value: number) {
     </div>
 
     <FileNavigator
-      v-if="panelMode === 'attachments' && isDecision(props.documentUnit)"
-      :attachments="props.documentUnit!.attachments"
+      v-if="panelMode === 'attachments' && isDecision(documentUnit)"
+      :attachments="documentUnit!.attachments"
       :current-index="currentAttachmentIndex"
       @select="emitAttachmentIndex"
     ></FileNavigator>
     <div v-if="panelMode === 'preview'" class="ml-auto flex flex-row">
       <Tooltip
-        v-if="props.documentUnit!.isEditable && showEditButton"
+        v-if="documentUnit!.isEditable && showEditButton"
         shortcut="b"
         text="Bearbeiten"
       >
         <router-link
           aria-label="Dokumentationseinheit in einem neuen Tab bearbeiten"
           target="_blank"
-          :to="
-            isDecision(documentUnit)
-              ? {
-                  name: 'caselaw-documentUnit-documentNumber-categories',
-                  params: {
-                    documentNumber: props.documentUnit!.documentNumber,
-                  },
-                }
-              : {
-                  name: 'caselaw-pending-proceeding-documentNumber-categories',
-                  params: {
-                    documentNumber: props.documentUnit!.documentNumber,
-                  },
-                }
-          "
+          :to="getRouterLinkTo('categories') as RouteLocationRaw"
         >
           <Button text>
             <template #icon>
@@ -166,21 +166,7 @@ function emitAttachmentIndex(value: number) {
         <router-link
           aria-label="Vorschau in neuem Tab öffnen"
           target="_blank"
-          :to="
-            isDecision(documentUnit)
-              ? {
-                  name: 'caselaw-documentUnit-documentNumber-preview',
-                  params: {
-                    documentNumber: props.documentUnit!.documentNumber,
-                  },
-                }
-              : {
-                  name: 'caselaw-pending-proceeding-documentNumber-preview',
-                  params: {
-                    documentNumber: props.documentUnit!.documentNumber,
-                  },
-                }
-          "
+          :to="getRouterLinkTo('preview') as RouteLocationRaw"
         >
           <Button text>
             <template #icon>
