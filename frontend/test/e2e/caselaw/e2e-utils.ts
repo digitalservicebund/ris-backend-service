@@ -612,11 +612,15 @@ export async function copyPasteTextFromAttachmentIntoEditor(
 }
 
 export async function getRequest(url: string, page: Page): Promise<Request> {
-  const requestFinishedPromise = page.waitForEvent("requestfinished")
+  // const requestFinishedPromise = page.waitForEvent("requestfinished")
+  const navigationRequestPromise = page.waitForEvent(
+    "request",
+    (request) => request.url().includes(url) && request.isNavigationRequest(),
+  )
   // waitUntil, because timeout NS_ERROR_FAILURE is a common issue in Firefox
   await page.goto(url, { waitUntil: "domcontentloaded" })
 
-  return await requestFinishedPromise
+  return await navigationRequestPromise
 }
 
 export async function clickCategoryButton(testId: string, page: Page) {
