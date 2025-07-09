@@ -443,10 +443,14 @@ public class DocumentationUnitService {
 
     if (docUnit instanceof Decision decision
         && decision.attachments() != null
-        && !decision.attachments().isEmpty())
+        && !decision.attachments().isEmpty()) {
       attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentationUnitId);
+    }
 
-    saveForRecycling(docUnit);
+    if (docUnit instanceof Decision decision) {
+      saveForRecycling(decision);
+    }
+
     try {
       repository.delete(docUnit);
     } catch (Exception e) {
