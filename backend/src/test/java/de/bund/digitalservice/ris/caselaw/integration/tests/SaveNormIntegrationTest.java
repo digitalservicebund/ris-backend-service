@@ -57,8 +57,7 @@ class SaveNormIntegrationTest extends BaseIntegrationTest {
   @Test
   void testSaveNorm_withoutNorm() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, documentationOfficeDTO);
+        EntityBuilderTestUtil.createAndSaveDecision(repository, documentationOfficeDTO);
 
     Decision decisionFromFrontend = generateDocumentationUnit(dto.getId());
 
@@ -84,7 +83,7 @@ class SaveNormIntegrationTest extends BaseIntegrationTest {
     NormAbbreviationDTO normAbbreviation = addNormToDB(2352);
 
     DocumentationUnitDTO savedDocumentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890124")
@@ -139,7 +138,7 @@ class SaveNormIntegrationTest extends BaseIntegrationTest {
     var dbNormAbbreviation2 = addNormToDB(2);
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOfficeDTO, "1234567890123");
 
     Decision decisionFromFrontend = generateDocumentationUnit(dto.getId());

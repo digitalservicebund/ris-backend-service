@@ -19,6 +19,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         documentNumber: "BVRE",
         courtType: "VerfGH",
+        kind: "DECISION",
       },
       maxDuration: 500, // last max 776, average 365, min 259
       minResults: 5,
@@ -27,55 +28,133 @@ test.describe("document unit search queries", () => {
       title: "vague documentNumber",
       parameter: {
         documentNumber: "BV",
+        kind: "DECISION",
       },
       maxDuration: 2000, // last max 1570 average 1370, min 1311
+      minResults: 5,
+    },
+    {
+      title: "vague documentNumber (pending proceeding)",
+      parameter: {
+        documentNumber: "ST",
+        kind: "PENDING_PROCEEDING",
+      },
+      maxDuration: 500, // last max 686 average 344, min 299
       minResults: 5,
     },
     {
       title: "not existing documentNumber",
       parameter: {
         documentNumber: "notExistingFoo",
+        kind: "DECISION",
       },
-      maxDuration: 400, // last max 379, average 161, min 136
+      maxDuration: 500, // last max 512, average 214, min 179
+    },
+    {
+      title: "not existing documentNumber (pending proceeding)",
+      parameter: {
+        documentNumber: "notExistingFoo",
+        kind: "PENDING_PROCEEDING",
+      },
+      maxDuration: 500, // last max 519, average 215, min 182
     },
     {
       title: "vague fileNumber",
       parameter: {
         fileNumber: "Bv",
+        kind: "DECISION",
       },
-      maxDuration: 2000, // last max 3546, average 1003, min 352
+      maxDuration: 1000, // last max 970, average 536, min 470
       minResults: 5,
       isRelevantForExternalUser: true,
+    },
+    {
+      title: "vague fileNumber (pending proceeding)",
+      parameter: {
+        fileNumber: "T-",
+        kind: "PENDING_PROCEEDING",
+      },
+      maxDuration: 500, // last max 286, average 210, min 191
+      minResults: 5,
     },
     {
       title: "not existing fileNumber",
       parameter: {
         fileNumber: "notExistingFoo",
+        kind: "DECISION",
       },
       maxDuration: 500, // last max 749, average 460, min 420
+    },
+    {
+      title: "not existing fileNumber (pending proceeding)",
+      parameter: {
+        fileNumber: "notExistingFoo",
+        kind: "PENDING_PROCEEDING",
+      },
+      maxDuration: 500, // last max 206, average 167, min 143
     },
     {
       title: "only unpublished",
       parameter: {
         publicationStatus: "UNPUBLISHED",
+        kind: "DECISION",
       },
-      maxDuration: 1300, // last max 1400, average 1151, min 1075
+      maxDuration: 800, // last max 1784, average 512, min 422
       minResults: 5,
+    },
+    {
+      title: "only unpublished (pending proceeding)",
+      parameter: {
+        publicationStatus: "UNPUBLISHED",
+        kind: "PENDING_PROCEEDING",
+      },
+      maxDuration: 500, // last max 535, average 230 , min 202
     },
     {
       title: "of all time",
       parameter: {
         decisionDate: "1900-01-01",
         decisionDateEnd: "2024-01-15",
+        kind: "DECISION",
       },
-      maxDuration: 500, // last max 590, average 336, min 270
+      maxDuration: 700, // last max 736, average 336, min 270
       minResults: 5,
       isRelevantForExternalUser: true,
+    },
+    {
+      title: "of all time (pending proceeding)",
+      parameter: {
+        decisionDate: "1900-01-01",
+        decisionDateEnd: "2024-01-15",
+        kind: "PENDING_PROCEEDING",
+      },
+      maxDuration: 700, // last max 683, average 246, min 195
+      minResults: 5,
+    },
+    {
+      title: "resolution date of all time (pending proceeding)",
+      parameter: {
+        resolutionDate: "1900-01-01",
+        resolutionDateEnd: "2025-01-15",
+        kind: "PENDING_PROCEEDING",
+      },
+      maxDuration: 500, // last max 418, average 208, min 172
+      minResults: 5,
+    },
+    {
+      title: "only resolved (pending proceeding)",
+      parameter: {
+        isResolved: "true",
+        kind: "PENDING_PROCEEDING",
+      },
+      maxDuration: 500, // last max 231, average 183, min 162
+      minResults: 5,
     },
     {
       title: "one day",
       parameter: {
         decisionDate: "1975-06-16",
+        kind: "DECISION",
       },
       maxDuration: 350, // last max 249, average 243, min 179
       minResults: 1,
@@ -84,22 +163,43 @@ test.describe("document unit search queries", () => {
       title: "only court location",
       parameter: {
         courtLocation: "München",
+        kind: "DECISION",
       },
-      maxDuration: 1600, // last max 1548, average 1306, min 1236
+      maxDuration: 1900, // last max 1808, average 1727, min 1688
+      minResults: 5,
+    },
+    {
+      title: "only court location (pending proceeding)",
+      parameter: {
+        courtLocation: "München",
+        kind: "PENDING_PROCEEDING",
+      },
+      maxDuration: 3000, // last max 7815, average 2339, min 1650
       minResults: 5,
     },
     {
       title: "only court type",
       parameter: {
         courtType: "VerfGH",
+        kind: "DECISION",
       },
       maxDuration: 500, // last max 609, average 356, min 289
+      minResults: 5,
+    },
+    {
+      title: "only court type (pending proceeding)",
+      parameter: {
+        courtType: "BFH",
+        kind: "PENDING_PROCEEDING",
+      },
+      maxDuration: 700, // last max 602, average 502, min 463
       minResults: 5,
     },
     {
       title: "only my doc office",
       parameter: {
         myDocOfficeOnly: "true",
+        kind: "DECISION",
       },
       maxDuration: 450, // last max 556, average 304, min 241
       minResults: 5,
@@ -109,6 +209,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         myDocOfficeOnly: "true",
         scheduledOnly: "true",
+        kind: "DECISION",
       },
       maxDuration: 500,
       minResults: 3,
@@ -118,6 +219,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         myDocOfficeOnly: "true",
         publicationDate: "2100-11-21",
+        kind: "DECISION",
       },
       maxDuration: 500,
       minResults: 3,
@@ -127,6 +229,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         myDocOfficeOnly: "true",
         withDuplicateWarning: "true",
+        kind: "DECISION",
       },
       maxDuration: 500,
       minResults: 3,

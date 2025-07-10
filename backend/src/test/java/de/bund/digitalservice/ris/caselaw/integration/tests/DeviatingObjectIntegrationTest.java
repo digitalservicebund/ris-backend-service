@@ -32,7 +32,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   private final DocumentationOffice docOffice = buildDSDocOffice();
 
   private DocumentationUnitDTO prepareDocumentationUnitDTOWithDeviatingFileNumbers() {
-    return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    return EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("1234567890123")
@@ -229,7 +229,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   // Deviating ECLI
   @Test
   void testReadOfDeviatingECLI() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("1234567890123")
@@ -259,7 +259,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testAddANewDeviatingEcliToAnExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -302,7 +302,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testAddADeviatingEcliTwiceToAnExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -337,7 +337,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testRemoveOneDeviatingEcliFromExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -379,7 +379,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testRemoveAllDeviatingEcliWithAEmplyListFromExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -420,7 +420,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testWithNullDontChangeTheExistingDeviatingEclis() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -462,7 +462,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testReadOfDeviatingCourts() {
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("1234567890123")
@@ -493,7 +493,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testAddANewDeviatingCourtToAnExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -536,7 +536,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testAddADeviatingCourtTwiceToAnExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -571,7 +571,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testRemoveOneDeviatingCourtFromExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -614,7 +614,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testRemoveAllDeviatingCourtWithAEmplyListFromExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -656,7 +656,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testWithNullDontChangeTheExistingDeviatingCourts() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -700,7 +700,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testReadOfDeviatingDates() {
 
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("1234567890123")
@@ -732,7 +732,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testAddANewDeviatingDatesToAnExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -786,7 +786,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testAddADeviatingDateTwiceToAnExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -832,7 +832,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testRemoveOneDeviatingDateFromExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -878,7 +878,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testRemoveAllDeviatingDatesWithAEmplyListFromExistingList() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -923,7 +923,7 @@ class DeviatingObjectIntegrationTest extends BaseIntegrationTest {
   @Test
   void testWithNullDontChangeExistingDeviatingDates() {
     var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")

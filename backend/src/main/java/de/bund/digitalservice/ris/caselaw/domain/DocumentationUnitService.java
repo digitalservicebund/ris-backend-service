@@ -275,6 +275,9 @@ public class DocumentationUnitService {
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly,
       Optional<Boolean> withDuplicateWarning,
+      Optional<LocalDate> resolutionDate,
+      Optional<LocalDate> resolutionDateEnd,
+      Optional<Boolean> isResolved,
       Optional<InboxStatus> inboxStatus,
       Optional<Kind> kind) {
 
@@ -299,6 +302,9 @@ public class DocumentationUnitService {
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .withDuplicateWarning(withDuplicateWarning.orElse(false))
             .inboxStatus(inboxStatus.orElse(null))
+            .resolutionDate(resolutionDate.orElse(null))
+            .resolutionDateEnd(resolutionDateEnd.orElse(null))
+            .isResolved(isResolved.orElse(false))
             .kind(kind.orElse(null))
             .build();
 
@@ -437,10 +443,14 @@ public class DocumentationUnitService {
 
     if (docUnit instanceof Decision decision
         && decision.attachments() != null
-        && !decision.attachments().isEmpty())
+        && !decision.attachments().isEmpty()) {
       attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentationUnitId);
+    }
 
-    saveForRecycling(docUnit);
+    if (docUnit instanceof Decision decision) {
+      saveForRecycling(decision);
+    }
+
     try {
       repository.delete(docUnit);
     } catch (Exception e) {

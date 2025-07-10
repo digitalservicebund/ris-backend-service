@@ -61,7 +61,7 @@ const badge = computed(() => {
             route.path.includes('caselaw/documentunit'),
         }"
         data-testid="search-navbar-button"
-        :to="{ name: 'caselaw' }"
+        :to="{ name: 'caselaw-search' }"
         >Suche
       </router-link>
       <router-link

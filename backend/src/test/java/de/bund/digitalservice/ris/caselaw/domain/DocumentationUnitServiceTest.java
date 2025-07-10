@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.eurlex.FmxImportService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberRecyclingException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
@@ -405,6 +406,60 @@ class DocumentationUnitServiceTest {
   }
 
   @Test
+  void testDeleteByUuid_withDecision_shouldSaveDocumentNumberForRecycling()
+      throws DocumentationUnitNotExistsException, DocumentNumberRecyclingException {
+    // Arrange
+    when(repository.findByUuid(TEST_UUID, null))
+        .thenReturn(
+            Decision.builder()
+                .uuid(TEST_UUID)
+                .documentNumber("foo")
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder()
+                                .id(UUID.randomUUID())
+                                .abbreviation("BGH")
+                                .build())
+                        .build())
+                .build());
+
+    // Act
+    var string = service.deleteByUuid(TEST_UUID);
+
+    // Assert
+    assertEquals("Dokumentationseinheit gelöscht: " + TEST_UUID, string);
+    verify(documentNumberRecyclingService).addForRecycling(TEST_UUID, "foo", "BGH");
+  }
+
+  @Test
+  void testDeleteByUuid_withPendingProceeding_shouldNotSaveDocumentNumberForRecycling()
+      throws DocumentationUnitNotExistsException, DocumentNumberRecyclingException {
+    // Arrange
+    when(repository.findByUuid(TEST_UUID, null))
+        .thenReturn(
+            PendingProceeding.builder()
+                .uuid(TEST_UUID)
+                .documentNumber("foo")
+                .coreData(
+                    CoreData.builder()
+                        .documentationOffice(
+                            DocumentationOffice.builder()
+                                .id(UUID.randomUUID())
+                                .abbreviation("BFH")
+                                .build())
+                        .build())
+                .build());
+
+    // Act
+    var string = service.deleteByUuid(TEST_UUID);
+
+    // Assert
+    assertEquals("Dokumentationseinheit gelöscht: " + TEST_UUID, string);
+    verify(documentNumberRecyclingService, never()).addForRecycling(TEST_UUID, "foo", "BFH");
+  }
+
+  @Test
   void testUpdateDocumentationUnit() throws DocumentationUnitNotExistsException {
     Decision decision =
         Decision.builder()
@@ -625,6 +680,9 @@ class DocumentationUnitServiceTest {
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty());
     verify(docUnitSearchRepository)
         .searchByDocumentationUnitSearchInput(documentationUnitSearchInput, pageRequest, oidcUser);
@@ -651,6 +709,9 @@ class DocumentationUnitServiceTest {
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courttype\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courtlocation\u180Ewith\u2060spaces"),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),

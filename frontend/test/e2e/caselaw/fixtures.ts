@@ -5,8 +5,10 @@ import {
   Page,
   test,
 } from "@playwright/test"
+import { mergeDeep } from "@tiptap/vue-3"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
+import jsonPatch from "fast-json-patch"
 import { navigateToCategories } from "./e2e-utils"
 import { Page as Pagination } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
@@ -28,6 +30,7 @@ type MyFixtures = {
   linkedDocumentNumber: string
   editorField: Locator
   pageWithBghUser: Page
+  pageWithBfhUser: Page
   pageWithExternalUser: Page
   prefilledDocumentUnitBgh: Decision
   edition: LegalPeriodicalEdition
@@ -38,6 +41,16 @@ type MyFixtures = {
   prefilledDocumentUnitWithTexts: Decision
   prefilledDocumentUnitWithManyReferences: Decision
   pendingProceeding: PendingProceeding
+  prefilledPendingProceeding: PendingProceeding
+  /** Define fixture option "pendingProceedingsToBeCreated" to define the pending proceedings to be generated */
+  pendingProceedingsFromOptions: {
+    createdPendingProceedings: PendingProceeding[]
+    fileNumberPrefix: string
+  }
+}
+
+type MyOptions = {
+  pendingProceedingsToBeCreated: Partial<PendingProceeding>[]
 }
 
 /**
@@ -77,7 +90,7 @@ async function deleteWithRetry(
   }
 }
 
-export const caselawTest = test.extend<MyFixtures>({
+export const caselawTest = test.extend<MyFixtures & MyOptions>({
   documentNumber: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
@@ -185,6 +198,118 @@ export const caselawTest = test.extend<MyFixtures>({
       prefilledDocumentUnit.uuid,
       csrfToken,
       prefilledDocumentUnit.documentNumber,
+    )
+  },
+
+  prefilledPendingProceeding: async ({ request, context }, use) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await request.put(
+      `/api/v1/caselaw/documentunits/new?kind=PENDING_PROCEEDING`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create prefilledPendingProceeding: ${response.status()} ${response.statusText()}`,
+      )
+    }
+    const prefilledPendingProceeding = await response.json()
+
+    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    const court = await courtResponse.json()
+
+    const normAbbreviationResponse = await request.get(
+      `api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`,
+    )
+    const normAbbreviation = await normAbbreviationResponse.json()
+
+    const fieldsOfLawResponse = await request.get(
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+    )
+    const fieldsOfLaw = await fieldsOfLawResponse.json()
+    const documentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const newPendingProceeding = {
+      ...prefilledPendingProceeding,
+      coreData: {
+        ...prefilledPendingProceeding.coreData,
+        court: court?.[0],
+        documentType: documentType?.[0],
+        fileNumbers: [generateString()],
+        decisionDate: "2019-12-31",
+        appraisalBody: "1. Senat, 2. Kammer",
+        source: {
+          value: SourceValue.AngefordertesOriginal,
+        },
+      },
+      contentRelatedIndexing: {
+        keywords: ["keyword"],
+        norms: [
+          {
+            normAbbreviation: normAbbreviation?.[0],
+          },
+        ],
+        fieldsOfLaw: [fieldsOfLaw?.[0]],
+      },
+      shortTexts: {
+        headline: "test headline",
+        resolutionNote: "test resolutionNote",
+        legalIssue: "test legalIssue",
+        admissionOfAppeal: "test admissionOfAppeal",
+        appellant: "test appellant",
+      },
+    } as PendingProceeding
+
+    const patchedPendingProceeding = mergeDeep(
+      newPendingProceeding,
+      prefilledPendingProceeding,
+    ) as PendingProceeding
+
+    const frontendPatch = jsonPatch.compare(
+      patchedPendingProceeding,
+      newPendingProceeding,
+    )
+
+    const patchResponse = await request.patch(
+      `/api/v1/caselaw/documentunits/${newPendingProceeding.uuid}`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+        data: {
+          documentationUnitVersion: newPendingProceeding.version,
+          patch: frontendPatch,
+          errorPaths: [],
+        },
+      },
+    )
+
+    if (!patchResponse.ok()) {
+      throw new Error(
+        `Failed to patch pending proceeding: ${response.status()} ${response.statusText()}`,
+      )
+    }
+    const getResponse = await request.get(
+      `/api/v1/caselaw/documentunits/${prefilledPendingProceeding.documentNumber}`,
+    )
+
+    if (!getResponse.ok()) {
+      throw new Error(
+        `Failed to get pending proceeding: ${getResponse.status()} ${getResponse.statusText()}`,
+      )
+    }
+
+    await use(await getResponse.json())
+
+    await deleteWithRetry(
+      request,
+      prefilledPendingProceeding.uuid,
+      csrfToken,
+      prefilledPendingProceeding.documentNumber,
     )
   },
 
@@ -589,6 +714,19 @@ export const caselawTest = test.extend<MyFixtures>({
     await bghContext.close()
   },
 
+  pageWithBfhUser: async ({ browser }, use) => {
+    const bfhContext = await browser.newContext({
+      storageState: `test/e2e/caselaw/.auth/user_bfh.json`,
+    })
+
+    const pageWithBfhUser = await bfhContext.newPage()
+
+    await use(pageWithBfhUser)
+
+    await pageWithBfhUser.close()
+    await bfhContext.close()
+  },
+
   pageWithExternalUser: async ({ browser }, use) => {
     const externalContext = await browser.newContext({
       storageState: `test/e2e/caselaw/.auth/user_external.json`,
@@ -702,7 +840,7 @@ export const caselawTest = test.extend<MyFixtures>({
 
   foreignDocumentationUnit: async ({ request }, use) => {
     const foreignDocumentUnitSearchResponse = await request.get(
-      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
+      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001&kind=DECISION`,
     )
 
     const foreignDocumentUnitPage =
@@ -727,7 +865,7 @@ export const caselawTest = test.extend<MyFixtures>({
     )
 
     const foreignDocumentUnitSearchResponse = await request.get(
-      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
+      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001&kind=DECISION`,
     )
 
     const eanDocType = (
@@ -869,7 +1007,7 @@ export const caselawTest = test.extend<MyFixtures>({
     )
 
     const foreignDocumentUnitSearchResponse = await request.get(
-      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
+      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001&kind=DECISION`,
     )
 
     const foreignDocumentUnitPage =
@@ -1004,13 +1142,7 @@ export const caselawTest = test.extend<MyFixtures>({
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
 
-    const documentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypes?q=Anh&category=CASELAW_PENDING_PROCEEDING`,
-    )
-    const documentType = await documentTypeResponse.json()
-
     const parameters = {
-      documentType: documentType?.[0],
       fileNumber: generateString(),
     }
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
@@ -1035,5 +1167,94 @@ export const caselawTest = test.extend<MyFixtures>({
       csrfToken,
       pendingProceeding.documentNumber,
     )
+  },
+
+  // These are the pending proceedings that will be created by the fixture pendingProceedingsFromOptions.
+  // By default, it is empty. Can be overridden by the test to create specific pending proceedings.
+  pendingProceedingsToBeCreated: [[], { option: true }],
+
+  pendingProceedingsFromOptions: async (
+    { browser, pendingProceedingsToBeCreated },
+    use,
+  ) => {
+    const context = await browser.newContext({
+      storageState: `test/e2e/caselaw/.auth/user_bfh.json`,
+    })
+    const request = context.request
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+
+    const commonFileNumberPrefix = generateString()
+    const createdPendingProceedings = []
+    for (const targetPendingProceeding of pendingProceedingsToBeCreated) {
+      const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+        params: { kind: Kind.PENDING_PROCEEDING },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+        data: {
+          fileNumber: generateString({ prefix: commonFileNumberPrefix }),
+        },
+      })
+
+      if (!response.ok()) {
+        throw new Error(
+          `Failed to create pending proceeding document: ${response.status()} ${response.statusText()}`,
+        )
+      }
+
+      const newPendingProceeding = await response.json()
+
+      const courtLabel = targetPendingProceeding.coreData?.court?.label
+      if (courtLabel) {
+        const courtResponse = await request.get(
+          `api/v1/caselaw/courts?q=${courtLabel}&sz=1&pg=0`,
+        )
+        targetPendingProceeding.coreData!.court = await courtResponse
+          .json()
+          .then((json) => json?.[0])
+      }
+
+      const patchedPendingProceeding = mergeDeep(
+        newPendingProceeding,
+        targetPendingProceeding,
+      ) as PendingProceeding
+
+      const frontendPatch = jsonPatch.compare(
+        newPendingProceeding,
+        patchedPendingProceeding,
+      )
+
+      const patchResponse = await request.patch(
+        `/api/v1/caselaw/documentunits/${newPendingProceeding.uuid}`,
+        {
+          headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+          data: {
+            documentationUnitVersion: newPendingProceeding.version,
+            patch: frontendPatch,
+            errorPaths: [],
+          },
+        },
+      )
+
+      if (!patchResponse.ok()) {
+        throw new Error(
+          `Failed to patch pending proceeding: ${response.status()} ${response.statusText()}`,
+        )
+      }
+      createdPendingProceedings.push(patchedPendingProceeding)
+    }
+
+    await use({
+      createdPendingProceedings,
+      fileNumberPrefix: commonFileNumberPrefix,
+    })
+
+    for (const newPendingProceeding of createdPendingProceedings) {
+      await deleteWithRetry(
+        request,
+        newPendingProceeding.uuid,
+        csrfToken,
+        newPendingProceeding.documentNumber,
+      )
+    }
   },
 })

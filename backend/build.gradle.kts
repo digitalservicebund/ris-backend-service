@@ -13,14 +13,14 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "7.0.4"
+    id("com.diffplug.spotless") version "7.1.0"
     id("org.sonarqube") version "6.2.0.5505"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.10.0"
+    id("org.flywaydb.flyway") version "11.10.1"
     id("io.sentry.jvm.gradle") version "5.8.0"
 }
 
@@ -180,9 +180,9 @@ dependencies {
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.42")
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.43")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.51"))
+    implementation(platform("software.amazon.awssdk:bom:2.31.77"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -191,7 +191,7 @@ dependencies {
 
     // caselaw tranformation to LDML for the communication with the portal
     implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7")
-    implementation("net.sf.saxon:Saxon-HE:12.7")
+    implementation("net.sf.saxon:Saxon-HE:12.8")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
@@ -222,20 +222,20 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
-    implementation("io.getunleash:unleash-client-java:11.0.1")
+    implementation("io.getunleash:unleash-client-java:11.0.2")
     implementation("org.apache.commons:commons-text:1.13.1")
     implementation("org.jsoup:jsoup:1.21.1")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.0")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.2")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.2")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.15.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.10.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.10.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -252,7 +252,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.19.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.20.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

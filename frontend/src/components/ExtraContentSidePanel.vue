@@ -57,16 +57,6 @@ const handleOnSelectAttachment = (index: number) => {
 }
 
 /**
- * Sets the panel content to "attachments", so that the attachment view is displayed in the panel.
- * If a selected attachment index is provided, the local attachment index reference is updated accordingly,
- * so that the selected attachment is displayed in the attachment view.
- * @param selectedIndex (optional) selected attachment index
- */
-function selectAttachments(selectedIndex?: number) {
-  store.selectAttachments(selectedIndex)
-}
-
-/**
  * Sets the panel content to selected mode
  */
 function setSidePanelMode(panelMode: SelectablePanelContent) {
@@ -85,16 +75,25 @@ function togglePanel(expand?: boolean): boolean {
 
 function setDefaultState() {
   if (props.sidePanelMode) {
-    store.setSidePanelMode(props.sidePanelMode)
-  } else if (
-    isDecision(props.documentUnit) &&
-    !props.documentUnit!.note &&
-    props.documentUnit!.hasAttachments
-  ) {
-    selectAttachments()
-  } else {
-    setSidePanelMode("note")
+    setSidePanelMode(props.sidePanelMode)
+    return
   }
+
+  if (
+    isDecision(props.documentUnit) &&
+    !props.documentUnit?.note &&
+    props.documentUnit?.hasAttachments
+  ) {
+    setSidePanelMode("attachments")
+    return
+  }
+
+  if (isPendingProceeding(props.documentUnit)) {
+    setSidePanelMode("preview")
+    return
+  }
+
+  setSidePanelMode("note")
 }
 
 /**
@@ -133,11 +132,9 @@ onMounted(() => {
       @update:is-expanded="togglePanel"
     >
       <ExtraContentExtraContentSidePanelMenu
-        v-if="isDecision(props.documentUnit)"
         :current-attachment-index="currentAttachmentIndex"
         :document-unit="props.documentUnit"
         :hide-panel-mode-bar="props.hidePanelModeBar"
-        :hide-preview-in-new-tab="props.hidePreviewInNewTab"
         :panel-mode="panelMode"
         :show-edit-button="props.showEditButton"
         @attachment-index:update="handleOnSelectAttachment"
@@ -196,9 +193,7 @@ onMounted(() => {
         </div>
 
         <CategoryImport
-          v-else-if="
-            panelMode === 'category-import' && isDecision(props.documentUnit)
-          "
+          v-else-if="panelMode === 'category-import'"
           :document-number="importDocumentNumber"
         />
 

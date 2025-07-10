@@ -50,13 +50,15 @@ test.describe(
       })
 
       await test.step("Nach Löschen wird zur Startseite weitergeleitet", async () => {
-        await expect(page).toHaveURL("/caselaw")
+        await expect(page).toHaveURL("/caselaw/search")
       })
 
       await test.step("Dokumentationseinheit existiert nicht mehr", async () => {
         await page.goto(
-          `/caselaw?documentNumber=${documentNumber}&fileNumber=${fileNumber}`,
+          `/caselaw/search/decisions?documentNumber=${documentNumber}&fileNumber=${fileNumber}`,
         )
+
+        await page.getByText("Ergebnisse anzeigen").click()
 
         await expect(
           page.getByText("Keine Suchergebnisse gefunden"),

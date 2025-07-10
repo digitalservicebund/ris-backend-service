@@ -23,13 +23,15 @@ export const navigateToSearch = async (
 ) => {
   await test.step("Navigate to 'Suche'", async () => {
     if (navigationBy === "url") {
-      await page.goto(`/caselaw`, { waitUntil: "domcontentloaded" })
+      await page.goto(`/caselaw/search`, { waitUntil: "domcontentloaded" })
     } else {
       await page.getByTestId("search-navbar-button").click()
     }
-    await page.waitForURL("/caselaw")
+    await page.waitForURL("/caselaw/search")
 
-    await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible({
+    await expect(
+      page.getByTestId("document-unit-search-entry-form"),
+    ).toBeVisible({
       timeout: 15000, // for backend warm up
     })
   })
@@ -610,11 +612,15 @@ export async function copyPasteTextFromAttachmentIntoEditor(
 }
 
 export async function getRequest(url: string, page: Page): Promise<Request> {
-  const requestFinishedPromise = page.waitForEvent("requestfinished")
+  // const requestFinishedPromise = page.waitForEvent("requestfinished")
+  const navigationRequestPromise = page.waitForEvent(
+    "request",
+    (request) => request.url().includes(url) && request.isNavigationRequest(),
+  )
   // waitUntil, because timeout NS_ERROR_FAILURE is a common issue in Firefox
   await page.goto(url, { waitUntil: "domcontentloaded" })
 
-  return await requestFinishedPromise
+  return await navigationRequestPromise
 }
 
 export async function clickCategoryButton(testId: string, page: Page) {
@@ -877,4 +883,37 @@ export async function expectHistoryLogRow(
   )
   await expect(createdByCell).toHaveText(createdBy)
   await expect(descriptionCell).toHaveText(description)
+}
+
+export async function navigateToCategoryImport(
+  page: Page,
+  documentNumber: string,
+  options?: {
+    category?: DocumentUnitCategoriesEnum
+    skipAssert?: boolean
+    type?: "pending-proceeding" | "documentunit"
+  },
+) {
+  await navigateToCategories(page, documentNumber, options)
+  await page.getByLabel("Seitenpanel öffnen").click()
+  await page.getByTestId("category-import-button").click()
+
+  await expect(page.getByText("Rubriken importieren")).toBeVisible()
+  await expect(page.getByLabel("Dokumentnummer Eingabefeld")).toBeVisible()
+}
+
+export async function searchForDocumentUnitToImport(
+  page: Page,
+  documentNumber: string,
+) {
+  await page
+    .getByRole("textbox", { name: "Dokumentnummer Eingabefeld" })
+    .fill(documentNumber)
+
+  await expect(
+    page.getByRole("button", { name: "Dokumentationseinheit laden" }),
+  ).toBeEnabled()
+  await page
+    .getByRole("button", { name: "Dokumentationseinheit laden" })
+    .click()
 }

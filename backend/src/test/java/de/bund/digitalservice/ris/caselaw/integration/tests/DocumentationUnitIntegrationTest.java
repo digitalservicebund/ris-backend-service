@@ -63,6 +63,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
@@ -291,7 +292,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Test
   void testForFileNumbersDbEntryAfterUpdateByUuid() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, "1234567890123");
 
     Decision decisionFromFrontend =
@@ -352,7 +353,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                 .build());
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -397,7 +398,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Test
   void testUpdateNormReferenceWithoutNormAbbreviationAndWithNormAbbreviationRawValue() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, "1234567890123");
 
     List<SingleNorm> singleNorms = List.of(SingleNorm.builder().singleNorm("Art 7 S 1").build());
@@ -468,7 +469,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   void
       testUpdateNormReferenceWithoutNormAbbreviationAndWithNormAbbreviationRawValue_shouldAlsoGroupNorms() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, "1234567890123");
 
     List<SingleNorm> singleNorms =
@@ -565,7 +566,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                 .build());
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, "1234567890123");
 
     Decision decisionFromFrontend =
@@ -636,7 +637,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     repository.deleteAll();
 
     DocumentationUnitDTO documentationUnitDto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, "1234567890123");
 
     Decision decisionFromFrontend =
@@ -686,7 +687,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
 
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository,
             DecisionDTO.builder()
                 .documentNumber("1234567890123")
@@ -743,7 +744,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                   .build());
 
       DocumentationUnitDTO dto =
-          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          EntityBuilderTestUtil.createAndSaveDecision(
               repository,
               DecisionDTO.builder()
                   .documentNumber(randomDocNumber)
@@ -809,7 +810,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  void testSearchByDocumentationUnitSearchInput() {
+  @SuppressWarnings("java:S5961") // Ignore Sonar complexity warning
+  void testSearchByDecisionSearchInput() {
     UUID otherDocOfficeUuid = documentationOfficeRepository.findByAbbreviation("BGH").getId();
 
     List<UUID> docOfficeIds =
@@ -856,7 +858,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                   .jurisId(new Random().nextInt())
                   .build());
 
-      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+      EntityBuilderTestUtil.createAndSaveDecision(
           repository,
           DecisionDTO.builder()
               .documentNumber(documentNumbers.get(i))
@@ -874,7 +876,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         documentationOfficeRepository.findByAbbreviation("BGH");
     String documentNumber = "1234567890123";
 
-    EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository, otherDocumentationOffice, documentationOffice, documentNumber);
 
     // no search criteria
@@ -977,9 +979,261 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("java:S5961") // Ignore Sonar complexity warning
+  void testSearchByPendingProceedingSearchInput() {
+    UUID otherDocOfficeUuid = documentationOfficeRepository.findByAbbreviation("BGH").getId();
+
+    List<UUID> docOfficeIds =
+        List.of(
+            documentationOffice.getId(),
+            documentationOffice.getId(),
+            documentationOffice.getId(),
+            documentationOffice.getId(),
+            otherDocOfficeUuid,
+            otherDocOfficeUuid);
+    List<String> documentNumbers =
+        List.of(
+            "ABCD202300007",
+            "EFGH202200123",
+            "IJKL202101234",
+            "MNOP202300099",
+            "QRST202200102",
+            "UVWX202311090");
+    List<String> fileNumbers = List.of("jkl", "ghi", "def", "ABC", "mno", "pqr");
+    List<String> courtTypes = List.of("MNO", "PQR", "STU", "VWX", "YZA", "BCD");
+    List<String> courtLocations =
+        List.of("Hamburg", "München", "Berlin", "Frankfurt", "Köln", "Leipzig");
+    List<LocalDate> decisionDates =
+        List.of(
+            LocalDate.parse("2021-01-02"),
+            LocalDate.parse("2022-02-03"),
+            LocalDate.parse("2023-03-04"),
+            LocalDate.parse("2023-08-01"),
+            LocalDate.parse("2023-08-10"),
+            LocalDate.parse("2023-09-10"));
+    List<PublicationStatus> statuses =
+        List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, PUBLISHED, UNPUBLISHED, PUBLISHED);
+    List<Boolean> errorStatuses = List.of(false, true, true, false, true, true);
+    List<Boolean> isResolved = List.of(true, false, true, false, false, true);
+    List<LocalDate> resolutionDate =
+        List.of(
+            LocalDate.parse("2023-02-02"),
+            LocalDate.parse("2022-02-02"),
+            LocalDate.parse("2024-02-02"),
+            LocalDate.parse("2020-02-02"),
+            LocalDate.parse("2025-02-02"),
+            LocalDate.parse("1999-02-02"));
+
+    for (int i = 0; i < 6; i++) {
+
+      CourtDTO court =
+          databaseCourtRepository.save(
+              CourtDTO.builder()
+                  .type(courtTypes.get(i))
+                  .location(courtLocations.get(i))
+                  .isSuperiorCourt(true)
+                  .isForeignCourt(false)
+                  .jurisId(new Random().nextInt())
+                  .build());
+
+      EntityBuilderTestUtil.createAndSavePendingProceeding(
+          repository,
+          PendingProceedingDTO.builder()
+              .documentNumber(documentNumbers.get(i))
+              .court(court)
+              .date(decisionDates.get(i))
+              .documentationOffice(DocumentationOfficeDTO.builder().id(docOfficeIds.get(i)).build())
+              .isResolved(isResolved.get(i))
+              .resolutionDate(resolutionDate.get(i))
+              .fileNumbers(
+                  List.of(
+                      FileNumberDTO.builder().value(fileNumbers.get(i)).rank((long) i).build())),
+          statuses.get(i),
+          errorStatuses.get(i));
+    }
+
+    String documentNumber = "1234567890123";
+
+    EntityBuilderTestUtil.createAndSavePendingProceeding(
+        repository, documentationOffice, documentNumber);
+
+    // no search criteria
+    DocumentationUnitSearchInput searchInput =
+        DocumentationUnitSearchInput.builder().kind(Kind.PENDING_PROCEEDING).build();
+    // the unpublished one from the other docoffice is not in it, the others are ordered
+    // by documentNumber
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains(
+            "ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099", "UVWX202311090");
+
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).contains("1234567890123");
+
+    // by documentNumber
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .documentNumber("abc")
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("ABCD202300007");
+
+    // by fileNumber
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .fileNumber("abc")
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("MNOP202300099");
+
+    // by fileNumber start
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .fileNumber("ab")
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("MNOP202300099");
+
+    // by fileNumber ending without wildcard (%) should not return anything
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .fileNumber("bc")
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).isEmpty();
+
+    // by fileNumber ending
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .fileNumber("%bc")
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("MNOP202300099");
+
+    // by documentNumber & fileNumber
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .fileNumber("abc")
+            .documentNumber("abc")
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).isEmpty();
+
+    // by court
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .courtType("pqr")
+            .courtLocation("münchen")
+            .build();
+
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("EFGH202200123");
+
+    // by decisionDate
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .decisionDate(decisionDates.get(2))
+            .build();
+
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
+
+    // by resolutionDate
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .resolutionDate(resolutionDate.get(2))
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
+
+    // by isResolved
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .isResolved(true)
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .containsExactly("UVWX202311090", "IJKL202101234", "ABCD202300007");
+
+    // by status
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .status(Status.builder().publicationStatus(UNPUBLISHED).build())
+            .build();
+
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("EFGH202200123");
+
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .status(Status.builder().publicationStatus(PUBLISHED).build())
+            .build();
+
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains("ABCD202300007", "MNOP202300099", "UVWX202311090");
+
+    // by error status
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .status(Status.builder().withError(true).build())
+            .build();
+    // the docunit with error from the other docoffice should not appear
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains("EFGH202200123", "IJKL202101234");
+
+    // by documentation office
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .myDocOfficeOnly(true)
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains("ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099");
+
+    // between two decision dates
+    LocalDate start = LocalDate.parse("2022-02-01");
+    LocalDate end = LocalDate.parse("2023-08-05");
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .decisionDate(start)
+            .decisionDateEnd(end)
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains("EFGH202200123", "IJKL202101234", "MNOP202300099");
+
+    // between two resolution dates
+    LocalDate startResolutionDate = LocalDate.parse("2020-02-01");
+    LocalDate endResolutionDate = LocalDate.parse("2023-08-05");
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .resolutionDate(startResolutionDate)
+            .resolutionDateEnd(endResolutionDate)
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains("MNOP202300099", "EFGH202200123", "ABCD202300007");
+
+    // all combined
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .kind(Kind.PENDING_PROCEEDING)
+            .documentNumber("abc")
+            .courtType("MNO")
+            .courtLocation("Hamburg")
+            .decisionDate(decisionDates.get(0))
+            .status(Status.builder().publicationStatus(PUBLISHED).build())
+            .isResolved(isResolved.get(0))
+            .resolutionDate(resolutionDate.get(0))
+            .build();
+
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).contains("ABCD202300007");
+  }
+
+  @Test
   void testSearchByFileNumber_withFileNumberAndDeviatingFileNumber_shouldOnlyReturnOneResult() {
 
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("documentNumber")
@@ -1003,6 +1257,10 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
     queryParams.add("pg", "0");
     queryParams.add("sz", "30");
+
+    if (searchInput.kind() != null) {
+      queryParams.add("kind", searchInput.kind().toString());
+    }
 
     if (searchInput.documentNumber() != null) {
       queryParams.add("documentNumber", searchInput.documentNumber());
@@ -1033,6 +1291,22 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         queryParams.add("publicationStatus", searchInput.status().publicationStatus().toString());
       }
       queryParams.add("withError", String.valueOf(searchInput.status().withError()));
+    }
+
+    if (searchInput.resolutionDate() != null) {
+      queryParams.add("resolutionDate", searchInput.resolutionDate().toString());
+    }
+
+    if (searchInput.resolutionDateEnd() != null) {
+      queryParams.add("resolutionDateEnd", searchInput.resolutionDateEnd().toString());
+    }
+
+    if (searchInput.isResolved()) {
+      queryParams.add("isResolved", String.valueOf(true));
+    }
+
+    if (searchInput.kind() != null) {
+      queryParams.add("kind", searchInput.kind().toString());
     }
 
     queryParams.add("myDocOfficeOnly", String.valueOf(searchInput.myDocOfficeOnly()));
@@ -1121,7 +1395,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     }
     assertThat(documentOffice).isNotNull();
 
-    return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    return EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentationOffice(documentOffice)
@@ -1148,7 +1422,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .build();
     repository.save(referencedDTO);
 
-    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+    EntityBuilderTestUtil.createAndSaveDecision(
         repository,
         DecisionDTO.builder()
             .documentNumber("ZZRE202400002")
@@ -1419,7 +1693,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     var ds = documentationOfficeRepository.findByAbbreviation("DS");
 
     var pendingDocUnit =
-        EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, creatingDocumentationOffice, documentNumber);
 
     risWebTestClient
@@ -1465,18 +1739,14 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               .documentNumber("DOCNUMBER_001")
               .documentationOffice(documentationOffice)
               .inboxStatus(InboxStatus.EXTERNAL_HANDOVER);
-      var docUnit1 =
-          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-              repository, decisionBuilder1);
+      var docUnit1 = EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder1);
 
       var decisionBuilder2 =
           DecisionDTO.builder()
               .documentNumber("DOCNUMBER_002")
               .documentationOffice(documentationOffice)
               .inboxStatus(InboxStatus.EU);
-      var docUnit2 =
-          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-              repository, decisionBuilder2);
+      var docUnit2 = EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder2);
       var docUnitIds = List.of(docUnit1.getId(), docUnit2.getId());
       risWebTestClient
           .withDefaultLogin()
@@ -1513,9 +1783,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               .documentNumber("DOCNUMBER_001")
               .documentationOffice(documentationOffice)
               .inboxStatus(null);
-      var docUnit1 =
-          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-              repository, decisionBuilder1);
+      var docUnit1 = EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder1);
 
       var docUnitIds = List.of(docUnit1.getId());
       risWebTestClient
@@ -1552,9 +1820,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               .documentationOffice(documentationOffice)
               .procedure(procedure)
               .inboxStatus(InboxStatus.EXTERNAL_HANDOVER);
-      var docUnit1 =
-          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-              repository, decisionBuilder1);
+      var docUnit1 = EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder1);
 
       var pendingProceedingBuilder2 =
           PendingProceedingDTO.builder()
@@ -1568,9 +1834,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               .documentNumber("DOCNUMBER_003")
               .documentationOffice(documentationOffice)
               .inboxStatus(InboxStatus.EU);
-      var docUnit3 =
-          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-              repository, decisionBuilder3);
+      var docUnit3 = EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder3);
       var docUnitIds = List.of(docUnit1.getId(), pendingProceeding2.getId(), docUnit3.getId());
       risWebTestClient
           .withDefaultLogin()
@@ -1605,9 +1869,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               .documentNumber("DOCNUMBER_001")
               .documentationOffice(bghDocOffice)
               .inboxStatus(InboxStatus.EXTERNAL_HANDOVER);
-      var docUnit1 =
-          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-              repository, decisionBuilder1);
+      var docUnit1 = EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder1);
 
       var docUnitIds = List.of(docUnit1.getId());
       risWebTestClient
@@ -1630,7 +1892,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .documentNumber("DOCNUMBER_001")
             .documentationOffice(documentationOffice);
     var documentationUnit =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(repository, decisionBuilder);
+        EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder);
 
     // Act
     risWebTestClient
@@ -1663,7 +1925,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .documentNumber("DOCNUMBER_001")
             .documentationOffice(documentationOffice);
     var documentationUnit =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(repository, decisionBuilder);
+        EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder);
 
     // Act
     risWebTestClient
@@ -1782,7 +2044,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Test
   void test_getDocumentationUnitImage_shouldSucceed() {
     DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        EntityBuilderTestUtil.createAndSaveDecision(
             repository, documentationOffice, "TEST123456789");
 
     when(attachmentService.findByDocumentationUnitIdAndFileName(dto.getId(), "image.png"))

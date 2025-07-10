@@ -61,8 +61,8 @@ public class PrototypePortalPublicationService extends CommonPortalPublicationSe
     List<String> portalBucketDocumentNumbers =
         prototypePortalBucket.getAllFilenames().stream()
             .filter(fileName -> fileName.contains(".xml"))
+            .map(fileName -> fileName.substring(fileName.lastIndexOf("/") + 1))
             .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
-            //            .map(fileName -> fileName.substring(0, fileName.lastIndexOf("/")))
             .toList();
 
     logDatabaseToBucketDiff(portalBucketDocumentNumbers);
