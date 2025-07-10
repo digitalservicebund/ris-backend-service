@@ -215,7 +215,7 @@ watch(
     class="flex flex-col bg-blue-200"
   >
     <div
-      class="m-40 grid grid-cols-[100px_1fr_200px_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-x-12 gap-y-20 [grid-template-areas:'az-label_az-input_docnumber-label_docnumber-input''court-label_court-input_status-label_status-input''date-label_date-input_resolution-date-label_resolution-date-input''publication-label_publication-input_._resolution-input''._._._search-button'] lg:gap-x-32"
+      class="m-40 grid grid-cols-[100px_1fr_200px_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-y-20 [grid-template-areas:'az-label_az-input_docnumber-label_docnumber-input''court-label_court-input_status-label_status-input''date-label_date-input_resolution-date-label_resolution-date-input''publication-label_publication-input_._resolution-input''._._._search-button'] lg:gap-x-40"
     >
       <div
         class="ris-body1-regular ml-3 flex flex-row items-center [grid-area:az-label]"

@@ -135,33 +135,6 @@ describe("CategoryImport", () => {
   })
 
   describe("Pending proceeding", () => {
-    it("displays error when pending proceeding is searched for import into pending proceeding", async () => {
-      const source = new PendingProceeding("q834")
-      const target = new PendingProceeding("uuid", {
-        documentNumber: "XXRE123456789",
-        kind: Kind.PENDING_PROCEEDING,
-      })
-      vi.spyOn(documentUnitService, "getByDocumentNumber").mockImplementation(
-        () => Promise.resolve({ status: 200, data: source }),
-      )
-      mockSessionStore(target)
-
-      const { user } = renderComponent()
-
-      await user.type(
-        screen.getByLabelText("Dokumentnummer Eingabefeld"),
-        "XXRE123456789",
-      )
-
-      await user.click(
-        screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
-      )
-
-      expect(
-        screen.getByText("Import zwischen anhängigen Verfahren nicht möglich."),
-      ).toBeInTheDocument()
-    })
-
     it("displays exclusively contentRelatedIndexing categories when the source is a pending proceeding", async () => {
       const source = new PendingProceeding("q834")
       const target = new Decision("uuid", {

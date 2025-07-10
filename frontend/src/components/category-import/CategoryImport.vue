@@ -17,7 +17,7 @@ import Reference from "@/domain/reference"
 import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
+import { isDecision } from "@/utils/typeGuards"
 import IconSearch from "~icons/ic/baseline-search"
 
 const props = defineProps<{
@@ -49,14 +49,6 @@ async function searchForDocumentUnit() {
 
   if (!response.data) {
     errorMessage.value = "Keine Dokumentationseinheit gefunden."
-    return
-  }
-
-  if (
-    isPendingProceeding(response.data) &&
-    isPendingProceeding(targetDocumentUnit.value)
-  ) {
-    errorMessage.value = "Import zwischen anhängigen Verfahren nicht möglich."
     return
   }
 
