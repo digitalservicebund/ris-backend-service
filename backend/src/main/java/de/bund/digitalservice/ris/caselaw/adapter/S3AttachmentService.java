@@ -13,9 +13,9 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
-import de.bund.digitalservice.ris.caselaw.domain.ImageBase64Util;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.image.ImageUtil;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -92,7 +92,7 @@ public class S3AttachmentService implements AttachmentService {
     if (equalsMediaType(wordMediaType, contentType)) {
       return attachDocx(
           documentationUnitId, byteBuffer, httpHeaders, user, documentationUnit, fileName);
-    } else if (ImageBase64Util.getSupportedMediaTypes().stream()
+    } else if (ImageUtil.getSupportedMediaTypes().stream()
         .anyMatch(type -> equalsMediaType(type, contentType))) {
 
       return attachImage(byteBuffer, contentType, documentationUnit);

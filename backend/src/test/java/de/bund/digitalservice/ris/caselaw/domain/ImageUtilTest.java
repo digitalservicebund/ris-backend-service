@@ -1,5 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.domain.image.ImageRotationAngle;
+import de.bund.digitalservice.ris.caselaw.domain.image.ImageUtil;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
@@ -9,11 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-class ImageBase64UtilTest {
+class ImageUtilTest {
 
   private static final String BASE64_PNG_SOURCE_SRC_TAG =
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII";
@@ -31,7 +37,7 @@ class ImageBase64UtilTest {
   @Test
   void test_extractBase64ImageTags() {
     var html = "<p>" + getDefaultImageTag().outerHtml() + "</p>";
-    var results = ImageBase64Util.extractBase64ImageTags(Jsoup.parse(html));
+    var results = ImageUtil.extractBase64ImageTags(Jsoup.parse(html));
     Assertions.assertFalse(results.isEmpty());
   }
 
@@ -44,7 +50,7 @@ class ImageBase64UtilTest {
 
     Assertions.assertNotNull(imageTag);
     Element updatedImageTag =
-        ImageBase64Util.createImageElementWithNewSrc(
+        ImageUtil.createImageElementWithNewSrc(
             imageTag, "26883193-d749-4003-9940-432b3d87e435.png", "YYTestDoc0001");
 
     Assertions.assertNotNull(updatedImageTag);
@@ -63,7 +69,7 @@ class ImageBase64UtilTest {
     IllegalArgumentException thrown =
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> ImageBase64Util.createImageElementWithNewSrc(imageTag, "123.png", null));
+            () -> ImageUtil.createImageElementWithNewSrc(imageTag, "123.png", null));
 
     Assertions.assertEquals(
         "Documentation unit number can't be null or blank", thrown.getMessage());
@@ -76,7 +82,7 @@ class ImageBase64UtilTest {
     IllegalArgumentException thrown =
         Assertions.assertThrows(
             IllegalArgumentException.class,
-            () -> ImageBase64Util.createImageElementWithNewSrc(imageTag, null, "YYTestDoc0001"));
+            () -> ImageUtil.createImageElementWithNewSrc(imageTag, null, "YYTestDoc0001"));
 
     Assertions.assertEquals("File name must have a valid image extension", thrown.getMessage());
   }
@@ -89,7 +95,7 @@ class ImageBase64UtilTest {
         Assertions.assertThrows(
             IllegalArgumentException.class,
             () ->
-                ImageBase64Util.createImageElementWithNewSrc(
+                ImageUtil.createImageElementWithNewSrc(
                     imageTag, "fileNameWithoutExtension", "YYTestDoc0001"));
 
     Assertions.assertEquals("File name must have a valid image extension", thrown.getMessage());
@@ -98,7 +104,7 @@ class ImageBase64UtilTest {
   @ParameterizedTest
   @MethodSource("imageFormatsWithFileMagicNumbers")
   void testBase64ToByteEncoder(String base64, byte[] expectedHeader) {
-    ByteBuffer result = ImageBase64Util.encodeToBytes(base64);
+    ByteBuffer result = ImageUtil.encodeToBytes(base64);
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.remaining() > 0, "Decoded buffer should not be empty");
 
@@ -149,6 +155,54 @@ class ImageBase64UtilTest {
     "jpeg, data:image/JPEG;base64,/9j/4AAQSkZJRgABAQEAYABgAAD",
   })
   void testGetFileExtension(String extension, String src) {
-    Assertions.assertEquals(extension, ImageBase64Util.getFileExtension(src));
+    Assertions.assertEquals(extension, ImageUtil.getFileExtension(src));
+  }
+
+  @ParameterizedTest
+  @EnumSource(ImageRotationAngle.class)
+  void testImageRotation(ImageRotationAngle rotationAngle) {
+
+    int width = 120;
+    int height = 80;
+
+    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    Graphics2D g = image.createGraphics();
+
+    g.fillRect(0, 0, width, height);
+
+    int red = Color.RED.getRGB();
+
+    // Setting top left red button for assertions after rotation
+    image.setRGB(0, 0, red);
+
+    g.dispose();
+
+    Assertions.assertNotNull(image);
+
+    BufferedImage rotated = ImageUtil.rotateImage(image, rotationAngle);
+
+    switch (rotationAngle) {
+      case D90 -> {
+        Assertions.assertEquals(height, rotated.getWidth());
+        Assertions.assertEquals(width, rotated.getHeight());
+
+        // After 90° rotation, (0,0) → (height - 1, 0)
+        Assertions.assertEquals(red, rotated.getRGB(height - 1, 0));
+      }
+      case D180 -> {
+        Assertions.assertEquals(width, rotated.getWidth());
+        Assertions.assertEquals(height, rotated.getHeight());
+
+        // After 180° rotation, (0,0) → (width - 1, height - 1)
+        Assertions.assertEquals(red, rotated.getRGB(width - 1, height - 1));
+      }
+      case D270 -> {
+        Assertions.assertEquals(height, rotated.getWidth());
+        Assertions.assertEquals(width, rotated.getHeight());
+
+        // After 270° rotation, (0,0) → (0, width - 1)
+        Assertions.assertEquals(red, rotated.getRGB(0, width - 1));
+      }
+    }
   }
 }
