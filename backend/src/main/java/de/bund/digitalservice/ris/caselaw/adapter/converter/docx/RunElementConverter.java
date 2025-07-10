@@ -345,10 +345,13 @@ public class RunElementConverter {
         }
 
         try {
-          Optional<DocxImagePart> optionalRotatedDocxImagePart =
-              getRotatedDocxImagePart(image, getImageRotationDegrees(pic.getSpPr()));
-          if (optionalRotatedDocxImagePart.isPresent()) {
-            image = optionalRotatedDocxImagePart.get();
+          Optional<ImageRotationAngle> rotationAngle = getImageRotationDegrees(pic.getSpPr());
+          if (rotationAngle.isPresent()) {
+            Optional<DocxImagePart> optionalRotatedDocxImagePart =
+                getRotatedDocxImagePart(image, rotationAngle.get());
+            if (optionalRotatedDocxImagePart.isPresent()) {
+              image = optionalRotatedDocxImagePart.get();
+            }
           }
         } catch (Exception e) {
           LOGGER.error("Error rotating image", e);
@@ -386,14 +389,15 @@ public class RunElementConverter {
     }
   }
 
-  private static ImageRotationAngle getImageRotationDegrees(CTShapeProperties ctShapeProperties) {
+  private static Optional<ImageRotationAngle> getImageRotationDegrees(
+      CTShapeProperties ctShapeProperties) {
 
-    if (ctShapeProperties == null || ctShapeProperties.getXfrm() == null) {
-      throw new DocxConverterException(
-          "Could not extract image rotation, rotation info was not found");
+    try {
+      var rotation = ctShapeProperties.getXfrm().getRot();
+      return Optional.of(ImageRotationAngle.fromDegrees(rotation / 60000));
+    } catch (Exception e) {
+      return Optional.empty();
     }
-    var rotation = ctShapeProperties.getXfrm().getRot();
-    return ImageRotationAngle.fromDegrees(rotation / 60000);
   }
 
   // convert images before
