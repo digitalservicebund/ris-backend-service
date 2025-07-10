@@ -24,7 +24,9 @@ test.describe(
       const citation3 = citationPrefix + ", 2"
 
       await test.step("References is a new selectable menu item in a documentation unit", async () => {
-        await navigateToReferences(page, pendingProceeding.documentNumber)
+        await navigateToReferences(page, pendingProceeding.documentNumber, {
+          type: "pending-proceeding",
+        })
       })
 
       await test.step("When typing the legal periodical abbreviation (MM), the entry including abbreviation, title and subtitle can be found in the combobox", async () => {
@@ -53,7 +55,11 @@ test.describe(
 
       await test.step("Reference can be added to editable list", async () => {
         await page.getByLabel("Fundstelle speichern", { exact: true }).click()
-        await expect(page.getByText("MM " + citation1 + " (LT)")).toBeVisible()
+        await expect(
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("MM " + citation1 + " (LT)"),
+        ).toBeVisible()
         await expect(page.getByText("sekundär", { exact: true })).toBeVisible()
       })
 
@@ -61,7 +67,11 @@ test.describe(
 
       await test.step("Reference is persisted and shown after reload", async () => {
         await page.reload()
-        await expect(page.getByText("MM " + citation1 + " (LT)")).toBeVisible()
+        await expect(
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("MM " + citation1 + " (LT)"),
+        ).toBeVisible()
         await expect(page.getByText("sekundär", { exact: true })).toBeVisible()
       })
 
@@ -82,7 +92,9 @@ test.describe(
         ).toBeVisible()
         await page.getByLabel("Fundstelle speichern", { exact: true }).click()
         await expect(
-          page.getByText("GVBl BB " + citation1 + " (LT)"),
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("GVBl BB " + citation1 + " (LT)"),
         ).toBeVisible()
 
         await expect(page.getByText("primär", { exact: true })).toBeVisible()
@@ -94,10 +106,14 @@ test.describe(
 
         await page.getByLabel("Fundstelle speichern", { exact: true }).click()
         await expect(
-          page.getByText("GVBl BB " + citation1 + " (LT)"),
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("GVBl BB " + citation1 + " (LT)"),
         ).toBeHidden()
         await expect(
-          page.getByText("GVBl BB " + citation1 + " (S)"),
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("GVBl BB " + citation1 + " (S)"),
         ).toBeVisible()
 
         await expect(page.getByText("primär", { exact: true })).toBeVisible()
@@ -109,10 +125,14 @@ test.describe(
 
         await page.getByLabel("Abbrechen").click()
         await expect(
-          page.getByText("GVBl BB " + citation1 + " (LT)"),
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("GVBl BB " + citation1 + " (LT)"),
         ).toBeHidden()
         await expect(
-          page.getByText("GVBl BB " + citation1 + " (S)"),
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("GVBl BB " + citation1 + " (S)"),
         ).toBeVisible()
 
         await expect(page.getByText("primär", { exact: true })).toBeVisible()
@@ -132,7 +152,11 @@ test.describe(
         await fillInput(page, "Zitatstelle", citation2)
         await fillInput(page, "Klammernzusatz", "ST")
         await page.getByLabel("Fundstelle speichern", { exact: true }).click()
-        await expect(page.getByText("WdG " + citation2 + " (ST)")).toBeVisible()
+        await expect(
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("WdG " + citation2 + " (ST)"),
+        ).toBeVisible()
       })
       await save(page)
 
@@ -150,7 +174,9 @@ test.describe(
         await fillInput(page, "Klammernzusatz", "L")
         await page.getByLabel("Fundstelle speichern", { exact: true }).click()
         await expect(
-          page.getByText("AllMBl " + citation3 + " (L)"),
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("AllMBl " + citation3 + " (L)"),
         ).toBeVisible()
       })
       await save(page)
@@ -171,10 +197,14 @@ test.describe(
         await page.getByTestId("list-entry-1").click()
         await page.getByLabel("Eintrag löschen", { exact: true }).click()
         await expect(
-          page.getByText("AllMBl " + citation3 + " (L)"),
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("AllMBl " + citation3 + " (L)"),
         ).toBeHidden()
         await expect(
-          page.getByText("GVBl BB " + citation1 + " (S)"),
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("GVBl BB " + citation1 + " (S)"),
         ).toBeVisible()
       })
       await test.step("Delete last reference and verify the list is empty", async () => {
@@ -202,7 +232,9 @@ test.describe(
     }) => {
       const citation = generateString() + ", 10-12"
 
-      await navigateToReferences(page, pendingProceeding.documentNumber ?? "")
+      await navigateToReferences(page, pendingProceeding.documentNumber ?? "", {
+        type: "pending-proceeding",
+      })
 
       await test.step("Add reference with only 'Klammerzusatz' shows error in 'Periodikum' & 'Zitatstelle'", async () => {
         await fillInput(page, "Klammernzusatz", "LT")
@@ -242,7 +274,9 @@ test.describe(
       pendingProceeding,
     }) => {
       const citation = generateString() + ", 2"
-      await navigateToReferences(page, pendingProceeding.documentNumber ?? "")
+      await navigateToReferences(page, pendingProceeding.documentNumber ?? "", {
+        type: "pending-proceeding",
+      })
 
       await test.step("Literature references are validated for required inputs", async () => {
         await expect(
@@ -303,7 +337,9 @@ test.describe(
       })
 
       await test.step("Add primary and secondary references with all data", async () => {
-        await navigateToReferences(page, documentNumber)
+        await navigateToReferences(page, documentNumber, {
+          type: "pending-proceeding",
+        })
         await fillInput(page, "Periodikum", "wdg")
         await page
           .getByText("WdG | Welt der Gesundheitsversorgung", {
@@ -313,7 +349,11 @@ test.describe(
         await fillInput(page, "Zitatstelle", citation1)
         await fillInput(page, "Klammernzusatz", "LT")
         await page.getByLabel("Fundstelle speichern", { exact: true }).click()
-        await expect(page.getByText("WdG " + citation1 + " (LT)")).toBeVisible()
+        await expect(
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("WdG " + citation1 + " (LT)"),
+        ).toBeVisible()
         await expect(
           page.getByText("sekundär", {
             exact: true,
@@ -330,7 +370,9 @@ test.describe(
         await fillInput(page, "Klammernzusatz", "L")
         await page.getByLabel("Fundstelle speichern", { exact: true }).click()
         await expect(
-          page.getByText("GVBl BB " + citation2 + " (L)"),
+          page
+            .getByTestId("caselaw-reference-list")
+            .getByText("GVBl BB " + citation2 + " (L)"),
         ).toBeVisible()
         await expect(
           page.getByText("primär", {
@@ -371,7 +413,9 @@ test.describe(
       })
 
       await test.step("Literature references are located in a dedicated editable list", async () => {
-        await navigateToReferences(page, pendingProceeding.documentNumber)
+        await navigateToReferences(page, pendingProceeding.documentNumber, {
+          type: "pending-proceeding",
+        })
         await expect(
           page.getByText("Literaturfundstellen", { exact: true }),
         ).toBeVisible()
@@ -399,7 +443,9 @@ test.describe(
           .getByLabel("Literaturfundstelle speichern", { exact: true })
           .click()
         await expect(
-          page.getByText("AllMBl " + citation1 + ", Bilen, Ulviye (Ean)"),
+          page
+            .getByTestId("literature-reference-list")
+            .getByText("AllMBl " + citation1 + ", Bilen, Ulviye (Ean)"),
         ).toBeVisible()
       })
 

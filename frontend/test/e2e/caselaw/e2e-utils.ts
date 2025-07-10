@@ -97,9 +97,13 @@ export const navigateToCategories = async (
 export const navigateToReferences = async (
   page: Page,
   documentNumber: string,
+  options?: {
+    type?: "pending-proceeding" | "documentunit"
+  },
 ) => {
   await test.step("Navigate to 'Fundstellen'", async () => {
-    const baseUrl = `/caselaw/documentunit/${documentNumber}/references`
+    const documentType = options?.type ?? "documentunit"
+    const baseUrl = `/caselaw/${documentType}/${documentNumber}/references`
 
     await page.goto(baseUrl)
     await expect(

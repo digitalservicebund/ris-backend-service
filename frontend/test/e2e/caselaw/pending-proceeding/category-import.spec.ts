@@ -14,18 +14,14 @@ test.describe("category import of pending proceeding", () => {
     { tag: ["@RISDEV-7012"] },
     async ({
       page,
-      prefilledPendingProceeding,
       pendingProceeding,
+      prefilledPendingProceeding,
       prefilledDocumentUnit,
       documentNumber,
     }) => {
-      await navigateToCategoryImport(
-        page,
-        prefilledPendingProceeding.documentNumber,
-        {
-          type: "pending-proceeding",
-        },
-      )
+      await navigateToCategoryImport(page, pendingProceeding.documentNumber, {
+        type: "pending-proceeding",
+      })
 
       await test.step("Wird nach einer falschen Dokumentnummer gesucht, erscheint ein Fehler", async () => {
         await searchForDocumentUnitToImport(page, "invalidnumber")
@@ -37,7 +33,7 @@ test.describe("category import of pending proceeding", () => {
       await test.step("Wird nach anhängigen Verfahren gesucht, erscheint ein Fehler", async () => {
         await searchForDocumentUnitToImport(
           page,
-          pendingProceeding.documentNumber,
+          prefilledPendingProceeding.documentNumber,
         )
         await expect(
           page.getByText("Import zwischen anhängigen Verfahren nicht möglich."),
@@ -97,17 +93,11 @@ test.describe("category import of pending proceeding", () => {
     { tag: ["@RISDEV-7012"] },
     async ({
       page,
-      prefilledDocumentUnit,
+      documentNumber,
       prefilledPendingProceeding,
       pendingProceeding,
     }) => {
-      await navigateToCategoryImport(
-        page,
-        prefilledDocumentUnit.documentNumber,
-        {
-          type: "pending-proceeding",
-        },
-      )
+      await navigateToCategoryImport(page, documentNumber)
 
       await test.step("Wird nach einer falschen Dokumentnummer gesucht, erscheint ein Fehler", async () => {
         await searchForDocumentUnitToImport(page, "invalidnumber")
@@ -424,7 +414,7 @@ test.describe("category import of pending proceeding", () => {
 
   // Normen
   test(
-    "Importiere Normen aus einer Entscheidung in ein Anhängiges Verfahren",
+    "Importiere Normen von einer Entscheidung in ein Anhängiges Verfahren",
     { tag: ["@RISDEV-7012"] },
     async ({ page, pendingProceeding, prefilledDocumentUnit }) => {
       await navigateToCategoryImport(page, pendingProceeding.documentNumber, {
@@ -482,7 +472,7 @@ test.describe("category import of pending proceeding", () => {
   )
 
   test(
-    "Importiere Normen aus einem Anhängigen Verfahren in eine Entscheidung",
+    "Importiere Normen von einem Anhängigen Verfahren in eine Entscheidung",
     { tag: ["@RISDEV-7012"] },
     async ({ page, documentNumber, prefilledPendingProceeding }) => {
       await navigateToCategoryImport(page, documentNumber)
