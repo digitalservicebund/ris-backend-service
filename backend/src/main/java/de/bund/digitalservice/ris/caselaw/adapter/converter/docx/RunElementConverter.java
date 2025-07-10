@@ -356,6 +356,11 @@ public class RunElementConverter {
         } catch (Exception e) {
           LOGGER.error("Error rotating image", e);
         }
+
+        var optionalRotatedDocxImagePart = getRotatedImage(pic.getSpPr(), image);
+        if (optionalRotatedDocxImagePart.isPresent()) {
+          image = optionalRotatedDocxImagePart.get();
+        }
         addImageContent(imageElement, image, size);
       }
     } else {
@@ -367,6 +372,19 @@ public class RunElementConverter {
       return new ErrorRunElement("unknown graphic element: " + stringBuilder);
     }
     return imageElement;
+  }
+
+  private static Optional<DocxImagePart> getRotatedImage(
+      CTShapeProperties ctShapeProperties, DocxImagePart image) {
+    try {
+      Optional<ImageRotationAngle> rotationAngle = getImageRotationDegrees(ctShapeProperties);
+      if (rotationAngle.isPresent()) {
+        return getRotatedDocxImagePart(image, rotationAngle.get());
+      }
+    } catch (Exception e) {
+      LOGGER.error("Error rotating image: ", e);
+    }
+    return Optional.empty();
   }
 
   public static Optional<DocxImagePart> getRotatedDocxImagePart(
