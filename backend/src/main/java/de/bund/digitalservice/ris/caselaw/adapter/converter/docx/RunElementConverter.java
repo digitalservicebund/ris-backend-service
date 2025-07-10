@@ -344,20 +344,7 @@ public class RunElementConverter {
           image = new DocxImagePart("image/png", ImageUtil.convertEMF2PNG(image.bytes(), size));
         }
 
-        try {
-          Optional<ImageRotationAngle> rotationAngle = getImageRotationDegrees(pic.getSpPr());
-          if (rotationAngle.isPresent()) {
-            Optional<DocxImagePart> optionalRotatedDocxImagePart =
-                getRotatedDocxImagePart(image, rotationAngle.get());
-            if (optionalRotatedDocxImagePart.isPresent()) {
-              image = optionalRotatedDocxImagePart.get();
-            }
-          }
-        } catch (Exception e) {
-          LOGGER.error("Error rotating image", e);
-        }
-
-        var optionalRotatedDocxImagePart = getRotatedImage(pic.getSpPr(), image);
+        var optionalRotatedDocxImagePart = getRotatedDocxImagePart(pic.getSpPr(), image);
         if (optionalRotatedDocxImagePart.isPresent()) {
           image = optionalRotatedDocxImagePart.get();
         }
@@ -374,7 +361,7 @@ public class RunElementConverter {
     return imageElement;
   }
 
-  private static Optional<DocxImagePart> getRotatedImage(
+  private static Optional<DocxImagePart> getRotatedDocxImagePart(
       CTShapeProperties ctShapeProperties, DocxImagePart image) {
     try {
       Optional<ImageRotationAngle> rotationAngle = getImageRotationDegrees(ctShapeProperties);
