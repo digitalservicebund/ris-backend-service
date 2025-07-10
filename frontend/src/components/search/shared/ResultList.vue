@@ -10,7 +10,6 @@ import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import { ResponseError } from "@/services/httpClient"
 import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
 import IconEdit from "~icons/ic/outline-edit"
@@ -19,7 +18,6 @@ import IconArrowDown from "~icons/mdi/arrow-down-drop"
 
 const props = defineProps<{
   pageEntries?: Page<DocumentUnitListEntry>
-  error?: ResponseError
   loading?: boolean
 }>()
 const emit = defineEmits<{

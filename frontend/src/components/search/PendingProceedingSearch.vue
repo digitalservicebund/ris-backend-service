@@ -118,7 +118,8 @@ async function search() {
   if (response.data) {
     currentPage.value = response.data
     serviceError.value = undefined
-  } else if (response.error) {
+  }
+  if (response.error) {
     serviceError.value = response.error
   }
 
@@ -214,6 +215,7 @@ async function createNewFromSearch() {
     />
 
     <ResultList
+      v-if="!serviceError"
       :loading="isLoading"
       :page-entries="currentPage"
       @delete-documentation-unit="handleDelete"
