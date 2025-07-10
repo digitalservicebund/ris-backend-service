@@ -57,6 +57,19 @@ export const longTextLabels: {
   otherLongText: "Sonstiger Langtext",
   outline: "Gliederung",
 }
+export const contentRelatedIndexingLabels = {
+  keywords: "Schlagwörter",
+  fieldsOfLaw: "Sachgebiete",
+  norms: "Normen",
+}
+export const allLabels = {
+  caselawReferences: "Rechtsprechungsfundstellen",
+  literatureReferences: "Literaturfundstellen",
+  activeCitations: "Aktivzitierung",
+  ...contentRelatedIndexingLabels,
+  ...shortTextLabels,
+  ...longTextLabels,
+}
 
 export class Decision {
   readonly uuid: string
