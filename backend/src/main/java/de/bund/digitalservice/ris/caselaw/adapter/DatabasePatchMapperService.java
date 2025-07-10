@@ -18,10 +18,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.ImageBase64Util;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
+import de.bund.digitalservice.ris.caselaw.domain.image.ImageUtil;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import java.util.ArrayList;
 import java.util.List;
@@ -244,23 +244,23 @@ public class DatabasePatchMapperService implements PatchMapperService {
                   Document document = Jsoup.parse(originalText);
                   document.outputSettings().prettyPrint(false);
 
-                  var elements = ImageBase64Util.extractBase64ImageTags(document);
+                  var elements = ImageUtil.extractBase64ImageTags(document);
 
                   for (Element base64ImageTag : elements) {
                     HttpHeaders headers = new HttpHeaders();
-                    String fileName = "." + ImageBase64Util.getFileExtension(base64ImageTag);
+                    String fileName = "." + ImageUtil.getFileExtension(base64ImageTag);
                     headers.set("X-Filename", fileName);
 
                     MediaType contentType = MediaTypeFactory.getMediaType(fileName).orElse(null);
                     headers.setContentType(contentType);
 
-                    var byteBuffer = ImageBase64Util.encodeToBytes(base64ImageTag);
+                    var byteBuffer = ImageUtil.encodeToBytes(base64ImageTag);
                     Attachment attachment =
                         attachmentService.attachFileToDocumentationUnit(
                             documentationUnit.uuid(), byteBuffer, headers, null);
 
                     base64ImageTag.replaceWith(
-                        ImageBase64Util.createImageElementWithNewSrc(
+                        ImageUtil.createImageElementWithNewSrc(
                             base64ImageTag, attachment.name(), documentationUnit.documentNumber()));
                   }
                   if (operation instanceof AddOperation) {
