@@ -11,8 +11,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Transformer for converting documentation units to LDML format for public portal use. Implements
- * reduced meta-data mapping for public access.
+ * Transformer for converting documentation units to LDML format in full LDML format. Excludes
+ * metadata like classification and keywords. Currently, the public Prototype Portal is under
+ * restrictions and must not use full LDML for legal reasons.
  */
 @Slf4j
 public class ReducedLdmlTransformer implements PortalTransformer {
