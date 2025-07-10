@@ -441,7 +441,7 @@ test.describe("category import of pending proceeding", () => {
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(3) // the last entry is the input field
         await expect(
           normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefG BGB RIS-Abkürzung * ")
+        ).toHaveText("PBefGBGBRIS-Abkürzung * ")
       })
 
       await test.step("'Übernommen' wird angezeigt", async () => {
@@ -466,7 +466,7 @@ test.describe("category import of pending proceeding", () => {
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(4) // the last entry is the input field
         await expect(
           normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefG BGB KBErrG, § 8 RIS-Abkürzung *")
+        ).toHaveText("PBefGBGBKBErrG, § 8RIS-Abkürzung * ")
       })
     },
   )
@@ -497,7 +497,7 @@ test.describe("category import of pending proceeding", () => {
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(3) // the last entry is the input field
         await expect(
           normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefG BGB RIS-Abkürzung * ")
+        ).toHaveText("PBefGBGBRIS-Abkürzung * ")
       })
 
       await test.step("'Übernommen' wird angezeigt", async () => {
@@ -522,7 +522,7 @@ test.describe("category import of pending proceeding", () => {
         await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(4) // the last entry is the input field
         await expect(
           normContainer.getByTestId("editable-list-container"),
-        ).toHaveText("PBefG BGB KBErrG, § 8 RIS-Abkürzung *")
+        ).toHaveText("PBefGBGBKBErrG, § 8RIS-Abkürzung * ")
       })
     },
   )
