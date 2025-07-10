@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml;
+package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
@@ -6,8 +6,6 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validate;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
-import de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
@@ -26,6 +24,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Opinions;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.DocumentationUnitLdmlTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.HtmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
@@ -34,35 +34,26 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.xml.bind.ValidationException;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.mapping.MappingException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
- * Abstract base class for transforming documentation units into LDML case law format. Provides
- * common transformation logic and helper methods.
+ * Abstract base class for transforming decisions into LDML case law format. Provides common
+ * transformation logic and helper methods.
  */
 @Slf4j
-public abstract class CommonPortalTransformer implements PortalTransformer {
+public abstract class DecisionCommonLdmlTransformer
+    implements DocumentationUnitLdmlTransformer<Decision> {
 
-  private final DocumentBuilderFactory documentBuilderFactory;
+  protected final HtmlTransformer htmlTransformer;
 
-  protected CommonPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
-    this.documentBuilderFactory = documentBuilderFactory;
+  protected DecisionCommonLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
+    this.htmlTransformer = new HtmlTransformer(documentBuilderFactory);
   }
 
   public CaseLawLdml transformToLdml(Decision decision) {
@@ -100,7 +91,7 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
             nullSafeGet(decision.shortTexts(), ShortTexts::headline), fallbackTitle);
 
     validateNotNull(title, "Title missing");
-    return JaxbHtml.build(htmlStringToObjectList(title));
+    return JaxbHtml.build(htmlTransformer.htmlStringToObjectList(title));
   }
 
   protected abstract Meta buildMeta(Decision decision) throws ValidationException;
@@ -148,13 +139,16 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
         // set guidingPrinciple/Leitsatz
         .motivation(
             JaxbHtml.build(
-                htmlStringToObjectList(nullSafeGet(shortTexts, ShortTexts::guidingPrinciple))))
+                htmlTransformer.htmlStringToObjectList(
+                    nullSafeGet(shortTexts, ShortTexts::guidingPrinciple))))
         // set headnote/Orientierungssatz, "other headnote"/"Sonstiger Orientierungssatz",
         // Outline/Gliederung, Tenor/Tenor
         .introduction(buildIntroduction(decision))
         // set caseFacts/Tatbestand
         .background(
-            JaxbHtml.build(htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::caseFacts))))
+            JaxbHtml.build(
+                htmlTransformer.htmlStringToObjectList(
+                    nullSafeGet(longTexts, LongTexts::caseFacts))))
         // set decisionReasons/Entscheidungsgründe, reasons/Gründe, otherLongText/"Sonstiger,
         // dissentingOpinion/"Abweichende Meinung"
         // Langtext"
@@ -188,16 +182,18 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
           .withBlock(
               AknEmbeddedStructureInBlock.DecisionReasons.NAME,
               AknEmbeddedStructureInBlock.DecisionReasons.build(
-                  JaxbHtml.build(htmlStringToObjectList(decisionReasons))))
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(decisionReasons))))
           .withBlock(
               AknEmbeddedStructureInBlock.Reasons.NAME,
               AknEmbeddedStructureInBlock.Reasons.build(
-                  JaxbHtml.build(htmlStringToObjectList(reasons))))
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(reasons))))
           .withBlock(
               AknEmbeddedStructureInBlock.OtherLongText.NAME,
               AknEmbeddedStructureInBlock.OtherLongText.build(
-                  JaxbHtml.build(htmlStringToObjectList(otherLongText))))
-          .withBlock(Opinions.NAME, Opinions.build(htmlStringToObjectList(dissentingOpinion)));
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(otherLongText))))
+          .withBlock(
+              Opinions.NAME,
+              Opinions.build(htmlTransformer.htmlStringToObjectList(dissentingOpinion)));
     }
     return null;
   }
@@ -228,7 +224,8 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
     String uniqueId = decision.documentNumber();
     FrbrDate frbrDate =
         new FrbrDate(
-            DateUtils.toDateString(nullSafeGet(decision.coreData(), CoreData::decisionDate)));
+            DateUtils.toDateString(nullSafeGet(decision.coreData(), CoreData::decisionDate)),
+            "entscheidungsdatum");
     FrbrAuthor frbrAuthor = new FrbrAuthor();
 
     List<FrbrAlias> aliases = generateAliases(decision);
@@ -281,37 +278,6 @@ public abstract class CommonPortalTransformer implements PortalTransformer {
       return null;
     }
     return input;
-  }
-
-  protected List<Object> htmlStringToObjectList(String html) {
-    if (StringUtils.isBlank(html)) {
-      return Collections.emptyList();
-    }
-
-    html = html.replace("&nbsp;", "&#160;");
-
-    // Pre-process:
-    // HTML allows tags that are not closed. However, XML does not. That's why we do
-    // this string-manipulation based workaround of closing the img and br tag.
-    // Colgroup are style elements for columns in table and are not needed */
-    html =
-        html.replaceAll("(<img\\b[^>]*?)(?<!/)>", "$1/>")
-            .replaceAll("<\\s*br\\s*>(?!\\s*<\\s*/\\s*br\\s*>)", "<br/>")
-            .replaceAll("<colgroup[^>]*>.*?</colgroup>", "");
-
-    try {
-      String wrapped = "<wrapper>" + html + "</wrapper>";
-
-      DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-      Document doc = builder.parse(new InputSource(new StringReader(wrapped)));
-
-      NodeList childNodes = doc.getDocumentElement().getChildNodes();
-
-      return XmlUtilService.toList(childNodes).stream().map(e -> (Object) e).toList();
-    } catch (ParserConfigurationException | IOException | SAXException e) {
-      log.error("Xml transformation error.", e);
-      throw new MappingException(e.getMessage());
-    }
   }
 
   protected void validateCoreData(Decision decision) throws ValidationException {

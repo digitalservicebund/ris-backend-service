@@ -139,4 +139,58 @@ public abstract class AknEmbeddedStructureInBlock extends AknBlock {
       return NAME;
     }
   }
+
+  @NoArgsConstructor
+  @XmlDiscriminatorValue(ResolutionNote.NAME)
+  public static class ResolutionNote extends AknEmbeddedStructureInBlock {
+    public static final String NAME = "Erledigungsmitteilung";
+
+    public ResolutionNote(JaxbHtml content) {
+      this.content = content;
+    }
+
+    public static ResolutionNote build(JaxbHtml content) {
+      return content == null ? null : new ResolutionNote(content);
+    }
+
+    public String getName() {
+      return NAME;
+    }
+  }
+
+  @NoArgsConstructor
+  @XmlDiscriminatorValue(Appellant.NAME)
+  public static class Appellant extends AknEmbeddedStructureInBlock {
+    public static final String NAME = "Rechtsmittelführer";
+
+    public Appellant(JaxbHtml content) {
+      this.content = content;
+    }
+
+    public static Appellant build(JaxbHtml content) {
+      return content == null ? null : new Appellant(content);
+    }
+
+    public String getName() {
+      return NAME;
+    }
+  }
+
+  @NoArgsConstructor
+  @XmlDiscriminatorValue(AdmissionOfAppeal.NAME)
+  public static class AdmissionOfAppeal extends AknEmbeddedStructureInBlock {
+    public static final String NAME = "Rechtsmittelzulassung";
+
+    public AdmissionOfAppeal(JaxbHtml content) {
+      this.content = content;
+    }
+
+    public static AdmissionOfAppeal build(JaxbHtml content) {
+      return content == null ? null : new AdmissionOfAppeal(content);
+    }
+
+    public String getName() {
+      return NAME;
+    }
+  }
 }

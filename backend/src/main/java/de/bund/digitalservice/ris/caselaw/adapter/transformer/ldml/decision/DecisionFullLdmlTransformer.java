@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml;
+package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
@@ -30,13 +30,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Transformer for converting documentation units to LDML format for internal portal use. Includes
- * additional metadata like classification and keywords for internal processing.
+ * Transformer for converting decisions to the full LDML format. Includes additional metadata like
+ * classification and keywords for internal processing. Currently, the public Prototype Portal is
+ * under restrictions and must not use full LDML for legal reasons.
  */
 @Slf4j
-public class PortalTransformer extends CommonPortalTransformer {
+public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
 
-  public PortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public DecisionFullLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 
@@ -136,19 +137,19 @@ public class PortalTransformer extends CommonPortalTransformer {
           .withBlock(
               AknEmbeddedStructureInBlock.HeadNote.NAME,
               AknEmbeddedStructureInBlock.HeadNote.build(
-                  JaxbHtml.build(htmlStringToObjectList(headnote))))
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(headnote))))
           .withBlock(
               AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
               AknEmbeddedStructureInBlock.OtherHeadNote.build(
-                  JaxbHtml.build(htmlStringToObjectList(otherHeadnote))))
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(otherHeadnote))))
           .withBlock(
               AknEmbeddedStructureInBlock.Outline.NAME,
               AknEmbeddedStructureInBlock.Outline.build(
-                  JaxbHtml.build(htmlStringToObjectList(outline))))
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(outline))))
           .withBlock(
               AknEmbeddedStructureInBlock.Tenor.NAME,
               AknEmbeddedStructureInBlock.Tenor.build(
-                  JaxbHtml.build(htmlStringToObjectList(tenor))));
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(tenor))));
     }
     return null;
   }
