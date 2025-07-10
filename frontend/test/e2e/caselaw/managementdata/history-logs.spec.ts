@@ -160,6 +160,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
   test("Es wird das Hochladen/Löschen eines Word-Dokuments geloggt", async ({
     page,
     documentNumber,
+    browserName,
   }) => {
     await test.step("Lade Word-Dokument hoch", async () => {
       await navigateToAttachments(page, documentNumber)
@@ -167,6 +168,10 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
     })
 
     await test.step("In der Historie gibt es ein Hochladen und ein Bearbeitet Historien-Event", async () => {
+      // Known error in firefox (NS_BINDING_ABORTED),
+      // when navigating with a concurrent navigation triggered
+      // eslint-disable-next-line playwright/no-wait-for-timeout,playwright/no-conditional-in-test
+      if (browserName === "firefox") await page.waitForTimeout(500)
       await navigateToManagementData(page, documentNumber)
       await expectHistoryCount(page, 3)
       await expectHistoryLogRow(
