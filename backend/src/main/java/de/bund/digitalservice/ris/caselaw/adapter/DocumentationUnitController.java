@@ -142,14 +142,13 @@ public class DocumentationUnitController {
    */
   @PutMapping(value = "new/eurlex", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
-  public ResponseEntity<List<String>> generateNewDocumentationUnitOutOfEurlexDecision(
+  public ResponseEntity<List<String>> generateNewDecisionFromEurlex(
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody(required = false) Optional<EurlexCreationParameters> parameters) {
     try {
       if (parameters.isPresent()) {
         List<String> documentationNumbers =
-            service.generateNewDocumentationUnitOutOfEurlexDecision(
-                userService.getUser(oidcUser), parameters);
+            service.generateNewDecisionFromEurlex(userService.getUser(oidcUser), parameters);
         eurLexSOAPSearchService.updateResultStatus(parameters.get().celexNumbers());
         return ResponseEntity.status(HttpStatus.CREATED).body(documentationNumbers);
       }

@@ -50,6 +50,7 @@ describe("preview core data", () => {
       legalEffect: "Ja",
       yearsOfDispute: ["2023"],
       source: { value: SourceValue.Zeitschrift },
+      inputTypes: ["Papier", "E-Mail"],
       isResolved: true,
       resolutionDate: "2025-06-12",
     })
@@ -77,6 +78,8 @@ describe("preview core data", () => {
     expect(await screen.findByText("Streitjahr")).toBeInTheDocument()
     expect(await screen.findByText("Quelle")).toBeInTheDocument()
     expect(await screen.findByText("Z")).toBeInTheDocument()
+    expect(await screen.findByText("Eingangsart")).toBeInTheDocument()
+    expect(await screen.findByText("Papier, E-Mail")).toBeInTheDocument()
     expect(await screen.findByText("Gerichtsbarkeit")).toBeInTheDocument()
     expect(
       await screen.findByText("Verfassungsgerichtsbarkeit"),
@@ -117,6 +120,7 @@ describe("preview core data", () => {
       previousProcedures: [],
       leadingDecisionNormReferences: [],
       yearsOfDispute: [],
+      inputTypes: [],
     })
 
     expect(screen.queryByText("Fehlerhaftes Gericht")).not.toBeInTheDocument()
@@ -131,6 +135,7 @@ describe("preview core data", () => {
     expect(screen.queryByText("Vorgangshistorie")).not.toBeInTheDocument()
     expect(screen.queryByText("BGH Nachschlagewerk")).not.toBeInTheDocument()
     expect(screen.queryByText("Streitjahr")).not.toBeInTheDocument()
+    expect(screen.queryByText("Eingangsart")).not.toBeInTheDocument()
   })
 
   it.each([
@@ -153,6 +158,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -174,6 +181,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -195,6 +204,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -216,6 +227,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -237,6 +250,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -258,6 +273,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -279,6 +296,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -300,6 +319,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -321,6 +342,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -342,6 +365,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -369,6 +394,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -390,6 +417,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -411,6 +440,8 @@ describe("preview core data", () => {
         "Region",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -431,6 +462,8 @@ describe("preview core data", () => {
         "Rechtskraft",
         "BGH Nachschlagewerk",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -451,6 +484,8 @@ describe("preview core data", () => {
         "Rechtskraft",
         "Region",
         "BGH Nachschlagewerk",
+        "Quelle",
+        "Eingangsart",
       ],
     ],
     [
@@ -471,6 +506,58 @@ describe("preview core data", () => {
         "Rechtskraft",
         "Region",
         "Gerichtsbarkeit",
+        "Quelle",
+        "Eingangsart",
+      ],
+    ],
+    [
+      "Quelle",
+      {
+        source: {
+          value: SourceValue.Zeitschrift,
+        },
+      },
+      [
+        "Fehlerhaftes Gericht",
+        "Aktenzeichen",
+        "Abweichendes Aktenzeichen",
+        "Entscheidungsdatum",
+        "Abweichendes Entscheidungsdatum",
+        "Spruchkörper",
+        "Dokumenttyp",
+        "ECLI",
+        "Abweichender ECLI",
+        "Vorgang",
+        "Vorgangshistorie",
+        "Rechtskraft",
+        "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
+        "Eingangsart",
+      ],
+    ],
+    [
+      "Eingangsart",
+      {
+        inputTypes: ["Papier", "E-Mail"],
+      },
+      [
+        "Fehlerhaftes Gericht",
+        "Aktenzeichen",
+        "Abweichendes Aktenzeichen",
+        "Entscheidungsdatum",
+        "Abweichendes Entscheidungsdatum",
+        "Spruchkörper",
+        "Dokumenttyp",
+        "ECLI",
+        "Abweichender ECLI",
+        "Vorgang",
+        "Vorgangshistorie",
+        "Rechtskraft",
+        "Region",
+        "BGH Nachschlagewerk",
+        "Gerichtsbarkeit",
+        "Quelle",
       ],
     ],
   ])(

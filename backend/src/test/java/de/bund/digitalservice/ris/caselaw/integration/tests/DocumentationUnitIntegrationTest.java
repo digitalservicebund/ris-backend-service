@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseInputTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
@@ -34,6 +35,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
@@ -43,6 +45,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceeding
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -58,6 +61,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogServ
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.EurlexCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
@@ -130,6 +134,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Autowired private DocumentationUnitHistoryLogRepository historyLogRepository;
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DocumentationUnitHistoryLogService historyLogService;
+  @Autowired private EurLexResultRepository eurLexResultRepository;
+  @Autowired private DatabaseInputTypeRepository inputTypeRepository;
 
   @MockitoBean private MailService mailService;
   @MockitoBean private AttachmentService attachmentService;
@@ -2081,5 +2087,75 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         .isCreated()
         .expectBody(Decision.class)
         .returnResult();
+  }
+
+  @Nested
+  class NewEurLexDecision {
+    @Test
+    void generateNewDecisionFromEurlex_withoutParameters_shouldReturnBadRequest() {
+      risWebTestClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/new/eurlex")
+          .contentType(MediaType.APPLICATION_JSON)
+          .exchange()
+          .expectStatus()
+          .isBadRequest()
+          .expectBody(String.class)
+          .consumeWith(
+              exchange -> {
+                assertThat(exchange.getResponseBody())
+                    .isEqualTo("[\"Missing eurlex creation parameters.\"]");
+              });
+    }
+
+    @Test
+    void generateNewDecisionFromEurlex_withParameters_shouldSucceedAndSetInputType() {
+      // Arrange
+      var celexNumber = "62019CV0001";
+      eurLexResultRepository.saveAll(
+          List.of(EurLexResultDTO.builder().uri("uri/" + celexNumber).celex(celexNumber).build()));
+      var category =
+          databaseDocumentCategoryRepository.saveAndFlush(
+              DocumentCategoryDTO.builder().label("R").build());
+      databaseDocumentTypeRepository.save(
+          DocumentTypeDTO.builder()
+              .abbreviation("ABC")
+              .category(category)
+              .label("ABC123")
+              .multiple(true)
+              .build());
+      when(documentNumberPatternConfig.getDocumentNumberPatterns())
+          .thenReturn(Map.of("DS", "XXREYYYY*****"));
+      assertThat(inputTypeRepository.findAll()).isEmpty();
+
+      // Act
+      var response =
+          risWebTestClient
+              .withDefaultLogin()
+              .put()
+              .uri("/api/v1/caselaw/documentunits/new/eurlex")
+              .bodyValue(
+                  EurlexCreationParameters.builder()
+                      .documentationOffice(
+                          DocumentationOfficeTransformer.transformToDomain(documentationOffice))
+                      .celexNumbers(List.of(celexNumber))
+                      .build())
+              .contentType(MediaType.APPLICATION_JSON)
+              .exchange()
+              .expectStatus()
+              .isCreated()
+              .expectBody(List.class)
+              .returnResult();
+
+      // Assert
+      var documentNumber = (String) response.getResponseBody().get(0);
+      assertThat(documentNumber).isEqualTo("XXRE202500001");
+      DecisionDTO decision = (DecisionDTO) repository.findByDocumentNumber(documentNumber).get();
+      assertThat(decision.getCelexNumber()).isEqualTo(celexNumber + "(02)");
+      assertThat(inputTypeRepository.findAll().get(0).getValue())
+          .isEqualTo("EUR-LEX-Schnittstelle");
+      eurLexResultRepository.deleteAllByCelexNumbers(List.of(celexNumber + "(02)"));
+    }
   }
 }

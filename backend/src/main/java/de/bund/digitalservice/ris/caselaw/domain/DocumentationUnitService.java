@@ -163,23 +163,26 @@ public class DocumentationUnitService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public List<String> generateNewDocumentationUnitOutOfEurlexDecision(
+  public List<String> generateNewDecisionFromEurlex(
       User user, Optional<EurlexCreationParameters> parameters) throws DocumentationUnitException {
 
     List<String> documentNumbers = new ArrayList<>();
 
     if (parameters.isPresent() && !parameters.get().celexNumbers().isEmpty()) {
       for (String celexNumber : parameters.get().celexNumbers()) {
-        documentNumbers.add(
+        var inputTypes = new ArrayList<String>();
+        inputTypes.add("EUR-LEX-Schnittstelle");
+        var newDecision =
             generateNewDecision(
-                    user,
-                    parameters.map(
-                        params ->
-                            DocumentationUnitCreationParameters.builder()
-                                .documentationOffice(params.documentationOffice())
-                                .build()),
-                    celexNumber)
-                .documentNumber());
+                user,
+                parameters.map(
+                    params ->
+                        DocumentationUnitCreationParameters.builder()
+                            .documentationOffice(params.documentationOffice())
+                            .inputTypes(inputTypes)
+                            .build()),
+                celexNumber);
+        documentNumbers.add(newDecision.documentNumber());
       }
     }
 
@@ -220,6 +223,7 @@ public class DocumentationUnitService {
                         LegalEffect.deriveFrom(params.court(), true)
                             .orElse(LegalEffect.NOT_SPECIFIED)
                             .getLabel())
+                    .inputTypes(params.inputTypes())
                     .build())
             .inboxStatus(isExternalHandover ? InboxStatus.EXTERNAL_HANDOVER : null)
             .build();

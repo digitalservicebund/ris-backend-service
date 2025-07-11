@@ -133,6 +133,12 @@ const sourceValue = computed(() =>
         {{ sourceValue }}
       </PreviewContent>
     </PreviewRow>
+    <PreviewRow v-if="coreData.inputTypes && coreData.inputTypes.length > 0">
+      <PreviewCategory>Eingangsart</PreviewCategory>
+      <PreviewContent>
+        {{ coreData.inputTypes?.join(", ") }}
+      </PreviewContent>
+    </PreviewRow>
     <PreviewRow v-if="isPendingProceeding">
       <PreviewCategory>Erledigung</PreviewCategory>
       <PreviewContent>
