@@ -2,7 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
-import { beforeEach } from "vitest"
+import { beforeEach, expect } from "vitest"
 import { ref } from "vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import { CoreData } from "@/domain/coreData"
@@ -176,5 +176,41 @@ describe("Core Data", () => {
     expect(model.value.source).toEqual({
       value: SourceValue.UnaufgefordertesOriginal,
     })
+  })
+
+  test("renders inputTypes", async () => {
+    // Arrange
+    const coreData = {
+      inputTypes: ["Papier", "E-Mail", "EUR-LEX-Schnittstelle"],
+    }
+
+    // Act
+    renderComponent({ initialModelValue: coreData })
+
+    // Assert
+    const chipList = screen.getAllByRole("listitem")
+    expect(chipList.length).toBe(3)
+    expect(chipList[0]).toHaveTextContent("Papier")
+    expect(chipList[1]).toHaveTextContent("E-Mail")
+    expect(chipList[2]).toHaveTextContent("EUR-LEX-Schnittstelle")
+  })
+
+  test("updates inputTypes", async () => {
+    // Arrange
+    const { user, model } = renderComponent({
+      initialModelValue: { inputTypes: [] },
+    })
+    expect(model.value.inputTypes?.length).toBe(0)
+    const input = screen.getByLabelText("Eingangsart")
+    await user.click(input)
+
+    // Act
+    await user.type(input, "Papier{enter}E-Mail{enter}")
+
+    // Assert
+    const resultList = screen.getAllByRole("listitem")
+    expect(resultList.length).toBe(2)
+    expect(resultList[0]).toHaveTextContent("Papier")
+    expect(resultList[1]).toHaveTextContent("E-Mail")
   })
 })
