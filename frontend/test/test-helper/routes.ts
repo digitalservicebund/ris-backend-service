@@ -1,7 +1,7 @@
 const routes = [
   {
     path: "/caselaw/documentUnit/new",
-    name: "new",
+    name: "caselaw-documentUnit-new",
     component: {},
   },
   {

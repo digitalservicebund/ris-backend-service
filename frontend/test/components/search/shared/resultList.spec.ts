@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { Page } from "@/components/Pagination.vue"
 import ResultList from "@/components/search/shared/ResultList.vue"
+import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
 import routes from "~/test-helper/routes"
@@ -47,7 +48,12 @@ const pageEntries: Page<DocumentUnitListEntry> = {
   empty: false,
 }
 
-function renderComponent(props = {}) {
+function renderComponent(props?: {
+  kind: Kind
+  pageEntries?: Page<DocumentUnitListEntry>
+  loading?: boolean
+  showPublicationDate?: boolean
+}) {
   const user = userEvent.setup()
 
   const router = createRouter({
@@ -58,8 +64,10 @@ function renderComponent(props = {}) {
     user,
     ...render(ResultList, {
       props: {
-        pageEntries,
-        ...props,
+        kind: props?.kind || Kind.DECISION,
+        pageEntries: props?.pageEntries || pageEntries,
+        loading: props?.loading || false,
+        showPublicationDate: props?.showPublicationDate || false,
       },
       global: {
         directives: {

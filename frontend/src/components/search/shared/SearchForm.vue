@@ -9,10 +9,12 @@ import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
+import { Kind } from "@/domain/documentationUnitKind"
 import { PublicationState } from "@/domain/publicationStatus"
 import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
-defineProps<{
+const props = defineProps<{
+  kind: Kind
   isLoading?: boolean
 }>()
 
@@ -20,6 +22,11 @@ const emit = defineEmits<{
   search: [value: Query<DocumentationUnitSearchParameter>]
   resetSearchResults: [void]
 }>()
+
+const isPendingProceeding = computed(
+  () => props.kind === Kind.PENDING_PROCEEDING,
+)
+const isDecision = computed(() => props.kind === Kind.DECISION)
 
 const validationStore = useValidationStore<DocumentationUnitSearchParameter>()
 const { route, getQueryFromRoute, pushQueryToRoute } =
@@ -30,15 +37,7 @@ const isEmptySearch = computed(() => {
   return Object.keys(query.value).length === 0
 })
 
-const submitButtonError = ref()
-
-const isResolved = computed({
-  get: () =>
-    query.value?.isResolved ? JSON.parse(query.value.isResolved) : false,
-  set: (data) => {
-    query.value.isResolved = data
-  },
-})
+const submitButtonError = ref<string | undefined>()
 
 const dropdownItems: DropdownItem[] = [
   { label: "Alle", value: "" },
@@ -51,6 +50,91 @@ const dropdownItems: DropdownItem[] = [
   { label: "Fremdanlage", value: PublicationState.EXTERNAL_HANDOVER_PENDING },
 ]
 
+const isResolved = computed({
+  get: () =>
+    isPendingProceeding.value && query.value?.isResolved
+      ? JSON.parse(query.value.isResolved)
+      : false,
+  set: (data) => {
+    if (isPendingProceeding.value) {
+      query.value.isResolved = data
+    }
+  },
+})
+
+const myDocOfficeOnly = computed({
+  get: () =>
+    isDecision.value && query.value?.myDocOfficeOnly
+      ? JSON.parse(query.value.myDocOfficeOnly)
+      : false,
+  set: (data) => {
+    if (isDecision.value) {
+      if (!data) {
+        // Clear related fields when myDocOfficeOnly is unchecked
+        delete query.value.withError
+        delete query.value.withDuplicateWarning
+        delete query.value.myDocOfficeOnly
+        delete query.value.scheduledOnly
+        delete query.value.publicationDate
+        resetErrors("publicationDate") // Clear validation for publicationDate
+      } else {
+        query.value.myDocOfficeOnly = "true"
+      }
+    }
+  },
+})
+
+const scheduledOnly = computed({
+  get: () =>
+    isDecision.value && query.value?.scheduledOnly
+      ? JSON.parse(query.value.scheduledOnly)
+      : false,
+  set: (data) => {
+    if (isDecision.value) {
+      if (!data) {
+        delete query.value.scheduledOnly
+      } else {
+        query.value.scheduledOnly = "true"
+      }
+    }
+  },
+})
+
+const withError = computed({
+  get: () =>
+    isDecision.value && query.value?.withError
+      ? JSON.parse(query.value.withError)
+      : false,
+  set: (data) => {
+    if (isDecision.value) {
+      if (!data) {
+        delete query.value.withError
+      } else {
+        query.value.withError = "true"
+      }
+    }
+  },
+})
+
+const withDuplicateWarning = computed({
+  get: () =>
+    isDecision.value && query.value?.withDuplicateWarning
+      ? JSON.parse(query.value.withDuplicateWarning)
+      : false,
+  set: (data) => {
+    if (isDecision.value) {
+      if (!data) {
+        delete query.value.withDuplicateWarning
+      } else {
+        query.value.withDuplicateWarning = "true"
+      }
+    }
+  },
+})
+
+/**
+ * Resets the search form, validation errors, and clears the query.
+ */
 function resetSearch() {
   validationStore.reset()
   submitButtonError.value = undefined
@@ -59,12 +143,20 @@ function resetSearch() {
   emit("resetSearchResults")
 }
 
+/**
+ * Resets specific validation errors by ID or clears the submit button error.
+ * @param {DocumentationUnitSearchParameter} id - The ID of the field to reset errors for.
+ */
 function resetErrors(id?: DocumentationUnitSearchParameter) {
   if (id) validationStore.remove(id)
   submitButtonError.value = undefined
 }
 
-function isSearchInputInvalid() {
+/**
+ * Checks if the search input is invalid (empty or has validation errors).
+ * @returns {boolean} - True if the input is invalid, false otherwise.
+ */
+function isSearchInputInvalid(): boolean {
   if (isEmptySearch.value) {
     submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
     return true
@@ -78,48 +170,20 @@ function isSearchInputInvalid() {
   return false
 }
 
-function hasValidationErrors() {
+/**
+ * Checks if there are any active validation errors.
+ * @returns {boolean} - True if there are validation errors, false otherwise.
+ */
+function hasValidationErrors(): boolean {
   return validationStore.getAll().length > 0
 }
 
-function validateResolutionDates() {
-  //Startdatum fehlt für Erledigungsvermerk
-  if (
-    query.value?.resolutionDateEnd &&
-    !query.value?.resolutionDate &&
-    !validationStore.getByField("resolutionDate")
-  ) {
-    validationStore.add("Startdatum fehlt", "resolutionDate")
-  } else if (
-    !query.value.resolutionDateEnd &&
-    validationStore.getByMessage("Startdatum fehlt").length === 1
-  ) {
-    validationStore.remove("resolutionDate")
-  }
-
-  //Enddatum darf nicht vor Startdatum liegen für Mitteilungsdatum
-  if (
-    query.value?.resolutionDateEnd &&
-    query.value?.resolutionDate &&
-    new Date(query.value.resolutionDate) >
-      new Date(query.value.resolutionDateEnd)
-  ) {
-    if (!validationStore.getByField("resolutionDateEnd")) {
-      validationStore.add(
-        "Enddatum darf nicht vor Startdatum liegen",
-        "resolutionDateEnd",
-      )
-    }
-  } else if (
-    validationStore.getByMessage("Enddatum darf nicht vor Startdatum liegen")
-      .length === 1
-  ) {
-    validationStore.remove("resolutionDateEnd")
-  }
-}
-
+/**
+ * Validates the decision dates (for pending proceeding 'Mitteilungsdatum').
+ * This logic is common to both forms for decisionDate and decisionDateEnd.
+ */
 function validateDecisionDates() {
-  //Startdatum fehlt für Mitteilungsdatum
+  // Check if end date is present but start date is missing
   if (
     query.value?.decisionDateEnd &&
     !query.value?.decisionDate &&
@@ -133,7 +197,7 @@ function validateDecisionDates() {
     validationStore.remove("decisionDate")
   }
 
-  //Enddatum darf nicht vor Startdatum liegen für Mitteilungsdatum
+  // Check if end date is before start date
   if (
     query.value?.decisionDateEnd &&
     query.value?.decisionDate &&
@@ -153,23 +217,76 @@ function validateDecisionDates() {
   }
 }
 
-function validateSearchInput() {
-  validateDecisionDates()
-  validateResolutionDates()
+/**
+ * Validates the resolution dates (Erledigungsmitteilung).
+ */
+function validateResolutionDates() {
+  if (isPendingProceeding.value) {
+    // Check if end date is present but start date is missing
+    if (
+      query.value?.resolutionDateEnd &&
+      !query.value?.resolutionDate &&
+      !validationStore.getByField("resolutionDate")
+    ) {
+      validationStore.add("Startdatum fehlt", "resolutionDate")
+    } else if (
+      !query.value.resolutionDateEnd &&
+      validationStore.getByMessage("Startdatum fehlt").length === 1
+    ) {
+      validationStore.remove("resolutionDate")
+    }
+
+    // Check if end date is before start date
+    if (
+      query.value?.resolutionDateEnd &&
+      query.value?.resolutionDate &&
+      new Date(query.value.resolutionDate) >
+        new Date(query.value.resolutionDateEnd)
+    ) {
+      if (!validationStore.getByField("resolutionDateEnd")) {
+        validationStore.add(
+          "Enddatum darf nicht vor Startdatum liegen",
+          "resolutionDateEnd",
+        )
+      }
+    } else if (
+      validationStore.getByMessage("Enddatum darf nicht vor Startdatum liegen")
+        .length === 1
+    ) {
+      validationStore.remove("resolutionDateEnd")
+    }
+  }
 }
 
+/**
+ * Main validation function that calls specific validation based on form type.
+ */
+function validateSearchInput() {
+  validateDecisionDates() // Always validate decision dates as they are common
+  if (isPendingProceeding.value) {
+    validateResolutionDates()
+  }
+}
+
+/**
+ * Handles local input errors from child components and updates the validation store.
+ * @param {ValidationError | undefined} error - The validation error object.
+ * @param {string} id - The ID of the input field.
+ */
 function handleLocalInputError(error: ValidationError | undefined, id: string) {
   if (error) {
     validationStore.add(
       error.message,
       error.instance as DocumentationUnitSearchParameter,
     )
-  } else validationStore.remove(id as DocumentationUnitSearchParameter)
-  validateSearchInput()
+  } else {
+    validationStore.remove(id as DocumentationUnitSearchParameter)
+  }
+  validateSearchInput() // Re-validate after error change
 }
 
 /**
- * Checks if the current search query is identical to the previous query.
+ * Checks if the current search query is identical to the previous query in the route.
  * @returns {boolean} - `true` if the current query matches the previous query, otherwise `false`.
  */
 function isIdenticalSearch(): boolean {
@@ -178,6 +295,10 @@ function isIdenticalSearch(): boolean {
   return JSON.stringify(previousQuery) === JSON.stringify(newQuery)
 }
 
+/**
+ * Handles the search button click event.
+ * Performs validation and triggers search if valid.
+ */
 function handleSearchButtonClicked() {
   validateSearchInput()
 
@@ -191,6 +312,9 @@ function handleSearchButtonClicked() {
   pushQueryToRoute(query.value)
 }
 
+/**
+ * Emits the search event with the current query or resets if empty.
+ */
 function handleSearch() {
   if (!isEmptySearch.value) {
     emit("search", getQueryFromRoute())
@@ -199,6 +323,7 @@ function handleSearch() {
   }
 }
 
+// Watch for route changes to update query and trigger search
 watch(
   route,
   () => {
@@ -212,22 +337,22 @@ watch(
 <template>
   <div
     v-ctrl-enter="handleSearchButtonClicked"
-    class="flex flex-col bg-blue-200"
+    class="mb-32 flex flex-col bg-blue-200 py-24"
+    data-testid="document-unit-search-entry-form"
   >
     <div
-      class="m-40 grid grid-cols-[100px_1fr_200px_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-y-20 [grid-template-areas:'az-label_az-input_docnumber-label_docnumber-input''court-label_court-input_status-label_status-input''date-label_date-input_resolution-date-label_resolution-date-input''publication-label_publication-input_._resolution-input''._._._search-button'] lg:gap-x-40"
+      class="m-40 grid grid-cols-[150px_1fr_150px_1fr] gap-y-20 lg:gap-x-40"
+      :class="{
+        'grid-layout-decision': isDecision,
+        'grid-layout-pending-proceeding': isPendingProceeding,
+      }"
     >
+      <!-- Common Fields for Decisions and Pending Proceeding-->
       <div
         class="ris-body1-regular ml-3 flex flex-row items-center [grid-area:az-label]"
       >
         Aktenzeichen
       </div>
-      <div
-        class="ris-body1-regular flex flex-row items-center [grid-area:court-label]"
-      >
-        Gericht
-      </div>
-
       <div class="[grid-area:az-input]">
         <InputField
           id="fileNumber"
@@ -244,6 +369,11 @@ watch(
             @focus="resetErrors(id as DocumentationUnitSearchParameter)"
           ></InputText>
         </InputField>
+      </div>
+      <div
+        class="ris-body1-regular flex flex-row items-center [grid-area:court-label]"
+      >
+        Gericht
       </div>
       <div class="flex flex-row gap-10 [grid-area:court-input]">
         <InputField
@@ -280,15 +410,11 @@ watch(
           ></InputText>
         </InputField>
       </div>
+
       <div
-        class="ris-body1-regular flex flex-row items-center pl-24 [grid-area:docnumber-label] lg:pl-48"
+        class="ris-body1-regular items-center[grid-area:docnumber-label] flex flex-row"
       >
         Dokumentnummer
-      </div>
-      <div
-        class="ris-body1-regular flex flex-row items-center pl-24 [grid-area:status-label] lg:pl-48"
-      >
-        Status
       </div>
       <div class="[grid-area:docnumber-input]">
         <InputField
@@ -306,6 +432,12 @@ watch(
             @focus="resetErrors(id as DocumentationUnitSearchParameter)"
           ></InputText>
         </InputField>
+      </div>
+
+      <div
+        class="ris-body1-regular flex flex-row items-center [grid-area:status-label]"
+      >
+        Status
       </div>
       <div class="flex flex-row gap-10 [grid-area:status-input]">
         <InputField
@@ -327,29 +459,27 @@ watch(
           />
         </InputField>
       </div>
+
       <div
         class="ris-body1-regular flex flex-row items-center [grid-area:date-label]"
       >
-        Mitteilungsdatum
-      </div>
-      <div
-        class="ris-body1-regular flex flex-row items-center pl-24 [grid-area:resolution-date-label] lg:pl-48"
-      >
-        Erledigungsmitteilung
+        {{ isDecision ? "Datum" : "Mitteilungsdatum" }}
       </div>
       <div class="flex flex-row gap-10 [grid-area:date-input]">
         <InputField
           id="decisionDate"
           v-slot="{ id, hasError }"
           data-testid="decision-date-input"
-          label="Mitteilungsdatum"
+          :label="isDecision ? 'Datum' : 'Mitteilungsdatum'"
           :validation-error="validationStore.getByField('decisionDate')"
           visually-hide-label
         >
           <DateInput
             :id="id"
             v-model="query.decisionDate"
-            aria-label="Mitteilungsdatum Suche"
+            :aria-label="
+              isDecision ? 'Entscheidungsdatum Suche' : 'Mitteilungsdatum Suche'
+            "
             :has-error="hasError"
             @blur="validateSearchInput"
             @focus="resetErrors(id as DocumentationUnitSearchParameter)"
@@ -364,14 +494,18 @@ watch(
           id="decisionDateEnd"
           v-slot="{ id, hasError }"
           data-testid="decision-date-end-input"
-          label="Mitteilungsdatum Ende"
+          :label="isDecision ? 'Datum Ende' : 'Mitteilungsdatum Ende'"
           :validation-error="validationStore.getByField('decisionDateEnd')"
           visually-hide-label
         >
           <DateInput
             :id="id"
             v-model="query.decisionDateEnd"
-            aria-label="Mitteilungsdatum Suche Ende"
+            :aria-label="
+              isDecision
+                ? 'Entscheidungsdatum Suche Ende'
+                : 'Mitteilungsdatum Suche Ende'
+            "
             :has-error="hasError"
             placeholder="TT.MM.JJJJ (optional)"
             @blur="validateSearchInput"
@@ -383,73 +517,189 @@ watch(
           ></DateInput>
         </InputField>
       </div>
-      <div class="flex flex-row gap-10 [grid-area:resolution-date-input]">
-        <InputField
-          id="resolutionDate"
-          v-slot="{ id, hasError }"
-          data-testid="resolution-date-input"
-          label="Erledigungsmitteilung"
-          :validation-error="validationStore.getByField('resolutionDate')"
-          visually-hide-label
+
+      <!-- Decision Specific Fields -->
+      <template v-if="isDecision">
+        <div
+          v-if="myDocOfficeOnly"
+          class="ris-body1-regular flex flex-row items-center [grid-area:jdv-label]"
         >
-          <DateInput
-            :id="id"
-            v-model="query.resolutionDate"
-            aria-label="Erledigungsmitteilung Suche"
-            :has-error="hasError"
-            @blur="validateSearchInput"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-            @update:validation-error="
-              (validationError: ValidationError | undefined) =>
-                handleLocalInputError(validationError, id)
-            "
-          ></DateInput>
-        </InputField>
-        <span class="pt-6">-</span>
-        <InputField
-          id="resolutionDateEnd"
-          v-slot="{ id, hasError }"
-          data-testid="resolution-date-end-input"
-          label="Erledigungsmitteilung Ende"
-          :validation-error="validationStore.getByField('resolutionDateEnd')"
-          visually-hide-label
+          jDV Übergabe
+        </div>
+
+        <div
+          v-if="myDocOfficeOnly"
+          class="flex flex-row gap-20 [grid-area:jdv-input]"
         >
-          <DateInput
-            :id="id"
-            v-model="query.resolutionDateEnd"
-            aria-label="Erledigungsmitteilung Suche Ende"
-            :has-error="hasError"
-            placeholder="TT.MM.JJJJ (optional)"
-            @blur="validateSearchInput"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-            @update:validation-error="
-              (validationError: ValidationError | undefined) =>
-                handleLocalInputError(validationError, id)
-            "
-          ></DateInput>
-        </InputField>
-      </div>
-      <div class="flex flex-row [grid-area:resolution-input]">
-        <InputField
-          id="resolved"
-          v-slot="{ id }"
-          label="Erledigt"
-          label-class="ris-label1-regular"
-          :label-position="LabelPosition.RIGHT"
+          <InputField
+            id="publicationDate"
+            v-slot="{ id, hasError }"
+            data-testid="publication-date-input"
+            label="jDV Übergabedatum"
+            :validation-error="validationStore.getByField('publicationDate')"
+            visually-hide-label
+          >
+            <DateInput
+              :id="id"
+              v-model="query.publicationDate"
+              aria-label="jDV Übergabedatum Suche"
+              :has-error="hasError"
+              is-future-date
+              @blur="validateSearchInput"
+              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              @update:validation-error="
+                (validationError: ValidationError | undefined) =>
+                  handleLocalInputError(validationError, id)
+              "
+            ></DateInput>
+          </InputField>
+          <InputField
+            id="scheduled"
+            v-slot="{ id }"
+            label="Nur terminiert"
+            label-class="ris-label1-regular"
+            :label-position="LabelPosition.RIGHT"
+          >
+            <Checkbox
+              v-model="scheduledOnly"
+              aria-label="Terminiert Filter"
+              binary
+              :input-id="id"
+            />
+          </InputField>
+        </div>
+
+        <div class="flex flex-row gap-20 [grid-area:checkbox-group]">
+          <InputField
+            id="documentationOffice"
+            v-slot="{ id }"
+            label="Nur meine Dokstelle"
+            label-class="ris-label1-regular"
+            :label-position="LabelPosition.RIGHT"
+          >
+            <Checkbox
+              v-model="myDocOfficeOnly"
+              aria-label="Nur meine Dokstelle Filter"
+              binary
+              :input-id="id"
+              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+            />
+          </InputField>
+          <InputField
+            v-if="myDocOfficeOnly"
+            id="withErrorsOnly"
+            v-slot="{ id }"
+            label="Nur Fehler"
+            label-class="ris-label1-regular"
+            :label-position="LabelPosition.RIGHT"
+          >
+            <Checkbox
+              v-model="withError"
+              aria-label="Nur fehlerhafte Dokumentationseinheiten"
+              binary
+              :input-id="id"
+              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+            />
+          </InputField>
+          <InputField
+            v-if="myDocOfficeOnly"
+            id="withDuplicateWaring"
+            v-slot="{ id }"
+            label="Dublettenverdacht"
+            label-class="ris-label1-regular"
+            :label-position="LabelPosition.RIGHT"
+          >
+            <Checkbox
+              v-model="withDuplicateWarning"
+              aria-label="Dokumentationseinheiten mit Dublettenverdacht"
+              binary
+              :input-id="id"
+              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+            />
+          </InputField>
+        </div>
+      </template>
+
+      <!-- Pending Proceeding Specific Fields -->
+      <template v-if="isPendingProceeding">
+        <div
+          class="ris-body1-regular 8 flex flex-row items-center [grid-area:resolution-date-label]"
         >
-          <Checkbox
-            v-model="isResolved"
-            aria-label="Erledigt Filter"
-            binary
-            :input-id="id"
-          />
-        </InputField>
-      </div>
+          Erledigungsmitteilung
+        </div>
+        <div class="flex flex-row gap-10 [grid-area:resolution-date-input]">
+          <InputField
+            id="resolutionDate"
+            v-slot="{ id, hasError }"
+            data-testid="resolution-date-input"
+            label="Erledigungsmitteilung"
+            :validation-error="validationStore.getByField('resolutionDate')"
+            visually-hide-label
+          >
+            <DateInput
+              :id="id"
+              v-model="query.resolutionDate"
+              aria-label="Erledigungsmitteilung Suche"
+              :has-error="hasError"
+              @blur="validateSearchInput"
+              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              @update:validation-error="
+                (validationError: ValidationError | undefined) =>
+                  handleLocalInputError(validationError, id)
+              "
+            ></DateInput>
+          </InputField>
+          <span class="pt-6">-</span>
+          <InputField
+            id="resolutionDateEnd"
+            v-slot="{ id, hasError }"
+            data-testid="resolution-date-end-input"
+            label="Erledigungsmitteilung Ende"
+            :validation-error="validationStore.getByField('resolutionDateEnd')"
+            visually-hide-label
+          >
+            <DateInput
+              :id="id"
+              v-model="query.resolutionDateEnd"
+              aria-label="Erledigungsmitteilung Suche Ende"
+              :has-error="hasError"
+              placeholder="TT.MM.JJJJ (optional)"
+              @blur="validateSearchInput"
+              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              @update:validation-error="
+                (validationError: ValidationError | undefined) =>
+                  handleLocalInputError(validationError, id)
+              "
+            ></DateInput>
+          </InputField>
+        </div>
+        <div class="flex flex-row [grid-area:resolved-input]">
+          <InputField
+            id="resolved"
+            v-slot="{ id }"
+            label="Erledigt"
+            label-class="ris-label1-regular"
+            :label-position="LabelPosition.RIGHT"
+          >
+            <Checkbox
+              v-model="isResolved"
+              aria-label="Erledigt Filter"
+              binary
+              :input-id="id"
+            />
+          </InputField>
+        </div>
+      </template>
+
+      <!-- Common Search Button -->
       <div class="flex flex-row [grid-area:search-button]">
         <div class="flex flex-col gap-8">
-          <!-- ":loading" disables button while request is running. Needed as long as we cannot cancel requests -->
           <Button
-            aria-label="Nach Anhängigen Verfahren suchen"
+            :aria-label="
+              isDecision
+                ? 'Nach Dokumentationseinheiten suchen'
+                : 'Nach Anhängigen Verfahren suchen'
+            "
             class="self-start"
             :disabled="isLoading"
             label="Ergebnisse anzeigen"
@@ -478,3 +728,24 @@ watch(
     </div>
   </div>
 </template>
+
+<style scoped>
+.grid-layout-decision {
+  grid-template-areas:
+    "az-label az-input docnumber-label docnumber-input"
+    "court-label court-input status-label status-input"
+    "date-label date-input . checkbox-group"
+    "jdv-label jdv-input . search-button";
+  grid-template-rows: auto auto auto auto;
+}
+
+.grid-layout-pending-proceeding {
+  grid-template-areas:
+    "az-label az-input docnumber-label docnumber-input"
+    "court-label court-input status-label status-input"
+    "date-label date-input resolution-date-label resolution-date-input"
+    ". . . resolved-input"
+    ". . . search-button";
+  grid-template-rows: auto auto auto auto auto;
+}
+</style>

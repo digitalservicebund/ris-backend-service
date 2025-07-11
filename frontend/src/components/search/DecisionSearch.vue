@@ -1,196 +1,191 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import Button from "primevue/button"
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
-import DateUtil from "../../utils/dateUtil"
-import DocumentUnitList from "@/components/DocumentUnitList.vue"
-import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
+import ResultList from "./shared/ResultList.vue"
+import SearchForm from "./shared/SearchForm.vue"
+import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
-import Pagination, { Page } from "@/components/Pagination.vue"
+import { Page } from "@/components/Pagination.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { Query } from "@/composables/useQueryFromRoute"
 import { Court } from "@/domain/court"
+import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import errorMessages from "@/i18n/errors.json"
-import comboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { DocumentationUnitCreationParameters } from "@/types/documentationUnitCreationParameters"
 import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
 const router = useRouter()
-const store = useDocumentUnitStore()
-
 const currentPage = ref<Page<DocumentUnitListEntry>>()
-const documentUnitListEntries = computed(() => currentPage.value?.content)
 
+const pageNumber = ref<number>(0)
 const itemsPerPage = 100
-const searchResponseError = ref()
+const serviceError = ref<ResponseError | undefined>(undefined)
 const isLoading = ref(false)
 const searchQuery = ref<Query<DocumentationUnitSearchParameter>>()
-const pageNumber = ref<number>(0)
 const isInternalUser = useInternalUser()
 
-const emptyStateLabel = computed(() => {
-  if (!documentUnitListEntries.value) {
-    if (isInternalUser.value) {
-      return "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
-    } else {
-      return "Starten Sie die Suche."
-    }
-  } else if (documentUnitListEntries.value.length === 0) {
+const emptyStateMessage = computed(() => {
+  if (!currentPage.value?.content) {
+    return isInternalUser.value
+      ? "Starten Sie die Suche oder erstellen Sie ein neues Anhängiges Verfahren."
+      : "Starten Sie die Suche."
+  }
+  if (currentPage.value.content.length === 0) {
     return errorMessages.SEARCH_RESULTS_NOT_FOUND.title
   }
   return undefined
 })
 
+const fileNumberFromQuery = computed(() =>
+  searchQuery.value?.fileNumber?.trim(),
+)
+
+const dateFromQuery = computed(() => {
+  if (
+    (searchQuery.value?.decisionDateEnd != undefined &&
+      searchQuery.value?.decisionDateEnd != searchQuery.value?.decisionDate) ||
+    searchQuery.value?.decisionDate == undefined
+  ) {
+    return undefined
+  }
+  return searchQuery.value?.decisionDate
+})
+
+const isSearchCompletedWithNoResults = computed(
+  () => currentPage.value?.content && currentPage.value.content.length === 0,
+)
+
 const courtFilter = ref("")
 const { data: courts, execute: fetchCourts } =
-  comboboxItemService.getCourts(courtFilter)
+  ComboboxItemService.getCourts(courtFilter)
+const courtFromQuery = ref<Court | undefined>()
 
-/**
- * Searches all documentation units by given input and updates the local
- * documentunit list entries, the currentPage for pagination and catches errors
- * if they happen. When no results found, but a court was given, the court input
- * is validated against the court table, in order to be able to create a new
- * documentation unit from search the given search input, if the user wants to.
- */
-async function search() {
-  isLoading.value = true
+const hasRequiredCreateParams = computed(() => {
+  const query = searchQuery.value
+  return (
+    !!query &&
+    (!!query.courtType || !!query.courtLocation) &&
+    !!query.fileNumber &&
+    !!query.decisionDate
+  )
+})
 
-  const response = await service.searchByDocumentUnitSearchInput({
-    ...(pageNumber.value != undefined
-      ? { pg: pageNumber.value.toString() }
-      : {}),
-    ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
-    ...searchQuery.value,
-    kind: "DECISION",
-  })
-  if (response.data) {
-    currentPage.value = response.data
-    searchResponseError.value = undefined
-  }
-  if (response.error) {
-    searchResponseError.value = response.error
-  }
-
-  if (
+const showCreateFromParamsButton = computed(
+  () =>
+    isInternalUser.value &&
     isSearchCompletedWithNoResults.value &&
-    !hasFilters.value &&
-    searchQuery.value?.courtType
-  ) {
-    courtFilter.value =
-      searchQuery.value.courtType +
-      (searchQuery.value.courtLocation
-        ? ` ${searchQuery.value.courtLocation}`
-        : "")
+    hasRequiredCreateParams.value,
+)
 
+async function validateAndSetCourtFromQuery() {
+  if (isSearchCompletedWithNoResults.value && searchQuery.value?.courtType) {
+    let courtFilterValue = searchQuery.value.courtType
+    if (searchQuery.value.courtLocation) {
+      courtFilterValue += ` ${searchQuery.value.courtLocation}`
+    }
+    courtFilter.value = courtFilterValue
     await fetchCourts()
 
-    const courtResponse = courts.value
-
-    //filter for exact matches
-    const matches = courtResponse
-      ? courtResponse.filter((item) => item.label === courtFilter.value)
-      : []
-
-    // add as court query only if 1 exact match
+    const matches = courts.value?.filter(
+      (item) => item.label === courtFilter.value,
+    )
     courtFromQuery.value =
-      matches.length === 1 ? (matches[0].value as Court) : undefined
-  } else courtFromQuery.value = undefined
+      matches?.length === 1 ? (matches[0].value as Court) : undefined
+  } else {
+    courtFromQuery.value = undefined
+  }
+}
+
+async function search() {
+  isLoading.value = true
+  currentPage.value = undefined
+
+  const params = {
+    pg: pageNumber.value.toString(),
+    sz: itemsPerPage.toString(),
+    ...searchQuery.value,
+    kind: "DECISION",
+  }
+
+  const response = await service.searchByDocumentUnitSearchInput(params)
+
+  if (response.data) {
+    currentPage.value = response.data
+    serviceError.value = undefined
+  }
+  if (response.error) {
+    serviceError.value = response.error
+  }
+
+  await validateAndSetCourtFromQuery()
   isLoading.value = false
 }
 
-/**
- * Deletes a documentation unit
- * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be removed
- */
-async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
-  if (documentUnitListEntries.value && currentPage.value) {
-    const response = await service.delete(documentUnitListEntry.uuid as string)
-    if (response.status === 200) {
-      if (documentUnitListEntries.value.length === 1) {
-        await search()
-        return
-      }
-      const newEntries = documentUnitListEntries.value.filter(
-        (item) => item != documentUnitListEntry,
+async function handleDelete(documentUnit: DocumentUnitListEntry) {
+  if (!documentUnit.uuid) return
+
+  const response = await service.delete(documentUnit.uuid)
+  if (response.status === 200) {
+    if (currentPage.value?.content?.length === 1) {
+      await search() // Re-fetch if the last item on the page was deleted
+    } else if (currentPage.value?.content) {
+      currentPage.value.content = currentPage.value.content.filter(
+        (item) => item.uuid !== documentUnit.uuid,
       )
-      currentPage.value.content = newEntries
-      currentPage.value.numberOfElements = newEntries.length
-      currentPage.value.empty = newEntries.length == 0
-    } else {
-      alert("Fehler beim Löschen der Dokumentationseinheit: " + response.data)
+      currentPage.value.numberOfElements = currentPage.value.content.length
+      currentPage.value.empty = currentPage.value.content.length === 0
+    }
+  } else {
+    serviceError.value = response.error || {
+      title: "Fehler beim Löschen der Entscheidung.",
     }
   }
 }
 
-/**
- * When using the navigation a new page number is set, the search is triggered,
- * with the given page number.
- * @param {number} page - The page to be updated
- */
 async function updatePage(page: number) {
   pageNumber.value = page
   await search()
 }
 
-/**
- * The search form emits an event, when clicking the search button and is
- * triggering the search with the updated query here.
- * It will always reset the pagination to the first page.
- * @param {Query<DocumentationUnitSearchParameter>} value - The page to be updated
- */
 async function updateQuery(value: Query<DocumentationUnitSearchParameter>) {
   searchQuery.value = value
   pageNumber.value = 0
   await search()
 }
 
-/**
- * The search form emits an event, when resetting the search,
- * which empties the document unit list and resets the pagination.
- */
-async function handleReset() {
+function handleReset() {
   currentPage.value = undefined
+  serviceError.value = undefined
+  courtFromQuery.value = undefined
 }
 
-const createFromSearchQueryResponseError = ref<ResponseError | undefined>()
 const createNew = async () => {
   await router.push({ name: "caselaw-documentUnit-new" })
 }
 
-/**
- * When a search returns no results and at least one valid search parameter
- * is given and no filters (documentNumber, myDocofficeOnly, status) are set,
- * a new documentation unit can be created with fileNumber, court and/ or date
- * from the current search query.
- */
 async function createNewFromSearch() {
-  isLoading.value = true
-  createFromSearchQueryResponseError.value = undefined
-  const createResponse = await service.createNew()
-  if (createResponse.error) {
-    createFromSearchQueryResponseError.value = createResponse.error
-    isLoading.value = false
+  if (!searchQuery.value) {
     return
   }
 
-  const docUnit = createResponse.data
-  docUnit.coreData.fileNumbers = fileNumberFromQuery.value
-    ? [fileNumberFromQuery.value]
-    : []
-  docUnit.coreData.decisionDate = dateFromQuery.value
-  docUnit.coreData.court = courtFromQuery.value
-  await store.loadDocumentUnit(docUnit.documentNumber)
-  store.documentUnit = docUnit
+  const requestBodyParameters: DocumentationUnitCreationParameters = {
+    fileNumber: searchQuery.value.fileNumber,
+    decisionDate: searchQuery.value.decisionDate,
+    court: courtFromQuery.value,
+  }
 
-  const updateResponse = await store.updateDocumentUnit()
+  const createResponse = await service.createNew(requestBodyParameters, {
+    kind: Kind.PENDING_PROCEEDING,
+  })
 
-  if (updateResponse.error) {
-    createFromSearchQueryResponseError.value = updateResponse.error
-    if (docUnit?.uuid) await service.delete(docUnit.uuid)
-    isLoading.value = false
+  if (createResponse.error) {
+    serviceError.value = createResponse.error
     return
   }
 
@@ -198,120 +193,77 @@ async function createNewFromSearch() {
     name: "caselaw-documentUnit-documentNumber-categories",
     params: { documentNumber: createResponse.data.documentNumber },
   })
-  isLoading.value = false
 }
-
-const fileNumberFromQuery = computed(() => {
-  return searchQuery.value?.fileNumber?.trim()
-})
-
-const courtFromQuery = ref<Court | undefined>()
-const dateFromQuery = computed(() => {
-  if (
-    (searchQuery.value?.decisionDateEnd != undefined &&
-      searchQuery.value?.decisionDateEnd != searchQuery.value?.decisionDate) ||
-    searchQuery.value?.decisionDate == undefined
-  )
-    return undefined
-  return searchQuery.value?.decisionDate
-})
-
-const isSearchCompletedWithNoResults = computed(
-  () =>
-    documentUnitListEntries.value != undefined &&
-    documentUnitListEntries.value.length === 0,
-)
-const hasFilters = computed(
-  () =>
-    searchQuery.value != undefined &&
-    (searchQuery.value.documentNumber ||
-      searchQuery.value.publicationStatus ||
-      searchQuery.value.myDocOfficeOnly),
-)
-const hasInvalidOrNoQueryData = computed(
-  () =>
-    searchQuery.value != undefined &&
-    !fileNumberFromQuery.value &&
-    !courtFromQuery.value &&
-    !dateFromQuery.value,
-)
-
-const showDefaultLink = computed(() => {
-  return (
-    !isSearchCompletedWithNoResults.value ||
-    hasFilters.value ||
-    hasInvalidOrNoQueryData.value
-  )
-})
 </script>
 
 <template>
-  <div>
-    <DocumentUnitSearchEntryForm
+  <div class="flex flex-col gap-24" data-testId="decision-search">
+    <SearchForm
       :is-loading="isLoading"
+      :kind="Kind.DECISION"
       @reset-search-results="handleReset"
       @search="updateQuery"
     />
-    <Pagination
-      :is-loading="isLoading"
-      navigation-position="bottom"
-      :page="currentPage"
+
+    <InfoModal
+      v-if="serviceError"
+      class="my-16"
+      data-testid="service-error"
+      :description="serviceError.description"
+      :status="InfoStatus.ERROR"
+      :title="serviceError.title"
+    />
+
+    <ResultList
+      :kind="Kind.DECISION"
+      :loading="isLoading"
+      :page-entries="currentPage"
+      :show-publication-date="
+        !!searchQuery?.publicationDate || searchQuery?.scheduledOnly === 'true'
+      "
+      @delete-documentation-unit="handleDelete"
       @update-page="updatePage"
     >
-      <DocumentUnitList
-        class="grow"
-        :document-unit-list-entries="documentUnitListEntries"
-        :empty-state="emptyStateLabel"
-        :is-loading="isLoading"
-        :search-response-error="searchResponseError"
-        :show-publication-date="
-          !!searchQuery?.publicationDate ||
-          searchQuery?.scheduledOnly === 'true'
-        "
-        @delete-documentation-unit="handleDelete"
-      >
-        <template v-if="isInternalUser" #newlink>
-          <Button
-            v-if="showDefaultLink"
-            aria-label="Neue Dokumentationseinheit erstellen"
-            label="Neue Dokumentationseinheit erstellen"
-            text
-            @click="createNew"
-          ></Button>
-          <div v-else class="space-y-16 text-center">
-            <div v-if="createFromSearchQueryResponseError" class="mb-24">
-              <InfoModal
-                :description="createFromSearchQueryResponseError.description"
-                :title="createFromSearchQueryResponseError.title"
-              />
-            </div>
-            <template v-else>
-              <p>
-                Sie können die folgenden Stammdaten übernehmen und eine neue<br />Dokumentationseinheit
-                erstellen:
-              </p>
-              <p class="ris-label1-bold mb-16 text-center">
-                <span :class="{ 'text-gray-800': !fileNumberFromQuery }">{{
-                  `${fileNumberFromQuery ?? "Aktenzeichen unbekannt"}, `
-                }}</span>
-                <span :class="{ 'text-gray-800': !courtFromQuery }">{{
-                  `${courtFromQuery?.label ?? "Gericht unbekannt"}, `
-                }}</span>
-                <span :class="{ 'text-gray-800': !dateFromQuery }">
-                  {{ DateUtil.formatDate(dateFromQuery) || "Datum unbekannt" }}
-                </span>
-              </p>
-              <Button
-                class="justify-self-center"
-                label="Übernehmen und fortfahren"
-                severity="secondary"
-                size="small"
-                @click="createNewFromSearch"
-              ></Button>
-            </template>
+      <template #empty-state-content>
+        <div class="flex flex-col gap-16 text-black">
+          <p>{{ emptyStateMessage }}</p>
+
+          <div v-if="showCreateFromParamsButton">
+            <p>
+              Sie können die folgenden Stammdaten übernehmen und eine neue<br />Entscheidung
+              erstellen:
+            </p>
+            <p class="ris-label1-bold mb-16 text-center">
+              <span :class="{ 'text-gray-800': !fileNumberFromQuery }"
+                >{{ fileNumberFromQuery ?? "Aktenzeichen unbekannt" }},
+              </span>
+              <span :class="{ 'text-gray-800': !courtFromQuery }"
+                >{{ courtFromQuery?.label ?? "Gericht unbekannt" }},
+              </span>
+              <span :class="{ 'text-gray-800': !dateFromQuery }">
+                {{
+                  dayjs(dateFromQuery).format("DD.MM.YYYY") ?? "Datum unbekannt"
+                }}
+              </span>
+            </p>
+            <Button
+              class="justify-self-center"
+              label="Übernehmen und fortfahren"
+              severity="secondary"
+              size="small"
+              @click="createNewFromSearch"
+            />
           </div>
-        </template>
-      </DocumentUnitList>
-    </Pagination>
+          <div v-else-if="isInternalUser">
+            <Button
+              aria-label="Neue Entscheidung erstellen"
+              label="Neue Entscheidung erstellen"
+              text
+              @click="createNew"
+            />
+          </div>
+        </div>
+      </template>
+    </ResultList>
   </div>
 </template>
