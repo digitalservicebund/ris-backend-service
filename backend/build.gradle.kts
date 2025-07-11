@@ -20,7 +20,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.10.1"
+    id("org.flywaydb.flyway") version "11.10.2"
     id("io.sentry.jvm.gradle") version "5.8.0"
 }
 
@@ -232,10 +232,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.15.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.10.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.10.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
