@@ -215,7 +215,6 @@ async function createNewFromSearch() {
     />
 
     <ResultList
-      v-if="!serviceError"
       :loading="isLoading"
       :page-entries="currentPage"
       @delete-documentation-unit="handleDelete"

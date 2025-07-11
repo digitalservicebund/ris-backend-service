@@ -8,6 +8,7 @@ import InputText from "primevue/inputtext"
 import { afterEach, beforeEach, expect, MockInstance, vi } from "vitest"
 import { Component, Directive } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
+import { Page } from "@/components/Pagination.vue"
 import PendingProceedingSearch from "@/components/search/PendingProceedingSearch.vue"
 import { Court } from "@/domain/court"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
@@ -129,12 +130,18 @@ describe("Pending Proceeding Search", () => {
       documentUnitService,
       "searchByDocumentUnitSearchInput",
     ).mockResolvedValue({
-      status: 400,
-      error: {
-        title: "Fehler",
-        description: "Etwas ist schiefgelaufen",
+      status: 500,
+      data: {
+        timestamp: "2025-07-11T09:01:25.758+00:00",
+        status: 500,
+        error: "Internal Server Error",
+        path: "/api/v1/caselaw/documentunits/search",
       },
-    })
+      error: {
+        title: "Die Suchergebnisse konnten nicht geladen werden.",
+        description: "Bitte versuchen Sie es später erneut.",
+      },
+    } as unknown as ServiceResponse<Page<DocumentUnitListEntry>>)
     const { user } = renderComponent()
 
     // Act
@@ -142,8 +149,13 @@ describe("Pending Proceeding Search", () => {
     await user.click(screen.getByText("Ergebnisse anzeigen"))
 
     // Assert
-    expect(await screen.findByTestId("service-error")).toBeInTheDocument()
-    expect(screen.getByText("Etwas ist schiefgelaufen")).toBeInTheDocument()
+    expect(screen.getByTestId("service-error")).toBeVisible()
+    expect(
+      screen.getByText("Die Suchergebnisse konnten nicht geladen werden."),
+    ).toBeVisible()
+    expect(
+      screen.getByText("Bitte versuchen Sie es später erneut."),
+    ).toBeVisible()
   })
 
   it("opens new document when 'Neues Anhängiges Verfahren erstellen' is clicked", async () => {

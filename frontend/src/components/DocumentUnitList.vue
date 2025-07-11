@@ -390,6 +390,7 @@ function onDelete() {
     <!-- Error State -->
     <div v-if="searchResponseError" class="mt-24">
       <InfoModal
+        data-testid="service-error"
         :description="searchResponseError.description"
         :title="searchResponseError.title"
       />
