@@ -195,7 +195,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
-    implementation("com.icegreen:greenmail:2.1.3")
+    implementation("com.icegreen:greenmail:2.1.4")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.37") {
@@ -252,7 +252,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.20.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.21.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
