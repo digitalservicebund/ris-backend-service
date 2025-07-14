@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.PageTestImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseEurLexResultRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultStatus;
 import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -23,6 +26,9 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 class EurLexResultIntegrationTest extends BaseIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
+
+  @Autowired private EurLexResultRepository eurlexResultRepository;
+  @Autowired private DatabaseEurLexResultRepository databaseRepository;
 
   @Test
   void getSearchResults() {
@@ -284,5 +290,67 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
             .getResponseBody();
 
     assertThat(searchResultPage.hasContent()).isFalse();
+  }
+
+  @Test
+  void seedTestData_shouldAddNewDecisionsAndUpdateExistingOnes() {
+    databaseRepository.deleteAll();
+    assertThat(databaseRepository.findAll()).isEmpty();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .post()
+        .uri("/api/v1/caselaw/eurlex/testdata/seed")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    assertThat(databaseRepository.findAll())
+        .hasSize(3)
+        .satisfiesExactlyInAnyOrder(
+            first -> {
+              assertThat(first.getCelex()).isEqualTo("62024CO0878");
+              assertThat(first.getStatus()).isEqualTo(EurLexResultStatus.NEW);
+            },
+            second -> {
+              assertThat(second.getCelex()).isEqualTo("62023CJ0538");
+              assertThat(second.getStatus()).isEqualTo(EurLexResultStatus.NEW);
+            },
+            third -> {
+              assertThat(third.getCelex()).isEqualTo("62019CV0001(02)");
+              assertThat(third.getStatus()).isEqualTo(EurLexResultStatus.NEW);
+            });
+
+    var existingResult =
+        databaseRepository.findAll().stream()
+            .filter(result -> result.getCelex().equals("62024CO0878"))
+            .findFirst()
+            .get();
+    existingResult.setStatus(EurLexResultStatus.ASSIGNED);
+    databaseRepository.save(existingResult);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .post()
+        .uri("/api/v1/caselaw/eurlex/testdata/seed")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    assertThat(databaseRepository.findAll())
+        .hasSize(3)
+        .satisfiesExactlyInAnyOrder(
+            first -> {
+              assertThat(first.getCelex()).isEqualTo("62024CO0878");
+              assertThat(first.getStatus()).isEqualTo(EurLexResultStatus.ASSIGNED);
+            },
+            second -> {
+              assertThat(second.getCelex()).isEqualTo("62023CJ0538");
+              assertThat(second.getStatus()).isEqualTo(EurLexResultStatus.NEW);
+            },
+            third -> {
+              assertThat(third.getCelex()).isEqualTo("62019CV0001(02)");
+              assertThat(third.getStatus()).isEqualTo(EurLexResultStatus.NEW);
+            });
   }
 }

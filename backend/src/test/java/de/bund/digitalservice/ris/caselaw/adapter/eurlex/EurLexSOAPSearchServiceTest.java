@@ -13,9 +13,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -253,12 +257,62 @@ class EurLexSOAPSearchServiceTest {
   }
 
   @Test
-  void updateResultsStatus_withNonExistantCelexNumbers_shouldUpdate() {
+  void updateResultsStatus_withNonExistentCelexNumbers_shouldDoNothing() {
     String celex1 = "celex1";
     String celex2 = "celex2";
 
     service.updateResultStatus(List.of(celex1, celex2));
 
     verify(repository, never()).saveAll(anyList());
+  }
+
+  @Test
+  void requestNewestDecisions_shouldInsertNew() throws IOException {
+    var searchResponse = Files.readString(Paths.get("src/test/resources/testdata/eurlex.xml"));
+    when(httpEurlexRetrievalService.requestEurlexResultList(any(), any()))
+        .thenReturn(searchResponse);
+    ArgumentCaptor<List<EurLexResultDTO>> captor = ArgumentCaptor.forClass((Class) List.class);
+
+    service.requestNewestDecisions();
+
+    verify(repository).saveAll(captor.capture());
+    var capturedSearchResults = captor.getValue();
+    assertThat(capturedSearchResults.size()).isEqualTo(3);
+    assertThat(capturedSearchResults.get(0).getCelex()).isEqualTo("62024CO0878");
+    assertThat(capturedSearchResults.get(0).getStatus()).isEqualTo(EurLexResultStatus.NEW);
+    assertThat(capturedSearchResults.get(1).getCelex()).isEqualTo("62023CJ0538");
+    assertThat(capturedSearchResults.get(1).getStatus()).isEqualTo(EurLexResultStatus.NEW);
+    assertThat(capturedSearchResults.get(2).getCelex()).isEqualTo("62019CV0001(02)");
+    assertThat(capturedSearchResults.get(2).getStatus()).isEqualTo(EurLexResultStatus.NEW);
+  }
+
+  @Test
+  void requestNewestDecisions_shouldUpdateExistingAndInsertNew() throws IOException {
+    var searchResponse = Files.readString(Paths.get("src/test/resources/testdata/eurlex.xml"));
+    when(httpEurlexRetrievalService.requestEurlexResultList(any(), any()))
+        .thenReturn(searchResponse);
+    ArgumentCaptor<List<EurLexResultDTO>> captor = ArgumentCaptor.forClass((Class) List.class);
+    var uuid = UUID.randomUUID();
+    when(repository.findByCelexNumber("62024CO0878"))
+        .thenReturn(
+            Optional.of(
+                EurLexResultDTO.builder()
+                    .celex("62024CO0878")
+                    .status(EurLexResultStatus.ASSIGNED)
+                    .id(uuid)
+                    .build()));
+
+    service.requestNewestDecisions();
+
+    verify(repository).saveAll(captor.capture());
+    var capturedSearchResults = captor.getValue();
+    assertThat(capturedSearchResults.size()).isEqualTo(3);
+    assertThat(capturedSearchResults.get(0).getCelex()).isEqualTo("62024CO0878");
+    assertThat(capturedSearchResults.get(0).getStatus()).isEqualTo(EurLexResultStatus.ASSIGNED);
+    assertThat(capturedSearchResults.get(0).getId()).isEqualTo(uuid);
+    assertThat(capturedSearchResults.get(1).getCelex()).isEqualTo("62023CJ0538");
+    assertThat(capturedSearchResults.get(1).getStatus()).isEqualTo(EurLexResultStatus.NEW);
+    assertThat(capturedSearchResults.get(2).getCelex()).isEqualTo("62019CV0001(02)");
+    assertThat(capturedSearchResults.get(2).getStatus()).isEqualTo(EurLexResultStatus.NEW);
   }
 }
