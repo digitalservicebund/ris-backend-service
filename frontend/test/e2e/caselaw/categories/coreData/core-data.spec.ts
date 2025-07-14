@@ -475,18 +475,38 @@ test.describe("core data", () => {
         await expect(legalEffect).toBeHidden()
       })
 
-      await test.step("Region ist nicht sichtbar", async () => {
-        const region = pageWithExternalUser.getByLabel("Region", {
-          exact: true,
-        })
-        await expect(region).toBeHidden()
-      })
-
       await test.step("Streitjahr ist nicht sichtbar", async () => {
         const yearsOfDispute = pageWithExternalUser.getByTestId(
           "chips-input-wrapper_yearOfDispute",
         )
         await expect(yearsOfDispute).toBeHidden()
+      })
+
+      await test.step("Quelle ist nicht sichtbar", async () => {
+        const source = pageWithExternalUser.getByTestId(
+          "chips-input-wrapper_source",
+        )
+        await expect(source).toBeHidden()
+      })
+
+      await test.step("Eingangsart ist nicht sichtbar", async () => {
+        const inputTypes = pageWithExternalUser.getByTestId(
+          "chips-input-wrapper_inputTypes",
+        )
+        await expect(inputTypes).toBeHidden()
+      })
+
+      await test.step("Gerichtsbarkeit ist nicht sichtbar", async () => {
+        const jurisdictionType =
+          pageWithExternalUser.getByTestId("jurisdiction-type")
+        await expect(jurisdictionType).toBeHidden()
+      })
+
+      await test.step("Region ist nicht sichtbar", async () => {
+        const region = pageWithExternalUser.getByLabel("Region", {
+          exact: true,
+        })
+        await expect(region).toBeHidden()
       })
     },
   )
@@ -560,14 +580,31 @@ test.describe("core data", () => {
         await expect(legalEffect).toBeEnabled()
       })
 
-      await test.step("Region ist readonly", async () => {
-        const region = page.getByLabel("Region", { exact: true })
-        await expect(region).not.toBeEditable()
-      })
-
       await test.step("Streitjahr ist bearbeitbar", async () => {
         const yearsOfDispute = page.getByLabel("Streitjahr", { exact: true })
         await expect(yearsOfDispute).toBeEditable()
+      })
+
+      await test.step("Quelle ist bearbeitbar", async () => {
+        const source = page.getByLabel("Quelle", { exact: true })
+        await expect(source).toBeEditable()
+      })
+
+      await test.step("Eingangsart ist bearbeitbar", async () => {
+        const inputTypes = page.getByLabel("Eingangsart", { exact: true })
+        await expect(inputTypes).toBeEditable()
+      })
+
+      await test.step("Gerichtsbarkeit ist readonly", async () => {
+        const jurisdictionType = page.getByLabel("Gerichtsbarkeit", {
+          exact: true,
+        })
+        await expect(jurisdictionType).toBeEditable()
+      })
+
+      await test.step("Region ist readonly", async () => {
+        const region = page.getByLabel("Region", { exact: true })
+        await expect(region).not.toBeEditable()
       })
     },
   )
