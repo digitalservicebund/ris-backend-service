@@ -11,7 +11,7 @@ export const useBubbleMenuMock = () => {
       BubbleMenu: {
         name: "BubbleMenu",
         template: "<div><slot /></div>",
-        props: ["editor", "tippyOptions", "shouldShow"],
+        props: ["editor", "options", "shouldShow"],
       },
     }
   })
