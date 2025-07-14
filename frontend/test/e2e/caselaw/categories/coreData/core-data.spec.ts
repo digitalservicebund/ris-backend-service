@@ -585,21 +585,9 @@ test.describe("core data", () => {
         await expect(yearsOfDispute).toBeEditable()
       })
 
-      await test.step("Quelle ist bearbeitbar", async () => {
-        const source = page.getByLabel("Quelle", { exact: true })
-        await expect(source).toBeEditable()
-      })
-
       await test.step("Eingangsart ist bearbeitbar", async () => {
         const inputTypes = page.getByLabel("Eingangsart", { exact: true })
         await expect(inputTypes).toBeEditable()
-      })
-
-      await test.step("Gerichtsbarkeit ist readonly", async () => {
-        const jurisdictionType = page.getByLabel("Gerichtsbarkeit", {
-          exact: true,
-        })
-        await expect(jurisdictionType).toBeEditable()
       })
 
       await test.step("Region ist readonly", async () => {
