@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { useScrollLock } from "@vueuse/core"
 import dayjs from "dayjs"
-import customParseFormat from "dayjs/plugin/customParseFormat" // Needed for dayjs
-import dayjsTimezone from "dayjs/plugin/timezone" // Needed for dayjs
-import dayjsUtc from "dayjs/plugin/utc" // Needed for dayjs
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import dayjsTimezone from "dayjs/plugin/timezone"
+import dayjsUtc from "dayjs/plugin/utc"
 
 import Button from "primevue/button"
 import Column from "primevue/column"
@@ -13,21 +13,21 @@ import { computed, ref, watch } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
-import Tooltip from "@/components/Tooltip.vue" // Imported from old table
+import Tooltip from "@/components/Tooltip.vue"
 
 import { useStatusBadge } from "@/composables/useStatusBadge"
-import { Kind } from "@/domain/documentationUnitKind" // Import Kind enum
+import { Kind } from "@/domain/documentationUnitKind"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import { PublicationState } from "@/domain/publicationStatus" // Needed for conditional actions
+import { PublicationState } from "@/domain/publicationStatus"
 
-import IconAttachedFile from "~icons/ic/baseline-attach-file" // From old table
+import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
-import IconSubject from "~icons/ic/baseline-subject" // From old table
-import IconNote from "~icons/ic/outline-comment-bank" // From old table
+import IconSubject from "~icons/ic/baseline-subject"
+import IconNote from "~icons/ic/outline-comment-bank"
 import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
-import IconClock from "~icons/ic/outline-watch-later" // From old table
+import IconClock from "~icons/ic/outline-watch-later"
 import IconArrowDown from "~icons/mdi/arrow-down-drop"
 
 const props = defineProps<{
@@ -86,6 +86,26 @@ const publicationDate = (listEntry: DocumentUnitListEntry) => {
     return dayjs.utc(date).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")
   } else {
     return "-"
+  }
+}
+
+/**
+ * Returns the correct router link, depending on docunit kind and suffix
+ * @param {DocumentUnitListEntry} item - The documentationunit list entry to determine the kind
+ * @param {"categories" | "preview"} suffix - The variable part of the router link
+ */
+const getRouterLinkTo = (
+  item: DocumentUnitListEntry,
+  suffix: "categories" | "preview",
+) => {
+  return {
+    name:
+      item.documentType?.jurisShortcut === "Anh"
+        ? `caselaw-pending-proceeding-documentNumber-${suffix}`
+        : `caselaw-documentUnit-documentNumber-${suffix}`,
+    params: {
+      documentNumber: item.documentNumber ?? "undefined",
+    },
   }
 }
 
@@ -315,17 +335,7 @@ defineSlots<{
             <div class="flex flex-row justify-end -space-x-2">
               <router-link
                 target="_blank"
-                :to="
-                  item.documentType?.jurisShortcut === 'Anh'
-                    ? {
-                        name: 'caselaw-pending-proceeding-documentNumber-categories',
-                        params: { documentNumber: item.documentNumber },
-                      }
-                    : {
-                        name: 'caselaw-documentUnit-documentNumber-categories',
-                        params: { documentNumber: item.documentNumber },
-                      }
-                "
+                :to="getRouterLinkTo(item, 'categories')"
               >
                 <Button
                   v-tooltip.bottom="{
@@ -349,13 +359,7 @@ defineSlots<{
 
               <router-link
                 target="_blank"
-                :to="{
-                  name:
-                    item.documentType?.jurisShortcut === 'Anh'
-                      ? 'caselaw-pending-proceeding-documentNumber-preview'
-                      : 'caselaw-documentUnit-documentNumber-preview',
-                  params: { documentNumber: item.documentNumber },
-                }"
+                :to="getRouterLinkTo(item, 'preview')"
               >
                 <Button
                   v-tooltip.bottom="{

@@ -33,7 +33,7 @@ const isInternalUser = useInternalUser()
 const emptyStateMessage = computed(() => {
   if (!currentPage.value?.content) {
     return isInternalUser.value
-      ? "Starten Sie die Suche oder erstellen Sie ein neues Anhängiges Verfahren."
+      ? "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
       : "Starten Sie die Suche."
   }
   if (currentPage.value.content.length === 0) {
@@ -143,7 +143,7 @@ async function handleDelete(documentUnit: DocumentUnitListEntry) {
     }
   } else {
     serviceError.value = response.error || {
-      title: "Fehler beim Löschen der Entscheidung.",
+      title: "Fehler beim Löschen der Dokumentationseinheit.",
     }
   }
 }
@@ -230,7 +230,7 @@ async function createNewFromSearch() {
 
           <div v-if="showCreateFromParamsButton">
             <p>
-              Sie können die folgenden Stammdaten übernehmen und eine neue<br />Entscheidung
+              Sie können die folgenden Stammdaten übernehmen und eine neue<br />Dokumentationseinheit
               erstellen:
             </p>
             <p class="ris-label1-bold mb-16 text-center">
@@ -256,8 +256,8 @@ async function createNewFromSearch() {
           </div>
           <div v-else-if="isInternalUser">
             <Button
-              aria-label="Neue Entscheidung erstellen"
-              label="Neue Entscheidung erstellen"
+              aria-label="Neue Dokumentationseinheit erstellen"
+              label="Neue Dokumentationseinheit erstellen"
               text
               @click="createNew"
             />

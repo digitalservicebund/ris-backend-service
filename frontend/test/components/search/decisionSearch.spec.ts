@@ -158,21 +158,23 @@ describe("Decision Search", () => {
     ).toBeVisible()
   })
 
-  it("opens new document when 'Neue Entscheidung erstellen' is clicked", async () => {
+  it("opens new document when 'Neue Dokumentationseinheit erstellen' is clicked", async () => {
     // Arrange
     mockNoSearchResult()
     const { user, router } = renderComponent()
     expect(
       screen.getByText(
-        "Starten Sie die Suche oder erstellen Sie ein neues Anhängiges Verfahren.",
+        "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
       ),
     ).toBeVisible()
-    expect(screen.getByText("Neue Entscheidung erstellen")).toBeVisible()
+    expect(
+      screen.getByText("Neue Dokumentationseinheit erstellen"),
+    ).toBeVisible()
     await user.type(screen.getByLabelText("Aktenzeichen Suche"), "TEST")
     await user.click(screen.getByText("Ergebnisse anzeigen"))
 
     // Act
-    await user.click(screen.getByText("Neue Entscheidung erstellen"))
+    await user.click(screen.getByText("Neue Dokumentationseinheit erstellen"))
 
     // Assert
     expect(router.currentRoute.value.fullPath).toBe("/caselaw/documentUnit/new")
