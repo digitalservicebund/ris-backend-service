@@ -16,7 +16,8 @@ import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
-import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
+import { Editor, EditorContent } from "@tiptap/vue-3"
+import { BubbleMenu } from "@tiptap/vue-3/menus"
 import { computed, onMounted, ref, watch } from "vue"
 import TextEditorFooter from "@/components/input/TextEditorFooter.vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
@@ -296,7 +297,7 @@ watch(
     // incoming changes
     // the cursor should not jump to the end of the content but stay where it is
     const cursorPos = editor.state.selection.anchor
-    editor.commands.setContent(value, false)
+    editor.commands.setContent(value, { emitUpdate: false })
     editor.commands.setTextSelection(cursorPos)
   },
 )

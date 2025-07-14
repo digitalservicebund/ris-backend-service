@@ -78,7 +78,9 @@ class NeurisTextCheckService implements TextCheckService {
 
     if (languageToolCheckResponse.status == 200) {
       this.matches = languageToolCheckResponse.data!.matches
-      editor.commands.setContent(languageToolCheckResponse.data!.htmlText, true)
+      editor.commands.setContent(languageToolCheckResponse.data!.htmlText, {
+        emitUpdate: true,
+      })
     } else if (languageToolCheckResponse.error) {
       this.responseError.value = languageToolCheckResponse.error
     }
