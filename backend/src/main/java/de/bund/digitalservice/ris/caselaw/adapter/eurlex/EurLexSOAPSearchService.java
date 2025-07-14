@@ -127,7 +127,9 @@ public class EurLexSOAPSearchService implements SearchService {
   @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "eurlex-update", lockAtMostFor = "PT5M")
   public void requestNewestDecisions() {
+    log.info("Requesting latest eurlex decisions.");
     requestNewestDecisions(1);
+    log.info("Finished adding/updating eurlex decisions.");
   }
 
   @SuppressWarnings("java:S2142")
@@ -149,9 +151,7 @@ public class EurLexSOAPSearchService implements SearchService {
       transformedList.forEach(
           result -> {
             var existing = repository.findByCelexNumber(result.getCelex());
-            if (existing
-                .isPresent()) { // update the existing entry by overriding everything except the
-              // status
+            if (existing.isPresent()) { // update entry by overriding everything except status
               result.setId(existing.get().getId());
               result.setStatus(existing.get().getStatus());
             }
