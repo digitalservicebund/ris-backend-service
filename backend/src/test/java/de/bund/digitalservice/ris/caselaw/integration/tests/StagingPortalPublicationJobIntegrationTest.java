@@ -31,7 +31,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.PortalTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
@@ -91,7 +91,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     @Primary
     public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer stagingPortalTransformer(
         DocumentBuilderFactory documentBuilderFactory) {
-      return new PortalTransformer(documentBuilderFactory);
+      return new FullLdmlTransformer(documentBuilderFactory);
     }
   }
 

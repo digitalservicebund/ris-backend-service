@@ -41,6 +41,7 @@ type MyFixtures = {
   prefilledDocumentUnitWithTexts: Decision
   prefilledDocumentUnitWithManyReferences: Decision
   pendingProceeding: PendingProceeding
+  prefilledPendingProceeding: PendingProceeding
   /** Define fixture option "pendingProceedingsToBeCreated" to define the pending proceedings to be generated */
   pendingProceedingsFromOptions: {
     createdPendingProceedings: PendingProceeding[]
@@ -197,6 +198,118 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
       prefilledDocumentUnit.uuid,
       csrfToken,
       prefilledDocumentUnit.documentNumber,
+    )
+  },
+
+  prefilledPendingProceeding: async ({ request, context }, use) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await request.put(
+      `/api/v1/caselaw/documentunits/new?kind=PENDING_PROCEEDING`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create prefilledPendingProceeding: ${response.status()} ${response.statusText()}`,
+      )
+    }
+    const prefilledPendingProceeding = await response.json()
+
+    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    const court = await courtResponse.json()
+
+    const normAbbreviationResponse = await request.get(
+      `api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`,
+    )
+    const normAbbreviation = await normAbbreviationResponse.json()
+
+    const fieldsOfLawResponse = await request.get(
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+    )
+    const fieldsOfLaw = await fieldsOfLawResponse.json()
+    const documentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const newPendingProceeding = {
+      ...prefilledPendingProceeding,
+      coreData: {
+        ...prefilledPendingProceeding.coreData,
+        court: court?.[0],
+        documentType: documentType?.[0],
+        fileNumbers: [generateString()],
+        decisionDate: "2019-12-31",
+        appraisalBody: "1. Senat, 2. Kammer",
+        source: {
+          value: SourceValue.AngefordertesOriginal,
+        },
+      },
+      contentRelatedIndexing: {
+        keywords: ["keyword"],
+        norms: [
+          {
+            normAbbreviation: normAbbreviation?.[0],
+          },
+        ],
+        fieldsOfLaw: [fieldsOfLaw?.[0]],
+      },
+      shortTexts: {
+        headline: "test headline",
+        resolutionNote: "test resolutionNote",
+        legalIssue: "test legalIssue",
+        admissionOfAppeal: "test admissionOfAppeal",
+        appellant: "test appellant",
+      },
+    } as PendingProceeding
+
+    const patchedPendingProceeding = mergeDeep(
+      newPendingProceeding,
+      prefilledPendingProceeding,
+    ) as PendingProceeding
+
+    const frontendPatch = jsonPatch.compare(
+      patchedPendingProceeding,
+      newPendingProceeding,
+    )
+
+    const patchResponse = await request.patch(
+      `/api/v1/caselaw/documentunits/${newPendingProceeding.uuid}`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+        data: {
+          documentationUnitVersion: newPendingProceeding.version,
+          patch: frontendPatch,
+          errorPaths: [],
+        },
+      },
+    )
+
+    if (!patchResponse.ok()) {
+      throw new Error(
+        `Failed to patch pending proceeding: ${response.status()} ${response.statusText()}`,
+      )
+    }
+    const getResponse = await request.get(
+      `/api/v1/caselaw/documentunits/${prefilledPendingProceeding.documentNumber}`,
+    )
+
+    if (!getResponse.ok()) {
+      throw new Error(
+        `Failed to get pending proceeding: ${getResponse.status()} ${getResponse.statusText()}`,
+      )
+    }
+
+    await use(await getResponse.json())
+
+    await deleteWithRetry(
+      request,
+      prefilledPendingProceeding.uuid,
+      csrfToken,
+      prefilledPendingProceeding.documentNumber,
     )
   },
 

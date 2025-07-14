@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml;
+package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision;
 
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.applyIfNotEmpty;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.nullSafeGet;
@@ -18,13 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Transformer for converting documentation units to LDML format for public portal use. Implements
- * specific meta-data mapping for public access.
+ * Transformer for converting decisions to the reduced LDML format. Currently, the public Prototype
+ * Portal is under restrictions and must not use full LDML for legal reasons.
  */
 @Slf4j
-public class PrototypePortalTransformer extends CommonPortalTransformer {
+public class DecisionReducedLdmlTransformer extends DecisionCommonLdmlTransformer {
 
-  public PrototypePortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public DecisionReducedLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     super(documentBuilderFactory);
   }
 
@@ -68,11 +68,11 @@ public class PrototypePortalTransformer extends CommonPortalTransformer {
           .withBlock(
               AknEmbeddedStructureInBlock.Outline.NAME,
               AknEmbeddedStructureInBlock.Outline.build(
-                  JaxbHtml.build(htmlStringToObjectList(outline))))
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(outline))))
           .withBlock(
               AknEmbeddedStructureInBlock.Tenor.NAME,
               AknEmbeddedStructureInBlock.Tenor.build(
-                  JaxbHtml.build(htmlStringToObjectList(tenor))));
+                  JaxbHtml.build(htmlTransformer.htmlStringToObjectList(tenor))));
     }
     return null;
   }

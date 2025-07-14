@@ -7,11 +7,13 @@ import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
 import { afterEach, beforeEach, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
+import { Page } from "@/components/Pagination.vue"
 import DecisionSearch from "@/components/search/DecisionSearch.vue"
 import { Court } from "@/domain/court"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import authService from "@/services/authService"
 import documentUnitService from "@/services/documentUnitService"
+import { ServiceResponse } from "@/services/httpClient"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
@@ -399,5 +401,39 @@ describe("Documentunit Search", () => {
     expect(
       screen.queryByText("Übernehmen und fortfahren"),
     ).not.toBeInTheDocument()
+  })
+
+  it("calls service on search and shows error modal on error", async () => {
+    // Arrange
+    vi.spyOn(
+      documentUnitService,
+      "searchByDocumentUnitSearchInput",
+    ).mockResolvedValue({
+      status: 500,
+      data: {
+        timestamp: "2025-07-11T09:01:25.758+00:00",
+        status: 500,
+        error: "Internal Server Error",
+        path: "/api/v1/caselaw/documentunits/search",
+      },
+      error: {
+        title: "Die Suchergebnisse konnten nicht geladen werden.",
+        description: "Bitte versuchen Sie es später erneut.",
+      },
+    } as unknown as ServiceResponse<Page<DocumentUnitListEntry>>)
+    const { user } = renderComponent()
+
+    // Act
+    await user.type(screen.getByLabelText("Aktenzeichen Suche"), "TEST")
+    await user.click(screen.getByText("Ergebnisse anzeigen"))
+
+    // Assert
+    expect(screen.getByTestId("service-error")).toBeVisible()
+    expect(
+      screen.getByText("Die Suchergebnisse konnten nicht geladen werden."),
+    ).toBeVisible()
+    expect(
+      screen.getByText("Bitte versuchen Sie es später erneut."),
+    ).toBeVisible()
   })
 })

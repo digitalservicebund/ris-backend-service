@@ -224,7 +224,7 @@ watch(
     data-testid="document-unit-search-entry-form"
   >
     <div
-      class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
+      class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-y-20 lg:gap-x-40"
     >
       <!-- Column 1 -->
       <div class="ris-body1-regular ml-3 flex flex-row items-center">

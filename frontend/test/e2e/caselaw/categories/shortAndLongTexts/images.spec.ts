@@ -10,7 +10,7 @@ import {
 test.describe(
   "base64 images are converted to attachments",
   {
-    tag: ["@RISDEV-7971"],
+    tag: ["@RISDEV-7971", "@RISDEV-3018"],
   },
   () => {
     test("Upload docx and copy image into long text", async ({
@@ -25,6 +25,28 @@ test.describe(
       await test.step("Navigate to categories", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
         await expect(page.getByLabel("Dokumente anzeigen")).toBeVisible()
+      })
+
+      await test.step("Validate word image is rotated correctly", async () => {
+        await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
+        await expect(page.getByLabel("Dokumente anzeigen")).toBeVisible()
+        const image = page
+          .getByTestId("Dokumentenvorschau")
+          .locator("img")
+          .first()
+
+        await expect(image).toBeVisible()
+
+        const { naturalWidth, naturalHeight } = await image.evaluate(
+          (img: HTMLImageElement) => ({
+            naturalWidth: img.naturalWidth,
+            naturalHeight: img.naturalHeight,
+          }),
+        )
+
+        expect(naturalWidth).toBe(200)
+        expect(naturalHeight).toBe(300)
+        expect(naturalHeight).toBeGreaterThan(naturalWidth)
       })
 
       await test.step("Copy image from docx  to Orientierungssatz", async () => {

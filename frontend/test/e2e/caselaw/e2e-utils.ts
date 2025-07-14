@@ -97,9 +97,13 @@ export const navigateToCategories = async (
 export const navigateToReferences = async (
   page: Page,
   documentNumber: string,
+  options?: {
+    type?: "pending-proceeding" | "documentunit"
+  },
 ) => {
   await test.step("Navigate to 'Fundstellen'", async () => {
-    const baseUrl = `/caselaw/documentunit/${documentNumber}/references`
+    const documentType = options?.type ?? "documentunit"
+    const baseUrl = `/caselaw/${documentType}/${documentNumber}/references`
 
     await page.goto(baseUrl)
     await expect(
@@ -883,4 +887,37 @@ export async function expectHistoryLogRow(
   )
   await expect(createdByCell).toHaveText(createdBy)
   await expect(descriptionCell).toHaveText(description)
+}
+
+export async function navigateToCategoryImport(
+  page: Page,
+  documentNumber: string,
+  options?: {
+    category?: DocumentUnitCategoriesEnum
+    skipAssert?: boolean
+    type?: "pending-proceeding" | "documentunit"
+  },
+) {
+  await navigateToCategories(page, documentNumber, options)
+  await page.getByLabel("Seitenpanel öffnen").click()
+  await page.getByTestId("category-import-button").click()
+
+  await expect(page.getByText("Rubriken importieren")).toBeVisible()
+  await expect(page.getByLabel("Dokumentnummer Eingabefeld")).toBeVisible()
+}
+
+export async function searchForDocumentUnitToImport(
+  page: Page,
+  documentNumber: string,
+) {
+  await page
+    .getByRole("textbox", { name: "Dokumentnummer Eingabefeld" })
+    .fill(documentNumber)
+
+  await expect(
+    page.getByRole("button", { name: "Dokumentationseinheit laden" }),
+  ).toBeEnabled()
+  await page
+    .getByRole("button", { name: "Dokumentationseinheit laden" })
+    .click()
 }

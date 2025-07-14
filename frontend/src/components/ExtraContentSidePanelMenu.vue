@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import Button from "primevue/button"
+import { computed } from "vue"
+import { RouteLocationRaw } from "vue-router"
 import FileNavigator from "@/components/FileNavigator.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
@@ -16,17 +18,28 @@ import IconImportCategories from "~icons/material-symbols/text-select-move-back-
 
 const props = defineProps<{
   panelMode?: SelectablePanelContent
-  documentUnit: DocumentationUnit
+  documentUnit?: DocumentationUnit
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   currentAttachmentIndex: number
-  hidePreviewInNewTab?: boolean
 }>()
 
 const emit = defineEmits<{
   "panelMode:update": [value: SelectablePanelContent]
   "attachmentIndex:update": [value: number]
 }>()
+
+const getRouterLinkTo = (suffix: "categories" | "preview") =>
+  computed(() => {
+    return {
+      name: isDecision(props.documentUnit)
+        ? `caselaw-documentUnit-documentNumber-${suffix}`
+        : `caselaw-pending-proceeding-documentNumber-${suffix}`,
+      params: {
+        documentNumber: props.documentUnit?.documentNumber ?? "undefined",
+      },
+    }
+  })
 
 const textCheckAll = useFeatureToggle("neuris.text-check-side-panel")
 
@@ -42,7 +55,7 @@ function emitAttachmentIndex(value: number) {
 <template>
   <div class="m-24 flex flex-row justify-between">
     <div v-if="!hidePanelModeBar" class="flex flex-row -space-x-2">
-      <Tooltip shortcut="n" text="Notiz">
+      <Tooltip v-if="isDecision(documentUnit)" shortcut="n" text="Notiz">
         <Button
           id="note"
           aria-label="Notiz anzeigen"
@@ -57,7 +70,7 @@ function emitAttachmentIndex(value: number) {
           </template>
         </Button>
       </Tooltip>
-      <Tooltip shortcut="d" text="Datei">
+      <Tooltip v-if="isDecision(documentUnit)" shortcut="d" text="Datei">
         <Button
           id="attachments"
           aria-label="Dokumente anzeigen"
@@ -104,7 +117,11 @@ function emitAttachmentIndex(value: number) {
           </template>
         </Button>
       </Tooltip>
-      <Tooltip v-if="textCheckAll" shortcut="t" text="Rechtschreibprüfung">
+      <Tooltip
+        v-if="textCheckAll && isDecision(documentUnit)"
+        shortcut="t"
+        text="Rechtschreibprüfung"
+      >
         <Button
           id="text-check"
           aria-label="Rechtschreibprüfung"
@@ -122,26 +139,21 @@ function emitAttachmentIndex(value: number) {
     </div>
 
     <FileNavigator
-      v-if="panelMode === 'attachments' && isDecision(props.documentUnit)"
-      :attachments="props.documentUnit!.attachments"
+      v-if="panelMode === 'attachments' && isDecision(documentUnit)"
+      :attachments="documentUnit!.attachments"
       :current-index="currentAttachmentIndex"
       @select="emitAttachmentIndex"
     ></FileNavigator>
     <div v-if="panelMode === 'preview'" class="ml-auto flex flex-row">
       <Tooltip
-        v-if="props.documentUnit!.isEditable && showEditButton"
+        v-if="documentUnit!.isEditable && showEditButton"
         shortcut="b"
         text="Bearbeiten"
       >
         <router-link
           aria-label="Dokumentationseinheit in einem neuen Tab bearbeiten"
           target="_blank"
-          :to="{
-            name: 'caselaw-documentUnit-documentNumber-categories',
-            params: {
-              documentNumber: props.documentUnit.documentNumber,
-            },
-          }"
+          :to="getRouterLinkTo('categories') as RouteLocationRaw"
         >
           <Button text>
             <template #icon>
@@ -150,16 +162,11 @@ function emitAttachmentIndex(value: number) {
           </Button>
         </router-link>
       </Tooltip>
-      <Tooltip v-if="!props.hidePreviewInNewTab" text="In neuem Tab öffnen">
+      <Tooltip text="In neuem Tab öffnen">
         <router-link
           aria-label="Vorschau in neuem Tab öffnen"
           target="_blank"
-          :to="{
-            name: 'caselaw-documentUnit-documentNumber-preview',
-            params: {
-              documentNumber: props.documentUnit.documentNumber,
-            },
-          }"
+          :to="getRouterLinkTo('preview') as RouteLocationRaw"
         >
           <Button text>
             <template #icon>

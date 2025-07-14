@@ -20,7 +20,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.10.1"
+    id("org.flywaydb.flyway") version "11.10.2"
     id("io.sentry.jvm.gradle") version "5.8.0"
 }
 
@@ -182,7 +182,7 @@ dependencies {
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.43")
 
-    implementation(platform("software.amazon.awssdk:bom:2.31.77"))
+    implementation(platform("software.amazon.awssdk:bom:2.31.78"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -195,7 +195,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
-    implementation("com.icegreen:greenmail:2.1.3")
+    implementation("com.icegreen:greenmail:2.1.4")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.37") {
@@ -232,10 +232,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.15.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.10.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.10.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -252,7 +252,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.20.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.21.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

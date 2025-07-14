@@ -24,16 +24,30 @@ test.describe("preview pending proceeding", () => {
         page.getByText("Mitteilungsdatum24.02.2025", { exact: true }),
       ).toBeVisible()
       await expect(
+        page.getByText("DokumenttypAnhängiges Verfahren", { exact: true }),
+      ).toBeVisible()
+      await expect(page.getByText("ErledigungJa")).toBeVisible()
+      await expect(
+        page.getByText("Erledigungsmitteilung06.06.2025", { exact: true }),
+      ).toBeVisible()
+      await expect(
+        page.getByText("GerichtsbarkeitFinanzgerichtsbarkeit", { exact: true }),
+      ).toBeVisible()
+      await expect(page.getByText("RegionDEU", { exact: true })).toBeVisible()
+      await expect(
         page.getByText(
-          "Verfahren ist erledigt durch: Zurücknahme der Klage. Das erstinstanzliche Urteil ist gegenstandslos",
+          "RechtsfrageGewerbesteuerpflicht des Bäderbetriebs einer Gemeinde als Betrieb gewerblicher Art",
         ),
       ).toBeVisible()
       await expect(
-        page.getByText("Anhängiges Verfahren", { exact: true }),
+        page.getByText("RechtsmittelzulassungZulassung durch BFH"),
       ).toBeVisible()
-      await expect(page.getByText("ErledigungJa")).toBeVisible()
-      await expect(page.getByText("Zulassung durch BFH")).toBeVisible()
       await expect(page.getByText("RechtsmittelführerVerwaltung")).toBeVisible()
+      await expect(
+        page.getByText(
+          "ErledigungsvermerkVerfahren ist erledigt durch: Zurücknahme der Klage. Das erstinstanzliche Urteil ist gegenstandslos",
+        ),
+      ).toBeVisible()
     },
   )
 })
