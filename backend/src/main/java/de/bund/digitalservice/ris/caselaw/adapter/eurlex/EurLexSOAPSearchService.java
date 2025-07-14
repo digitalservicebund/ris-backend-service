@@ -9,9 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SearchService;
 import java.io.IOException;
 import java.io.StringReader;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,28 +127,16 @@ public class EurLexSOAPSearchService implements SearchService {
   @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "eurlex-update", lockAtMostFor = "PT5M")
   public void requestNewestDecisions() {
-    Optional<EurLexResultDTO> lastResult = repository.findTopByOrderByCreatedAtDesc();
-
-    LocalDate lastUpdate;
-    if (lastResult.isPresent()) {
-      lastUpdate = LocalDate.ofInstant(lastResult.get().getCreatedAt(), ZoneId.of("Europe/Berlin"));
-    } else {
-      lastUpdate = LocalDate.now().withDayOfMonth(1);
-      if (ChronoUnit.DAYS.between(lastUpdate, LocalDate.now()) < 5) {
-        lastUpdate = lastUpdate.minusMonths(1);
-      }
-    }
-
-    requestNewestDecisions(1, lastUpdate);
+    requestNewestDecisions(1);
   }
 
   @SuppressWarnings("java:S2142")
-  private void requestNewestDecisions(int pageNumber, LocalDate lastUpdate) {
+  private void requestNewestDecisions(int pageNumber) {
     Element searchResults;
 
     String response =
         eurlexRetrievalService.requestEurlexResultList(
-            url, generatePayload(pageNumber, lastUpdate));
+            url, generatePayload(pageNumber, LocalDate.now().minusDays(90)));
     searchResults = extractSearchResultsFromResponse(response);
 
     if (searchResults != null) {
@@ -160,11 +146,22 @@ public class EurLexSOAPSearchService implements SearchService {
       List<EurLexResultDTO> transformedList =
           EurLexSearchResultTransformer.transformXmlToDTO(searchResults, courts);
 
+      transformedList.forEach(
+          result -> {
+            var existing = repository.findByCelexNumber(result.getCelex());
+            if (existing
+                .isPresent()) { // update the existing entry by overriding everything except the
+              // status
+              result.setId(existing.get().getId());
+              result.setStatus(existing.get().getStatus());
+            }
+          });
+
       repository.saveAll(transformedList);
 
       int totalNum = EurLexSearchResultTransformer.getTotalNum(searchResults);
       if (totalNum > pageNumber * PAGE_SIZE) {
-        requestNewestDecisions(pageNumber + 1, lastUpdate);
+        requestNewestDecisions(pageNumber + 1);
       }
     }
   }

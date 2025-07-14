@@ -10,8 +10,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
 public interface EurLexResultRepository {
-  Optional<EurLexResultDTO> findTopByOrderByCreatedAtDesc();
-
   Page<EurLexResultDTO> findAllNewWithUriBySearchParameters(
       Pageable pageable,
       Optional<String> fileNumber,
