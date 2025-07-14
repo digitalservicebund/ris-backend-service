@@ -87,7 +87,7 @@ const getOutdent =
     return editor.chain().focus().outdent().run()
   }
 
-export const Indent = Extension.create<IndentOptions, never>({
+export const Indent = Extension.create<IndentOptions>({
   name: "indent",
 
   addOptions() {
