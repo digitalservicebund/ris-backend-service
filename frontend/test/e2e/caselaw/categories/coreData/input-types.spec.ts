@@ -193,10 +193,6 @@ test.describe(
           await expect(page.getByText("XML Vorschau")).toBeVisible()
           await page.getByText("XML Vorschau").click()
 
-          await expect(page.getByText("XML Vorschau")).toBeVisible()
-
-          await page.getByText("XML Vorschau").click()
-
           await expect(
             page.getByText("<begriff>E-Mail</begriff>"),
           ).toBeVisible()

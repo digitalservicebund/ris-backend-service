@@ -10,7 +10,7 @@ import { generateString } from "~/test-helper/dataGenerators"
 test.describe("eurlex", () => {
   test(
     "Eurlex Entscheidungen können in NeuRIS übernommen werden",
-    { tag: ["@RISDEV-7376", "@RISDEV-7578"] },
+    { tag: ["@RISDEV-7376", "@RISDEV-7578", "@RISDEV-6383"] },
     async ({ page }) => {
       const celexNumber1 = "62024CO0878"
       const celexNumber2 = "62023CJ0538"
@@ -174,7 +174,7 @@ test.describe("eurlex", () => {
         ).toBeVisible()
       })
 
-      await test.step("Stammdaten und Textrubriken wurden automatisch befüllt", async () => {
+      await test.step("Stammdaten, Eingangsart und Textrubriken wurden automatisch befüllt", async () => {
         //look at judgment and check all data is there
         const pagePromise = page.context().waitForEvent("page")
         const rows = page.locator("tr")
@@ -200,6 +200,9 @@ test.describe("eurlex", () => {
         await expect(newTab.getByText("ECLIECLI:EU:C:2025:256")).toBeVisible()
         await expect(newTab.getByText("RechtskraftKeine Angabe")).toBeVisible()
         await expect(newTab.getByText("QuelleL")).toBeVisible()
+        await expect(
+          newTab.getByText("EingangsartEUR-LEX-Schnittstelle"),
+        ).toBeVisible()
         await expect(
           newTab.getByText("GerichtsbarkeitBesondere Gerichtsbarkeit"),
         ).toBeVisible()
