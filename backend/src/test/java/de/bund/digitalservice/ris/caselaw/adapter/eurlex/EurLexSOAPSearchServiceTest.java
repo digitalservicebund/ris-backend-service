@@ -277,7 +277,7 @@ class EurLexSOAPSearchServiceTest {
 
     verify(repository).saveAll(captor.capture());
     var capturedSearchResults = captor.getValue();
-    assertThat(capturedSearchResults.size()).isEqualTo(3);
+    assertThat(capturedSearchResults).hasSize(3);
     assertThat(capturedSearchResults.get(0).getCelex()).isEqualTo("62024CO0878");
     assertThat(capturedSearchResults.get(0).getStatus()).isEqualTo(EurLexResultStatus.NEW);
     assertThat(capturedSearchResults.get(1).getCelex()).isEqualTo("62023CJ0538");
@@ -306,7 +306,7 @@ class EurLexSOAPSearchServiceTest {
 
     verify(repository).saveAll(captor.capture());
     var capturedSearchResults = captor.getValue();
-    assertThat(capturedSearchResults.size()).isEqualTo(3);
+    assertThat(capturedSearchResults).hasSize(3);
     assertThat(capturedSearchResults.get(0).getCelex()).isEqualTo("62024CO0878");
     assertThat(capturedSearchResults.get(0).getStatus()).isEqualTo(EurLexResultStatus.ASSIGNED);
     assertThat(capturedSearchResults.get(0).getId()).isEqualTo(uuid);
