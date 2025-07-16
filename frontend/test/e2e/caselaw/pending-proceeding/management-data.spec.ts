@@ -1,12 +1,12 @@
 import { expect, Page } from "@playwright/test"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   navigateToManagementData,
   expectHistoryCount,
   expectHistoryLogRow,
   navigateToCategories,
   save,
-} from "../e2e-utils"
-import { caselawTest as test } from "../fixtures"
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("Verwaltungsdaten", { tag: ["@RISDEV-8004"] }, () => {
   test("Verwaltungsdaten für anhängige Verfahren", async ({

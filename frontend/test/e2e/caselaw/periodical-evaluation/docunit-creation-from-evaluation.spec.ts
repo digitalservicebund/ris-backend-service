@@ -1,5 +1,7 @@
 import { expect, Page } from "@playwright/test"
 import dayjs from "dayjs"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
   fillInput,
   navigateToPeriodicalReferences,
@@ -7,9 +9,7 @@ import {
   navigateToReferences,
   navigateToSearch,
   save,
-} from "../e2e-utils"
-import { caselawTest as test } from "../fixtures"
-import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
+} from "~/e2e/caselaw/utils/e2e-utils"
 import { generateString } from "~/test-helper/dataGenerators"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")

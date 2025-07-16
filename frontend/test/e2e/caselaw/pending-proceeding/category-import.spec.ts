@@ -1,12 +1,12 @@
 import { expect, Page } from "@playwright/test"
+import { longTextLabels, shortTextLabels } from "@/domain/decision"
+import SingleNorm from "@/domain/singleNorm"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   fillNormInputs,
   navigateToCategoryImport,
   searchForDocumentUnitToImport,
-} from "../e2e-utils"
-import { caselawTest as test } from "../fixtures"
-import { longTextLabels, shortTextLabels } from "@/domain/decision"
-import SingleNorm from "@/domain/singleNorm"
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("category import of pending proceeding", () => {
   test(

@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test"
+import { caselawTest as test } from "./fixtures"
 import {
   extraContentMenuKeyboardNavigator,
   fillInput,
@@ -9,8 +10,7 @@ import {
   navigateToSearch,
   save,
   uploadTestfile,
-} from "./e2e-utils"
-import { caselawTest as test } from "./fixtures"
+} from "./utils/e2e-utils"
 
 test.describe(
   "extra content side panel",

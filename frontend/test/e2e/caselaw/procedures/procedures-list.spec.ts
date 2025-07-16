@@ -1,8 +1,10 @@
 import { APIRequestContext, BrowserContext, expect } from "@playwright/test"
-import { assignProcedureToDocUnit, navigateToProcedures } from "../e2e-utils"
-
-import { caselawTest as test } from "../fixtures"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { deleteAllProcedures } from "~/e2e/caselaw/utils/documentation-unit-api-util"
+import {
+  assignProcedureToDocUnit,
+  navigateToProcedures,
+} from "~/e2e/caselaw/utils/e2e-utils"
 import { generateString } from "~/test-helper/dataGenerators"
 
 // Because of the procedures performance problem, the requests might take more than 10s

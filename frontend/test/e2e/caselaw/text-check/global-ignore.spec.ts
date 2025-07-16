@@ -1,11 +1,11 @@
 import { expect, Page } from "@playwright/test"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   clearTextField,
   navigateToCategories,
   navigateToHandover,
-} from "~/e2e/caselaw/e2e-utils"
-import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+} from "~/e2e/caselaw/utils/e2e-utils"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe(

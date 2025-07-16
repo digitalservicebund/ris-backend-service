@@ -1,7 +1,7 @@
 import { expect, Locator } from "@playwright/test"
-import { clearTextField, navigateToCategories } from "../e2e-utils"
-import { caselawTest as test } from "../fixtures"
+import { clearTextField, navigateToCategories } from "../utils/e2e-utils"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { convertHexToRGB } from "~/test-helper/coloursUtil"
 
 // eslint-disable-next-line playwright/no-skipped-test

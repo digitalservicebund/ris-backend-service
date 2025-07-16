@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test"
-import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 import { useAxeBuilder } from "~/a11y/caselaw/a11y.utils"
-import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { navigateToHandover } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("a11y of handover page (/caselaw/documentunit/{documentNumber}/handover)", () => {
   test("handover", async ({ page, documentNumber }) => {

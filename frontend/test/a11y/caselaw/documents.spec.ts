@@ -1,11 +1,11 @@
 import { expect } from "@playwright/test"
-import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 import { useAxeBuilder } from "~/a11y/caselaw/a11y.utils"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   navigateToAttachments,
   navigateToHandover,
   uploadTestfile,
-} from "~/e2e/caselaw/e2e-utils"
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/files)", () => {
   test("upload document", async ({ page, documentNumber }) => {

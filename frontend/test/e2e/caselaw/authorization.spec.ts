@@ -1,11 +1,11 @@
 import { expect } from "@playwright/test"
-import { caselawTest as test } from "./fixtures"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   navigateToAttachments,
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
-} from "~/e2e/caselaw/e2e-utils"
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 const options = {
   skipAssert: true, // Skip assertions to test access denied.

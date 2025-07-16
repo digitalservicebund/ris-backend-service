@@ -1,4 +1,6 @@
 import { expect } from "@playwright/test"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { deleteAllProcedures } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
   assignProcedureToDocUnit,
   assignUserGroupToProcedure,
@@ -9,9 +11,7 @@ import {
   navigateToSearch,
   save,
   unassignUserGroupFromProcedure,
-} from "~/e2e/caselaw/e2e-utils"
-import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import { deleteAllProcedures } from "~/e2e/caselaw/utils/documentation-unit-api-util"
+} from "~/e2e/caselaw/utils/e2e-utils"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe(
