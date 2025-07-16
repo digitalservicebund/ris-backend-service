@@ -232,7 +232,7 @@ defineSlots<{
         <Column field="decisionDate">
           <template #header>
             <div class="flex flex-row">
-              Mitteilungsdatum
+              {{ isDecision ? "Datum" : "Mitteilungsdatum" }}
               <IconArrowDown />
             </div>
           </template>

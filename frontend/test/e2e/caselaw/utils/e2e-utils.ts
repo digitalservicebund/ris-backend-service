@@ -1,10 +1,13 @@
 import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
 import dayjs from "dayjs"
+import { PublicationState } from "./../../../../src/domain/publicationStatus"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
+import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import PendingProceeding from "@/domain/pendingProceeding"
 import SingleNorm from "@/domain/singleNorm"
+import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
@@ -944,11 +947,17 @@ export async function openSearchWithFileNumberPrefix(
   }
 }
 
-export async function triggerSearch(pageWithBfhUser: Page) {
+export async function triggerSearch(page: Page, kind?: Kind) {
   await test.step("Führe Suche aus", async () => {
-    await pageWithBfhUser
-      .getByRole("button", { name: "Nach Anhängigen Verfahren" })
-      .click()
+    if (kind && kind === Kind.PENDING_PROCEEDING) {
+      await page
+        .getByRole("button", { name: "Nach Anhängigen Verfahren" })
+        .click()
+    } else {
+      await page
+        .getByRole("button", { name: "Nach Dokumentationseinheiten suchen" })
+        .click()
+    }
   })
 }
 
@@ -956,31 +965,32 @@ export async function triggerSearch(pageWithBfhUser: Page) {
  * Check for given pending proceedings that the result list contains the expected content cell by cell.
  */
 export async function checkResultListContent(
-  pendingProceedings: PendingProceeding[],
-  pageWithBfhUser: Page,
+  documentationUnits: PendingProceeding[] | Decision[],
+  page: Page,
 ) {
   const expectedResultsCountText =
-    pendingProceedings.length > 1
-      ? `${pendingProceedings.length} Ergebnisse gefunden`
+    documentationUnits.length > 1
+      ? `${documentationUnits.length} Ergebnisse gefunden`
       : "1 Ergebnis gefunden"
   await test.step(`Prüfe, dass ${expectedResultsCountText}`, async () => {
-    await expect(
-      pageWithBfhUser.getByText(expectedResultsCountText),
-    ).toBeVisible()
+    await expect(page.getByText(expectedResultsCountText)).toBeVisible()
   })
 
-  await test.step(`Prüfe alle ${pendingProceedings.length} Ergebnisse in der Liste`, async () => {
-    for (let i = 1; i <= pendingProceedings.length; i++) {
+  await test.step(`Prüfe alle ${documentationUnits.length} Ergebnisse in der Liste`, async () => {
+    for (let i = 1; i <= documentationUnits.length; i++) {
       // Reversed list as we sort by date DESC and docNumber DESC (most recent first).
-      const listItem = pendingProceedings[pendingProceedings.length - i]
-      const listRow = pageWithBfhUser.getByRole("row").nth(i)
+      const listItem = documentationUnits[documentationUnits.length - i]
+      const listRow = page.getByRole("row").nth(i)
 
-      await checkContentOfResultRow(listRow, listItem)
+      if (isPendingProceeding(listItem))
+        await checkContentOfPendingProceedingResultRow(listRow, listItem)
+      else if (isDecision(listItem))
+        await checkContentOfDecisionResultRow(listRow, listItem)
     }
   })
 }
 
-export async function checkContentOfResultRow(
+export async function checkContentOfPendingProceedingResultRow(
   listRow: Locator,
   expectedItem: PendingProceeding,
 ) {
@@ -1017,12 +1027,88 @@ export async function checkContentOfResultRow(
   await test.step("Fehler", async () => {
     await expect(errorCell).toHaveText("-")
   })
+
   await test.step("Erledigungsmitteilung", async () => {
     const formattedResolutionDate = expectedItem.coreData.resolutionDate
       ? dayjs(expectedItem.coreData.resolutionDate).format("DD.MM.YYYY")
       : "-"
     await expect(resolutionDateCell).toHaveText(formattedResolutionDate)
   })
+
+  await test.step("Kann bearbeitet, angesehen und gelöscht werden", async () => {
+    await expect(
+      listRow.getByLabel("Dokumentationseinheit bearbeiten"),
+    ).toBeEnabled()
+    await expect(
+      listRow.getByLabel("Dokumentationseinheit ansehen"),
+    ).toBeEnabled()
+    await expect(
+      listRow.getByLabel("Dokumentationseinheit löschen"),
+    ).toBeEnabled()
+  })
+}
+
+export async function checkContentOfDecisionResultRow(
+  listRow: Locator,
+  expectedItem: Decision,
+) {
+  const docNumberCell = listRow.getByRole("cell").nth(0)
+  const courtTypeCell = listRow.getByRole("cell").nth(1)
+  const courtLocationCell = listRow.getByRole("cell").nth(2)
+  const decisionDateCell = listRow.getByRole("cell").nth(3)
+  const fileNumberCell = listRow.getByRole("cell").nth(4)
+  const appraisalBodyCell = listRow.getByRole("cell").nth(5)
+  const documentTypCell = listRow.getByRole("cell").nth(6)
+  const statusCell = listRow.getByRole("cell").nth(7)
+  const errorCell = listRow.getByRole("cell").nth(8)
+
+  await test.step("Dokumentnummer", async () => {
+    await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
+  })
+  await test.step("Gerichtstyp", async () => {
+    await expect(courtTypeCell).toHaveText(
+      expectedItem.coreData.court?.type ?? "-",
+    )
+  })
+  await test.step("Gerichtsort", async () => {
+    await expect(courtLocationCell).toHaveText(
+      expectedItem.coreData.court?.location ?? "-",
+    )
+  })
+  await test.step("Entscheidungsdatum", async () => {
+    const formattedDate = expectedItem.coreData.decisionDate
+      ? dayjs(expectedItem.coreData.decisionDate).format("DD.MM.YYYY")
+      : "-"
+    await expect(decisionDateCell).toHaveText(formattedDate)
+  })
+  await test.step("Aktenzeichen", async () => {
+    await expect(fileNumberCell).toHaveText(
+      expectedItem.coreData.fileNumbers?.[0] ?? "-",
+    )
+  })
+  await test.step("Spruchkörper", async () => {
+    await expect(appraisalBodyCell).toHaveText(
+      expectedItem.coreData.appraisalBody ?? "-",
+    )
+  })
+  await test.step("Dokumenttyp", async () => {
+    await expect(documentTypCell).toHaveText(
+      expectedItem.coreData.documentType?.label ?? "-",
+    )
+  })
+  await test.step("Veröffentlichungsstatus", async () => {
+    await expect(statusCell).toHaveText(
+      expectedItem.status?.publicationStatus === PublicationState.UNPUBLISHED
+        ? "Unveröffentlicht"
+        : "Veröffentlicht",
+    )
+  })
+  await test.step("Fehler", async () => {
+    await expect(errorCell).toHaveText(
+      expectedItem.status?.withError ? "Fehler" : "-",
+    )
+  })
+
   await test.step("Kann bearbeitet, angesehen und gelöscht werden", async () => {
     await expect(
       listRow.getByLabel("Dokumentationseinheit bearbeiten"),

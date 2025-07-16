@@ -1,96 +1,73 @@
 import { expect } from "@playwright/test"
-import dayjs from "dayjs"
-import errorMessages from "@/i18n/errors.json" with { type: "json" }
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
   fillInput,
+  navigateToSearch,
+  checkResultListContent,
+  openSearchWithFileNumberPrefix,
+  triggerSearch,
   fillSearchInput,
   navigateToCategories,
-  navigateToSearch,
   save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 import { noteContent } from "~/e2e/testdata"
 import { generateString } from "~/test-helper/dataGenerators"
 
-/* eslint-disable playwright/no-conditional-in-test */
-test.describe("search", () => {
-  test("renders search entry form", async ({ page }) => {
-    await navigateToSearch(page)
-    await expect(
-      page.getByRole("button", {
-        name: "Neue Dokumentationseinheit",
-        exact: true,
-      }),
-    ).toBeVisible()
+/* eslint-disable playwright/expect-expect */
 
-    await expect(page.getByLabel("Aktenzeichen Suche")).toBeVisible()
-    await expect(page.getByLabel("Gerichtstyp Suche")).toBeVisible()
-    await expect(page.getByLabel("Gerichtsort Suche")).toBeVisible()
-    await expect(
-      page.getByLabel("Entscheidungsdatum Suche", {
-        exact: true,
-      }),
-    ).toBeVisible()
-    await expect(
-      page.getByLabel("Entscheidungsdatum Suche Ende", {
-        exact: true,
-      }),
-    ).toBeVisible()
-    await expect(page.getByLabel("Dokumentnummer Suche")).toBeVisible()
-    await expect(page.getByLabel("Status Suche")).toBeVisible()
-    await expect(page.getByLabel("Nur meine Dokstelle Filter")).toBeVisible()
-
-    await expect(
-      page.getByText(
-        "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
-      ),
-    ).toBeVisible()
+test.describe("Große Suche nach Entscheidungen", () => {
+  let documentNumberToBeDeleted: string | undefined
+  test.use({
+    decisionsToBeCreated: [
+      // Reverse sorting: date DESC, docNumber DESC
+      [
+        { coreData: { court: { label: "BFH" } } },
+        { coreData: { court: { label: "AG Aachen" } } },
+        { coreData: { decisionDate: "2023-01-01" } },
+        { coreData: { decisionDate: "2023-01-02" } },
+        { coreData: { decisionDate: "2023-01-31" } },
+      ],
+      { scope: "test" },
+    ],
   })
 
-  // Suchzustände
-  test("renders search results", async ({ page, documentNumber }) => {
+  test("Keine Ergebnisse", async ({ page }) => {
     await navigateToSearch(page)
+    const loadingIndicator = page.locator('div[data-pc-section="mask"]')
 
-    //initial state
-    await expect(
-      page.getByText(
-        "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
-      ),
-    ).toBeVisible()
-    await expect(
-      page.getByRole("button", {
-        name: "Neue Dokumentationseinheit erstellen",
-      }),
-    ).toBeVisible()
+    await test.step("Initialer Zustand", async () => {
+      await expect(
+        page.getByText(
+          "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
+        ),
+      ).toBeVisible()
+      await expect(
+        page.getByRole("button", {
+          name: "Neue Dokumentationseinheit erstellen",
+        }),
+      ).toBeVisible()
+    })
 
-    //results
-    await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect
-      .poll(async () =>
-        page
-          .locator(".table-row", {
-            hasText: documentNumber,
-          })
-          .count(),
-      )
-      .toBe(1)
+    await test.step("Suche auslösen und Ladezustand prüfen", async () => {
+      await fillInput(page, "Dokumentnummer Suche", "non existing")
+      await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+      await expect(loadingIndicator).toBeVisible()
+    })
 
-    //no results
-    await page.getByLabel("Dokumentnummer Suche").fill("wrong document number")
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(
-      page.locator(".table-row", {
-        hasText: documentNumber,
-      }),
-    ).toBeHidden()
+    await test.step("Keine Ergebnisse nach Suche", async () => {
+      await expect(
+        page.getByText("Keine Suchergebnisse gefunden"),
+      ).toBeVisible()
+      await expect(
+        page.getByText("Neue Dokumentationseinheit erstellen"),
+      ).toBeVisible()
+      await expect(loadingIndicator).toBeHidden()
+    })
   })
 
-  test("renders message when error occurs", async ({ page }) => {
+  test("Fehleranzeige bei fehlgeschlagener Suche", async ({ page }) => {
     await navigateToSearch(page)
 
-    //error
     await page.getByLabel("Nur meine Dokstelle Filter").click()
     await page.route("**/*", async (route) => {
       await route.fulfill({
@@ -103,13 +80,14 @@ test.describe("search", () => {
         page.getByText("Die Suchergebnisse konnten nicht geladen werden."),
       ).toBeVisible()
     })
+    await page.unroute("**/*")
   })
 
-  test("starting search with all kinds of errors or no search parameters not possible", async ({
+  test("Eine Suche kann nicht mit leeren oder fehlerhaften Inputs gestartet werden", async ({
     page,
   }) => {
     await navigateToSearch(page)
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    await triggerSearch(page)
     await expect(
       page.getByText("Geben Sie mindestens ein Suchkriterium ein"),
     ).toBeVisible()
@@ -119,213 +97,216 @@ test.describe("search", () => {
       .fill("24.12.2022")
     await page.getByLabel("Entscheidungsdatum Suche Ende").fill("29.02.2023")
     await expect(page.getByText("Kein valides Datum")).toBeVisible()
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    await triggerSearch(page)
     await expect(page.getByText("Fehler in Suchkriterien")).toBeVisible()
 
     await page.getByLabel("Entscheidungsdatum Suche Ende").fill("25.12.2022")
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    await triggerSearch(page)
     await expect(page.getByText("Fehler in Suchkriterien")).toBeHidden()
-    await expect(
-      page.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
-    ).toBeVisible()
   })
 
-  // Datumskomponente Zeitraum
-  test("search for exact dates", async ({
-    page,
-    prefilledDocumentUnit,
-    secondPrefilledDocumentUnit,
-  }) => {
-    //1st date input provided: display results matching exactly this date.
-    await navigateToSearch(page)
-
-    await page
-      .getByLabel("Entscheidungsdatum Suche", { exact: true })
-      .fill(
-        dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY"),
-      )
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-    await expect
-      .poll(async () =>
-        page
-          .locator(".table-row", {
-            hasText: dayjs(prefilledDocumentUnit.coreData.decisionDate).format(
-              "DD.MM.YYYY",
-            ),
-          })
-          .count(),
-      )
-      .toBeGreaterThanOrEqual(1)
-
-    await expect(
-      page.locator(".table-row", {
-        hasText: dayjs(
-          secondPrefilledDocumentUnit.coreData.decisionDate,
-        ).format("DD.MM.YYYY"),
-      }),
-    ).toHaveCount(0)
-
-    await page
-      .getByLabel("Entscheidungsdatum Suche", { exact: true })
-      .fill(
-        dayjs(secondPrefilledDocumentUnit.coreData.decisionDate).format(
-          "DD.MM.YYYY",
-        ),
-      )
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-    await expect
-      .poll(async () =>
-        page
-          .locator(".table-row", {
-            hasText: dayjs(
-              secondPrefilledDocumentUnit.coreData.decisionDate,
-            ).format("DD.MM.YYYY"),
-          })
-          .count(),
-      )
-      .toBeGreaterThanOrEqual(1)
-
-    await expect(
-      page.locator(".table-row", {
-        hasText: dayjs(prefilledDocumentUnit.coreData.decisionDate).format(
-          "DD.MM.YYYY",
-        ),
-      }),
-    ).toHaveCount(0)
+  test("Suche nach Aktenzeichen", async ({ page, decisions }) => {
+    const { fileNumberPrefix, createdDecisions } = decisions
+    await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+    await triggerSearch(page)
+    await checkResultListContent(createdDecisions, page)
   })
 
-  test("search results between two dates", async ({ page }) => {
-    //Both inputs provided: display results matching the date range.
-    await page.goto("/")
-
-    await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
-
-    await page
-      .getByLabel("Entscheidungsdatum Suche", { exact: true })
-      .fill("02.02.2022")
-
-    await page
-      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
-      .fill("02.02.2024")
-
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-    await expect
-      .poll(async () => page.locator(".table-row").count())
-      .toBeGreaterThanOrEqual(5)
-
-    //Same date entered: Show results for the exact date
-    await page
-      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
-      .fill("02.02.2022")
-
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-    await expect
-      .poll(async () => page.locator(".table-row").count())
-      .toBeGreaterThanOrEqual(1)
-  })
-
-  test("search for file number", async ({ page }) => {
-    await navigateToSearch(page)
-
-    await test.step("search for file number case insensitive works", async () => {
-      await page.getByLabel("Aktenzeichen Suche").fill("FILEnumber1")
-      await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-      await expect
-        .poll(async () => page.getByText("YYTestDoc0001").count())
-        .toBe(1)
+  test("Suche nach Gerichtstyp", async ({ page, decisions }) => {
+    const { fileNumberPrefix, createdDecisions } = decisions
+    await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+    await test.step("Wähle Gerichtstyp 'BFH' in Suche", async () => {
+      await fillInput(page, "Gerichtstyp Suche", "BFH")
     })
+    await triggerSearch(page)
+    const docUnitSearchResults = createdDecisions.filter(
+      (p) => p.coreData.court?.label === "BFH",
+    )
+    await checkResultListContent(docUnitSearchResults, page)
+  })
 
-    await test.step("search for file number starting with", async () => {
-      await page.getByLabel("Aktenzeichen Suche").fill("fileNumber")
-      await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-      await expect
-        .poll(async () => page.getByText("YYTestDoc0001").count())
-        .toBe(1)
-      await expect
-        .poll(async () => page.locator(".table-row").count())
-        .toBeGreaterThanOrEqual(4)
+  test("Suche nach Gerichtsort", async ({ page, decisions }) => {
+    const { fileNumberPrefix, createdDecisions } = decisions
+    await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+    await test.step("Wähle Gerichtsort 'Aachen' in Suche", async () => {
+      await fillInput(page, "Gerichtsort Suche", "Aachen")
     })
+    await triggerSearch(page)
+    const docUnitSearchResults = createdDecisions.filter(
+      (p) => p.coreData.court?.label === "AG Aachen",
+    )
+    await checkResultListContent(docUnitSearchResults, page)
+  })
 
-    await test.step("search for file number ending does not work by default", async () => {
-      await page.getByLabel("Aktenzeichen Suche").fill("Number1")
-      await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+  test("Suche nach Dokumentnummer", async ({ page, decisions }) => {
+    const { fileNumberPrefix, createdDecisions } = decisions
+    await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+    const docNumber = createdDecisions[4].documentNumber
+    await test.step(`Wähle Dokumentnummer '${docNumber}' in Suche`, async () => {
+      await fillInput(page, "Dokumentnummer Suche", docNumber)
+    })
+    await triggerSearch(page)
+    const docUnitSearchResults = createdDecisions.filter(
+      (p) => p.documentNumber === docNumber,
+    )
+    await checkResultListContent(docUnitSearchResults, page)
+  })
+
+  test("Suche nach Status", async ({ page, decisions }) => {
+    const { createdDecisions } = decisions
+    await openSearchWithFileNumberPrefix("fileNumber1", page)
+    await test.step(`Wähle Status 'Veröffentlicht' in Suche`, async () => {
+      await page.getByLabel("Status Suche").click()
+      await page
+        .getByRole("option", { name: "Veröffentlicht", exact: true })
+        .click()
+    })
+    await triggerSearch(page)
+    await test.step(`Prüfe, dass 1 Ergebnis gefunden wurde`, async () => {
+      await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
+      //Veröffentlicht Status kann nur übers seeding script generiert werden
+      await expect(page.getByText("YYTestDoc0001")).toBeVisible()
       await expect(
-        page.getByText("Keine Suchergebnisse gefunden"),
+        page.getByText(createdDecisions[0].documentNumber),
+      ).toBeHidden()
+    })
+  })
+
+  test("Suche nach Entscheidungsdatum", async ({ page, decisions }) => {
+    const { fileNumberPrefix, createdDecisions } = decisions
+    await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+    await test.step("Wähle Entscheidungsdatum '02.01.2023' in Suche", async () => {
+      await fillInput(page, "Entscheidungsdatum Suche", "02.01.2023")
+    })
+    await triggerSearch(page)
+    const docUnitSearchResultsSpecificDate = createdDecisions.filter(
+      (p) => p.coreData.decisionDate === "2023-01-02",
+    )
+    await checkResultListContent(docUnitSearchResultsSpecificDate, page)
+
+    await test.step("Wähle Entsheidungsdatum Ende '31.01.2023' in Suche", async () => {
+      await fillInput(page, "Entscheidungsdatum Suche Ende", "31.01.2023")
+    })
+    await triggerSearch(page)
+    const docUnitSearchResultsDateRange = createdDecisions.filter(
+      (p) =>
+        p.coreData.decisionDate && p.coreData.decisionDate !== "2023-01-01",
+    )
+    await checkResultListContent(docUnitSearchResultsDateRange, page)
+  })
+
+  test("Datumsvalidierung", async ({ page }) => {
+    await navigateToSearch(page)
+    await test.step("Wähle Entscheidungsdatum Ende '02.01.2023' in Suche", async () => {
+      await fillInput(page, "Entscheidungsdatum Suche Ende", "02.01.2022")
+      await page.getByLabel("Entscheidungsdatum Suche Ende").blur()
+      await expect(page.getByText("Startdatum fehlt")).toBeVisible()
+    })
+
+    await test.step("Fokussieren von Entscheidungsdatum Input lässt Fehlermeldung verschwinden", async () => {
+      await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).focus()
+      await expect(page.getByText("Startdatum fehlt")).toBeHidden()
+    })
+
+    await test.step("Verlasse von Entscheidungsdatum Input ohne Input lässt Fehlermeldung wieder erscheinen", async () => {
+      await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).blur()
+      await expect(page.getByText("Startdatum fehlt")).toBeVisible()
+    })
+
+    await test.step("Enddatum darf nicht vor Startdatum liegen", async () => {
+      await fillInput(page, "Entscheidungsdatum Suche", "02.01.2023")
+      await expect(page.getByText("Startdatum fehlt")).toBeHidden()
+      await expect(
+        page.getByText("Enddatum darf nicht vor Startdatum liegen"),
       ).toBeVisible()
     })
 
-    await test.step("search for file ending with does work when adding '%'", async () => {
-      await page.getByLabel("Aktenzeichen Suche").fill("%number1")
-      await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-      await expect
-        .poll(async () => page.getByText("YYTestDoc0001").count())
-        .toBe(1)
+    await test.step("Löschen von Startdatum lässt erste Fehlermeldung wieder erscheinen", async () => {
+      await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).clear()
+      await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).blur()
+      await expect(page.getByText("Startdatum fehlt")).toBeVisible()
+      await expect(
+        page.getByText("Enddatum darf nicht vor Startdatum liegen"),
+      ).toBeHidden()
+    })
+
+    await test.step("Löschen von Enddatum lässt erste Fehlermeldung wieder verschwinden", async () => {
+      await page
+        .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
+        .clear()
+      await page
+        .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
+        .blur()
+      await expect(page.getByText("Startdatum fehlt")).toBeHidden()
+    })
+
+    await test.step("Datum wird validiert", async () => {
+      const firstDate = page.getByLabel("Entscheidungsdatum Suche", {
+        exact: true,
+      })
+      const secondDate = page.getByLabel("Entscheidungsdatum Suche Ende")
+      const firstDateInput = page.getByTestId("decision-date-input")
+      const secondDateInput = page.getByTestId("decision-date-end-input")
+
+      await firstDate.fill("29.02.2022")
+      await expect(firstDateInput.getByText("Kein valides Datum")).toBeVisible()
+      await secondDate.fill("29.02.2022")
+      await expect(
+        secondDateInput.getByText("Kein valides Datum"),
+      ).toBeVisible()
     })
   })
 
-  test("search for status", async ({ page }) => {
+  test("Suche zurücksetzen", async ({ page }) => {
+    // on input button is visible
+    await navigateToSearch(page)
+    const resetSearch = page.getByLabel("Suche zurücksetzen")
+    const searchTerm = generateString()
+    await expect(resetSearch).toBeHidden()
+    await page.getByLabel("Aktenzeichen Suche").fill(searchTerm)
+    await expect(resetSearch).toBeVisible()
+    await triggerSearch(page)
+
+    await expect(page.getByText("Keine Suchergebnisse gefunden")).toBeVisible()
+    await resetSearch.click()
+    await expect(page.getByText(searchTerm)).toBeHidden()
+    await expect(page.getByText("Keine Suchergebnisse gefunden")).toBeHidden()
+    await expect(
+      page.getByText(
+        "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
+      ),
+    ).toBeVisible()
+  })
+
+  test("URL mit Parametern wird richtig aktualisiert", async ({ page }) => {
+    await navigateToSearch(page)
+
+    await fillInput(page, "Entscheidungsdatum Suche", "02.01.2022")
+
+    await triggerSearch(page)
+
+    await expect(page).toHaveURL(/decisionDate=2022-01-02/)
+    await page.reload()
+    await expect(page).toHaveURL(/decisionDate=2022-01-02/)
+
+    await fillInput(page, "Entscheidungsdatum Suche Ende", "02.01.2023")
+    await triggerSearch(page)
+    await expect(page).toHaveURL(
+      /decisionDate=2022-01-02&decisionDateEnd=2023-01-02/,
+    )
+
+    await page.goBack()
+    await expect(page).not.toHaveURL(
+      /decisionDate=2022-01-02&decisionDateEnd=2023-01-02/,
+    )
+    await page.reload()
+    await expect(page).toHaveURL(/decisionDate=2022-01-02/)
+  })
+
+  test("Suche nach fehlerhaften Dokumentationseinheiten", async ({ page }) => {
     await navigateToSearch(page)
 
     await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
-
-    await page.getByLabel("Nur meine Dokstelle Filter").click()
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-    await expect
-      .poll(async () => page.getByText("Unveröffentlicht").count())
-      .toBe(6)
-
-    await page.getByLabel("Status Suche").click()
-    await page
-      .getByRole("option", {
-        name: "Veröffentlicht",
-        exact: true,
-      })
-      .click()
-
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-    await expect
-      .poll(async () =>
-        page.getByText("Veröffentlicht", { exact: true }).count(),
-      )
-      .toBe(8)
-  })
-
-  test(
-    "pending proceedings cannot be found in decision list",
-    {
-      annotation: {
-        type: "story",
-        description:
-          "https://digitalservicebund.atlassian.net/browse/RISDEV-6109",
-      },
-    },
-    async ({ page }) => {
-      await test.step("pending proceedings of own doc office appear in search by default", async () => {
-        await navigateToSearch(page)
-
-        await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
-        await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-        await expect(page.getByText("YYTestDoc0001")).toBeVisible() // result list is present
-        await expect(page.getByText("YYTestDoc0017")).toBeHidden() // published pending proceeding is not in list
-        await expect(page.getByText("YYTestDoc0018")).toBeHidden() // unpublished pending proceeding is not in list
-      })
-    },
-  )
-
-  test("filter for documentunits with errors only", async ({ page }) => {
-    await page.goto("/")
-
-    await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    //16 + table header
-    await expect.poll(async () => page.locator(".table-row").count()).toBe(17)
 
     const docofficeOnly = page.getByLabel("Nur meine Dokstelle Filter")
     await docofficeOnly.click()
@@ -333,17 +314,17 @@ test.describe("search", () => {
       "Nur fehlerhafte Dokumentationseinheiten",
     )
     await errorsOnly.click()
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    await triggerSearch(page)
 
     //3 + table header
-    await expect.poll(async () => page.locator(".table-row").count()).toBe(4)
+    await expect.poll(async () => page.getByRole("row").count()).toBe(4)
 
-    //unclick my dokstelle should also reset errors only filter
     await docofficeOnly.click()
     await expect(errorsOnly).toBeHidden()
   })
 
-  test("appraisal/judicial body shown in test results", async ({
+  // Todo: replace prefilledDocumentUnit, use dynamic 'decision' fixture instead and fill in place
+  test("Spruchkörper wird in Suchergebnissen angezeigt", async ({
     page,
     prefilledDocumentUnit,
   }) => {
@@ -357,14 +338,14 @@ test.describe("search", () => {
     await expect
       .poll(async () =>
         page
-          .locator(".table-row", {
-            hasText: prefilledDocumentUnit.coreData.appraisalBody,
-          })
+          .getByRole("row")
+          .getByText(prefilledDocumentUnit.coreData.appraisalBody!)
           .count(),
       )
       .toBeGreaterThanOrEqual(1)
   })
 
+  // Todo: replace prefilledDocumentUnit, use dynamic 'decision' fixture instead and fill in place
   test("exisiting headnote/ guiding principle are indicated as icon", async ({
     page,
     prefilledDocumentUnit,
@@ -378,8 +359,10 @@ test.describe("search", () => {
     await expect(page.getByTestId("headnote-principle-icon")).toBeVisible()
   })
 
+  // Todo: replace prefilledDocumentUnit, use dynamic 'decision' fixture instead and fill in place
+
   test(
-    "existing note is indicated as icon",
+    "Existierende Notiz wird in Suchergebnissen angezeigt",
     {
       annotation: {
         type: "story",
@@ -387,8 +370,8 @@ test.describe("search", () => {
       },
     },
     async ({ page, prefilledDocumentUnit }) => {
-      await test.step("fill notiz", async () => {
-        await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await test.step("Notiz ausfüllen", async () => {
+        await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
         await page.getByRole("button", { name: "Seitenpanel öffnen" }).click()
 
@@ -396,7 +379,7 @@ test.describe("search", () => {
         await save(page)
       })
 
-      await test.step("search indicates by icon that doc unit has notiz", async () => {
+      await test.step("Suchergebnis zeigt an, dass Notiz vorhanden ist", async () => {
         await navigateToSearch(page)
 
         await fillSearchInput(page, {
@@ -407,14 +390,14 @@ test.describe("search", () => {
         await expect(page.getByLabel(trimmedNote)).toBeVisible()
       })
 
-      await test.step("delete notiz", async () => {
+      await test.step("Lösche Notiz", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
         await fillInput(page, "Notiz Eingabefeld", "")
         await save(page)
       })
 
-      await test.step("search indicates by icon that doc unit has no notiz", async () => {
+      await test.step("Suchergebnis zeigt an, dass keine Notiz vorhanden ist", async () => {
         await navigateToSearch(page)
 
         await fillSearchInput(page, {
@@ -426,387 +409,108 @@ test.describe("search", () => {
     },
   )
 
-  test("displaying errors on focus and blur", async ({
-    page,
-    prefilledDocumentUnit,
-    secondPrefilledDocumentUnit,
-  }) => {
+  test("Entscheidung neu erstellen und löschen", async ({ page }) => {
     await navigateToSearch(page)
-
-    await page
-      .getByLabel("Entscheidungsdatum Suche Ende")
-      .fill(
-        dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY"),
+    await test.step("Klicke auf 'Neue Dokumentationseinheit'", async () => {
+      await page
+        .getByRole("button", { name: "Neue Dokumentationseinheit" })
+        .first()
+        .click()
+    })
+    await test.step("Öffnet Rubriken von neuer Entscheidung", async () => {
+      await expect(page).toHaveURL(
+        /\/caselaw\/documentunit\/[A-Z0-9]{13}\/attachments$/,
       )
-
-    await page.getByLabel("Entscheidungsdatum Suche Ende").blur()
-    await expect(page.getByText("Startdatum fehlt")).toBeVisible()
-
-    await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).focus()
-    await expect(page.getByText("Startdatum fehlt")).toBeHidden()
-
-    //on blur without changes error reappears
-    await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).blur()
-    await expect(page.getByText("Startdatum fehlt")).toBeVisible()
-
-    await page
-      .getByLabel("Entscheidungsdatum Suche", { exact: true })
-      .fill(
-        dayjs(secondPrefilledDocumentUnit.coreData.decisionDate).format(
-          "DD.MM.YYYY",
-        ),
-      )
-
-    await expect(page.getByText("Startdatum fehlt")).toBeHidden()
-    await expect(
-      page.getByText("Enddatum darf nicht vor Startdatum liegen"),
-    ).toBeVisible()
-
-    await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).clear()
-    await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).blur()
-    await expect(page.getByText("Startdatum fehlt")).toBeVisible()
-    await expect(
-      page.getByText("Enddatum darf nicht vor Startdatum liegen"),
-    ).toBeHidden()
-
-    // removes startdate missing error if 2nd date is removed
-    await page
-      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
-      .clear()
-    await page
-      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
-      .blur()
-    await expect(page.getByText("Startdatum fehlt")).toBeHidden()
-  })
-
-  test("updating of date input errors and interdependent errors", async ({
-    page,
-  }) => {
-    await navigateToSearch(page)
-
-    const firstDate = page.getByLabel("Entscheidungsdatum Suche", {
-      exact: true,
-    })
-    const secondDate = page.getByLabel("Entscheidungsdatum Suche Ende")
-    const firstDateInput = page.getByTestId("decision-date-input")
-    const secondDateInput = page.getByTestId("decision-date-end-input")
-
-    await firstDate.fill("29.02.2022")
-    await expect(firstDateInput.getByText("Kein valides Datum")).toBeVisible()
-    await secondDate.fill("29.02.2022")
-    await expect(secondDateInput.getByText("Kein valides Datum")).toBeVisible()
-
-    await secondDate.clear()
-    await secondDate.fill("28.02.2022")
-
-    // no valid error "wins" against missing start date error
-    await expect(firstDateInput.getByText("Kein valides Datum")).toBeVisible()
-    await firstDate.clear()
-    await expect(page.getByText("Startdatum fehlt")).toBeVisible()
-    await firstDate.fill("28.02.2023")
-    await expect(
-      secondDateInput.getByText("Enddatum darf nicht vor Startdatum liegen"),
-    ).toBeVisible()
-
-    // no valid error "wins" against range error
-    await secondDate.clear()
-    await secondDate.fill("29.02.2022")
-    await expect(secondDateInput.getByText("Kein valides Datum")).toBeVisible()
-  })
-
-  // Suche zurücksetzen
-  test("resetting the search", async ({ page }) => {
-    // on input button is visible
-    await navigateToSearch(page)
-    const resetSearch = page.getByLabel("Suche zurücksetzen")
-    const searchTerm = generateString()
-    await expect(resetSearch).toBeHidden()
-    await page.getByLabel("Aktenzeichen Suche").fill(searchTerm)
-    await expect(resetSearch).toBeVisible()
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-    await expect(page.getByLabel("Ladestatus")).toBeHidden()
-    await expect(
-      page.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
-    ).toBeVisible()
-    await resetSearch.click()
-    await expect(page.getByText(searchTerm)).toBeHidden()
-    await expect(
-      page.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
-    ).toBeHidden()
-    await expect(
-      page.getByText(
-        "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
-      ),
-    ).toBeVisible()
-  })
-
-  test("reload and navigation back in browser history persist search parameters in url", async ({
-    page,
-    prefilledDocumentUnit,
-    secondPrefilledDocumentUnit,
-  }) => {
-    await navigateToSearch(page)
-
-    await page
-      .getByLabel("Entscheidungsdatum Suche", { exact: true })
-      .fill(
-        dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY"),
-      )
-
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-    await expect(page).toHaveURL(/decisionDate=2019-12-31/)
-    await page.reload()
-    await expect(page).toHaveURL(/decisionDate=2019-12-31/)
-
-    await page
-      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
-      .fill(
-        dayjs(secondPrefilledDocumentUnit.coreData.decisionDate).format(
-          "DD.MM.YYYY",
-        ),
-      )
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(page).toHaveURL(
-      /decisionDate=2019-12-31&decisionDateEnd=2020-01-01/,
-    )
-
-    await page.goBack()
-    await expect(page).not.toHaveURL(
-      /decisionDate=2019-12-31&decisionDateEnd=2020-01-01/,
-    )
-    await expect(page).toHaveURL(/decisionDate=2019-12-31/)
-  })
-
-  test("show button for creating new doc unit from search parameters", async ({
-    page,
-  }) => {
-    await navigateToSearch(page)
-
-    //initial state
-    await expect(
-      page.getByText(
-        "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
-      ),
-    ).toBeVisible()
-    await expect(
-      page.getByRole("button", {
-        name: "Neue Dokumentationseinheit erstellen",
-      }),
-    ).toBeVisible()
-
-    const fileNumber = generateString()
-    const courtType = "AG"
-    const courtLocation = "Lüneburg"
-    const decisionDate = "25.12.1999"
-
-    await test.step("all the data can be used", async () => {
-      await fillSearchInput(page, {
-        fileNumber,
-        courtType,
-        courtLocation,
-        decisionDate,
-      })
-
+      documentNumberToBeDeleted =
+        /caselaw\/documentunit\/(.*)\/attachments/g.exec(
+          page.url(),
+        )?.[1] as string
       await expect(
-        page.getByText(
-          `${fileNumber}, ${courtType} ${courtLocation}, ${decisionDate}`,
-        ),
-      ).toBeVisible()
-    })
-
-    await test.step("only file number set", async () => {
-      await fillSearchInput(page, {
-        fileNumber,
-      })
-      await expect(
-        page.getByText(`${fileNumber}, Gericht unbekannt, Datum unbekannt`),
-      ).toBeVisible()
-    })
-
-    await test.step("only date set", async () => {
-      await fillSearchInput(page, { decisionDate })
-      await expect(
-        page.getByText(
-          `Aktenzeichen unbekannt, Gericht unbekannt, ${decisionDate}`,
-        ),
-      ).toBeVisible()
-    })
-
-    await test.step("invalid court", async () => {
-      await fillSearchInput(page, {
-        fileNumber,
-        courtType: "invalid",
-        courtLocation,
-        decisionDate,
-      })
-      await expect(
-        page.getByText(`${fileNumber}, Gericht unbekannt, ${decisionDate}`),
-      ).toBeVisible()
-    })
-
-    await test.step("decision date end is set, so decision date can not be used", async () => {
-      await fillSearchInput(page, {
-        fileNumber,
-        courtType,
-        courtLocation,
-        decisionDate,
-        decisionDateEnd: "01.01.2002",
-      })
-      await expect(
-        page.getByText(
-          `${fileNumber}, ${courtType} ${courtLocation}, Datum unbekannt`,
-        ),
-      ).toBeVisible()
-    })
-  })
-
-  test("do not show button for creating new doc unit, when filters set", async ({
-    page,
-    browserName,
-  }) => {
-    const fileNumber = generateString()
-    const courtType = "AG"
-    const courtLocation = "Lüneburg"
-    const decisionDate = "25.12.1999"
-
-    await test.step("document number is set, so nothing can be used", async () => {
-      await fillSearchInput(page, {
-        fileNumber,
-        courtType,
-        courtLocation,
-        decisionDate,
-        documentNumber: "test",
-      })
-      await expect(
-        page.getByRole("button", {
-          name: "Neue Dokumentationseinheit erstellen",
+        page.getByRole("heading", {
+          name: documentNumberToBeDeleted,
         }),
       ).toBeVisible()
     })
-
-    // Todo: Known error in firefox (NS_BINDING_ABORTED),
-    // when navigating with a concurrent navigation triggered
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    if (browserName === "firefox") await page.waitForTimeout(500)
-
-    await test.step("my docoffice only is set, so nothing can be used", async () => {
-      await fillSearchInput(page, {
-        fileNumber,
-        courtType,
-        courtLocation,
-        decisionDate,
-        myDocOfficeOnly: true,
-      })
+    await test.step("Suche nach neuer Dokumentnummer", async () => {
+      await navigateToSearch(page)
+      await fillInput(page, "Dokumentnummer Suche", documentNumberToBeDeleted)
+      await triggerSearch(page)
+    })
+    await test.step(`Prüfe, dass 1 Ergebnis gefunden wurde`, async () => {
+      await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
+      await expect(page.getByText(documentNumberToBeDeleted!)).toBeVisible()
+    })
+    await test.step("Lösche Anhängiges Verfahren", async () => {
+      await page
+        .getByRole("button", { name: "Dokumentationseinheit löschen" })
+        .click()
+      await page.getByRole("button", { name: "Löschen", exact: true }).click()
       await expect(
-        page.getByRole("button", {
-          name: "Neue Dokumentationseinheit erstellen",
-        }),
+        page.getByText("Keine Suchergebnisse gefunden"),
       ).toBeVisible()
     })
-
-    // Todo: Known error in firefox (NS_BINDING_ABORTED),
-    // when navigating with a concurrent navigation triggered
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    if (browserName === "firefox") await page.waitForTimeout(500)
-    await test.step("status is set, so nothing can be used", async () => {
-      await fillSearchInput(page, {
-        fileNumber,
-        courtType,
-        courtLocation,
-        decisionDate,
-        status: "Veröffentlicht",
-      })
+    await test.step("Suche nach neuer Dokumentnummer ergibt kein Ergebnis", async () => {
+      await navigateToSearch(page)
+      await fillInput(page, "Dokumentnummer Suche", documentNumberToBeDeleted)
+      await triggerSearch(page)
       await expect(
-        page.getByRole("button", {
-          name: "Neue Dokumentationseinheit erstellen",
-        }),
+        page.getByText("Keine Suchergebnisse gefunden"),
       ).toBeVisible()
+      documentNumberToBeDeleted = undefined
     })
   })
 
-  test("create new doc unit from search parameter and switch to categories page", async ({
-    page,
-  }) => {
-    await navigateToSearch(page)
-
+  test("Neuanlage aus Suche", async ({ page }) => {
     const fileNumber = generateString()
-    const courtType = "AG"
-    const courtLocation = "Aachen"
-    const decisionDate = "25.12.2000"
-
-    await fillSearchInput(page, {
-      fileNumber,
-      courtType,
-      courtLocation,
-      decisionDate,
-    })
-
-    await expect(
-      page.getByText(
-        `${fileNumber}, ${courtType} ${courtLocation}, ${decisionDate}`,
-      ),
-    ).toBeVisible()
-
-    await page
-      .getByRole("button", {
-        name: "Übernehmen und fortfahren",
-      })
-      .click()
-    await page.waitForURL(/categories$/)
-
-    const documentNumber = page
-      .url()
-      .match(/documentunit\/([A-Z0-9]{13})\/categories/)![1]
-
-    const infoPanel = page.getByText(new RegExp(`${documentNumber}|.*`))
-
-    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
-      `${courtType} ${courtLocation}`,
-    )
-    await expect(
-      infoPanel.getByText(
-        `${courtType} ${courtLocation}, ${fileNumber}, ${decisionDate}`,
-      ),
-    ).toBeVisible()
-
-    await deleteDocumentUnit(page, documentNumber)
-  })
-
-  test("show error message when creating new doc unit from search parameters fails", async ({
-    page,
-  }) => {
     await navigateToSearch(page)
-
-    const fileNumber = generateString()
-
-    await fillSearchInput(page, {
-      fileNumber: fileNumber,
+    await test.step("Suche nach Gericht, Datum und Aktenzeichen", async () => {
+      await fillInput(page, "Aktenzeichen Suche", fileNumber)
+      await fillInput(page, "Gerichtstyp Suche", "BFH")
+      await fillInput(page, "Entscheidungsdatum Suche", "05.07.2022")
+      await triggerSearch(page)
     })
-
-    await expect(
-      page.getByText(`${fileNumber}, Gericht unbekannt, Datum unbekannt`),
-    ).toBeVisible()
-
-    await page.route("**/new", async (route) => {
-      await route.fulfill({
-        status: 404,
-        contentType: "text/plain",
-        body: "Not Found!",
-      })
-
+    await test.step("Ohne Ergebnisse kann Neuanlage aus Suchparametern erfolgen", async () => {
       await expect(
-        page.getByText(
-          "Neue Dokumentationseinheit konnte nicht erstellt werden.",
-        ),
+        page.getByText("folgenden Stammdaten übernehmen"),
+      ).toBeVisible()
+      await expect(
+        page.getByText(`${fileNumber}, BFH, 05.07.2022`),
       ).toBeVisible()
     })
-
-    await page
-      .getByRole("button", {
-        name: "Übernehmen und fortfahren",
-      })
-      .click()
+    await test.step("Klicke 'Übernehmen und fortfahren'", async () => {
+      await page
+        .getByRole("button", { name: "Übernehmen und fortfahren" })
+        .click()
+    })
+    await test.step("Öffnet Rubriken von neuer Entscheidung", async () => {
+      await expect(page).toHaveURL(
+        /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
+      )
+      documentNumberToBeDeleted =
+        /caselaw\/documentunit\/(.*)\/categories/g.exec(
+          page.url(),
+        )?.[1] as string
+      await expect(
+        page.getByRole("heading", {
+          name: documentNumberToBeDeleted,
+        }),
+      ).toBeVisible()
+    })
+    await test.step("Rubriken sind bereits mit Suchparametern befüllt", async () => {
+      await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+        "BFH",
+      )
+      await expect(
+        page.getByRole("textbox", {
+          name: "Entscheidungsdatum",
+          exact: true,
+        }),
+      ).toHaveValue("05.07.2022")
+      await expect(
+        page
+          .getByTestId("chips-input-wrapper_fileNumber")
+          .getByTestId("chip-value"),
+      ).toHaveText(fileNumber)
+    })
   })
 })

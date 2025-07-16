@@ -181,7 +181,7 @@ async function createNewFromSearch() {
   }
 
   const createResponse = await service.createNew(requestBodyParameters, {
-    kind: Kind.PENDING_PROCEEDING,
+    kind: Kind.DECISION,
   })
 
   if (createResponse.error) {
