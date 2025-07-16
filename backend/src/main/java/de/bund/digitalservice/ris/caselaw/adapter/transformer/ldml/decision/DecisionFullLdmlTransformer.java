@@ -96,6 +96,14 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
         builder.legalEffect(coreData.legalEffect());
       }
 
+      if (coreData.inputTypes() != null) {
+        applyIfNotEmpty(
+            Stream.of(coreData.inputTypes())
+                .flatMap(it -> decision.coreData().inputTypes().stream())
+                .toList(),
+            builder::inputTypes);
+      }
+
       builder
           .documentType(coreData.documentType().label())
           .courtLocation(nullSafeGet(coreData.court(), Court::location))

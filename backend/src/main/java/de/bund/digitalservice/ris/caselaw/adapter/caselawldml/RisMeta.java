@@ -87,4 +87,8 @@ public class RisMeta {
   @XmlElementWrapper(name = "procedures", namespace = CaseLawLdml.RIS_NS)
   @XmlElement(name = "procedure", namespace = CaseLawLdml.RIS_NS)
   private List<String> procedure;
+
+  @XmlElementWrapper(name = "inputTypes", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "inputType", namespace = CaseLawLdml.RIS_NS)
+  private List<String> inputTypes;
 }
