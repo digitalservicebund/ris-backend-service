@@ -41,9 +41,7 @@ test.describe(
             .getByLabel("Nach Dokumentationseinheiten suchen")
             .click()
           await expect(
-            pageWithExternalUser.locator(".table-row", {
-              hasText: documentNumber,
-            }),
+            pageWithExternalUser.getByRole("row").getByText(documentNumber),
           ).toBeVisible()
         })
 
@@ -88,9 +86,7 @@ test.describe(
             .getByLabel("Nach Dokumentationseinheiten suchen")
             .click()
           await expect(
-            pageWithExternalUser.locator(".table-row", {
-              hasText: documentNumber,
-            }),
+            pageWithExternalUser.getByRole("row").getByText(documentNumber),
           ).toBeVisible()
         })
 

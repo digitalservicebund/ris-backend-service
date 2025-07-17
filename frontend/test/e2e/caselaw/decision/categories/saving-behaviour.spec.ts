@@ -153,21 +153,8 @@ test.describe("saving behaviour", () => {
     await page.getByLabel("Aktenzeichen Suche").fill(fileNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
-    await expect(
-      page.locator(".table-row", {
-        hasText: documentNumber,
-      }),
-    ).toBeVisible()
-    await expect(
-      page.locator(".table-row", {
-        hasText: documentNumber,
-      }),
-    ).toBeVisible()
-    await expect(
-      page.locator(".table-row", {
-        hasText: fileNumber,
-      }),
-    ).toBeVisible()
+    await expect(page.getByRole("row").getByText(documentNumber)).toBeVisible()
+    await expect(page.getByRole("row").getByText(fileNumber)).toBeVisible()
   })
 
   test(

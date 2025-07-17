@@ -317,9 +317,7 @@ test.describe(
             await page.getByLabel("Aktenzeichen Suche").fill(fileNumber)
             await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
             //3 + table header
-            await expect
-              .poll(async () => page.locator(".table-row").count())
-              .toBe(4)
+            await expect.poll(async () => page.getByRole("row").count()).toBe(4)
           })
 
           await test.step("Apply duplicate filter to search for 2 duplicates", async () => {
@@ -330,9 +328,7 @@ test.describe(
             await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
             //2 + table header
-            await expect
-              .poll(async () => page.locator(".table-row").count())
-              .toBe(3)
+            await expect.poll(async () => page.getByRole("row").count()).toBe(3)
 
             await docOfficeOnly.click()
             await expect(withDuplicateWarning).toBeHidden()

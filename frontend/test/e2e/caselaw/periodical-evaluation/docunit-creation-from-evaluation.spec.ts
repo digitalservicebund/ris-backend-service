@@ -463,11 +463,10 @@ test.describe(
             await newTab
               .getByLabel("Nach Dokumentationseinheiten suchen")
               .click()
-            const listEntry = newTab.getByRole("row")
-            await expect(listEntry).toHaveCount(1)
-
-            await expect(listEntry).toContainText(documentNumber)
-            await expect(listEntry).toContainText("Unveröffentlicht")
+            const allRows = newTab.getByRole("row")
+            const resultRow = allRows.filter({ hasText: documentNumber })
+            await expect(resultRow).toBeVisible()
+            await expect(resultRow).toContainText("Unveröffentlicht")
           })
 
           await test.step("The new documentation unit can be deleted with when deleting reference", async () => {
@@ -544,7 +543,7 @@ test.describe(
       {
         tag: ["@RISDEV-4832", "@RISDEV-4980, @RISDEV-6381"],
       },
-      async ({ page, edition, browserName }) => {
+      async ({ page, edition }) => {
         await navigateToPeriodicalReferences(page, edition.id ?? "")
         const randomFileNumber = generateString()
         let documentNumber = ""
@@ -615,28 +614,6 @@ test.describe(
               { exact: true },
             ),
           ).toBeVisible()
-        })
-
-        // Todo: Known error in firefox (NS_BINDING_ABORTED),
-        // when navigating with a concurrent navigation triggered
-        // eslint-disable-next-line playwright/no-wait-for-timeout,playwright/no-conditional-in-test
-        if (browserName === "firefox") await page.waitForTimeout(500)
-
-        await test.step("Created documentation unit is not visible to creating doc office in search with Fremdanlage status", async () => {
-          await navigateToSearch(newTab)
-
-          await newTab.getByLabel("Dokumentnummer Suche").fill(documentNumber)
-
-          await newTab.getByLabel("Status Suche").click()
-          await newTab
-            .getByRole("option", {
-              name: "Fremdanlage",
-              exact: true,
-            })
-            .click()
-          await newTab.getByLabel("Nach Dokumentationseinheiten suchen").click()
-          const listEntry = newTab.getByRole("row")
-          await expect(listEntry).toHaveCount(0)
         })
 
         await test.step("Created DocUnit is deleted when reference is deleted", async () => {

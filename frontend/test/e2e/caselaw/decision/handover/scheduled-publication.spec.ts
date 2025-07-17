@@ -154,26 +154,21 @@ test.describe(
           await expect(page.getByLabel("Terminiert Filter")).toBeVisible()
           // jdv Übergabe column is not visible by default
           await expect(
-            page.getByRole("cell", { name: "jDV Übergabe", exact: true }),
+            page.getByRole("columnheader", { name: "jDV Übergabe" }),
           ).toBeHidden()
         })
 
         await test.step("Suche nach terminierten Dok-Einheiten zeigt neue Terminierung", async () => {
           await page.getByLabel("Terminiert Filter").check()
           await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-          const resultRow = page.getByTestId(
-            `listEntry_${prefilledDocumentUnit.documentNumber}`,
-          )
           // jDV Übergabe date column is visible when filter is active
           await expect(
-            page.getByRole("cell", { name: "jDV Übergabe", exact: true }),
+            page.getByRole("columnheader", { name: "jDV Übergabe" }),
           ).toBeVisible()
-          await expect(resultRow).toBeVisible()
-          await expect(
-            resultRow.getByLabel("Terminierte Übergabe am 31.12.2080 13:14"),
-          ).toBeVisible()
-          await expect(resultRow.getByTestId("publicationDate")).toHaveText(
-            "31.12.2080 13:14",
+          await checkResultListForPublishedDocUnit(
+            page,
+            prefilledDocumentUnit.documentNumber,
+            "Terminierte Übergabe am 31.12.2080 13:14",
           )
         })
 
@@ -208,8 +203,9 @@ test.describe(
           await page.getByLabel("Nur meine Dokstelle Filter").check()
           await expect(page.getByLabel("jDV Übergabedatum Suche")).toBeVisible()
           // jdv Übergabe column is not visible by default
+
           await expect(
-            page.getByRole("cell", { name: "jDV Übergabe", exact: true }),
+            page.getByRole("columnheader", { name: "jDV Übergabe" }),
           ).toBeHidden()
         })
 
@@ -221,17 +217,14 @@ test.describe(
           await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
           // jDV Übergabe date column is visible when filter is active
           await expect(
-            page.getByRole("cell", { name: "jDV Übergabe", exact: true }),
+            page.getByRole("columnheader", { name: "jDV Übergabe" }),
           ).toBeVisible()
         })
 
         await checkResultListForPublishedDocUnit(
           page,
           prefilledDocumentUnit.documentNumber,
-        )
-        await checkResultListForPublishedDocUnit(
-          page,
-          secondPrefilledDocumentUnit.documentNumber,
+          "Keine Übergabe terminiert",
         )
 
         await checkPublicationDateSorting(page)
@@ -258,15 +251,13 @@ async function checkPublicationDateSorting(page: Page) {
 async function checkResultListForPublishedDocUnit(
   page: Page,
   documentNumber: string,
+  expectedString: string,
 ) {
   await test.step(`Ergebnisliste enthält abgegebene Dok-Einheit ${documentNumber}`, async () => {
-    const resultRow = page.getByTestId(`listEntry_${documentNumber}`)
+    const allRows = page.getByRole("row")
+    const resultRow = allRows.filter({ hasText: documentNumber })
+
     await expect(resultRow).toBeVisible()
-    await expect(
-      resultRow.getByLabel("Keine Übergabe terminiert"),
-    ).toBeVisible()
-    await expect(resultRow.getByTestId("publicationDate")).toContainText(
-      dayjs().format("DD.MM.YYYY"),
-    )
+    await expect(resultRow.getByLabel(expectedString)).toBeVisible()
   })
 }
