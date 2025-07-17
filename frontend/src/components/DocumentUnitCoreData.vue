@@ -383,6 +383,18 @@ onBeforeUnmount(() => {
           placeholder="Bitte auswählen"
         />
       </InputField>
+      <InputField id="inputTypes" label="Eingangsart">
+        <div class="flex w-full flex-col">
+          <ChipsInput
+            id="inputTypes"
+            v-model="coreDataModel.inputTypes"
+            aria-label="Eingangsart"
+          ></ChipsInput>
+          <div class="ris-label3-regular pt-4">
+            Papier, BLK-DB-Schnittstelle, EUR-LEX-Schnittstelle, E-Mail
+          </div>
+        </div>
+      </InputField>
     </div>
     <div :class="layoutClass">
       <InputField

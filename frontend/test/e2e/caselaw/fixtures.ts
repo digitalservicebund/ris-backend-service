@@ -423,7 +423,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     const documentType = await documentTypeResponse.json()
 
     const literatureDocumentTypeResponse = await request.get(
-      `api/v1/caselaw/documenttypesq=Ean&category=DEPENDENT_LITERATURE`,
+      `api/v1/caselaw/documenttypes?q=Ean&category=DEPENDENT_LITERATURE`,
     )
     const literatureDocumentType = await literatureDocumentTypeResponse.json()
 
