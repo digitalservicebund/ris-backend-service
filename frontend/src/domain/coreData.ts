@@ -6,6 +6,7 @@ import { Procedure } from "@/domain/procedure"
 import { Source } from "@/domain/source"
 
 export type CoreData = {
+  deviatingDocumentNumbers?: string[]
   fileNumbers?: string[]
   deviatingFileNumbers?: string[]
   court?: Court

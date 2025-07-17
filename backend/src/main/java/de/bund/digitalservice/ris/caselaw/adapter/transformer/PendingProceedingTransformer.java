@@ -56,6 +56,7 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
           .isResolved(coreData.isResolved())
           .resolutionDate(coreData.resolutionDate());
 
+      addDeviatingDocumentNumbers(builder, coreData, currentDto);
       addFileNumbers(builder, coreData, currentDto);
       addDeviationCourts(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);

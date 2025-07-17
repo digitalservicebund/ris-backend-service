@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDocumentNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsDTO;
@@ -21,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
@@ -1458,51 +1460,6 @@ class DecisionTransformerTest {
     assertThat(decision.longTexts().participatingJudges()).isEmpty();
   }
 
-  private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {
-    return Decision.builder()
-        .previousDecisions(Collections.emptyList())
-        .ensuingDecisions(Collections.emptyList())
-        .shortTexts(ShortTexts.builder().build())
-        .longTexts(LongTexts.builder().build())
-        .managementData(
-            ManagementData.builder()
-                .scheduledPublicationDateTime(null)
-                .lastPublicationDateTime(null)
-                .borderNumbers(Collections.emptyList())
-                .duplicateRelations(List.of())
-                .build())
-        .attachments(Collections.emptyList())
-        .contentRelatedIndexing(
-            ContentRelatedIndexing.builder()
-                .keywords(Collections.emptyList())
-                .fieldsOfLaw(Collections.emptyList())
-                .norms(Collections.emptyList())
-                .activeCitations(Collections.emptyList())
-                .jobProfiles(Collections.emptyList())
-                .dismissalGrounds(Collections.emptyList())
-                .dismissalTypes(Collections.emptyList())
-                .collectiveAgreements(Collections.emptyList())
-                .hasLegislativeMandate(false)
-                .build())
-        .caselawReferences(Collections.emptyList())
-        .literatureReferences(Collections.emptyList())
-        .documentalists(Collections.emptyList());
-  }
-
-  private CoreDataBuilder generateSimpleCoreDataBuilder() {
-    return CoreData.builder()
-        .documentationOffice(DocumentationOffice.builder().abbreviation("doc office").build())
-        .fileNumbers(Collections.emptyList())
-        .deviatingFileNumbers(Collections.emptyList())
-        .deviatingCourts(Collections.emptyList())
-        .previousProcedures(Collections.emptyList())
-        .deviatingEclis(Collections.emptyList())
-        .deviatingDecisionDates(Collections.emptyList())
-        .inputTypes(Collections.emptyList())
-        .leadingDecisionNormReferences(Collections.emptyList())
-        .yearsOfDispute(Collections.emptyList());
-  }
-
   @Test
   void testTransformToDomain_withDocumentalists_shouldAddDocumentalists() {
     DecisionDTO decisionDTO =
@@ -1547,5 +1504,107 @@ class DecisionTransformerTest {
         .satisfiesExactlyInAnyOrder(
             attachment -> assertThat(attachment.name()).isEqualTo("foo"),
             attachment -> assertThat(attachment.name()).isEqualTo("bar"));
+  }
+
+  @Test
+  void testTransformToDomain_withDeviatingDocumentNumbers_shouldAdd() {
+    DecisionDTO decisionDTO =
+        generateSimpleDTOBuilder()
+            .deviatingDocumentNumbers(
+                List.of(
+                    DeviatingDocumentNumberDTO.builder().value("XXRE123456789").rank(1L).build(),
+                    DeviatingDocumentNumberDTO.builder().value("XXRE234567890").rank(2L).build()))
+            .build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.coreData().deviatingDocumentNumbers())
+        .containsExactly("XXRE123456789", "XXRE234567890");
+  }
+
+  @Test
+  void testTransformToDomain_withoutDeviatingDocumentNumbers_shouldNotAdd() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.coreData().deviatingDocumentNumbers()).isEmpty();
+  }
+
+  @Test
+  void testTransformToDTO_withDeviatingDocumentNumbers_shouldAdd() {
+    Decision decision =
+        generateSimpleDocumentationUnitBuilder()
+            .coreData(
+                generateSimpleCoreDataBuilder()
+                    .deviatingDocumentNumbers(List.of("XXRE123456789", "XXRE234567890"))
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(documentationUnitDTO.getDeviatingDocumentNumbers())
+        .extracting("value")
+        .containsExactly("XXRE123456789", "XXRE234567890");
+  }
+
+  @Test
+  void testTransformToDTO_withoutDeviatingDocumentNumbers_shouldNotAdd() {
+    Decision decision =
+        generateSimpleDocumentationUnitBuilder()
+            .coreData(generateSimpleCoreDataBuilder().build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(documentationUnitDTO.getDeviatingDocumentNumbers()).isEmpty();
+  }
+
+  private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {
+    return Decision.builder()
+        .previousDecisions(Collections.emptyList())
+        .ensuingDecisions(Collections.emptyList())
+        .shortTexts(ShortTexts.builder().build())
+        .longTexts(LongTexts.builder().build())
+        .managementData(
+            ManagementData.builder()
+                .scheduledPublicationDateTime(null)
+                .lastPublicationDateTime(null)
+                .borderNumbers(Collections.emptyList())
+                .duplicateRelations(List.of())
+                .build())
+        .attachments(Collections.emptyList())
+        .contentRelatedIndexing(
+            ContentRelatedIndexing.builder()
+                .keywords(Collections.emptyList())
+                .fieldsOfLaw(Collections.emptyList())
+                .norms(Collections.emptyList())
+                .activeCitations(Collections.emptyList())
+                .jobProfiles(Collections.emptyList())
+                .dismissalGrounds(Collections.emptyList())
+                .dismissalTypes(Collections.emptyList())
+                .collectiveAgreements(Collections.emptyList())
+                .hasLegislativeMandate(false)
+                .build())
+        .caselawReferences(Collections.emptyList())
+        .literatureReferences(Collections.emptyList())
+        .documentalists(Collections.emptyList());
+  }
+
+  private CoreDataBuilder generateSimpleCoreDataBuilder() {
+    return CoreData.builder()
+        .documentationOffice(DocumentationOffice.builder().abbreviation("doc office").build())
+        .deviatingDocumentNumbers(Collections.emptyList())
+        .fileNumbers(Collections.emptyList())
+        .deviatingFileNumbers(Collections.emptyList())
+        .deviatingCourts(Collections.emptyList())
+        .previousProcedures(Collections.emptyList())
+        .deviatingEclis(Collections.emptyList())
+        .deviatingDecisionDates(Collections.emptyList())
+        .inputTypes(Collections.emptyList())
+        .leadingDecisionNormReferences(Collections.emptyList())
+        .yearsOfDispute(Collections.emptyList());
   }
 }

@@ -75,7 +75,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     Root<DocumentationUnitDTO> root = cq.from(DocumentationUnitDTO.class);
 
     List<Predicate> predicates = new ArrayList<>();
-    predicates.addAll(getDocNumberPredicates(parameters, cb, root));
+    predicates.addAll(getDocNumberPredicates(parameters, cq, cb, root));
     predicates.addAll(getCourtTypePredicates(parameters, cb, root));
     predicates.addAll(getCourtLocationPredicates(parameters, cb, root));
     predicates.addAll(getDecisionDatePredicates(parameters, cb, root));
@@ -123,15 +123,34 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
   }
 
   private List<Predicate> getDocNumberPredicates(
-      SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
+      SearchParameters parameters,
+      CriteriaQuery<DocumentationUnitListItemDTO> cq,
+      HibernateCriteriaBuilder cb,
+      Root<DocumentationUnitDTO> root) {
     List<Predicate> predicates = new ArrayList<>();
     if (parameters.documentNumber.isPresent()
         && !parameters.documentNumber.get().trim().isEmpty()) {
+      String documentNumberLike = "%" + parameters.documentNumber.get().trim().toUpperCase() + "%";
       Predicate documentNumberPredicate =
+          cb.like(cb.upper(root.get(DocumentationUnitDTO_.documentNumber)), documentNumberLike);
+
+      Subquery<UUID> subqueryDeviatingFileNumber = cq.subquery(UUID.class);
+      Root<DeviatingDocumentNumberDTO> subRootDeviatingFileNumber =
+          subqueryDeviatingFileNumber.from(DeviatingDocumentNumberDTO.class);
+      subqueryDeviatingFileNumber.select(
+          subRootDeviatingFileNumber
+              .get(DeviatingDocumentNumberDTO_.documentationUnit)
+              .get(DocumentationUnitDTO_.id));
+      subqueryDeviatingFileNumber.where(
           cb.like(
-              cb.upper(root.get(DocumentationUnitDTO_.documentNumber)),
-              "%" + parameters.documentNumber.get().trim().toUpperCase() + "%");
-      predicates.add(documentNumberPredicate);
+              cb.upper(subRootDeviatingFileNumber.get(DeviatingDocumentNumberDTO_.value)),
+              documentNumberLike));
+      Predicate deviatingDocumentNumberPredicate =
+          root.get(DocumentationUnitDTO_.id).in(subqueryDeviatingFileNumber);
+
+      Predicate anyDocumentNumberPredicate =
+          cb.or(documentNumberPredicate, deviatingDocumentNumberPredicate);
+      predicates.add(anyDocumentNumberPredicate);
     }
     return predicates;
   }

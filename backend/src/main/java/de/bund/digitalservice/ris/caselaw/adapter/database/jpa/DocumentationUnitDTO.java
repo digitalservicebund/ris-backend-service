@@ -156,16 +156,15 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @OrderBy("rank")
   private List<DeviatingDateDTO> deviatingDates = new ArrayList<>();
 
-  //
-  //  @OneToMany(
-  //      mappedBy = "documentationUnit",
-  //      cascade = CascadeType.ALL,
-  //      cascade = CascadeType.ALL,
-  //      fetch = FetchType.EAGER,
-  //      orphanRemoval = true)
-  //  @Builder.Default
-  //  private Set<DeviatingDocumentNumber> deviatingDocumentNumbers = new HashSet<>();
-  //
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "documentationUnit")
+  @Builder.Default
+  @OrderBy("rank")
+  private List<DeviatingDocumentNumberDTO> deviatingDocumentNumbers = new ArrayList<>();
+
   // Abweichendes Aktenzeichen
   @OneToMany(
       cascade = CascadeType.ALL,

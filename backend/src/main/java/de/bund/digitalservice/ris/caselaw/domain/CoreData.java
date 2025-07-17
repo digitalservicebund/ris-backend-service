@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 @Builder(toBuilder = true)
 public record CoreData(
+    @UniqueElements List<String> deviatingDocumentNumbers,
     @UniqueElements List<String> fileNumbers,
     @UniqueElements List<String> deviatingFileNumbers,
     Court court,

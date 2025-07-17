@@ -277,6 +277,19 @@ onBeforeUnmount(() => {
       </InputField>
     </div>
 
+    <div>
+      <InputField
+        id="deviatingDocumentNumbers"
+        label="Abweichende Dokumentnummer"
+      >
+        <ChipsInput
+          id="deviatingDocumentNumbers"
+          v-model="coreDataModel.deviatingDocumentNumbers"
+          aria-label="Abweichende Dokumentnummer"
+        ></ChipsInput>
+      </InputField>
+    </div>
+
     <div v-if="!isPendingProceeding" :class="layoutClass">
       <NestedComponent
         aria-label="Abweichender ECLI"

@@ -213,4 +213,33 @@ describe("Core Data", () => {
     expect(resultList[0]).toHaveTextContent("Papier")
     expect(resultList[1]).toHaveTextContent("E-Mail")
   })
+
+  test("renders deviating document number", async () => {
+    const documentUnit = new Decision("1", {
+      coreData: {
+        deviatingDocumentNumbers: ["XXRE123456789", "XXRE111111111"],
+      },
+      documentNumber: "ABCD2022000001",
+    })
+
+    renderComponent({ initialModelValue: documentUnit.coreData })
+    expect(
+      await screen.findByLabelText("Abweichende Dokumentnummer"),
+    ).toBeVisible()
+
+    const chipList = screen.getAllByRole("listitem")
+    expect(chipList.length).toBe(2)
+    expect(chipList[0]).toHaveTextContent("XXRE123456789")
+    expect(chipList[1]).toHaveTextContent("XXRE111111111")
+  })
+
+  test("updates deviating decision date", async () => {
+    const { user, model } = renderComponent({
+      initialModelValue: { deviatingDocumentNumbers: [] },
+    })
+    const input = await screen.findByLabelText("Abweichende Dokumentnummer")
+    await user.type(input, "XXRE123456789{enter}")
+
+    expect(model.value.deviatingDocumentNumbers).toEqual(["XXRE123456789"])
+  })
 })

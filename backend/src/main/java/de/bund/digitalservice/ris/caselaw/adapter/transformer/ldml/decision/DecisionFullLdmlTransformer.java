@@ -82,6 +82,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       applyIfNotEmpty(coreData.deviatingCourts(), builder::deviatingCourt);
       applyIfNotEmpty(coreData.deviatingEclis(), builder::deviatingEcli);
       applyIfNotEmpty(coreData.deviatingFileNumbers(), builder::deviatingFileNumber);
+      applyIfNotEmpty(coreData.deviatingDocumentNumbers(), builder::deviatingDocumentNumber);
       applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
       if (coreData.procedure() != null) {
         applyIfNotEmpty(

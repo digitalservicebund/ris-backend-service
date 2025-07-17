@@ -37,6 +37,7 @@ function renderComponent() {
                         "NSW WEG $ 14 (BGH-intern)",
                       ],
                       deviatingCourts: ["BGH"],
+                      deviatingDocumentNumbers: ["XXRE123456789"],
                       fileNumbers: ["abc-123"],
                       deviatingFileNumbers: ["cde-456"],
                       decisionDate: "2023-12-12",
@@ -95,6 +96,9 @@ describe("preview", () => {
     ).not.toBeInTheDocument()
     expect(await screen.findByText("Spruchkörper")).toBeInTheDocument()
     expect(await screen.findByText("Dokumenttyp")).toBeInTheDocument()
+    expect(
+      await screen.findByText("Abweichende Dokumentnummer"),
+    ).toBeInTheDocument()
     expect(await screen.findByText("ECLI")).toBeInTheDocument()
     expect(await screen.findByText("Abweichender ECLI")).toBeInTheDocument()
     expect(await screen.findByText("Vorgang")).toBeInTheDocument()

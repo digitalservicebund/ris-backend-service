@@ -38,13 +38,13 @@ const sourceValue = computed(() =>
     >
       <PreviewCategory>Fehlerhaftes Gericht</PreviewCategory>
       <PreviewContent>
-        {{ coreData.deviatingCourts.toString() }}
+        {{ coreData.deviatingCourts.join(", ") }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.fileNumbers && coreData.fileNumbers.length > 0">
       <PreviewCategory> Aktenzeichen</PreviewCategory>
       <PreviewContent>
-        {{ coreData.fileNumbers.toString() }}
+        {{ coreData.fileNumbers.join(", ") }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow
@@ -55,7 +55,7 @@ const sourceValue = computed(() =>
     >
       <PreviewCategory> Abweichendes Aktenzeichen</PreviewCategory>
       <PreviewContent>
-        {{ coreData.deviatingFileNumbers.toString() }}
+        {{ coreData.deviatingFileNumbers.join(", ") }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.decisionDate">
@@ -85,6 +85,17 @@ const sourceValue = computed(() =>
       <PreviewCategory>Dokumenttyp</PreviewCategory>
       <PreviewContent>{{ coreData.documentType.label }}</PreviewContent>
     </PreviewRow>
+    <PreviewRow
+      v-if="
+        coreData.deviatingDocumentNumbers &&
+        coreData.deviatingDocumentNumbers.length > 0
+      "
+    >
+      <PreviewCategory>Abweichende Dokumentnummer</PreviewCategory>
+      <PreviewContent>
+        {{ coreData.deviatingDocumentNumbers.join(", ") }}
+      </PreviewContent>
+    </PreviewRow>
     <PreviewRow v-if="coreData.ecli">
       <PreviewCategory>ECLI</PreviewCategory>
       <PreviewContent>{{ coreData.ecli }}</PreviewContent>
@@ -93,7 +104,7 @@ const sourceValue = computed(() =>
       v-if="coreData.deviatingEclis && coreData.deviatingEclis.length > 0"
     >
       <PreviewCategory>Abweichender ECLI</PreviewCategory>
-      <PreviewContent>{{ coreData.deviatingEclis.toString() }}</PreviewContent>
+      <PreviewContent>{{ coreData.deviatingEclis.join(", ") }}</PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.procedure">
       <PreviewCategory>Vorgang</PreviewCategory>
@@ -106,7 +117,7 @@ const sourceValue = computed(() =>
     >
       <PreviewCategory>Vorgangshistorie</PreviewCategory>
       <PreviewContent
-        >{{ coreData.previousProcedures?.toReversed().toString() }}
+        >{{ coreData.previousProcedures?.toReversed().join(", ") }}
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="coreData.legalEffect">

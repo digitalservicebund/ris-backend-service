@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDocumentNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -216,6 +217,29 @@ public class DocumentableTransformer {
     }
   }
 
+  static void addDeviatingDocumentNumbers(
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder,
+      CoreData coreData,
+      DocumentationUnitDTO currentDto) {
+    if (coreData.deviatingDocumentNumbers() == null) {
+      return;
+    }
+
+    List<DeviatingDocumentNumberDTO> deviatingDocumentNumberDTOs = new ArrayList<>(); // NOSONAR
+    List<String> deviatingDocumentNumbers = coreData.deviatingDocumentNumbers(); // NOSONAR
+
+    for (int i = 0; i < deviatingDocumentNumbers.size(); i++) {
+      deviatingDocumentNumberDTOs.add(
+          DeviatingDocumentNumberDTO.builder()
+              .value(StringUtils.normalizeSpace(deviatingDocumentNumbers.get(i)))
+              .documentationUnit(currentDto)
+              .rank(i + 1L)
+              .build());
+    }
+
+    builder.deviatingDocumentNumbers(deviatingDocumentNumberDTOs);
+  }
+
   static void addDeviatingFileNumbers(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder<?, ?> builder,
       CoreData coreData,
@@ -310,6 +334,7 @@ public class DocumentableTransformer {
             .celexNumber(documentationUnitDTO.getCelexNumber())
             .appraisalBody(documentationUnitDTO.getJudicialBody());
 
+    addDeviatingDocumentNumberToDomain(documentationUnitDTO, coreDataBuilder);
     addFileNumbersToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingFileNumbersToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingCourtsToDomain(documentationUnitDTO, coreDataBuilder);
@@ -453,6 +478,19 @@ public class DocumentableTransformer {
     List<LocalDate> deviatingDecisionDates =
         decisionDTO.getDeviatingDates().stream().map(DeviatingDateDTO::getValue).toList();
     coreDataBuilder.deviatingDecisionDates(deviatingDecisionDates);
+  }
+
+  static void addDeviatingDocumentNumberToDomain(
+      DocumentationUnitDTO decisionDTO, CoreDataBuilder coreDataBuilder) {
+    if (decisionDTO.getDeviatingDocumentNumbers() == null) {
+      return;
+    }
+
+    List<String> deviatingDocumentNumbers =
+        decisionDTO.getDeviatingDocumentNumbers().stream()
+            .map(DeviatingDocumentNumberDTO::getValue)
+            .toList();
+    coreDataBuilder.deviatingDocumentNumbers(deviatingDocumentNumbers);
   }
 
   static void addDeviatingCourtsToDomain(
