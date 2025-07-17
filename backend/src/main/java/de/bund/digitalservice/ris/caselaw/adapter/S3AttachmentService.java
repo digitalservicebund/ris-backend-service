@@ -119,8 +119,6 @@ public class S3AttachmentService implements AttachmentService {
     attachmentDTO = repository.save(attachmentDTO);
     attachmentDTO.setFilename(attachmentDTO.getId() + "." + attachmentDTO.getFormat());
 
-    // TODO: clarify : code review log update doc is redundant on long text / short update, only on
-    // upload page
     return AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
   }
 

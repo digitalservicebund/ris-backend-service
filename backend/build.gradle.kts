@@ -171,7 +171,7 @@ dependencies {
     implementation("net.minidev:json-smart:2.5.2")
 
     // CVE-2025-24970
-    implementation("io.netty:netty-handler:4.2.2.Final")
+    implementation("io.netty:netty-handler:4.2.3.Final")
 
     implementation("org.postgresql:postgresql:42.7.7")
 
@@ -217,8 +217,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.15.1")
-    implementation("io.micrometer:micrometer-core:1.15.1")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.15.2")
+    implementation("io.micrometer:micrometer-core:1.15.2")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
@@ -243,7 +243,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.7")
+    testImplementation("io.projectreactor:reactor-test:3.7.8")
     testImplementation("org.springframework.security:spring-security-test:6.5.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")

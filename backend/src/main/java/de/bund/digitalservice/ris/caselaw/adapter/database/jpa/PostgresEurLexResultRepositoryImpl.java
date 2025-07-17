@@ -34,11 +34,6 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
   }
 
   @Override
-  public Optional<EurLexResultDTO> findTopByOrderByCreatedAtDesc() {
-    return repository.findTopByOrderByCreatedAtDesc();
-  }
-
-  @Override
   public Page<EurLexResultDTO> findAllNewWithUriBySearchParameters(
       Pageable pageable,
       Optional<String> fileNumber,
