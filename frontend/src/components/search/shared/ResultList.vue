@@ -331,6 +331,9 @@ defineSlots<{
         </Column>
 
         <Column field="actions">
+          <template #header>
+            <span class="sr-only">Aktionen</span>
+          </template>
           <template #body="{ data: item }">
             <div class="flex flex-row justify-end -space-x-2">
               <router-link

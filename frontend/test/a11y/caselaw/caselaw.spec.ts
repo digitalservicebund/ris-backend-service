@@ -25,15 +25,10 @@ test.describe("a11y of start page (/caselaw)", () => {
     ).toBeVisible()
     await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(
-      page.locator(".table-row", {
-        hasText: documentNumber,
-      }),
-    ).toBeVisible()
+    await expect(page.getByRole("cell", { name: documentNumber })).toBeVisible()
     await page
-      .locator(".table-row", {
-        hasText: documentNumber,
-      })
+      .getByRole("row")
+      .filter({ hasText: documentNumber })
       .getByLabel("Dokumentationseinheit löschen", { exact: true })
       .click()
     const accessibilityScanResults = await useAxeBuilder(page).analyze()
