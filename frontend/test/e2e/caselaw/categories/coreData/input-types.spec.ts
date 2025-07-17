@@ -188,7 +188,7 @@ test.describe(
         }
         await save(page)
 
-        await test.step("In der Übergabe werden die Einträge in der richtigen Reihenfolge angezeigt", async () => {
+        await test.step("In der Übergabe werden die Einträge angezeigt", async () => {
           await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
           await expect(page.getByText("XML Vorschau")).toBeVisible()
           await page.getByText("XML Vorschau").click()

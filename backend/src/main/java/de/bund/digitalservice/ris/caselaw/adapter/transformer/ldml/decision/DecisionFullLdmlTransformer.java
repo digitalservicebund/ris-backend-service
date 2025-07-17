@@ -97,11 +97,7 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       }
 
       if (coreData.inputTypes() != null) {
-        applyIfNotEmpty(
-            Stream.of(coreData.inputTypes())
-                .flatMap(it -> decision.coreData().inputTypes().stream())
-                .toList(),
-            builder::inputTypes);
+        applyIfNotEmpty(coreData.inputTypes(), builder::inputTypes);
       }
 
       builder
