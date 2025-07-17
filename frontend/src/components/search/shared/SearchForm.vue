@@ -40,7 +40,7 @@ const isEmptySearch = computed(() => {
 const submitButtonError = ref<string | undefined>()
 
 const dropdownItems: DropdownItem[] = [
-  { label: "Alle", value: "" },
+  { label: "Alle", value: undefined },
   { label: "Veröffentlicht", value: PublicationState.PUBLISHED },
   { label: "Unveröffentlicht", value: PublicationState.UNPUBLISHED },
   { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
@@ -58,6 +58,17 @@ const isResolved = computed({
   set: (data) => {
     if (isPendingProceeding.value) {
       query.value.isResolved = data
+    }
+  },
+})
+
+const publicationStatus = computed({
+  get: () => query.value?.publicationStatus,
+  set: (data) => {
+    if (!data) {
+      delete query.value.publicationStatus
+    } else {
+      query.value.publicationStatus = data
     }
   },
 })
@@ -448,7 +459,7 @@ watch(
         >
           <InputSelect
             :id="id"
-            v-model="query.publicationStatus"
+            v-model="publicationStatus"
             aria-label="Status Suche"
             fluid
             option-label="label"
