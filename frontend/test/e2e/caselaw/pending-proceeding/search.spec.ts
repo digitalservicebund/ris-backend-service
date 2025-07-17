@@ -1,13 +1,18 @@
-import { expect, Locator, Page } from "@playwright/test"
-import dayjs from "dayjs"
-import { fillInput, navigateToSearch } from "../e2e-utils"
-import { caselawTest as test } from "../fixtures"
-import PendingProceeding from "@/domain/pendingProceeding"
+import { expect } from "@playwright/test"
+import { Kind } from "@/domain/documentationUnitKind"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
+import {
+  fillInput,
+  navigateToSearch,
+  checkResultListContent,
+  openSearchWithFileNumberPrefix,
+  triggerSearch,
+} from "~/e2e/caselaw/utils/e2e-utils"
 import { generateString } from "~/test-helper/dataGenerators"
 
 /* eslint-disable playwright/expect-expect */
-/* eslint-disable playwright/no-nested-step */
+
 test.describe(
   "Große Suche nach Anhängigen Verfahren",
   {
@@ -35,26 +40,32 @@ test.describe(
 
     test("Suche nach Aktenzeichen", async ({
       pageWithBfhUser,
-      pendingProceedingsFromOptions,
+      pendingProceedings,
     }) => {
-      const { fileNumberPrefix, createdPendingProceedings } =
-        pendingProceedingsFromOptions
-      await openSearchWithFileNumberPrefix(fileNumberPrefix, pageWithBfhUser)
-      await triggerSearch(pageWithBfhUser)
+      const { fileNumberPrefix, createdPendingProceedings } = pendingProceedings
+      await openSearchWithFileNumberPrefix(
+        fileNumberPrefix,
+        pageWithBfhUser,
+        Kind.PENDING_PROCEEDING,
+      )
+      await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       await checkResultListContent(createdPendingProceedings, pageWithBfhUser)
     })
 
     test("Suche nach Gerichtstyp", async ({
       pageWithBfhUser,
-      pendingProceedingsFromOptions,
+      pendingProceedings,
     }) => {
-      const { fileNumberPrefix, createdPendingProceedings } =
-        pendingProceedingsFromOptions
-      await openSearchWithFileNumberPrefix(fileNumberPrefix, pageWithBfhUser)
+      const { fileNumberPrefix, createdPendingProceedings } = pendingProceedings
+      await openSearchWithFileNumberPrefix(
+        fileNumberPrefix,
+        pageWithBfhUser,
+        Kind.PENDING_PROCEEDING,
+      )
       await test.step("Wähle Gerichtstyp 'BFH' in Suche", async () => {
         await fillInput(pageWithBfhUser, "Gerichtstyp Suche", "BFH")
       })
-      await triggerSearch(pageWithBfhUser)
+      await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResults = createdPendingProceedings.filter(
         (p) => p.coreData.court?.label === "BFH",
       )
@@ -63,15 +74,18 @@ test.describe(
 
     test("Suche nach Gerichtsort", async ({
       pageWithBfhUser,
-      pendingProceedingsFromOptions,
+      pendingProceedings,
     }) => {
-      const { fileNumberPrefix, createdPendingProceedings } =
-        pendingProceedingsFromOptions
-      await openSearchWithFileNumberPrefix(fileNumberPrefix, pageWithBfhUser)
+      const { fileNumberPrefix, createdPendingProceedings } = pendingProceedings
+      await openSearchWithFileNumberPrefix(
+        fileNumberPrefix,
+        pageWithBfhUser,
+        Kind.PENDING_PROCEEDING,
+      )
       await test.step("Wähle Gerichtsort 'Aachen' in Suche", async () => {
         await fillInput(pageWithBfhUser, "Gerichtsort Suche", "Aachen")
       })
-      await triggerSearch(pageWithBfhUser)
+      await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResults = createdPendingProceedings.filter(
         (p) => p.coreData.court?.label === "AG Aachen",
       )
@@ -80,15 +94,18 @@ test.describe(
 
     test("Suche nach Mitteilungsdatum", async ({
       pageWithBfhUser,
-      pendingProceedingsFromOptions,
+      pendingProceedings,
     }) => {
-      const { fileNumberPrefix, createdPendingProceedings } =
-        pendingProceedingsFromOptions
-      await openSearchWithFileNumberPrefix(fileNumberPrefix, pageWithBfhUser)
+      const { fileNumberPrefix, createdPendingProceedings } = pendingProceedings
+      await openSearchWithFileNumberPrefix(
+        fileNumberPrefix,
+        pageWithBfhUser,
+        Kind.PENDING_PROCEEDING,
+      )
       await test.step("Wähle Mitteilungsdatum '02.01.2023' in Suche", async () => {
         await fillInput(pageWithBfhUser, "Mitteilungsdatum Suche", "02.01.2023")
       })
-      await triggerSearch(pageWithBfhUser)
+      await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResultsSpecificDate = createdPendingProceedings.filter(
         (p) => p.coreData.decisionDate === "2023-01-02",
       )
@@ -104,7 +121,7 @@ test.describe(
           "31.01.2023",
         )
       })
-      await triggerSearch(pageWithBfhUser)
+      await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResultsDateRange = createdPendingProceedings.filter(
         (p) =>
           p.coreData.decisionDate && p.coreData.decisionDate !== "2023-01-01",
@@ -117,11 +134,14 @@ test.describe(
 
     test("Suche nach Erledigungsdatum", async ({
       pageWithBfhUser,
-      pendingProceedingsFromOptions,
+      pendingProceedings,
     }) => {
-      const { fileNumberPrefix, createdPendingProceedings } =
-        pendingProceedingsFromOptions
-      await openSearchWithFileNumberPrefix(fileNumberPrefix, pageWithBfhUser)
+      const { fileNumberPrefix, createdPendingProceedings } = pendingProceedings
+      await openSearchWithFileNumberPrefix(
+        fileNumberPrefix,
+        pageWithBfhUser,
+        Kind.PENDING_PROCEEDING,
+      )
       await test.step("Wähle Erledigungsmitteilung '01.01.2024' in Suche", async () => {
         await fillInput(
           pageWithBfhUser,
@@ -129,7 +149,7 @@ test.describe(
           "01.01.2024",
         )
       })
-      await triggerSearch(pageWithBfhUser)
+      await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResultsSpecificDate = createdPendingProceedings.filter(
         (p) => p.coreData.resolutionDate === "2024-01-01",
       )
@@ -145,7 +165,7 @@ test.describe(
           "30.12.2024",
         )
       })
-      await triggerSearch(pageWithBfhUser)
+      await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResultsDateRange = createdPendingProceedings.filter(
         (p) =>
           p.coreData.resolutionDate &&
@@ -159,17 +179,20 @@ test.describe(
 
     test("Suche nach erledigten Anhängigen Verfahren (Checkbox)", async ({
       pageWithBfhUser,
-      pendingProceedingsFromOptions,
+      pendingProceedings,
     }) => {
-      const { fileNumberPrefix, createdPendingProceedings } =
-        pendingProceedingsFromOptions
-      await openSearchWithFileNumberPrefix(fileNumberPrefix, pageWithBfhUser)
+      const { fileNumberPrefix, createdPendingProceedings } = pendingProceedings
+      await openSearchWithFileNumberPrefix(
+        fileNumberPrefix,
+        pageWithBfhUser,
+        Kind.PENDING_PROCEEDING,
+      )
       await test.step("Wähle Erledigt Checkbox in Suche aus", async () => {
         await pageWithBfhUser
           .getByRole("checkbox", { name: "Erledigt Filter" })
           .check()
       })
-      await triggerSearch(pageWithBfhUser)
+      await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResults = createdPendingProceedings.filter(
         (p) => p.coreData.isResolved,
       )
@@ -178,16 +201,19 @@ test.describe(
 
     test("Suche nach Dokumentnummer", async ({
       pageWithBfhUser,
-      pendingProceedingsFromOptions,
+      pendingProceedings,
     }) => {
-      const { fileNumberPrefix, createdPendingProceedings } =
-        pendingProceedingsFromOptions
-      await openSearchWithFileNumberPrefix(fileNumberPrefix, pageWithBfhUser)
+      const { fileNumberPrefix, createdPendingProceedings } = pendingProceedings
+      await openSearchWithFileNumberPrefix(
+        fileNumberPrefix,
+        pageWithBfhUser,
+        Kind.PENDING_PROCEEDING,
+      )
       const docNumber = createdPendingProceedings[4].documentNumber
       await test.step(`Wähle Dokumentnummer '${docNumber}' in Suche`, async () => {
         await fillInput(pageWithBfhUser, "Dokumentnummer Suche", docNumber)
       })
-      await triggerSearch(pageWithBfhUser)
+      await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       const docUnitSearchResults = createdPendingProceedings.filter(
         (p) => p.documentNumber === docNumber,
       )
@@ -196,17 +222,21 @@ test.describe(
 
     test("Suche nach Status", async ({
       pageWithBfhUser,
-      pendingProceedingsFromOptions,
+      pendingProceedings,
     }) => {
-      const { createdPendingProceedings } = pendingProceedingsFromOptions
-      await openSearchWithFileNumberPrefix("I R 20000/34", pageWithBfhUser)
+      const { createdPendingProceedings } = pendingProceedings
+      await openSearchWithFileNumberPrefix(
+        "I R 20000/34",
+        pageWithBfhUser,
+        Kind.PENDING_PROCEEDING,
+      )
       await test.step(`Wähle Status 'Veröffentlicht' in Suche`, async () => {
         await pageWithBfhUser.getByLabel("Status Suche").click()
         await pageWithBfhUser
           .getByRole("option", { name: "Veröffentlicht", exact: true })
           .click()
       })
-      await triggerSearch(pageWithBfhUser)
+      await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       await test.step(`Prüfe, dass 1 Ergebnis gefunden wurde`, async () => {
         await expect(
           pageWithBfhUser.getByText("1 Ergebnis gefunden"),
@@ -223,7 +253,11 @@ test.describe(
     test("Anhängiges Verfahren neu erstellen und löschen", async ({
       pageWithBfhUser,
     }) => {
-      await openSearchWithFileNumberPrefix("", pageWithBfhUser)
+      await openSearchWithFileNumberPrefix(
+        "",
+        pageWithBfhUser,
+        Kind.PENDING_PROCEEDING,
+      )
       await test.step("Klicke auf 'Neues anhängiges Verfahren'", async () => {
         await pageWithBfhUser
           .getByRole("button", { name: "Neues Anhängiges Verfahren" })
@@ -245,13 +279,17 @@ test.describe(
         ).toBeVisible()
       })
       await test.step("Suche nach neuer Dokumentnummer", async () => {
-        await openSearchWithFileNumberPrefix("", pageWithBfhUser)
+        await openSearchWithFileNumberPrefix(
+          "",
+          pageWithBfhUser,
+          Kind.PENDING_PROCEEDING,
+        )
         await fillInput(
           pageWithBfhUser,
           "Dokumentnummer Suche",
           documentNumberToBeDeleted,
         )
-        await triggerSearch(pageWithBfhUser)
+        await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       })
       await test.step(`Prüfe, dass 1 Ergebnis gefunden wurde`, async () => {
         await expect(
@@ -273,13 +311,17 @@ test.describe(
         ).toBeVisible()
       })
       await test.step("Suche nach neuer Dokumentnummer ergibt kein Ergebnis", async () => {
-        await openSearchWithFileNumberPrefix("", pageWithBfhUser)
+        await openSearchWithFileNumberPrefix(
+          "",
+          pageWithBfhUser,
+          Kind.PENDING_PROCEEDING,
+        )
         await fillInput(
           pageWithBfhUser,
           "Dokumentnummer Suche",
           documentNumberToBeDeleted,
         )
-        await triggerSearch(pageWithBfhUser)
+        await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
         await expect(
           pageWithBfhUser.getByText("Keine Suchergebnisse gefunden"),
         ).toBeVisible()
@@ -289,12 +331,16 @@ test.describe(
 
     test("Neuanlage aus Suche", async ({ pageWithBfhUser }) => {
       const fileNumber = generateString()
-      await openSearchWithFileNumberPrefix("", pageWithBfhUser)
+      await openSearchWithFileNumberPrefix(
+        "",
+        pageWithBfhUser,
+        Kind.PENDING_PROCEEDING,
+      )
       await test.step("Suche nach Gericht, Datum und Aktenzeichen", async () => {
         await fillInput(pageWithBfhUser, "Aktenzeichen Suche", fileNumber)
         await fillInput(pageWithBfhUser, "Gerichtstyp Suche", "BFH")
         await fillInput(pageWithBfhUser, "Mitteilungsdatum Suche", "05.07.2022")
-        await triggerSearch(pageWithBfhUser)
+        await triggerSearch(pageWithBfhUser, Kind.PENDING_PROCEEDING)
       })
       await test.step("Ohne Ergebnisse kann Neuanlage aus Suchparametern erfolgen", async () => {
         await expect(
@@ -360,119 +406,3 @@ test.describe(
     })
   },
 )
-
-async function openSearchWithFileNumberPrefix(
-  commonFileNumberPrefix: string,
-  pageWithBfhUser: Page,
-) {
-  await navigateToSearch(pageWithBfhUser)
-  await test.step("Wähle Tab 'Anhängige Verfahren' aus", async () => {
-    await pageWithBfhUser.getByTestId("search-tab-pending-proceeding").click()
-    await expect(pageWithBfhUser).toHaveURL(/pending-proceedings/)
-  })
-  if (commonFileNumberPrefix) {
-    await test.step("Befülle Suche mit Aktenzeichen-Prefix", async () => {
-      await fillInput(
-        pageWithBfhUser,
-        "Aktenzeichen Suche",
-        commonFileNumberPrefix,
-      )
-    })
-  }
-}
-
-async function triggerSearch(pageWithBfhUser: Page) {
-  await test.step("Führe Suche aus", async () => {
-    await pageWithBfhUser
-      .getByRole("button", { name: "Nach Anhängigen Verfahren" })
-      .click()
-  })
-}
-
-/**
- * Check for given pending proceedings that the result list contains the expected content cell by cell.
- */
-async function checkResultListContent(
-  pendingProceedings: PendingProceeding[],
-  pageWithBfhUser: Page,
-) {
-  const expectedResultsCountText =
-    pendingProceedings.length > 1
-      ? `${pendingProceedings.length} Ergebnisse gefunden`
-      : "1 Ergebnis gefunden"
-  await test.step(`Prüfe, dass ${expectedResultsCountText}`, async () => {
-    await expect(
-      pageWithBfhUser.getByText(expectedResultsCountText),
-    ).toBeVisible()
-  })
-
-  await test.step("Prüfe Inhalte in sortierter Ergebnisliste", async () => {
-    // Index is not zero-based because of table header row.
-    for (let i = 1; i <= pendingProceedings.length; i++) {
-      // Reversed list as we sort by date DESC and docNumber DESC (most recent first).
-      const listItem = pendingProceedings[pendingProceedings.length - i]
-      const listRow = pageWithBfhUser.getByRole("row").nth(i)
-      await test.step(`Prüfe ${i}. Ergebnis in Liste`, async () => {
-        await checkContentOfResultRow(listRow, listItem)
-      })
-    }
-  })
-}
-
-async function checkContentOfResultRow(
-  listRow: Locator,
-  expectedItem: PendingProceeding,
-) {
-  const docNumberCell = listRow.getByRole("cell").nth(0)
-  const courtTypeCell = listRow.getByRole("cell").nth(1)
-  const decisionDateCell = listRow.getByRole("cell").nth(2)
-  const fileNumberCell = listRow.getByRole("cell").nth(3)
-  const statusCell = listRow.getByRole("cell").nth(4)
-  const errorCell = listRow.getByRole("cell").nth(5)
-  const resolutionDateCell = listRow.getByRole("cell").nth(6)
-
-  await test.step("Dokumentnummer", async () => {
-    await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
-  })
-  await test.step("Gerichtstyp", async () => {
-    await expect(courtTypeCell).toHaveText(
-      expectedItem.coreData.court?.type ?? "-",
-    )
-  })
-  await test.step("Mitteilungsdatum", async () => {
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    const formattedDate = expectedItem.coreData.decisionDate
-      ? dayjs(expectedItem.coreData.decisionDate).format("DD.MM.YYYY")
-      : "-"
-    await expect(decisionDateCell).toHaveText(formattedDate)
-  })
-  await test.step("Aktenzeichen", async () => {
-    await expect(fileNumberCell).toHaveText(
-      expectedItem.coreData.fileNumbers?.[0] ?? "-",
-    )
-  })
-  await test.step("Veröffentlichungsstatus", async () => {
-    await expect(statusCell).toHaveText("Unveröffentlicht")
-  })
-  await test.step("Fehler", async () => {
-    await expect(errorCell).toHaveText("-")
-  })
-  await test.step("Erledigungsmitteilung", async () => {
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    const formattedResolutionDate = expectedItem.coreData.resolutionDate
-      ? dayjs(expectedItem.coreData.resolutionDate).format("DD.MM.YYYY")
-      : "-"
-    await expect(resolutionDateCell).toHaveText(formattedResolutionDate)
-  })
-  await test.step("Kann bearbeitet, angesehen und gelöscht werden", async () => {
-    await expect(
-      listRow.getByLabel("Dokumentationseinheit bearbeiten"),
-    ).toBeEnabled()
-    await expect(
-      listRow.getByLabel("Dokumentationseinheit ansehen"),
-    ).toBeEnabled()
-    await expect(
-      listRow.getByLabel("Dokumentationseinheit löschen"),
-    ).toBeEnabled()
-  })
-}

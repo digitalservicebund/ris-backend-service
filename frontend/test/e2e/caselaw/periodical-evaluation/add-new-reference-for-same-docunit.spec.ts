@@ -1,10 +1,10 @@
 import { expect } from "@playwright/test"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   fillInput,
   navigateToPeriodicalReferences,
   searchForDocUnitWithFileNumberAndDecisionDate,
-} from "../e2e-utils"
-import { caselawTest as test } from "../fixtures"
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 /* eslint-disable playwright/no-conditional-in-test */
 test.describe(

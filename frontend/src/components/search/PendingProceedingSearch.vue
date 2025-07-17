@@ -201,6 +201,7 @@ async function createNewFromSearch() {
   <div class="flex flex-col gap-24" data-testId="pending-proceeding-search">
     <SearchForm
       :is-loading="isLoading"
+      :kind="Kind.PENDING_PROCEEDING"
       @reset-search-results="handleReset"
       @search="updateQuery"
     />
@@ -215,6 +216,7 @@ async function createNewFromSearch() {
     />
 
     <ResultList
+      :kind="Kind.PENDING_PROCEEDING"
       :loading="isLoading"
       :page-entries="currentPage"
       @delete-documentation-unit="handleDelete"

@@ -9,6 +9,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import SearchForm from "@/components/search/shared/SearchForm.vue"
 import { Court } from "@/domain/court"
+import { Kind } from "@/domain/documentationUnitKind"
 import PendingProceeding from "@/domain/pendingProceeding"
 import authService from "@/services/authService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
@@ -40,6 +41,9 @@ function renderComponent(
   return {
     user,
     ...render(SearchForm, {
+      props: {
+        kind: Kind.PENDING_PROCEEDING,
+      },
       global: {
         directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [

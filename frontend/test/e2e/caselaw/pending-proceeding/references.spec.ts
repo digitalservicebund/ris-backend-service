@@ -1,11 +1,11 @@
 import { expect } from "@playwright/test"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   fillInput,
   navigateToPreview,
   navigateToReferences,
   save,
-} from "../e2e-utils"
-import { caselawTest as test } from "../fixtures"
+} from "~/e2e/caselaw/utils/e2e-utils"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe(

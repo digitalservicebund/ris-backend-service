@@ -1,8 +1,8 @@
 import { expect, Page, TestInfo } from "@playwright/test"
 import { Decision } from "@/domain/decision"
 import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
-import { getRequest } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { getRequest } from "~/e2e/caselaw/utils/e2e-utils"
 
 // This is a performance test for the backend search endpoint
 // We run it sequentially not to skew the results

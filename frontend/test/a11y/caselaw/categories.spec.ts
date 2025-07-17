@@ -1,12 +1,12 @@
 import { expect } from "@playwright/test"
-import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 import { useAxeBuilder } from "~/a11y/caselaw/a11y.utils"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   clickCategoryButton,
   fillPreviousDecisionInputs,
   navigateToCategories,
   save,
-} from "~/e2e/caselaw/e2e-utils"
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/categories)", () => {
   test("first load", async ({ page, documentNumber }) => {

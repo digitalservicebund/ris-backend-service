@@ -9,7 +9,7 @@ import { mergeDeep } from "@tiptap/vue-3"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import jsonPatch from "fast-json-patch"
-import { navigateToCategories } from "./e2e-utils"
+import { navigateToCategories } from "./utils/e2e-utils"
 import { Page as Pagination } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
@@ -42,8 +42,17 @@ type MyFixtures = {
   prefilledDocumentUnitWithManyReferences: Decision
   pendingProceeding: PendingProceeding
   prefilledPendingProceeding: PendingProceeding
+  /** Define fixture option "decisionsToBeCreated" to define the decisions to be generated */
+  decision: {
+    createdDecision: Decision
+    fileNumber: string
+  }
+  decisions: {
+    createdDecisions: Decision[]
+    fileNumberPrefix: string
+  }
   /** Define fixture option "pendingProceedingsToBeCreated" to define the pending proceedings to be generated */
-  pendingProceedingsFromOptions: {
+  pendingProceedings: {
     createdPendingProceedings: PendingProceeding[]
     fileNumberPrefix: string
   }
@@ -51,6 +60,8 @@ type MyFixtures = {
 
 type MyOptions = {
   pendingProceedingsToBeCreated: Partial<PendingProceeding>[]
+  decisionsToBeCreated: Partial<Decision>[]
+  decisionToBeCreated: Partial<Decision>
 }
 
 /**
@@ -1138,6 +1149,157 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     }
   },
 
+  // This is the decision that will be created by the fixture decision.
+  // An empty decision is created by default. Can be overwritten in the test to give specific attributes to the decisionToBeCreated
+  decisionToBeCreated: [{}, { option: true }],
+
+  decision: async ({ decisionToBeCreated, context }, use) => {
+    const request = context.request
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const fileNumber = generateString()
+
+    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+      params: { kind: Kind.DECISION },
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      data: {
+        fileNumber: fileNumber,
+      },
+    })
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create decision document: ${response.status()} ${response.statusText()}`,
+      )
+    }
+
+    const newDecision = await response.json()
+
+    const courtLabel = decisionToBeCreated.coreData?.court?.label
+    if (courtLabel) {
+      const courtResponse = await request.get(
+        `api/v1/caselaw/courts?q=${courtLabel}&sz=1&pg=0`,
+      )
+      decisionToBeCreated.coreData!.court = await courtResponse
+        .json()
+        .then((json) => json?.[0])
+    }
+
+    const createdDecision = mergeDeep(
+      newDecision,
+      decisionToBeCreated,
+    ) as Decision
+
+    const frontendPatch = jsonPatch.compare(newDecision, createdDecision)
+
+    const patchResponse = await request.patch(
+      `/api/v1/caselaw/documentunits/${newDecision.uuid}`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+        data: {
+          documentationUnitVersion: newDecision.version,
+          patch: frontendPatch,
+          errorPaths: [],
+        },
+      },
+    )
+
+    if (!patchResponse.ok()) {
+      throw new Error(
+        `Failed to patch decision: ${response.status()} ${response.statusText()}`,
+      )
+    }
+
+    await use({
+      createdDecision,
+      fileNumber: fileNumber,
+    })
+
+    await deleteWithRetry(
+      request,
+      createdDecision.uuid,
+      csrfToken,
+      createdDecision.documentNumber,
+    )
+  },
+
+  // These are the decisions that will be created by the fixture decisions.
+  // By default, it is empty. Can be overridden by the test to create specific decisions.
+  decisionsToBeCreated: [[], { option: true }],
+
+  decisions: async ({ decisionsToBeCreated, context }, use) => {
+    const request = context.request
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+
+    const commonFileNumberPrefix = generateString()
+    const createdDecisions = []
+    for (const targetDecision of decisionsToBeCreated) {
+      const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+        params: { kind: Kind.DECISION },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+        data: {
+          fileNumber: generateString({ prefix: commonFileNumberPrefix }),
+        },
+      })
+
+      if (!response.ok()) {
+        throw new Error(
+          `Failed to create decision document: ${response.status()} ${response.statusText()}`,
+        )
+      }
+
+      const newDecision = await response.json()
+
+      const courtLabel = targetDecision.coreData?.court?.label
+      if (courtLabel) {
+        const courtResponse = await request.get(
+          `api/v1/caselaw/courts?q=${courtLabel}&sz=1&pg=0`,
+        )
+        targetDecision.coreData!.court = await courtResponse
+          .json()
+          .then((json) => json?.[0])
+      }
+
+      const patchedDecision = mergeDeep(newDecision, targetDecision) as Decision
+
+      const frontendPatch = jsonPatch.compare(newDecision, patchedDecision)
+
+      const patchResponse = await request.patch(
+        `/api/v1/caselaw/documentunits/${newDecision.uuid}`,
+        {
+          headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+          data: {
+            documentationUnitVersion: newDecision.version,
+            patch: frontendPatch,
+            errorPaths: [],
+          },
+        },
+      )
+
+      if (!patchResponse.ok()) {
+        throw new Error(
+          `Failed to patch decision: ${response.status()} ${response.statusText()}`,
+        )
+      }
+      createdDecisions.push(patchedDecision)
+    }
+
+    await use({
+      createdDecisions,
+      fileNumberPrefix: commonFileNumberPrefix,
+    })
+
+    for (const newDecision of createdDecisions) {
+      await deleteWithRetry(
+        request,
+        newDecision.uuid,
+        csrfToken,
+        newDecision.documentNumber,
+      )
+    }
+  },
+
   pendingProceeding: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
@@ -1169,11 +1331,11 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
   },
 
-  // These are the pending proceedings that will be created by the fixture pendingProceedingsFromOptions.
+  // These are the pending proceedings that will be created by the fixture pendingProceedings.
   // By default, it is empty. Can be overridden by the test to create specific pending proceedings.
   pendingProceedingsToBeCreated: [[], { option: true }],
 
-  pendingProceedingsFromOptions: async (
+  pendingProceedings: async (
     { browser, pendingProceedingsToBeCreated },
     use,
   ) => {

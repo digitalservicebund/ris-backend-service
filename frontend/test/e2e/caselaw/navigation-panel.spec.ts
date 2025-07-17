@@ -1,6 +1,9 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, navigateToAttachments } from "./e2e-utils"
-import { caselawTest as test } from "./fixtures"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import {
+  navigateToCategories,
+  navigateToAttachments,
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("test navigation panel", () => {
   test("navigation panel reacts to route parameters", async ({

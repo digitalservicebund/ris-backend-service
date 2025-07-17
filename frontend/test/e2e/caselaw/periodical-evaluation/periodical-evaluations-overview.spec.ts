@@ -1,7 +1,10 @@
 import { expect } from "@playwright/test"
 import dayjs from "dayjs"
-import { fillInput, navigateToPeriodicalEvaluation } from "../e2e-utils"
-import { caselawTest as test } from "../fixtures"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import {
+  fillInput,
+  navigateToPeriodicalEvaluation,
+} from "~/e2e/caselaw/utils/e2e-utils"
 import { generateString } from "~/test-helper/dataGenerators"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")
