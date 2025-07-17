@@ -215,6 +215,16 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   private Set<DuplicateRelationDTO> duplicateRelations2 = new HashSet<>();
 
+  // Fremdsprachige Fassung
+  @OneToMany(
+      mappedBy = "documentationUnit",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<ForeignLanguageVersionDTO> foreignLanguageVersions = new ArrayList<>();
+
   @Override
   @SuppressWarnings("java:S2097") // Class type check is not recognized by Sonar
   public final boolean equals(Object o) {

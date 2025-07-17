@@ -1,5 +1,6 @@
 import ActiveCitation from "@/domain/activeCitation"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
+import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import NormReference from "@/domain/normReference"
 
 export type ContentRelatedIndexing = {
@@ -12,4 +13,5 @@ export type ContentRelatedIndexing = {
   fieldsOfLaw?: FieldOfLaw[]
   jobProfiles?: string[]
   hasLegislativeMandate?: boolean
+  foreignLanguageVersions?: ForeignLanguageVersion[]
 }
