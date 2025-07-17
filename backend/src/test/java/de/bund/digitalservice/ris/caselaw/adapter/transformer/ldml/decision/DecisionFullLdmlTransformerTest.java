@@ -514,6 +514,10 @@ class DecisionFullLdmlTransformerTest {
                <ris:procedures>
                   <ris:procedure>previous procedure test</ris:procedure>
                </ris:procedures>
+               <ris:inputTypes>
+                  <ris:inputType>E-Mail</ris:inputType>
+                  <ris:inputType>Papier</ris:inputType>
+               </ris:inputTypes>
             </ris:meta>
          </akn:proprietary>
       </akn:meta>
@@ -642,7 +646,7 @@ class DecisionFullLdmlTransformerTest {
                 .fileNumbers(List.of("fileNumber test"))
                 .decisionDate(LocalDate.of(2020, 1, 1))
                 .appraisalBody("appraisalBody test")
-                .inputTypes(List.of("inputType test"))
+                .inputTypes(List.of("E-Mail", "Papier"))
                 .procedure(Procedure.builder().label("procedure test").build())
                 .previousProcedures(List.of("previous procedure test"))
                 .documentationOffice(
@@ -651,7 +655,6 @@ class DecisionFullLdmlTransformerTest {
                     DocumentationOffice.builder().abbreviation("documentationOffice test").build())
                 .previousProcedures(List.of("previous procedure test"))
                 .procedure(Procedure.builder().label("procedure test").build())
-                .inputTypes(List.of("inputType test"))
                 .deviatingEclis(List.of("deviating ecli test"))
                 .deviatingCourts(List.of("deviating court"))
                 .deviatingFileNumbers(List.of("deviating fileNumber"))
