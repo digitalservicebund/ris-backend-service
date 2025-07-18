@@ -45,7 +45,7 @@ if (import.meta.env.PROD) {
     ],
     tracePropagationTargets: targets(),
     // Performance Monitoring
-    tracesSampleRate: 0.1, // Capture 100% of the transactions, reduce in production!
+    tracesSampleRate: 0.01, // Capture 100% of the transactions, reduce in production!
     attachProps: true,
     ignoreErrors: [
       // Irrelevant ProseMirror warning, see {@link filterConsoleWarnings} for details
