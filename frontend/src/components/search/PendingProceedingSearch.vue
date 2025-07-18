@@ -70,9 +70,10 @@ const hasRequiredCreateParams = computed(() => {
   const query = searchQuery.value
   return (
     !!query &&
-    (!!query.courtType || !!query.courtLocation) &&
-    !!query.fileNumber &&
-    !!query.decisionDate
+    (query.courtType ||
+      query.courtLocation ||
+      query.fileNumber ||
+      query.decisionDate)
   )
 })
 

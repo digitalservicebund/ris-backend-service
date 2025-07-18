@@ -80,6 +80,7 @@ describe("Decision Search", () => {
       InputMask: InputText,
     }
     deleteSpy = vi.spyOn(documentUnitService, "delete")
+    vi.resetAllMocks()
   })
 
   afterEach(() => {
@@ -162,6 +163,7 @@ describe("Decision Search", () => {
     // Arrange
     mockNoSearchResult()
     const { user, router } = renderComponent()
+    await router.replace({ path: "/" })
     expect(
       screen.getByText(
         "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
@@ -170,7 +172,7 @@ describe("Decision Search", () => {
     expect(
       screen.getByText("Neue Dokumentationseinheit erstellen"),
     ).toBeVisible()
-    await user.type(screen.getByLabelText("Aktenzeichen Suche"), "TEST")
+    await user.type(screen.getByLabelText("Dokumentnummer Suche"), "TEST")
     await user.click(screen.getByText("Ergebnisse anzeigen"))
 
     // Act
@@ -231,6 +233,7 @@ describe("Decision Search", () => {
 
   it("displays empty state message when there are no search results", async () => {
     // Arrange
+    mockNoSearchResult()
     const { user } = renderComponent()
     expect(
       screen.queryByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
@@ -396,4 +399,67 @@ describe("Decision Search", () => {
       },
     })
   }
+
+  it("displays 'Übernehmen und fortfahren' option when only filenumber is given", async () => {
+    // Arrange
+    mockNoSearchResult()
+    const { user } = renderComponent()
+    await user.type(
+      screen.getByLabelText("Aktenzeichen Suche"),
+      "TEST Aktenzeigen",
+    )
+
+    // Act
+    await user.click(screen.getByText("Ergebnisse anzeigen"))
+
+    // Assert
+    expect(
+      screen.getByText(
+        /Sie können die folgenden Stammdaten übernehmen und eine neue/i,
+      ),
+    ).toBeVisible()
+    expect(screen.getByText("Übernehmen und fortfahren")).toBeVisible()
+  })
+
+  it("displays 'Übernehmen und fortfahren' option when only court type is given", async () => {
+    // Arrange
+    mockNoSearchResult()
+    const { user } = renderComponent()
+    await user.type(
+      screen.getByLabelText("Gerichtstyp Suche"),
+      "TEST Gerichtstyp",
+    )
+
+    // Act
+    await user.click(screen.getByText("Ergebnisse anzeigen"))
+
+    // Assert
+    expect(
+      screen.getByText(
+        /Sie können die folgenden Stammdaten übernehmen und eine neue/i,
+      ),
+    ).toBeVisible()
+    expect(screen.getByText("Übernehmen und fortfahren")).toBeVisible()
+  })
+
+  it("displays 'Übernehmen und fortfahren' option when only decision date is given", async () => {
+    // Arrange
+    mockNoSearchResult()
+    const { user } = renderComponent()
+    await user.type(
+      screen.getByLabelText("Entscheidungsdatum Suche"),
+      "05.05.2005",
+    )
+
+    // Act
+    await user.click(screen.getByText("Ergebnisse anzeigen"))
+
+    // Assert
+    expect(
+      screen.getByText(
+        /Sie können die folgenden Stammdaten übernehmen und eine neue/i,
+      ),
+    ).toBeVisible()
+    expect(screen.getByText("Übernehmen und fortfahren")).toBeVisible()
+  })
 })
