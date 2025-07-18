@@ -322,7 +322,7 @@ defineExpose({ jumpToMatch })
   <div
     id="text-editor"
     ref="editorElement"
-    class="editor bg-white"
+    class="editor"
     fluid
     @blur="hasFocus = false"
     @focusin="hasFocus = true"
