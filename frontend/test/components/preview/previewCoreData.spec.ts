@@ -121,6 +121,7 @@ describe("preview core data", () => {
       deviatingFileNumbers: [],
       deviatingDecisionDates: [],
       deviatingEclis: [],
+      deviatingDocumentNumbers: [],
       previousProcedures: [],
       leadingDecisionNormReferences: [],
       yearsOfDispute: [],
@@ -136,6 +137,9 @@ describe("preview core data", () => {
       screen.queryByText("Abweichendes Entscheidungsdatum"),
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Abweichender ECLI")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Abweichende Dokumentnummer"),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText("Vorgangshistorie")).not.toBeInTheDocument()
     expect(screen.queryByText("BGH Nachschlagewerk")).not.toBeInTheDocument()
     expect(screen.queryByText("Streitjahr")).not.toBeInTheDocument()

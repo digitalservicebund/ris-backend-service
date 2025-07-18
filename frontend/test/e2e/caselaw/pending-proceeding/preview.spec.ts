@@ -3,6 +3,33 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { navigateToPreview } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("preview pending proceeding", () => {
+  test.use({
+    pendingProceedingsToBeCreated: [
+      [
+        {
+          coreData: {
+            fileNumbers: ["I R 20000/34"],
+            court: {
+              label: "BFH",
+            },
+            isResolved: true,
+            decisionDate: "2025-02-24",
+            resolutionDate: "2025-06-06",
+          },
+          shortTexts: {
+            headline: "Anhängiges Verfahren am BFH ",
+            resolutionNote:
+              "Verfahren ist erledigt durch: Zurücknahme der Klage. Das erstinstanzliche Urteil ist gegenstandslos",
+            legalIssue:
+              "Gewerbesteuerpflicht des Bäderbetriebs einer Gemeinde als Betrieb gewerblicher Art",
+            admissionOfAppeal: "Zulassung durch BFH",
+            appellant: "Verwaltung",
+          },
+        },
+      ],
+      { scope: "test" },
+    ],
+  })
   test(
     "display preview, check that fields are filled with values from categories",
     {
@@ -12,39 +39,56 @@ test.describe("preview pending proceeding", () => {
           "https://digitalservicebund.atlassian.net/browse/RISDEV-6109",
       },
     },
-    async ({ page }) => {
-      await navigateToPreview(page, "YYTestDoc0017", {
-        type: "pending-proceeding",
-      })
+    async ({ pageWithBfhUser, pendingProceedings }) => {
+      const { createdPendingProceedings } = pendingProceedings
+      await navigateToPreview(
+        pageWithBfhUser,
+        createdPendingProceedings[0].documentNumber,
+        {
+          type: "pending-proceeding",
+        },
+      )
 
       const fileNumber = "I R 20000/34"
-      await expect(page.getByText("GerichtBFH")).toBeVisible()
-      await expect(page.getByText(fileNumber)).toBeVisible()
+      await expect(pageWithBfhUser.getByText("GerichtBFH")).toBeVisible()
+      await expect(pageWithBfhUser.getByText(fileNumber)).toBeVisible()
       await expect(
-        page.getByText("Mitteilungsdatum24.02.2025", { exact: true }),
+        pageWithBfhUser.getByText("Mitteilungsdatum24.02.2025", {
+          exact: true,
+        }),
       ).toBeVisible()
       await expect(
-        page.getByText("DokumenttypAnhängiges Verfahren", { exact: true }),
+        pageWithBfhUser.getByText("DokumenttypAnhängiges Verfahren", {
+          exact: true,
+        }),
       ).toBeVisible()
-      await expect(page.getByText("ErledigungJa")).toBeVisible()
+      await expect(pageWithBfhUser.getByText("ErledigungJa")).toBeVisible()
       await expect(
-        page.getByText("Erledigungsmitteilung06.06.2025", { exact: true }),
+        pageWithBfhUser.getByText("Erledigungsmitteilung06.06.2025", {
+          exact: true,
+        }),
       ).toBeVisible()
       await expect(
-        page.getByText("GerichtsbarkeitFinanzgerichtsbarkeit", { exact: true }),
+        pageWithBfhUser.getByText("GerichtsbarkeitFinanzgerichtsbarkeit", {
+          exact: true,
+        }),
       ).toBeVisible()
-      await expect(page.getByText("RegionDEU", { exact: true })).toBeVisible()
       await expect(
-        page.getByText(
+        pageWithBfhUser.getByText("RegionDEU", { exact: true }),
+      ).toBeVisible()
+      await expect(
+        pageWithBfhUser.getByText(
           "RechtsfrageGewerbesteuerpflicht des Bäderbetriebs einer Gemeinde als Betrieb gewerblicher Art",
         ),
       ).toBeVisible()
       await expect(
-        page.getByText("RechtsmittelzulassungZulassung durch BFH"),
+        pageWithBfhUser.getByText("RechtsmittelzulassungZulassung durch BFH"),
       ).toBeVisible()
-      await expect(page.getByText("RechtsmittelführerVerwaltung")).toBeVisible()
       await expect(
-        page.getByText(
+        pageWithBfhUser.getByText("RechtsmittelführerVerwaltung"),
+      ).toBeVisible()
+      await expect(
+        pageWithBfhUser.getByText(
           "ErledigungsvermerkVerfahren ist erledigt durch: Zurücknahme der Klage. Das erstinstanzliche Urteil ist gegenstandslos",
         ),
       ).toBeVisible()

@@ -508,6 +508,9 @@ class DecisionFullLdmlTransformerTest {
                <ris:deviatingFileNumbers>
                   <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
                </ris:deviatingFileNumbers>
+               <ris:deviatingDocumentNumbers>
+                  <ris:deviatingDocumentNumber>deviating documentNumber</ris:deviatingDocumentNumber>
+               </ris:deviatingDocumentNumbers>
                <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
                <ris:error>false</ris:error>
                <ris:documentationOffice>documentationOffice test</ris:documentationOffice>
@@ -658,6 +661,7 @@ class DecisionFullLdmlTransformerTest {
                 .deviatingEclis(List.of("deviating ecli test"))
                 .deviatingCourts(List.of("deviating court"))
                 .deviatingFileNumbers(List.of("deviating fileNumber"))
+                .deviatingDocumentNumbers(List.of("deviating documentNumber"))
                 .deviatingDecisionDates(List.of(LocalDate.of(2010, 5, 12)))
                 .yearsOfDispute(List.of(Year.now()))
                 .leadingDecisionNormReferences(List.of("leadingDecisionNormReference test"))
