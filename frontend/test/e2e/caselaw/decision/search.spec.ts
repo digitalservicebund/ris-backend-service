@@ -170,6 +170,14 @@ test.describe("Große Suche nach Entscheidungen", () => {
         page.getByText(createdDecisions[0].documentNumber),
       ).toBeHidden()
     })
+    await test.step(`Setze Status-Filter zurück`, async () => {
+      await page.getByLabel("Status Suche").click()
+      await page.getByRole("option", { name: "Alle", exact: true }).click()
+    })
+    await triggerSearch(page)
+    await test.step(`Prüfe, dass 2 Ergebnisse gefunden wurden`, async () => {
+      await expect(page.getByText("2 Ergebnisse gefunden")).toBeVisible()
+    })
   })
 
   test("Suche nach Entscheidungsdatum", async ({ page, decisions }) => {

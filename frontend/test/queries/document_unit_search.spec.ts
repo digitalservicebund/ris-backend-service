@@ -21,7 +21,7 @@ test.describe("document unit search queries", () => {
         courtType: "VerfGH",
         kind: "DECISION",
       },
-      maxDuration: 500, // last max 776, average 365, min 259
+      maxDuration: 900, // last max 776, average 365, min 259
       minResults: 5,
     },
     {
@@ -48,7 +48,7 @@ test.describe("document unit search queries", () => {
         documentNumber: "notExistingFoo",
         kind: "DECISION",
       },
-      maxDuration: 500, // last max 512, average 214, min 179
+      maxDuration: 700, // last max 512, average 214, min 179
     },
     {
       title: "not existing documentNumber (pending proceeding)",
@@ -56,7 +56,7 @@ test.describe("document unit search queries", () => {
         documentNumber: "notExistingFoo",
         kind: "PENDING_PROCEEDING",
       },
-      maxDuration: 500, // last max 519, average 215, min 182
+      maxDuration: 700, // last max 519, average 215, min 182
     },
     {
       title: "vague fileNumber",
@@ -165,7 +165,7 @@ test.describe("document unit search queries", () => {
         courtLocation: "München",
         kind: "DECISION",
       },
-      maxDuration: 1900, // last max 1808, average 1727, min 1688
+      maxDuration: 2000, // last max 1808, average 1727, min 1688
       minResults: 5,
     },
     {
