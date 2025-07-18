@@ -502,15 +502,15 @@ class DecisionFullLdmlTransformerTest {
                <ris:deviatingDates>
                   <ris:deviatingDate>2010-05-12</ris:deviatingDate>
                </ris:deviatingDates>
+               <ris:deviatingDocumentNumbers>
+                  <ris:deviatingDocumentNumber>deviating documentNumber</ris:deviatingDocumentNumber>
+               </ris:deviatingDocumentNumbers>
                <ris:deviatingEclis>
                   <ris:deviatingEcli>deviating ecli test</ris:deviatingEcli>
                </ris:deviatingEclis>
                <ris:deviatingFileNumbers>
                   <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
                </ris:deviatingFileNumbers>
-               <ris:deviatingDocumentNumbers>
-                  <ris:deviatingDocumentNumber>deviating documentNumber</ris:deviatingDocumentNumber>
-               </ris:deviatingDocumentNumbers>
                <ris:publicationStatus>PUBLISHED</ris:publicationStatus>
                <ris:error>false</ris:error>
                <ris:documentationOffice>documentationOffice test</ris:documentationOffice>

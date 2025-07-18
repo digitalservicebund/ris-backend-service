@@ -70,6 +70,7 @@ public class PendingProceedingFullLdmlTransformer extends PendingProceedingCommo
       }
       applyIfNotEmpty(coreData.deviatingCourts(), builder::deviatingCourt);
       applyIfNotEmpty(coreData.deviatingFileNumbers(), builder::deviatingFileNumber);
+      applyIfNotEmpty(coreData.deviatingDocumentNumbers(), builder::deviatingDocumentNumber);
       applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
 
       builder.documentationOffice(
