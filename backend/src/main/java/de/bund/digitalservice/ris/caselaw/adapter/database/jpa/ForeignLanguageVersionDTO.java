@@ -28,7 +28,7 @@ public class ForeignLanguageVersionDTO {
   @Id @GeneratedValue private UUID id;
 
   @ManyToOne
-  @JoinColumn(name = "language_code_id", nullable = false)
+  @JoinColumn(name = "language_code_id")
   private LanguageCodeDTO languageCode;
 
   @Column(name = "url", length = 2048)
