@@ -3,6 +3,7 @@ import { computed } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
+import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
@@ -37,6 +38,12 @@ const hasJobProfiles = computed<boolean>(() =>
 )
 const hasLegislativeMandate = computed(() => {
   return contentRelatedIndexing.value.hasLegislativeMandate
+})
+
+const hasForeignLanguageVersion = computed(() => {
+  return contentRelatedIndexing.value.foreignLanguageVersions
+    ? contentRelatedIndexing.value.foreignLanguageVersions?.length > 0
+    : false
 })
 
 const shouldDisplayLegislativeMandateCategory = computed(() => {
@@ -93,6 +100,12 @@ const shouldDisplayCollectiveAgreements = computed(
           headline="Gesetzgebungsauftrag"
           label="Gesetzgebungsauftrag vorhanden"
         />
+      </CategoryWrapper>
+      <CategoryWrapper
+        label="Fremdsprachliche Fassung"
+        :should-show-button="!hasForeignLanguageVersion"
+      >
+        <ForeignLanguageVersions label="Fremdsprachliche Fassung" />
       </CategoryWrapper>
     </div>
   </div>
