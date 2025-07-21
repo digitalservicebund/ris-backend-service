@@ -128,6 +128,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addDismissalTypes(builder, contentRelatedIndexing);
       addCollectiveAgreements(builder, contentRelatedIndexing);
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
+      builder.evsf(contentRelatedIndexing.evsf());
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -616,6 +617,7 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     contentRelatedIndexingBuilder.hasLegislativeMandate(decisionDTO.isHasLegislativeMandate());
+    contentRelatedIndexingBuilder.evsf(decisionDTO.getEvsf());
 
     return contentRelatedIndexingBuilder.build();
   }
