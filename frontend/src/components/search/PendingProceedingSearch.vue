@@ -241,7 +241,9 @@ async function createNewFromSearch() {
               </span>
               <span :class="{ 'text-gray-800': !dateFromQuery }">
                 {{
-                  dayjs(dateFromQuery).format("DD.MM.YYYY") ?? "Datum unbekannt"
+                  dateFromQuery
+                    ? dayjs(dateFromQuery).format("DD.MM.YYYY")
+                    : "Datum unbekannt"
                 }}
               </span>
             </p>

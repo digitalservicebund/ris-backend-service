@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import userEvent from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { render, screen, within } from "@testing-library/vue"
 import { config } from "@vue/test-utils"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
@@ -197,7 +197,7 @@ describe("Decision Search", () => {
     const { user, router } = renderComponent()
     await user.type(
       screen.getByLabelText("Aktenzeichen Suche"),
-      "TEST Aktenzeigen",
+      "TEST Aktenzeichen",
     )
     await user.type(screen.getByLabelText("Gerichtstyp Suche"), "TEST Gericht")
     await user.type(
@@ -403,49 +403,63 @@ describe("Decision Search", () => {
   it("displays 'Übernehmen und fortfahren' option when only filenumber is given", async () => {
     // Arrange
     mockNoSearchResult()
-    const { user } = renderComponent()
+    const { user, router } = renderComponent()
+    await router.replace({ path: "/" })
     await user.type(
       screen.getByLabelText("Aktenzeichen Suche"),
-      "TEST Aktenzeigen",
+      "TEST Aktenzeichen",
     )
 
     // Act
     await user.click(screen.getByText("Ergebnisse anzeigen"))
 
     // Assert
+    const resultList = screen.getByTestId("search-result-list")
     expect(
-      screen.getByText(
+      within(resultList).getByText(
         /Sie können die folgenden Stammdaten übernehmen und eine neue/i,
       ),
     ).toBeVisible()
-    expect(screen.getByText("Übernehmen und fortfahren")).toBeVisible()
+    expect(within(resultList).getByText("TEST Aktenzeichen,")).toBeVisible()
+    expect(within(resultList).getByText("Gericht unbekannt,")).toBeVisible()
+    expect(within(resultList).getByText("Datum unbekannt")).toBeVisible()
+    expect(
+      within(resultList).getByText("Übernehmen und fortfahren"),
+    ).toBeVisible()
   })
 
   it("displays 'Übernehmen und fortfahren' option when only court type is given", async () => {
     // Arrange
     mockNoSearchResult()
-    const { user } = renderComponent()
-    await user.type(
-      screen.getByLabelText("Gerichtstyp Suche"),
-      "TEST Gerichtstyp",
-    )
+    const { user, router } = renderComponent()
+    await router.replace({ path: "/" })
+    await user.type(screen.getByLabelText("Gerichtstyp Suche"), "BGH")
 
     // Act
     await user.click(screen.getByText("Ergebnisse anzeigen"))
 
     // Assert
+    const resultList = screen.getByTestId("search-result-list")
     expect(
-      screen.getByText(
+      within(resultList).getByText(
         /Sie können die folgenden Stammdaten übernehmen und eine neue/i,
       ),
     ).toBeVisible()
-    expect(screen.getByText("Übernehmen und fortfahren")).toBeVisible()
+    expect(
+      within(resultList).getByText("Aktenzeichen unbekannt,"),
+    ).toBeVisible()
+    expect(within(resultList).getByText("BGH,")).toBeVisible()
+    expect(within(resultList).getByText("Datum unbekannt")).toBeVisible()
+    expect(
+      within(resultList).getByText("Übernehmen und fortfahren"),
+    ).toBeVisible()
   })
 
   it("displays 'Übernehmen und fortfahren' option when only decision date is given", async () => {
     // Arrange
     mockNoSearchResult()
-    const { user } = renderComponent()
+    const { user, router } = renderComponent()
+    await router.replace({ path: "/" })
     await user.type(
       screen.getByLabelText("Entscheidungsdatum Suche"),
       "05.05.2005",
@@ -455,11 +469,19 @@ describe("Decision Search", () => {
     await user.click(screen.getByText("Ergebnisse anzeigen"))
 
     // Assert
+    const resultList = screen.getByTestId("search-result-list")
     expect(
-      screen.getByText(
+      within(resultList).getByText(
         /Sie können die folgenden Stammdaten übernehmen und eine neue/i,
       ),
     ).toBeVisible()
-    expect(screen.getByText("Übernehmen und fortfahren")).toBeVisible()
+    expect(
+      within(resultList).getByText("Aktenzeichen unbekannt,"),
+    ).toBeVisible()
+    expect(within(resultList).getByText("Gericht unbekannt,")).toBeVisible()
+    expect(within(resultList).getByText("05.05.2005")).toBeVisible()
+    expect(
+      within(resultList).getByText("Übernehmen und fortfahren"),
+    ).toBeVisible()
   })
 })
