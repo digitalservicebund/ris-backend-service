@@ -11,6 +11,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,8 +32,8 @@ public class DocumentationUnitProcessStepController {
   }
 
   /**
-   * Advances the process step for a documentation unit. Marks the current step as completed and
-   * starts the new specified step. POST /api/v1/caselaw/processsteps/{documentationUnitId}/new
+   * Adds a new process step link for a documentation unit POST
+   * /api/v1/caselaw/processsteps/{documentationUnitId}/new
    *
    * @param documentationUnitId The ID of the documentation unit.
    * @param processStepId The request body containing the ID of the new process step.
@@ -40,6 +41,7 @@ public class DocumentationUnitProcessStepController {
    *     HTTP Status 201 Created.
    */
   @PostMapping("/{documentationUnitId}/new")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<DocumentationUnitProcessStep> saveProcessStep(
       @PathVariable UUID documentationUnitId, @RequestBody UUID processStepId) {
     try {
@@ -56,9 +58,10 @@ public class DocumentationUnitProcessStepController {
    * /api/v1/caselaw/processsteps/{documentationUnitId}/current
    *
    * @param documentationUnitId The ID of the documentation unit.
-   * @return ResponseEntity with ProcessStep if found.
+   * @return ResponseEntity with DocumentationUnitProcessStep if found.
    */
   @GetMapping("/{documentationUnitId}/current")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<DocumentationUnitProcessStep> getCurrentProcessStep(
       @PathVariable UUID documentationUnitId) {
     try {
@@ -76,9 +79,10 @@ public class DocumentationUnitProcessStepController {
    * /api/v1/caselaw/processsteps/{documentationUnitId}/last
    *
    * @param documentationUnitId The ID of the documentation unit.
-   * @return ResponseEntity with ProcessStepDto if found, or 404 Not Found.
+   * @return ResponseEntity with DocumentationUnitProcessStep if found.
    */
   @GetMapping("/{documentationUnitId}/last")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<DocumentationUnitProcessStep> getLastProcessStep(
       @PathVariable UUID documentationUnitId) {
     try {
@@ -92,13 +96,14 @@ public class DocumentationUnitProcessStepController {
 
   /**
    * Retrieves the complete history of process steps for a given documentation unit, ordered by the
-   * time each step was started. GET /api/v1/caselaw/processsteps/{documentationUnitId}/history
+   * time each step was created. GET /api/v1/caselaw/processsteps/{documentationUnitId}/history
    *
    * @param documentationUnitId The ID of the documentation unit.
    * @return ResponseEntity with a list of DocumentationUnitProcessStep objects representing the
-   *     history. Returns 404 if the documentation unit is not found.
+   *     history.
    */
   @GetMapping("/{documentationUnitId}/history")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<List<DocumentationUnitProcessStep>>
       getProcessStepHistoryForDocumentationUnit(@PathVariable UUID documentationUnitId) {
     try {
@@ -116,9 +121,11 @@ public class DocumentationUnitProcessStepController {
    * /api/v1/caselaw/processsteps/{documentationUnitId}/next
    *
    * @param documentationUnitId The ID of the documentation unit.
-   * @return ResponseEntity with ProcessStepDto if a next step is defined, or 404 Not Found.
+   * @return ResponseEntity with ProcessStep if a next step is defined, or null if no next step is
+   *     defined.
    */
   @GetMapping("/{documentationUnitId}/next")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<ProcessStep> getNextProcessStep(@PathVariable UUID documentationUnitId) {
     try {
       return ResponseEntity.ok(processStepService.getNextProcessStep(documentationUnitId));
@@ -132,10 +139,11 @@ public class DocumentationUnitProcessStepController {
    * their defined rank. GET /api/v1/caselaw/processsteps/{docOfficeId}/all
    *
    * @param docOfficeId The ID of the documentation office.
-   * @return ResponseEntity with a list of ProcessStep objects. Returns 404 if the documentation
-   *     office is not found.
+   * @return ResponseEntity with a list of ProcessStep objects or 404 if the documentation office is
+   *     not found.
    */
   @GetMapping("/{docOfficeId}/all")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<List<ProcessStep>> getAllPossibleProcessStepsForDocOffice(
       @PathVariable UUID docOfficeId) {
     List<ProcessStep> possibleSteps =
