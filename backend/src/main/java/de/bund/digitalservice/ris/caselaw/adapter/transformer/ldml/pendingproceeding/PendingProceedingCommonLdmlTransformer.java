@@ -256,7 +256,15 @@ public abstract class PendingProceedingCommonLdmlTransformer
   }
 
   protected List<FrbrAlias> generateAliases(PendingProceeding pendingProceeding) {
-    return List.of(new FrbrAlias("uebergreifende-id", pendingProceeding.uuid().toString()));
+    List<FrbrAlias> aliases = new ArrayList<>();
+
+    aliases.add(new FrbrAlias("uebergreifende-id", pendingProceeding.uuid().toString()));
+
+    if (pendingProceeding.coreData() != null
+        && pendingProceeding.coreData().celexNumber() != null) {
+      aliases.add(new FrbrAlias("celex", pendingProceeding.coreData().celexNumber()));
+    }
+    return aliases;
   }
 
   protected void validateCoreData(PendingProceeding pendingProceeding) throws ValidationException {

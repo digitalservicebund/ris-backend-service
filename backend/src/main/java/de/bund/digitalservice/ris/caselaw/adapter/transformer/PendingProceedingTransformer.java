@@ -53,6 +53,7 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
                   : null)
           .court(CourtTransformer.transformToDTO(coreData.court()))
+          .celexNumber(coreData.celexNumber())
           .isResolved(coreData.isResolved())
           .resolutionDate(coreData.resolutionDate());
 
