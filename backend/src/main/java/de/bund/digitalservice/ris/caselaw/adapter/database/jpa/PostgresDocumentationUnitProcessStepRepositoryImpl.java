@@ -4,9 +4,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitP
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStepRepository;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepMissingException;
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -31,49 +32,57 @@ public class PostgresDocumentationUnitProcessStepRepositoryImpl
     this.processStepRepository = processStepRepository;
   }
 
+  private DocumentationUnitProcessStep transformDocumentationUnitProcessStep(
+      DocumentationUnitProcessStepDTO dto) {
+    ProcessStepDTO processStepDTO =
+        processStepRepository
+            .findById(dto.getProcessStepId())
+            .orElseThrow(
+                () ->
+                    new EntityNotFoundException(
+                        "Prozessschritt für ID "
+                            + dto.getProcessStepId()
+                            + " wurde nicht gefunden für DocumentationUnitProcessStepDTO "
+                            + dto.getId()));
+
+    return DocumentationUnitProcessStepTransformer.toDomain(
+        dto, ProcessStepTransformer.toDomain(processStepDTO));
+  }
+
   @Override
-  public Optional<DocumentationUnitProcessStep> findTopByDocumentationUnitIdOrderByCreatedAtDesc(
+  public DocumentationUnitProcessStep findTopByDocumentationUnitIdOrderByCreatedAtDesc(
       UUID documentationUnitId) {
 
     return repository
         .findTopByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId)
-        .map(
-            entity -> {
-              ProcessStepDTO processStepDTO =
-                  processStepRepository
-                      .findById(entity.getProcessStepId())
-                      .orElseThrow(
-                          () ->
-                              new EntityNotFoundException(
-                                  "Associated ProcessStep with ID "
-                                      + entity.getProcessStepId()
-                                      + " not found for ProcessStepEntity "
-                                      + entity.getId()));
-
-              return DocumentationUnitProcessStepTransformer.toDomain(
-                  entity, ProcessStepTransformer.toDomain(processStepDTO));
-            });
+        .map(this::transformDocumentationUnitProcessStep)
+        .orElseThrow(
+            () ->
+                new ProcessStepMissingException(
+                    "Für Dokeinheit mit ID: "
+                        + documentationUnitId
+                        + " wurde kein Prozessschritt gefunden, obwohl einer erwartet wurde."));
   }
 
   @Override
   public List<DocumentationUnitProcessStep> findByDocumentationUnitOrderByCreatedAtDesc(
       UUID documentationUnitId) {
+
     return repository.findByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId).stream()
-        .map(
-            entity -> {
-              ProcessStepDTO processStepDTO =
-                  processStepRepository
-                      .findById(entity.getProcessStepId())
-                      .orElseThrow(
-                          () ->
-                              new EntityNotFoundException(
-                                  "Associated ProcessStep with ID "
-                                      + entity.getProcessStepId()
-                                      + " not found for ProcessStepEntity "
-                                      + entity.getId()));
-              return DocumentationUnitProcessStepTransformer.toDomain(
-                  entity, ProcessStepTransformer.toDomain(processStepDTO));
-            })
+        .map(this::transformDocumentationUnitProcessStep)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public DocumentationUnitProcessStep saveProcessStep(
+      UUID documentationUnitId, UUID processStepId) {
+    DocumentationUnitProcessStepDTO newDTO =
+        DocumentationUnitProcessStepDTO.builder()
+            // Todo:  .userId
+            .createdAt(LocalDateTime.now())
+            .processStepId(processStepId)
+            .documentationUnitId(documentationUnitId)
+            .build();
+    return transformDocumentationUnitProcessStep(repository.save(newDTO));
   }
 }
