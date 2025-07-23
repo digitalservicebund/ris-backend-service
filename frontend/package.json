@@ -77,7 +77,8 @@
     "tippy.js": "^6.3.7",
     "vue": "^3.5.17",
     "vue-router": "4.5.1",
-    "vue-tsc": "2.2.12"
+    "vue-tsc": "2.2.12",
+    "stylus": "github:stylus/stylus#0.57.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
