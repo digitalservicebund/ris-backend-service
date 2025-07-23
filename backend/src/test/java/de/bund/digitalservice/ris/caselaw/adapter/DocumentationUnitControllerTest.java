@@ -152,7 +152,7 @@ class DocumentationUnitControllerTest {
     void
         testGenerateNewDocumentationUnit_withInternalUserAndNoKind_shouldSuccessfullyCreateDecision() {
       // userService.getDocumentationOffice is mocked in @BeforeEach
-      when(userService.getUser(any())).thenReturn(user);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
       when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.DECISION))
           .thenReturn(
               Decision.builder()
@@ -176,7 +176,7 @@ class DocumentationUnitControllerTest {
     void
         testGenerateNewDocumentationUnit_withInternalUserAndKindPendingProceeding_shouldSuccessfullyCreatePendingProceeding() {
       // Arrange
-      when(userService.getUser(any())).thenReturn(user);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
       when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.PENDING_PROCEEDING))
           .thenReturn(
               PendingProceeding.builder()
@@ -260,7 +260,7 @@ class DocumentationUnitControllerTest {
     @Test
     void testGenerateNewDocumentationUnit_withUnsupportedKind_shouldBeForbidden() {
       // Arrange
-      when(userService.getUser(any())).thenReturn(user);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
       when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
       when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.UNSUPPORTED))
           .thenThrow(DocumentationUnitException.class);

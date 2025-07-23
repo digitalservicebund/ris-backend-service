@@ -15,16 +15,7 @@ spring:
       host: 127.0.0.1
       username: redis
       password: password
-  security:
-    oauth2:
-      client:
-        registration:
-          oidcclient:
-            client-id: ${OAUTH2_CLIENT_ID:}
-            client-secret: ${OAUTH2_CLIENT_SECRET:}
-        provider:
-          keycloak:
-            issuer-uri: ${OAUTH2_CLIENT_ISSUER:}
+
 mail:
   exporter:
     response:

@@ -18,9 +18,12 @@ import org.springframework.stereotype.Service;
 public class KeycloakUserService implements UserService {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
   private final UserGroupService userGroupService;
+  private final BareIdUserApiService userApiService;
 
-  public KeycloakUserService(UserGroupService userGroupService) {
+  public KeycloakUserService(
+      UserGroupService userGroupService, BareIdUserApiService userApiService) {
     this.userGroupService = userGroupService;
+    this.userApiService = userApiService;
   }
 
   @Override
@@ -47,6 +50,11 @@ public class KeycloakUserService implements UserService {
       return roles.contains("Internal");
     }
     return false;
+  }
+
+  @Override
+  public User getUser(UUID uuid) {
+    return userApiService.getUser(uuid);
   }
 
   @Override
