@@ -70,9 +70,10 @@ const hasRequiredCreateParams = computed(() => {
   const query = searchQuery.value
   return (
     !!query &&
-    (!!query.courtType || !!query.courtLocation) &&
-    !!query.fileNumber &&
-    !!query.decisionDate
+    (query.courtType ||
+      query.courtLocation ||
+      query.fileNumber ||
+      query.decisionDate)
   )
 })
 
@@ -240,7 +241,9 @@ async function createNewFromSearch() {
               </span>
               <span :class="{ 'text-gray-800': !dateFromQuery }">
                 {{
-                  dayjs(dateFromQuery).format("DD.MM.YYYY") ?? "Datum unbekannt"
+                  dateFromQuery
+                    ? dayjs(dateFromQuery).format("DD.MM.YYYY")
+                    : "Datum unbekannt"
                 }}
               </span>
             </p>

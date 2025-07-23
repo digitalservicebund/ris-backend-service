@@ -452,6 +452,16 @@ test.describe("core data", () => {
         await expect(documentType).toBeHidden()
       })
 
+      await test.step("Abweichende Dokumentnummer ist nicht sichtbar", async () => {
+        const deviatingDocumentNumber = pageWithExternalUser.getByLabel(
+          "Abweichende Dokumentnummer",
+          {
+            exact: true,
+          },
+        )
+        await expect(deviatingDocumentNumber).toBeHidden()
+      })
+
       await test.step("ECLI und abweichender ECLI sind nicht sichtbar", async () => {
         const ecli = pageWithExternalUser.getByLabel("ECLI", { exact: true })
         const deviatingEcli = pageWithExternalUser.getByTestId(
@@ -561,6 +571,14 @@ test.describe("core data", () => {
       await test.step("Dokumenttyp ist bearbeitbar", async () => {
         const documentType = page.getByLabel("Dokumenttyp", { exact: true })
         await expect(documentType).toBeEditable()
+      })
+
+      await test.step("Abweichende Dokumentnummer ist bearbeitbar", async () => {
+        const deviatingDocumentNumber = page.getByLabel(
+          "Abweichende Dokumentnummer",
+          { exact: true },
+        )
+        await expect(deviatingDocumentNumber).toBeEditable()
       })
 
       await test.step("ECLI und abweichender ECLI sind bearbeitbar", async () => {

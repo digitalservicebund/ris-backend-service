@@ -259,6 +259,9 @@ class PendingProceedingFullLdmlTransformerTest {
                <ris:deviatingDates>
                   <ris:deviatingDate>2010-05-12</ris:deviatingDate>
                </ris:deviatingDates>
+               <ris:deviatingDocumentNumbers>
+                  <ris:deviatingDocumentNumber>Abweichende Dokumentnummer</ris:deviatingDocumentNumber>
+               </ris:deviatingDocumentNumbers>
                <ris:deviatingFileNumbers>
                   <ris:deviatingFileNumber>Abweichendes Aktenzeichen</ris:deviatingFileNumber>
                </ris:deviatingFileNumbers>
@@ -331,6 +334,7 @@ class PendingProceedingFullLdmlTransformerTest {
                 .deviatingCourts(List.of("Abweichendes Gericht"))
                 .deviatingFileNumbers(List.of("Abweichendes Aktenzeichen"))
                 .deviatingDecisionDates(List.of(LocalDate.of(2010, 5, 12)))
+                .deviatingDocumentNumbers(List.of("Abweichende Dokumentnummer"))
                 .documentationOffice(DocumentationOffice.builder().abbreviation("BFH").build())
                 .isResolved(false)
                 .resolutionDate(null)

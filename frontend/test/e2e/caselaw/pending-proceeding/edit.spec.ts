@@ -62,6 +62,20 @@ test.describe("edit pending proceeding", () => {
         await expect(checkbox).toBeChecked()
       })
 
+      // Abweichende Dokumentnummer
+      await test.step("deviating document numbers can be added", async () => {
+        const fileNumber = page.getByLabel("Abweichende Dokumentnummer", {
+          exact: true,
+        })
+        await fileNumber.fill("abc")
+        await page.keyboard.press("Enter")
+        await expect(
+          page
+            .getByTestId("chips-input-wrapper_deviatingDocumentNumbers")
+            .getByText("abc"),
+        ).toBeVisible()
+      })
+
       // Gerichtsbarkeit Finanzgerichtsbarkeit
       await test.step("'Gerichtsbarkeit' is readonly", async () => {
         const jurisdictionType = page.getByLabel("Gerichtsbarkeit", {

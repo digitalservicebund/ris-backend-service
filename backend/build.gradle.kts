@@ -13,14 +13,14 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "7.1.0"
+    id("com.diffplug.spotless") version "7.2.0"
     id("org.sonarqube") version "6.2.0.5505"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.10.2"
+    id("org.flywaydb.flyway") version "11.10.3"
     id("io.sentry.jvm.gradle") version "5.8.0"
 }
 
@@ -186,7 +186,7 @@ dependencies {
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.3")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.4")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
@@ -210,10 +210,10 @@ dependencies {
     // for local development:
  //   implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.71.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.19.1")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.1")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.1")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.19.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.2")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
@@ -232,10 +232,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.15.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.10.2"
+    val flywayCore = "org.flywaydb:flyway-core:11.10.3"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.2")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.3")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -252,7 +252,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.21.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.22.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

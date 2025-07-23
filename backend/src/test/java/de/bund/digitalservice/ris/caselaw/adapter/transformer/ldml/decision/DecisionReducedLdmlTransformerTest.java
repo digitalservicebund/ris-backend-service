@@ -689,6 +689,13 @@ class DecisionReducedLdmlTransformerTest {
               <ris:deviatingFileNumbers>
                   <ris:deviatingFileNumber>deviating fileNumber</ris:deviatingFileNumber>
                </ris:deviatingFileNumbers>
+            """),
+        Arguments.of(
+            "'deviatingDocumentNumbers' (Abweichende Dokumentnummer)",
+            """
+              <ris:deviatingDocumentNumbers>
+                  <ris:deviatingDocumentNumber>deviating document number test</ris:deviatingDocumentNumber>
+               </ris:deviatingDocumentNumbers>
             """));
   }
 }

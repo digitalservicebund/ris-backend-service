@@ -233,7 +233,7 @@ describe("Core Data", () => {
     expect(chipList[1]).toHaveTextContent("XXRE111111111")
   })
 
-  test("updates deviating decision date", async () => {
+  test("updates deviating document number", async () => {
     const { user, model } = renderComponent({
       initialModelValue: { deviatingDocumentNumbers: [] },
     })

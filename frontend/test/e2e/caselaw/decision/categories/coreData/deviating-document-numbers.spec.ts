@@ -108,7 +108,7 @@ test.describe("deviating document numbers", () => {
         prefilledDocumentUnit.documentNumber ?? "",
       )
 
-      await test.step("Enter deviating document numberes", async () => {
+      await test.step("Enter deviating document numbers", async () => {
         const inputField = page.getByLabel("Abweichende Dokumentnummer", {
           exact: true,
         })
