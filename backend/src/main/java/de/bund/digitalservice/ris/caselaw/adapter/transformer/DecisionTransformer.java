@@ -479,7 +479,7 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     List<ForeignLanguageVersionDTO> foreignLanguageVersionDTOs = new ArrayList<>();
     List<ForeignLanguageVersion> foreignLanguageVersions =
-        contentRelatedIndexing.foreignLanguageVersions().stream().distinct().toList();
+        contentRelatedIndexing.foreignLanguageVersions();
 
     for (int i = 0; i < foreignLanguageVersions.size(); i++) {
       foreignLanguageVersionDTOs.add(
