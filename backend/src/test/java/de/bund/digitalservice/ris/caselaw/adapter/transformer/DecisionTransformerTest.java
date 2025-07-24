@@ -1587,6 +1587,7 @@ class DecisionTransformerTest {
                 .dismissalTypes(Collections.emptyList())
                 .collectiveAgreements(Collections.emptyList())
                 .hasLegislativeMandate(false)
+                .foreignLanguageVersions(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())
