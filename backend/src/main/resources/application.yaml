@@ -125,3 +125,6 @@ languagetool:
 
 eurlex:
   url: ${EURLEX_URL}
+
+bareid:
+  instance: ${BAREID_INSTANCE}
