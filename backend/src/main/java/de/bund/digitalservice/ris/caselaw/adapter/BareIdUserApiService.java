@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,8 +20,7 @@ public class BareIdUserApiService implements UserApiService {
 
   private final RestTemplate restTemplate;
 
-  @Value("${bareid.instance}")
-  private String bareidInstance;
+  private final String INSTANCE_ID = "random_id_to_be_added_later";
 
   public BareIdUserApiService(
       BareIdUserApiTokenService bareIdUserApiTokenService, RestTemplate restTemplate) {
@@ -37,7 +35,7 @@ public class BareIdUserApiService implements UserApiService {
     headers.setBearerAuth(bareIdUserApiTokenService.getAccessToken().getTokenValue());
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
 
-    String url = String.format("https://api.bare.id/user/v1/%s/users/%s", bareidInstance, userId);
+    String url = String.format("https://api.bare.id/user/v1/%s/users/%s", INSTANCE_ID, userId);
 
     ResponseEntity<OidcUser> response =
         restTemplate.exchange(url, HttpMethod.GET, request, OidcUser.class);

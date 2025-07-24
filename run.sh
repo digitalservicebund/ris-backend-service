@@ -96,7 +96,6 @@ EURLEX_URL=https://eur-lex.europa.eu/EURLexWebService?WSDL
 IMPORTER_USERNAME=$( op read "op://Team NeuRIS/Importer - Staging/username")
 IMPORTER_PASSWORD=$( op read "op://Team NeuRIS/Importer - Staging/password")
 IMPORTER_URL=$( op read "op://Team NeuRIS/Importer - Staging/website")
-BAREID_INSTANCE=$(op read "op://Team NeuRIS/API keycloak bare.id user api client staging/instanceUuid")
 
 EOF
 
