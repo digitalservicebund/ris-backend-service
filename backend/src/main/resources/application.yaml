@@ -98,7 +98,6 @@ spring:
           bareid:
             issuer-uri: ${OAUTH2_USER_API_CLIENT_ISSUER:}
 
-
 springdoc:
   api-docs:
     path: /api/docs.json
