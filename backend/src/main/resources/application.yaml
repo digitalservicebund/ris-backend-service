@@ -88,12 +88,6 @@ spring:
               - openid
               - profile
               - email
-          bareid-user-api-client:
-            client-id: ${OAUTH2_USER_API_CLIENT_ID}
-            client-secret: ${OAUTH2_USER_API_CLIENT_SECRET}
-            provider: keycloak
-            authorization-grant-type: client_credentials
-            client-authentication-method: client_secret_basic
 
 springdoc:
   api-docs:

@@ -49,7 +49,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -72,7 +71,6 @@ class DocumentationUnitControllerAuthTest {
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
   @MockitoBean DatabaseApiKeyRepository apiKeyRepository;
   @MockitoBean DatabaseDocumentationOfficeRepository officeRepository;
   @MockitoBean PatchMapperService patchMapperService;
