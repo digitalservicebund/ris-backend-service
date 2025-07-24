@@ -91,6 +91,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -108,6 +109,7 @@ class DocumentationUnitControllerTest {
   @MockitoBean private UserService userService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean DatabaseApiKeyRepository apiKeyRepository;
   @MockitoBean DatabaseDocumentationOfficeRepository officeRepository;
