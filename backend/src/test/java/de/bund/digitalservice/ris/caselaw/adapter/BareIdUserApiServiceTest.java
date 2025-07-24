@@ -48,20 +48,20 @@ class BareIdUserApiServiceTest {
   }
 
   @Test
-  void getBareIdToken() {
-    var user_id = UUID.randomUUID();
-    OidcUser mockOAuth2User = createMockOidcUser(user_id);
+  void testGetBareIdToken() {
+    final UUID userId = UUID.randomUUID();
+    OidcUser mockOAuth2User = createMockOidcUser(userId);
 
     ResponseEntity<OAuth2User> mockResponse = ResponseEntity.ok(mockOAuth2User);
     doReturn(mockResponse)
         .when(restTemplate)
         .exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(OidcUser.class));
 
-    var userResult = bareIdUserApiService.getUser(user_id);
+    var userResult = bareIdUserApiService.getUser(userId);
 
     Assertions.assertEquals("Tina Taxpayer", userResult.name());
     Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
-    Assertions.assertEquals(user_id, userResult.id());
+    Assertions.assertEquals(userId, userResult.id());
   }
 
   private OidcUser createMockOidcUser(UUID userId) {

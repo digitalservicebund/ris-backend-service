@@ -28,7 +28,7 @@ class UserApiTokenServiceIntegrationTest {
   @Autowired private BareIdUserApiTokenService service;
 
   @Test
-  void getAccessToken() {
+  void testGetAccessToken() {
     var result = service.getAccessToken();
     assertNotNull(result.getTokenValue());
   }
