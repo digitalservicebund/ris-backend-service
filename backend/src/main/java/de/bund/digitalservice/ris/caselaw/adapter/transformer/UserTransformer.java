@@ -6,6 +6,8 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 public class UserTransformer {
 
+  private UserTransformer() {}
+
   public static User transformToDomain(OidcUser auth2User) {
 
     return User.builder()
