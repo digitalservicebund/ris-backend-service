@@ -77,7 +77,7 @@ onMounted(() => {
       <div class="basis-1/2">
         <InputField
           id="foreignLanguageVersionLinkInput"
-          data-testid="foreign-lanuage-version-link"
+          data-testid="foreign-language-version-link"
           label="Link"
         >
           <InputText
