@@ -21,9 +21,9 @@ public class DocumentationUnitProcessStepDTO {
   @Id private UUID id;
 
   @Column(name = "user_id")
-  private UUID userId; // New field from table schema
+  private UUID userId;
 
-  @Column(name = "created_at", nullable = false) // Matches table, not started_at
+  @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
 
   @Column(name = "process_step_id", nullable = false)

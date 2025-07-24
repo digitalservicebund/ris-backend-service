@@ -7,12 +7,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface DocumentationUnitProcessStepRepository {
 
-  /**
-   * Find the latest (current) process step of a documentation unit by documentationUnitId
-   *
-   * @param documentationUnitId the uuid of the documentation unit
-   * @return the latest (current) process step of the documentation unit
-   */
   DocumentationUnitProcessStep findTopByDocumentationUnitIdOrderByCreatedAtDesc(
       UUID documentationUnitId);
 
