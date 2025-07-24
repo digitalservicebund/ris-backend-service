@@ -4,11 +4,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransfo
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.ProcessStepDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -69,13 +69,14 @@ public class PostgresProcessStepDocumentationOfficeRepositoryImpl
                       .findById(entity.getProcessStepId())
                       .orElseThrow(
                           () ->
-                              new EntityNotFoundException(
+                              new ProcessStepNotFoundException(
                                   "ProcessStep with ID "
                                       + entity.getProcessStepId()
-                                      + " not found for ProcessStepDocumentationOfficeEntity "
-                                      + entity.getId()));
+                                      + " associated with documentation office ID "
+                                      + docOfficeId
+                                      + " not found."));
               return ProcessStepTransformer.toDomain(processStepDTO);
             })
-        .collect(Collectors.toList());
+        .toList();
   }
 }

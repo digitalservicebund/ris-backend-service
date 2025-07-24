@@ -3,10 +3,11 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStepService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
-import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepMissingException;
-import jakarta.persistence.EntityNotFoundException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -37,8 +38,9 @@ public class DocumentationUnitProcessStepController {
    *
    * @param documentationUnitId The ID of the documentation unit.
    * @param processStepId The request body containing the ID of the new process step.
-   * @return ResponseEntity with ProcessStepDto representing the newly saved (current) step, and
-   *     HTTP Status 201 Created.
+   * @return ResponseEntity with DocumentationUnitProcessStep representing the newly saved (current)
+   *     step, and HTTP Status 201 Created. Returns 404 Not Found if the documentation unit does not
+   *     exist.
    */
   @PostMapping("/{documentationUnitId}/new")
   @PreAuthorize("isAuthenticated()")
@@ -48,7 +50,7 @@ public class DocumentationUnitProcessStepController {
       DocumentationUnitProcessStep newCurrentStep =
           processStepService.saveProcessStep(documentationUnitId, processStepId);
       return new ResponseEntity<>(newCurrentStep, HttpStatus.CREATED);
-    } catch (DocumentationUnitNotExistsException ex) {
+    } catch (DocumentationUnitNotExistsException | ProcessStepNotFoundException ex) {
       return ResponseEntity.notFound().build();
     }
   }
@@ -58,59 +60,16 @@ public class DocumentationUnitProcessStepController {
    * /api/v1/caselaw/processsteps/{documentationUnitId}/current
    *
    * @param documentationUnitId The ID of the documentation unit.
-   * @return ResponseEntity with DocumentationUnitProcessStep if found.
+   * @return ResponseEntity with DocumentationUnitProcessStep if found (200 OK), or 404 Not Found if
+   *     the documentation unit or the current process step is not found.
    */
   @GetMapping("/{documentationUnitId}/current")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<DocumentationUnitProcessStep> getCurrentProcessStep(
       @PathVariable UUID documentationUnitId) {
     try {
-      DocumentationUnitProcessStep currentStep =
-          processStepService.getCurrentProcessStep(documentationUnitId);
-      return ResponseEntity.ok(currentStep);
-    } catch (DocumentationUnitNotExistsException | ProcessStepMissingException ex) {
-      return ResponseEntity.notFound().build();
-    }
-  }
-
-  /**
-   * Retrieves the last (previous) process step for a given documentation unit. This is the step
-   * that was active immediately before the current one. GET
-   * /api/v1/caselaw/processsteps/{documentationUnitId}/last
-   *
-   * @param documentationUnitId The ID of the documentation unit.
-   * @return ResponseEntity with DocumentationUnitProcessStep if found.
-   */
-  @GetMapping("/{documentationUnitId}/last")
-  @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<DocumentationUnitProcessStep> getLastProcessStep(
-      @PathVariable UUID documentationUnitId) {
-    try {
-      DocumentationUnitProcessStep lastStep =
-          processStepService.getLastProcessStep(documentationUnitId);
-      return ResponseEntity.ok(lastStep);
-    } catch (DocumentationUnitNotExistsException | EntityNotFoundException ex) {
-      return ResponseEntity.notFound().build();
-    }
-  }
-
-  /**
-   * Retrieves the complete history of process steps for a given documentation unit, ordered by the
-   * time each step was created. GET /api/v1/caselaw/processsteps/{documentationUnitId}/history
-   *
-   * @param documentationUnitId The ID of the documentation unit.
-   * @return ResponseEntity with a list of DocumentationUnitProcessStep objects representing the
-   *     history.
-   */
-  @GetMapping("/{documentationUnitId}/history")
-  @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<List<DocumentationUnitProcessStep>>
-      getProcessStepHistoryForDocumentationUnit(@PathVariable UUID documentationUnitId) {
-    try {
-      List<DocumentationUnitProcessStep> history =
-          processStepService.getProcessStepHistoryForDocumentationUnit(documentationUnitId);
-      return ResponseEntity.ok(history);
-    } catch (DocumentationUnitNotExistsException | EntityNotFoundException ex) {
+      return ResponseEntity.ok(processStepService.getCurrentProcessStep(documentationUnitId));
+    } catch (DocumentationUnitNotExistsException | ProcessStepNotFoundException ex) {
       return ResponseEntity.notFound().build();
     }
   }
@@ -121,14 +80,66 @@ public class DocumentationUnitProcessStepController {
    * /api/v1/caselaw/processsteps/{documentationUnitId}/next
    *
    * @param documentationUnitId The ID of the documentation unit.
-   * @return ResponseEntity with ProcessStep if a next step is defined, or null if no next step is
-   *     defined.
+   * @return ResponseEntity with ProcessStep if a next step is defined (200 OK), or 204 No Content
+   *     if no next step is defined for the current state. Returns 404 Not Found if the
+   *     documentation unit does not exist.
    */
   @GetMapping("/{documentationUnitId}/next")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<ProcessStep> getNextProcessStep(@PathVariable UUID documentationUnitId) {
     try {
-      return ResponseEntity.ok(processStepService.getNextProcessStep(documentationUnitId));
+      Optional<ProcessStep> nextStepOptional =
+          processStepService.getNextProcessStep(documentationUnitId);
+      return nextStepOptional
+          .map(ResponseEntity::ok)
+          .orElseGet(() -> ResponseEntity.noContent().build());
+    } catch (DocumentationUnitNotExistsException | ProcessStepNotFoundException ex) {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  /**
+   * Retrieves the last (previous) process step for a given documentation unit. This is the step
+   * that was active immediately before the current one. GET
+   * /api/v1/caselaw/processsteps/{documentationUnitId}/last
+   *
+   * @param documentationUnitId The ID of the documentation unit.
+   * @return ResponseEntity with DocumentationUnitProcessStep if found (200 OK), or 204 No Content
+   *     if no last process step found (i.e., less than two steps exist). Returns 404 Not Found if
+   *     the documentation unit does not exist.
+   */
+  @GetMapping("/{documentationUnitId}/last")
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<DocumentationUnitProcessStep> getLastProcessStep(
+      @PathVariable UUID documentationUnitId) {
+    try {
+      Optional<DocumentationUnitProcessStep> lastStepOptional =
+          processStepService.getLastProcessStep(documentationUnitId);
+      return lastStepOptional
+          .map(ResponseEntity::ok)
+          .orElseGet(() -> ResponseEntity.noContent().build());
+    } catch (DocumentationUnitNotExistsException | ProcessStepNotFoundException ex) {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  /**
+   * Retrieves the complete history of process steps for a given documentation unit, ordered by the
+   * time each step was created. GET /api/v1/caselaw/processsteps/{documentationUnitId}/history
+   *
+   * @param documentationUnitId The ID of the documentation unit.
+   * @return ResponseEntity with a list of DocumentationUnitProcessStep objects representing the
+   *     history (200 OK), potentially an empty list if no history. Returns 404 Not Found if the
+   *     documentation unit was not found.
+   */
+  @GetMapping("/{documentationUnitId}/history")
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<List<DocumentationUnitProcessStep>>
+      getProcessStepHistoryForDocumentationUnit(@PathVariable UUID documentationUnitId) {
+    try {
+      List<DocumentationUnitProcessStep> history =
+          processStepService.getProcessStepHistoryForDocumentationUnit(documentationUnitId);
+      return ResponseEntity.ok(history);
     } catch (DocumentationUnitNotExistsException ex) {
       return ResponseEntity.notFound().build();
     }
@@ -139,15 +150,21 @@ public class DocumentationUnitProcessStepController {
    * their defined rank. GET /api/v1/caselaw/processsteps/{docOfficeId}/all
    *
    * @param docOfficeId The ID of the documentation office.
-   * @return ResponseEntity with a list of ProcessStep objects or 404 if the documentation office is
-   *     not found.
+   * @return ResponseEntity with a list of ProcessStep objects (200 OK), potentially an empty list
+   *     if the office exists but has no configured steps. Returns 404 Not Found if the
+   *     documentation office is not found, or if an associated process step is not found (data
+   *     inconsistency).
    */
   @GetMapping("/{docOfficeId}/all")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<List<ProcessStep>> getAllPossibleProcessStepsForDocOffice(
       @PathVariable UUID docOfficeId) {
-    List<ProcessStep> possibleSteps =
-        processStepService.getAllProcessStepsForDocOffice(docOfficeId);
-    return ResponseEntity.ok(possibleSteps);
+    try {
+      List<ProcessStep> possibleSteps =
+          processStepService.getAllProcessStepsForDocOffice(docOfficeId);
+      return ResponseEntity.ok(possibleSteps);
+    } catch (DocumentationOfficeNotExistsException | ProcessStepNotFoundException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
 }

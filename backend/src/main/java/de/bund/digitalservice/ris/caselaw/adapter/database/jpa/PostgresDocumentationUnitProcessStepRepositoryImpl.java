@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitP
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStepRepository;
-import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepMissingException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -58,7 +58,7 @@ public class PostgresDocumentationUnitProcessStepRepositoryImpl
         .map(this::transformDocumentationUnitProcessStep)
         .orElseThrow(
             () ->
-                new ProcessStepMissingException(
+                new ProcessStepNotFoundException(
                     "Für Dokeinheit mit ID: "
                         + documentationUnitId
                         + " wurde kein Prozessschritt gefunden, obwohl einer erwartet wurde."));
