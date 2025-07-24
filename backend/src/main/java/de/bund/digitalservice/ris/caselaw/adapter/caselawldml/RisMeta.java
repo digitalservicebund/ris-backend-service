@@ -91,4 +91,8 @@ public class RisMeta {
   @XmlElementWrapper(name = "inputTypes", namespace = CaseLawLdml.RIS_NS)
   @XmlElement(name = "inputType", namespace = CaseLawLdml.RIS_NS)
   private List<String> inputTypes;
+
+  @XmlElementWrapper(name = "foreignLanguageVersions", namespace = CaseLawLdml.RIS_NS)
+  @XmlElement(name = "foreignLanguageVersion", namespace = CaseLawLdml.RIS_NS)
+  private List<ForeignLanguageVersion> foreignLanguageVersions;
 }

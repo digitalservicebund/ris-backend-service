@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +13,11 @@ public class LanguageCodeService {
     this.languageCodeRepository = languageCodeRepository;
   }
 
-  public List<LanguageCode> getLanguageCodes(Optional<String> searchStr) {
+  public List<LanguageCode> getLanguageCodes(String searchStr, Integer size) {
+    if (searchStr != null && !searchStr.trim().isBlank()) {
+      return languageCodeRepository.findAllBySearchStr(searchStr.trim(), size);
+    }
 
-    return languageCodeRepository.findAllBySearchStr(searchStr);
+    return languageCodeRepository.findAll(size);
   }
 }

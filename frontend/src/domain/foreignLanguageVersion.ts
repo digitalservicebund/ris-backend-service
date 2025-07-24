@@ -32,7 +32,7 @@ export default class ForeignLanguageVersion implements EditableListItem {
   }
 
   get isEmpty(): boolean {
-    return ForeignLanguageVersion.fields.every((field) =>
+    return ForeignLanguageVersion.fields.some((field) =>
       this.fieldIsEmpty(this[field]),
     )
   }

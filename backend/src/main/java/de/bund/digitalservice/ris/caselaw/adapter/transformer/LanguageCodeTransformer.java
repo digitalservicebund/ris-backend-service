@@ -14,6 +14,7 @@ public class LanguageCodeTransformer {
     return LanguageCode.builder()
         .id(languageCodeDTO.getId())
         .label(languageCodeDTO.getValue())
+        .isoCode(languageCodeDTO.getIsoCode())
         .build();
   }
 
@@ -21,6 +22,10 @@ public class LanguageCodeTransformer {
     if (languageCode == null) {
       return null;
     }
-    return LanguageCodeDTO.builder().id(languageCode.id()).value(languageCode.label()).build();
+    return LanguageCodeDTO.builder()
+        .id(languageCode.id())
+        .value(languageCode.label())
+        .isoCode(languageCode.isoCode())
+        .build();
   }
 }

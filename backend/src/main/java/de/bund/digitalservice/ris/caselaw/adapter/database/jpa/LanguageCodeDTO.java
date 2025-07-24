@@ -26,4 +26,7 @@ public class LanguageCodeDTO {
   @Column(nullable = false)
   @NotBlank
   private String value;
+
+  @Column(name = "iso_code")
+  private String isoCode;
 }

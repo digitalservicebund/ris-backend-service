@@ -243,7 +243,7 @@ public abstract class DecisionCommonLdmlTransformer
         FrbrElement.builder()
             .frbrDate(frbrDate)
             .frbrAuthor(frbrAuthor)
-            .frbrLanguage(new FrbrLanguage())
+            .frbrLanguage(new FrbrLanguage("de"))
             .build()
             .withFrbrThisAndUri(uniqueId + "/dokument");
 

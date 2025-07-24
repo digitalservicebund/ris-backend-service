@@ -4,4 +4,4 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record LanguageCode(UUID id, String label) {}
+public record LanguageCode(UUID id, String label, String isoCode) {}

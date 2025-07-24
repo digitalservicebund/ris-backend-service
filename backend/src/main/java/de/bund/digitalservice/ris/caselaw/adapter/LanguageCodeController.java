@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.LanguageCode;
 import de.bund.digitalservice.ris.caselaw.domain.LanguageCodeService;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +24,8 @@ public class LanguageCodeController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public List<LanguageCode> getDocumentTypes(
-      @RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getLanguageCodes(searchStr);
+      @RequestParam(value = "q", required = false) String searchStr,
+      @RequestParam(value = "sz", required = false, defaultValue = "200") Integer size) {
+    return service.getLanguageCodes(searchStr, size);
   }
 }

@@ -200,7 +200,7 @@ const hasForeignLanguageVersions = computed(() => {
         >
           {{ foreignLanguageVersion.languageCode?.label }}:
           <a
-            class="text-blue-600 underline hover:text-blue-800"
+            class="ris-link1-bold whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
             :href="foreignLanguageVersion.link"
             rel="noopener noreferrer"
             target="_blank"
