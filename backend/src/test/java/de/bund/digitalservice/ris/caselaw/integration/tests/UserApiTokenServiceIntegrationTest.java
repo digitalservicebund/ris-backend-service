@@ -21,7 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
       "management.health.livenessState.enabled=true",
       "management.health.readinessState.enabled=true",
       "management.endpoint.health.group.readiness.include=readinessState,db,redis",
-      "spring.security.oauth2.client.provider.keycloak.issuer-uri=https://neuris.login.bare.id/auth/realms/development",
+      "spring.security.oauth2.client.provider.keycloak.issuer-uri=${OAUTH2_CLIENT_ISSUER}"
     })
 class UserApiTokenServiceIntegrationTest {
 
