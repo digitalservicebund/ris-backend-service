@@ -74,7 +74,6 @@ GH_PACKAGES_REPOSITORY_TOKEN=$(op read "op://Team NeuRIS/Github Package Reposito
 OAUTH2_CLIENT_ISSUER=$( op read "op://Team NeuRIS/neuris-local oauth client/issuer_url")
 OAUTH2_CLIENT_ID=$( op read "op://Team NeuRIS/neuris-local oauth client/username")
 OAUTH2_CLIENT_SECRET=$( op read "op://Team NeuRIS/neuris-local oauth client/credential")
-OAUTH2_USER_API_CLIENT_ISSUER=$(op read "op://Team NeuRIS/API keycloak bare.id user api client staging/issuer_url")
 OAUTH2_USER_API_CLIENT_ID=$(op read "op://Team NeuRIS/API keycloak bare.id user api client staging/username")
 OAUTH2_USER_API_CLIENT_SECRET=$(op read "op://Team NeuRIS/API keycloak bare.id user api client staging/credential")
 E2E_TEST_USER=$( op read "op://Team NeuRIS/staging e2e test user DS/username")

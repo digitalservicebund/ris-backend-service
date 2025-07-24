@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import java.time.Instant;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -20,6 +18,7 @@ public class BareIdUserApiTokenService {
 
   public BareIdUserApiTokenService(OAuth2AuthorizedClientManager authorizedClientManager) {
     this.authorizedClientManager = authorizedClientManager;
+    setAccessToken();
   }
 
   public OAuth2AccessToken getAccessToken() {
@@ -29,11 +28,9 @@ public class BareIdUserApiTokenService {
 
   private void setAccessToken() {
     accessToken = null;
-    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null) return;
     OAuth2AuthorizeRequest req =
         OAuth2AuthorizeRequest.withClientRegistrationId(REGISTRATION_ID)
-            .principal(authentication.getName())
+            .principal("neuris")
             .build();
     OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(req);
     if (authorizedClient == null) return;
