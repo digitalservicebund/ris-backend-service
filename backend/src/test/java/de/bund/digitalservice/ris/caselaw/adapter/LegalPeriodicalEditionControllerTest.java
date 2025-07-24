@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -44,6 +45,7 @@ class LegalPeriodicalEditionControllerTest {
   @MockitoBean private DatabaseApiKeyRepository databaseApiKeyRepository;
   @MockitoBean private DatabaseDocumentationOfficeRepository databaseDocumentationOfficeRepository;
   @MockitoBean private UserGroupService userGroupService;
+  @MockitoBean private UserApiService userApiService;
   @MockitoBean private DocumentationUnitService documentationUnitService;
   @MockitoBean private ProcedureService procedureService;
 
