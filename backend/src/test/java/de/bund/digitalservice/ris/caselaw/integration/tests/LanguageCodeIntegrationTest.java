@@ -16,7 +16,7 @@ class LanguageCodeIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testGetAllLanguageCodes() {
-    assertThat(databaseLanguageCodeRepository.findAll().size()).isEqualTo(195);
+    assertThat(databaseLanguageCodeRepository.findAll()).hasSize(195);
 
     risWebTestClient
         .withDefaultLogin()
@@ -35,7 +35,7 @@ class LanguageCodeIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testGetLanguageCodesWithSearchParam() {
-    assertThat(databaseLanguageCodeRepository.findAll().size()).isEqualTo(195);
+    assertThat(databaseLanguageCodeRepository.findAll()).hasSize(195);
 
     risWebTestClient
         .withDefaultLogin()
@@ -55,7 +55,7 @@ class LanguageCodeIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testGetLanguageCodesWithSizeLimit() {
-    assertThat(databaseLanguageCodeRepository.findAll().size()).isEqualTo(195);
+    assertThat(databaseLanguageCodeRepository.findAll()).hasSize(195);
 
     risWebTestClient
         .withDefaultLogin()
