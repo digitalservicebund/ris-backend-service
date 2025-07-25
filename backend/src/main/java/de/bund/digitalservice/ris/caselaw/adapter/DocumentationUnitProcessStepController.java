@@ -43,7 +43,7 @@ public class DocumentationUnitProcessStepController {
    *     exist.
    */
   @PostMapping("/{documentationUnitId}/new")
-  @PreAuthorize("isAuthenticated()")
+  @PreAuthorize("isAuthenticated() and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<DocumentationUnitProcessStep> saveProcessStep(
       @PathVariable UUID documentationUnitId, @RequestBody UUID processStepId) {
     try {
@@ -125,7 +125,8 @@ public class DocumentationUnitProcessStepController {
 
   /**
    * Retrieves the complete history of process steps for a given documentation unit, ordered by the
-   * time each step was created. GET /api/v1/caselaw/processsteps/{documentationUnitId}/history
+   * time each step was created, latest first. GET
+   * /api/v1/caselaw/processsteps/{documentationUnitId}/history
    *
    * @param documentationUnitId The ID of the documentation unit.
    * @return ResponseEntity with a list of DocumentationUnitProcessStep objects representing the

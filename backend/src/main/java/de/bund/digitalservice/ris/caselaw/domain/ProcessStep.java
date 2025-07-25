@@ -4,4 +4,4 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record ProcessStep(UUID uuid, ProcessStepName name, String abbreviation) {}
+public record ProcessStep(UUID uuid, String name, String abbreviation) {}

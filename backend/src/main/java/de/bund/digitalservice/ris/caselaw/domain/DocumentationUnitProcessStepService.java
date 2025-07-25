@@ -72,16 +72,7 @@ public class DocumentationUnitProcessStepService {
         documentationOfficeService.getProcessStepsForDocumentationOffice(
             documentationUnit.coreData().documentationOffice().id());
 
-    UUID currentProcessStepId = currentProcessStep.getProcessStep().uuid();
-
-    int currentIndex = -1;
-    // Find the index of the current process step in the ordered list
-    for (int i = 0; i < orderedOfficeProcessSteps.size(); i++) {
-      if (orderedOfficeProcessSteps.get(i).uuid().equals(currentProcessStepId)) {
-        currentIndex = i;
-        break;
-      }
-    }
+    int currentIndex = orderedOfficeProcessSteps.indexOf(currentProcessStep.getProcessStep());
 
     // If the current step was found in the list and it's not the last one
     if (currentIndex != -1 && currentIndex < orderedOfficeProcessSteps.size() - 1) {

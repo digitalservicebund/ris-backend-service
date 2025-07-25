@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.domain.ProcessStepName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -19,7 +18,7 @@ public class ProcessStepDTO {
   @Id private UUID id;
 
   @Column(name = "name", nullable = false, unique = true)
-  private ProcessStepName name;
+  private String name;
 
   @Column(name = "abbreviation", nullable = false, unique = true)
   private String abbreviation;
