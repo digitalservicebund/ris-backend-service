@@ -22,10 +22,10 @@ public class DocumentationOfficeTransformer {
   public static DocumentationOfficeDTO transformToDTO(DocumentationOffice documentationOffice) {
     return Optional.ofNullable(documentationOffice)
         .map(
-            dto ->
+            domain ->
                 DocumentationOfficeDTO.builder()
-                    .id(dto.id())
-                    .abbreviation(dto.abbreviation())
+                    .id(domain.id())
+                    .abbreviation(domain.abbreviation())
                     .build())
         .orElse(null);
   }
