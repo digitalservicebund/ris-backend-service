@@ -14,17 +14,14 @@ public class DocumentationUnitProcessStepService {
 
   private final DocumentationUnitProcessStepRepository documentationUnitProcessStepRepository;
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final ProcessStepDocumentationOfficeRepository processStepDocumentationOfficeRepository;
   private final DocumentationOfficeService documentationOfficeService;
 
   public DocumentationUnitProcessStepService(
       DocumentationUnitProcessStepRepository documentationUnitProcessStepRepository,
       DocumentationUnitRepository documentationUnitRepository,
-      ProcessStepDocumentationOfficeRepository processStepDocumentationOfficeRepository,
       DocumentationOfficeService documentationOfficeService) {
     this.documentationUnitProcessStepRepository = documentationUnitProcessStepRepository;
     this.documentationUnitRepository = documentationUnitRepository;
-    this.processStepDocumentationOfficeRepository = processStepDocumentationOfficeRepository;
     this.documentationOfficeService = documentationOfficeService;
   }
 
