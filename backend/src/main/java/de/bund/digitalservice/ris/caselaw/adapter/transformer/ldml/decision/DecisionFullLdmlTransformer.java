@@ -8,9 +8,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructu
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentRef;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.ForeignLanguageVersion;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrLanguage;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
@@ -73,24 +70,6 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       applyIfNotEmpty(
           contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
           builder::fieldOfLaw);
-    }
-    if (contentRelatedIndexing != null
-        && contentRelatedIndexing.foreignLanguageVersions() != null) {
-      applyIfNotEmpty(
-          contentRelatedIndexing.foreignLanguageVersions().stream()
-              .map(
-                  foreignLanguageVersion ->
-                      ForeignLanguageVersion.builder()
-                          .documentRef(
-                              DocumentRef.builder()
-                                  .href(foreignLanguageVersion.getLink())
-                                  .showAs(foreignLanguageVersion.getLanguageCode().label())
-                                  .build())
-                          .frbrLanguage(
-                              new FrbrLanguage(foreignLanguageVersion.getLanguageCode().isoCode()))
-                          .build())
-              .toList(),
-          builder::foreignLanguageVersions);
     }
 
     var coreData = decision.coreData();
