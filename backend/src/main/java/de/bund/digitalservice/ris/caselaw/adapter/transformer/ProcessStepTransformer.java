@@ -6,12 +6,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProcessStepTransformer {
+  private ProcessStepTransformer() {}
+
   public static ProcessStep toDomain(ProcessStepDTO dto) {
     if (dto == null) return null;
     return new ProcessStep(dto.getId(), dto.getName(), dto.getAbbreviation());
   }
 
-  public ProcessStepDTO toDTO(ProcessStep domain) {
+  public static ProcessStepDTO toDTO(ProcessStep domain) {
     if (domain == null) return null;
     return new ProcessStepDTO(domain.uuid(), domain.name(), domain.abbreviation());
   }

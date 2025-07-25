@@ -56,20 +56,45 @@ public class DocumentationUnitProcessStepService {
    * @throws DocumentationUnitNotExistsException if the documentation unit is not found.
    * @throws ProcessStepNotFoundException if the current process step for the documentation unit
    *     cannot be found.
+   * @throws DocumentationOfficeNotExistsException if the documentation office associated with the
+   *     documentation unit is not found.
    */
   @Transactional(readOnly = true)
   public Optional<ProcessStep> getNextProcessStep(UUID documentationUnitId)
-      throws DocumentationUnitNotExistsException, ProcessStepNotFoundException {
+      throws DocumentationUnitNotExistsException,
+          ProcessStepNotFoundException,
+          DocumentationOfficeNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
 
     DocumentationUnitProcessStep currentProcessStep =
         documentationUnitProcessStepRepository.findTopByDocumentationUnitIdOrderByCreatedAtDesc(
             documentationUnit.uuid());
-    UUID docOfficeId = documentationUnit.coreData().documentationOffice().id();
 
-    return processStepDocumentationOfficeRepository.findNextProcessStepForDocumentationOffice(
-        currentProcessStep, docOfficeId);
+    DocumentationOffice docOffice =
+        documentationOfficeService.findByUuid(
+            documentationUnit.coreData().documentationOffice().id());
+
+    List<ProcessStep> orderedOfficeProcessSteps = docOffice.processSteps();
+
+    UUID currentProcessStepId = currentProcessStep.getProcessStep().uuid();
+
+    int currentIndex = -1;
+    // Find the index of the current process step in the ordered list
+    for (int i = 0; i < orderedOfficeProcessSteps.size(); i++) {
+      if (orderedOfficeProcessSteps.get(i).uuid().equals(currentProcessStepId)) {
+        currentIndex = i;
+        break;
+      }
+    }
+
+    // If the current step was found in the list and it's not the last one
+    if (currentIndex != -1 && currentIndex < orderedOfficeProcessSteps.size() - 1) {
+      return Optional.of(orderedOfficeProcessSteps.get(currentIndex + 1));
+    } else {
+      // No next step (either current step not found in the office's flow, or it's the last step)
+      return Optional.empty();
+    }
   }
 
   /**
@@ -144,13 +169,9 @@ public class DocumentationUnitProcessStepService {
    * @return A list of ProcessSteps associated with the given documentation office, ordered by rank.
    * @throws DocumentationOfficeNotExistsException if the documentation office with the given ID is
    *     not found.
-   * @throws ProcessStepNotFoundException if a process step referenced by an association to the
-   *     documentation office cannot be found.
    */
   public List<ProcessStep> getAllProcessStepsForDocOffice(UUID docOfficeId)
       throws DocumentationOfficeNotExistsException, ProcessStepNotFoundException {
-    var documentationOffice = documentationOfficeService.findByUuid(docOfficeId);
-    return processStepDocumentationOfficeRepository.findAllProcessStepsForDocOffice(
-        documentationOffice.id());
+    return documentationOfficeService.findByUuid(docOfficeId).processSteps();
   }
 }
