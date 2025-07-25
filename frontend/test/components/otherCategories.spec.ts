@@ -2,10 +2,13 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { vi } from "vitest"
+import { createRouter, createWebHistory } from "vue-router"
 import OtherCategories from "@/components/OtherCategories.vue"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
+import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import routes from "~/test-helper/routes"
 
 function mockSessionStore(
   contentRelatedIndexing: ContentRelatedIndexing,
@@ -219,6 +222,72 @@ describe("other categories", () => {
       expect(
         screen.queryByRole("button", { name: "Tarifvertrag" }),
       ).not.toBeInTheDocument()
+    })
+  })
+
+  describe("Foreign Language Versions", () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
+    it("should display foreign language version button when no data", async () => {
+      // Arrange
+      mockSessionStore({
+        foreignLanguageVersions: [],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(
+        screen.getByRole("button", { name: "Fremdsprachige Fassung" }),
+      ).toBeInTheDocument()
+    })
+
+    it("should display foreign language versions", async () => {
+      // Arrange
+      mockSessionStore({
+        foreignLanguageVersions: [
+          new ForeignLanguageVersion({
+            id: "1",
+            languageCode: {
+              id: "3",
+              label: "Englisch",
+            },
+            link: "https://link-to-tranlsation.en",
+          }),
+          new ForeignLanguageVersion({
+            id: "2",
+            languageCode: {
+              id: "4",
+              label: "Französisch",
+            },
+            link: "https://link-to-tranlsation.fr",
+          }),
+        ],
+      })
+
+      // Act
+      render(OtherCategories, {
+        global: {
+          plugins: [[router]],
+        },
+      })
+
+      // Assert
+      expect(await screen.findByText("Fremdsprachige Fassung")).toBeVisible()
+      expect(
+        await screen.findByText("Englisch: https://link-to-tranlsation.en"),
+      ).toBeVisible()
+      expect(
+        await screen.findByText("Französisch: https://link-to-tranlsation.fr"),
+      ).toBeVisible()
     })
   })
 })

@@ -102,10 +102,10 @@ const shouldDisplayCollectiveAgreements = computed(
         />
       </CategoryWrapper>
       <CategoryWrapper
-        label="Fremdsprachliche Fassung"
+        label="Fremdsprachige Fassung"
         :should-show-button="!hasForeignLanguageVersion"
       >
-        <ForeignLanguageVersions label="Fremdsprachliche Fassung" />
+        <ForeignLanguageVersions label="Fremdsprachige Fassung" />
       </CategoryWrapper>
     </div>
   </div>
