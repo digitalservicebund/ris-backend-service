@@ -135,11 +135,11 @@ public abstract class DecisionCommonLdmlTransformer
                       ForeignLanguageVersion.builder()
                           .documentRef(
                               DocumentRef.builder()
-                                  .href(foreignLanguageVersion.getLink())
-                                  .showAs(foreignLanguageVersion.getLanguageCode().label())
+                                  .href(foreignLanguageVersion.link())
+                                  .showAs(foreignLanguageVersion.languageCode().label())
                                   .build())
                           .frbrLanguage(
-                              new FrbrLanguage(foreignLanguageVersion.getLanguageCode().isoCode()))
+                              new FrbrLanguage(foreignLanguageVersion.languageCode().isoCode()))
                           .build())
               .toList(),
           builder::foreignLanguageVersions);

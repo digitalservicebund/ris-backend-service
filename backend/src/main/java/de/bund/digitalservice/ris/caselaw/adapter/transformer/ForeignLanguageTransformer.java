@@ -27,11 +27,10 @@ public class ForeignLanguageTransformer {
       return null;
     }
     return ForeignLanguageVersionDTO.builder()
-        .id(foreignLanguageVersion.getId())
+        .id(foreignLanguageVersion.id())
         .documentationUnit(decisionDTO)
-        .languageCode(
-            LanguageCodeTransformer.transformToDTO(foreignLanguageVersion.getLanguageCode()))
-        .url(foreignLanguageVersion.getLink())
+        .languageCode(LanguageCodeTransformer.transformToDTO(foreignLanguageVersion.languageCode()))
+        .url(foreignLanguageVersion.link())
         .build();
   }
 }

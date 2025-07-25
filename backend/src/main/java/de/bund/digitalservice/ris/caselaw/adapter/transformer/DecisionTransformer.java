@@ -485,10 +485,10 @@ public class DecisionTransformer extends DocumentableTransformer {
       foreignLanguageVersionDTOs.add(
           ForeignLanguageVersionDTO.builder()
               .documentationUnit(currentDto)
-              .url(foreignLanguageVersions.get(i).getLink())
+              .url(foreignLanguageVersions.get(i).link())
               .languageCode(
                   LanguageCodeTransformer.transformToDTO(
-                      foreignLanguageVersions.get(i).getLanguageCode()))
+                      foreignLanguageVersions.get(i).languageCode()))
               .rank(i + 1L)
               .build());
     }
