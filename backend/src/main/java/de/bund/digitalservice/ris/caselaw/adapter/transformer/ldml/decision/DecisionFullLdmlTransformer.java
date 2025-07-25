@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -24,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import jakarta.xml.bind.ValidationException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +73,10 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
           contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
           builder::fieldOfLaw);
     }
+
+    Optional.ofNullable(contentRelatedIndexing)
+        .map(ContentRelatedIndexing::evsf)
+        .ifPresent(builder::evfs);
 
     var coreData = decision.coreData();
     if (coreData != null) {

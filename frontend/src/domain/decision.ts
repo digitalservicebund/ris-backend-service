@@ -57,15 +57,23 @@ export const longTextLabels: {
   otherLongText: "Sonstiger Langtext",
   outline: "Gliederung",
 }
-export const contentRelatedIndexingLabels = {
+export const contentRelatedIndexingLabels: {
+  [contentRelatedIndexingKey in keyof Required<ContentRelatedIndexing>]: string
+} = {
   keywords: "Schlagwörter",
   fieldsOfLaw: "Sachgebiete",
   norms: "Normen",
+  activeCitations: "Aktivzitierung",
+  collectiveAgreements: "Tarifvertrag",
+  dismissalTypes: "Kündigungsarten",
+  dismissalGrounds: "Kündigungsgründe",
+  jobProfiles: "Berufsbild",
+  evsf: "E-VSF",
+  hasLegislativeMandate: "Gesetzgebungsauftrag",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
   literatureReferences: "Literaturfundstellen",
-  activeCitations: "Aktivzitierung",
   ...contentRelatedIndexingLabels,
   ...shortTextLabels,
   ...longTextLabels,

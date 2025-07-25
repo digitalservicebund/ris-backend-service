@@ -5,8 +5,10 @@ import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
+import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import laborCourtTypes from "@/data/laborCourtTypes.json"
+import { contentRelatedIndexingLabels } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
@@ -38,6 +40,10 @@ const hasJobProfiles = computed<boolean>(() =>
 const hasLegislativeMandate = computed(() => {
   return contentRelatedIndexing.value.hasLegislativeMandate
 })
+const evsf = computed({
+  get: () => contentRelatedIndexing.value.evsf,
+  set: (value) => (store.documentUnit!.contentRelatedIndexing.evsf = value),
+})
 
 const shouldDisplayLegislativeMandateCategory = computed(() => {
   return (
@@ -53,6 +59,12 @@ const isLaborCourt = computed(() =>
   ),
 )
 
+const isFinanceCourt = computed(() =>
+  ["BFH", "FG", "OFH", "RFH"].includes(
+    store.documentUnit?.coreData.court?.type ?? "",
+  ),
+)
+
 const shouldDisplayDismissalAttributes = computed(
   () => isLaborCourt.value || hasDismissalInput.value,
 )
@@ -60,6 +72,8 @@ const shouldDisplayDismissalAttributes = computed(
 const shouldDisplayCollectiveAgreements = computed(
   () => isLaborCourt.value || hasCollectiveAgreement.value,
 )
+
+const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
 </script>
 
 <template>
@@ -94,6 +108,15 @@ const shouldDisplayCollectiveAgreements = computed(
           label="Gesetzgebungsauftrag vorhanden"
         />
       </CategoryWrapper>
+      <TextInputCategory
+        v-if="shouldDisplayEvsf"
+        id="evsf"
+        v-model="evsf"
+        :data-testid="contentRelatedIndexingLabels.evsf"
+        editable
+        :label="contentRelatedIndexingLabels.evsf"
+        :should-show-button="!evsf"
+      />
     </div>
   </div>
 </template>

@@ -221,4 +221,53 @@ describe("other categories", () => {
       ).not.toBeInTheDocument()
     })
   })
+
+  describe("E-VSF", () => {
+    test("should not display evsf button when it is empty and not a financial court", async () => {
+      // Arrange
+      mockSessionStore({ evsf: undefined }, "BVerfG")
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(
+        screen.queryByRole("button", { name: "E-VSF" }),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole("textbox", { name: "E-VSF" }),
+      ).not.toBeInTheDocument()
+    })
+
+    test("should display E-VSF button when it is empty and financial court", async () => {
+      // Arrange
+      mockSessionStore({ evsf: undefined }, "BFH")
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(screen.getByRole("button", { name: "E-VSF" })).toBeInTheDocument()
+      expect(
+        screen.queryByRole("textbox", { name: "E-VSF" }),
+      ).not.toBeInTheDocument()
+    })
+
+    test("should display E-VSF when it is not empty without financial court", async () => {
+      // Arrange
+      mockSessionStore({ evsf: "X 00 00-0-0" }, "BVerfG")
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(screen.getByRole("textbox", { name: "E-VSF" })).toHaveValue(
+        "X 00 00-0-0",
+      )
+
+      expect(
+        screen.queryByRole("button", { name: "E-VSF" }),
+      ).not.toBeInTheDocument()
+    })
+  })
 })

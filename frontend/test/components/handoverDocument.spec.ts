@@ -472,6 +472,54 @@ describe("HandoverDocumentationUnitView:", () => {
         }),
       ).toBeEnabled()
     })
+
+    it("should show a warning when unexportable field E-VSF is filled", async () => {
+      renderComponent({
+        documentUnit: new Decision("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+          contentRelatedIndexing: { evsf: "X 00 00" },
+          longTexts: { decisionReasons: "decisionReasons" },
+          managementData: {
+            duplicateRelations: [],
+            borderNumbers: [],
+          },
+        }),
+      })
+
+      expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          "Folgende Rubriken sind befüllt und können nicht an die jDV exportiert werden:",
+        ),
+      ).toBeInTheDocument()
+      expect(screen.getByText("E-VSF")).toBeInTheDocument()
+      const handoverButton = screen.getByRole("button", {
+        name: "Dokumentationseinheit an jDV übergeben",
+      })
+      expect(handoverButton).toBeEnabled()
+      await fireEvent.click(handoverButton)
+
+      expect(
+        screen.getByText("Prüfung hat Warnungen ergeben"),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole("button", { name: "Trotzdem übergeben" }),
+      ).toBeInTheDocument()
+    })
   })
 
   it("should show error message with invalid border numbers", async () => {

@@ -372,6 +372,7 @@ class DecisionReducedLdmlTransformerTest {
                     .dismissalTypes(List.of("dismissalType test"))
                     .collectiveAgreements(List.of("collectiveAgreement test"))
                     .hasLegislativeMandate(true)
+                    .evsf("evsf test")
                     .build())
             .previousDecisions(List.of(previousDecision1, previousDecision2))
             .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))

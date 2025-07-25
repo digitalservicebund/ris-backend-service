@@ -42,15 +42,15 @@ import org.hibernate.proxy.HibernateProxy;
 // everything.
 public class DecisionDTO extends DocumentationUnitDTO {
 
-  // Tatbestand
+  /** Tatbestand */
   @Column(name = "case_facts")
   private String caseFacts;
 
-  // Entscheidungsgründe
+  /** Entscheidungsgründe */
   @Column(name = "decision_grounds")
   private String decisionGrounds;
 
-  // Entscheidungsname
+  /** Entscheidungsname */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
@@ -58,36 +58,36 @@ public class DecisionDTO extends DocumentationUnitDTO {
 
   @Column private String ecli;
 
-  // Gründe
+  /** Gründe */
   @Column private String grounds;
 
-  // Leitsatz
+  /** Leitsatz */
   @Column(name = "guiding_principle")
   private String guidingPrinciple;
 
-  // Orientierungssatz
+  /** Orientierungssatz */
   @Column private String headnote;
 
-  // Eingangsart
+  /** Eingangsart */
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
   private List<InputTypeDTO> inputTypes = new ArrayList<>();
 
-  // Sonstiger Langtext
+  /** Sonstiger Langtext */
   @Column(name = "other_long_text")
   String otherLongText;
 
-  // Gliederung
+  /** Gliederung */
   @Column(name = "outline")
   String outline;
 
-  // Sonstiger Orientierungssatz
+  /** Sonstiger Orientierungssatz */
   @Column(name = "other_headnote")
   String otherHeadnote;
 
-  // Abweichende Meinung
+  /** Abweichende Meinung */
   @Column(name = "dissenting_opinion")
   private String dissentingOpinion;
 
@@ -101,12 +101,12 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   private List<ProcedureDTO> procedureHistory = new ArrayList<>();
 
-  // Vorgang
+  /** Vorgang */
   @OneToOne()
   @JoinColumn(name = "current_procedure_id")
   private ProcedureDTO procedure;
 
-  // Quelle
+  /** Quelle */
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
@@ -115,7 +115,10 @@ public class DecisionDTO extends DocumentationUnitDTO {
 
   @Column private String tenor;
 
-  // Rechtskraft
+  /** Elektronische Vorschriftensammlung Bundesfinanzverwaltung */
+  @Column private String evsf;
+
+  /** Rechtskraft */
   @Column(name = "legal_effect")
   @Enumerated(EnumType.STRING)
   private LegalEffectDTO legalEffect;
@@ -124,7 +127,7 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @JoinColumn(name = "creating_documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO creatingDocumentationOffice;
 
-  // Aktivzitierung
+  /** Aktivzitierung */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
@@ -137,14 +140,14 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @OrderBy("rank")
   private List<DeviatingEcliDTO> deviatingEclis = new ArrayList<>();
 
-  // Nachgehende Entscheidungen
+  /** Nachgehende Entscheidungen */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
   private List<EnsuingDecisionDTO> ensuingDecisions = new ArrayList<>();
 
-  // Nachgehende Entscheidungen mit Prädikat anhängig
+  /** Nachgehende Entscheidungen mit Prädikat anhängig */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
@@ -159,46 +162,46 @@ public class DecisionDTO extends DocumentationUnitDTO {
 
   @Column private String note;
 
-  // Streitjahr
+  /** Streitjahr */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
   private Set<YearOfDisputeDTO> yearsOfDispute = new HashSet<>();
 
-  // Berufsbild
+  /** Berufsbild */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<JobProfileDTO> jobProfiles = new ArrayList<>();
 
-  // Kündigungsgründe
+  /** Kündigungsgründe */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<DismissalGroundsDTO> dismissalGrounds = new ArrayList<>();
 
-  // Kündigungsarten
+  /** Kündigungsarten */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<DismissalTypesDTO> dismissalTypes = new ArrayList<>();
 
-  // Tarifvertrag
+  /** Tarifvertrag */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<CollectiveAgreementDTO> collectiveAgreements = new ArrayList<>();
 
-  // Gesetzgebungsauftrag
+  /** Gesetzgebungsauftrag */
   @Column(name = "legislative_mandate")
   private boolean hasLegislativeMandate;
 
-  // Mitwirkende Richter
+  /** Mitwirkende Richter */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
