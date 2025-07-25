@@ -79,9 +79,6 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @OrderBy("rank")
   private List<FileNumberDTO> fileNumbers = new ArrayList<>();
 
-  @Column(name = "celex_number")
-  private String celexNumber;
-
   // Titelzeile
   @Column private String headline;
 

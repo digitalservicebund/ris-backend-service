@@ -290,6 +290,7 @@ onBeforeUnmount(() => {
       </InputField>
 
       <InputField
+        v-if="!isPendingProceeding"
         id="celex"
         v-slot="slotProps"
         class="flex-col"

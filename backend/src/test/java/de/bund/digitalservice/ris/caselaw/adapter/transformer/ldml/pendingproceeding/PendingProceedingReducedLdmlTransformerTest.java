@@ -177,7 +177,6 @@ class PendingProceedingReducedLdmlTransformerTest {
                        <akn:FRBRthis value="YYTestDoc0013"/>
                        <akn:FRBRuri value="YYTestDoc0013"/>
                        <akn:FRBRalias name="uebergreifende-id" value="%s"/>
-                       <akn:FRBRalias name="celex" value="celex test"/>
                        <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
                        <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
                        <akn:FRBRcountry value="de"/>
@@ -273,7 +272,6 @@ class PendingProceedingReducedLdmlTransformerTest {
         .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
         .coreData(
             CoreData.builder()
-                .celexNumber("celex test")
                 .court(
                     Court.builder()
                         .type("Gerichtstyp")

@@ -76,16 +76,6 @@ test.describe("edit pending proceeding", () => {
         ).toBeVisible()
       })
 
-      // CELEX-Nummer
-      await test.step("celex number is readonly", async () => {
-        const celexNumber = page.getByLabel("Celex-Nummer", {
-          exact: true,
-        })
-
-        await expect(celexNumber).toHaveValue("")
-        await expect(celexNumber).toHaveAttribute("readonly")
-      })
-
       // Gerichtsbarkeit Finanzgerichtsbarkeit
       await test.step("'Gerichtsbarkeit' is readonly", async () => {
         const jurisdictionType = page.getByLabel("Gerichtsbarkeit", {
@@ -165,38 +155,6 @@ test.describe("edit pending proceeding", () => {
         await resolutionNote.click()
         await page.keyboard.type(`Test`)
         await expect(resolutionNote.getByText("Test")).toBeVisible()
-      })
-
-      await save(page)
-    },
-  )
-
-  test(
-    "user can edit and save celex number for eugh decisions",
-    { tag: ["@RISDEV-8469"] },
-    async ({ page, pendingProceeding }) => {
-      await navigateToCategories(page, pendingProceeding.documentNumber, {
-        type: "pending-proceeding",
-      })
-
-      await test.step("set court to eug", async () => {
-        const court = page.getByLabel("Gericht", { exact: true })
-        await expect(court).toHaveValue("")
-        await court.fill("EuGH")
-        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
-        await expect(court).toHaveValue("EuGH")
-        await page.getByText("EuGH", { exact: true }).click()
-        await expect(court).toHaveValue("EuGH")
-      })
-
-      // CELEX-Nummer
-      await test.step("celex number can be added", async () => {
-        const celexNumber = page.getByLabel("Celex-Nummer", {
-          exact: true,
-        })
-        await celexNumber.fill("abc")
-
-        await expect(celexNumber).toHaveValue("abc")
       })
 
       await save(page)

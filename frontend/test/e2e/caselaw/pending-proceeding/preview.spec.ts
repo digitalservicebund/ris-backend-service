@@ -16,7 +16,6 @@ test.describe("preview pending proceeding", () => {
             decisionDate: "2025-02-24",
             resolutionDate: "2025-06-06",
             deviatingDocumentNumbers: ["STRE123456789"],
-            celexNumber: "celex123456789",
           },
           shortTexts: {
             headline: "Anhängiges Verfahren am BFH ",
@@ -66,11 +65,6 @@ test.describe("preview pending proceeding", () => {
       ).toBeVisible()
       await expect(
         pageWithBfhUser.getByText("Abweichende DokumentnummerSTRE123456789", {
-          exact: true,
-        }),
-      ).toBeVisible()
-      await expect(
-        pageWithBfhUser.getByText("CELEX-Nummercelex123456789", {
           exact: true,
         }),
       ).toBeVisible()

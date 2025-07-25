@@ -191,7 +191,6 @@ class PendingProceedingTransformerTest {
             .date(decisionDate)
             .documentType(DocumentTypeDTO.builder().id(documentTypeId).abbreviation("Urt").build())
             .court(CourtDTO.builder().id(courtId).type("BVerfG").build())
-            .celexNumber(celexNumber)
             .judicialBody(judicialBody) // Mapped to coreData.appraisalBody
             .fileNumbers(
                 List.of(
@@ -234,7 +233,6 @@ class PendingProceedingTransformerTest {
     assertThat(coreData).isNotNull();
 
     // --- Assert mutual CoreData fields that are transformed from DocumentableTransformer ---
-    assertThat(coreData.celexNumber()).isEqualTo(celexNumber);
     assertThat(coreData.appraisalBody()).isEqualTo(judicialBody);
     assertThat(coreData.decisionDate()).isEqualTo(decisionDate);
     assertThat(coreData.documentType().jurisShortcut()).isEqualTo("Urt");
@@ -448,53 +446,6 @@ class PendingProceedingTransformerTest {
             generateSimpleDTOBuilder().build(), pendingProceeding);
 
     assertThat(pendingProceedingDTO.getDeviatingDocumentNumbers()).isEmpty();
-  }
-
-  @Test
-  void testTransformToDomain_withCelex_resultShouldHaveCelex() {
-    PendingProceedingDTO decisionDTO =
-        generateSimpleDTOBuilder().celexNumber("62023CJ0538").build();
-
-    PendingProceeding pendingProceeding =
-        PendingProceedingTransformer.transformToDomain(decisionDTO);
-
-    assertThat(pendingProceeding.coreData().celexNumber()).isEqualTo("62023CJ0538");
-  }
-
-  @Test
-  void testTransformToDomain_withoutCelex_resultShouldNotHaveCelex() {
-    PendingProceedingDTO pendingProceedingDTO = generateSimpleDTOBuilder().build();
-
-    PendingProceeding pendingProceeding =
-        PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
-
-    assertThat(pendingProceeding.coreData().celexNumber()).isBlank();
-  }
-
-  @Test
-  void testTransformToDTO_withCelex_resultShouldHaveCelex() {
-    PendingProceeding pendingProceeding =
-        PendingProceeding.builder()
-            .coreData(CoreData.builder().celexNumber("62023CJ0538").build())
-            .build();
-
-    PendingProceedingDTO pendingProceedingDTO =
-        PendingProceedingTransformer.transformToDTO(
-            generateSimpleDTOBuilder().build(), pendingProceeding);
-
-    assertThat(pendingProceedingDTO.getCelexNumber()).isEqualTo("62023CJ0538");
-  }
-
-  @Test
-  void testTransformToDTO_withoutCelex_resultShouldNotHaveCelex() {
-    PendingProceeding pendingProceeding =
-        PendingProceeding.builder().coreData(CoreData.builder().build()).build();
-
-    PendingProceedingDTO pendingProceedingDTO =
-        PendingProceedingTransformer.transformToDTO(
-            generateSimpleDTOBuilder().build(), pendingProceeding);
-
-    assertThat(pendingProceedingDTO.getCelexNumber()).isBlank();
   }
 
   private PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> generateSimpleDTOBuilder() {
