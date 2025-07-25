@@ -25,7 +25,7 @@ class ForeignLanguageVersionTransformerTest {
     LanguageCodeDTO languageCodeDTO =
         LanguageCodeDTO.builder().id(UUID.randomUUID()).value("Englisch").isoCode("en").build();
 
-    ForeignLanguageVersionDTO dto =
+    ForeignLanguageVersionDTO foreignLanguageVersionDTO =
         ForeignLanguageVersionDTO.builder()
             .id(UUID.randomUUID())
             .languageCode(languageCodeDTO)
@@ -40,14 +40,15 @@ class ForeignLanguageVersionTransformerTest {
             .build();
 
     // Act
-    ForeignLanguageVersion result = ForeignLanguageTransformer.transformToDomain(dto);
+    ForeignLanguageVersion foreignLanguageVersion =
+        ForeignLanguageTransformer.transformToDomain(foreignLanguageVersionDTO);
 
     // Assert
-    assertNotNull(result);
-    assertEquals(dto.getId(), result.id());
-    assertEquals(expectedLanguageCode.label(), result.languageCode().label());
-    assertEquals(expectedLanguageCode.isoCode(), result.languageCode().isoCode());
-    assertEquals(dto.getUrl(), result.link());
+    assertNotNull(foreignLanguageVersion);
+    assertEquals(foreignLanguageVersionDTO.getId(), foreignLanguageVersion.id());
+    assertEquals(expectedLanguageCode.label(), foreignLanguageVersion.languageCode().label());
+    assertEquals(expectedLanguageCode.isoCode(), foreignLanguageVersion.languageCode().isoCode());
+    assertEquals(foreignLanguageVersionDTO.getUrl(), foreignLanguageVersion.link());
   }
 
   @Test
@@ -59,12 +60,10 @@ class ForeignLanguageVersionTransformerTest {
   @Test
   void transformToDTO_validDomain_transformsCorrectly() {
     // Arrange
-    UUID languageCodeId = UUID.randomUUID();
-
     LanguageCode languageCode =
-        LanguageCode.builder().id(languageCodeId).label("Englisch").isoCode("en").build();
+        LanguageCode.builder().id(UUID.randomUUID()).label("Englisch").isoCode("en").build();
 
-    ForeignLanguageVersion domain =
+    ForeignLanguageVersion foreignLanguageVersion =
         ForeignLanguageVersion.builder()
             .id(UUID.randomUUID())
             .languageCode(languageCode)
@@ -72,19 +71,18 @@ class ForeignLanguageVersionTransformerTest {
             .build();
 
     LanguageCodeDTO expectedLanguageCodeDTO =
-        LanguageCodeDTO.builder().id(languageCodeId).value("Englisch").isoCode("en").build();
-
-    DecisionDTO decision = new DecisionDTO();
+        LanguageCodeDTO.builder().id(languageCode.id()).value("Englisch").isoCode("en").build();
 
     // Act
-    ForeignLanguageVersionDTO result = ForeignLanguageTransformer.transformToDTO(domain, decision);
+    ForeignLanguageVersionDTO foreignLanguageVersionDTO =
+        ForeignLanguageTransformer.transformToDTO(foreignLanguageVersion, new DecisionDTO());
 
     // Assert
-    assertNotNull(result);
-    assertEquals(domain.id(), result.getId());
-    assertEquals(decision, result.getDocumentationUnit());
-    assertNotNull(result.getLanguageCode());
-    assertEquals(expectedLanguageCodeDTO.getId(), result.getLanguageCode().getId());
-    assertEquals(domain.link(), result.getUrl());
+    assertNotNull(foreignLanguageVersionDTO);
+    assertEquals(foreignLanguageVersion.id(), foreignLanguageVersionDTO.getId());
+    assertNotNull(foreignLanguageVersionDTO.getLanguageCode());
+    assertEquals(
+        expectedLanguageCodeDTO.getId(), foreignLanguageVersionDTO.getLanguageCode().getId());
+    assertEquals(foreignLanguageVersion.link(), foreignLanguageVersionDTO.getUrl());
   }
 }

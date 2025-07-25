@@ -19,17 +19,17 @@ class LanguageCodeTransformerTest {
   @Test
   void transformToDomain_withValidDTO_transformsCorrectly() {
     // Arrange
-    UUID id = UUID.randomUUID();
-    LanguageCodeDTO dto = LanguageCodeDTO.builder().id(id).value("Deutsch").isoCode("de").build();
+    LanguageCodeDTO languageCodeDTO =
+        LanguageCodeDTO.builder().id(UUID.randomUUID()).value("Deutsch").isoCode("de").build();
 
     // Act
-    LanguageCode result = LanguageCodeTransformer.transformToDomain(dto);
+    LanguageCode result = LanguageCodeTransformer.transformToDomain(languageCodeDTO);
 
     // Assert
     assertNotNull(result);
-    assertEquals(id, result.id());
-    assertEquals("Deutsch", result.label());
-    assertEquals("de", result.isoCode());
+    assertEquals(languageCodeDTO.getId(), result.id());
+    assertEquals(languageCodeDTO.getValue(), result.label());
+    assertEquals(languageCodeDTO.getIsoCode(), result.isoCode());
   }
 
   @Test
@@ -40,16 +40,16 @@ class LanguageCodeTransformerTest {
   @Test
   void transformToDTO_withValidDomain_transformsCorrectly() {
     // Arrange
-    UUID id = UUID.randomUUID();
-    LanguageCode domain = LanguageCode.builder().id(id).label("Englisch").isoCode("en").build();
+    LanguageCode languageCode =
+        LanguageCode.builder().id(UUID.randomUUID()).label("Englisch").isoCode("en").build();
 
     // Act
-    LanguageCodeDTO result = LanguageCodeTransformer.transformToDTO(domain);
+    LanguageCodeDTO languageCodeDTO = LanguageCodeTransformer.transformToDTO(languageCode);
 
     // Assert
-    assertNotNull(result);
-    assertEquals(id, result.getId());
-    assertEquals("Englisch", result.getValue());
-    assertEquals("en", result.getIsoCode());
+    assertNotNull(languageCodeDTO);
+    assertEquals(languageCode.id(), languageCodeDTO.getId());
+    assertEquals(languageCode.label(), languageCodeDTO.getValue());
+    assertEquals(languageCode.isoCode(), languageCodeDTO.getIsoCode());
   }
 }
