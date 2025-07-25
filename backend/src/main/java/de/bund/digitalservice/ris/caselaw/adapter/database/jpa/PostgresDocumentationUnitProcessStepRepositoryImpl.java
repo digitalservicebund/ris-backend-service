@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransfo
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStepRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +38,7 @@ public class PostgresDocumentationUnitProcessStepRepositoryImpl
             .findById(dto.getProcessStepId())
             .orElseThrow(
                 () ->
-                    new EntityNotFoundException(
+                    new ProcessStepNotFoundException(
                         "Prozessschritt für ID "
                             + dto.getProcessStepId()
                             + " wurde nicht gefunden für DocumentationUnitProcessStepDTO "

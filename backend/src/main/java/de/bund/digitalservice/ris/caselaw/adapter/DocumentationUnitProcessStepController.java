@@ -163,7 +163,7 @@ public class DocumentationUnitProcessStepController {
       List<ProcessStep> possibleSteps =
           processStepService.getAllProcessStepsForDocOffice(docOfficeId);
       return ResponseEntity.ok(possibleSteps);
-    } catch (DocumentationOfficeNotExistsException | ProcessStepNotFoundException e) {
+    } catch (DocumentationOfficeNotExistsException e) {
       return ResponseEntity.notFound().build();
     }
   }

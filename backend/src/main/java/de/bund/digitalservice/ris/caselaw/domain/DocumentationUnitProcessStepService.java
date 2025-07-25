@@ -68,11 +68,9 @@ public class DocumentationUnitProcessStepService {
         documentationUnitProcessStepRepository.findTopByDocumentationUnitIdOrderByCreatedAtDesc(
             documentationUnit.uuid());
 
-    DocumentationOffice docOffice =
-        documentationOfficeService.findByUuid(
+    List<ProcessStep> orderedOfficeProcessSteps =
+        documentationOfficeService.getProcessStepsForDocumentationOffice(
             documentationUnit.coreData().documentationOffice().id());
-
-    List<ProcessStep> orderedOfficeProcessSteps = docOffice.processSteps();
 
     UUID currentProcessStepId = currentProcessStep.getProcessStep().uuid();
 
@@ -168,7 +166,7 @@ public class DocumentationUnitProcessStepService {
    *     not found.
    */
   public List<ProcessStep> getAllProcessStepsForDocOffice(UUID docOfficeId)
-      throws DocumentationOfficeNotExistsException, ProcessStepNotFoundException {
-    return documentationOfficeService.findByUuid(docOfficeId).processSteps();
+      throws DocumentationOfficeNotExistsException {
+    return documentationOfficeService.getProcessStepsForDocumentationOffice(docOfficeId);
   }
 }

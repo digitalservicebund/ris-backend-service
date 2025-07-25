@@ -1595,11 +1595,7 @@ class DecisionTransformerTest {
 
   private CoreDataBuilder generateSimpleCoreDataBuilder() {
     return CoreData.builder()
-        .documentationOffice(
-            DocumentationOffice.builder()
-                .abbreviation("doc office")
-                .processSteps(Collections.emptyList())
-                .build())
+        .documentationOffice(DocumentationOffice.builder().abbreviation("doc office").build())
         .deviatingDocumentNumbers(Collections.emptyList())
         .fileNumbers(Collections.emptyList())
         .deviatingFileNumbers(Collections.emptyList())
