@@ -277,7 +277,7 @@ onBeforeUnmount(() => {
       </InputField>
     </div>
 
-    <div>
+    <div :class="layoutClass">
       <InputField
         id="deviatingDocumentNumbers"
         label="Abweichende Dokumentnummer"
@@ -287,6 +287,27 @@ onBeforeUnmount(() => {
           v-model="coreDataModel.deviatingDocumentNumbers"
           aria-label="Abweichende Dokumentnummer"
         ></ChipsInput>
+      </InputField>
+
+      <InputField
+        v-if="!isPendingProceeding"
+        id="celex"
+        v-slot="slotProps"
+        class="flex-col"
+        label="CELEX-Nummer"
+      >
+        <InputText
+          id="celex"
+          v-model="coreDataModel.celexNumber"
+          aria-label="Celex-Nummer"
+          fluid
+          :invalid="slotProps.hasError"
+          :readonly="
+            coreDataModel.court?.label != 'EuG' &&
+            coreDataModel.court?.label != 'EuGH'
+          "
+          size="small"
+        />
       </InputField>
     </div>
 

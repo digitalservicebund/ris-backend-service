@@ -331,7 +331,6 @@ public class DocumentableTransformer {
                 DocumentationOfficeTransformer.transformToDomain(
                     documentationUnitDTO.getDocumentationOffice()))
             .decisionDate(documentationUnitDTO.getDate())
-            .celexNumber(documentationUnitDTO.getCelexNumber())
             .appraisalBody(documentationUnitDTO.getJudicialBody());
 
     addDeviatingDocumentNumberToDomain(documentationUnitDTO, coreDataBuilder);

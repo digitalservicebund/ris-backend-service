@@ -4614,7 +4614,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
   @Nested
   @Sql(
       scripts = {
-        "classpath:doc_office_init.sql",
         "classpath:user_group_init.sql",
         "classpath:procedures_init.sql",
       })
