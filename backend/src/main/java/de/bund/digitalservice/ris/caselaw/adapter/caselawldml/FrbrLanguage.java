@@ -7,5 +7,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class FrbrLanguage {
-  @XmlAttribute private String language = "deu";
+  @XmlAttribute private String language;
+
+  public FrbrLanguage(String language) {
+    this.language = language;
+  }
 }

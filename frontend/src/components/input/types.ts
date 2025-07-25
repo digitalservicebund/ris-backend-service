@@ -8,6 +8,7 @@ import { DocumentationUnit } from "@/domain/documentationUnit"
 import { DocumentType } from "@/domain/documentType"
 
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
+import { LanguageCode } from "@/domain/foreignLanguageVersion"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -142,6 +143,7 @@ export type ComboboxInputModelType =
   | LegalForceType
   | LegalPeriodical
   | DocumentationOffice
+  | LanguageCode
 
 export type ComboboxItem = {
   label: string

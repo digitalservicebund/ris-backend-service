@@ -5,6 +5,7 @@ import { ref } from "vue"
 import { Court } from "@/domain/court"
 import { DocumentType } from "@/domain/documentType"
 import { DocumentTypeCategory } from "@/domain/documentTypeCategory"
+import { LanguageCode } from "@/domain/foreignLanguageVersion"
 import service from "@/services/comboboxItemService"
 
 const court: Court = {
@@ -26,6 +27,9 @@ const dependentLiteratureDoctype: DocumentType = {
   jurisShortcut: "Auf",
   label: "Aufsatz",
 }
+const normAbbreviation = { id: "id", abbreviation: "BGB" }
+const languageCode: LanguageCode = { id: "id", label: "Englisch" }
+
 const server = setupServer(
   http.get("/api/v1/caselaw/courts", () => HttpResponse.json([court])),
   http.get("/api/v1/caselaw/documenttypes", ({ request }) => {
@@ -42,6 +46,12 @@ const server = setupServer(
       return HttpResponse.json([doctype])
     }
     return HttpResponse.json([])
+  }),
+  http.get("/api/v1/caselaw/normabbreviation/search", () => {
+    return HttpResponse.json([normAbbreviation])
+  }),
+  http.get("/api/v1/caselaw/languagecodes", () => {
+    return HttpResponse.json([languageCode])
   }),
 )
 
@@ -90,6 +100,26 @@ describe("comboboxItemService", () => {
     await waitFor(() => {
       expect(data.value?.[0].label).toEqual("BGH Karlsruhe")
       expect(data.value?.[0].value).toEqual(court)
+    })
+  })
+
+  it("should fetch risAbbreviations from lookup table", async () => {
+    const { data, execute } = service.getRisAbbreviations(ref())
+
+    await execute()
+    await waitFor(() => {
+      expect(data.value?.[0].label).toEqual("BGB")
+      expect(data.value?.[0].value).toEqual(normAbbreviation)
+    })
+  })
+
+  it("should fetch language code from lookup table", async () => {
+    const { data, execute } = service.getLanguageCodes(ref())
+
+    await execute()
+    await waitFor(() => {
+      expect(data.value?.[0].label).toEqual("Englisch")
+      expect(data.value?.[0].value).toEqual(languageCode)
     })
   })
 })

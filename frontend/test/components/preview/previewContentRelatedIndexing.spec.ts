@@ -3,6 +3,7 @@ import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
+import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 
@@ -58,6 +59,16 @@ describe("preview content related indexing", () => {
       dismissalTypes: ["Einführung neuer Technologien"],
       collectiveAgreements: ["Normalvertrag Chor", "Stehende Bühnen"],
       hasLegislativeMandate: true,
+      foreignLanguageVersions: [
+        new ForeignLanguageVersion({
+          languageCode: { id: "1", label: "Englisch" },
+          link: "https://link-to-tranlsation.en",
+        }),
+        new ForeignLanguageVersion({
+          languageCode: { id: "2", label: "Französisch" },
+          link: "https://link-to-tranlsation.fr",
+        }),
+      ],
     })
 
     expect(await screen.findByText("Schlagwörter")).toBeInTheDocument()
@@ -69,6 +80,9 @@ describe("preview content related indexing", () => {
     expect(await screen.findByText("Berufsbild")).toBeInTheDocument()
     expect(await screen.findByText("Gesetzgebungsauftrag")).toBeInTheDocument()
     expect(await screen.findByText("Tarifvertrag")).toBeInTheDocument()
+    expect(
+      await screen.findByText("Fremdsprachige Fassung"),
+    ).toBeInTheDocument()
   })
 
   test("renders multiple keywords and nothing else", async () => {
@@ -95,6 +109,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 
   test("renders multiple norms and single norms and nothing else", async () => {
@@ -137,6 +152,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 
   test("renders multiple active citations and nothing else", async () => {
@@ -191,6 +207,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 
   test("renders multiple fields of law and nothing else", async () => {
@@ -267,6 +284,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 
   test("renders multiple job profiles and nothing else", async () => {
@@ -293,6 +311,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 
   test("renders multiple collective agreements and nothing else", async () => {
@@ -318,6 +337,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 
   test("renders legislative mandate and nothing else", async () => {
@@ -343,6 +363,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 
   test("renders dismissal inputs and nothing else", async () => {
@@ -367,6 +388,38 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(await screen.findByText("Kündigungsgründe")).toBeInTheDocument()
     expect(await screen.findByText("Kündigungsarten")).toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+  })
+
+  test("renders foreign language versions and nothing else", async () => {
+    renderComponent({
+      keywords: [],
+      norms: [],
+      activeCitations: [],
+      fieldsOfLaw: [],
+      jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
+      collectiveAgreements: [],
+      hasLegislativeMandate: false,
+      foreignLanguageVersions: [
+        new ForeignLanguageVersion({
+          languageCode: { id: "1", label: "Englisch" },
+          link: "https://link-to-tranlsation.en",
+        }),
+      ],
+    })
+
+    expect(screen.getByText("Fremdsprachige Fassung")).toBeInTheDocument()
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
+    expect(screen.queryByText("Normen")).not.toBeInTheDocument()
+    expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
   })
 
   test("renders no legislative mandate when it is false", async () => {
@@ -388,6 +441,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       collectiveAgreements: [],
       hasLegislativeMandate: undefined,
+      foreignLanguageVersions: [],
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -398,6 +452,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 
   test("renders nothing when elements are undefined", async () => {
@@ -411,6 +466,7 @@ describe("preview content related indexing", () => {
       dismissalGrounds: undefined,
       dismissalTypes: undefined,
       collectiveAgreements: undefined,
+      foreignLanguageVersions: undefined,
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -421,5 +477,6 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 })
