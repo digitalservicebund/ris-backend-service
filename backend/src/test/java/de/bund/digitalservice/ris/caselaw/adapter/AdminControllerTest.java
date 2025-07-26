@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -32,6 +33,7 @@ class AdminControllerTest {
   @MockitoBean private EnvironmentService environmentService;
   @MockitoBean StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
 

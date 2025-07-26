@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -80,7 +82,9 @@ public abstract class BaseIntegrationTest {
 
   @MockitoBean FeatureToggleService featureToggleService;
   @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
   @MockitoBean UserGroupService userGroupService;
+  @MockitoBean UserApiService userApiService;
 
   static DataSource dataSource;
 

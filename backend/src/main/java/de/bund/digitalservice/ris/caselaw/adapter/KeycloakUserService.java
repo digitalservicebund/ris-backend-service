@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -18,9 +19,11 @@ import org.springframework.stereotype.Service;
 public class KeycloakUserService implements UserService {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
   private final UserGroupService userGroupService;
+  private final UserApiService userApiService;
 
-  public KeycloakUserService(UserGroupService userGroupService) {
+  public KeycloakUserService(UserGroupService userGroupService, UserApiService userApiService) {
     this.userGroupService = userGroupService;
+    this.userApiService = userApiService;
   }
 
   @Override
@@ -47,6 +50,11 @@ public class KeycloakUserService implements UserService {
       return roles.contains("Internal");
     }
     return false;
+  }
+
+  @Override
+  public User getUser(UUID uuid) {
+    return userApiService.getUser(uuid);
   }
 
   @Override

@@ -40,6 +40,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -55,6 +56,7 @@ class DocumentationUnitHistoryLogControllerTest {
   @MockitoBean private DocumentationUnitService docUnitService;
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
   @MockitoBean private DatabaseApiKeyRepository databaseApiKeyRepository;
   @MockitoBean private DatabaseDocumentationOfficeRepository databaseDocumentationOfficeRepository;
   @MockitoBean private UserGroupService userGroupService;

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -28,6 +29,7 @@ class CourtControllerTest {
 
   @MockitoBean private CourtService service;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
 
   @Test
   void testGetCourtsWithoutSize() {
