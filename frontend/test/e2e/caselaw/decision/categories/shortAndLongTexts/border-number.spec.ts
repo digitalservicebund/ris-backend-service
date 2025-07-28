@@ -735,7 +735,10 @@ test.describe(
       await checkAllBorderNumbersAreVisible(editor)
 
       await test.step("Fuse the second with the first border number", async () => {
-        await selectAllViaKeyboard(page)
+        await editor.getByText(secondParagraph).selectText()
+        // The promise returns before the selection is applied.
+        // eslint-disable-next-line playwright/no-wait-for-timeout
+        await page.waitForTimeout(100)
         await page.keyboard.press("ArrowLeft")
         await clickBackspace(page)
         await clickBackspace(page)
