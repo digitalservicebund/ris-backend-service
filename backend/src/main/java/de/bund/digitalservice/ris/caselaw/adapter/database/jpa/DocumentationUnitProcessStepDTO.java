@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "documentation_unit_process_step", schema = "incremental_migration")
 public class DocumentationUnitProcessStepDTO {
-  @Id private UUID id;
+  @Id @GeneratedValue private UUID id;
 
   @Column(name = "user_id")
   private UUID userId;

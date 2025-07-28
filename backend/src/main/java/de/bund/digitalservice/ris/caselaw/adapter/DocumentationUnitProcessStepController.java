@@ -43,7 +43,7 @@ public class DocumentationUnitProcessStepController {
    *     exist.
    */
   @PostMapping("/{documentationUnitId}/new")
-  @PreAuthorize("isAuthenticated() and @userHasWriteAccess.apply(#uuid)")
+  @PreAuthorize("isAuthenticated() and @userHasWriteAccess.apply(#documentationUnitId)")
   public ResponseEntity<DocumentationUnitProcessStep> saveProcessStep(
       @PathVariable UUID documentationUnitId, @RequestBody UUID processStepId) {
     try {
