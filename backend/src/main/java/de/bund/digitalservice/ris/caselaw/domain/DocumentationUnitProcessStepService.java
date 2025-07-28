@@ -34,14 +34,12 @@ public class DocumentationUnitProcessStepService {
    * @throws ProcessStepNotFoundException if the current process step associated with that
    *     documentation unit cannot be found.
    */
-  @Transactional(readOnly = true)
-  public DocumentationUnitProcessStep getCurrentProcessStep(UUID documentationUnitId)
-      throws DocumentationUnitNotExistsException, ProcessStepNotFoundException {
+  public Optional<DocumentationUnitProcessStep> getCurrentProcessStep(UUID documentationUnitId)
+      throws DocumentationUnitNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
 
-    return documentationUnitProcessStepRepository.findTopByDocumentationUnitIdOrderByCreatedAtDesc(
-        documentationUnit.uuid());
+    return documentationUnitProcessStepRepository.getCurrentProcessStep(documentationUnit.uuid());
   }
 
   /**
@@ -51,36 +49,33 @@ public class DocumentationUnitProcessStepService {
    * @param documentationUnitId The ID of the documentation unit.
    * @return An optional ProcessStep representing the next step or empty if no next step found.
    * @throws DocumentationUnitNotExistsException if the documentation unit is not found.
-   * @throws ProcessStepNotFoundException if the current process step for the documentation unit
-   *     cannot be found.
    * @throws DocumentationOfficeNotExistsException if the documentation office associated with the
    *     documentation unit is not found.
    */
   @Transactional(readOnly = true)
   public Optional<ProcessStep> getNextProcessStep(UUID documentationUnitId)
-      throws DocumentationUnitNotExistsException,
-          ProcessStepNotFoundException,
-          DocumentationOfficeNotExistsException {
+      throws DocumentationUnitNotExistsException, DocumentationOfficeNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
 
-    DocumentationUnitProcessStep currentProcessStep =
-        documentationUnitProcessStepRepository.findTopByDocumentationUnitIdOrderByCreatedAtDesc(
-            documentationUnit.uuid());
+    return documentationUnitProcessStepRepository
+        .getCurrentProcessStep(documentationUnit.uuid())
+        .flatMap(
+            currentProcessStep -> {
+              List<ProcessStep> orderedOfficeProcessSteps =
+                  documentationOfficeService.getProcessStepsForDocumentationOffice(
+                      documentationUnit.coreData().documentationOffice().id());
 
-    List<ProcessStep> orderedOfficeProcessSteps =
-        documentationOfficeService.getProcessStepsForDocumentationOffice(
-            documentationUnit.coreData().documentationOffice().id());
+              int currentIndex =
+                  orderedOfficeProcessSteps.indexOf(currentProcessStep.getProcessStep());
 
-    int currentIndex = orderedOfficeProcessSteps.indexOf(currentProcessStep.getProcessStep());
-
-    // If the current step was found in the list and it's not the last one
-    if (currentIndex != -1 && currentIndex < orderedOfficeProcessSteps.size() - 1) {
-      return Optional.of(orderedOfficeProcessSteps.get(currentIndex + 1));
-    } else {
-      // No next step (either current step not found in the office's flow, or it's the last step)
-      return Optional.empty();
-    }
+              // If the current step was found in the list and it's not the last one
+              if (currentIndex != -1 && currentIndex < orderedOfficeProcessSteps.size() - 1) {
+                return Optional.of(orderedOfficeProcessSteps.get(currentIndex + 1));
+              } else {
+                return Optional.empty(); // No next step
+              }
+            });
   }
 
   /**
@@ -101,7 +96,7 @@ public class DocumentationUnitProcessStepService {
         documentationUnitRepository.findByUuid(documentationUnitId);
 
     List<DocumentationUnitProcessStep> allSteps =
-        documentationUnitProcessStepRepository.findByDocumentationUnitOrderByCreatedAtDesc(
+        documentationUnitProcessStepRepository.findAllByDocumentationUnitId(
             documentationUnit.uuid());
 
     if (allSteps.size() < 2) {
@@ -124,7 +119,7 @@ public class DocumentationUnitProcessStepService {
       UUID documentationUnitId) throws DocumentationUnitNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
-    return documentationUnitProcessStepRepository.findByDocumentationUnitOrderByCreatedAtDesc(
+    return documentationUnitProcessStepRepository.findAllByDocumentationUnitId(
         documentationUnit.uuid());
   }
 

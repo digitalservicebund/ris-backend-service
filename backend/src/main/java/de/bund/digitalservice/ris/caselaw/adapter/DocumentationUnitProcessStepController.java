@@ -40,7 +40,7 @@ public class DocumentationUnitProcessStepController {
    * @param processStepId The request body containing the ID of the new process step.
    * @return ResponseEntity with DocumentationUnitProcessStep representing the newly saved (current)
    *     step, and HTTP Status 201 Created. Returns 404 Not Found if the documentation unit does not
-   *     exist.
+   *     exist or the process step was not found.
    */
   @PostMapping("/{documentationUnitId}/new")
   @PreAuthorize("isAuthenticated() and @userHasWriteAccess.apply(#documentationUnitId)")
@@ -61,15 +61,19 @@ public class DocumentationUnitProcessStepController {
    *
    * @param documentationUnitId The ID of the documentation unit.
    * @return ResponseEntity with DocumentationUnitProcessStep if found (200 OK), or 404 Not Found if
-   *     the documentation unit or the current process step is not found.
+   *     the documentation unit is not found.
    */
   @GetMapping("/{documentationUnitId}/current")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<DocumentationUnitProcessStep> getCurrentProcessStep(
       @PathVariable UUID documentationUnitId) {
     try {
-      return ResponseEntity.ok(processStepService.getCurrentProcessStep(documentationUnitId));
-    } catch (DocumentationUnitNotExistsException | ProcessStepNotFoundException ex) {
+      Optional<DocumentationUnitProcessStep> currentStepOptional =
+          processStepService.getCurrentProcessStep(documentationUnitId);
+      return currentStepOptional
+          .map(ResponseEntity::ok)
+          .orElseGet(() -> ResponseEntity.noContent().build());
+    } catch (DocumentationUnitNotExistsException ex) {
       return ResponseEntity.notFound().build();
     }
   }

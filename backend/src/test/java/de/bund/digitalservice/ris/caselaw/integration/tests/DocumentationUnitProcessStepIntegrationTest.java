@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,6 +48,7 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
   private ProcessStepDTO neuProcessStep;
   private ProcessStepDTO ersterfassungProcessStep;
   private ProcessStepDTO qsformalProcessStep;
+  private ProcessStepDTO blockiertProcessStep;
   private static final String PROCESS_STEP_ENDPOINT = "/api/v1/caselaw/processsteps/";
 
   @BeforeEach
@@ -75,6 +77,11 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
             .findByName("QS formal")
             .orElseThrow(
                 () -> new AssertionError("Process step 'QS formal' not found in repository."));
+    blockiertProcessStep =
+        processStepRepository
+            .findByName("Blockiert")
+            .orElseThrow(
+                () -> new AssertionError("Process step 'Blockiert' not found in repository."));
   }
 
   @AfterEach
@@ -117,6 +124,34 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @DisplayName("POST /new - Should throw if process step not found")
+  void saveProcessStep_withInvalidProcessStepId_shouldThrow() {
+    risWebTestClient
+        .withDefaultLogin()
+        .post()
+        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitDS.getId() + "/new")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(UUID.randomUUID().toString())
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
+  }
+
+  @Test
+  @DisplayName("POST /new - Should throw if docunit not found")
+  void saveProcessStep_withInvalidDocumentationUnitId_shouldThrow() {
+    risWebTestClient
+        .withDefaultLogin()
+        .post()
+        .uri(PROCESS_STEP_ENDPOINT + UUID.randomUUID() + "/new")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(neuProcessStep.getId().toString())
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
+  }
+
+  @Test
   @DisplayName("GET /current - Should retrieve the current process step of a documentation unit")
   void getCurrentProcessStep_shouldReturnCurrentStep() {
     LocalDateTime now = LocalDateTime.now();
@@ -154,6 +189,32 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @DisplayName("GET /current - Should return 204 No Content if no current step found for docunit")
+  void getCurrentProcessStep_withNoProcessStepNotFound_shouldReturnNoContent() {
+
+    // Act & Assert
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitDS.getId() + "/current")
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+  }
+
+  @Test
+  @DisplayName("GET /current - Should return 404 Not Found if docunit not found")
+  void getCurrentProcessStep_withInvalidDocumentationUnitId_shouldReturnNotFound() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + UUID.randomUUID() + "/current")
+        .exchange()
+        .expectStatus()
+        .isNotFound();
+  }
+
+  @Test
   @DisplayName("GET /next - Should retrieve the next logical process step")
   void getNextProcessStep_shouldReturnNextStep() {
     LocalDateTime now = LocalDateTime.now();
@@ -162,7 +223,7 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnitId(testDocumentationUnitBGH.getId())
             .processStepId(ersterfassungProcessStep.getId())
-            .createdAt(now.minusSeconds(10))
+            .createdAt(now)
             .build());
 
     // Act & Assert
@@ -180,6 +241,54 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
               assertThat(response.getResponseBody().uuid()).isEqualTo(qsformalProcessStep.getId());
               assertThat(response.getResponseBody().name()).isEqualTo("QS formal");
             });
+  }
+
+  @Test
+  @DisplayName("GET /next - Should return 204 No Content if no next step is found")
+  void getNextProcessStep_shouldReturnNoContent_ifNoNextStep() {
+
+    LocalDateTime now = LocalDateTime.now();
+    // Arrange: Set current step to the last possible step for the docoffice
+    documentationUnitProcessStepRepository.save(
+        DocumentationUnitProcessStepDTO.builder()
+            .documentationUnitId(testDocumentationUnitBGH.getId())
+            .processStepId(blockiertProcessStep.getId())
+            .createdAt(now)
+            .build());
+    // Act & Assert
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitBGH.getId() + "/next")
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+  }
+
+  @Test
+  @DisplayName("GET /next - Should return 204 No Content if docunit has no current process step")
+  void getNextProcessStep_shouldReturnNoContent_ifNoCurrentStep() {
+
+    // Act & Assert
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitBGH.getId() + "/next")
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+  }
+
+  @Test
+  @DisplayName("GET /next - Should return 404 Not Found if docunit not found")
+  void getNextProcessStep_withInvalidDocumentationUnitId_shouldReturnNotFound() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + UUID.randomUUID() + "/next")
+        .exchange()
+        .expectStatus()
+        .isNotFound();
   }
 
   @Test
@@ -217,6 +326,55 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
                   .isEqualTo(neuProcessStep.getId());
               assertThat(response.getResponseBody().getProcessStep().name()).isEqualTo("Neu");
             });
+  }
+
+  @Test
+  @DisplayName("GET /last - Should return 204 No Content if no last (previous) process step")
+  void getLastProcessStep_withNoPreviousStepFound_shouldReturnNoContent() {
+    LocalDateTime now = LocalDateTime.now();
+
+    // Arrange
+    documentationUnitProcessStepRepository.save(
+        DocumentationUnitProcessStepDTO.builder()
+            .documentationUnitId(testDocumentationUnitDS.getId())
+            .processStepId(neuProcessStep.getId())
+            .createdAt(now)
+            .build());
+
+    // Act & Assert
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitDS.getId() + "/last")
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+  }
+
+  @Test
+  @DisplayName("GET /last - Should return 204 No Content if docunit has no process steps")
+  void getLastProcessStep_withNoProcessSteps_shouldReturnNoContent() {
+
+    // Act & Assert
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitDS.getId() + "/last")
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+  }
+
+  @Test
+  @DisplayName("GET /last - Should return 404 Not Found if docunit not found")
+  void getLastProcessStep_withInvalidDocumentationUnitId_shouldReturnNotFound() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + UUID.randomUUID() + "/last")
+        .exchange()
+        .expectStatus()
+        .isNotFound();
   }
 
   @Test
@@ -263,6 +421,38 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @DisplayName("GET /history - Should return empty list if no previous steps found")
+  void getProcessStepHistory_shouldReturnEmptyList_ifNoPreviousStepsFound() {
+
+    // Act & Assert
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitDS.getId() + "/history")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<List<DocumentationUnitProcessStep>>() {})
+        .consumeWith(
+            response -> {
+              List<DocumentationUnitProcessStep> history = response.getResponseBody();
+              assertThat(history).isNotNull().isEmpty();
+            });
+  }
+
+  @Test
+  @DisplayName("GET /history - Should return 404 Not Found if docunit not found")
+  void getProcessStepHistory_withInvalidDocumentationUnitId_shouldReturnNotFound() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + UUID.randomUUID() + "/history")
+        .exchange()
+        .expectStatus()
+        .isNotFound();
+  }
+
+  @Test
   @DisplayName("GET /all - Should retrieve all possible process steps for a documentation office")
   void getAllPossibleProcessStepsForDocOffice_shouldReturnAllSteps() {
 
@@ -287,5 +477,38 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
               assertThat(possibleSteps.get(5).name()).isEqualTo("Wiedervorlage");
               assertThat(possibleSteps.get(6).name()).isEqualTo("Blockiert");
             });
+  }
+
+  @Test
+  @DisplayName("GET /all - Should return empty list if docoffice has no associated process steps")
+  void
+      getAllPossibleProcessStepsForDocOffice_shouldReturnEmptyList_ifNoAssociatedProcessStepsFound() {
+
+    // Act & Assert
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + documentationOfficeDS.getId() + "/all")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<List<ProcessStep>>() {})
+        .consumeWith(
+            response -> {
+              List<ProcessStep> possibleSteps = response.getResponseBody();
+              assertThat(possibleSteps).isNotNull().isEmpty();
+            });
+  }
+
+  @Test
+  @DisplayName("GET /all - Should return 404 Not Found if docoffice not found")
+  void getAllPossibleProcessStepsForDocOffice_withInvalidDocOfficeId_shouldReturnNotFound() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(PROCESS_STEP_ENDPOINT + UUID.randomUUID() + "/all")
+        .exchange()
+        .expectStatus()
+        .isNotFound();
   }
 }
