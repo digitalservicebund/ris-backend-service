@@ -128,10 +128,10 @@ onBeforeUnmount(() => {
 <template>
   <div
     ref="parentRef"
-    aria-label="Stammdaten"
+    aria-label="Formaldaten"
     class="core-data flex flex-col gap-24 bg-white p-24"
   >
-    <TitleElement>Stammdaten</TitleElement>
+    <TitleElement>Formaldaten</TitleElement>
     <NestedComponent
       aria-label="Fehlerhaftes Gericht"
       class="w-full"

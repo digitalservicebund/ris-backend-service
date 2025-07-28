@@ -44,7 +44,7 @@ describe("Pending Proceeding Categories", () => {
   test("renders all categories", async () => {
     renderComponent()
 
-    expect(screen.getByRole("heading", { name: "Stammdaten" })).toBeVisible()
+    expect(screen.getByRole("heading", { name: "Formaldaten" })).toBeVisible()
 
     expect(
       screen.getByRole("heading", { name: "Rechtszug" }),

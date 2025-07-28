@@ -209,7 +209,7 @@ describe("Decision Search", () => {
 
     expect(
       screen.getByText(
-        /Sie können die folgenden Stammdaten übernehmen und eine neue/i,
+        /Sie können die folgenden Formaldaten übernehmen und eine neue/i,
       ),
     ).toBeVisible()
 
@@ -417,7 +417,7 @@ describe("Decision Search", () => {
     const resultList = screen.getByTestId("search-result-list")
     expect(
       within(resultList).getByText(
-        /Sie können die folgenden Stammdaten übernehmen und eine neue/i,
+        /Sie können die folgenden Formaldaten übernehmen und eine neue/i,
       ),
     ).toBeVisible()
     expect(within(resultList).getByText("TEST Aktenzeichen,")).toBeVisible()
@@ -442,7 +442,7 @@ describe("Decision Search", () => {
     const resultList = screen.getByTestId("search-result-list")
     expect(
       within(resultList).getByText(
-        /Sie können die folgenden Stammdaten übernehmen und eine neue/i,
+        /Sie können die folgenden Formaldaten übernehmen und eine neue/i,
       ),
     ).toBeVisible()
     expect(
@@ -472,7 +472,7 @@ describe("Decision Search", () => {
     const resultList = screen.getByTestId("search-result-list")
     expect(
       within(resultList).getByText(
-        /Sie können die folgenden Stammdaten übernehmen und eine neue/i,
+        /Sie können die folgenden Formaldaten übernehmen und eine neue/i,
       ),
     ).toBeVisible()
     expect(

@@ -403,7 +403,7 @@ class DecisionReducedLdmlTransformerTest {
             """
                <akn:FRBRthis value="YYTestDoc0013"/>
                """),
-        // CoreData/Stammdaten -->
+        // CoreData/Formaldaten -->
         Arguments.of(
             "'court' (Gericht)",
             """

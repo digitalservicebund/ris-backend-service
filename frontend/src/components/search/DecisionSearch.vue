@@ -231,7 +231,7 @@ async function createNewFromSearch() {
 
           <div v-if="showCreateFromParamsButton">
             <p>
-              Sie können die folgenden Stammdaten übernehmen und eine neue<br />Dokumentationseinheit
+              Sie können die folgenden Formaldaten übernehmen und eine neue<br />Dokumentationseinheit
               erstellen:
             </p>
             <p class="ris-label1-bold mb-16 text-center">
