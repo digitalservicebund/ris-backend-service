@@ -15,6 +15,5 @@ public class DocumentationUnitProcessStep {
   private UUID id;
   private UUID userId;
   private LocalDateTime createdAt;
-  private DocumentationUnit documentationUnit;
   private ProcessStep processStep;
 }
