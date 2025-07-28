@@ -213,7 +213,7 @@ class PendingProceedingFullLdmlTransformerTest {
                <akn:FRBRuri value="YYTestDoc0013/dokument"/>
                <akn:FRBRdate date="2020-01-01" name="Mitteilungsdatum"/>
                <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-               <akn:FRBRlanguage language="deu"/>
+               <akn:FRBRlanguage language="de"/>
             </akn:FRBRExpression>
             <akn:FRBRManifestation>
                <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>

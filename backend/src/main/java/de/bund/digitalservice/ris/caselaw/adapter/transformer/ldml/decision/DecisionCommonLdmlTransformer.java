@@ -9,6 +9,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.DocumentRef;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.ForeignLanguageVersion;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAlias;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAuthor;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrCountry;
@@ -123,6 +125,24 @@ public abstract class DecisionCommonLdmlTransformer
               .filter(Objects::nonNull)
               .toList(),
           builder::legalForce);
+    }
+    if (contentRelatedIndexing != null
+        && contentRelatedIndexing.foreignLanguageVersions() != null) {
+      applyIfNotEmpty(
+          contentRelatedIndexing.foreignLanguageVersions().stream()
+              .map(
+                  foreignLanguageVersion ->
+                      ForeignLanguageVersion.builder()
+                          .documentRef(
+                              DocumentRef.builder()
+                                  .href(foreignLanguageVersion.link())
+                                  .showAs(foreignLanguageVersion.languageCode().label())
+                                  .build())
+                          .frbrLanguage(
+                              new FrbrLanguage(foreignLanguageVersion.languageCode().isoCode()))
+                          .build())
+              .toList(),
+          builder::foreignLanguageVersions);
     }
 
     return builder;
@@ -243,7 +263,7 @@ public abstract class DecisionCommonLdmlTransformer
         FrbrElement.builder()
             .frbrDate(frbrDate)
             .frbrAuthor(frbrAuthor)
-            .frbrLanguage(new FrbrLanguage())
+            .frbrLanguage(new FrbrLanguage("de"))
             .build()
             .withFrbrThisAndUri(uniqueId + "/dokument");
 

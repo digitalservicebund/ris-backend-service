@@ -5,22 +5,22 @@ VALUES
   (
     '16f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
     '1234567890123',
-    'ba90a851-3c54-4858-b4fa-7742ffbe8f05'
+    '6be0bb1a-c196-484a-addf-822f2ab557f7'
   ),
   (
     '26f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
     'docNumber00002',
-    'ba90a851-3c54-4858-b4fa-7742ffbe8f05'
+    '6be0bb1a-c196-484a-addf-822f2ab557f7'
   ),
   (
     '36f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
     'docNumber00003',
-    'ba90a851-3c54-4858-b4fa-7742ffbe8f05'
+    '6be0bb1a-c196-484a-addf-822f2ab557f7'
   ),
   (
     '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
     'bghDocument123',
-    '41e62dbc-e5b6-414f-91e2-0cfe559447d1'
+    'bd350c93-7ff0-4409-9c62-371e3d0c749e'
   );
 
 INSERT INTO
@@ -81,49 +81,49 @@ INSERT INTO
 VALUES
   (
     '1e768071-1a19-43a1-8ab9-c185adec94bf',
-    'ba90a851-3c54-4858-b4fa-7742ffbe8f05',
+    '6be0bb1a-c196-484a-addf-822f2ab557f7',
     'procedure1',
     null,
     null
   ),
   (
     '2e768071-1a19-43a1-8ab9-c185adec94bf',
-    'ba90a851-3c54-4858-b4fa-7742ffbe8f05',
+    '6be0bb1a-c196-484a-addf-822f2ab557f7',
     'procedure2',
     null,
     null
   ),
   (
     '3e768071-1a19-43a1-8ab9-c185adec94bf',
-    'ba90a851-3c54-4858-b4fa-7742ffbe8f05',
+    '6be0bb1a-c196-484a-addf-822f2ab557f7',
     'procedure3',
     null,
     null
   ),
   (
     '9e768071-1a19-43a1-8ab9-c185adec94bf',
-    '41e62dbc-e5b6-414f-91e2-0cfe559447d1',
+    'bd350c93-7ff0-4409-9c62-371e3d0c749e',
     'testProcedure BGH',
     null,
     null
   ),
   (
     '3f768071-1a19-43a1-8ab9-c185adec94bf',
-    'ba90a851-3c54-4858-b4fa-7742ffbe8f05',
+    '6be0bb1a-c196-484a-addf-822f2ab557f7',
     'with date',
     '2023-12-04 18:21:48.334174+00',
     null
   ),
   (
     '4f768071-1a19-43a1-8ab9-c185adec94bf',
-    'ba90a851-3c54-4858-b4fa-7742ffbe8f05',
+    '6be0bb1a-c196-484a-addf-822f2ab557f7',
     'with date in past',
     '2022-12-04 18:21:48.334174+00',
     null
   ),
   (
     '5f768071-1a19-43a1-8ab9-c185adec94bf',
-    'ba90a851-3c54-4858-b4fa-7742ffbe8f05',
+    '6be0bb1a-c196-484a-addf-822f2ab557f7',
     'without date',
     null,
     null

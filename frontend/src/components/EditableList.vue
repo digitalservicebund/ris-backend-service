@@ -6,7 +6,7 @@ import Tooltip from "./Tooltip.vue"
 import DefaultSummary from "@/components/DefaultSummary.vue"
 import { useScroll } from "@/composables/useScroll"
 import ListItem from "@/domain/editableListItem"
-import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
+import IconEdit from "~icons/ic/outline-edit"
 import IconAdd from "~icons/material-symbols/add"
 
 interface Props {
@@ -187,7 +187,7 @@ defineExpose({
           @add-new-entry="handleAddFromSummary"
         />
 
-        <Tooltip text="Aufklappen">
+        <Tooltip text="Eintrag bearbeiten">
           <Button
             id="editable-list-select-button"
             :data-testid="`list-entry-${index}`"
@@ -205,7 +205,7 @@ defineExpose({
                 setEditEntry(entry as T)
               }
             "
-            ><template #icon> <IconArrowDown /> </template
+            ><template #icon> <IconEdit /> </template
           ></Button>
         </Tooltip>
       </div>
