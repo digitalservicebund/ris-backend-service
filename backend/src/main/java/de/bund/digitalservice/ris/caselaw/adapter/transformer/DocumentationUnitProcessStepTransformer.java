@@ -18,7 +18,7 @@ public class DocumentationUnitProcessStepTransformer {
    */
   public static DocumentationUnitProcessStep toDomain(
       DocumentationUnitProcessStepDTO entity, ProcessStep processStep) {
-    if (entity == null) {
+    if (entity == null || processStep == null) {
       return null;
     }
 
