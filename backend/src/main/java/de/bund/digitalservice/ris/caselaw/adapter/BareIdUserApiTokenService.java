@@ -18,6 +18,7 @@ public class BareIdUserApiTokenService {
 
   public BareIdUserApiTokenService(OAuth2AuthorizedClientManager authorizedClientManager) {
     this.authorizedClientManager = authorizedClientManager;
+    setAccessToken();
   }
 
   public OAuth2AccessToken getAccessToken() {
