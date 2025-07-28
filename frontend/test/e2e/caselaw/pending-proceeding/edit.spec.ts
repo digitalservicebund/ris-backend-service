@@ -85,7 +85,7 @@ test.describe("edit pending proceeding", () => {
         await expect(jurisdictionType).toHaveAttribute("readonly", "")
       })
 
-      // Gerichtsbarkeit Finanzgerichtsbarkeit
+      // Region
       await test.step("'Region' is readonly", async () => {
         const jurisdictionType = page.getByLabel("Region", {
           exact: true,

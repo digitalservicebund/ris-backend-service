@@ -1562,6 +1562,45 @@ class DecisionTransformerTest {
     assertThat(documentationUnitDTO.getDeviatingDocumentNumbers()).isEmpty();
   }
 
+  @Test
+  void testTransformToDomain_withCelex_resultShouldHaveCelex() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().celexNumber("62023CJ0538").build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.coreData().celexNumber()).isEqualTo("62023CJ0538");
+  }
+
+  @Test
+  void testTransformToDomain_withoutCelex_resultShouldNotHaveCelex() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.coreData().celexNumber()).isBlank();
+  }
+
+  @Test
+  void testTransformToDTO_withCelex_resultShouldHaveCelex() {
+    Decision decision =
+        Decision.builder().coreData(CoreData.builder().celexNumber("62023CJ0538").build()).build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getCelexNumber()).isEqualTo("62023CJ0538");
+  }
+
+  @Test
+  void testTransformToDTO_withoutCelex_resultShouldNotHaveCelex() {
+    Decision decision = Decision.builder().coreData(CoreData.builder().build()).build();
+
+    DecisionDTO decisionDTO =
+        DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+    assertThat(decisionDTO.getCelexNumber()).isBlank();
+  }
+
   private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {
     return Decision.builder()
         .previousDecisions(Collections.emptyList())
