@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import java.time.Instant;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -8,6 +9,7 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class BareIdUserApiTokenService {
 
   private OAuth2AccessToken accessToken;
@@ -18,7 +20,11 @@ public class BareIdUserApiTokenService {
 
   public BareIdUserApiTokenService(OAuth2AuthorizedClientManager authorizedClientManager) {
     this.authorizedClientManager = authorizedClientManager;
-    setAccessToken();
+    try {
+      setAccessToken();
+    } catch (Exception e) {
+      log.error("Did not retrieve api token", e);
+    }
   }
 
   public OAuth2AccessToken getAccessToken() {
