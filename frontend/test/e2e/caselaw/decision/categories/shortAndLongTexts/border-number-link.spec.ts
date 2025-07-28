@@ -117,6 +117,9 @@ test("create and validate border number links", async ({
   const reasons = page.getByTestId("Gründe")
   await reasons.click()
   await page.keyboard.press(`ControlOrMeta+A`)
+  // Without timeout, the selection is applied after the backspace left.
+  // eslint-disable-next-line playwright/no-wait-for-timeout
+  await page.waitForTimeout(100)
   await page.keyboard.press(`ControlOrMeta+Backspace`)
 
   // save
