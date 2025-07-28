@@ -93,7 +93,7 @@ watch(
     <div>
       <p class="ris-label1-bold">Keine passende Entscheidung gefunden?</p>
       <p>
-        Übernehmen Sie die Stammdaten und erstellen Sie eine neue Entscheidung.
+        Übernehmen Sie die Formaldaten und erstellen Sie eine neue Entscheidung.
       </p>
     </div>
     <InputField

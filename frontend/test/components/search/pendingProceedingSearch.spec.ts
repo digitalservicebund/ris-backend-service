@@ -211,7 +211,7 @@ describe("Pending Proceeding Search", () => {
 
     expect(
       screen.getByText(
-        /sie können die folgenden stammdaten übernehmen und ein neuesanhängiges verfahren erstellen:/i,
+        /sie können die folgenden formaldaten übernehmen und ein neuesanhängiges verfahren erstellen:/i,
       ),
     ).toBeVisible()
 
@@ -419,7 +419,7 @@ describe("Pending Proceeding Search", () => {
     const resultList = screen.getByTestId("search-result-list")
     expect(
       screen.getByText(
-        /Sie können die folgenden Stammdaten übernehmen und ein neues/i,
+        /Sie können die folgenden Formaldaten übernehmen und ein neues/i,
       ),
     ).toBeVisible()
     expect(within(resultList).getByText("TEST Aktenzeichen,")).toBeVisible()
@@ -444,7 +444,7 @@ describe("Pending Proceeding Search", () => {
     const resultList = screen.getByTestId("search-result-list")
     expect(
       screen.getByText(
-        /Sie können die folgenden Stammdaten übernehmen und ein neues/i,
+        /Sie können die folgenden Formaldaten übernehmen und ein neues/i,
       ),
     ).toBeVisible()
     expect(
@@ -474,7 +474,7 @@ describe("Pending Proceeding Search", () => {
     const resultList = screen.getByTestId("search-result-list")
     expect(
       within(resultList).getByText(
-        /Sie können die folgenden Stammdaten übernehmen und ein neues/i,
+        /Sie können die folgenden Formaldaten übernehmen und ein neues/i,
       ),
     ).toBeVisible()
     expect(

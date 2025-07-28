@@ -13,7 +13,7 @@ test.describe("scrolling behavior with hashes", () => {
     )
 
     await expect(
-      page.getByRole("heading", { name: "Stammdaten" }),
+      page.getByRole("heading", { name: "Formaldaten" }),
     ).toBeInViewport()
     await expect(
       page.getByRole("heading", { name: "Kurz- & Langtexte" }),
@@ -22,7 +22,7 @@ test.describe("scrolling behavior with hashes", () => {
     await textsNavItem.click()
 
     await expect(
-      page.getByRole("heading", { name: "Stammdaten" }),
+      page.getByRole("heading", { name: "Formaldaten" }),
     ).not.toBeInViewport()
     await expect(
       page.getByRole("heading", { name: "Kurz- & Langtexte" }),
@@ -44,7 +44,7 @@ test.describe("scrolling behavior with hashes", () => {
 
     await textsNavItem.click()
     await expect(
-      page.getByRole("heading", { name: "Stammdaten" }),
+      page.getByRole("heading", { name: "Formaldaten" }),
     ).not.toBeInViewport()
     await expect(
       page.getByRole("heading", { name: "Kurz- & Langtexte" }),
@@ -52,7 +52,7 @@ test.describe("scrolling behavior with hashes", () => {
 
     await coreDataNavItem.click()
     await expect(
-      page.getByRole("heading", { name: "Stammdaten" }),
+      page.getByRole("heading", { name: "Formaldaten" }),
     ).toBeInViewport()
     await expect(
       page.getByRole("heading", { name: "Kurz- & Langtexte" }),
