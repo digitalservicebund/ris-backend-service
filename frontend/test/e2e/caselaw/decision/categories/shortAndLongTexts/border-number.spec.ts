@@ -111,9 +111,7 @@ test.describe(
 
       await test.step("Select text of first border number", async () => {
         await editor.getByText(firstParagraph).selectText()
-        // The promise returns before the selection is applied.
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(100)
+        await waitForSelectionTimeout(page)
       })
 
       await clickRemoveBorderNumberButton(page)
@@ -130,9 +128,7 @@ test.describe(
 
       await test.step("Navigate cursor to the start of the first border number content", async () => {
         await editor.getByText(firstParagraph).selectText()
-        // The promise returns before the selection is applied.
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(100)
+        await waitForSelectionTimeout(page)
         await page.keyboard.press("ArrowLeft")
       })
 
@@ -150,9 +146,7 @@ test.describe(
 
       await test.step("Navigate cursor to the first border number number", async () => {
         await editor.getByText(firstParagraph).selectText()
-        // The promise returns before the selection is applied.
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(100)
+        await waitForSelectionTimeout(page)
         await page.keyboard.press("ArrowLeft")
         await page.keyboard.press("ArrowLeft")
       })
@@ -181,17 +175,13 @@ test.describe(
 
       await test.step("Change number of second border number to 99", async () => {
         await editor.getByText("2").selectText()
-        // The promise returns before the selection is applied.
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(100)
+        await waitForSelectionTimeout(page)
         await page.keyboard.insertText("99")
       })
 
       await test.step("Select text of first border number which has been removed", async () => {
         await editor.getByText(firstParagraph).selectText()
-        // The promise returns before the selection is applied.
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(100)
+        await waitForSelectionTimeout(page)
       })
 
       await clickRemoveBorderNumberButton(page)
@@ -244,9 +234,7 @@ test.describe(
 
       await test.step("Select text of first border number", async () => {
         await editor.getByText(firstParagraph).selectText()
-        // The promise returns before the selection is applied.
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(100)
+        await waitForSelectionTimeout(page)
       })
 
       await clickRemoveBorderNumberButton(page)
@@ -302,17 +290,13 @@ test.describe(
 
       await test.step("Change number of second border number to 99", async () => {
         await editor.getByText("2").selectText()
-        // The promise returns before the selection is applied.
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(100)
+        await waitForSelectionTimeout(page)
         await page.keyboard.insertText("99")
       })
 
       await test.step("Select text of first border number", async () => {
         await editor.getByText(firstParagraph).selectText()
-        // The promise returns before the selection is applied.
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(100)
+        await waitForSelectionTimeout(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -631,6 +615,7 @@ test.describe(
       await test.step("Paste paragraphs into middle of first border number content", async () => {
         const middleOfFirstParagraph = firstParagraph.slice(4)
         await editor.getByText(middleOfFirstParagraph).click()
+        await waitForSelectionTimeout(page)
         await page.keyboard.press(`ControlOrMeta+V`)
       })
 
@@ -736,9 +721,7 @@ test.describe(
 
       await test.step("Fuse the second with the first border number", async () => {
         await editor.getByText(secondParagraph).selectText()
-        // The promise returns before the selection is applied.
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(100)
+        await waitForSelectionTimeout(page)
         await page.keyboard.press("ArrowLeft")
         await clickBackspace(page)
         await clickBackspace(page)
@@ -836,9 +819,14 @@ async function checkAllBorderNumbersAreRemoved(editor: Locator) {
   })
 }
 
-async function selectAllViaKeyboard(page: Page) {
-  await page.keyboard.press(`ControlOrMeta+A`)
-  // The promise returns before the selection is applied.
+async function waitForSelectionTimeout(page: Page) {
+  // With the latest Chromium versions, the selection promise seems to return without the selection being applied.
   // eslint-disable-next-line playwright/no-wait-for-timeout
   await page.waitForTimeout(100)
+}
+
+async function selectAllViaKeyboard(page: Page) {
+  await page.keyboard.press(`ControlOrMeta+A`)
+  // With the latest Chromium versions, the selection promise seems to return without the selection being applied.
+  await page.waitForFunction(() => window.getSelection()?.toString()?.length)
 }
