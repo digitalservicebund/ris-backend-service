@@ -88,6 +88,10 @@ spring:
               - openid
               - profile
               - email
+          bareid-user-api-client:
+            provider: keycloak
+            authorization-grant-type: client_credentials
+            client-authentication-method: client_secret_basic
 
 springdoc:
   api-docs:
@@ -119,3 +123,6 @@ languagetool:
 
 eurlex:
   url: ${EURLEX_URL}
+
+bareid:
+  instance: ${BAREID_INSTANCE}
