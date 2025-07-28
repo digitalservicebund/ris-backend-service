@@ -11,16 +11,16 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.5.3"
+    id("org.springframework.boot") version "3.5.4"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "7.2.0"
+    id("com.diffplug.spotless") version "7.2.1"
     id("org.sonarqube") version "6.2.0.5505"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.10.3"
+    id("org.flywaydb.flyway") version "11.10.4"
     id("io.sentry.jvm.gradle") version "5.8.0"
 }
 
@@ -160,7 +160,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.1")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.2")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
@@ -223,7 +223,7 @@ dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
     implementation("io.getunleash:unleash-client-java:11.0.2")
-    implementation("org.apache.commons:commons-text:1.13.1")
+    implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.1")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.2")
@@ -232,10 +232,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.15.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.10.3"
+    val flywayCore = "org.flywaydb:flyway-core:11.10.4"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.3")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.4")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -244,7 +244,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.8")
-    testImplementation("org.springframework.security:spring-security-test:6.5.1")
+    testImplementation("org.springframework.security:spring-security-test:6.5.2")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
