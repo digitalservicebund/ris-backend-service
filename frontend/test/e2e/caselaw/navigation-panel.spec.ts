@@ -54,7 +54,7 @@ test.describe("test navigation panel", () => {
     await page.keyboard.press("Tab")
     await expect(page.getByRole("link", { name: "Rubriken" })).toBeFocused()
     await page.keyboard.press("Tab")
-    await expect(page.getByRole("link", { name: "Stammdaten" })).toBeFocused()
+    await expect(page.getByRole("link", { name: "Formaldaten" })).toBeFocused()
     await page.keyboard.press("Tab")
     await expect(page.getByRole("link", { name: "Rechtszug" })).toBeFocused()
     await page.keyboard.press("Tab")

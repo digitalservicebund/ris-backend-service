@@ -755,7 +755,7 @@ jobs:
           # This email identifies the commit as GitHub Actions - see https://github.com/orgs/community/discussions/26560
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       # First checkout ris-backend-service because of ADRs
-      - name: Checkout ris-norms repository
+      - name: Checkout ris-backend-service repository
         uses: actions/checkout@v4
         with:
           path: ris-backend-service

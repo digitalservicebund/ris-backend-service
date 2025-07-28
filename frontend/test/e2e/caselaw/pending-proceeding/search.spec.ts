@@ -344,7 +344,7 @@ test.describe(
       })
       await test.step("Ohne Ergebnisse kann Neuanlage aus Suchparametern erfolgen", async () => {
         await expect(
-          pageWithBfhUser.getByText("folgenden Stammdaten übernehmen"),
+          pageWithBfhUser.getByText("folgenden Formaldaten übernehmen"),
         ).toBeVisible()
         await expect(
           pageWithBfhUser.getByText(`${fileNumber}, BFH, 05.07.2022`),
