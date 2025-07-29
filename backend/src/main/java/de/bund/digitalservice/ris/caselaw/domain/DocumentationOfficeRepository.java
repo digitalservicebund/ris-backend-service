@@ -13,5 +13,4 @@ public interface DocumentationOfficeRepository {
 
   List<ProcessStep> findAllProcessStepsByUuid(UUID uuid)
       throws DocumentationOfficeNotExistsException;
-  ;
 }

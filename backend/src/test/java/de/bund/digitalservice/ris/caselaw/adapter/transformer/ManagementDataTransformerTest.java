@@ -456,7 +456,6 @@ class ManagementDataTransformerTest {
     @Test
     void testTransformDecisionToDomain_withAllowedUserDocOffice_shouldTransformUserName() {
       // Arrange
-      UUID docOfficeId = UUID.randomUUID();
       DocumentationOfficeDTO documentationOfficeDTO =
           DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation("BGH").build();
       ManagementDataDTO managementDataDTO =
@@ -489,7 +488,6 @@ class ManagementDataTransformerTest {
     @Test
     void testTransformPendingProceedingToDomain_withAllowedUserDocOffice_shouldTransformUserName() {
       // Arrange
-      UUID docOfficeId = UUID.randomUUID();
       DocumentationOfficeDTO documentationOfficeDTO =
           DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation("BGH").build();
       ManagementDataDTO managementDataDTO =
