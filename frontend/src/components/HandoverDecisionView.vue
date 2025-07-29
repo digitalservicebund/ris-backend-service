@@ -137,7 +137,7 @@ function handoverDocumentUnit() {
       warnings.push("Es besteht Dublettenverdacht.")
     if (!areBorderNumbersAndLinksValid.value)
       warnings.push("Die Randnummern sind nicht korrekt.")
-    if (fieldsWithoutJdvExport.value)
+    if (fieldsWithoutJdvExport.value.length > 0)
       warnings.push(
         "Die folgenden Rubriken können nicht an die jDV exportiert werden: \n" +
           fieldsWithoutJdvExport.value.join(", ") +
