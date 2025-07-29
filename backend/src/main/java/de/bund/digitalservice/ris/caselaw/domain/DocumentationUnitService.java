@@ -52,6 +52,7 @@ public class DocumentationUnitService {
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
   private final DocumentationOfficeService documentationOfficeService;
+  private final DocumentationUnitProcessStepService processStepService;
   private static final List<String> pathsForDuplicateCheck =
       List.of(
           "/coreData/ecli",
@@ -81,7 +82,8 @@ public class DocumentationUnitService {
       DuplicateCheckService duplicateCheckService,
       DocumentationOfficeService documentationOfficeService,
       DocumentationUnitHistoryLogService historyLogService,
-      DocumentationUnitSearchRepository docUnitSearchRepository) {
+      DocumentationUnitSearchRepository docUnitSearchRepository,
+      DocumentationUnitProcessStepService processStepService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -98,6 +100,7 @@ public class DocumentationUnitService {
     this.documentationOfficeService = documentationOfficeService;
     this.historyLogService = historyLogService;
     this.docUnitSearchRepository = docUnitSearchRepository;
+    this.processStepService = processStepService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -240,6 +243,18 @@ public class DocumentationUnitService {
     var newDocumentationUnit =
         repository.createNewDocumentationUnit(
             docUnit, status, params.reference(), params.fileNumber(), user);
+
+    var docOfficeProcessSteps =
+        processStepService.getAllProcessStepsForDocOffice(
+            docUnit.coreData().documentationOffice().id());
+    if (docOfficeProcessSteps != null && !docOfficeProcessSteps.isEmpty()) {
+      try {
+        processStepService.saveProcessStep(
+            newDocumentationUnit.uuid(), docOfficeProcessSteps.getFirst().uuid());
+      } catch (DocumentationUnitNotExistsException e) {
+        log.warn("Could not save process step for new decision because it does not exist", e);
+      }
+    }
 
     if (isExternalHandover) {
       String description =

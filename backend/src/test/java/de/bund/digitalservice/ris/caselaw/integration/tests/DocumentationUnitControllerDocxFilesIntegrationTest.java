@@ -9,11 +9,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
@@ -61,7 +59,6 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
-  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private AttachmentRepository attachmentRepository;
@@ -77,7 +74,6 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
   @BeforeEach
   void setUp() {
     dsDocOffice = documentationOfficeRepository.findByAbbreviation("DS");
-    databaseDocumentCategoryRepository.save(DocumentCategoryDTO.builder().label("R").build());
   }
 
   @AfterEach
@@ -85,7 +81,6 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     repository.deleteAll();
     attachmentRepository.deleteAll();
     databaseCourtRepository.deleteAll();
-    databaseDocumentCategoryRepository.deleteAll();
   }
 
   @Test

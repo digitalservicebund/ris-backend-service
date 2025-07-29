@@ -96,7 +96,7 @@ test.describe(
       await checkStyleOfFirstParagraph(editor)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
       })
 
       await clickRemoveBorderNumberButton(page)
@@ -111,6 +111,7 @@ test.describe(
 
       await test.step("Select text of first border number", async () => {
         await editor.getByText(firstParagraph).selectText()
+        await waitForSelectionTimeout(page)
       })
 
       await clickRemoveBorderNumberButton(page)
@@ -127,6 +128,7 @@ test.describe(
 
       await test.step("Navigate cursor to the start of the first border number content", async () => {
         await editor.getByText(firstParagraph).selectText()
+        await waitForSelectionTimeout(page)
         await page.keyboard.press("ArrowLeft")
       })
 
@@ -144,6 +146,7 @@ test.describe(
 
       await test.step("Navigate cursor to the first border number number", async () => {
         await editor.getByText(firstParagraph).selectText()
+        await waitForSelectionTimeout(page)
         await page.keyboard.press("ArrowLeft")
         await page.keyboard.press("ArrowLeft")
       })
@@ -172,11 +175,13 @@ test.describe(
 
       await test.step("Change number of second border number to 99", async () => {
         await editor.getByText("2").selectText()
+        await waitForSelectionTimeout(page)
         await page.keyboard.insertText("99")
       })
 
       await test.step("Select text of first border number which has been removed", async () => {
         await editor.getByText(firstParagraph).selectText()
+        await waitForSelectionTimeout(page)
       })
 
       await clickRemoveBorderNumberButton(page)
@@ -229,6 +234,7 @@ test.describe(
 
       await test.step("Select text of first border number", async () => {
         await editor.getByText(firstParagraph).selectText()
+        await waitForSelectionTimeout(page)
       })
 
       await clickRemoveBorderNumberButton(page)
@@ -275,7 +281,7 @@ test.describe(
       await checkAllParagraphsAreVisible(editor)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -284,11 +290,13 @@ test.describe(
 
       await test.step("Change number of second border number to 99", async () => {
         await editor.getByText("2").selectText()
+        await waitForSelectionTimeout(page)
         await page.keyboard.insertText("99")
       })
 
       await test.step("Select text of first border number", async () => {
         await editor.getByText(firstParagraph).selectText()
+        await waitForSelectionTimeout(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -318,7 +326,7 @@ test.describe(
       await checkAllParagraphsAreVisible(reasons)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -341,7 +349,7 @@ test.describe(
       await checkAllParagraphsAreVisible(dissentingOpinion)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -374,7 +382,7 @@ test.describe(
       await checkAllParagraphsAreVisible(otherLongText)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -414,7 +422,7 @@ test.describe(
       await checkAllParagraphsAreVisible(casefacts)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -437,7 +445,7 @@ test.describe(
       await checkAllParagraphsAreVisible(decisionReasons)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -470,7 +478,7 @@ test.describe(
       await checkAllParagraphsAreVisible(dissentingOpinion)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -503,7 +511,7 @@ test.describe(
       await checkAllParagraphsAreVisible(otherLongText)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -595,18 +603,19 @@ test.describe(
       })
 
       await test.step("Add border numbers to the paragraphs", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
         await page.keyboard.press(`ControlOrMeta+Alt+.`)
       })
 
       await test.step("Copy paragraphs with border numbers", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
         await page.keyboard.press(`ControlOrMeta+C`)
       })
 
       await test.step("Paste paragraphs into middle of first border number content", async () => {
         const middleOfFirstParagraph = firstParagraph.slice(4)
         await editor.getByText(middleOfFirstParagraph).click()
+        await waitForSelectionTimeout(page)
         await page.keyboard.press(`ControlOrMeta+V`)
       })
 
@@ -640,12 +649,12 @@ test.describe(
       })
 
       await test.step("Add border numbers to the paragraphs", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
         await page.keyboard.press(`ControlOrMeta+Alt+.`)
       })
 
       await test.step("Copy paragraphs with border numbers", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
         await page.keyboard.press(`ControlOrMeta+C`)
       })
 
@@ -703,7 +712,7 @@ test.describe(
       await checkAllParagraphsAreVisible(editor)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`ControlOrMeta+A`)
+        await selectAllViaKeyboard(page)
       })
 
       await clickAddBorderNumberButton(page)
@@ -712,6 +721,7 @@ test.describe(
 
       await test.step("Fuse the second with the first border number", async () => {
         await editor.getByText(secondParagraph).selectText()
+        await waitForSelectionTimeout(page)
         await page.keyboard.press("ArrowLeft")
         await clickBackspace(page)
         await clickBackspace(page)
@@ -752,7 +762,7 @@ async function clickAddBorderNumberButton(page: Page) {
 
 async function reinsertAllBorderNumbers(page: Page) {
   await test.step("Reinsert all border numbers", async () => {
-    await page.keyboard.press(`ControlOrMeta+A`)
+    await selectAllViaKeyboard(page)
     await page.keyboard.press(`Delete`)
     await page.keyboard.press(`ControlOrMeta+V`)
   })
@@ -807,4 +817,16 @@ async function checkAllBorderNumbersAreRemoved(editor: Locator) {
     await expect(editor.getByText(`2${secondParagraph}`)).toBeHidden()
     await expect(editor.getByText(`3${thirdParagraph}`)).toBeHidden()
   })
+}
+
+async function waitForSelectionTimeout(page: Page) {
+  // With the latest Chromium versions, the selection promise seems to return without the selection being applied.
+  // eslint-disable-next-line playwright/no-wait-for-timeout
+  await page.waitForTimeout(100)
+}
+
+async function selectAllViaKeyboard(page: Page) {
+  await page.keyboard.press(`ControlOrMeta+A`)
+  // With the latest Chromium versions, the selection promise seems to return without the selection being applied.
+  await page.waitForFunction(() => window.getSelection()?.toString()?.length)
 }

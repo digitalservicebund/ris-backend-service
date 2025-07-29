@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ManagementDataTransformerTest {
+  UUID docOfficeId = UUID.randomUUID();
+
   @Test
   void testTransformDecisionToDomain_withoutManagementData_shouldTransformToEmptyManagementData() {
     // Arrange
@@ -454,7 +456,6 @@ class ManagementDataTransformerTest {
     @Test
     void testTransformDecisionToDomain_withAllowedUserDocOffice_shouldTransformUserName() {
       // Arrange
-      UUID docOfficeId = UUID.randomUUID();
       DocumentationOfficeDTO documentationOfficeDTO =
           DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation("BGH").build();
       ManagementDataDTO managementDataDTO =
@@ -487,7 +488,6 @@ class ManagementDataTransformerTest {
     @Test
     void testTransformPendingProceedingToDomain_withAllowedUserDocOffice_shouldTransformUserName() {
       // Arrange
-      UUID docOfficeId = UUID.randomUUID();
       DocumentationOfficeDTO documentationOfficeDTO =
           DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation("BGH").build();
       ManagementDataDTO managementDataDTO =
@@ -1130,7 +1130,8 @@ class ManagementDataTransformerTest {
 
   private DecisionDTO.DecisionDTOBuilder<?, ?> generateSimpleDTOBuilder() {
     return DecisionDTO.builder()
-        .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("doc office").build());
+        .documentationOffice(
+            DocumentationOfficeDTO.builder().id(docOfficeId).abbreviation("doc office").build());
   }
 
   @Builder(toBuilder = true)

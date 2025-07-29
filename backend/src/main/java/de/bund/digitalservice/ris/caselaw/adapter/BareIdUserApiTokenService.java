@@ -20,11 +20,6 @@ public class BareIdUserApiTokenService {
 
   public BareIdUserApiTokenService(OAuth2AuthorizedClientManager authorizedClientManager) {
     this.authorizedClientManager = authorizedClientManager;
-    try {
-      setAccessToken();
-    } catch (Exception e) {
-      log.error("Did not retrieve api token", e);
-    }
   }
 
   public OAuth2AccessToken getAccessToken() {

@@ -25,7 +25,7 @@ export function useCaseLawMenuItems(
         ...(isInternalUser.value
           ? [
               {
-                label: "Stammdaten",
+                label: "Formaldaten",
                 route: {
                   ...baseRoute,
                   name: "caselaw-documentUnit-documentNumber-categories",

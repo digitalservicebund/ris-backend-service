@@ -25,7 +25,7 @@ export function usePendingProceedingMenuItems(
         ...(isInternalUser.value
           ? [
               {
-                label: "Stammdaten",
+                label: "Formaldaten",
                 route: {
                   ...baseRoute,
                   name: "caselaw-pending-proceeding-documentNumber-categories",
