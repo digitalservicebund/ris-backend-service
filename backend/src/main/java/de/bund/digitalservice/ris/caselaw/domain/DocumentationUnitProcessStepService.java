@@ -58,14 +58,14 @@ public class DocumentationUnitProcessStepService {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
 
+    List<ProcessStep> orderedOfficeProcessSteps =
+        documentationOfficeService.getProcessStepsForDocumentationOffice(
+            documentationUnit.coreData().documentationOffice().id());
+
     return documentationUnitProcessStepRepository
         .getCurrentProcessStep(documentationUnit.uuid())
         .flatMap(
             currentProcessStep -> {
-              List<ProcessStep> orderedOfficeProcessSteps =
-                  documentationOfficeService.getProcessStepsForDocumentationOffice(
-                      documentationUnit.coreData().documentationOffice().id());
-
               int currentIndex =
                   orderedOfficeProcessSteps.indexOf(currentProcessStep.getProcessStep());
 
@@ -75,7 +75,8 @@ public class DocumentationUnitProcessStepService {
               } else {
                 return Optional.empty(); // No next step
               }
-            });
+            })
+        .or(() -> Optional.of(orderedOfficeProcessSteps.getFirst()));
   }
 
   /**
