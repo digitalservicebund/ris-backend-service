@@ -988,6 +988,30 @@ class DecisionTransformerTest {
     assertThat(domainObject.coreData().source().sourceRawValue()).isNull();
   }
 
+  @Test
+  void testTransformToDto_withEvsf_shouldAddEvsf() {
+    DecisionDTO currentDto = DecisionDTO.builder().build();
+
+    Decision updatedDomainObject =
+        Decision.builder()
+            .contentRelatedIndexing(ContentRelatedIndexing.builder().evsf("X 00 00-0-0").build())
+            .build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(decisionDTO.getEvsf()).isEqualTo("X 00 00-0-0");
+  }
+
+  @Test
+  void testTransformToDto_withoutEvsf_shouldNotAddEvsf() {
+    DecisionDTO currentDto = DecisionDTO.builder().build();
+
+    Decision updatedDomainObject =
+        Decision.builder().contentRelatedIndexing(ContentRelatedIndexing.builder().build()).build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(decisionDTO.getEvsf()).isNull();
+  }
+
   @ParameterizedTest
   @EnumSource(
       value = ReferenceType.class,
@@ -1410,6 +1434,24 @@ class DecisionTransformerTest {
   }
 
   @Test
+  void testTransformToDomain_withEvsf_shouldAddEvsf() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().evsf("X 00 00-0-0").build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().evsf()).isEqualTo("X 00 00-0-0");
+  }
+
+  @Test
+  void testTransformToDomain_withoutEvsf_shouldNotAddEvsf() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().evsf()).isNull();
+  }
+
+  @Test
   void testTransformToDomain_withoutLegislativeMandate_shouldLegislativeMandateBeFalse() {
     DecisionDTO decisionDTO = generateSimpleDTOBuilder().hasLegislativeMandate(false).build();
 
@@ -1587,6 +1629,7 @@ class DecisionTransformerTest {
                 .dismissalTypes(Collections.emptyList())
                 .collectiveAgreements(Collections.emptyList())
                 .hasLegislativeMandate(false)
+                .evsf(null)
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())

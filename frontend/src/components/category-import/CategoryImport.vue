@@ -9,7 +9,7 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
-import { allLabels, contentRelatedIndexingLabels } from "@/domain/decision"
+import { allLabels } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
@@ -55,11 +55,20 @@ async function searchForDocumentUnit() {
   sourceDocumentUnit.value = response.data
 }
 
+const pendingProceedingLabels: Pick<
+  typeof allLabels,
+  "keywords" | "fieldsOfLaw" | "norms"
+> = {
+  keywords: allLabels.keywords,
+  fieldsOfLaw: allLabels.fieldsOfLaw,
+  norms: allLabels.norms,
+}
+
 const labels = computed(() => {
   return isDecision(targetDocumentUnit.value) &&
     isDecision(sourceDocumentUnit.value)
     ? allLabels
-    : contentRelatedIndexingLabels
+    : pendingProceedingLabels
 })
 
 const hasContent = (key: keyof typeof allLabels): boolean => {

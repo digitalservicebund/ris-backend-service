@@ -12,4 +12,5 @@ export type ContentRelatedIndexing = {
   fieldsOfLaw?: FieldOfLaw[]
   jobProfiles?: string[]
   hasLegislativeMandate?: boolean
+  evsf?: string
 }

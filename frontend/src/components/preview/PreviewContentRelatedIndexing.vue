@@ -7,6 +7,7 @@ import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
+import { contentRelatedIndexingLabels } from "@/domain/decision"
 
 const props = defineProps<{
   contentRelatedIndexing: ContentRelatedIndexing
@@ -69,6 +70,10 @@ const hasDismissalTypes = computed(() => {
 })
 const hasLegislativeMandate = computed(() => {
   return props.contentRelatedIndexing.hasLegislativeMandate
+})
+
+const hasEvsf = computed(() => {
+  return props.contentRelatedIndexing.evsf
 })
 </script>
 
@@ -185,6 +190,10 @@ const hasLegislativeMandate = computed(() => {
     <PreviewRow v-if="hasLegislativeMandate">
       <PreviewCategory>Gesetzgebungsauftrag</PreviewCategory>
       <PreviewContent>Ja</PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasEvsf">
+      <PreviewCategory>{{ contentRelatedIndexingLabels.evsf }}</PreviewCategory>
+      <PreviewContent>{{ props.contentRelatedIndexing.evsf }}</PreviewContent>
     </PreviewRow>
   </FlexContainer>
 </template>
