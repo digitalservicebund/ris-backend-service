@@ -6,6 +6,7 @@ import {
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
+  save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
@@ -41,6 +42,7 @@ test.describe(
       await test.step("Befülltes E-VSF ist mit anderem Gericht sichtbar", async () => {
         await fillCombobox(page, "Gericht", "BGH")
         await expect(page.getByLabel("E-VSF")).toHaveValue("X 00 00-0-0")
+        await save(page)
       })
 
       await test.step("E-VSF erscheint in der Vorschau", async () => {

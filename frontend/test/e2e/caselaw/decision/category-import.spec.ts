@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(19) // we have 19 importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(25) // we have 25 importable categories
       })
     },
   )
