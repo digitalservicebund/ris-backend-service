@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -83,6 +84,7 @@ class DocumentationUnitServiceTest {
   @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
   @MockitoBean private DocumentationUnitSearchRepository docUnitSearchRepository;
+  @MockitoBean private DocumentationUnitProcessStepService processStepService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
@@ -92,7 +94,8 @@ class DocumentationUnitServiceTest {
     void testGenerateNewDecision()
         throws DocumentationUnitExistsException,
             DocumentNumberPatternException,
-            DocumentNumberFormatterException {
+            DocumentNumberFormatterException,
+            DocumentationUnitNotExistsException {
       DocumentationOffice documentationOffice =
           DocumentationOffice.builder().id(UUID.randomUUID()).build();
       User user = User.builder().documentationOffice(documentationOffice).build();
@@ -105,6 +108,21 @@ class DocumentationUnitServiceTest {
       // Can we use a captor to check if the document number was correctly created?
       // The chicken-egg-problem is, that we are dictating what happens when
       // repository.save(), so we can't just use a captor at the same time
+
+      UUID firstProcessStepId = UUID.randomUUID();
+      when(processStepService.getAllProcessStepsForDocOffice(any()))
+          .thenReturn(
+              List.of(
+                  ProcessStep.builder()
+                      .abbreviation("A")
+                      .name("Step A")
+                      .uuid(firstProcessStepId)
+                      .build(),
+                  ProcessStep.builder()
+                      .abbreviation("B")
+                      .name("Step B")
+                      .uuid(UUID.randomUUID())
+                      .build()));
 
       assertNotNull(service.generateNewDecision(user, Optional.empty()));
 
@@ -128,13 +146,15 @@ class DocumentationUnitServiceTest {
               null,
               null,
               user);
+      verify(processStepService).saveProcessStep(any(), eq(firstProcessStepId));
     }
 
     @Test
     void testGenerateNewDecisionWithParameters()
         throws DocumentationUnitExistsException,
             DocumentNumberPatternException,
-            DocumentNumberFormatterException {
+            DocumentNumberFormatterException,
+            DocumentationUnitNotExistsException {
       DocumentationOffice userDocumentationOffice =
           DocumentationOffice.builder().abbreviation("BAG").id(UUID.randomUUID()).build();
       User user = User.builder().documentationOffice(userDocumentationOffice).build();
@@ -165,6 +185,21 @@ class DocumentationUnitServiceTest {
       // The chicken-egg-problem is, that we are dictating what happens when
       // repository.save(), so we can't just use a captor at the same time
 
+      UUID firstProcessStepId = UUID.randomUUID();
+      when(processStepService.getAllProcessStepsForDocOffice(any()))
+          .thenReturn(
+              List.of(
+                  ProcessStep.builder()
+                      .abbreviation("A")
+                      .name("Step A")
+                      .uuid(firstProcessStepId)
+                      .build(),
+                  ProcessStep.builder()
+                      .abbreviation("B")
+                      .name("Step B")
+                      .uuid(UUID.randomUUID())
+                      .build()));
+
       assertNotNull(service.generateNewDecision(user, Optional.of(parameters)));
 
       verify(documentNumberService)
@@ -192,6 +227,8 @@ class DocumentationUnitServiceTest {
               parameters.reference(),
               parameters.fileNumber(),
               user);
+
+      verify(processStepService).saveProcessStep(any(), eq(firstProcessStepId));
     }
 
     @Test
