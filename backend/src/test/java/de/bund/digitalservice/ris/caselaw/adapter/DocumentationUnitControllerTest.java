@@ -806,7 +806,7 @@ class DocumentationUnitControllerTest {
       throws DocumentationUnitNotExistsException {
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder()
-            .id(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
             .abbreviation("DS")
             .build();
     String documentNumber = "ABCD202200001";
@@ -942,7 +942,7 @@ class DocumentationUnitControllerTest {
     when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder()
-            .id(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
             .abbreviation("DS")
             .build();
 
@@ -978,7 +978,7 @@ class DocumentationUnitControllerTest {
     when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder()
-            .id(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
             .abbreviation("DS")
             .build();
 
@@ -992,8 +992,8 @@ class DocumentationUnitControllerTest {
 
     String body =
         """
-            { "status": "INVALID" }
-            """;
+                        { "status": "INVALID" }
+                        """;
     risWebClient
         .withDefaultLogin()
         .put()
@@ -1017,7 +1017,7 @@ class DocumentationUnitControllerTest {
     when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
     DocumentationOffice documentationOffice =
         DocumentationOffice.builder()
-            .id(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
             .abbreviation("DS")
             .build();
 

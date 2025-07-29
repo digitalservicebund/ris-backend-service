@@ -29,7 +29,9 @@ class DocumentationOfficeIntegrationTest extends BaseIntegrationTest {
             response ->
                 assertThat(response.getResponseBody())
                     .extracting("abbreviation")
-                    .containsExactly("BFH", "BGH", "CC-RIS", "DS"));
+                    .containsExactly(
+                        "BAG", "BFH", "BGH", "BMJ", "BPatG", "BSG", "BVerfG", "BVerwG", "BZSt",
+                        "CC-RIS", "DS", "juris", "OVGNW", "VVBund"));
   }
 
   @Test
@@ -46,6 +48,7 @@ class DocumentationOfficeIntegrationTest extends BaseIntegrationTest {
             response ->
                 assertThat(response.getResponseBody())
                     .extracting("abbreviation")
-                    .containsExactly("BGH", "BFH"));
+                    .containsExactly(
+                        "BVerfG", "BZSt", "BVerwG", "BFH", "BAG", "BSG", "BMJ", "BPatG", "BGH"));
   }
 }

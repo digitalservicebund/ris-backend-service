@@ -34,8 +34,22 @@ public class DocumentationOfficeService {
    *
    * @param uuid the UUID to search for
    * @return the found documentation office
+   * @throws DocumentationOfficeNotExistsException if no documentation office found for given UUID.
    */
   public DocumentationOffice findByUuid(UUID uuid) throws DocumentationOfficeNotExistsException {
     return documentationOfficeRepository.findByUuid(uuid);
+  }
+
+  /**
+   * Returns a list of all process steps associated to a documentation office, ordered by rank.
+   *
+   * @param uuid the UUID to search for
+   * @return a list of all associated process steps, ordered by rank. If none found, returns an
+   *     empty list.
+   * @throws DocumentationOfficeNotExistsException if no documentation office found for given UUID.
+   */
+  public List<ProcessStep> getProcessStepsForDocumentationOffice(UUID uuid)
+      throws DocumentationOfficeNotExistsException {
+    return documentationOfficeRepository.findAllProcessStepsByUuid(uuid);
   }
 }
