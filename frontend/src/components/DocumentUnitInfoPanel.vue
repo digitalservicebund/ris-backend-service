@@ -135,7 +135,7 @@ async function moveProcessStep(): Promise<void> {
       :icon="IconError"
       label="Fehler"
     />
-    <div v-if="processStepsEnabled">
+    <template v-if="processStepsEnabled">
       <IconBadge
         v-for="(step, index) in props.processSteps"
         :key="step.id"
@@ -151,7 +151,7 @@ async function moveProcessStep(): Promise<void> {
             : step.processStep.abbreviation
         "
       />
-    </div>
+    </template>
 
     <span class="flex-grow"></span>
     <div
