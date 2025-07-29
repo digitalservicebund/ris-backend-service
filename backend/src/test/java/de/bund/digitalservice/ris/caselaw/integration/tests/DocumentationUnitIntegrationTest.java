@@ -30,7 +30,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -156,7 +155,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     fileNumberRepository.deleteAll();
     repository.deleteAll();
     databaseDocumentTypeRepository.deleteAll();
-    databaseDocumentCategoryRepository.deleteAll();
     databaseDocumentNumberRepository.deleteAll();
     procedureRepository.deleteAll();
   }
@@ -604,20 +602,14 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testDocumentTypeToSetIdFromLookuptable() {
-    var categoryB =
-        databaseDocumentCategoryRepository.saveAndFlush(
-            DocumentCategoryDTO.builder().label("B").build());
-    var categoryR =
-        databaseDocumentCategoryRepository.saveAndFlush(
-            DocumentCategoryDTO.builder().label("R").build());
-    var categoryC =
-        databaseDocumentCategoryRepository.saveAndFlush(
-            DocumentCategoryDTO.builder().label("C").build());
+    var categoryS = databaseDocumentCategoryRepository.findFirstByLabel("S");
+    var categoryR = databaseDocumentCategoryRepository.findFirstByLabel("R");
+    var categoryC = databaseDocumentCategoryRepository.findFirstByLabel("G");
 
     databaseDocumentTypeRepository.save(
         DocumentTypeDTO.builder()
             .abbreviation("ABC")
-            .category(categoryB)
+            .category(categoryS)
             .label("ABC123")
             .multiple(true)
             .build());
@@ -2115,9 +2107,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
       var celexNumber = "62019CV0001";
       eurLexResultRepository.saveAll(
           List.of(EurLexResultDTO.builder().uri("uri/" + celexNumber).celex(celexNumber).build()));
-      var category =
-          databaseDocumentCategoryRepository.saveAndFlush(
-              DocumentCategoryDTO.builder().label("R").build());
+      var category = databaseDocumentCategoryRepository.findFirstByLabel("R");
       databaseDocumentTypeRepository.save(
           DocumentTypeDTO.builder()
               .abbreviation("ABC")

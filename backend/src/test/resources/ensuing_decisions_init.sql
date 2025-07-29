@@ -1,9 +1,3 @@
-INSERT INTO
-  incremental_migration.document_category (id, label)
-VALUES
-  ('dd315130-1fda-46d5-bccd-d587cf51c664', 'R'),
-  ('4eea678f-39a9-4c56-aba1-b29423415209', 'N');
-
 insert into
   incremental_migration.court (
     id,
@@ -32,13 +26,13 @@ values
     'b57e016e-665d-486c-902e-c191f5a7acf6',
     'Bes',
     'Beschluss',
-    'dd315130-1fda-46d5-bccd-d587cf51c664'
+    '4a92661f-0367-4992-98ec-fb7cffa0d714'
   ),
   (
     '0c64fc8f-806c-4c43-a80f-dc54500b2a5a',
     'AO',
     'Anordnung',
-    '4eea678f-39a9-4c56-aba1-b29423415209'
+    '0997cb00-3c3e-4db3-b5f6-81a8227c8ba0'
   );
 
 insert into

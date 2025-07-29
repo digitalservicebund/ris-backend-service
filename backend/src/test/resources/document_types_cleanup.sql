@@ -1,2 +1,1 @@
 DELETE FROM incremental_migration.document_type;
-DELETE FROM incremental_migration.document_category;
