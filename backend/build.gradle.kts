@@ -230,7 +230,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.2")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.15.0")
+    implementation("com.squareup.okio:okio-jvm:3.16.0")
 
     val flywayCore = "org.flywaydb:flyway-core:11.10.4"
     implementation(flywayCore)
@@ -252,7 +252,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.22.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.23.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
