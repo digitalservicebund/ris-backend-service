@@ -94,8 +94,7 @@ class DocumentationUnitServiceTest {
     void testGenerateNewDecision()
         throws DocumentationUnitExistsException,
             DocumentNumberPatternException,
-            DocumentNumberFormatterException,
-            DocumentationUnitNotExistsException {
+            DocumentNumberFormatterException {
       DocumentationOffice documentationOffice =
           DocumentationOffice.builder().id(UUID.randomUUID()).build();
       User user = User.builder().documentationOffice(documentationOffice).build();
@@ -146,7 +145,8 @@ class DocumentationUnitServiceTest {
               null,
               null,
               user);
-      verify(processStepService).saveProcessStep(any(UUID.class), eq(firstProcessStepId));
+      verify(processStepService)
+          .saveProcessStep(any(DocumentationUnit.class), eq(firstProcessStepId));
     }
 
     @Test
@@ -228,7 +228,8 @@ class DocumentationUnitServiceTest {
               parameters.fileNumber(),
               user);
 
-      verify(processStepService).saveProcessStep(any(UUID.class), eq(firstProcessStepId));
+      verify(processStepService)
+          .saveProcessStep(any(DocumentationUnit.class), eq(firstProcessStepId));
     }
 
     @Test
