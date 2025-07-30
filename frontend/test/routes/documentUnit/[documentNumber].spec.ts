@@ -2,6 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createHead } from "@unhead/vue/client"
+import Tooltip from "primevue/tooltip"
 import { createRouter, createWebHistory } from "vue-router"
 import { Decision } from "@/domain/decision"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
@@ -81,7 +82,10 @@ function renderComponent() {
         documentNumber: "1234567891234",
       },
       global: {
-        directives: { "ctrl-enter": onSearchShortcutDirective },
+        directives: {
+          "ctrl-enter": onSearchShortcutDirective,
+          tooltip: Tooltip,
+        },
         plugins: [
           head,
           router,

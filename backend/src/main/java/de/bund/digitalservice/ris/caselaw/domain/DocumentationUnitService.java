@@ -248,12 +248,8 @@ public class DocumentationUnitService {
         processStepService.getAllProcessStepsForDocOffice(
             docUnit.coreData().documentationOffice().id());
     if (docOfficeProcessSteps != null && !docOfficeProcessSteps.isEmpty()) {
-      try {
-        processStepService.saveProcessStep(
-            newDocumentationUnit.uuid(), docOfficeProcessSteps.getFirst().uuid());
-      } catch (DocumentationUnitNotExistsException e) {
-        log.warn("Could not save process step for new decision because it does not exist", e);
-      }
+      processStepService.saveProcessStep(
+          newDocumentationUnit, docOfficeProcessSteps.getFirst().uuid());
     }
 
     if (isExternalHandover) {

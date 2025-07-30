@@ -97,7 +97,7 @@ async function requestDocumentUnitFromServer() {
 
 async function requestProcessStepsFromServer(docUnitId: string) {
   await processStepService.getProcessSteps(docUnitId).then((response) => {
-    if (response.data) processSteps.value = response.data.toReversed()
+    if (response.data) processSteps.value = response.data
     else processSteps.value = [] // TODO show error?
   })
 }

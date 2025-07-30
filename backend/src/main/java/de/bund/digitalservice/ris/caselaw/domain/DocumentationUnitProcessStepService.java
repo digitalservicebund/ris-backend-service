@@ -138,6 +138,11 @@ public class DocumentationUnitProcessStepService {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
 
+    return saveProcessStep(documentationUnit, processStepId);
+  }
+
+  public DocumentationUnitProcessStep saveProcessStep(
+      DocumentationUnit documentationUnit, UUID processStepId) throws ProcessStepNotFoundException {
     return documentationUnitProcessStepRepository.saveProcessStep(
         documentationUnit.uuid(), processStepId);
   }

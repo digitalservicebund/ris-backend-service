@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import Tooltip from "primevue/tooltip"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import { CoreData } from "@/domain/coreData"
@@ -42,10 +43,10 @@ function renderComponent(options?: {
 
   const docUnitProcessSteps: DocumentationUnitProcessStep[] = [
     {
-      id: "a-id",
-      userId: "user1-id",
+      id: "c-id",
+      userId: "user2-id",
       createdAt: new Date(),
-      processStep: { uuid: "neu-id", name: "Neu", abbreviation: "N" },
+      processStep: { uuid: "fertig-id", name: "Fertig", abbreviation: "F" },
     },
     {
       id: "b-id",
@@ -58,10 +59,10 @@ function renderComponent(options?: {
       },
     },
     {
-      id: "c-id",
-      userId: "user2-id",
+      id: "a-id",
+      userId: "user1-id",
       createdAt: new Date(),
-      processStep: { uuid: "fertig-id", name: "Fertig", abbreviation: "F" },
+      processStep: { uuid: "neu-id", name: "Neu", abbreviation: "N" },
     },
   ]
 
@@ -69,6 +70,7 @@ function renderComponent(options?: {
     ...render(DocumentUnitInfoPanel, {
       props: { documentUnit: documentUnit, processSteps: docUnitProcessSteps },
       global: {
+        directives: { tooltip: Tooltip },
         plugins: [
           router,
           createTestingPinia({
@@ -166,7 +168,7 @@ describe("documentUnit InfoPanel", () => {
 
   it("renders proccess steps and move button", async () => {
     renderComponent()
-    expect(await screen.findByText("N")).toBeInTheDocument()
+    expect(screen.queryByText("N")).not.toBeInTheDocument()
     expect(screen.queryByText("Neu")).not.toBeInTheDocument()
     expect(await screen.findByText("B")).toBeInTheDocument()
     expect(screen.queryByText("Blockiert")).not.toBeInTheDocument()

@@ -1,23 +1,18 @@
 <script setup lang="ts" generic="TDocument">
 import dayjs from "dayjs"
-import Button from "primevue/button"
-import Dialog from "primevue/dialog"
 import { computed, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
+import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
-import Tooltip from "@/components/Tooltip.vue"
+import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
-import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
-import ProcessStep from "@/domain/processStep"
-import processStepService from "@/services/processStepService"
 import { isDecision } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
-import IconApprovalDelegation from "~icons/material-symbols/approval-delegation-outline"
 
 const props = defineProps<{
   documentUnit: DocumentationUnit
@@ -76,34 +71,11 @@ const managementDataRoute = computed(() => ({
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
 
+const processStepsEnabled = useFeatureToggle("neuris.process-steps")
+
 watchEffect(() => {
   statusBadge.value = useStatusBadge(props.documentUnit.status).value
 })
-
-const processStepsEnabled = useFeatureToggle("neuris.process-steps")
-
-const showMoveProcessStepModal = ref(false)
-
-let nextProcessStep: ProcessStep | undefined
-
-async function triggerMoveProcessStep(): Promise<void> {
-  nextProcessStep = (
-    await processStepService.getNextProcessStep(props.documentUnit.uuid)
-  ).data
-  showMoveProcessStepModal.value = true
-}
-
-async function moveProcessStep(): Promise<void> {
-  if (nextProcessStep) {
-    await processStepService.moveToNextProcessStep(
-      props.documentUnit.uuid,
-      nextProcessStep,
-    )
-    // TODO emit new process step?
-    // if (newStep && newStep.data) props.processSteps.push(newStep.data)
-  }
-  showMoveProcessStepModal.value = false
-}
 </script>
 
 <template>
@@ -135,23 +107,10 @@ async function moveProcessStep(): Promise<void> {
       :icon="IconError"
       label="Fehler"
     />
-    <template v-if="processStepsEnabled">
-      <IconBadge
-        v-for="(step, index) in props.processSteps"
-        :key="step.id"
-        :background-color="
-          useProcessStepBadge(step.processStep).value.backgroundColor
-        "
-        :border-color="useProcessStepBadge(step.processStep).value.borderColor"
-        :class="`border px-8 ${index == 0 ? 'ml-12' : 'ml-[-5px]'}`"
-        :color="index == props.processSteps.length - 1 ? 'black' : 'gray-900'"
-        :label="
-          index == props.processSteps.length - 1
-            ? step.processStep.name
-            : step.processStep.abbreviation
-        "
-      />
-    </template>
+    <CurrentAndLastProcessStepBadge
+      v-if="processStepsEnabled"
+      :process-steps="props.processSteps"
+    />
 
     <span class="flex-grow"></span>
     <div
@@ -176,63 +135,16 @@ async function moveProcessStep(): Promise<void> {
       <span v-if="isRouteWithSaveButton && isInternalUser">|</span>
     </div>
 
-    <Tooltip
+    <UpdateProcessStepDialog
       v-if="processStepsEnabled"
-      text="Dokumentationseinheit weitergeben"
-    >
-      <Button
-        aria-label="Dokumentationseinheit weitergeben"
-        severity="secondary"
-        size="small"
-        @click="triggerMoveProcessStep"
-      >
-        <template #icon>
-          <IconApprovalDelegation />
-        </template>
-      </Button>
-    </Tooltip>
+      :doc-unit-id="props.documentUnit.uuid"
+      :process-steps="props.processSteps"
+    ></UpdateProcessStepDialog>
 
     <SaveButton
       v-if="isRouteWithSaveButton"
       aria-label="Speichern Button"
       data-testid="document-unit-save-button"
     />
-
-    <Dialog
-      class="max-h-[768px] max-w-[1024px]"
-      :closable="false"
-      header="Dokumentationseinheit weitergeben"
-      modal
-      :visible="showMoveProcessStepModal"
-    >
-      <div v-if="nextProcessStep" class="mb-12 flex items-center">
-        Nächster Schritt:
-        <IconBadge
-          :background-color="
-            useProcessStepBadge(nextProcessStep).value.backgroundColor
-          "
-          :border-color="useProcessStepBadge(nextProcessStep).value.borderColor"
-          color="black"
-          :label="nextProcessStep.name"
-        />
-      </div>
-
-      <div class="modal-buttons-container flex w-full flex-row gap-[1rem]">
-        <Button
-          aria-label="Weitergeben"
-          label="Weitergeben"
-          severity="primary"
-          size="small"
-          @click="moveProcessStep"
-        ></Button>
-        <Button
-          aria-label="Abbrechen"
-          label="Abbrechen"
-          severity="secondary"
-          size="small"
-          @click="showMoveProcessStepModal = false"
-        ></Button>
-      </div>
-    </Dialog>
   </div>
 </template>
