@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildBGHDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildVVBundDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.byLessThan;
 
@@ -41,6 +42,7 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
   @Autowired
   private DatabaseDocumentationUnitProcessStepRepository documentationUnitProcessStepRepository;
 
+  private DocumentationOfficeDTO documentationOfficeVVBund;
   private DocumentationOfficeDTO documentationOfficeDS;
   private DocumentationOfficeDTO documentationOfficeBGH;
   private DocumentationUnitDTO testDocumentationUnitDS;
@@ -53,6 +55,8 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
   void setUp() {
+    documentationOfficeVVBund =
+        documentationOfficeRepository.findByAbbreviation(buildVVBundDocOffice().abbreviation());
     documentationOfficeDS =
         documentationOfficeRepository.findByAbbreviation(buildDSDocOffice().abbreviation());
     documentationOfficeBGH =
@@ -489,7 +493,7 @@ class DocumentationUnitProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + documentationOfficeDS.getId() + "/all")
+        .uri(PROCESS_STEP_ENDPOINT + documentationOfficeVVBund.getId() + "/all")
         .exchange()
         .expectStatus()
         .isOk()

@@ -99,6 +99,13 @@ public class AuthUtils {
         .build();
   }
 
+  public static DocumentationOffice buildVVBundDocOffice() {
+    return DocumentationOffice.builder()
+        .abbreviation("VVBund")
+        .id(UUID.fromString("ddc6339b-ffb2-49c8-b54b-81eb62a6b01c"))
+        .build();
+  }
+
   public static void mockUserGroups(UserGroupService userGroupService) {
     doReturn(
             List.of(
