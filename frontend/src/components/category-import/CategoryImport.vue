@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
+import Accordion from "primevue/accordion"
+import AccordionContent from "primevue/accordioncontent"
+import AccordionHeader from "primevue/accordionheader"
+import AccordionPanel from "primevue/accordionpanel"
 import Button from "primevue/button"
+import Divider from "primevue/divider"
 import InputText from "primevue/inputtext"
 import { computed, onMounted, Ref, ref, watch } from "vue"
 import { useRouter } from "vue-router"
@@ -9,7 +14,7 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
-import { allLabels } from "@/domain/decision"
+import { allLabels, contentRelatedIndexingLabels } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
@@ -71,11 +76,29 @@ const labels = computed(() => {
     : pendingProceedingLabels
 })
 
+const labelsWithContent = computed(
+  () =>
+    Object.fromEntries(
+      Object.entries(labels.value).filter(([key]) =>
+        hasContent(key as keyof typeof allLabels),
+      ),
+    ) as typeof allLabels,
+)
+
+const labelsWithoutContent = computed(
+  () =>
+    Object.fromEntries(
+      Object.entries(labels.value).filter(
+        ([key]) => !hasContent(key as keyof typeof allLabels),
+      ),
+    ) as typeof allLabels,
+)
+
 const hasContent = (key: keyof typeof allLabels): boolean => {
   if (isDecision(sourceDocumentUnit.value)) {
     if (key == "caselawReferences" || key == "literatureReferences") {
       const object = sourceDocumentUnit.value[key]
-      return !!(Array.isArray(object) && object.length > 0)
+      return Array.isArray(object) && object.length > 0
     } else if (key in sourceDocumentUnit.value.shortTexts) {
       return !!sourceDocumentUnit.value.shortTexts[
         key as keyof typeof sourceDocumentUnit.value.shortTexts
@@ -101,7 +124,11 @@ const hasContent = (key: keyof typeof allLabels): boolean => {
         key as keyof typeof sourceDocumentUnit.value.contentRelatedIndexing
       ]
 
-    return !!(Array.isArray(object) && object.length > 0)
+    return (
+      (Array.isArray(object) && object.length > 0) ||
+      (typeof object === "string" && object.trim().length > 0) ||
+      (typeof object === "boolean" && object)
+    )
   }
   return false
 }
@@ -126,6 +153,23 @@ const isImportable = (key: keyof typeof allLabels): boolean => {
       const isEmptyArray =
         Array.isArray(targetLongText) && targetLongText.length > 0
       return !isEmptyText && !isEmptyArray
+    } else if (
+      ["activeCitations", "keywords", "norms", "fieldsOfLaw"].includes(key)
+    ) {
+      // These categories are always importable, even if they have content in the target document unit
+      return true
+    } else if (key in sourceDocumentUnit.value.contentRelatedIndexing) {
+      const targetCategory =
+        targetDocumentUnit.value!.contentRelatedIndexing[
+          key as keyof typeof sourceDocumentUnit.value.contentRelatedIndexing
+        ]
+
+      const isEmptyText =
+        typeof targetCategory === "string" && targetCategory.trim().length > 0
+      const isEmptyArray =
+        Array.isArray(targetCategory) && targetCategory.length > 0
+      const isActiveFlag = typeof targetCategory === "boolean" && targetCategory
+      return !isEmptyText && !isEmptyArray && !isActiveFlag
     }
   return true
 }
@@ -156,6 +200,15 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "headnote":
     case "otherHeadnote":
       importShortTexts(key)
+      break
+    case "collectiveAgreements":
+    case "dismissalTypes":
+    case "dismissalGrounds":
+    case "jobProfiles":
+    case "evsf":
+    case "definitions":
+    case "hasLegislativeMandate":
+      importContextRelatedIndexing(key)
       break
     case "tenor":
     case "reasons":
@@ -387,6 +440,20 @@ function importShortTexts(key: string) {
   }
 }
 
+function importContextRelatedIndexing<
+  K extends keyof typeof contentRelatedIndexingLabels,
+>(key: K) {
+  let source = sourceDocumentUnit.value?.contentRelatedIndexing[key]
+
+  if (typeof source === "object" && "id" in source) {
+    // If the category is an editable list, we need to remove the existing id => interpreted as new entry.
+    source = { ...source, id: undefined }
+  }
+
+  if (targetDocumentUnit.value)
+    targetDocumentUnit.value.contentRelatedIndexing[key] = source
+}
+
 // By narrowing the type of key to exclude "participatingJudges", TypeScript no longer considers the possibility of assigning a non-string value to documentUnit.value.longTexts[key].
 type StringKeys =
   | "tenor"
@@ -490,7 +557,7 @@ onMounted(() => {
         :status="sourceDocumentUnit.status"
         :summary="sourceDocumentUnit.renderSummary"
       />
-      <div v-for="(value, key) in labels" :key="key">
+      <div v-for="(value, key) in labelsWithContent" :key="key">
         <SingleCategory
           :error-message="validationStore.getByField(key)"
           :handle-import="() => handleImport(key)"
@@ -499,6 +566,38 @@ onMounted(() => {
           :label="value"
         />
       </div>
+      <div v-if="Object.keys(labelsWithContent).length === 0">
+        <span class="ris-label2-regular text-gray-800">
+          Alle importierbaren Rubriken haben im Quelldokument keinen Inhalt.
+        </span>
+      </div>
+      <Divider
+        v-if="Object.keys(labelsWithoutContent).length > 0"
+        class="border-1 border-solid border-gray-800"
+      />
+      <Accordion v-if="Object.keys(labelsWithoutContent).length > 0" value="">
+        <AccordionPanel value="0">
+          <AccordionHeader
+            class="flex items-baseline justify-between self-center justify-self-stretch"
+            >Rubriken ohne Inhalt</AccordionHeader
+          >
+          <AccordionContent>
+            <div
+              class="ris-label1-regular mt-24 flex flex-col gap-16 bg-blue-100"
+            >
+              <div v-for="(value, key) in labelsWithoutContent" :key="key">
+                <SingleCategory
+                  :error-message="validationStore.getByField(key)"
+                  :handle-import="() => handleImport(key)"
+                  :has-content="hasContent(key)"
+                  :importable="isImportable(key)"
+                  :label="value"
+                />
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionPanel>
+      </Accordion>
     </div>
   </div>
 </template>

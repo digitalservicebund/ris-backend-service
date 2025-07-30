@@ -607,6 +607,10 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             otherLongText: "Test Sonstiger Langtext",
             outline: "Test Gliederung",
           },
+          contentRelatedIndexing: {
+            evsf: "Test E-VSF",
+            definitions: [{ definedTerm: "Test Definition", newEntry: true }],
+          },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
       },
