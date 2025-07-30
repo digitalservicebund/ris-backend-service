@@ -153,8 +153,7 @@ class DocumentationUnitServiceTest {
     void testGenerateNewDecisionWithParameters()
         throws DocumentationUnitExistsException,
             DocumentNumberPatternException,
-            DocumentNumberFormatterException,
-            DocumentationUnitNotExistsException {
+            DocumentNumberFormatterException {
       DocumentationOffice userDocumentationOffice =
           DocumentationOffice.builder().abbreviation("BAG").id(UUID.randomUUID()).build();
       User user = User.builder().documentationOffice(userDocumentationOffice).build();
