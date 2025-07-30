@@ -25,7 +25,8 @@ jobs:
 
   backend-unit-tests:
     needs: scan-backend-changes
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main'  }}
+    # Disabled as tests run in sonar job
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && false  }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +59,8 @@ jobs:
 
   backend-integration-tests:
     needs: scan-backend-changes
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main'  }}
+    # Disabled as tests run in sonar job
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && false  }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -92,7 +94,7 @@ jobs:
 
   backend-tests-and-code-quality:
     needs: scan-backend-changes
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref == 'refs/heads/main'  }}
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -133,6 +135,6 @@ jobs:
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
-        if: ${{ failure() }}
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
