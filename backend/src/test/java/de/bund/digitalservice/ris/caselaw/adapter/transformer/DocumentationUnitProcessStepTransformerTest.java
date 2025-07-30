@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.Test;
 class DocumentationUnitProcessStepTransformerTest {
 
   UUID documentationUnitProcessStepId = UUID.randomUUID();
-  UUID userId = UUID.randomUUID();
+  User user = User.builder().id(UUID.randomUUID()).build();
   LocalDateTime createdAt = LocalDateTime.now();
 
   @Test
@@ -22,13 +23,13 @@ class DocumentationUnitProcessStepTransformerTest {
     DocumentationUnitProcessStepDTO documentationUnitProcessStepDTO =
         DocumentationUnitProcessStepDTO.builder()
             .id(documentationUnitProcessStepId)
-            .userId(userId)
+            .userId(user.id())
             .createdAt(createdAt)
             .build();
     DocumentationUnitProcessStep documentationUnitProcessStep =
         DocumentationUnitProcessStep.builder()
             .id(documentationUnitProcessStepId)
-            .userId(userId)
+            .user(user)
             .createdAt(createdAt)
             .processStep(processStep)
             .build();
@@ -45,7 +46,7 @@ class DocumentationUnitProcessStepTransformerTest {
     DocumentationUnitProcessStepDTO documentationUnitProcessStepDTO =
         DocumentationUnitProcessStepDTO.builder()
             .id(documentationUnitProcessStepId)
-            .userId(userId)
+            .userId(user.id())
             .createdAt(createdAt)
             .build();
 

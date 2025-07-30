@@ -146,7 +146,7 @@ class DocumentationUnitServiceTest {
               null,
               user);
       verify(processStepService)
-          .saveProcessStep(any(DocumentationUnit.class), eq(firstProcessStepId));
+          .saveProcessStep(any(DocumentationUnit.class), eq(firstProcessStepId), any(UUID.class));
     }
 
     @Test
@@ -228,7 +228,7 @@ class DocumentationUnitServiceTest {
               user);
 
       verify(processStepService)
-          .saveProcessStep(any(DocumentationUnit.class), eq(firstProcessStepId));
+          .saveProcessStep(any(DocumentationUnit.class), eq(firstProcessStepId), any(UUID.class));
     }
 
     @Test
