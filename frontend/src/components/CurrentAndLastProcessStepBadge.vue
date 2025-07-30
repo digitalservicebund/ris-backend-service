@@ -5,7 +5,7 @@ import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 
 const props = defineProps<{
-  processSteps: DocumentationUnitProcessStep[]
+  processSteps: DocumentationUnitProcessStep[] | undefined
 }>()
 
 const currentProcessStep = computed(

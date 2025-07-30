@@ -38,6 +38,10 @@ public interface DocumentationUnit {
 
   List<String> documentalists();
 
+  DocumentationUnitProcessStep currentProcessStep();
+
+  List<DocumentationUnitProcessStep> processSteps();
+
   boolean isEditable();
 
   boolean isDeletable();

@@ -16,11 +16,9 @@ import useQuery from "@/composables/useQueryFromRoute"
 import { Decision } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import { Kind } from "@/domain/documentationUnitKind"
-import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import MenuItem from "@/domain/menuItem"
 import PendingProceeding from "@/domain/pendingProceeding"
 import { ResponseError } from "@/services/httpClient"
-import processStepService from "@/services/processStepService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { Match } from "@/types/textCheck"
@@ -51,8 +49,6 @@ const documentUnit = computed<DocumentationUnit | undefined>(() => {
   }
   return undefined
 })
-
-const processSteps: Ref<DocumentationUnitProcessStep[]> = ref([])
 
 const route = useRoute()
 
@@ -90,16 +86,7 @@ async function requestDocumentUnitFromServer() {
 
   if (!response.data) {
     responseError.value = response.error
-  } else {
-    await requestProcessStepsFromServer(response.data.uuid)
   }
-}
-
-async function requestProcessStepsFromServer(docUnitId: string) {
-  await processStepService.getProcessSteps(docUnitId).then((response) => {
-    if (response.data) processSteps.value = response.data
-    else processSteps.value = [] // TODO show error?
-  })
 }
 
 const textEditorRefs = ref<Record<string, typeof TextEditor | null>>({})
@@ -210,7 +197,6 @@ onMounted(async () => {
       <DocumentUnitInfoPanel
         v-if="documentUnit && !route.path.includes('preview')"
         :document-unit="documentUnit"
-        :process-steps="processSteps"
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer

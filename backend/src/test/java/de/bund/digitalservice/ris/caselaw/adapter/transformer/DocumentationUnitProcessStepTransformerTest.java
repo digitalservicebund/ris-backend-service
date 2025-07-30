@@ -34,9 +34,7 @@ class DocumentationUnitProcessStepTransformerTest {
             .processStep(processStep)
             .build();
 
-    assertThat(
-            DocumentationUnitProcessStepTransformer.toDomain(
-                documentationUnitProcessStepDTO, processStep))
+    assertThat(DocumentationUnitProcessStepTransformer.toDomain(documentationUnitProcessStepDTO))
         .isEqualTo(documentationUnitProcessStep);
   }
 
@@ -50,20 +48,15 @@ class DocumentationUnitProcessStepTransformerTest {
             .createdAt(createdAt)
             .build();
 
-    assertThat(
-            DocumentationUnitProcessStepTransformer.toDomain(
-                documentationUnitProcessStepDTO, processStep))
+    assertThat(DocumentationUnitProcessStepTransformer.toDomain(documentationUnitProcessStepDTO))
         .isNull();
   }
 
   @Test
   void shouldNotTransformToDomain_ifDocumentationUnitProcessStepDTONull() {
-    ProcessStep processStep = ProcessStep.builder().uuid(UUID.randomUUID()).build();
     DocumentationUnitProcessStepDTO documentationUnitProcessStepDTO = null;
 
-    assertThat(
-            DocumentationUnitProcessStepTransformer.toDomain(
-                documentationUnitProcessStepDTO, processStep))
+    assertThat(DocumentationUnitProcessStepTransformer.toDomain(documentationUnitProcessStepDTO))
         .isNull();
   }
 }

@@ -12,4 +12,13 @@ public class ProcessStepTransformer {
     if (dto == null) return null;
     return new ProcessStep(dto.getId(), dto.getName(), dto.getAbbreviation());
   }
+
+  public static ProcessStepDTO toDto(ProcessStep domain) {
+    if (domain == null) return null;
+    return ProcessStepDTO.builder()
+        .id(domain.uuid())
+        .name(domain.name())
+        .abbreviation(domain.abbreviation())
+        .build();
+  }
 }

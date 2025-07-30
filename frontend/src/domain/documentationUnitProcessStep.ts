@@ -1,9 +1,9 @@
 import ProcessStep from "@/domain/processStep"
 
 type DocumentationUnitProcessStep = {
-  id: string
-  userId: string
-  createdAt: Date
+  id?: string
+  userId?: string
+  createdAt?: Date
   processStep: ProcessStep
 }
 

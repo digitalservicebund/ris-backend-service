@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitProcessStepTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStepRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
@@ -44,12 +43,11 @@ public class PostgresDocumentationUnitProcessStepRepositoryImpl
     DocumentationUnitProcessStepDTO newDTO =
         DocumentationUnitProcessStepDTO.builder()
             .createdAt(LocalDateTime.now())
-            .processStepId(processStep.getId())
-            .documentationUnitId(documentationUnitId)
+            .processStep(processStep)
             .userId(userId)
             .build();
 
-    return transformDocumentationUnitProcessStep(repository.save(newDTO));
+    return DocumentationUnitProcessStepTransformer.toDomain(repository.save(newDTO));
   }
 
   @Override
@@ -57,31 +55,14 @@ public class PostgresDocumentationUnitProcessStepRepositoryImpl
 
     return repository
         .findTopByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId)
-        .map(this::transformDocumentationUnitProcessStep);
+        .map(DocumentationUnitProcessStepTransformer::toDomain);
   }
 
   @Override
   public List<DocumentationUnitProcessStep> findAllByDocumentationUnitId(UUID documentationUnitId) {
 
     return repository.findByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId).stream()
-        .map(this::transformDocumentationUnitProcessStep)
+        .map(DocumentationUnitProcessStepTransformer::toDomain)
         .toList();
-  }
-
-  private DocumentationUnitProcessStep transformDocumentationUnitProcessStep(
-      DocumentationUnitProcessStepDTO dto) {
-    ProcessStepDTO processStepDTO =
-        processStepRepository
-            .findById(dto.getProcessStepId())
-            .orElseThrow(
-                () ->
-                    new ProcessStepNotFoundException(
-                        "Prozessschritt für ID "
-                            + dto.getProcessStepId()
-                            + " wurde nicht gefunden für DocumentationUnitProcessStepDTO "
-                            + dto.getId()));
-
-    return DocumentationUnitProcessStepTransformer.toDomain(
-        dto, ProcessStepTransformer.toDomain(processStepDTO));
   }
 }

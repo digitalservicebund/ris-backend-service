@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransforme
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitProcessStepTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PendingProceedingTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.StatusTransformer;
@@ -13,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
@@ -29,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import jakarta.persistence.EntityManager;
@@ -76,6 +79,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
+  private final DatabaseProcessStepRepository processStepRepository;
+  private final DatabaseDocumentationUnitProcessStepRepository
+      databaseDocumentationUnitProcessStepRepository;
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
@@ -88,6 +94,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseKeywordRepository keywordRepository,
       DatabaseProcedureRepository procedureRepository,
       DatabaseFieldOfLawRepository fieldOfLawRepository,
+      DatabaseProcessStepRepository processStepRepository,
+      DatabaseDocumentationUnitProcessStepRepository databaseDocumentationUnitProcessStepRepository,
       EntityManager entityManager,
       DatabaseReferenceRepository referenceRepository,
       DocumentationUnitHistoryLogService historyLogService) {
@@ -102,6 +110,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.referenceRepository = referenceRepository;
     this.entityManager = entityManager;
     this.historyLogService = historyLogService;
+    this.processStepRepository = processStepRepository;
+    this.databaseDocumentationUnitProcessStepRepository =
+        databaseDocumentationUnitProcessStepRepository;
   }
 
   @Override
@@ -177,7 +188,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       Status status,
       Reference createdFromReference,
       String fileNumber,
-      User user) {
+      User user,
+      DocumentationUnitProcessStep initialProcessStep) {
 
     var documentationUnitDTO = repository.save(getTransformedEntity(docUnit));
 
@@ -220,6 +232,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             .build();
 
     documentationUnitDTO.setStatus(statusDTO);
+
+    DocumentationUnitProcessStepDTO initialStepDTO =
+        DocumentationUnitProcessStepTransformer.toDto(initialProcessStep).toBuilder()
+            .documentationUnit(documentationUnitDTO)
+            .createdAt(LocalDateTime.now())
+            .build();
+
+    initialStepDTO = databaseDocumentationUnitProcessStepRepository.save(initialStepDTO);
+
+    documentationUnitDTO.setCurrentProcessStep(initialStepDTO);
+
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       decisionDTO.setSource(sources);
     }
@@ -493,6 +516,79 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
                 documentationUnitDTO.setDocumentationUnitKeywordDTOs(documentationUnitKeywordDTOs);
 
+                repository.save(documentationUnitDTO);
+              }
+            });
+  }
+
+  @Override
+  @Transactional
+  public void saveProcessSteps(DocumentationUnit documentationUnit) {
+    if (documentationUnit == null) {
+      return;
+    }
+
+    repository
+        .findById(documentationUnit.uuid())
+        .ifPresent(
+            documentationUnitDTO -> {
+              DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend =
+                  documentationUnit.currentProcessStep();
+              DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB =
+                  documentationUnitDTO.getCurrentProcessStep();
+
+              if (currentDocunitProcessStepFromFrontend == null) {
+                documentationUnitDTO.setCurrentProcessStep(null);
+                repository.save(documentationUnitDTO);
+                return;
+              }
+
+              // Check that current process step from domain exists in DB
+              ProcessStepDTO processStepDTO =
+                  processStepRepository
+                      .findById(currentDocunitProcessStepFromFrontend.getProcessStep().uuid())
+                      .orElseThrow(
+                          () ->
+                              new ProcessStepNotFoundException( // Throw specific exception
+                                  "Process Step not found for id: "
+                                      + currentDocunitProcessStepFromFrontend
+                                          .getProcessStep()
+                                          .uuid()
+                                          .toString()));
+
+              boolean changed = false;
+              if (currentDocumentationUnitProcessStepDTOFromDB == null) {
+                // If there was no current step in DB, but frontend provides one, it's a change.
+                changed = true;
+              } else {
+                // Compare DB processStepDTO and processStepDTO form frontend
+                if (!currentDocumentationUnitProcessStepDTOFromDB
+                    .getProcessStep()
+                    .equals(processStepDTO)) {
+                  changed = true;
+                }
+                // Todo: check userId too if a change in assigned user makes it a "new" step entry.
+                // if (!Objects.equals(currentDocumentationUnitProcessStepDTOFromDB.getUserId(),
+                // currentDocunitProcessStepFromFrontend.getUserId())) {
+                //    changed = true;
+                // }
+              }
+
+              if (changed) {
+                DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
+                    DocumentationUnitProcessStepDTO.builder()
+                        // .userId(currentDocunitProcessStepFromFrontend.getUser().id())
+                        .createdAt(LocalDateTime.now())
+                        .processStep(processStepDTO)
+                        .documentationUnit(documentationUnitDTO)
+                        .build();
+
+                newDocumentationUnitProcessStepDTO =
+                    databaseDocumentationUnitProcessStepRepository.save(
+                        newDocumentationUnitProcessStepDTO);
+
+                documentationUnitDTO.getProcessSteps().add(newDocumentationUnitProcessStepDTO);
+                documentationUnitDTO.setCurrentProcessStep(newDocumentationUnitProcessStepDTO);
                 repository.save(documentationUnitDTO);
               }
             });

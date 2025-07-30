@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
-import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 
 public class DocumentationUnitProcessStepTransformer {
@@ -14,12 +13,10 @@ public class DocumentationUnitProcessStepTransformer {
    * method expects the associated ProcessStep domain objects to be passed as parameters.
    *
    * @param entity The JPA Entity to transform.
-   * @param processStep The ProcessStep domain object (already fetched).
    * @return The corresponding DocumentationUnitProcessStep domain object.
    */
-  public static DocumentationUnitProcessStep toDomain(
-      DocumentationUnitProcessStepDTO entity, ProcessStep processStep) {
-    if (entity == null || processStep == null) {
+  public static DocumentationUnitProcessStep toDomain(DocumentationUnitProcessStepDTO entity) {
+    if (entity == null) {
       return null;
     }
 
@@ -27,7 +24,18 @@ public class DocumentationUnitProcessStepTransformer {
         .id(entity.getId())
         .user(User.builder().id(entity.getUserId()).build())
         .createdAt(entity.getCreatedAt())
-        .processStep(processStep)
+        .processStep(ProcessStepTransformer.toDomain(entity.getProcessStep()))
+        .build();
+  }
+
+  public static DocumentationUnitProcessStepDTO toDto(
+      DocumentationUnitProcessStep documentationUnitProcessStep) {
+    if (documentationUnitProcessStep == null) {
+      return null;
+    }
+    return DocumentationUnitProcessStepDTO.builder()
+        //            .userId()
+        .processStep(ProcessStepTransformer.toDto(documentationUnitProcessStep.getProcessStep()))
         .build();
   }
 }
