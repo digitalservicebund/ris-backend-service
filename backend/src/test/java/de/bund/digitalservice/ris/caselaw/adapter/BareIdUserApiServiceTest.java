@@ -45,7 +45,7 @@ class BareIdUserApiServiceTest {
   }
 
   @Test
-  void testGetBareIdToken() {
+  void testGetUser() {
     final UUID userId = UUID.randomUUID();
 
     BareUserApiResponse.BareUser bareUser = generateBareUser(userId);
@@ -68,6 +68,27 @@ class BareIdUserApiServiceTest {
     Assertions.assertEquals("Tina Taxpayer", userResult.name());
     Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
     Assertions.assertEquals(userId, userResult.id());
+  }
+
+  @Test
+  void testGetUser_whenApiReturnsBadRequest_shouldReturnUserWithGivenId() {
+    final UUID userId = UUID.randomUUID();
+
+    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
+        ResponseEntity.badRequest().build();
+
+    doReturn(mockResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UserApiResponse.class));
+
+    var userResult = bareIdUserApiService.getUser(userId);
+
+    Assertions.assertEquals(userId, userResult.id());
+    Assertions.assertNull(userResult.name());
   }
 
   private BareUserApiResponse.BareUser generateBareUser(UUID userId) {
