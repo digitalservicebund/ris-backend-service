@@ -17,10 +17,6 @@ const props = defineProps<{
   documentUnit: DocumentationUnit
 }>()
 
-const emit = defineEmits<{
-  (e: "update:documentUnit", docUnit: DocumentationUnit): void
-}>()
-
 const route = useRoute()
 
 const isInternalUser = useInternalUser()

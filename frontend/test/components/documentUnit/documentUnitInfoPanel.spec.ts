@@ -12,6 +12,33 @@ import {
 } from "@/domain/managementData"
 import routes from "~/test-helper/routes"
 
+const currentProcessStep: DocumentationUnitProcessStep = {
+  id: "c-id",
+  userId: "user2-id",
+  createdAt: new Date(),
+  processStep: { uuid: "fertig-id", name: "Fertig", abbreviation: "F" },
+}
+
+const docUnitProcessSteps: DocumentationUnitProcessStep[] = [
+  currentProcessStep,
+  {
+    id: "b-id",
+    userId: "user1-id",
+    createdAt: new Date(),
+    processStep: {
+      uuid: "blockiert-id",
+      name: "Blockiert",
+      abbreviation: "B",
+    },
+  },
+  {
+    id: "a-id",
+    userId: "user1-id",
+    createdAt: new Date(),
+    processStep: { uuid: "neu-id", name: "Neu", abbreviation: "N" },
+  },
+]
+
 function renderComponent(options?: {
   documentNumber?: string
   coreData?: CoreData
@@ -35,36 +62,13 @@ function renderComponent(options?: {
       borderNumbers: [],
       duplicateRelations: options?.duplicateRelations ?? [],
     },
+    currentProcessStep: currentProcessStep,
+    processSteps: docUnitProcessSteps,
   })
-
-  const docUnitProcessSteps: DocumentationUnitProcessStep[] = [
-    {
-      id: "c-id",
-      userId: "user2-id",
-      createdAt: new Date(),
-      processStep: { uuid: "fertig-id", name: "Fertig", abbreviation: "F" },
-    },
-    {
-      id: "b-id",
-      userId: "user1-id",
-      createdAt: new Date(),
-      processStep: {
-        uuid: "blockiert-id",
-        name: "Blockiert",
-        abbreviation: "B",
-      },
-    },
-    {
-      id: "a-id",
-      userId: "user1-id",
-      createdAt: new Date(),
-      processStep: { uuid: "neu-id", name: "Neu", abbreviation: "N" },
-    },
-  ]
 
   return {
     ...render(DocumentUnitInfoPanel, {
-      props: { documentUnit: documentUnit, processSteps: docUnitProcessSteps },
+      props: { documentUnit: documentUnit },
       global: {
         directives: { tooltip: Tooltip },
         plugins: [

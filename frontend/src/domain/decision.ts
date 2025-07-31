@@ -1,6 +1,5 @@
 import dayjs from "dayjs"
 import DocumentationUnitProcessStep from "./documentationUnitProcessStep"
-import ProcessStep from "./processStep"
 import ActiveCitation from "@/domain/activeCitation"
 import Attachment from "@/domain/attachment"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
