@@ -36,7 +36,7 @@ describe("ProcessStepService", () => {
       const result = await service.getNextProcessStep("testDocUnitId123")
 
       expect(httpClient.get).toHaveBeenCalledWith(
-        `caselaw/processsteps/${"testDocUnitId123"}/next`,
+        `caselaw/documentationUnits/${"testDocUnitId123"}/processteps/next`,
       )
       expect(result.data).toEqual(mockNextProcessStep)
       expect(result.error).toBeUndefined()

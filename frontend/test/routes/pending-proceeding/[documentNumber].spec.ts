@@ -4,14 +4,12 @@ import { render, screen } from "@testing-library/vue"
 import { createHead } from "@unhead/vue/client"
 import Tooltip from "primevue/tooltip"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import PendingProceeding from "@/domain/pendingProceeding"
 import categories from "@/routes/caselaw/pending-proceeding/[documentNumber]/categories.vue"
 import DocumentNumber from "@/routes/caselaw/pending-proceeding/[documentNumber].vue"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
-import processStepService from "@/services/processStepService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 function renderComponent() {
@@ -117,40 +115,6 @@ describe("Document Number Route", () => {
       status: 200,
       data: true,
     })
-
-    vi.spyOn(processStepService, "getProcessSteps").mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: [
-          {
-            id: "a-id",
-            userId: "user1-id",
-            createdAt: new Date(),
-            processStep: { uuid: "neu-id", name: "Neu", abbreviation: "N" },
-          },
-          {
-            id: "b-id",
-            userId: "user1-id",
-            createdAt: new Date(),
-            processStep: {
-              uuid: "blockiert-id",
-              name: "Blockiert",
-              abbreviation: "B",
-            },
-          },
-          {
-            id: "c-id",
-            userId: "user2-id",
-            createdAt: new Date(),
-            processStep: {
-              uuid: "fertig-id",
-              name: "Fertig",
-              abbreviation: "F",
-            },
-          },
-        ] as DocumentationUnitProcessStep[],
-      }),
-    )
   })
 
   describe("Conditional rendering", () => {

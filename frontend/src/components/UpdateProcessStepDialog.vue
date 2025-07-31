@@ -24,7 +24,6 @@ async function triggerUpdateProcessStep(): Promise<void> {
     nextProcessStep = (
       await processStepService.getNextProcessStep(documentUnit.value?.uuid)
     ).data
-  console.log(nextProcessStep)
   showDialog.value = true
 }
 
