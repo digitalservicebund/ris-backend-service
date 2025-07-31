@@ -592,6 +592,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             appraisalBody: "1. Senat, 2. Kammer",
           },
           shortTexts: {
+            decisionName: "Test Entscheidungsname",
             headnote: "Test Orientierungssatz",
             guidingPrinciple: "Test Leitsatz",
             headline: "Test Titelzeile",
@@ -609,7 +610,18 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           },
           contentRelatedIndexing: {
             evsf: "Test E-VSF",
-            definitions: [{ definedTerm: "Test Definition", newEntry: true }],
+            definitions: [
+              {
+                definedTerm: "Test Definition",
+                definingBorderNumber: 2,
+                newEntry: true,
+              },
+              { definedTerm: "Test Definition2", newEntry: true },
+            ],
+            dismissalTypes: ["Test Kündigungsarten"],
+            dismissalGrounds: ["Test Kündigungsgründe"],
+            jobProfiles: ["Test Berufsbild"],
+            hasLegislativeMandate: true,
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },

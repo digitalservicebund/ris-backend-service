@@ -1,9 +1,6 @@
 <script setup lang="ts">
+import { RisSingleAccordion } from "@digitalservicebund/ris-ui/components"
 import { storeToRefs } from "pinia"
-import Accordion from "primevue/accordion"
-import AccordionContent from "primevue/accordioncontent"
-import AccordionHeader from "primevue/accordionheader"
-import AccordionPanel from "primevue/accordionpanel"
 import Button from "primevue/button"
 import Divider from "primevue/divider"
 import InputText from "primevue/inputtext"
@@ -195,6 +192,7 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "activeCitations":
       importActiveCitations()
       break
+    case "decisionName":
     case "headline":
     case "guidingPrinciple":
     case "headnote":
@@ -222,11 +220,19 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "participatingJudges":
       importParticipatingJudges()
       break
+    default: {
+      // The never type ensures all keys are handled in the switch.
+      const unimportableKey: never = key
+      validationStore.add(
+        "Fehler beim Importieren von " + allLabels[key],
+        unimportableKey,
+      )
+    }
   }
 
   const updateResponse = await store.updateDocumentUnit()
   if (updateResponse.error) {
-    validationStore.add("Fehler beim Speichern der " + allLabels[key], key) // add an errormessage to the validationstore field with the key
+    validationStore.add("Fehler beim Speichern von " + allLabels[key], key)
   } else if (key == "caselawReferences" || key == "literatureReferences") {
     await router.push({
       name: "caselaw-documentUnit-documentNumber-references",
@@ -575,29 +581,24 @@ onMounted(() => {
         v-if="Object.keys(labelsWithoutContent).length > 0"
         class="border-1 border-solid border-gray-800"
       />
-      <Accordion v-if="Object.keys(labelsWithoutContent).length > 0" value="">
-        <AccordionPanel value="0">
-          <AccordionHeader
-            class="flex items-baseline justify-between self-center justify-self-stretch"
-            >Rubriken ohne Inhalt</AccordionHeader
-          >
-          <AccordionContent>
-            <div
-              class="ris-label1-regular mt-24 flex flex-col gap-16 bg-blue-100"
-            >
-              <div v-for="(value, key) in labelsWithoutContent" :key="key">
-                <SingleCategory
-                  :error-message="validationStore.getByField(key)"
-                  :handle-import="() => handleImport(key)"
-                  :has-content="hasContent(key)"
-                  :importable="isImportable(key)"
-                  :label="value"
-                />
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionPanel>
-      </Accordion>
+      <RisSingleAccordion
+        v-if="Object.keys(labelsWithoutContent).length > 0"
+        class="mt-[-16px]"
+        header-collapsed="Rubriken ohne Inhalt einblenden"
+        header-expanded="Rubriken ohne Inhalt ausblenden"
+      >
+        <div class="ris-label1-regular flex flex-col gap-16 bg-blue-100">
+          <div v-for="(value, key) in labelsWithoutContent" :key="key">
+            <SingleCategory
+              :error-message="validationStore.getByField(key)"
+              :handle-import="() => handleImport(key)"
+              :has-content="hasContent(key)"
+              :importable="isImportable(key)"
+              :label="value"
+            />
+          </div>
+        </div>
+      </RisSingleAccordion>
     </div>
   </div>
 </template>

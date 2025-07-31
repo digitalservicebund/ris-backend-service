@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(14) // we have 14 non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(19) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -613,7 +613,234 @@ test.describe("category import", () => {
     },
   )
 
+  // Kündigungsart
+  test("import dismissalTypes", async ({
+    page,
+    linkedDocumentNumber,
+    prefilledDocumentUnitWithTexts,
+  }) => {
+    await navigateToCategoryImport(page, linkedDocumentNumber)
+
+    await test.step("import into empty category", async () => {
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnitWithTexts.documentNumber,
+      )
+      await expect(page.getByLabel("Kündigungsarten übernehmen")).toBeVisible()
+      await page.getByLabel("Kündigungsarten übernehmen").click()
+
+      await expect(page.getByText("Test Kündigungsarten")).toBeVisible()
+    })
+
+    await test.step("show success badge", async () => {
+      await expect(page.getByText("Übernommen")).toBeVisible()
+    })
+
+    await test.step("scroll to category", async () => {
+      await expect(
+        page.getByTestId("chips-input-wrapper_dismissalTypes"),
+      ).toBeInViewport()
+    })
+  })
+
+  // Kündigungsgrund
+  test("import dismissalGrounds", async ({
+    page,
+    linkedDocumentNumber,
+    prefilledDocumentUnitWithTexts,
+  }) => {
+    await navigateToCategoryImport(page, linkedDocumentNumber)
+
+    await test.step("import into empty category", async () => {
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnitWithTexts.documentNumber,
+      )
+      await expect(page.getByLabel("Kündigungsgründe übernehmen")).toBeVisible()
+      await page.getByLabel("Kündigungsgründe übernehmen").click()
+
+      await expect(page.getByText("Test Kündigungsgründe")).toBeVisible()
+    })
+
+    await test.step("show success badge", async () => {
+      await expect(page.getByText("Übernommen")).toBeVisible()
+    })
+
+    await test.step("scroll to category", async () => {
+      await expect(
+        page.getByTestId("chips-input-wrapper_dismissalGrounds"),
+      ).toBeInViewport()
+    })
+  })
+
+  // Berufsbild
+  test("import jobProfiles", async ({
+    page,
+    linkedDocumentNumber,
+    prefilledDocumentUnitWithTexts,
+  }) => {
+    await navigateToCategoryImport(page, linkedDocumentNumber)
+
+    await test.step("import into empty category", async () => {
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnitWithTexts.documentNumber,
+      )
+      await expect(page.getByLabel("Berufsbild übernehmen")).toBeVisible()
+      await page.getByLabel("Berufsbild übernehmen").click()
+
+      await expect(page.getByText("Test Berufsbild")).toBeVisible()
+    })
+
+    await test.step("show success badge", async () => {
+      await expect(page.getByText("Übernommen")).toBeVisible()
+    })
+
+    await test.step("scroll to category", async () => {
+      await expect(
+        page.getByTestId("chips-input-wrapper_jobProfiles"),
+      ).toBeInViewport()
+    })
+  })
+
+  // Definition
+  test("import definition", async ({
+    page,
+    linkedDocumentNumber,
+    prefilledDocumentUnitWithTexts,
+  }) => {
+    await navigateToCategoryImport(page, linkedDocumentNumber)
+
+    await test.step("import into empty category", async () => {
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnitWithTexts.documentNumber,
+      )
+      await expect(page.getByLabel("Definition übernehmen")).toBeVisible()
+      await page.getByLabel("Definition übernehmen").click()
+
+      await expect(
+        page.getByText("Test Definition", { exact: true }),
+      ).toBeVisible()
+      await expect(
+        page.getByText("Test Definition2", { exact: true }),
+      ).toBeVisible()
+    })
+
+    await test.step("show success badge", async () => {
+      await expect(page.getByText("Übernommen")).toBeVisible()
+    })
+
+    await test.step("scroll to category", async () => {
+      await expect(
+        page.getByText("Test Definition2", { exact: true }),
+      ).toBeInViewport()
+    })
+  })
+
+  // E-VSF
+  test("import evsf", async ({
+    page,
+    linkedDocumentNumber,
+    prefilledDocumentUnitWithTexts,
+  }) => {
+    await navigateToCategoryImport(page, linkedDocumentNumber)
+
+    await test.step("import into empty category", async () => {
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnitWithTexts.documentNumber,
+      )
+      await expect(page.getByLabel("E-VSF übernehmen")).toBeVisible()
+      await page.getByLabel("E-VSF übernehmen").click()
+
+      await expect(page.getByRole("textbox", { name: "E-VSF" })).toHaveValue(
+        "Test E-VSF",
+      )
+    })
+
+    await test.step("show success badge", async () => {
+      await expect(page.getByText("Übernommen")).toBeVisible()
+    })
+
+    await test.step("scroll to category", async () => {
+      await expect(
+        page.getByRole("textbox", { name: "E-VSF" }),
+      ).toBeInViewport()
+    })
+  })
+
+  // Gesetzgebungsauftrag
+  test("import hasLegislativeMandate", async ({
+    page,
+    linkedDocumentNumber,
+    prefilledDocumentUnitWithTexts,
+  }) => {
+    await navigateToCategoryImport(page, linkedDocumentNumber)
+
+    await test.step("import into empty category", async () => {
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnitWithTexts.documentNumber,
+      )
+      await expect(
+        page.getByLabel("Gesetzgebungsauftrag übernehmen"),
+      ).toBeVisible()
+      await page.getByLabel("Gesetzgebungsauftrag übernehmen").click()
+
+      await expect(
+        page.getByRole("checkbox", { name: "Gesetzgebungsauftrag" }),
+      ).toBeChecked()
+    })
+
+    await test.step("show success badge", async () => {
+      await expect(page.getByText("Übernommen")).toBeVisible()
+    })
+
+    await test.step("scroll to category", async () => {
+      await expect(
+        page.getByRole("checkbox", { name: "Gesetzgebungsauftrag" }),
+      ).toBeInViewport()
+    })
+  })
+
   // Short text categories
+
+  // Entscheidungsname
+  test(
+    "import decisionName",
+    { tag: ["@RISDEV-5721"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+
+        await expect(
+          page.getByLabel("Entscheidungsname übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Entscheidungsname übernehmen").click()
+        await expect(
+          page.getByRole("textbox", { name: "Entscheidungsname" }),
+        ).toHaveValue("Test Entscheidungsname")
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page
+            .getByLabel("Kurztexte")
+            .getByText("Entscheidungsname", { exact: true }),
+        ).toBeInViewport()
+      })
+    },
+  )
 
   // Titelzeile
   test(
