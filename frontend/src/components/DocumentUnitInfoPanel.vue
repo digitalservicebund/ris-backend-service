@@ -135,16 +135,16 @@ watchEffect(() => {
       <span v-if="isRouteWithSaveButton && isInternalUser">|</span>
     </div>
 
+    <UpdateProcessStepDialog
+      v-if="processStepsEnabled"
+      :doc-unit-id="props.documentUnit.uuid"
+      :process-steps="props.processSteps"
+    ></UpdateProcessStepDialog>
+
     <SaveButton
       v-if="isRouteWithSaveButton"
       aria-label="Speichern Button"
       data-testid="document-unit-save-button"
-    >
-      <UpdateProcessStepDialog
-        v-if="processStepsEnabled"
-        :doc-unit-id="props.documentUnit.uuid"
-        :process-steps="props.processSteps"
-      ></UpdateProcessStepDialog>
-    </SaveButton>
+    />
   </div>
 </template>

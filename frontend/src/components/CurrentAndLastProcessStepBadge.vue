@@ -37,7 +37,7 @@ const lastProcessBadge = computed(() =>
     v-if="currentProcessStep && currentProcessBadge"
     :background-color="currentProcessBadge.backgroundColor"
     :border-color="currentProcessBadge?.borderColor"
-    :class="`border px-8 ${lastProcessBadge ? 'ml-[-5px]' : 'ml-12'}`"
+    class="ml-[-5px] border px-8"
     color="black"
     :label="currentProcessStep.name"
   />
