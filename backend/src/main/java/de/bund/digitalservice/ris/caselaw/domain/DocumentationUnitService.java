@@ -249,7 +249,7 @@ public class DocumentationUnitService {
             docUnit.coreData().documentationOffice().id());
     if (docOfficeProcessSteps != null && !docOfficeProcessSteps.isEmpty()) {
       processStepService.saveProcessStep(
-          newDocumentationUnit, docOfficeProcessSteps.getFirst().uuid());
+          newDocumentationUnit, docOfficeProcessSteps.getFirst().uuid(), user.id());
     }
 
     if (isExternalHandover) {

@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 
 public class DocumentationUnitProcessStepTransformer {
 
@@ -24,7 +25,7 @@ public class DocumentationUnitProcessStepTransformer {
 
     return DocumentationUnitProcessStep.builder()
         .id(entity.getId())
-        .userId(entity.getUserId())
+        .user(User.builder().id(entity.getUserId()).build())
         .createdAt(entity.getCreatedAt())
         .processStep(processStep)
         .build();

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DocumentationUnitProcessStep {
   private UUID id;
-  private UUID userId;
+  private User user;
   private LocalDateTime createdAt;
   private ProcessStep processStep;
 }

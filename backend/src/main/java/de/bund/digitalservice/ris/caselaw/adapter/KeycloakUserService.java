@@ -72,7 +72,7 @@ public class KeycloakUserService implements UserService {
   }
 
   private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
-    UUID id = Optional.ofNullable(oidcUser.getSubject()).map(UUID::fromString).orElse(null);
+    UUID id = getUserId(oidcUser);
 
     return User.builder()
         .name(oidcUser.getAttribute("name"))
@@ -85,5 +85,9 @@ public class KeycloakUserService implements UserService {
 
   private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
     return getUserGroup(oidcUser).map(UserGroup::docOffice);
+  }
+
+  public static UUID getUserId(OidcUser oidcUser) {
+    return Optional.ofNullable(oidcUser.getSubject()).map(UUID::fromString).orElse(null);
   }
 }

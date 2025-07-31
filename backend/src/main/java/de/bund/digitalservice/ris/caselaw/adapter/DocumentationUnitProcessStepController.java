@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,10 +47,14 @@ public class DocumentationUnitProcessStepController {
   @PostMapping("/{documentationUnitId}/new")
   @PreAuthorize("isAuthenticated() and @userHasWriteAccess.apply(#documentationUnitId)")
   public ResponseEntity<DocumentationUnitProcessStep> saveProcessStep(
-      @PathVariable UUID documentationUnitId, @RequestBody UUID processStepId) {
+      @PathVariable UUID documentationUnitId,
+      @RequestBody UUID processStepId,
+      @AuthenticationPrincipal OidcUser oidcUser) {
+
     try {
       DocumentationUnitProcessStep newCurrentStep =
-          processStepService.saveProcessStep(documentationUnitId, processStepId);
+          processStepService.saveProcessStep(
+              documentationUnitId, processStepId, KeycloakUserService.getUserId(oidcUser));
       return new ResponseEntity<>(newCurrentStep, HttpStatus.CREATED);
     } catch (DocumentationUnitNotExistsException | ProcessStepNotFoundException ex) {
       return ResponseEntity.notFound().build();

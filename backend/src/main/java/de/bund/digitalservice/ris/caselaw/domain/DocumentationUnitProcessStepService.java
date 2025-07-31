@@ -133,18 +133,20 @@ public class DocumentationUnitProcessStepService {
    * @throws ProcessStepNotFoundException if the process step with the given ID does not exist.
    */
   @Transactional
-  public DocumentationUnitProcessStep saveProcessStep(UUID documentationUnitId, UUID processStepId)
+  public DocumentationUnitProcessStep saveProcessStep(
+      UUID documentationUnitId, UUID processStepId, UUID userId)
       throws DocumentationUnitNotExistsException, ProcessStepNotFoundException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByUuid(documentationUnitId);
 
-    return saveProcessStep(documentationUnit, processStepId);
+    return saveProcessStep(documentationUnit, processStepId, userId);
   }
 
   public DocumentationUnitProcessStep saveProcessStep(
-      DocumentationUnit documentationUnit, UUID processStepId) throws ProcessStepNotFoundException {
+      DocumentationUnit documentationUnit, UUID processStepId, UUID userId)
+      throws ProcessStepNotFoundException {
     return documentationUnitProcessStepRepository.saveProcessStep(
-        documentationUnit.uuid(), processStepId);
+        documentationUnit.uuid(), processStepId, userId);
   }
 
   /**

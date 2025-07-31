@@ -7,22 +7,19 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
@@ -48,14 +45,28 @@ class BareIdUserApiServiceTest {
   }
 
   @Test
-  void testGetBareIdToken() {
+  void testGetUser() {
     final UUID userId = UUID.randomUUID();
-    OidcUser mockOAuth2User = createMockOidcUser(userId);
 
-    ResponseEntity<OAuth2User> mockResponse = ResponseEntity.ok(mockOAuth2User);
+    var attributes =
+        Map.of(
+            "firstName", new BareUserApiResponse.AttributeValues(List.of("Tina")),
+            "lastName", new BareUserApiResponse.AttributeValues(List.of("Taxpayer")));
+
+    BareUserApiResponse.BareUser bareUser = generateBareUser(userId, attributes);
+    BareUserApiResponse.UserApiResponse userApiResponse =
+        new BareUserApiResponse.UserApiResponse(bareUser);
+
+    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
+        ResponseEntity.ok(userApiResponse);
+
     doReturn(mockResponse)
         .when(restTemplate)
-        .exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(OidcUser.class));
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UserApiResponse.class));
 
     var userResult = bareIdUserApiService.getUser(userId);
 
@@ -64,18 +75,61 @@ class BareIdUserApiServiceTest {
     Assertions.assertEquals(userId, userResult.id());
   }
 
-  private OidcUser createMockOidcUser(UUID userId) {
-    OidcUserInfo userInfo = Mockito.mock(OidcUserInfo.class);
-    when(userInfo.getFullName()).thenReturn("Tina Taxpayer");
-    when(userInfo.getEmail()).thenReturn("e2e_tests_bfh@digitalservice.bund.de");
+  @Test
+  void testGetUser_whenApiReturnsBadRequest_shouldReturnUserWithGivenId() {
+    final UUID userId = UUID.randomUUID();
 
-    OidcIdToken idToken = Mockito.mock(OidcIdToken.class);
-    when(idToken.toString()).thenReturn(userId.toString());
+    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
+        ResponseEntity.badRequest().build();
 
-    OidcUser mockUser = Mockito.mock(OidcUser.class);
-    when(mockUser.getUserInfo()).thenReturn(userInfo);
-    when(mockUser.getIdToken()).thenReturn(idToken);
+    doReturn(mockResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UserApiResponse.class));
 
-    return mockUser;
+    var userResult = bareIdUserApiService.getUser(userId);
+
+    Assertions.assertEquals(userId, userResult.id());
+    Assertions.assertNull(userResult.name());
+  }
+
+  @Test
+  void testGetUser_withEmptyNamesAttributes_shouldReturnNullName() {
+    final UUID userId = UUID.randomUUID();
+
+    BareUserApiResponse.BareUser bareUser = generateBareUser(userId, null);
+    BareUserApiResponse.UserApiResponse userApiResponse =
+        new BareUserApiResponse.UserApiResponse(bareUser);
+
+    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
+        ResponseEntity.ok(userApiResponse);
+
+    doReturn(mockResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UserApiResponse.class));
+
+    var userResult = bareIdUserApiService.getUser(userId);
+
+    Assertions.assertNull(userResult.name());
+    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
+    Assertions.assertEquals(userId, userResult.id());
+  }
+
+  private BareUserApiResponse.BareUser generateBareUser(
+      UUID userId, Map<String, BareUserApiResponse.AttributeValues> attributes) {
+    return new BareUserApiResponse.BareUser(
+        userId,
+        true,
+        true,
+        "e2e_tests_bfh@digitalservice.bund.de",
+        "e2e_tests_bfh@digitalservice.bund.de",
+        attributes);
   }
 }

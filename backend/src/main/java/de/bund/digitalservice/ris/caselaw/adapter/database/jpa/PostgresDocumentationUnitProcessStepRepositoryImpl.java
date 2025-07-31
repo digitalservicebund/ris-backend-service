@@ -33,7 +33,7 @@ public class PostgresDocumentationUnitProcessStepRepositoryImpl
 
   @Override
   public DocumentationUnitProcessStep saveProcessStep(
-      UUID documentationUnitId, UUID processStepId) {
+      UUID documentationUnitId, UUID processStepId, UUID userId) {
     var processStep =
         processStepRepository
             .findById(processStepId)
@@ -46,7 +46,9 @@ public class PostgresDocumentationUnitProcessStepRepositoryImpl
             .createdAt(LocalDateTime.now())
             .processStepId(processStep.getId())
             .documentationUnitId(documentationUnitId)
+            .userId(userId)
             .build();
+
     return transformDocumentationUnitProcessStep(repository.save(newDTO));
   }
 

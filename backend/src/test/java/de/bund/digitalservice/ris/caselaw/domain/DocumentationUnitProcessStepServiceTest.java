@@ -39,6 +39,7 @@ class DocumentationUnitProcessStepServiceTest {
   private UUID processStep1Id;
   private UUID processStep2Id;
   private UUID processStep3Id;
+  private UUID userId;
   private DocumentationUnit testDocumentationUnit;
   private ProcessStep processStepNeu;
   private ProcessStep processStepErsterfassung;
@@ -75,6 +76,7 @@ class DocumentationUnitProcessStepServiceTest {
     processStep1Id = UUID.randomUUID();
     processStep2Id = UUID.randomUUID();
     processStep3Id = UUID.randomUUID();
+    userId = UUID.randomUUID();
     UUID processStepFertigId = UUID.randomUUID();
 
     testDocumentationUnit = createMockDocumentationUnit(docUnitId, docOfficeId);
@@ -101,17 +103,19 @@ class DocumentationUnitProcessStepServiceTest {
     DocumentationUnitProcessStep savedStep =
         createMockDocumentationUnitProcessStep(
             processStepNeu.uuid(), processStepNeu.name(), LocalDateTime.now());
-    when(documentationUnitProcessStepRepository.saveProcessStep(docUnitId, processStepNeu.uuid()))
+    when(documentationUnitProcessStepRepository.saveProcessStep(
+            docUnitId, processStepNeu.uuid(), userId))
         .thenReturn(savedStep);
 
     // Act
-    DocumentationUnitProcessStep result = service.saveProcessStep(docUnitId, processStepNeu.uuid());
+    DocumentationUnitProcessStep result =
+        service.saveProcessStep(docUnitId, processStepNeu.uuid(), userId);
 
     // Assert
     assertThat(result).isEqualTo(savedStep);
     verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
     verify(documentationUnitProcessStepRepository, times(1))
-        .saveProcessStep(docUnitId, processStepNeu.uuid());
+        .saveProcessStep(docUnitId, processStepNeu.uuid(), userId);
   }
 
   @Test
@@ -125,11 +129,12 @@ class DocumentationUnitProcessStepServiceTest {
         .thenThrow(new DocumentationUnitNotExistsException("Doc unit not found for save"));
 
     // Act & Assert
-    assertThatThrownBy(() -> service.saveProcessStep(nonExistentDocUnitId, processStepNeu.uuid()))
+    assertThatThrownBy(
+            () -> service.saveProcessStep(nonExistentDocUnitId, processStepNeu.uuid(), userId))
         .isInstanceOf(DocumentationUnitNotExistsException.class)
         .hasMessageContaining("Doc unit not found for save");
     verify(documentationUnitRepository, times(1)).findByUuid(nonExistentDocUnitId);
-    verify(documentationUnitProcessStepRepository, never()).saveProcessStep(any(), any());
+    verify(documentationUnitProcessStepRepository, never()).saveProcessStep(any(), any(), any());
   }
 
   @Test
@@ -140,16 +145,16 @@ class DocumentationUnitProcessStepServiceTest {
     // Arrange
     UUID nonExistentProcessStepId = UUID.randomUUID();
     when(documentationUnitProcessStepRepository.saveProcessStep(
-            docUnitId, nonExistentProcessStepId))
+            docUnitId, nonExistentProcessStepId, userId))
         .thenThrow(new ProcessStepNotFoundException("Process step not found for save"));
 
     // Act & Assert
-    assertThatThrownBy(() -> service.saveProcessStep(docUnitId, nonExistentProcessStepId))
+    assertThatThrownBy(() -> service.saveProcessStep(docUnitId, nonExistentProcessStepId, userId))
         .isInstanceOf(ProcessStepNotFoundException.class)
         .hasMessageContaining("Process step not found for save");
     verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
     verify(documentationUnitProcessStepRepository, times(1))
-        .saveProcessStep(docUnitId, nonExistentProcessStepId);
+        .saveProcessStep(docUnitId, nonExistentProcessStepId, userId);
   }
 
   // --- Tests for getCurrentProcessStep ---

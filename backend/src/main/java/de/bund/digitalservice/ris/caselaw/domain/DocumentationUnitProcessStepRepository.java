@@ -8,7 +8,8 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface DocumentationUnitProcessStepRepository {
 
-  DocumentationUnitProcessStep saveProcessStep(UUID documentationUnitId, UUID processStepId);
+  DocumentationUnitProcessStep saveProcessStep(
+      UUID documentationUnitId, UUID processStepId, UUID userId);
 
   Optional<DocumentationUnitProcessStep> getCurrentProcessStep(UUID documentationUnitId);
 
