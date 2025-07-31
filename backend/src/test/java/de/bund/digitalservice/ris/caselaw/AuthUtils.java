@@ -106,6 +106,13 @@ public class AuthUtils {
         .build();
   }
 
+  public static DocumentationOffice buildBZStDocOffice() {
+    return DocumentationOffice.builder()
+        .abbreviation("BZSt")
+        .id(UUID.fromString("f13636bb-f611-480e-b50f-940f88b0de27"))
+        .build();
+  }
+
   public static void mockUserGroups(UserGroupService userGroupService) {
     doReturn(
             List.of(
@@ -140,6 +147,11 @@ public class AuthUtils {
                 UserGroup.builder()
                     .docOffice(buildCCRisDocOffice())
                     .userGroupPathName("/CC-RIS")
+                    .isInternal(true)
+                    .build(),
+                UserGroup.builder()
+                    .docOffice(buildBZStDocOffice())
+                    .userGroupPathName("/BZSt")
                     .isInternal(true)
                     .build()))
         .when(userGroupService)

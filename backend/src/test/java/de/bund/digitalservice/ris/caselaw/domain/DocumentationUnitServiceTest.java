@@ -225,8 +225,7 @@ class DocumentationUnitServiceTest {
               parameters.reference(),
               parameters.fileNumber(),
               user,
-                  initialDocUnitProcessStep);
-
+              initialDocUnitProcessStep);
     }
 
     @Test

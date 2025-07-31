@@ -58,9 +58,8 @@ public class ProcessStepController {
   }
 
   /**
-   * Retrieves a list of all possible process steps for a given documentation office, ordered by
-   * their defined rank. GET
-   * /api/v1/caselaw/documentationUnits/{documentationUnitId}/processteps/all
+   * Retrieves a list of all possible process steps for the user's documentation office, ordered by
+   * their defined rank. GET /api/v1/caselaw/documentationUnits/processteps/all
    *
    * @param oidcUser the logged-in user, to retrieve the docoffice from
    * @return ResponseEntity with a list of ProcessStep objects (200 OK), potentially an empty list
@@ -68,12 +67,15 @@ public class ProcessStepController {
    *     documentation office is not found, or if an associated process step is not found (data
    *     inconsistency).
    */
-  @GetMapping("/{documentationUnitId}/processteps/all")
+  @GetMapping("/processteps/all")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<List<ProcessStep>> getAllPossibleProcessStepsForDocOffice(
       @AuthenticationPrincipal OidcUser oidcUser) {
     try {
       var documentationOffice = userService.getDocumentationOffice(oidcUser);
+      if (documentationOffice == null) {
+        return ResponseEntity.notFound().build();
+      }
       List<ProcessStep> possibleSteps =
           processStepService.getAllProcessStepsForDocOffice(documentationOffice.id());
       return ResponseEntity.ok(possibleSteps);

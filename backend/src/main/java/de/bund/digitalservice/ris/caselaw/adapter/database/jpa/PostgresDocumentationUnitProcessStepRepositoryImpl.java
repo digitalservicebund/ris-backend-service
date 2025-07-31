@@ -31,5 +31,4 @@ public class PostgresDocumentationUnitProcessStepRepositoryImpl
         .findTopByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId)
         .map(DocumentationUnitProcessStepTransformer::toDomain);
   }
-
 }

@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.User;
@@ -18,20 +19,20 @@ class DocumentationUnitProcessStepTransformerTest {
 
   @Test
   void shouldTransformToDomain() {
-
-    ProcessStep processStep = ProcessStep.builder().uuid(UUID.randomUUID()).build();
+    ProcessStepDTO processStepDTO = ProcessStepDTO.builder().id(UUID.randomUUID()).build();
     DocumentationUnitProcessStepDTO documentationUnitProcessStepDTO =
         DocumentationUnitProcessStepDTO.builder()
             .id(documentationUnitProcessStepId)
             .userId(user.id())
             .createdAt(createdAt)
+            .processStep(processStepDTO)
             .build();
     DocumentationUnitProcessStep documentationUnitProcessStep =
         DocumentationUnitProcessStep.builder()
             .id(documentationUnitProcessStepId)
             .user(user)
             .createdAt(createdAt)
-            .processStep(processStep)
+            .processStep(ProcessStep.builder().uuid(processStepDTO.getId()).build())
             .build();
 
     assertThat(DocumentationUnitProcessStepTransformer.toDomain(documentationUnitProcessStepDTO))
@@ -40,16 +41,7 @@ class DocumentationUnitProcessStepTransformerTest {
 
   @Test
   void shouldNotTransformToDomain_ifProcessStepNull() {
-    ProcessStep processStep = null;
-    DocumentationUnitProcessStepDTO documentationUnitProcessStepDTO =
-        DocumentationUnitProcessStepDTO.builder()
-            .id(documentationUnitProcessStepId)
-            .userId(user.id())
-            .createdAt(createdAt)
-            .build();
-
-    assertThat(DocumentationUnitProcessStepTransformer.toDomain(documentationUnitProcessStepDTO))
-        .isNull();
+    assertThat(DocumentationUnitProcessStepTransformer.toDomain(null)).isNull();
   }
 
   @Test

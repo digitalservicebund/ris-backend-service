@@ -273,7 +273,7 @@ public class DocumentationUnitService {
           DocumentationUnitProcessStep.builder()
               .createdAt(LocalDateTime.now())
               .processStep(docOfficeProcessSteps.getFirst())
-                  .user(user)
+              .user(user)
               .build();
     }
 

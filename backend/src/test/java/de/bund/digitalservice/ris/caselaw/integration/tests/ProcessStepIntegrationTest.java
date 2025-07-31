@@ -173,9 +173,9 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
 
     // Act & Assert
     risWebTestClient
-        .withDefaultLogin()
+        .withLogin("/BGH")
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitBGH.getId() + "/processteps/all")
+        .uri(PROCESS_STEP_ENDPOINT + "/processteps/all")
         .exchange()
         .expectStatus()
         .isOk()
@@ -202,9 +202,9 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
 
     // Act & Assert
     risWebTestClient
-        .withDefaultLogin()
+        .withLogin("/BZSt")
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitBGH.getId() + "/processteps/all")
+        .uri(PROCESS_STEP_ENDPOINT + "/processteps/all")
         .exchange()
         .expectStatus()
         .isOk()
@@ -220,9 +220,9 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
   @DisplayName("GET /all - Should return 404 Not Found if docoffice not found")
   void getAllPossibleProcessStepsForDocOffice_withInvalidDocOfficeId_shouldReturnNotFound() {
     risWebTestClient
-        .withDefaultLogin()
+        .withLogin("/random")
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitBGH.getId() + "/processteps/all")
+        .uri(PROCESS_STEP_ENDPOINT + "/processteps/all")
         .exchange()
         .expectStatus()
         .isNotFound();
