@@ -1,26 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
 public class DocumentationOfficeService {
   private final DocumentationOfficeRepository documentationOfficeRepository;
-  private final DatabaseDocumentationOfficeRepository databaseDocumentationOfficeRepository;
 
-  public DocumentationOfficeService(
-      DocumentationOfficeRepository documentationOfficeRepository,
-      DatabaseDocumentationOfficeRepository databaseDocumentationOfficeRepository) {
+  public DocumentationOfficeService(DocumentationOfficeRepository documentationOfficeRepository) {
     this.documentationOfficeRepository = documentationOfficeRepository;
-    this.databaseDocumentationOfficeRepository = databaseDocumentationOfficeRepository;
   }
 
   /**
@@ -51,23 +43,13 @@ public class DocumentationOfficeService {
   /**
    * Returns a list of all process steps associated to a documentation office, ordered by rank.
    *
-   * @param docOfficeId the UUID of the docoffice
+   * @param uuid the UUID to search for
    * @return a list of all associated process steps, ordered by rank. If none found, returns an
    *     empty list.
    * @throws DocumentationOfficeNotExistsException if no documentation office found for given UUID.
    */
-  @Transactional(transactionManager = "jpaTransactionManager")
-  public List<ProcessStep> getProcessStepsForDocumentationOffice(UUID docOfficeId)
+  public List<ProcessStep> getProcessStepsForDocumentationOffice(UUID uuid)
       throws DocumentationOfficeNotExistsException {
-    DocumentationOfficeDTO docOffice =
-        databaseDocumentationOfficeRepository
-            .findById(docOfficeId)
-            .orElseThrow(
-                () ->
-                    new DocumentationOfficeNotExistsException(
-                        String.format(
-                            "The documentation office with id %s doesn't exist.", docOfficeId)));
-
-    return docOffice.getProcessSteps().stream().map(ProcessStepTransformer::toDomain).toList();
+    return documentationOfficeRepository.findAllProcessStepsForDocOffice(uuid);
   }
 }
