@@ -48,7 +48,12 @@ class BareIdUserApiServiceTest {
   void testGetUser() {
     final UUID userId = UUID.randomUUID();
 
-    BareUserApiResponse.BareUser bareUser = generateBareUser(userId);
+    var attributes =
+        Map.of(
+            "firstName", new BareUserApiResponse.AttributeValues(List.of("Tina")),
+            "lastName", new BareUserApiResponse.AttributeValues(List.of("Taxpayer")));
+
+    BareUserApiResponse.BareUser bareUser = generateBareUser(userId, attributes);
     BareUserApiResponse.UserApiResponse userApiResponse =
         new BareUserApiResponse.UserApiResponse(bareUser);
 
@@ -91,15 +96,40 @@ class BareIdUserApiServiceTest {
     Assertions.assertNull(userResult.name());
   }
 
-  private BareUserApiResponse.BareUser generateBareUser(UUID userId) {
+  @Test
+  void testGetUser_withEmptyNamesAttributes_shouldReturnNullName() {
+    final UUID userId = UUID.randomUUID();
+
+    BareUserApiResponse.BareUser bareUser = generateBareUser(userId, null);
+    BareUserApiResponse.UserApiResponse userApiResponse =
+        new BareUserApiResponse.UserApiResponse(bareUser);
+
+    ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
+        ResponseEntity.ok(userApiResponse);
+
+    doReturn(mockResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UserApiResponse.class));
+
+    var userResult = bareIdUserApiService.getUser(userId);
+
+    Assertions.assertNull(userResult.name());
+    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
+    Assertions.assertEquals(userId, userResult.id());
+  }
+
+  private BareUserApiResponse.BareUser generateBareUser(
+      UUID userId, Map<String, BareUserApiResponse.AttributeValues> attributes) {
     return new BareUserApiResponse.BareUser(
         userId,
         true,
         true,
         "e2e_tests_bfh@digitalservice.bund.de",
         "e2e_tests_bfh@digitalservice.bund.de",
-        Map.of(
-            "firstName", new BareUserApiResponse.AttributeValues(List.of("Tina")),
-            "lastName", new BareUserApiResponse.AttributeValues(List.of("Taxpayer"))));
+        attributes);
   }
 }

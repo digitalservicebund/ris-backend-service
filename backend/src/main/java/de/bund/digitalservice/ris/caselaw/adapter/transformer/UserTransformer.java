@@ -14,16 +14,25 @@ public class UserTransformer {
 
     return User.builder()
         .id(bareUser.uuid())
-        .name(String.join(" ", getFullName(bareUser.attributes())))
+        .name(buildFullName(bareUser.attributes()))
         .email(bareUser.email())
         .build();
   }
 
-  public static List<String> getFullName(
-      Map<String, BareUserApiResponse.AttributeValues> attributes) {
-    return java.util.stream.Stream.concat(
-            getValues(attributes, "firstName").stream(), getValues(attributes, "lastName").stream())
-        .toList();
+  private static String buildFullName(Map<String, BareUserApiResponse.AttributeValues> attributes) {
+    List<String> firstNames = getValues(attributes, "firstName");
+    List<String> lastNames = getValues(attributes, "lastName");
+
+    if (firstNames.isEmpty() && lastNames.isEmpty()) {
+      return null;
+    }
+
+    return String.join(
+        " ",
+        java.util.stream.Stream.concat(
+                getValues(attributes, "firstName").stream(),
+                getValues(attributes, "lastName").stream())
+            .toList());
   }
 
   public static List<String> getValues(
@@ -31,7 +40,6 @@ public class UserTransformer {
     if (attributes == null || !attributes.containsKey(key)) {
       return Collections.emptyList();
     }
-    List<String> values = attributes.get(key).values();
-    return values != null ? values : Collections.emptyList();
+    return attributes.get(key).values();
   }
 }

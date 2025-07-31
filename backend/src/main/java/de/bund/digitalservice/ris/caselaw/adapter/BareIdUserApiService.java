@@ -33,7 +33,7 @@ public class BareIdUserApiService implements UserApiService {
   }
 
   @Override
-  public de.bund.digitalservice.ris.caselaw.domain.User getUser(UUID userId) {
+  public User getUser(UUID userId) {
 
     try {
 
