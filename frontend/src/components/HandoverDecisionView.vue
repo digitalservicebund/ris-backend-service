@@ -140,11 +140,10 @@ function handoverDocumentUnit() {
     if (fieldsWithoutJdvExport.value.length > 0)
       warnings.push(
         "Die folgenden Rubriken können nicht an die jDV exportiert werden: \n" +
-          fieldsWithoutJdvExport.value.join(", ") +
-          "\n",
+          fieldsWithoutJdvExport.value.map((field) => `- ${field}`).join(", "),
       )
     warnings.push("Wollen Sie das Dokument dennoch übergeben?")
-    warningModalReasons.value = warnings.join("\n")
+    warningModalReasons.value = warnings.join("\n\n")
     showHandoverWarningModal.value = true
   } else {
     emits("handoverDocument")

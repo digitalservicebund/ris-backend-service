@@ -17,5 +17,6 @@ public record ContentRelatedIndexing(
     List<String> dismissalGrounds,
     List<String> dismissalTypes,
     List<String> collectiveAgreements,
+    List<Definition> definitions,
     boolean hasLegislativeMandate,
     String evsf) {}

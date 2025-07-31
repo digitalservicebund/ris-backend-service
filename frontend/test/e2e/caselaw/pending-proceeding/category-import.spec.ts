@@ -32,6 +32,7 @@ test.describe("category import of pending proceeding", () => {
       await test.step("Wenn die Quellrubriken leer sind wird 'Quellrubrik leer' angezeigt und übernehmen ist nicht möglich", async () => {
         await searchForDocumentUnitToImport(page, documentNumber)
         await expect(page.getByText("Quellrubrik leer")).toHaveCount(3) // we have 3 importable categories
+        await page.getByRole("button", { name: "Rubriken ohne Inhalt" }).click()
         await expect(
           page.getByRole("button", { name: "Schlagwörter übernehmen" }),
         ).toBeDisabled()
@@ -101,6 +102,7 @@ test.describe("category import of pending proceeding", () => {
           pendingProceeding.documentNumber,
         )
         await expect(page.getByText("Quellrubrik leer")).toHaveCount(3) // we have 3 importable categories
+        await page.getByRole("button", { name: "Rubriken ohne Inhalt" }).click()
         await expect(
           page.getByRole("button", { name: "Schlagwörter übernehmen" }),
         ).toBeDisabled()
@@ -167,6 +169,7 @@ test.describe("category import of pending proceeding", () => {
           pendingProceeding.documentNumber,
         )
         await expect(page.getByText("Quellrubrik leer")).toHaveCount(3) // we have 3 importable categories
+        await page.getByRole("button", { name: "Rubriken ohne Inhalt" }).click()
         await expect(
           page.getByRole("button", { name: "Schlagwörter übernehmen" }),
         ).toBeDisabled()

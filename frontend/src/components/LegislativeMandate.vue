@@ -24,7 +24,7 @@ const hasLegislativeMandate = computed({
     <div class="ris-label2-regular mb-16">{{ headline }}</div>
     <div class="flex flex-row">
       <InputField
-        id="legislativeMandate"
+        id="hasLegislativeMandate"
         v-slot="{ id }"
         :label="label"
         label-class="ris-label1-regular"

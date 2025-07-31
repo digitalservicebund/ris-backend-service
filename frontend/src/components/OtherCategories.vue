@@ -2,6 +2,7 @@
 import { computed } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
+import DefinitionList from "@/components/DefinitionList.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
@@ -80,6 +81,12 @@ const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
   <div aria-label="Weitere Rubriken">
     <h2 class="ris-label1-bold mb-16">Weitere Rubriken</h2>
     <div class="flex flex-col gap-24">
+      <CategoryWrapper
+        label="Definition"
+        :should-show-button="!contentRelatedIndexing.definitions?.length"
+      >
+        <DefinitionList label="Definition" />
+      </CategoryWrapper>
       <CategoryWrapper
         v-if="shouldDisplayCollectiveAgreements"
         v-slot="slotProps"
