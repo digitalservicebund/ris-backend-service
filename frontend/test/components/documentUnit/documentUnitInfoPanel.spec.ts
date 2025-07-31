@@ -1,4 +1,5 @@
 import { createTestingPinia } from "@pinia/testing"
+import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import Tooltip from "primevue/tooltip"
 import { createRouter, createWebHistory } from "vue-router"
@@ -10,6 +11,7 @@ import {
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/managementData"
+import processStepService from "@/services/processStepService"
 import routes from "~/test-helper/routes"
 
 const currentProcessStep: DocumentationUnitProcessStep = {
@@ -45,6 +47,7 @@ function renderComponent(options?: {
   duplicateRelations?: DuplicateRelation[]
   isExternalUser?: boolean
 }) {
+  const user = userEvent.setup()
   const router = createRouter({
     history: createWebHistory(),
     routes: routes,
@@ -67,6 +70,7 @@ function renderComponent(options?: {
   })
 
   return {
+    user,
     ...render(DocumentUnitInfoPanel, {
       props: { documentUnit: documentUnit },
       global: {
@@ -166,7 +170,7 @@ describe("documentUnit InfoPanel", () => {
     expect(screen.queryByText("Dublettenverdacht")).not.toBeInTheDocument()
   })
 
-  it("renders proccess steps", async () => {
+  it("renders proccess steps and move button", async () => {
     renderComponent()
     expect(screen.queryByText("N")).not.toBeInTheDocument()
     expect(screen.queryByText("Neu")).not.toBeInTheDocument()
@@ -174,5 +178,55 @@ describe("documentUnit InfoPanel", () => {
     expect(screen.queryByText("Blockiert")).not.toBeInTheDocument()
     expect(await screen.findByText("Fertig")).toBeInTheDocument()
     expect(screen.queryByText("F")).not.toBeInTheDocument()
+    expect(
+      await screen.findByLabelText("Dokumentationseinheit weitergeben"),
+    ).toBeInTheDocument()
+  })
+
+  it("renders proccess steps modal", async () => {
+    vi.spyOn(processStepService, "getNextProcessStep").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          uuid: "qs-formal-id",
+          name: "QS formal",
+          abbreviation: "QS",
+        },
+      }),
+    )
+
+    const { user } = renderComponent()
+    // Open move proccess step dialog
+    await user.click(
+      await screen.findByLabelText("Dokumentationseinheit weitergeben"),
+    )
+    expect(
+      await screen.findByText("Dokumentationseinheit weitergeben"),
+    ).toBeInTheDocument()
+    expect(await screen.findByText("Weitergeben")).toBeInTheDocument()
+    expect(await screen.findByText("Abbrechen")).toBeInTheDocument()
+    expect(await screen.findByText("QS formal")).toBeInTheDocument()
+
+    // Move process
+    await user.click(await screen.findByLabelText("Weitergeben"))
+    expect(
+      screen.queryByText("Dokumentationseinheit weitergeben"),
+    ).not.toBeInTheDocument()
+    // TODO new process step is not updated immediately
+    // expect(screen.queryByText("Fertig")).not.toBeInTheDocument()
+    // expect(await screen.findByText("F")).toBeInTheDocument()
+    // expect(await screen.findByText("QS formal")).toBeInTheDocument()
+
+    // Cancel
+    await user.click(
+      await screen.findByLabelText("Dokumentationseinheit weitergeben"),
+    )
+    expect(
+      await screen.findByText("Dokumentationseinheit weitergeben"),
+    ).toBeInTheDocument()
+    await user.click(await screen.findByLabelText("Abbrechen"))
+    expect(
+      screen.queryByText("Dokumentationseinheit weitergeben"),
+    ).not.toBeInTheDocument()
   })
 })
