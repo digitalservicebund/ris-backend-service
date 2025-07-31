@@ -97,7 +97,8 @@ class DocumentationUnitServiceTest {
             DocumentNumberFormatterException {
       DocumentationOffice documentationOffice =
           DocumentationOffice.builder().id(UUID.randomUUID()).build();
-      User user = User.builder().documentationOffice(documentationOffice).build();
+      User user =
+          User.builder().id(UUID.randomUUID()).documentationOffice(documentationOffice).build();
       Decision decision = Decision.builder().build();
 
       when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
@@ -156,7 +157,8 @@ class DocumentationUnitServiceTest {
             DocumentNumberFormatterException {
       DocumentationOffice userDocumentationOffice =
           DocumentationOffice.builder().abbreviation("BAG").id(UUID.randomUUID()).build();
-      User user = User.builder().documentationOffice(userDocumentationOffice).build();
+      User user =
+          User.builder().id(UUID.randomUUID()).documentationOffice(userDocumentationOffice).build();
       DocumentationOffice designatedDocumentationOffice =
           DocumentationOffice.builder().abbreviation("BGH").id(UUID.randomUUID()).build();
       Decision decision = Decision.builder().build();
