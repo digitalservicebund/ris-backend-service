@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildBGHDocOffice;
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildVVBundDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -38,35 +36,20 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
   @Autowired
   private DatabaseDocumentationUnitProcessStepRepository documentationUnitProcessStepRepository;
 
-  private DocumentationOfficeDTO documentationOfficeVVBund;
-  private DocumentationOfficeDTO documentationOfficeDS;
   private DocumentationOfficeDTO documentationOfficeBGH;
-  private DocumentationUnitDTO testDocumentationUnitDS;
   private DocumentationUnitDTO testDocumentationUnitBGH;
-  private ProcessStepDTO neuProcessStep;
   private ProcessStepDTO ersterfassungProcessStep;
   private ProcessStepDTO qsformalProcessStep;
   private ProcessStepDTO blockiertProcessStep;
-  private static final String PROCESS_STEP_ENDPOINT = "/api/v1/caselaw/documentationUnits/";
+  private static final String PROCESS_STEP_ENDPOINT = "/api/v1/caselaw/";
 
   @BeforeEach
   void setUp() {
-    documentationOfficeVVBund =
-        documentationOfficeRepository.findByAbbreviation(buildVVBundDocOffice().abbreviation());
-    documentationOfficeDS =
-        documentationOfficeRepository.findByAbbreviation(buildDSDocOffice().abbreviation());
     documentationOfficeBGH =
         documentationOfficeRepository.findByAbbreviation(buildBGHDocOffice().abbreviation());
-    testDocumentationUnitDS =
-        EntityBuilderTestUtil.createAndSaveDecision(
-            documentationUnitRepository, documentationOfficeDS, "TESTDOC001");
     testDocumentationUnitBGH =
         EntityBuilderTestUtil.createAndSaveDecision(
             documentationUnitRepository, documentationOfficeBGH, "TESTDOC002");
-    neuProcessStep =
-        processStepRepository
-            .findByName("Neu")
-            .orElseThrow(() -> new AssertionError("Process step 'Neu' not found in repository."));
     ersterfassungProcessStep =
         processStepRepository
             .findByName("Ersterfassung")
@@ -106,7 +89,11 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitBGH.getId() + "/processteps/next")
+        .uri(
+            PROCESS_STEP_ENDPOINT
+                + "documentationUnits/"
+                + testDocumentationUnitBGH.getId()
+                + "/processteps/next")
         .exchange()
         .expectStatus()
         .isOk()
@@ -135,7 +122,11 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitBGH.getId() + "/processteps/next")
+        .uri(
+            PROCESS_STEP_ENDPOINT
+                + "documentationUnits/"
+                + testDocumentationUnitBGH.getId()
+                + "/processteps/next")
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -149,7 +140,11 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + testDocumentationUnitBGH.getId() + "/processteps/next")
+        .uri(
+            PROCESS_STEP_ENDPOINT
+                + "documentationUnits/"
+                + testDocumentationUnitBGH.getId()
+                + "/processteps/next")
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -161,7 +156,8 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + UUID.randomUUID() + "/processteps/next")
+        .uri(
+            PROCESS_STEP_ENDPOINT + "documentationUnits/" + UUID.randomUUID() + "/processteps/next")
         .exchange()
         .expectStatus()
         .isNotFound();
@@ -175,7 +171,7 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withLogin("/BGH")
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + "/processteps/all")
+        .uri(PROCESS_STEP_ENDPOINT + "processteps")
         .exchange()
         .expectStatus()
         .isOk()
@@ -204,7 +200,7 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withLogin("/BZSt")
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + "/processteps/all")
+        .uri(PROCESS_STEP_ENDPOINT + "processteps")
         .exchange()
         .expectStatus()
         .isOk()
@@ -222,7 +218,7 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withLogin("/random")
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + "/processteps/all")
+        .uri(PROCESS_STEP_ENDPOINT + "processteps")
         .exchange()
         .expectStatus()
         .isNotFound();

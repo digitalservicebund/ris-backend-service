@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/caselaw/documentationUnits")
+@RequestMapping("api/v1/caselaw")
 @Slf4j
 public class ProcessStepController {
 
@@ -42,7 +42,7 @@ public class ProcessStepController {
    *     if no next step is defined for the current state. Returns 404 Not Found if the
    *     documentation unit does not exist.
    */
-  @GetMapping("/{documentationUnitId}/processteps/next")
+  @GetMapping("/documentationUnits/{documentationUnitId}/processteps/next")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<ProcessStep> getNextProcessStepForDocOffice(
       @PathVariable UUID documentationUnitId) {
@@ -59,7 +59,7 @@ public class ProcessStepController {
 
   /**
    * Retrieves a list of all possible process steps for the user's documentation office, ordered by
-   * their defined rank. GET /api/v1/caselaw/documentationUnits/processteps/all
+   * their defined rank. GET /api/v1/caselaw/processteps
    *
    * @param oidcUser the logged-in user, to retrieve the docoffice from
    * @return ResponseEntity with a list of ProcessStep objects (200 OK), potentially an empty list
@@ -67,7 +67,7 @@ public class ProcessStepController {
    *     documentation office is not found, or if an associated process step is not found (data
    *     inconsistency).
    */
-  @GetMapping("/processteps/all")
+  @GetMapping("/processteps")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<List<ProcessStep>> getAllPossibleProcessStepsForDocOffice(
       @AuthenticationPrincipal OidcUser oidcUser) {
