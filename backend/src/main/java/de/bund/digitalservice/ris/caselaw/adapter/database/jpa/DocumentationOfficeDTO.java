@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ public class DocumentationOfficeDTO {
       schema = "incremental_migration",
       joinColumns = @JoinColumn(name = "documentation_office_id"),
       inverseJoinColumns = @JoinColumn(name = "process_step_id"))
+  @OrderColumn(name = "rank")
   @Builder.Default
   private List<ProcessStepDTO> processSteps = new ArrayList<>();
 

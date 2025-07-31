@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -38,6 +37,7 @@ import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.Validator;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +84,7 @@ class DocumentationUnitServiceTest {
   @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
   @MockitoBean private DocumentationUnitSearchRepository docUnitSearchRepository;
-  @MockitoBean private DocumentationUnitProcessStepService processStepService;
+  @MockitoBean private ProcessStepService processStepService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
@@ -101,7 +101,7 @@ class DocumentationUnitServiceTest {
           User.builder().id(UUID.randomUUID()).documentationOffice(documentationOffice).build();
       Decision decision = Decision.builder().build();
 
-      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
           .thenReturn(decision);
       when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
           .thenReturn("nextDocumentNumber");
@@ -109,20 +109,19 @@ class DocumentationUnitServiceTest {
       // The chicken-egg-problem is, that we are dictating what happens when
       // repository.save(), so we can't just use a captor at the same time
 
-      UUID firstProcessStepId = UUID.randomUUID();
+      ProcessStep firstProcessStep =
+          ProcessStep.builder().abbreviation("A").name("Step A").uuid(UUID.randomUUID()).build();
+
+      ProcessStep secondProcessStep =
+          ProcessStep.builder().abbreviation("B").name("Step B").uuid(UUID.randomUUID()).build();
       when(processStepService.getAllProcessStepsForDocOffice(any()))
-          .thenReturn(
-              List.of(
-                  ProcessStep.builder()
-                      .abbreviation("A")
-                      .name("Step A")
-                      .uuid(firstProcessStepId)
-                      .build(),
-                  ProcessStep.builder()
-                      .abbreviation("B")
-                      .name("Step B")
-                      .uuid(UUID.randomUUID())
-                      .build()));
+          .thenReturn(List.of(firstProcessStep, secondProcessStep));
+
+      DocumentationUnitProcessStep initialDocUnitProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .createdAt(LocalDateTime.now())
+              .processStep(firstProcessStep)
+              .build();
 
       assertNotNull(service.generateNewDecision(user, Optional.empty()));
 
@@ -145,9 +144,8 @@ class DocumentationUnitServiceTest {
                   .build(),
               null,
               null,
-              user);
-      verify(processStepService)
-          .saveProcessStep(any(DocumentationUnit.class), eq(firstProcessStepId), any(UUID.class));
+              user,
+              initialDocUnitProcessStep);
     }
 
     @Test
@@ -176,7 +174,7 @@ class DocumentationUnitServiceTest {
                       .build())
               .build();
 
-      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
           .thenReturn(decision);
 
       when(documentNumberService.generateDocumentNumber(
@@ -186,20 +184,19 @@ class DocumentationUnitServiceTest {
       // The chicken-egg-problem is, that we are dictating what happens when
       // repository.save(), so we can't just use a captor at the same time
 
-      UUID firstProcessStepId = UUID.randomUUID();
+      ProcessStep firstProcessStep =
+          ProcessStep.builder().abbreviation("A").name("Step A").uuid(UUID.randomUUID()).build();
+
+      ProcessStep secondProcessStep =
+          ProcessStep.builder().abbreviation("B").name("Step B").uuid(UUID.randomUUID()).build();
       when(processStepService.getAllProcessStepsForDocOffice(any()))
-          .thenReturn(
-              List.of(
-                  ProcessStep.builder()
-                      .abbreviation("A")
-                      .name("Step A")
-                      .uuid(firstProcessStepId)
-                      .build(),
-                  ProcessStep.builder()
-                      .abbreviation("B")
-                      .name("Step B")
-                      .uuid(UUID.randomUUID())
-                      .build()));
+          .thenReturn(List.of(firstProcessStep, secondProcessStep));
+
+      DocumentationUnitProcessStep initialDocUnitProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .createdAt(LocalDateTime.now())
+              .processStep(firstProcessStep)
+              .build();
 
       assertNotNull(service.generateNewDecision(user, Optional.of(parameters)));
 
@@ -227,10 +224,9 @@ class DocumentationUnitServiceTest {
                   .build(),
               parameters.reference(),
               parameters.fileNumber(),
-              user);
+              user,
+                  initialDocUnitProcessStep);
 
-      verify(processStepService)
-          .saveProcessStep(any(DocumentationUnit.class), eq(firstProcessStepId), any(UUID.class));
     }
 
     @Test
@@ -250,8 +246,22 @@ class DocumentationUnitServiceTest {
               .jurisShortcut("Anh")
               .build();
 
+      ProcessStep firstProcessStep =
+          ProcessStep.builder().abbreviation("A").name("Step A").uuid(UUID.randomUUID()).build();
+
+      ProcessStep secondProcessStep =
+          ProcessStep.builder().abbreviation("B").name("Step B").uuid(UUID.randomUUID()).build();
+      when(processStepService.getAllProcessStepsForDocOffice(any()))
+          .thenReturn(List.of(firstProcessStep, secondProcessStep));
+
+      DocumentationUnitProcessStep initialDocUnitProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .createdAt(LocalDateTime.now())
+              .processStep(firstProcessStep)
+              .build();
+
       when(documentTypeService.getPendingProceedingType()).thenReturn(documentType);
-      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
           .thenReturn(pendingProceeding);
       when(documentNumberService.generateDocumentNumber(
               documentationOffice.abbreviation() + "-Anh"))
@@ -282,7 +292,8 @@ class DocumentationUnitServiceTest {
                   .build(),
               null,
               null,
-              user);
+              user,
+              initialDocUnitProcessStep);
     }
 
     @Test
@@ -316,9 +327,22 @@ class DocumentationUnitServiceTest {
                       .legalPeriodical(LegalPeriodical.builder().abbreviation("BAG").build())
                       .build())
               .build();
+      ProcessStep firstProcessStep =
+          ProcessStep.builder().abbreviation("A").name("Step A").uuid(UUID.randomUUID()).build();
+
+      ProcessStep secondProcessStep =
+          ProcessStep.builder().abbreviation("B").name("Step B").uuid(UUID.randomUUID()).build();
+      when(processStepService.getAllProcessStepsForDocOffice(any()))
+          .thenReturn(List.of(firstProcessStep, secondProcessStep));
+
+      DocumentationUnitProcessStep initialDocUnitProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .createdAt(LocalDateTime.now())
+              .processStep(firstProcessStep)
+              .build();
 
       when(documentTypeService.getPendingProceedingType()).thenReturn(documentType);
-      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
           .thenReturn(pendingProceeding);
       when(documentNumberService.generateDocumentNumber(
               designatedDocumentationOffice.abbreviation() + "-Anh"))
@@ -350,7 +374,8 @@ class DocumentationUnitServiceTest {
                   .build(),
               parameters.reference(),
               parameters.fileNumber(),
-              user);
+              user,
+              initialDocUnitProcessStep);
     }
 
     @Test

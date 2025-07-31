@@ -53,7 +53,7 @@ public class DocumentationUnitService {
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
   private final DocumentationOfficeService documentationOfficeService;
-  private final DocumentationUnitProcessStepService processStepService;
+  private final ProcessStepService processStepService;
   private static final List<String> pathsForDuplicateCheck =
       List.of(
           "/coreData/ecli",
@@ -84,7 +84,7 @@ public class DocumentationUnitService {
       DocumentationOfficeService documentationOfficeService,
       DocumentationUnitHistoryLogService historyLogService,
       DocumentationUnitSearchRepository docUnitSearchRepository,
-      DocumentationUnitProcessStepService processStepService) {
+      ProcessStepService processStepService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -168,7 +168,7 @@ public class DocumentationUnitService {
 
     DocumentationUnitProcessStep initialDocUnitProcessStep = null;
     if (!docOfficeProcessSteps.isEmpty()) {
-      // create new DocumentationUnitProcessStep with first process step for dooffice
+      // create new DocumentationUnitProcessStep with first process step for docoffice
       initialDocUnitProcessStep =
           DocumentationUnitProcessStep.builder()
               .createdAt(LocalDateTime.now())
