@@ -78,6 +78,7 @@ test.describe(
         await expect(page.getByTestId("Definitionen")).toHaveText(
           /Sachgesamtheit \| 1/,
         )
+        await save(page)
       })
 
       await test.step("Definition kann auf Übergabeseite exportiert werden", async () => {
