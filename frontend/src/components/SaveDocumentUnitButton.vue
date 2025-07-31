@@ -41,6 +41,7 @@ window.onbeforeunload = function () {
       <span>{{ formattedLastSavedOn }}</span>
       Uhr
     </p>
+    <slot />
     <Button
       :aria-label="props.ariaLabel"
       data-testid="save-button"
