@@ -14,8 +14,7 @@ defineProps<{
 <template>
   <div
     class="ris-label2-regular w-[fit-content] rounded-full px-4 py-2"
-    :class="backgroundColor"
-    :style="{ borderColor: borderColor, backgroundColor: backgroundColor }"
+    :class="`${backgroundColor} bg-${backgroundColor} border border-${borderColor}`"
   >
     <component :is="icon" class="inline-block" :class="color" />
     <span
