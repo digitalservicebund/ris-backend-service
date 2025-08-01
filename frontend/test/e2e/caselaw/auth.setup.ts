@@ -5,23 +5,7 @@ function authenticateUser(user: {
   email: string
   password: string
 }) {
-  setup(`authenticate ${user.name}`, async ({ page, browser }) => {
-    const context = await browser.newContext({
-      storageState: `test/e2e/caselaw/.auth/${user.name}.json`,
-    })
-
-    const cookies = await context.cookies()
-    let sessionCookie = null
-    cookies.forEach((cookie) => {
-      if (cookie.name === "SESSION") {
-        sessionCookie = cookie
-      }
-    })
-
-    if (sessionCookie !== null) {
-      return
-    }
-
+  setup(`authenticate ${user.name}`, async ({ page }) => {
     await page.goto("/")
     await page.fill("#username", user.email)
     await page.fill("#password", user.password)
