@@ -8,7 +8,7 @@ import { importDocumentationUnitFromXml } from "~/e2e/caselaw/utils/importer-api
 test.describe("ensuring the exported XML is generated from imported decision as expected", () => {
   // eslint-disable-next-line playwright/no-skipped-test
   test.skip(
-    process.env.E2E_TEST_URL === "http://127.0.0.1",
+    ({ baseURL }) => baseURL === "http://127.0.0.1",
     "Skipping this test on local execution, as there is no importer available",
   )
 

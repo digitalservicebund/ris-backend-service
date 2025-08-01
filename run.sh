@@ -126,7 +126,7 @@ _dev() {
         services="initialization"
         ;;
       -n|--no-backend)
-        services="traefik redis postgres14 frontend languagetool"
+        services="traefik redis postgres14 frontend"
         ;;
       -d|--detached)
         wait="--wait"

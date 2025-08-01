@@ -45,6 +45,10 @@ public class LanguageToolService extends TextCheckService {
 
   @Override
   protected List<Match> requestTool(String text) {
+    if (!languageToolConfig.isEnabled()) {
+      log.info("LanguageTool is disabled. Skipping text check.");
+      return List.of();
+    }
     Document document = Jsoup.parse(text);
 
     JsonArray annotations = getAnnotationsArray(document);
