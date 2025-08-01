@@ -198,17 +198,17 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.4")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.39") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.40") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.38.jar"))
+//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.40.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.81")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.82")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.79.jar"))
+//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.82.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.19.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")

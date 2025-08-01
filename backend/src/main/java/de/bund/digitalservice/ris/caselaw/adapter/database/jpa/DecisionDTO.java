@@ -208,6 +208,13 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
 
+  /* Definition */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<DefinitionDTO> definitions = new ArrayList<>();
+
   @OneToMany(mappedBy = "documentationUnit1", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonManagedReference // Prevent infinite recursion
   @Builder.Default

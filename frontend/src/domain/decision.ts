@@ -4,6 +4,7 @@ import ActiveCitation from "@/domain/activeCitation"
 import Attachment from "@/domain/attachment"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { CoreData } from "@/domain/coreData"
+import Definition from "@/domain/definition"
 import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import LegalForce from "@/domain/legalForce"
@@ -70,6 +71,7 @@ export const contentRelatedIndexingLabels: {
   dismissalGrounds: "Kündigungsgründe",
   jobProfiles: "Berufsbild",
   evsf: "E-VSF",
+  definitions: "Definition",
   hasLegislativeMandate: "Gesetzgebungsauftrag",
 }
 export const allLabels = {
@@ -186,6 +188,9 @@ export class Decision {
         data.contentRelatedIndexing.activeCitations.map(
           (activeCitations) => new ActiveCitation({ ...activeCitations }),
         )
+
+    if (data.contentRelatedIndexing?.definitions)
+      data.contentRelatedIndexing.definitions = data.contentRelatedIndexing?.definitions.map(def => new Definition({ ...def }))
 
     if (data.attachments != undefined && data.attachments.length > 0) {
       data.attachments = data.attachments.map(
