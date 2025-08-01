@@ -37,7 +37,7 @@ window.onbeforeunload = function () {
       v-else-if="formattedLastSavedOn !== undefined"
       class="ris-label1-regular"
     >
-      Zuletzt
+      Gespeichert:
       <span>{{ formattedLastSavedOn }}</span>
       Uhr
     </p>
