@@ -20,7 +20,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.10.4"
+    id("org.flywaydb.flyway") version "11.10.5"
     id("io.sentry.jvm.gradle") version "5.8.0"
 }
 
@@ -194,7 +194,7 @@ dependencies {
     implementation("net.sf.saxon:Saxon-HE:12.8")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
-    implementation("org.eclipse.angus:angus-mail:2.0.3")
+    implementation("org.eclipse.angus:angus-mail:2.0.4")
     implementation("com.icegreen:greenmail:2.1.4")
 
     // package served by private repo, requires authentication:
@@ -232,10 +232,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.10.4"
+    val flywayCore = "org.flywaydb:flyway-core:11.10.5"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.4")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.5")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
