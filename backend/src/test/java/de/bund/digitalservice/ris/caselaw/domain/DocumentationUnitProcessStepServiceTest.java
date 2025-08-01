@@ -38,7 +38,6 @@ class DocumentationUnitProcessStepServiceTest {
   private UUID processStep1Id;
   private UUID processStep2Id;
   private UUID processStep3Id;
-  private UUID userId;
   private DocumentationUnit testDocumentationUnit;
   private ProcessStep processStepNeu;
   private ProcessStep processStepErsterfassung;
@@ -75,7 +74,6 @@ class DocumentationUnitProcessStepServiceTest {
     processStep1Id = UUID.randomUUID();
     processStep2Id = UUID.randomUUID();
     processStep3Id = UUID.randomUUID();
-    userId = UUID.randomUUID();
     UUID processStepFertigId = UUID.randomUUID();
 
     testDocumentationUnit = createMockDocumentationUnit(docUnitId, docOfficeId);
