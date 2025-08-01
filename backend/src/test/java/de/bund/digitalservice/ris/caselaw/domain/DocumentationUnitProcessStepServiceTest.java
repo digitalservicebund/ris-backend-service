@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationOfficeNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
-import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +31,7 @@ class DocumentationUnitProcessStepServiceTest {
   @Mock private DocumentationUnitRepository documentationUnitRepository;
   @Mock private DocumentationOfficeService documentationOfficeService;
 
-  @InjectMocks private DocumentationUnitProcessStepService service;
+  @InjectMocks private ProcessStepService service;
 
   private UUID docUnitId;
   private UUID docOfficeId;
@@ -93,127 +92,6 @@ class DocumentationUnitProcessStepServiceTest {
         .thenReturn(testDocumentationUnit);
   }
 
-  // --- Tests for saveProcessStep ---
-
-  @Test
-  @DisplayName("saveProcessStep - Should save a new process step successfully")
-  void saveProcessStep_shouldSaveSuccessfully()
-      throws DocumentationUnitNotExistsException, ProcessStepNotFoundException {
-    // Arrange
-    DocumentationUnitProcessStep savedStep =
-        createMockDocumentationUnitProcessStep(
-            processStepNeu.uuid(), processStepNeu.name(), LocalDateTime.now());
-    when(documentationUnitProcessStepRepository.saveProcessStep(
-            docUnitId, processStepNeu.uuid(), userId))
-        .thenReturn(savedStep);
-
-    // Act
-    DocumentationUnitProcessStep result =
-        service.saveProcessStep(docUnitId, processStepNeu.uuid(), userId);
-
-    // Assert
-    assertThat(result).isEqualTo(savedStep);
-    verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
-    verify(documentationUnitProcessStepRepository, times(1))
-        .saveProcessStep(docUnitId, processStepNeu.uuid(), userId);
-  }
-
-  @Test
-  @DisplayName(
-      "saveProcessStep - Should throw DocumentationUnitNotExistsException if doc unit not found")
-  void saveProcessStep_shouldThrowDocumentationUnitNotExistsException_ifDocUnitNotFound()
-      throws DocumentationUnitNotExistsException {
-    // Arrange
-    UUID nonExistentDocUnitId = UUID.randomUUID();
-    when(documentationUnitRepository.findByUuid(nonExistentDocUnitId))
-        .thenThrow(new DocumentationUnitNotExistsException("Doc unit not found for save"));
-
-    // Act & Assert
-    assertThatThrownBy(
-            () -> service.saveProcessStep(nonExistentDocUnitId, processStepNeu.uuid(), userId))
-        .isInstanceOf(DocumentationUnitNotExistsException.class)
-        .hasMessageContaining("Doc unit not found for save");
-    verify(documentationUnitRepository, times(1)).findByUuid(nonExistentDocUnitId);
-    verify(documentationUnitProcessStepRepository, never()).saveProcessStep(any(), any(), any());
-  }
-
-  @Test
-  @DisplayName(
-      "saveProcessStep - Should throw ProcessStepNotFoundException if process step not found")
-  void saveProcessStep_shouldThrowProcessStepNotFoundException_ifProcessStepNotFound()
-      throws DocumentationUnitNotExistsException {
-    // Arrange
-    UUID nonExistentProcessStepId = UUID.randomUUID();
-    when(documentationUnitProcessStepRepository.saveProcessStep(
-            docUnitId, nonExistentProcessStepId, userId))
-        .thenThrow(new ProcessStepNotFoundException("Process step not found for save"));
-
-    // Act & Assert
-    assertThatThrownBy(() -> service.saveProcessStep(docUnitId, nonExistentProcessStepId, userId))
-        .isInstanceOf(ProcessStepNotFoundException.class)
-        .hasMessageContaining("Process step not found for save");
-    verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
-    verify(documentationUnitProcessStepRepository, times(1))
-        .saveProcessStep(docUnitId, nonExistentProcessStepId, userId);
-  }
-
-  // --- Tests for getCurrentProcessStep ---
-
-  @Test
-  @DisplayName("getCurrentProcessStep - Should return current step if found")
-  void getCurrentProcessStep_shouldReturnCurrentStep() throws DocumentationUnitNotExistsException {
-    // Arrange
-    DocumentationUnitProcessStep currentStep =
-        createMockDocumentationUnitProcessStep(
-            processStepErsterfassung.uuid(), processStepErsterfassung.name(), LocalDateTime.now());
-    when(documentationUnitProcessStepRepository.getCurrentProcessStep(docUnitId))
-        .thenReturn(Optional.of(currentStep));
-
-    // Act
-    Optional<DocumentationUnitProcessStep> result = service.getCurrentProcessStep(docUnitId);
-
-    // Assert
-    assertThat(result).isPresent();
-    assertThat(result.get().getProcessStep().uuid()).isEqualTo(processStepErsterfassung.uuid());
-    verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
-    verify(documentationUnitProcessStepRepository, times(1)).getCurrentProcessStep(docUnitId);
-  }
-
-  @Test
-  @DisplayName("getCurrentProcessStep - Should return empty Optional if no current step found")
-  void getCurrentProcessStep_shouldReturnEmptyOptional_ifNoCurrentStep()
-      throws DocumentationUnitNotExistsException {
-    // Arrange
-    when(documentationUnitProcessStepRepository.getCurrentProcessStep(docUnitId))
-        .thenReturn(Optional.empty());
-
-    // Act
-    Optional<DocumentationUnitProcessStep> result = service.getCurrentProcessStep(docUnitId);
-
-    // Assert
-    assertThat(result).isNotPresent();
-    verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
-    verify(documentationUnitProcessStepRepository, times(1)).getCurrentProcessStep(docUnitId);
-  }
-
-  @Test
-  @DisplayName(
-      "getCurrentProcessStep - Should throw DocumentationUnitNotExistsException if doc unit not found")
-  void getCurrentProcessStep_shouldThrowDocumentationUnitNotExistsException_ifDocUnitNotFound()
-      throws DocumentationUnitNotExistsException {
-    // Arrange
-    UUID nonExistentDocUnitId = UUID.randomUUID();
-    when(documentationUnitRepository.findByUuid(nonExistentDocUnitId))
-        .thenThrow(new DocumentationUnitNotExistsException("Doc unit not found"));
-
-    // Act & Assert
-    assertThatThrownBy(() -> service.getCurrentProcessStep(nonExistentDocUnitId))
-        .isInstanceOf(DocumentationUnitNotExistsException.class)
-        .hasMessageContaining("Doc unit not found");
-    verify(documentationUnitRepository, times(1)).findByUuid(nonExistentDocUnitId);
-    verify(documentationUnitProcessStepRepository, never()).getCurrentProcessStep(any());
-  }
-
   // --- Tests for getNextProcessStep ---
 
   @Test
@@ -234,7 +112,7 @@ class DocumentationUnitProcessStepServiceTest {
         .thenReturn(officeProcessSteps);
 
     // Act
-    Optional<ProcessStep> result = service.getNextProcessStep(docUnitId);
+    Optional<ProcessStep> result = service.getNextProcessStepForDocOffice(docUnitId);
 
     // Assert
     assertThat(result).isPresent();
@@ -254,7 +132,7 @@ class DocumentationUnitProcessStepServiceTest {
         .thenReturn(Optional.empty());
 
     // Act
-    Optional<ProcessStep> result = service.getNextProcessStep(docUnitId);
+    Optional<ProcessStep> result = service.getNextProcessStepForDocOffice(docUnitId);
 
     // Assert
     assertThat(result).isNotPresent();
@@ -287,7 +165,7 @@ class DocumentationUnitProcessStepServiceTest {
         .thenReturn(officeProcessSteps);
 
     // Act
-    Optional<ProcessStep> result = service.getNextProcessStep(docUnitId);
+    Optional<ProcessStep> result = service.getNextProcessStepForDocOffice(docUnitId);
 
     // Assert
     assertThat(result).isNotPresent();
@@ -317,7 +195,7 @@ class DocumentationUnitProcessStepServiceTest {
         .thenReturn(officeProcessSteps);
 
     // Act
-    Optional<ProcessStep> result = service.getNextProcessStep(docUnitId);
+    Optional<ProcessStep> result = service.getNextProcessStepForDocOffice(docUnitId);
 
     // Assert
     assertThat(result).isNotPresent();
@@ -337,7 +215,7 @@ class DocumentationUnitProcessStepServiceTest {
         .thenThrow(new DocumentationUnitNotExistsException("Doc unit not found for next step"));
 
     // Act & Assert
-    assertThatThrownBy(() -> service.getNextProcessStep(nonExistentDocUnitId))
+    assertThatThrownBy(() -> service.getNextProcessStepForDocOffice(nonExistentDocUnitId))
         .isInstanceOf(DocumentationUnitNotExistsException.class)
         .hasMessageContaining("Doc unit not found for next step");
     verify(documentationUnitRepository, times(1)).findByUuid(nonExistentDocUnitId);
@@ -368,177 +246,13 @@ class DocumentationUnitProcessStepServiceTest {
                 "Office not found for next step calculation"));
 
     // Act & Assert
-    assertThatThrownBy(() -> service.getNextProcessStep(docUnitId))
+    assertThatThrownBy(() -> service.getNextProcessStepForDocOffice(docUnitId))
         .isInstanceOf(DocumentationOfficeNotExistsException.class)
         .hasMessageContaining("Office not found for next step calculation");
     verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
     verify(documentationUnitProcessStepRepository, times(1)).getCurrentProcessStep(docUnitId);
     verify(documentationOfficeService, times(1))
         .getProcessStepsForDocumentationOffice(nonExistentOfficeId);
-  }
-
-  // --- Tests for getLastProcessStep ---
-
-  @Test
-  @DisplayName("getLastProcessStep - Should return last step if multiple steps exist")
-  void getLastProcessStep_shouldReturnLastStep()
-      throws DocumentationUnitNotExistsException, ProcessStepNotFoundException {
-    // Arrange
-    LocalDateTime now = LocalDateTime.now();
-    DocumentationUnitProcessStep step1 =
-        createMockDocumentationUnitProcessStep(
-            processStepNeu.uuid(), processStepNeu.name(), now.minusMinutes(2));
-    DocumentationUnitProcessStep step2 =
-        createMockDocumentationUnitProcessStep(
-            processStepErsterfassung.uuid(), processStepErsterfassung.name(), now.minusMinutes(1));
-    DocumentationUnitProcessStep step3 =
-        createMockDocumentationUnitProcessStep(
-            processStepQsFormal.uuid(), processStepQsFormal.name(), now); // Current step
-
-    when(documentationUnitProcessStepRepository.findAllByDocumentationUnitId(docUnitId))
-        .thenReturn(Arrays.asList(step3, step2, step1));
-
-    // Act
-    Optional<DocumentationUnitProcessStep> result = service.getLastProcessStep(docUnitId);
-
-    // Assert
-    assertThat(result).isPresent();
-    assertThat(result.get().getProcessStep().uuid()).isEqualTo(processStepErsterfassung.uuid());
-    assertThat(result.get().getProcessStep().name()).isEqualTo(processStepErsterfassung.name());
-    verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
-    verify(documentationUnitProcessStepRepository, times(1))
-        .findAllByDocumentationUnitId(docUnitId);
-  }
-
-  @Test
-  @DisplayName("getLastProcessStep - Should return empty Optional if only one step exists")
-  void getLastProcessStep_shouldReturnEmptyOptional_ifOnlyOneStep()
-      throws DocumentationUnitNotExistsException, ProcessStepNotFoundException {
-    // Arrange
-    DocumentationUnitProcessStep step1 =
-        createMockDocumentationUnitProcessStep(
-            processStepNeu.uuid(), processStepNeu.name(), LocalDateTime.now());
-    when(documentationUnitProcessStepRepository.findAllByDocumentationUnitId(docUnitId))
-        .thenReturn(List.of(step1));
-
-    // Act
-    Optional<DocumentationUnitProcessStep> result = service.getLastProcessStep(docUnitId);
-
-    // Assert
-    assertThat(result).isNotPresent();
-    verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
-    verify(documentationUnitProcessStepRepository, times(1))
-        .findAllByDocumentationUnitId(docUnitId);
-  }
-
-  @Test
-  @DisplayName("getLastProcessStep - Should return empty Optional if no steps exist")
-  void getLastProcessStep_shouldReturnEmptyOptional_ifNoSteps()
-      throws DocumentationUnitNotExistsException, ProcessStepNotFoundException {
-    // Arrange
-    when(documentationUnitProcessStepRepository.findAllByDocumentationUnitId(docUnitId))
-        .thenReturn(List.of());
-
-    // Act
-    Optional<DocumentationUnitProcessStep> result = service.getLastProcessStep(docUnitId);
-
-    // Assert
-    assertThat(result).isNotPresent();
-    verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
-    verify(documentationUnitProcessStepRepository, times(1))
-        .findAllByDocumentationUnitId(docUnitId);
-  }
-
-  @Test
-  @DisplayName(
-      "getLastProcessStep - Should throw DocumentationUnitNotExistsException if doc unit not found")
-  void getLastProcessStep_shouldThrowDocumentationUnitNotExistsException_ifDocUnitNotFound()
-      throws DocumentationUnitNotExistsException {
-    // Arrange
-    UUID nonExistentDocUnitId = UUID.randomUUID();
-    when(documentationUnitRepository.findByUuid(nonExistentDocUnitId))
-        .thenThrow(new DocumentationUnitNotExistsException("Doc unit not found for last step"));
-
-    // Act & Assert
-    assertThatThrownBy(() -> service.getLastProcessStep(nonExistentDocUnitId))
-        .isInstanceOf(DocumentationUnitNotExistsException.class)
-        .hasMessageContaining("Doc unit not found for last step");
-    verify(documentationUnitRepository, times(1)).findByUuid(nonExistentDocUnitId);
-    verify(documentationUnitProcessStepRepository, never()).findAllByDocumentationUnitId(any());
-  }
-
-  // --- Tests for getProcessStepHistoryForDocumentationUnit ---
-
-  @Test
-  @DisplayName("getProcessStepHistoryForDocumentationUnit - Should return full history if found")
-  void getProcessStepHistoryForDocumentationUnit_shouldReturnFullHistory()
-      throws DocumentationUnitNotExistsException {
-    // Arrange
-    LocalDateTime now = LocalDateTime.now();
-    DocumentationUnitProcessStep step1 =
-        createMockDocumentationUnitProcessStep(
-            processStepNeu.uuid(), processStepNeu.name(), now.minusMinutes(2));
-    DocumentationUnitProcessStep step2 =
-        createMockDocumentationUnitProcessStep(
-            processStepErsterfassung.uuid(), processStepErsterfassung.name(), now.minusMinutes(1));
-    DocumentationUnitProcessStep step3 =
-        createMockDocumentationUnitProcessStep(
-            processStepQsFormal.uuid(), processStepQsFormal.name(), now);
-
-    List<DocumentationUnitProcessStep> history =
-        Arrays.asList(step3, step2, step1); // Ordered newest first
-    when(documentationUnitProcessStepRepository.findAllByDocumentationUnitId(docUnitId))
-        .thenReturn(history);
-
-    // Act
-    List<DocumentationUnitProcessStep> result =
-        service.getProcessStepHistoryForDocumentationUnit(docUnitId);
-
-    // Assert
-    assertThat(result).hasSize(3).containsExactly(step3, step2, step1);
-    verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
-    verify(documentationUnitProcessStepRepository, times(1))
-        .findAllByDocumentationUnitId(docUnitId);
-  }
-
-  @Test
-  @DisplayName(
-      "getProcessStepHistoryForDocumentationUnit - Should return empty list if no history found")
-  void getProcessStepHistoryForDocumentationUnit_shouldReturnEmptyList_ifNoHistory()
-      throws DocumentationUnitNotExistsException {
-    // Arrange
-    when(documentationUnitProcessStepRepository.findAllByDocumentationUnitId(docUnitId))
-        .thenReturn(List.of());
-
-    // Act
-    List<DocumentationUnitProcessStep> result =
-        service.getProcessStepHistoryForDocumentationUnit(docUnitId);
-
-    // Assert
-    assertThat(result).isEmpty();
-    verify(documentationUnitRepository, times(1)).findByUuid(docUnitId);
-    verify(documentationUnitProcessStepRepository, times(1))
-        .findAllByDocumentationUnitId(docUnitId);
-  }
-
-  @Test
-  @DisplayName(
-      "getProcessStepHistoryForDocumentationUnit - Should throw DocumentationUnitNotExistsException if doc unit not found")
-  void
-      getProcessStepHistoryForDocumentationUnit_shouldThrowDocumentationUnitNotExistsException_ifDocUnitNotFound()
-          throws DocumentationUnitNotExistsException {
-    // Arrange
-    UUID nonExistentDocUnitId = UUID.randomUUID();
-    when(documentationUnitRepository.findByUuid(nonExistentDocUnitId))
-        .thenThrow(new DocumentationUnitNotExistsException("Doc unit not found for history"));
-
-    // Act & Assert
-    assertThatThrownBy(
-            () -> service.getProcessStepHistoryForDocumentationUnit(nonExistentDocUnitId))
-        .isInstanceOf(DocumentationUnitNotExistsException.class)
-        .hasMessageContaining("Doc unit not found for history");
-    verify(documentationUnitRepository, times(1)).findByUuid(nonExistentDocUnitId);
-    verify(documentationUnitProcessStepRepository, never()).findAllByDocumentationUnitId(any());
   }
 
   // --- Tests for getAllProcessStepsForDocOffice ---

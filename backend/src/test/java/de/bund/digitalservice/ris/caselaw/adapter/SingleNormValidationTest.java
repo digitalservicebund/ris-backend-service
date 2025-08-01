@@ -10,7 +10,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStepService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -20,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormElement;
 import de.bund.digitalservice.ris.caselaw.domain.NormElementRepository;
+import de.bund.digitalservice.ris.caselaw.domain.ProcessStepService;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
@@ -69,7 +69,7 @@ class SingleNormValidationTest {
   @MockitoBean DocumentationUnitHistoryLogService logService;
   @MockitoBean DocumentationOfficeService documentationOfficeService;
   @MockitoBean private DocumentationUnitSearchRepository docUnitSearchRepository;
-  @MockitoBean private DocumentationUnitProcessStepService documentationUnitProcessStepService;
+  @MockitoBean private ProcessStepService documentationUnitProcessStepService;
 
   @BeforeEach
   void setUp() {

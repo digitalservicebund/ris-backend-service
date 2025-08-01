@@ -5,7 +5,7 @@ import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 
 const props = defineProps<{
-  processSteps: DocumentationUnitProcessStep[]
+  processSteps: DocumentationUnitProcessStep[] | undefined
 }>()
 
 const currentProcessStep = computed(
@@ -25,20 +25,22 @@ const lastProcessBadge = computed(() =>
 </script>
 
 <template>
-  <IconBadge
-    v-if="lastProcessStep && lastProcessBadge"
-    :background-color="lastProcessBadge.backgroundColor"
-    :border-color="lastProcessBadge?.borderColor"
-    class="ml-12 border px-8"
-    color="gray-900"
-    :label="lastProcessStep.abbreviation"
-  />
-  <IconBadge
-    v-if="currentProcessStep && currentProcessBadge"
-    :background-color="currentProcessBadge.backgroundColor"
-    :border-color="currentProcessBadge?.borderColor"
-    :class="`border px-8 ${lastProcessBadge ? 'ml-[-5px]' : 'ml-12'}`"
-    color="black"
-    :label="currentProcessStep.name"
-  />
+  <div class="ml-12 flex flex-row">
+    <IconBadge
+      v-if="lastProcessStep && lastProcessBadge"
+      :background-color="lastProcessBadge.backgroundColor"
+      :border-color="lastProcessBadge?.borderColor"
+      class="border px-8"
+      color="gray-900"
+      :label="lastProcessStep.abbreviation"
+    />
+    <IconBadge
+      v-if="currentProcessStep && currentProcessBadge"
+      :background-color="currentProcessBadge.backgroundColor"
+      :border-color="currentProcessBadge?.borderColor"
+      :class="`border px-8 ${lastProcessBadge ? 'ml-[-5px]' : 'ml-12'}`"
+      color="black"
+      :label="currentProcessStep.name"
+    />
+  </div>
 </template>

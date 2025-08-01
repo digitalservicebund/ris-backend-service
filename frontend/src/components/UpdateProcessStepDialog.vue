@@ -1,41 +1,42 @@
 <script setup lang="ts" generic="TDocument">
+import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import Dialog from "primevue/dialog"
-import { ref } from "vue"
+import { onMounted, Ref, ref } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
 import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
-import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
+import { DocumentationUnit } from "@/domain/documentationUnit"
 import ProcessStep from "@/domain/processStep"
 import processStepService from "@/services/processStepService"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconApprovalDelegation from "~icons/material-symbols/approval-delegation-outline"
 
-const props = defineProps<{
-  docUnitId: string
-  processSteps: DocumentationUnitProcessStep[]
-}>()
-
+const store = useDocumentUnitStore()
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentationUnit | undefined>
+}
 const showDialog = ref(false)
 
 let nextProcessStep: ProcessStep | undefined
 
 async function triggerUpdateProcessStep(): Promise<void> {
-  nextProcessStep = (
-    await processStepService.getNextProcessStep(props.docUnitId)
-  ).data
+  if (documentUnit.value?.uuid)
+    nextProcessStep = (
+      await processStepService.getNextProcessStep(documentUnit.value?.uuid)
+    ).data
   showDialog.value = true
 }
 
 async function updateProcessStep(): Promise<void> {
-  if (nextProcessStep) {
-    await processStepService.moveToNextProcessStep(
-      props.docUnitId,
-      nextProcessStep,
-    )
-    // TODO emit new process step?
-    // if (newStep && newStep.data) props.processSteps.push(newStep.data)
-  }
+  if (nextProcessStep)
+    documentUnit.value!.currentProcessStep = { processStep: nextProcessStep }
+  await store.updateDocumentUnit()
   showDialog.value = false
 }
+
+onMounted(async () => {
+  await store.loadDocumentUnit
+})
 </script>
 
 <template>

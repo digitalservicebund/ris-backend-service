@@ -1,8 +1,10 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import Tooltip from "primevue/tooltip"
 import { createRouter, createWebHistory } from "vue-router"
 import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
+import { Decision } from "@/domain/decision"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import processStepService from "@/services/processStepService"
 import routes from "~/test-helper/routes"
@@ -40,12 +42,42 @@ function renderComponent() {
     },
   ]
 
+  const documentUnit = new Decision("foo", {
+    documentNumber: "1234567891234",
+    coreData: {
+      court: {
+        type: "AG",
+        location: "Test",
+        label: "AG Test",
+      },
+    },
+    managementData: {
+      borderNumbers: [],
+      duplicateRelations: [],
+    },
+    currentProcessStep: docUnitProcessSteps.at(0),
+    processSteps: docUnitProcessSteps,
+  })
+
   return {
     ...render(UpdateProcessStepDialog, {
-      props: { processSteps: docUnitProcessSteps, docUnitId: "abc" },
       global: {
         directives: { tooltip: Tooltip },
-        plugins: [router],
+        plugins: [
+          router,
+          createTestingPinia({
+            initialState: {
+              session: {
+                user: {
+                  roles: ["Internal"],
+                },
+              },
+              docunitStore: {
+                documentUnit: documentUnit,
+              },
+            },
+          }),
+        ],
       },
     }),
   }
@@ -66,21 +98,6 @@ it("renders proccess steps modal", async () => {
         uuid: "qs-formal-id",
         name: "QS formal",
         abbreviation: "QS",
-      },
-    }),
-  )
-  vi.spyOn(processStepService, "moveToNextProcessStep").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: {
-        id: "new-step-id",
-        userId: "user1-id",
-        createdAt: new Date(),
-        processStep: {
-          uuid: "qs-formal-id",
-          name: "QS formal",
-          abbreviation: "QS",
-        },
       },
     }),
   )

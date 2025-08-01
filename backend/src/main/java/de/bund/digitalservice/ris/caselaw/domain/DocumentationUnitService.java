@@ -15,6 +15,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +53,7 @@ public class DocumentationUnitService {
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
   private final DocumentationOfficeService documentationOfficeService;
-  private final DocumentationUnitProcessStepService processStepService;
+  private final ProcessStepService processStepService;
   private static final List<String> pathsForDuplicateCheck =
       List.of(
           "/coreData/ecli",
@@ -83,7 +84,7 @@ public class DocumentationUnitService {
       DocumentationOfficeService documentationOfficeService,
       DocumentationUnitHistoryLogService historyLogService,
       DocumentationUnitSearchRepository docUnitSearchRepository,
-      DocumentationUnitProcessStepService processStepService) {
+      ProcessStepService processStepService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -160,9 +161,29 @@ public class DocumentationUnitService {
     Status status =
         Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build();
 
+    // get all process steps associated with doc office
+    var docOfficeProcessSteps =
+        processStepService.getAllProcessStepsForDocOffice(
+            docUnit.coreData().documentationOffice().id());
+
+    DocumentationUnitProcessStep initialDocUnitProcessStep = null;
+    if (!docOfficeProcessSteps.isEmpty()) {
+      // create new DocumentationUnitProcessStep with first process step for docoffice
+      initialDocUnitProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .createdAt(LocalDateTime.now())
+              .processStep(docOfficeProcessSteps.getFirst())
+              .build();
+    }
+
     return (PendingProceeding)
         repository.createNewDocumentationUnit(
-            docUnit, status, params.reference(), params.fileNumber(), user);
+            docUnit,
+            status,
+            params.reference(),
+            params.fileNumber(),
+            user,
+            initialDocUnitProcessStep);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -240,17 +261,30 @@ public class DocumentationUnitService {
             .withError(false)
             .build();
 
-    var newDocumentationUnit =
-        repository.createNewDocumentationUnit(
-            docUnit, status, params.reference(), params.fileNumber(), user);
-
+    // get all process steps associated with doc office
     var docOfficeProcessSteps =
         processStepService.getAllProcessStepsForDocOffice(
             docUnit.coreData().documentationOffice().id());
-    if (docOfficeProcessSteps != null && !docOfficeProcessSteps.isEmpty()) {
-      processStepService.saveProcessStep(
-          newDocumentationUnit, docOfficeProcessSteps.getFirst().uuid(), user.id());
+
+    DocumentationUnitProcessStep initialDocUnitProcessStep = null;
+    if (!docOfficeProcessSteps.isEmpty()) {
+      // create new DocumentationUnitProcessStep with first process step for dooffice
+      initialDocUnitProcessStep =
+          DocumentationUnitProcessStep.builder()
+              .createdAt(LocalDateTime.now())
+              .processStep(docOfficeProcessSteps.getFirst())
+              .user(user)
+              .build();
     }
+
+    var newDocumentationUnit =
+        repository.createNewDocumentationUnit(
+            docUnit,
+            status,
+            params.reference(),
+            params.fileNumber(),
+            user,
+            initialDocUnitProcessStep);
 
     if (isExternalHandover) {
       String description =
@@ -644,6 +678,7 @@ public class DocumentationUnitService {
     repository.saveKeywords(decision);
     repository.saveFieldsOfLaw(decision);
     repository.saveProcedures(decision, user);
+    repository.saveProcessSteps(decision);
 
     repository.save(decision, user);
 
@@ -662,6 +697,7 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException {
     repository.saveKeywords(pendingProceeding);
     repository.saveFieldsOfLaw(pendingProceeding);
+    repository.saveProcessSteps(pendingProceeding);
 
     repository.save(pendingProceeding, user);
 

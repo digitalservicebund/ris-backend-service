@@ -11,6 +11,6 @@ public interface DocumentationOfficeRepository {
 
   List<DocumentationOffice> findAllOrderByAbbreviationAsc();
 
-  List<ProcessStep> findAllProcessStepsByUuid(UUID uuid)
+  List<ProcessStep> findAllProcessStepsForDocOffice(UUID uuid)
       throws DocumentationOfficeNotExistsException;
 }

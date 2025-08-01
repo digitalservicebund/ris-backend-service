@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import DocumentationUnitProcessStep from "./documentationUnitProcessStep"
 import EnsuingDecision from "./ensuingDecision"
 import PreviousDecision from "./previousDecision"
 import Reference from "./reference"
@@ -48,6 +49,8 @@ export default class PendingProceeding {
     borderNumbers: [],
     duplicateRelations: [],
   }
+  public currentProcessStep?: DocumentationUnitProcessStep
+  public processSteps?: DocumentationUnitProcessStep[]
 
   public isEditable?: boolean
 

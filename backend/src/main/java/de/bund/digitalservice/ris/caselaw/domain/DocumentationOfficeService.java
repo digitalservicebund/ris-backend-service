@@ -50,6 +50,6 @@ public class DocumentationOfficeService {
    */
   public List<ProcessStep> getProcessStepsForDocumentationOffice(UUID uuid)
       throws DocumentationOfficeNotExistsException {
-    return documentationOfficeRepository.findAllProcessStepsByUuid(uuid);
+    return documentationOfficeRepository.findAllProcessStepsForDocOffice(uuid);
   }
 }

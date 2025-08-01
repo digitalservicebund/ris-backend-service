@@ -48,16 +48,16 @@ public class PostgresDocumentationOfficeRepositoryImpl implements DocumentationO
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public List<ProcessStep> findAllProcessStepsByUuid(UUID uuid) {
-    var docOffice =
+  public List<ProcessStep> findAllProcessStepsForDocOffice(UUID docOfficeId) {
+    DocumentationOfficeDTO docOffice =
         repository
-            .findById(uuid)
+            .findById(docOfficeId)
             .orElseThrow(
                 () ->
                     new DocumentationOfficeNotExistsException(
-                        String.format("The documentation office with id %s doesn't exist.", uuid)));
-    return repository.findOrderedProcessStepsByDocumentationOfficeId(docOffice.getId()).stream()
-        .map(ProcessStepTransformer::toDomain)
-        .toList();
+                        String.format(
+                            "The documentation office with id %s doesn't exist.", docOfficeId)));
+
+    return docOffice.getProcessSteps().stream().map(ProcessStepTransformer::toDomain).toList();
   }
 }

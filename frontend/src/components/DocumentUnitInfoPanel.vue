@@ -10,13 +10,11 @@ import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
-import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import { isDecision } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
 
 const props = defineProps<{
   documentUnit: DocumentationUnit
-  processSteps: DocumentationUnitProcessStep[]
 }>()
 
 const route = useRoute()
@@ -109,7 +107,7 @@ watchEffect(() => {
     />
     <CurrentAndLastProcessStepBadge
       v-if="processStepsEnabled"
-      :process-steps="props.processSteps"
+      :process-steps="props.documentUnit.processSteps"
     />
 
     <span class="flex-grow"></span>
@@ -140,11 +138,7 @@ watchEffect(() => {
       aria-label="Speichern Button"
       data-testid="document-unit-save-button"
     >
-      <UpdateProcessStepDialog
-        v-if="processStepsEnabled"
-        :doc-unit-id="props.documentUnit.uuid"
-        :process-steps="props.processSteps"
-      ></UpdateProcessStepDialog>
+      <UpdateProcessStepDialog v-if="processStepsEnabled" />
     </SaveButton>
   </div>
 </template>

@@ -1708,7 +1708,8 @@ class DecisionTransformerTest {
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())
-        .documentalists(Collections.emptyList());
+        .documentalists(Collections.emptyList())
+        .processSteps(Collections.emptyList());
   }
 
   private CoreDataBuilder generateSimpleCoreDataBuilder() {
