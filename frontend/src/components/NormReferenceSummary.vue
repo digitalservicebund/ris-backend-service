@@ -33,16 +33,16 @@ const props = defineProps<{
             v-if="data.singleNorms[0].legalForce?.hasMissingRequiredFields"
             background-color="bg-red-300"
             class="ml-8"
-            color="text-red-900"
             :icon="IconError"
+            icon-color="text-red-900"
             label="Fehlende Daten"
           />
         </div>
         <IconBadge
           v-if="props.data?.hasAmbiguousNormReference"
           background-color="bg-red-300"
-          color="text-red-900"
           :icon="IconError"
+          icon-color="text-red-900"
           label="Mehrdeutiger Verweis"
         />
       </div>
@@ -55,8 +55,8 @@ const props = defineProps<{
           <IconBadge
             v-if="data.hasAmbiguousNormReference"
             background-color="bg-red-300"
-            color="text-red-900"
             :icon="IconError"
+            icon-color="text-red-900"
             label="Mehrdeutiger Verweis"
           />
         </div>
@@ -83,8 +83,8 @@ const props = defineProps<{
                   "
                   background-color="bg-red-300"
                   class="ml-8"
-                  color="text-red-900"
                   :icon="IconError"
+                  icon-color="text-red-900"
                   label="Fehlende Daten"
                 />
               </div>

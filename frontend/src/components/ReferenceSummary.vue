@@ -24,14 +24,14 @@ const hasAmbiguousLegalPeriodicalAbbreviation = computed(
       <IconBadge
         background-color="bg-blue-300"
         class="mr-8"
-        color="text-blue-900"
         :label="primaryReference"
+        text-color="text-blue-900"
       />
       <IconBadge
         v-if="hasAmbiguousLegalPeriodicalAbbreviation"
         background-color="bg-red-300"
-        color="text-red-900"
         label="Mehrdeutiger Verweis"
+        text-color="text-red-900"
       />
     </div>
   </div>

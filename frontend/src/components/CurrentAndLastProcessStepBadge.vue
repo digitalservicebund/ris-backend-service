@@ -29,17 +29,17 @@ const lastProcessBadge = computed(() =>
     <IconBadge
       v-if="lastProcessStep && lastProcessBadge"
       :background-color="lastProcessBadge.backgroundColor"
-      :border-color="lastProcessBadge?.borderColor"
-      class="border px-8"
-      color="gray-900"
+      :border-color="lastProcessBadge.borderColor"
+      class="px-8"
       :label="lastProcessStep.abbreviation"
+      text-color="text-gray-900"
     />
     <IconBadge
       v-if="currentProcessStep && currentProcessBadge"
       :background-color="currentProcessBadge.backgroundColor"
-      :border-color="currentProcessBadge?.borderColor"
-      :class="`border px-8 ${lastProcessBadge ? 'ml-[-5px]' : ''}`"
-      color="black"
+      :border-color="currentProcessBadge.borderColor"
+      class="“px-8”"
+      :class="{ 'ml-[-5px]': lastProcessBadge }"
       :label="currentProcessStep.name"
     />
   </div>

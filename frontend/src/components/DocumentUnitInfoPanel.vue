@@ -93,7 +93,6 @@ watchEffect(() => {
       v-if="statusBadge"
       :background-color="statusBadge.backgroundColor"
       class="ml-12"
-      :color="statusBadge.color"
       :icon="toRaw(statusBadge.icon)"
       :label="statusBadge.label"
     />
@@ -101,8 +100,8 @@ watchEffect(() => {
       v-if="hasErrorStatus"
       background-color="bg-red-300"
       class="ml-12"
-      color="text-red-900"
       :icon="IconError"
+      icon-color="text-red-900"
       label="Fehler"
     />
     <CurrentAndLastProcessStepBadge
@@ -118,9 +117,9 @@ watchEffect(() => {
       <IconBadge
         background-color="bg-red-300"
         class="ml-12"
-        color="text-red-900"
         data-testid="duplicate-icon"
         :icon="IconError"
+        icon-color="text-red-900"
         label="Dublettenverdacht"
       />
       <RouterLink

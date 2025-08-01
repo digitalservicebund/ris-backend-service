@@ -17,45 +17,45 @@ export function useProcessStepBadge(step: ProcessStep) {
 
     switch (step.name) {
       case "Neu":
-        badge.backgroundColor = "white"
-        badge.borderColor = "gray-800"
+        badge.backgroundColor = "bg-white"
+        badge.borderColor = "border-gray-800"
         break
       case "Dokumentationswürdigkeit":
-        badge.backgroundColor = "gray-400"
-        badge.borderColor = "gray-800"
+        badge.backgroundColor = "bg-gray-400"
+        badge.borderColor = "border-gray-800"
         break
       case "Ersterfassung":
-        badge.backgroundColor = "gray-300"
-        badge.borderColor = "gray-800"
+        badge.backgroundColor = "bg-gray-300"
+        badge.borderColor = "border-gray-800"
         break
       case "Fachdokumentation":
-        badge.backgroundColor = "gray-100"
-        badge.borderColor = "gray-800"
+        badge.backgroundColor = "bg-gray-100"
+        badge.borderColor = "border-gray-800"
         break
       case "QS formal":
-        badge.backgroundColor = "blue-200"
-        badge.borderColor = "blue-800"
+        badge.backgroundColor = "bg-blue-200"
+        badge.borderColor = "border-blue-800"
         break
       case "QS fachlich":
-        badge.backgroundColor = "blue-400"
-        badge.borderColor = "blue-800"
+        badge.backgroundColor = "bg-blue-400"
+        badge.borderColor = "border-blue-800"
         break
       case "Blockiert":
-        badge.backgroundColor = "red-200"
-        badge.borderColor = "red-600"
+        badge.backgroundColor = "bg-red-200"
+        badge.borderColor = "border-red-600"
         break
       case "Terminiert":
       case "Abgabe":
-        badge.backgroundColor = "green-100"
-        badge.borderColor = "green-800"
+        badge.backgroundColor = "bg-green-100"
+        badge.borderColor = "border-green-800"
         break
       case "Wiedervorlage":
-        badge.backgroundColor = "yellow-200"
-        badge.borderColor = "yellow-900"
+        badge.backgroundColor = "bg-yellow-200"
+        badge.borderColor = "border-yellow-900"
         break
       case "Fertig":
-        badge.backgroundColor = "green-300"
-        badge.borderColor = "green-800"
+        badge.backgroundColor = "bg-green-300"
+        badge.borderColor = "border-green-800"
         break
     }
     return badge

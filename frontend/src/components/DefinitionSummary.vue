@@ -29,8 +29,8 @@ const showErrorBadge = computed(() => {
       <IconBadge
         v-if="showErrorBadge"
         background-color="bg-red-300"
-        color="text-red-900"
         :icon="IconError"
+        icon-color="text-red-900"
         label="Fehlende Daten"
       />
     </div>

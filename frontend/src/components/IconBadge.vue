@@ -1,26 +1,28 @@
 <script setup lang="ts">
-import { type Component } from "vue"
+import { type Component, computed } from "vue"
 
-defineProps<{
+const props = defineProps<{
   label: string
   icon?: Component
-  color: string
-  backgroundColor: string
+  iconColor?: string
+  textColor?: string
+  backgroundColor?: string
   borderColor?: string
   marginX?: number
 }>()
+
+const borderClass = computed(() => ({
+  border: props.borderColor,
+}))
 </script>
 
 <template>
   <div
     class="ris-label2-regular w-[fit-content] rounded-full px-4 py-2"
-    :class="`${backgroundColor} bg-${backgroundColor} border border-${borderColor}`"
+    :class="[backgroundColor, borderColor, borderClass]"
   >
-    <component :is="icon" class="inline-block" :class="color" />
-    <span
-      class="align-middle"
-      :class="`text-${color} ${marginX ? `mx-${marginX}` : `mx-2`}`"
-    >
+    <component :is="icon" class="inline-block" :class="[iconColor]" />
+    <span class="mx-2 align-middle" :class="[textColor]">
       {{ label }}
     </span>
   </div>

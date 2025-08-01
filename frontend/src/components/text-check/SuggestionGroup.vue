@@ -52,7 +52,7 @@ function updateCurrentIndex(index: number) {
         <span v-if="suggestion.matches.length > 1">
           <IconBadge
             background-color="bg-red-300"
-            color="text-red-900"
+            icon-color="text-red-900"
             :label="suggestion.matches.length.toString()"
           />
         </span>

@@ -66,7 +66,6 @@ onMounted(async () => {
           useProcessStepBadge(nextProcessStep).value.backgroundColor
         "
         :border-color="useProcessStepBadge(nextProcessStep).value.borderColor"
-        color="black"
         :label="nextProcessStep.name"
       />
     </div>
