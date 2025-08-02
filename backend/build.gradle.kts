@@ -252,7 +252,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.23.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:7.0.8.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
