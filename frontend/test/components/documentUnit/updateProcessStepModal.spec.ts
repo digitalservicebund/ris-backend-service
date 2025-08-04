@@ -99,13 +99,13 @@ describe("update process step modal", () => {
     expect(await screen.findByText("QS formal")).toBeInTheDocument()
 
     await user.click(await screen.findByLabelText("Weitergeben"))
-    expect(emitted().closeDialog).toBeTruthy()
+    expect(emitted().onProcessStepUpdated).toBeTruthy()
   })
 
   test("closes after cancel", async () => {
     const { user, emitted } = renderComponent()
 
     await user.click(await screen.findByLabelText("Abbrechen"))
-    expect(emitted().closeDialog).toBeTruthy()
+    expect(emitted().onCancelled).toBeTruthy()
   })
 })

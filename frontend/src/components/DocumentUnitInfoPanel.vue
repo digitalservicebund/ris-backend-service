@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="TDocument">
 import dayjs from "dayjs"
 import Button from "primevue/button"
+import { useToast } from "primevue/usetoast"
 import { computed, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
 import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
@@ -74,6 +75,20 @@ const managementDataRoute = computed(() => ({
 const processStepsEnabled = useFeatureToggle("neuris.process-steps")
 
 const showProcessStepDialog = ref(false)
+const toast = useToast()
+
+async function onProcessStepUpdated() {
+  toast.add({
+    severity: "success",
+    summary: "Weitergeben erfolgreich",
+    life: 5_000,
+  })
+  onProcessStepDialogClosed()
+}
+
+function onProcessStepDialogClosed() {
+  showProcessStepDialog.value = false
+}
 
 watchEffect(() => {
   statusBadge.value = useStatusBadge(props.documentUnit.status).value
@@ -142,6 +157,7 @@ watchEffect(() => {
       data-testid="document-unit-save-button"
     >
       <Button
+        v-if="processStepsEnabled"
         v-tooltip.bottom="'Dokumentationseinheit weitergeben'"
         aria-label="Dokumentationseinheit weitergeben"
         severity="secondary"
@@ -156,7 +172,8 @@ watchEffect(() => {
     <UpdateProcessStepDialog
       v-if="processStepsEnabled"
       :show-dialog="showProcessStepDialog"
-      @close-dialog="showProcessStepDialog = false"
+      @on-cancelled="onProcessStepDialogClosed"
+      @on-process-step-updated="onProcessStepUpdated"
     />
   </div>
 </template>

@@ -18,7 +18,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  closeDialog: []
+  onProcessStepUpdated: []
+  onCancelled: []
 }>()
 
 const store = useDocumentUnitStore()
@@ -35,7 +36,7 @@ async function updateProcessStep(): Promise<void> {
       processStep: nextProcessStep.value,
     }
   await store.updateDocumentUnit()
-  emit("closeDialog")
+  emit("onProcessStepUpdated")
 }
 
 // The logic you want to run every time the dialog is shown
@@ -105,7 +106,7 @@ watch(
           label="Abbrechen"
           severity="secondary"
           size="small"
-          @click="$emit('closeDialog')"
+          @click="$emit('onCancelled')"
         ></Button>
       </div>
     </div>
