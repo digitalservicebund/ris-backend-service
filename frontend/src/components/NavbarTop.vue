@@ -99,7 +99,6 @@ const badge = computed(() => {
               <IconBadge
                 v-if="session.user.documentationOffice"
                 :background-color="badge.color"
-                color="text-black"
                 :label="badge.label"
               />
             </FlexItem>

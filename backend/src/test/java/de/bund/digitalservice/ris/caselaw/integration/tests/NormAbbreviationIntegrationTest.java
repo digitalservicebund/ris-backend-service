@@ -6,7 +6,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentC
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
@@ -120,10 +119,6 @@ class NormAbbreviationIntegrationTest extends BaseIntegrationTest {
           .source("Z")
           .build();
 
-  private DocumentCategoryDTO documentCategoryDTO1 =
-      DocumentCategoryDTO.builder().label("L").build();
-  private DocumentCategoryDTO documentCategoryDTO2 =
-      DocumentCategoryDTO.builder().label("M").build();
   private DocumentTypeDTO documentType1 =
       DocumentTypeDTO.builder()
           .abbreviation("document type abbreviation 1")
@@ -153,7 +148,6 @@ class NormAbbreviationIntegrationTest extends BaseIntegrationTest {
   void cleanUp() {
     repository.deleteAll();
     documentTypeRepository.deleteAll();
-    documentCategoryRepository.deleteAll();
     regionRepository.deleteAll();
   }
 
@@ -471,13 +465,9 @@ class NormAbbreviationIntegrationTest extends BaseIntegrationTest {
   }
 
   private void generateOtherLookupValues() {
-
-    documentCategoryDTO1 = documentCategoryRepository.save(documentCategoryDTO1);
-    documentCategoryDTO2 = documentCategoryRepository.save(documentCategoryDTO2);
-
-    documentType1.setCategory(documentCategoryDTO1);
+    documentType1.setCategory(documentCategoryRepository.findFirstByLabel("S"));
     documentType1 = documentTypeRepository.save(documentType1);
-    documentType2.setCategory(documentCategoryDTO2);
+    documentType2.setCategory(documentCategoryRepository.findFirstByLabel("G"));
     documentType2 = documentTypeRepository.save(documentType2);
 
     region1 = regionRepository.save(region1);

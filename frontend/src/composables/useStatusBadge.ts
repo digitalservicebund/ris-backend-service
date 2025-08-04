@@ -5,7 +5,6 @@ import { Label, PublicationState } from "@/domain/publicationStatus"
 export interface Badge {
   label: string
   icon?: FunctionalComponent<SVGAttributes>
-  color: string
   backgroundColor: string
 }
 
@@ -13,8 +12,7 @@ export function useStatusBadge(status: DocumentationUnit["status"]) {
   const badge: Badge = {
     label: "",
     icon: undefined,
-    color: "black",
-    backgroundColor: "white",
+    backgroundColor: "bg-white",
   }
 
   return computed(() => {

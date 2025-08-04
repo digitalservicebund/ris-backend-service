@@ -280,8 +280,8 @@ function onDelete() {
           <IconBadge
             v-if="listEntry.status?.withError"
             background-color="bg-red-300"
-            color="text-red-900"
             :icon="IconError"
+            icon-color="text-red-900"
             label="Fehler"
           />
           <span v-else>-</span>

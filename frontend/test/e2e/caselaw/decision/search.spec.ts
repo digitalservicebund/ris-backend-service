@@ -479,7 +479,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
     })
     await test.step("Ohne Ergebnisse kann Neuanlage aus Suchparametern erfolgen", async () => {
       await expect(
-        page.getByText("folgenden Stammdaten übernehmen"),
+        page.getByText("folgenden Formaldaten übernehmen"),
       ).toBeVisible()
       await expect(
         page.getByText(`${fileNumber}, BFH, 05.07.2022`),

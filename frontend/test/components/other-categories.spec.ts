@@ -2,10 +2,13 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { vi } from "vitest"
+import { createRouter, createWebHistory } from "vue-router"
 import OtherCategories from "@/components/OtherCategories.vue"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
+import Definition from "@/domain/definition"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import routes from "~/test-helper/routes"
 
 function mockSessionStore(
   contentRelatedIndexing: ContentRelatedIndexing,
@@ -219,6 +222,87 @@ describe("other categories", () => {
       expect(
         screen.queryByRole("button", { name: "Tarifvertrag" }),
       ).not.toBeInTheDocument()
+    })
+  })
+
+  describe("E-VSF", () => {
+    test("should not display evsf button when it is empty and not a financial court", async () => {
+      // Arrange
+      mockSessionStore({ evsf: undefined }, "BVerfG")
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(
+        screen.queryByRole("button", { name: "E-VSF" }),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole("textbox", { name: "E-VSF" }),
+      ).not.toBeInTheDocument()
+    })
+
+    test("should display E-VSF button when it is empty and financial court", async () => {
+      // Arrange
+      mockSessionStore({ evsf: undefined }, "BFH")
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(screen.getByRole("button", { name: "E-VSF" })).toBeInTheDocument()
+      expect(
+        screen.queryByRole("textbox", { name: "E-VSF" }),
+      ).not.toBeInTheDocument()
+    })
+
+    test("should display E-VSF when it is not empty without financial court", async () => {
+      // Arrange
+      mockSessionStore({ evsf: "X 00 00-0-0" }, "BVerfG")
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(screen.getByRole("textbox", { name: "E-VSF" })).toHaveValue(
+        "X 00 00-0-0",
+      )
+
+      expect(
+        screen.queryByRole("button", { name: "E-VSF" }),
+      ).not.toBeInTheDocument()
+    })
+  })
+  describe("Definition", () => {
+    test("should display button without existing definitions", async () => {
+      // Arrange
+      mockSessionStore({ definitions: [] }, "BGH")
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(
+        screen.getByRole("button", { name: "Definition" }),
+      ).toBeInTheDocument()
+    })
+
+    test("should display existing definitions", async () => {
+      // Arrange
+      mockSessionStore(
+        { definitions: [new Definition({ definedTerm: "abc" })] },
+        "BGH",
+      )
+
+      // Act
+      const router = createRouter({
+        history: createWebHistory(),
+        routes: routes,
+      })
+      render(OtherCategories, { global: { plugins: [router] } })
+
+      // Assert
+      expect(screen.getByLabelText("Definitionen")).toHaveTextContent("abc")
     })
   })
 })

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue"
+import BorderNumberLinkView from "@/components/BorderNumberLinkView.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FieldOfLawNodeView from "@/components/preview/FieldOfLawNodeView.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
@@ -7,6 +8,7 @@ import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
+import { contentRelatedIndexingLabels } from "@/domain/decision"
 
 const props = defineProps<{
   contentRelatedIndexing: ContentRelatedIndexing
@@ -69,6 +71,14 @@ const hasDismissalTypes = computed(() => {
 })
 const hasLegislativeMandate = computed(() => {
   return props.contentRelatedIndexing.hasLegislativeMandate
+})
+
+const hasEvsf = computed(() => {
+  return props.contentRelatedIndexing.evsf
+})
+
+const hasDefinitions = computed(() => {
+  return !!props.contentRelatedIndexing.definitions?.length
 })
 </script>
 
@@ -185,6 +195,27 @@ const hasLegislativeMandate = computed(() => {
     <PreviewRow v-if="hasLegislativeMandate">
       <PreviewCategory>Gesetzgebungsauftrag</PreviewCategory>
       <PreviewContent>Ja</PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasEvsf">
+      <PreviewCategory>{{ contentRelatedIndexingLabels.evsf }}</PreviewCategory>
+      <PreviewContent>{{ props.contentRelatedIndexing.evsf }}</PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasDefinitions">
+      <PreviewCategory>Definition</PreviewCategory>
+      <PreviewContent>
+        <div
+          v-for="definition in props.contentRelatedIndexing.definitions"
+          :key="`${definition.definedTerm}|${definition.id}`"
+        >
+          <span>{{ definition?.definedTerm }}</span>
+          <span v-if="definition?.definingBorderNumber">
+            |
+            <BorderNumberLinkView
+              :border-number="definition.definingBorderNumber"
+            />
+          </span>
+        </div>
+      </PreviewContent>
     </PreviewRow>
   </FlexContainer>
 </template>

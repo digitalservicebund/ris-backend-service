@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -18,9 +19,11 @@ import org.springframework.stereotype.Service;
 public class KeycloakUserService implements UserService {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
   private final UserGroupService userGroupService;
+  private final UserApiService userApiService;
 
-  public KeycloakUserService(UserGroupService userGroupService) {
+  public KeycloakUserService(UserGroupService userGroupService, UserApiService userApiService) {
     this.userGroupService = userGroupService;
+    this.userApiService = userApiService;
   }
 
   @Override
@@ -50,6 +53,11 @@ public class KeycloakUserService implements UserService {
   }
 
   @Override
+  public User getUser(UUID uuid) {
+    return userApiService.getUser(uuid);
+  }
+
+  @Override
   public Optional<UserGroup> getUserGroup(OidcUser oidcUser) {
     List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
     var matchingUserGroup =
@@ -64,7 +72,7 @@ public class KeycloakUserService implements UserService {
   }
 
   private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
-    UUID id = Optional.ofNullable(oidcUser.getSubject()).map(UUID::fromString).orElse(null);
+    UUID id = getUserId(oidcUser);
 
     return User.builder()
         .name(oidcUser.getAttribute("name"))
@@ -77,5 +85,9 @@ public class KeycloakUserService implements UserService {
 
   private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
     return getUserGroup(oidcUser).map(UserGroup::docOffice);
+  }
+
+  public static UUID getUserId(OidcUser oidcUser) {
+    return Optional.ofNullable(oidcUser.getSubject()).map(UUID::fromString).orElse(null);
   }
 }

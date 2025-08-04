@@ -15,7 +15,12 @@ import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
-import { Decision, longTextLabels, shortTextLabels } from "@/domain/decision"
+import {
+  contentRelatedIndexingLabels,
+  Decision,
+  longTextLabels,
+  shortTextLabels,
+} from "@/domain/decision"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
 } from "@/domain/ensuingDecision"
@@ -36,6 +41,7 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import useSessionStore from "@/stores/sessionStore"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
+import IconInfoOutline from "~icons/ic/baseline-info"
 import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
 import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 
@@ -122,7 +128,8 @@ function handoverDocumentUnit() {
     }
   } else if (
     pendingDuplicates.value?.length ||
-    !areBorderNumbersAndLinksValid.value
+    !areBorderNumbersAndLinksValid.value ||
+    fieldsWithoutJdvExport.value.length > 0
   ) {
     // With active warnings, you need to confirm a modal before handing over
     const warnings: string[] = []
@@ -130,8 +137,13 @@ function handoverDocumentUnit() {
       warnings.push("Es besteht Dublettenverdacht.")
     if (!areBorderNumbersAndLinksValid.value)
       warnings.push("Die Randnummern sind nicht korrekt.")
+    if (fieldsWithoutJdvExport.value.length > 0)
+      warnings.push(
+        "Die folgenden Rubriken können nicht an die jDV exportiert werden: \n" +
+          fieldsWithoutJdvExport.value.map((field) => `- ${field}`).join(", "),
+      )
     warnings.push("Wollen Sie das Dokument dennoch übergeben?")
-    warningModalReasons.value = warnings.join("\n")
+    warningModalReasons.value = warnings.join("\n\n")
     showHandoverWarningModal.value = true
   } else {
     emits("handoverDocument")
@@ -148,6 +160,14 @@ const pendingDuplicates = ref(
     (relation) => relation.status === DuplicateRelationStatus.PENDING,
   ),
 )
+
+// Labels of non-empty fields that won't be exported to the jDV
+const fieldsWithoutJdvExport = computed<string[]>(() => {
+  const fieldLabels: string[] = []
+  if (decision.value?.contentRelatedIndexing.evsf)
+    fieldLabels.push(contentRelatedIndexingLabels.evsf)
+  return fieldLabels
+})
 
 //Required Previous Decision fields
 const missingPreviousDecisionFields = ref(
@@ -512,6 +532,22 @@ const isPublishable = computed<boolean>(
         <div v-else class="flex flex-row gap-8">
           <IconCheck class="text-green-700" />
           <p>Alle Pflichtfelder sind korrekt ausgefüllt.</p>
+        </div>
+
+        <div v-if="fieldsWithoutJdvExport.length > 0" class="mt-16">
+          <div class="flex flex-row gap-8">
+            <IconInfoOutline class="text-blue-800" />
+
+            <div class="ris-body1-regular">
+              Folgende Rubriken sind befüllt und können nicht an die jDV
+              exportiert werden:
+              <ul class="list-disc">
+                <li v-for="field in fieldsWithoutJdvExport" :key="field">
+                  {{ field }}
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
       <div aria-label="Randnummernprüfung" class="flex flex-col">

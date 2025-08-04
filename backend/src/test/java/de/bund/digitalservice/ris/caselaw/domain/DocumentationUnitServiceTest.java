@@ -3,8 +3,10 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType.ACTIVE_CITATION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -37,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.Validator;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +47,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,11 +87,30 @@ class DocumentationUnitServiceTest {
   @MockitoBean private FmxImportService fmxImportService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
   @MockitoBean private DocumentationUnitSearchRepository docUnitSearchRepository;
+  @MockitoBean private ProcessStepService processStepService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
   @Nested
   class GenerateNew {
+
+    ProcessStep proccessStepNeu =
+        ProcessStep.builder().abbreviation("N").name("Neu").uuid(UUID.randomUUID()).build();
+    ProcessStep processStepErsterfassung =
+        ProcessStep.builder()
+            .abbreviation("EE")
+            .name("Ersterfassung")
+            .uuid(UUID.randomUUID())
+            .build();
+
+    @BeforeEach
+    void setup() {
+      when(processStepService.getProcessStepForName("Neu"))
+          .thenReturn(Optional.of(proccessStepNeu));
+      when(processStepService.getProcessStepForName("Ersterfassung"))
+          .thenReturn(Optional.of(processStepErsterfassung));
+    }
+
     @Test
     void testGenerateNewDecision()
         throws DocumentationUnitExistsException,
@@ -95,39 +118,65 @@ class DocumentationUnitServiceTest {
             DocumentNumberFormatterException {
       DocumentationOffice documentationOffice =
           DocumentationOffice.builder().id(UUID.randomUUID()).build();
-      User user = User.builder().documentationOffice(documentationOffice).build();
+      User user =
+          User.builder().id(UUID.randomUUID()).documentationOffice(documentationOffice).build();
       Decision decision = Decision.builder().build();
 
-      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
           .thenReturn(decision);
       when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
           .thenReturn("nextDocumentNumber");
-      // Can we use a captor to check if the document number was correctly created?
-      // The chicken-egg-problem is, that we are dictating what happens when
-      // repository.save(), so we can't just use a captor at the same time
 
+      LocalDateTime startTime = LocalDateTime.now();
       assertNotNull(service.generateNewDecision(user, Optional.empty()));
 
       verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
       verify(duplicateCheckService, times(1)).checkDuplicates("nextDocumentNumber");
+
+      ArgumentCaptor<DocumentationUnitProcessStep> processStepCaptor =
+          ArgumentCaptor.forClass(DocumentationUnitProcessStep.class);
+
+      Decision expectedDecision =
+          Decision.builder()
+              .version(0L)
+              .documentNumber("nextDocumentNumber")
+              .coreData(
+                  CoreData.builder()
+                      .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
+                      .documentationOffice(documentationOffice)
+                      .build())
+              .build();
+
+      Status expectedStatus =
+          Status.builder()
+              .publicationStatus(PublicationStatus.UNPUBLISHED)
+              .withError(false)
+              .build();
+
       verify(repository)
           .createNewDocumentationUnit(
-              Decision.builder()
-                  .version(0L)
-                  .documentNumber("nextDocumentNumber")
-                  .coreData(
-                      CoreData.builder()
-                          .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
-                          .documentationOffice(documentationOffice)
-                          .build())
-                  .build(),
-              Status.builder()
-                  .publicationStatus(PublicationStatus.UNPUBLISHED)
-                  .withError(false)
-                  .build(),
-              null,
-              null,
-              user);
+              eq(expectedDecision),
+              eq(expectedStatus),
+              eq(null), // reference
+              eq(null), // fileNumber
+              eq(user),
+              processStepCaptor.capture());
+
+      DocumentationUnitProcessStep capturedStep = processStepCaptor.getValue();
+      LocalDateTime capturedTime = capturedStep.getCreatedAt();
+      LocalDateTime endTime = LocalDateTime.now();
+
+      assertNotNull(capturedStep);
+      assertNotNull(capturedTime);
+
+      assertTrue(
+          capturedTime.isAfter(startTime.minusSeconds(1))
+              && capturedTime.isBefore(endTime.plusSeconds(1)),
+          "The createdAt timestamp should be within a reasonable range of the test execution time.");
+
+      assertEquals(user, capturedStep.getUser());
+      assertEquals(
+          processStepErsterfassung, capturedStep.getProcessStep()); // 'Neu' because of Neuanlage
     }
 
     @Test
@@ -135,9 +184,11 @@ class DocumentationUnitServiceTest {
         throws DocumentationUnitExistsException,
             DocumentNumberPatternException,
             DocumentNumberFormatterException {
+
       DocumentationOffice userDocumentationOffice =
           DocumentationOffice.builder().abbreviation("BAG").id(UUID.randomUUID()).build();
-      User user = User.builder().documentationOffice(userDocumentationOffice).build();
+      User user =
+          User.builder().id(UUID.randomUUID()).documentationOffice(userDocumentationOffice).build();
       DocumentationOffice designatedDocumentationOffice =
           DocumentationOffice.builder().abbreviation("BGH").id(UUID.randomUUID()).build();
       Decision decision = Decision.builder().build();
@@ -155,43 +206,67 @@ class DocumentationUnitServiceTest {
                       .build())
               .build();
 
-      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
           .thenReturn(decision);
 
       when(documentNumberService.generateDocumentNumber(
               designatedDocumentationOffice.abbreviation()))
           .thenReturn("nextDocumentNumber");
-      // Can we use a captor to check if the document number was correctly created?
-      // The chicken-egg-problem is, that we are dictating what happens when
-      // repository.save(), so we can't just use a captor at the same time
+
+      // To check the createdAt range later
+      LocalDateTime startTime = LocalDateTime.now();
 
       assertNotNull(service.generateNewDecision(user, Optional.of(parameters)));
 
-      verify(documentNumberService)
-          .generateDocumentNumber(designatedDocumentationOffice.abbreviation());
+      ArgumentCaptor<DocumentationUnitProcessStep> processStepCaptor =
+          ArgumentCaptor.forClass(DocumentationUnitProcessStep.class);
+
+      Decision expectedDecision =
+          Decision.builder()
+              .version(0L)
+              .documentNumber("nextDocumentNumber")
+              .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
+              .coreData(
+                  CoreData.builder()
+                      .creatingDocOffice(userDocumentationOffice)
+                      .documentationOffice(designatedDocumentationOffice)
+                      .court(parameters.court())
+                      .legalEffect(LegalEffect.YES.getLabel())
+                      .decisionDate(parameters.decisionDate())
+                      .documentType(parameters.documentType())
+                      .build())
+              .build();
+
+      Status expectedStatus =
+          Status.builder()
+              .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+              .withError(false)
+              .build();
+
       verify(repository)
           .createNewDocumentationUnit(
-              Decision.builder()
-                  .version(0L)
-                  .documentNumber("nextDocumentNumber")
-                  .inboxStatus(InboxStatus.EXTERNAL_HANDOVER)
-                  .coreData(
-                      CoreData.builder()
-                          .creatingDocOffice(userDocumentationOffice)
-                          .documentationOffice(designatedDocumentationOffice)
-                          .court(parameters.court())
-                          .legalEffect(LegalEffect.YES.getLabel())
-                          .decisionDate(parameters.decisionDate())
-                          .documentType(parameters.documentType())
-                          .build())
-                  .build(),
-              Status.builder()
-                  .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
-                  .withError(false)
-                  .build(),
-              parameters.reference(),
-              parameters.fileNumber(),
-              user);
+              eq(expectedDecision),
+              eq(expectedStatus),
+              eq(parameters.reference()),
+              eq(parameters.fileNumber()),
+              eq(user),
+              processStepCaptor.capture());
+
+      DocumentationUnitProcessStep capturedStep = processStepCaptor.getValue();
+      LocalDateTime capturedTime = capturedStep.getCreatedAt();
+      LocalDateTime endTime = LocalDateTime.now();
+
+      assertNotNull(capturedStep);
+      assertNotNull(capturedTime);
+
+      assertTrue(
+          capturedTime.isAfter(startTime.minusSeconds(1))
+              && capturedTime.isBefore(endTime.plusSeconds(1)),
+          "The createdAt timestamp should be within a reasonable range of the test execution time.");
+
+      assertEquals(user, capturedStep.getUser());
+      assertEquals(
+          proccessStepNeu, capturedStep.getProcessStep()); // 'Ersterfassung' because of Fremdanlage
     }
 
     @Test
@@ -212,38 +287,64 @@ class DocumentationUnitServiceTest {
               .build();
 
       when(documentTypeService.getPendingProceedingType()).thenReturn(documentType);
-      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
           .thenReturn(pendingProceeding);
       when(documentNumberService.generateDocumentNumber(
               documentationOffice.abbreviation() + "-Anh"))
           .thenReturn("nextDocumentNumber");
 
       // Act
+      LocalDateTime startTime = LocalDateTime.now();
       assertNotNull(service.generateNewPendingProceeding(user, Optional.empty()));
 
       // Assert
       verify(documentNumberService)
           .generateDocumentNumber(documentationOffice.abbreviation() + "-Anh");
       verify(duplicateCheckService, never()).checkDuplicates(any());
+
+      ArgumentCaptor<DocumentationUnitProcessStep> processStepCaptor =
+          ArgumentCaptor.forClass(DocumentationUnitProcessStep.class);
+
+      PendingProceeding expectedPendingProceeding =
+          PendingProceeding.builder()
+              .version(0L)
+              .documentNumber("nextDocumentNumber")
+              .coreData(
+                  CoreData.builder()
+                      .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
+                      .documentationOffice(documentationOffice)
+                      .documentType(documentType)
+                      .build())
+              .build();
+
+      Status expectedStatus =
+          Status.builder()
+              .publicationStatus(PublicationStatus.UNPUBLISHED)
+              .withError(false)
+              .build();
+
       verify(repository)
           .createNewDocumentationUnit(
-              PendingProceeding.builder()
-                  .version(0L)
-                  .documentNumber("nextDocumentNumber")
-                  .coreData(
-                      CoreData.builder()
-                          .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
-                          .documentationOffice(documentationOffice)
-                          .documentType(documentType)
-                          .build())
-                  .build(),
-              Status.builder()
-                  .publicationStatus(PublicationStatus.UNPUBLISHED)
-                  .withError(false)
-                  .build(),
-              null,
-              null,
-              user);
+              eq(expectedPendingProceeding),
+              eq(expectedStatus),
+              eq(null), // reference
+              eq(null), // fileNumber
+              eq(user),
+              processStepCaptor.capture());
+
+      DocumentationUnitProcessStep capturedStep = processStepCaptor.getValue();
+      LocalDateTime capturedTime = capturedStep.getCreatedAt();
+      LocalDateTime endTime = LocalDateTime.now();
+
+      assertNotNull(capturedStep);
+      assertNotNull(capturedTime);
+
+      assertTrue(
+          capturedTime.isAfter(startTime.minusSeconds(1))
+              && capturedTime.isBefore(endTime.plusSeconds(1)),
+          "The createdAt timestamp should be within a reasonable range of the test execution time.");
+
+      assertEquals(processStepErsterfassung, capturedStep.getProcessStep());
     }
 
     @Test
@@ -251,7 +352,6 @@ class DocumentationUnitServiceTest {
         throws DocumentationUnitExistsException,
             DocumentNumberPatternException,
             DocumentNumberFormatterException {
-      // Arrange
       DocumentationOffice userDocumentationOffice =
           DocumentationOffice.builder().abbreviation("BAG").id(UUID.randomUUID()).build();
       User user = User.builder().documentationOffice(userDocumentationOffice).build();
@@ -279,39 +379,63 @@ class DocumentationUnitServiceTest {
               .build();
 
       when(documentTypeService.getPendingProceedingType()).thenReturn(documentType);
-      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any()))
+      when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
           .thenReturn(pendingProceeding);
       when(documentNumberService.generateDocumentNumber(
               designatedDocumentationOffice.abbreviation() + "-Anh"))
           .thenReturn("nextDocumentNumber");
 
-      // Act
+      LocalDateTime startTime = LocalDateTime.now();
       assertNotNull(service.generateNewPendingProceeding(user, Optional.of(parameters)));
 
-      // Assert
       verify(documentNumberService)
           .generateDocumentNumber(designatedDocumentationOffice.abbreviation() + "-Anh");
+
+      ArgumentCaptor<DocumentationUnitProcessStep> processStepCaptor =
+          ArgumentCaptor.forClass(DocumentationUnitProcessStep.class);
+
+      PendingProceeding expectedPendingProceeding =
+          PendingProceeding.builder()
+              .version(0L)
+              .documentNumber("nextDocumentNumber")
+              .coreData(
+                  CoreData.builder()
+                      .documentationOffice(designatedDocumentationOffice)
+                      .court(parameters.court())
+                      .legalEffect(LegalEffect.YES.getLabel())
+                      .decisionDate(parameters.decisionDate())
+                      .documentType(documentType)
+                      .build())
+              .build();
+
+      Status expectedStatus =
+          Status.builder()
+              .publicationStatus(PublicationStatus.UNPUBLISHED)
+              .withError(false)
+              .build();
+
       verify(repository)
           .createNewDocumentationUnit(
-              PendingProceeding.builder()
-                  .version(0L)
-                  .documentNumber("nextDocumentNumber")
-                  .coreData(
-                      CoreData.builder()
-                          .documentationOffice(designatedDocumentationOffice)
-                          .court(parameters.court())
-                          .legalEffect(LegalEffect.YES.getLabel())
-                          .decisionDate(parameters.decisionDate())
-                          .documentType(documentType)
-                          .build())
-                  .build(),
-              Status.builder()
-                  .publicationStatus(PublicationStatus.UNPUBLISHED)
-                  .withError(false)
-                  .build(),
-              parameters.reference(),
-              parameters.fileNumber(),
-              user);
+              eq(expectedPendingProceeding),
+              eq(expectedStatus),
+              eq(parameters.reference()),
+              eq(parameters.fileNumber()),
+              eq(user),
+              processStepCaptor.capture());
+
+      DocumentationUnitProcessStep capturedStep = processStepCaptor.getValue();
+      LocalDateTime capturedTime = capturedStep.getCreatedAt();
+      LocalDateTime endTime = LocalDateTime.now();
+
+      assertNotNull(capturedStep);
+      assertNotNull(capturedTime);
+
+      assertTrue(
+          capturedTime.isAfter(startTime.minusSeconds(1))
+              && capturedTime.isBefore(endTime.plusSeconds(1)),
+          "The createdAt timestamp should be within a reasonable range of the test execution time.");
+
+      assertEquals(processStepErsterfassung, capturedStep.getProcessStep());
     }
 
     @Test

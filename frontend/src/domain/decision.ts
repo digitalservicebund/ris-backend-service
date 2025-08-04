@@ -1,8 +1,10 @@
 import dayjs from "dayjs"
+import DocumentationUnitProcessStep from "./documentationUnitProcessStep"
 import ActiveCitation from "@/domain/activeCitation"
 import Attachment from "@/domain/attachment"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { CoreData } from "@/domain/coreData"
+import Definition from "@/domain/definition"
 import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import LegalForce from "@/domain/legalForce"
@@ -57,15 +59,24 @@ export const longTextLabels: {
   otherLongText: "Sonstiger Langtext",
   outline: "Gliederung",
 }
-export const contentRelatedIndexingLabels = {
+export const contentRelatedIndexingLabels: {
+  [contentRelatedIndexingKey in keyof Required<ContentRelatedIndexing>]: string
+} = {
   keywords: "Schlagwörter",
   fieldsOfLaw: "Sachgebiete",
   norms: "Normen",
+  activeCitations: "Aktivzitierung",
+  collectiveAgreements: "Tarifvertrag",
+  dismissalTypes: "Kündigungsarten",
+  dismissalGrounds: "Kündigungsgründe",
+  jobProfiles: "Berufsbild",
+  evsf: "E-VSF",
+  definitions: "Definition",
+  hasLegislativeMandate: "Gesetzgebungsauftrag",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
   literatureReferences: "Literaturfundstellen",
-  activeCitations: "Aktivzitierung",
   ...contentRelatedIndexingLabels,
   ...shortTextLabels,
   ...longTextLabels,
@@ -94,6 +105,8 @@ export class Decision {
     duplicateRelations: [],
   }
   public inboxStatus?: InboxStatus
+  public currentProcessStep?: DocumentationUnitProcessStep
+  public processSteps?: DocumentationUnitProcessStep[]
 
   static readonly requiredFields = [
     "fileNumbers",
@@ -175,6 +188,9 @@ export class Decision {
         data.contentRelatedIndexing.activeCitations.map(
           (activeCitations) => new ActiveCitation({ ...activeCitations }),
         )
+
+    if (data.contentRelatedIndexing?.definitions)
+      data.contentRelatedIndexing.definitions = data.contentRelatedIndexing?.definitions.map(def => new Definition({ ...def }))
 
     if (data.attachments != undefined && data.attachments.length > 0) {
       data.attachments = data.attachments.map(

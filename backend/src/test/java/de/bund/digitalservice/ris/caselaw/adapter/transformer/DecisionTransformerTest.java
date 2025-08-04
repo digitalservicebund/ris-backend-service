@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DefinitionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDocumentNumberDTO;
@@ -42,6 +43,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
@@ -988,6 +990,79 @@ class DecisionTransformerTest {
     assertThat(domainObject.coreData().source().sourceRawValue()).isNull();
   }
 
+  @Test
+  void testTransformToDto_withEvsf_shouldAddEvsf() {
+    DecisionDTO currentDto = DecisionDTO.builder().build();
+
+    Decision updatedDomainObject =
+        Decision.builder()
+            .contentRelatedIndexing(ContentRelatedIndexing.builder().evsf("X 00 00-0-0").build())
+            .build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(decisionDTO.getEvsf()).isEqualTo("X 00 00-0-0");
+  }
+
+  @Test
+  void testTransformToDto_withoutEvsf_shouldNotAddEvsf() {
+    DecisionDTO currentDto = DecisionDTO.builder().build();
+
+    Decision updatedDomainObject =
+        Decision.builder().contentRelatedIndexing(ContentRelatedIndexing.builder().build()).build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(decisionDTO.getEvsf()).isNull();
+  }
+
+  @Test
+  void testTransformToDto_withDefinitions_shouldAddDefinitions() {
+    DecisionDTO currentDto = DecisionDTO.builder().build();
+
+    Decision updatedDomainObject =
+        Decision.builder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .definitions(
+                        List.of(
+                            Definition.builder()
+                                .definedTerm("Test")
+                                .definingBorderNumber(1L)
+                                .id(UUID.fromString("f73990a0-a9c2-4948-bc6e-8dea1d0d0b2d"))
+                                .newEntry(true)
+                                .build(),
+                            Definition.builder()
+                                .definedTerm("Zweiter")
+                                .definingBorderNumber(3L)
+                                .id(UUID.fromString("d9813057-195f-4735-b338-81b4408c2d52"))
+                                .newEntry(false)
+                                .build()))
+                    .build())
+            .build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(decisionDTO.getDefinitions())
+        .usingRecursiveFieldByFieldElementComparator()
+        .contains(
+            DefinitionDTO.builder().value("Test").rank(1L).id(null).borderNumber(1L).build(),
+            DefinitionDTO.builder()
+                .value("Zweiter")
+                .rank(2L)
+                .borderNumber(3L)
+                .id(UUID.fromString("d9813057-195f-4735-b338-81b4408c2d52"))
+                .build());
+  }
+
+  @Test
+  void testTransformToDto_withoutDefinitions_shouldNotAddDefinitions() {
+    DecisionDTO currentDto = DecisionDTO.builder().build();
+
+    Decision updatedDomainObject =
+        Decision.builder().contentRelatedIndexing(ContentRelatedIndexing.builder().build()).build();
+
+    DecisionDTO decisionDTO = DecisionTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(decisionDTO.getDefinitions()).isEmpty();
+  }
+
   @ParameterizedTest
   @EnumSource(
       value = ReferenceType.class,
@@ -1410,6 +1485,47 @@ class DecisionTransformerTest {
   }
 
   @Test
+  void testTransformToDomain_withEvsf_shouldAddEvsf() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().evsf("X 00 00-0-0").build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().evsf()).isEqualTo("X 00 00-0-0");
+  }
+
+  @Test
+  void testTransformToDomain_withoutEvsf_shouldNotAddEvsf() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().evsf()).isNull();
+  }
+
+  @Test
+  void testTransformToDomain_withDefinitions_shouldAddDefinitions() {
+    DecisionDTO decisionDTO =
+        generateSimpleDTOBuilder()
+            .definitions(List.of(DefinitionDTO.builder().value("test").borderNumber(3L).build()))
+            .build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().definitions())
+        .isEqualTo(
+            List.of(Definition.builder().definedTerm("test").definingBorderNumber(3L).build()));
+  }
+
+  @Test
+  void testTransformToDomain_withoutDefinitions_shouldNotAddDefinitions() {
+    DecisionDTO decisionDTO = DecisionDTO.builder().build();
+
+    Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+    assertThat(decision.contentRelatedIndexing().definitions()).isEqualTo(List.of());
+  }
+
+  @Test
   void testTransformToDomain_withoutLegislativeMandate_shouldLegislativeMandateBeFalse() {
     DecisionDTO decisionDTO = generateSimpleDTOBuilder().hasLegislativeMandate(false).build();
 
@@ -1625,11 +1741,14 @@ class DecisionTransformerTest {
                 .dismissalGrounds(Collections.emptyList())
                 .dismissalTypes(Collections.emptyList())
                 .collectiveAgreements(Collections.emptyList())
+                .definitions(Collections.emptyList())
                 .hasLegislativeMandate(false)
+                .evsf(null)
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())
-        .documentalists(Collections.emptyList());
+        .documentalists(Collections.emptyList())
+        .processSteps(Collections.emptyList());
   }
 
   private CoreDataBuilder generateSimpleCoreDataBuilder() {

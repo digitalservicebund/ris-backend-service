@@ -177,7 +177,7 @@ test.describe("eurlex", () => {
         ).toBeVisible()
       })
 
-      await test.step("Stammdaten, Eingangsart und Textrubriken wurden automatisch befüllt", async () => {
+      await test.step("Formaldaten, Eingangsart und Textrubriken wurden automatisch befüllt", async () => {
         //look at judgment and check all data is there
         const pagePromise = page.context().waitForEvent("page")
         const rows = page.locator("tr")

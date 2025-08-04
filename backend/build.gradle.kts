@@ -11,16 +11,16 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.5.3"
+    id("org.springframework.boot") version "3.5.4"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "7.2.0"
+    id("com.diffplug.spotless") version "7.2.1"
     id("org.sonarqube") version "6.2.0.5505"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.10.3"
+    id("org.flywaydb.flyway") version "11.10.5"
     id("io.sentry.jvm.gradle") version "5.8.0"
 }
 
@@ -141,7 +141,7 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property(
             "sonar.coverage.exclusions",
-            "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/PostgresDocumentationUnitSearchRepositoryImpl.java"
+            "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/PostgresDocumentationUnitSearchRepositoryImpl.java,**/*Exception.java"
         )
     }
 }
@@ -160,7 +160,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.1")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.2")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
@@ -168,7 +168,7 @@ dependencies {
     implementation("com.google.protobuf:protobuf-java:4.31.1")
 
     // CVE-2024-57699
-    implementation("net.minidev:json-smart:2.5.2")
+    implementation("net.minidev:json-smart:2.6.0")
 
     // CVE-2025-24970
     implementation("io.netty:netty-handler:4.2.3.Final")
@@ -182,7 +182,7 @@ dependencies {
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.43")
 
-    implementation(platform("software.amazon.awssdk:bom:2.31.78"))
+    implementation(platform("software.amazon.awssdk:bom:2.32.13"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -194,21 +194,21 @@ dependencies {
     implementation("net.sf.saxon:Saxon-HE:12.8")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
-    implementation("org.eclipse.angus:angus-mail:2.0.3")
+    implementation("org.eclipse.angus:angus-mail:2.0.4")
     implementation("com.icegreen:greenmail:2.1.4")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.39") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.40") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.38.jar"))
+//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.40.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.77")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.83")
     // for local development:
-//    implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.77.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.83.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.19.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
@@ -223,19 +223,19 @@ dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
     implementation("io.getunleash:unleash-client-java:11.0.2")
-    implementation("org.apache.commons:commons-text:1.13.1")
+    implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.1")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.2")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.2")
 
     // CVE-2023-3635
-    implementation("com.squareup.okio:okio-jvm:3.15.0")
+    implementation("com.squareup.okio:okio-jvm:3.16.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.10.3"
+    val flywayCore = "org.flywaydb:flyway-core:11.10.5"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.3")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.5")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -244,7 +244,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.8")
-    testImplementation("org.springframework.security:spring-security-test:6.5.1")
+    testImplementation("org.springframework.security:spring-security-test:6.5.2")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
@@ -252,7 +252,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.22.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.24.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

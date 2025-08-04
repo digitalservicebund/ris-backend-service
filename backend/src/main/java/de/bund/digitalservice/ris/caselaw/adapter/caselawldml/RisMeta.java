@@ -91,4 +91,8 @@ public class RisMeta {
   @XmlElementWrapper(name = "inputTypes", namespace = CaseLawLdml.RIS_NS)
   @XmlElement(name = "inputType", namespace = CaseLawLdml.RIS_NS)
   private List<String> inputTypes;
+
+  /** Elektronische Vorschriftensammlung Bundesfinanzverwaltung */
+  @XmlElement(name = "evfs", namespace = CaseLawLdml.RIS_NS)
+  private String evfs;
 }

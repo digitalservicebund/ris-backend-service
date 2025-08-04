@@ -47,7 +47,7 @@ test.describe("saving behaviour", () => {
       "VG-001",
     )
 
-    await expect(page.getByText(/Zuletzt .* Uhr/)).toBeHidden()
+    await expect(page.getByText(/Gespeichert: .* Uhr/)).toBeHidden()
     await page.locator("a:has-text('Übergabe an jDV')").click()
     await expect(page.locator("h1:has-text('Übergabe an jDV')")).toBeVisible({
       timeout: 15000,

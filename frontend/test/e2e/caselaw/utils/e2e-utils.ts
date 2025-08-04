@@ -289,7 +289,7 @@ export async function save(page: Page) {
   })
   await page.getByLabel("Speichern Button", { exact: true }).click()
   await saveRequest
-  await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
+  await expect(page.getByText(`Gespeichert`).first()).toBeVisible()
 }
 
 export async function fillSearchInput(

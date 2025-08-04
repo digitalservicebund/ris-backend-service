@@ -1,8 +1,11 @@
+import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
+import { Decision } from "@/domain/decision"
+import Definition from "@/domain/definition"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 
@@ -16,6 +19,23 @@ function renderComponent(contentRelatedIndexing?: ContentRelatedIndexing) {
         provide: {
           [previewLayoutInjectionKey as symbol]: "wide",
         },
+        plugins: [
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new Decision("foo", {
+                    managementData: {
+                      borderNumbers: ["1", "2"],
+                      duplicateRelations: [],
+                    },
+                  }),
+                },
+              },
+              stubActions: false,
+            }),
+          ],
+        ],
       },
     }),
   }
@@ -58,6 +78,14 @@ describe("preview content related indexing", () => {
       dismissalTypes: ["Einführung neuer Technologien"],
       collectiveAgreements: ["Normalvertrag Chor", "Stehende Bühnen"],
       hasLegislativeMandate: true,
+      evsf: "X 00 00-0-0",
+      definitions: [
+        new Definition({ definedTerm: "Finanzkraft" }),
+        new Definition({
+          definedTerm: "Kündigungsfrist",
+          definingBorderNumber: 3,
+        }),
+      ],
     })
 
     expect(await screen.findByText("Schlagwörter")).toBeInTheDocument()
@@ -69,6 +97,8 @@ describe("preview content related indexing", () => {
     expect(await screen.findByText("Berufsbild")).toBeInTheDocument()
     expect(await screen.findByText("Gesetzgebungsauftrag")).toBeInTheDocument()
     expect(await screen.findByText("Tarifvertrag")).toBeInTheDocument()
+    expect(await screen.findByText("E-VSF")).toBeInTheDocument()
+    expect(await screen.findByText("Definition")).toBeInTheDocument()
   })
 
   test("renders multiple keywords and nothing else", async () => {
@@ -82,6 +112,7 @@ describe("preview content related indexing", () => {
       jobProfiles: [],
       hasLegislativeMandate: false,
       collectiveAgreements: [],
+      definitions: [],
     })
 
     expect(await screen.findByText("Schlagwörter")).toBeInTheDocument()
@@ -95,6 +126,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
 
   test("renders multiple norms and single norms and nothing else", async () => {
@@ -123,6 +156,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       hasLegislativeMandate: false,
       collectiveAgreements: [],
+      definitions: [],
     })
 
     expect(await screen.findByText("Normen")).toBeInTheDocument()
@@ -137,6 +171,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
 
   test("renders multiple active citations and nothing else", async () => {
@@ -174,6 +210,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       hasLegislativeMandate: false,
       collectiveAgreements: [],
+      definitions: [],
     })
 
     expect(await screen.findByText("Aktivzitierung")).toBeInTheDocument()
@@ -191,6 +228,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
 
   test("renders multiple fields of law and nothing else", async () => {
@@ -247,6 +286,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       hasLegislativeMandate: false,
       collectiveAgreements: [],
+      definitions: [],
     })
 
     expect(await screen.findByText("Sachgebiete")).toBeInTheDocument()
@@ -267,6 +307,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
 
   test("renders multiple job profiles and nothing else", async () => {
@@ -280,6 +322,7 @@ describe("preview content related indexing", () => {
       collectiveAgreements: [],
       dismissalTypes: [],
       hasLegislativeMandate: false,
+      definitions: [],
     })
 
     expect(await screen.findByText("Berufsbild")).toBeInTheDocument()
@@ -293,6 +336,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
 
   test("renders multiple collective agreements and nothing else", async () => {
@@ -305,6 +350,7 @@ describe("preview content related indexing", () => {
       collectiveAgreements: ["Normalvertrag Chor", "Stehende Bühnen"],
       dismissalGrounds: [],
       dismissalTypes: [],
+      definitions: [],
     })
 
     expect(await screen.findByText("Tarifvertrag")).toBeInTheDocument()
@@ -318,6 +364,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
 
   test("renders legislative mandate and nothing else", async () => {
@@ -331,6 +379,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       collectiveAgreements: [],
       hasLegislativeMandate: true,
+      definitions: [],
     })
 
     expect(await screen.findByText("Gesetzgebungsauftrag")).toBeInTheDocument()
@@ -343,6 +392,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
 
   test("renders dismissal inputs and nothing else", async () => {
@@ -356,6 +407,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: ["type"],
       collectiveAgreements: [],
       hasLegislativeMandate: false,
+      definitions: [],
     })
 
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
@@ -367,6 +419,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(await screen.findByText("Kündigungsgründe")).toBeInTheDocument()
     expect(await screen.findByText("Kündigungsarten")).toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
 
   test("renders no legislative mandate when it is false", async () => {
@@ -375,6 +429,74 @@ describe("preview content related indexing", () => {
     })
 
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+  })
+
+  test("renders E-VSF and nothing else", async () => {
+    renderComponent({
+      keywords: [],
+      norms: [],
+      activeCitations: [],
+      fieldsOfLaw: [],
+      jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
+      collectiveAgreements: [],
+      hasLegislativeMandate: false,
+      evsf: "X 00 00-0-0",
+      definitions: [],
+    })
+
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
+    expect(screen.queryByText("Normen")).not.toBeInTheDocument()
+    expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(await screen.findByText("E-VSF")).toBeInTheDocument()
+    expect(await screen.findByText("X 00 00-0-0")).toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+  })
+
+  test("renders definitions and nothing else", async () => {
+    const { container } = renderComponent({
+      keywords: [],
+      norms: [],
+      activeCitations: [],
+      fieldsOfLaw: [],
+      jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
+      collectiveAgreements: [],
+      hasLegislativeMandate: false,
+      definitions: [
+        new Definition({ definedTerm: "Finanzkraft" }),
+        new Definition({
+          definedTerm: "Richtige Randnummer",
+          definingBorderNumber: 1,
+        }),
+        new Definition({
+          definedTerm: "Kündigungsfrist (falsche Randnummer)",
+          definingBorderNumber: 3,
+        }),
+      ],
+    })
+
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
+    expect(screen.queryByText("Normen")).not.toBeInTheDocument()
+    expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(container).toHaveTextContent(
+      "DefinitionFinanzkraftRichtige Randnummer | 1Kündigungsfrist (falsche Randnummer) | 3",
+    )
   })
 
   test("renders nothing when elements are empty", async () => {
@@ -388,6 +510,8 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       collectiveAgreements: [],
       hasLegislativeMandate: undefined,
+      evsf: "",
+      definitions: [],
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -398,6 +522,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
 
   test("renders nothing when elements are undefined", async () => {
@@ -411,6 +537,8 @@ describe("preview content related indexing", () => {
       dismissalGrounds: undefined,
       dismissalTypes: undefined,
       collectiveAgreements: undefined,
+      evsf: undefined,
+      definitions: undefined,
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
@@ -421,5 +549,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
+    expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
 })

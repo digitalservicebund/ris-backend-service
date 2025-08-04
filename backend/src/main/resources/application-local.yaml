@@ -22,6 +22,13 @@ spring:
           oidcclient:
             client-id: ${OAUTH2_CLIENT_ID:}
             client-secret: ${OAUTH2_CLIENT_SECRET:}
+            provider: keycloak
+          bareid-user-api-client:
+            client-id: ${OAUTH2_USER_API_CLIENT_ID}
+            client-secret: ${OAUTH2_USER_API_CLIENT_SECRET}
+            provider: keycloak
+            authorization-grant-type: client_credentials
+            client-authentication-method: client_secret_basic
         provider:
           keycloak:
             issuer-uri: ${OAUTH2_CLIENT_ISSUER:}
@@ -40,6 +47,7 @@ neuris:
 languagetool:
   url: http://localhost:8181/v2/check
   language: de-DE
+  enabled: false
 
 eurlex:
 #  username: ${EURLEX_USERNAME}

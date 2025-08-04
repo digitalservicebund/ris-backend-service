@@ -1,14 +1,44 @@
 import { createTestingPinia } from "@pinia/testing"
+import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import Tooltip from "primevue/tooltip"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import { CoreData } from "@/domain/coreData"
 import { Decision } from "@/domain/decision"
+import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import {
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/managementData"
 import routes from "~/test-helper/routes"
+
+const currentProcessStep: DocumentationUnitProcessStep = {
+  id: "c-id",
+  userId: "user2-id",
+  createdAt: new Date(),
+  processStep: { uuid: "fertig-id", name: "Fertig", abbreviation: "F" },
+}
+
+const docUnitProcessSteps: DocumentationUnitProcessStep[] = [
+  currentProcessStep,
+  {
+    id: "b-id",
+    userId: "user1-id",
+    createdAt: new Date(),
+    processStep: {
+      uuid: "blockiert-id",
+      name: "Blockiert",
+      abbreviation: "B",
+    },
+  },
+  {
+    id: "a-id",
+    userId: "user1-id",
+    createdAt: new Date(),
+    processStep: { uuid: "neu-id", name: "Neu", abbreviation: "N" },
+  },
+]
 
 function renderComponent(options?: {
   documentNumber?: string
@@ -16,6 +46,7 @@ function renderComponent(options?: {
   duplicateRelations?: DuplicateRelation[]
   isExternalUser?: boolean
 }) {
+  const user = userEvent.setup()
   const router = createRouter({
     history: createWebHistory(),
     routes: routes,
@@ -33,11 +64,16 @@ function renderComponent(options?: {
       borderNumbers: [],
       duplicateRelations: options?.duplicateRelations ?? [],
     },
+    currentProcessStep: currentProcessStep,
+    processSteps: docUnitProcessSteps,
   })
+
   return {
+    user,
     ...render(DocumentUnitInfoPanel, {
       props: { documentUnit: documentUnit },
       global: {
+        directives: { tooltip: Tooltip },
         plugins: [
           router,
           createTestingPinia({
@@ -131,5 +167,15 @@ describe("documentUnit InfoPanel", () => {
     })
 
     expect(screen.queryByText("Dublettenverdacht")).not.toBeInTheDocument()
+  })
+
+  it("renders proccess steps and move button", async () => {
+    renderComponent()
+    expect(screen.queryByText("N")).not.toBeInTheDocument()
+    expect(screen.queryByText("Neu")).not.toBeInTheDocument()
+    expect(await screen.findByText("B")).toBeInTheDocument()
+    expect(screen.queryByText("Blockiert")).not.toBeInTheDocument()
+    expect(await screen.findByText("Fertig")).toBeInTheDocument()
+    expect(screen.queryByText("F")).not.toBeInTheDocument()
   })
 })

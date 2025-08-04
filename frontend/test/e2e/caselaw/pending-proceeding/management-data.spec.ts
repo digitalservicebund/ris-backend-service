@@ -113,7 +113,6 @@ test.describe("Verwaltungsdaten", { tag: ["@RISDEV-8004"] }, () => {
   }
 
   async function expectSource(page: Page, source: string | RegExp) {
-    // eslint-disable-next-line playwright/no-conditional-in-test
     await test.step(`Quelle ist '${source instanceof RegExp ? "Z aus MMG 2024, 12, Heft e2e-[...] (L) (DS)" : source}'`, async () => {
       const label = page.locator('[data-testid="management-data-source"] dt')
       await expect(label).toHaveText("Quelle")
@@ -128,7 +127,6 @@ test.describe("Verwaltungsdaten", { tag: ["@RISDEV-8004"] }, () => {
     page: Page,
     lastUpdatedAt: string | RegExp,
   ) {
-    // eslint-disable-next-line playwright/no-conditional-in-test
     await test.step(`Zuletzt bearbeitet am ist ${lastUpdatedAt instanceof RegExp ? "befüllt" : "'" + lastUpdatedAt + "'"}`, async () => {
       const label = page.locator(
         '[data-testid="management-data-last-updated-at"] dt',

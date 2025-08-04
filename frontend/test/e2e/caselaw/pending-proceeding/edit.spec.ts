@@ -11,7 +11,7 @@ test.describe("edit pending proceeding", () => {
         type: "pending-proceeding",
       })
 
-      // Stammdaten
+      // Formaldaten
 
       // Gericht
       await test.step("court can be changed", async () => {

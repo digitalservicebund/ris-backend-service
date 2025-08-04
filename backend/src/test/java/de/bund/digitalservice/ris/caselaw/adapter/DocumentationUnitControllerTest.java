@@ -91,6 +91,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -108,6 +109,7 @@ class DocumentationUnitControllerTest {
   @MockitoBean private UserService userService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean DatabaseApiKeyRepository apiKeyRepository;
   @MockitoBean DatabaseDocumentationOfficeRepository officeRepository;
@@ -152,7 +154,7 @@ class DocumentationUnitControllerTest {
     void
         testGenerateNewDocumentationUnit_withInternalUserAndNoKind_shouldSuccessfullyCreateDecision() {
       // userService.getDocumentationOffice is mocked in @BeforeEach
-      when(userService.getUser(any())).thenReturn(user);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
       when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.DECISION))
           .thenReturn(
               Decision.builder()
@@ -176,7 +178,7 @@ class DocumentationUnitControllerTest {
     void
         testGenerateNewDocumentationUnit_withInternalUserAndKindPendingProceeding_shouldSuccessfullyCreatePendingProceeding() {
       // Arrange
-      when(userService.getUser(any())).thenReturn(user);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
       when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.PENDING_PROCEEDING))
           .thenReturn(
               PendingProceeding.builder()
@@ -260,7 +262,7 @@ class DocumentationUnitControllerTest {
     @Test
     void testGenerateNewDocumentationUnit_withUnsupportedKind_shouldBeForbidden() {
       // Arrange
-      when(userService.getUser(any())).thenReturn(user);
+      when(userService.getUser(any(OidcUser.class))).thenReturn(user);
       when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
       when(service.generateNewDocumentationUnit(user, Optional.empty(), Kind.UNSUPPORTED))
           .thenThrow(DocumentationUnitException.class);

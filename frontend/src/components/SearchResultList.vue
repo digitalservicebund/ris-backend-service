@@ -87,8 +87,8 @@ export type SearchResults<Type extends RelatedDocumentation> = {
             <IconBadge
               v-if="searchResult.isLinked"
               background-color="bg-yellow-300"
-              color="text-yellow-900"
               label="Bereits hinzugefügt"
+              text-color="text-yellow-900"
             />
           </span>
         </FlexContainer>

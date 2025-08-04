@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -247,6 +248,20 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @Nullable
   @Enumerated(EnumType.STRING)
   private InboxStatus inboxStatus;
+
+  @OneToOne()
+  @JoinColumn(name = "current_process_step_id")
+  private DocumentationUnitProcessStepDTO currentProcessStep;
+
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true,
+      mappedBy = "documentationUnit")
+  @OrderBy("createdAt DESC")
+  @Builder.Default
+  @JsonManagedReference
+  private List<DocumentationUnitProcessStepDTO> processSteps = new ArrayList<>();
 
   @Override
   @Nullable

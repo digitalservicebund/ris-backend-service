@@ -10,6 +10,12 @@ test.skip(
   "Skipping firefox flaky test",
 )
 
+// eslint-disable-next-line playwright/no-skipped-test
+test.skip(
+  ({ baseURL }) => baseURL === "http://127.0.0.1",
+  "Skipping this test on local execution, as there is no languagetool running",
+)
+
 const textCheckUnderlinesColors = {
   uncategorized: "#e86a69",
   style: "#9d8eff",

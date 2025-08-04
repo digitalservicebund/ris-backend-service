@@ -6,10 +6,9 @@ import { beforeEach, describe } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import CategoryImport from "@/components/category-import/CategoryImport.vue"
 import {
+  allLabels,
   contentRelatedIndexingLabels,
   Decision,
-  longTextLabels,
-  shortTextLabels,
 } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import { Kind } from "@/domain/documentationUnitKind"
@@ -157,17 +156,13 @@ describe("CategoryImport", () => {
         screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
       )
 
-      for (const label of Object.values(contentRelatedIndexingLabels)) {
+      for (const label of ["Schlagwörter", "Sachgebiete", "Normen"]) {
         expect(screen.getByText(label)).toBeInTheDocument()
       }
-      const allOtherLabels = {
-        caselawReferences: "Rechtsprechungsfundstellen",
-        literatureReferences: "Literaturfundstellen",
-        activeCitations: "Aktivzitierung",
-        ...shortTextLabels,
-        ...longTextLabels,
-      }
-      for (const label of Object.values(allOtherLabels)) {
+      const allOtherLabels = Object.values(allLabels).filter(
+        (label) => !["Schlagwörter", "Sachgebiete", "Normen"].includes(label),
+      )
+      for (const label of allOtherLabels) {
         expect(screen.queryByText(label)).not.toBeInTheDocument()
       }
     })
@@ -194,17 +189,13 @@ describe("CategoryImport", () => {
         screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
       )
 
-      for (const label of Object.values(contentRelatedIndexingLabels)) {
+      for (const label of ["Schlagwörter", "Sachgebiete", "Normen"]) {
         expect(screen.getByText(label)).toBeInTheDocument()
       }
-      const allOtherLabels = {
-        caselawReferences: "Rechtsprechungsfundstellen",
-        literatureReferences: "Literaturfundstellen",
-        activeCitations: "Aktivzitierung",
-        ...shortTextLabels,
-        ...longTextLabels,
-      }
-      for (const label of Object.values(allOtherLabels)) {
+      const allOtherLabels = Object.values(allLabels).filter(
+        (label) => !["Schlagwörter", "Sachgebiete", "Normen"].includes(label),
+      )
+      for (const label of allOtherLabels) {
         expect(screen.queryByText(label)).not.toBeInTheDocument()
       }
     })

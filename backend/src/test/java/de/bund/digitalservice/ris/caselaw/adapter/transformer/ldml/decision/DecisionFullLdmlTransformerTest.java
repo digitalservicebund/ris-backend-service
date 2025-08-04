@@ -522,6 +522,7 @@ class DecisionFullLdmlTransformerTest {
                   <ris:inputType>E-Mail</ris:inputType>
                   <ris:inputType>Papier</ris:inputType>
                </ris:inputTypes>
+               <ris:evfs>evsf test</ris:evfs>
             </ris:meta>
          </akn:proprietary>
       </akn:meta>
@@ -593,8 +594,7 @@ class DecisionFullLdmlTransformerTest {
     // Assert
     Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    Assertions.assertTrue(fileContent.isPresent());
-    Assertions.assertEquals(expected, fileContent.get());
+    assertThat(fileContent).isPresent().get().isEqualTo(expected);
   }
 
   Decision getEntireDocumentationUnit() {
@@ -728,6 +728,7 @@ class DecisionFullLdmlTransformerTest {
                 .dismissalTypes(List.of("dismissalType test"))
                 .collectiveAgreements(List.of("collectiveAgreement test"))
                 .hasLegislativeMandate(true)
+                .evsf("evsf test")
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))
         .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))
