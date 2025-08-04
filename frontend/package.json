@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "engines": {
-    "node": ">=22.17.1"
+    "node": ">=22.18.0"
   },
   "type": "module",
   "scripts": {
@@ -144,5 +144,8 @@
     "vite-plugin-pages": "^0.33.1",
     "vite-plugin-vue-devtools": "^8.0.0",
     "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "playwright-core": "1.54.1"
   }
 }
