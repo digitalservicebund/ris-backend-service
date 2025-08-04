@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="TDocument">
 import dayjs from "dayjs"
+import Button from "primevue/button"
 import { computed, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
 import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
@@ -12,6 +13,7 @@ import { useStatusBadge } from "@/composables/useStatusBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import { isDecision } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
+import IconApprovalDelegation from "~icons/material-symbols/approval-delegation-outline"
 
 const props = defineProps<{
   documentUnit: DocumentationUnit
@@ -70,6 +72,8 @@ const managementDataRoute = computed(() => ({
 }))
 
 const processStepsEnabled = useFeatureToggle("neuris.process-steps")
+
+const showProcessStepDialog = ref(false)
 
 watchEffect(() => {
   statusBadge.value = useStatusBadge(props.documentUnit.status).value
@@ -137,7 +141,22 @@ watchEffect(() => {
       aria-label="Speichern Button"
       data-testid="document-unit-save-button"
     >
-      <UpdateProcessStepDialog v-if="processStepsEnabled" />
+      <Button
+        v-tooltip.bottom="'Dokumentationseinheit weitergeben'"
+        aria-label="Dokumentationseinheit weitergeben"
+        severity="secondary"
+        size="small"
+        @click="showProcessStepDialog = true"
+      >
+        <template #icon>
+          <IconApprovalDelegation />
+        </template>
+      </Button>
     </SaveButton>
+    <UpdateProcessStepDialog
+      v-if="processStepsEnabled"
+      :show-dialog="showProcessStepDialog"
+      @close-dialog="showProcessStepDialog = false"
+    />
   </div>
 </template>
