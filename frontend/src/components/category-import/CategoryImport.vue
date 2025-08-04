@@ -206,6 +206,7 @@ const handleImport = async (key: keyof typeof allLabels) => {
     case "evsf":
     case "definitions":
     case "hasLegislativeMandate":
+    case "foreignLanguageVersions":
       importContextRelatedIndexing(key)
       break
     case "tenor":

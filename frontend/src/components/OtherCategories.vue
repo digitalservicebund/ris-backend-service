@@ -4,6 +4,7 @@ import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
 import DefinitionList from "@/components/DefinitionList.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
+import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
@@ -44,6 +45,12 @@ const hasLegislativeMandate = computed(() => {
 const evsf = computed({
   get: () => contentRelatedIndexing.value.evsf,
   set: (value) => (store.documentUnit!.contentRelatedIndexing.evsf = value),
+})
+
+const hasForeignLanguageVersion = computed(() => {
+  return contentRelatedIndexing.value.foreignLanguageVersions
+    ? contentRelatedIndexing.value.foreignLanguageVersions?.length > 0
+    : false
 })
 
 const shouldDisplayLegislativeMandateCategory = computed(() => {
@@ -114,6 +121,12 @@ const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
           headline="Gesetzgebungsauftrag"
           label="Gesetzgebungsauftrag vorhanden"
         />
+      </CategoryWrapper>
+      <CategoryWrapper
+        label="Fremdsprachige Fassung"
+        :should-show-button="!hasForeignLanguageVersion"
+      >
+        <ForeignLanguageVersions label="Fremdsprachige Fassung" />
       </CategoryWrapper>
       <TextInputCategory
         v-if="shouldDisplayEvsf"

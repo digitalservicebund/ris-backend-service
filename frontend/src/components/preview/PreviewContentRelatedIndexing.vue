@@ -69,8 +69,16 @@ const hasDismissalTypes = computed(() => {
     props.contentRelatedIndexing.dismissalTypes?.length > 0
   )
 })
+
 const hasLegislativeMandate = computed(() => {
   return props.contentRelatedIndexing.hasLegislativeMandate
+})
+
+const hasForeignLanguageVersions = computed(() => {
+  return (
+    props.contentRelatedIndexing.foreignLanguageVersions &&
+    props.contentRelatedIndexing.foreignLanguageVersions?.length > 0
+  )
 })
 
 const hasEvsf = computed(() => {
@@ -189,6 +197,26 @@ const hasDefinitions = computed(() => {
           :key="jobProfile"
         >
           {{ jobProfile }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasForeignLanguageVersions">
+      <PreviewCategory>Fremdsprachige Fassung</PreviewCategory>
+      <PreviewContent data-testid="Fremdsprachige Fassung">
+        <div
+          v-for="foreignLanguageVersion in props.contentRelatedIndexing
+            .foreignLanguageVersions"
+          :key="foreignLanguageVersion.id"
+        >
+          {{ foreignLanguageVersion.languageCode?.label }}:
+          <a
+            class="ris-link1-bold whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+            :href="foreignLanguageVersion.link"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {{ foreignLanguageVersion.link }}
+          </a>
         </div>
       </PreviewContent>
     </PreviewRow>

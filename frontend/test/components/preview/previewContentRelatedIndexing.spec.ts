@@ -6,6 +6,7 @@ import ActiveCitation from "@/domain/activeCitation"
 import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { Decision } from "@/domain/decision"
 import Definition from "@/domain/definition"
+import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 
@@ -78,6 +79,16 @@ describe("preview content related indexing", () => {
       dismissalTypes: ["Einführung neuer Technologien"],
       collectiveAgreements: ["Normalvertrag Chor", "Stehende Bühnen"],
       hasLegislativeMandate: true,
+      foreignLanguageVersions: [
+        new ForeignLanguageVersion({
+          languageCode: { id: "1", label: "Englisch" },
+          link: "https://link-to-tranlsation.en",
+        }),
+        new ForeignLanguageVersion({
+          languageCode: { id: "2", label: "Französisch" },
+          link: "https://link-to-tranlsation.fr",
+        }),
+      ],
       evsf: "X 00 00-0-0",
       definitions: [
         new Definition({ definedTerm: "Finanzkraft" }),
@@ -97,6 +108,9 @@ describe("preview content related indexing", () => {
     expect(await screen.findByText("Berufsbild")).toBeInTheDocument()
     expect(await screen.findByText("Gesetzgebungsauftrag")).toBeInTheDocument()
     expect(await screen.findByText("Tarifvertrag")).toBeInTheDocument()
+    expect(
+      await screen.findByText("Fremdsprachige Fassung"),
+    ).toBeInTheDocument()
     expect(await screen.findByText("E-VSF")).toBeInTheDocument()
     expect(await screen.findByText("Definition")).toBeInTheDocument()
   })
@@ -126,6 +140,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
@@ -171,6 +186,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
@@ -228,6 +244,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
@@ -307,6 +324,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
@@ -336,6 +354,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
@@ -364,6 +383,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
@@ -394,6 +414,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 
   test("renders dismissal inputs and nothing else", async () => {
@@ -419,6 +440,38 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(await screen.findByText("Kündigungsgründe")).toBeInTheDocument()
     expect(await screen.findByText("Kündigungsarten")).toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
+  })
+
+  test("renders foreign language versions and nothing else", async () => {
+    renderComponent({
+      keywords: [],
+      norms: [],
+      activeCitations: [],
+      fieldsOfLaw: [],
+      jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
+      collectiveAgreements: [],
+      hasLegislativeMandate: false,
+      foreignLanguageVersions: [
+        new ForeignLanguageVersion({
+          languageCode: { id: "1", label: "Englisch" },
+          link: "https://link-to-tranlsation.en",
+        }),
+      ],
+    })
+
+    expect(screen.getByText("Fremdsprachige Fassung")).toBeInTheDocument()
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
+    expect(screen.queryByText("Normen")).not.toBeInTheDocument()
+    expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
@@ -510,6 +563,7 @@ describe("preview content related indexing", () => {
       dismissalTypes: [],
       collectiveAgreements: [],
       hasLegislativeMandate: undefined,
+      foreignLanguageVersions: [],
       evsf: "",
       definitions: [],
     })
@@ -522,6 +576,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
   })
@@ -537,6 +592,7 @@ describe("preview content related indexing", () => {
       dismissalGrounds: undefined,
       dismissalTypes: undefined,
       collectiveAgreements: undefined,
+      foreignLanguageVersions: undefined,
       evsf: undefined,
       definitions: undefined,
     })
@@ -551,5 +607,6 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("E-VSF")).not.toBeInTheDocument()
     expect(screen.queryByText("Definition")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fremdsprachige Fassung")).not.toBeInTheDocument()
   })
 })

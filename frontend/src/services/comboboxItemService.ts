@@ -9,6 +9,7 @@ import DocumentationOffice from "@/domain/documentationOffice"
 import { DocumentType } from "@/domain/documentType"
 import { DocumentTypeCategory } from "@/domain/documentTypeCategory"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
+import { LanguageCode } from "@/domain/foreignLanguageVersion"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -26,6 +27,7 @@ enum Endpoint {
   legalForceTypes = `legalforcetype`,
   legalPeriodicals = `legalperiodicals`,
   documentationOffices = `documentationoffices`,
+  languageCodes = `languagecodes`,
   usersForDocOffice = "users",
 }
 
@@ -102,6 +104,12 @@ function formatDropdownItems(
     case Endpoint.documentationOffices: {
       return (responseData as DocumentationOffice[]).map((item) => ({
         label: item.abbreviation,
+        value: item,
+      }))
+    }
+    case Endpoint.languageCodes: {
+      return (responseData as LanguageCode[]).map((item) => ({
+        label: item.label,
         value: item,
       }))
     }
@@ -204,6 +212,8 @@ const service: ComboboxItemService = {
     fetchFromEndpoint(Endpoint.legalPeriodicals, filter),
   getDocumentationOffices: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.documentationOffices, filter),
+  getLanguageCodes: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.languageCodes, filter),
   getUsersForDocOffice: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.usersForDocOffice, filter),
 }

@@ -8,6 +8,8 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
+import de.bund.digitalservice.ris.caselaw.domain.LanguageCode;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
@@ -124,7 +126,7 @@ class DecisionReducedLdmlTransformerTest {
                                <akn:FRBRuri value="YYTestDoc0013/dokument"/>
                                <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
                                <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
-                               <akn:FRBRlanguage language="deu"/>
+                               <akn:FRBRlanguage language="de"/>
                             </akn:FRBRExpression>
                             <akn:FRBRManifestation>
                                <akn:FRBRthis value="YYTestDoc0013/dokument.xml"/>
@@ -169,6 +171,17 @@ class DecisionReducedLdmlTransformerTest {
                                   <ris:legalForce>legalForce test</ris:legalForce>
                                </ris:legalForces>
                                <ris:judicialBody>appraisalBody test</ris:judicialBody>
+                               <ris:foreignLanguageVersions>
+                                  <ris:foreignLanguageVersion>
+                                     <akn:FRBRlanguage language="en"/>
+                                     <akn:documentRef href="https://ihre-url-zur-englischen-übersetzung" showAs="Englisch"/>
+                                  </ris:foreignLanguageVersion>
+                                  <ris:foreignLanguageVersion>
+                                     <akn:FRBRlanguage language="fr"/>
+                                     <akn:documentRef href="https://ihre-url-zur-französischen-übersetzung"
+                                                      showAs="Französisch"/>
+                                  </ris:foreignLanguageVersion>
+                               </ris:foreignLanguageVersions>
                             </ris:meta>
                          </akn:proprietary>
                       </akn:meta>
@@ -374,6 +387,28 @@ class DecisionReducedLdmlTransformerTest {
                     .dismissalTypes(List.of("dismissalType test"))
                     .collectiveAgreements(List.of("collectiveAgreement test"))
                     .hasLegislativeMandate(true)
+                    .foreignLanguageVersions(
+                        List.of(
+                            ForeignLanguageVersion.builder()
+                                .id(UUID.randomUUID())
+                                .languageCode(
+                                    LanguageCode.builder()
+                                        .id(UUID.randomUUID())
+                                        .label("Englisch")
+                                        .isoCode("en")
+                                        .build())
+                                .link("https://ihre-url-zur-englischen-übersetzung")
+                                .build(),
+                            ForeignLanguageVersion.builder()
+                                .id(UUID.randomUUID())
+                                .languageCode(
+                                    LanguageCode.builder()
+                                        .id(UUID.randomUUID())
+                                        .label("Französisch")
+                                        .isoCode("fr")
+                                        .build())
+                                .link("https://ihre-url-zur-französischen-übersetzung")
+                                .build()))
                     .evsf("evsf test")
                     .build())
             .previousDecisions(List.of(previousDecision1, previousDecision2))

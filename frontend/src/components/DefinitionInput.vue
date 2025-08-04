@@ -96,7 +96,7 @@ onMounted(() => {
           class="flex-1"
           data-testid="definition-defined-term-input"
           :invalid="slotProps.hasError"
-          placeholder="Beispielbegriff"
+          placeholder="Begriff"
           @blur="validate"
           @focus="validationStore.remove('definedTerm')"
         ></InputText>

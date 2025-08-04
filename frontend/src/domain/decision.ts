@@ -7,6 +7,7 @@ import { CoreData } from "@/domain/coreData"
 import Definition from "@/domain/definition"
 import { Kind } from "@/domain/documentationUnitKind"
 import EnsuingDecision from "@/domain/ensuingDecision"
+import ForeignLanguageVersion from "@/domain/foreignLanguageVersion"
 import LegalForce from "@/domain/legalForce"
 import { ManagementData } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
@@ -73,6 +74,7 @@ export const contentRelatedIndexingLabels: {
   evsf: "E-VSF",
   definitions: "Definition",
   hasLegislativeMandate: "Gesetzgebungsauftrag",
+  foreignLanguageVersions: "Fremdsprachige Fassung",
 }
 export const allLabels = {
   caselawReferences: "Rechtsprechungsfundstellen",
@@ -207,6 +209,11 @@ export class Decision {
       data.literatureReferences = data.literatureReferences.map(
         (literatureReference) => new Reference({ ...literatureReference }),
       )
+    if (data.contentRelatedIndexing?.foreignLanguageVersions)
+      data.contentRelatedIndexing.foreignLanguageVersions =
+          data.contentRelatedIndexing.foreignLanguageVersions.map(
+              (foreignVersion) => new ForeignLanguageVersion({ ...foreignVersion }),
+          )
 
     Object.assign(this, data)
   }

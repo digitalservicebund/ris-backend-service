@@ -18,5 +18,6 @@ public record ContentRelatedIndexing(
     List<String> dismissalTypes,
     List<String> collectiveAgreements,
     List<Definition> definitions,
+    List<ForeignLanguageVersion> foreignLanguageVersions,
     boolean hasLegislativeMandate,
     String evsf) {}

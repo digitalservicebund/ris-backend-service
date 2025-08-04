@@ -23,10 +23,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVersionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LanguageCodeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
@@ -46,6 +47,8 @@ import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
+import de.bund.digitalservice.ris.caselaw.domain.LanguageCode;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
@@ -70,6 +73,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -1657,10 +1661,10 @@ class DecisionTransformerTest {
                     .build())
             .build();
 
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO decisionDTO =
         DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
 
-    assertThat(documentationUnitDTO.getDeviatingDocumentNumbers())
+    assertThat(decisionDTO.getDeviatingDocumentNumbers())
         .extracting("value")
         .containsExactly("XXRE123456789", "XXRE234567890");
   }
@@ -1672,10 +1676,118 @@ class DecisionTransformerTest {
             .coreData(generateSimpleCoreDataBuilder().build())
             .build();
 
-    DocumentationUnitDTO documentationUnitDTO =
+    DecisionDTO decisionDTO =
         DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
 
-    assertThat(documentationUnitDTO.getDeviatingDocumentNumbers()).isEmpty();
+    assertThat(decisionDTO.getDeviatingDocumentNumbers()).isEmpty();
+  }
+
+  @Nested
+  class ForeignLanguageVersions {
+    @Test
+    void testTransformToDomain_withForeignLanguageVersions_shouldAddData() {
+      // Arrange
+      var englisch =
+          ForeignLanguageVersionDTO.builder()
+              .url("https://link-to-tranlsation.en")
+              .languageCode(LanguageCodeDTO.builder().isoCode("en").value("Englisch").build())
+              .rank(1L)
+              .build();
+      var french =
+          ForeignLanguageVersionDTO.builder()
+              .url("https://link-to-tranlsation.fr")
+              .languageCode(LanguageCodeDTO.builder().isoCode("fr").value("Französisch").build())
+              .rank(2L)
+              .build();
+      DecisionDTO decisionDTO =
+          generateSimpleDTOBuilder().foreignLanguageVersions(List.of(englisch, french)).build();
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      assertThat(decision.contentRelatedIndexing().foreignLanguageVersions()).hasSize(2);
+      assertThat(decision.contentRelatedIndexing().foreignLanguageVersions().get(0))
+          .isEqualTo(
+              ForeignLanguageVersion.builder()
+                  .link("https://link-to-tranlsation.en")
+                  .languageCode(LanguageCode.builder().isoCode("en").label("Englisch").build())
+                  .build());
+      assertThat(decision.contentRelatedIndexing().foreignLanguageVersions().get(1))
+          .isEqualTo(
+              ForeignLanguageVersion.builder()
+                  .link("https://link-to-tranlsation.fr")
+                  .languageCode(LanguageCode.builder().isoCode("fr").label("Französisch").build())
+                  .build());
+    }
+
+    @Test
+    void testTransformToDomain_withoutForeignLanguageVersions_shouldNotAddData() {
+      // Arrange
+      DecisionDTO decisionDTO = generateSimpleDTOBuilder().build();
+
+      // Act
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
+
+      // Assert
+      assertThat(decision.contentRelatedIndexing().foreignLanguageVersions()).isEmpty();
+    }
+
+    @Test
+    void testTransformToDTO_withForeignLanguageVersions_shouldAddData() {
+      // Arrange
+      var englisch =
+          ForeignLanguageVersion.builder()
+              .link("https://link-to-tranlsation.en")
+              .languageCode(LanguageCode.builder().isoCode("en").label("Englisch").build())
+              .build();
+      var french =
+          ForeignLanguageVersion.builder()
+              .link("https://link-to-tranlsation.fr")
+              .languageCode(LanguageCode.builder().isoCode("fr").label("Französisch").build())
+              .build();
+      Decision decision =
+          Decision.builder()
+              .contentRelatedIndexing(
+                  ContentRelatedIndexing.builder()
+                      .foreignLanguageVersions(List.of(englisch, french))
+                      .build())
+              .build();
+
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+      assertThat(decisionDTO.getForeignLanguageVersions()).hasSize(2);
+      assertThat(decisionDTO.getForeignLanguageVersions().get(0).getUrl())
+          .isEqualTo("https://link-to-tranlsation.en");
+      assertThat(decisionDTO.getForeignLanguageVersions().get(0).getRank()).isEqualTo(1L);
+      assertThat(decisionDTO.getForeignLanguageVersions().get(0).getLanguageCode().getValue())
+          .isEqualTo("Englisch");
+      assertThat(decisionDTO.getForeignLanguageVersions().get(0).getLanguageCode().getIsoCode())
+          .isEqualTo("en");
+      assertThat(decisionDTO.getForeignLanguageVersions().get(1).getUrl())
+          .isEqualTo("https://link-to-tranlsation.fr");
+      assertThat(decisionDTO.getForeignLanguageVersions().get(1).getRank()).isEqualTo(2L);
+      assertThat(decisionDTO.getForeignLanguageVersions().get(1).getLanguageCode().getValue())
+          .isEqualTo("Französisch");
+      assertThat(decisionDTO.getForeignLanguageVersions().get(1).getLanguageCode().getIsoCode())
+          .isEqualTo("fr");
+    }
+
+    @Test
+    void testTransformToDTO_withoutForeignLanguageVersions_shouldNotAddData() {
+      // Arrange
+      Decision decision = generateSimpleDocumentationUnitBuilder().build();
+
+      // Act
+      DecisionDTO decisionDTO =
+          DecisionTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+
+      // Assert
+      assertThat(decisionDTO.getForeignLanguageVersions()).isEmpty();
+    }
   }
 
   @Test
@@ -1744,6 +1856,7 @@ class DecisionTransformerTest {
                 .definitions(Collections.emptyList())
                 .hasLegislativeMandate(false)
                 .evsf(null)
+                .foreignLanguageVersions(Collections.emptyList())
                 .build())
         .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList())

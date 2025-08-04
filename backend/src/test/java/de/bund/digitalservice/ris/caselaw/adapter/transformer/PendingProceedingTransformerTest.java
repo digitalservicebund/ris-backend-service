@@ -176,7 +176,6 @@ class PendingProceedingTransformerTest {
 
     LocalDate decisionDate = LocalDate.of(2024, 5, 10);
     LocalDate deviatingDecisionDate = LocalDate.of(2024, 5, 10);
-    String celexNumber = "CELEX-XYZ";
     String judicialBody = "Bundesverfassungsgericht";
     String fileNumber = "AZ-456";
     String deviatingFileNumber = "1B23/24";

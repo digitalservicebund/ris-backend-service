@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentalistDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ForeignLanguageVersionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
@@ -24,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
@@ -132,6 +134,7 @@ public class DecisionTransformer extends DocumentableTransformer {
       addCollectiveAgreements(builder, contentRelatedIndexing);
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
       builder.evsf(contentRelatedIndexing.evsf());
+      addForeignLanguageVersions(currentDto, builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.longTexts() != null) {
@@ -493,6 +496,33 @@ public class DecisionTransformer extends DocumentableTransformer {
     builder.inputTypes(inputTypeDTOs);
   }
 
+  private static void addForeignLanguageVersions(
+      DecisionDTO currentDto,
+      DecisionDTOBuilder<?, ?> builder,
+      ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.foreignLanguageVersions() == null) {
+      return;
+    }
+
+    List<ForeignLanguageVersionDTO> foreignLanguageVersionDTOs = new ArrayList<>();
+    List<ForeignLanguageVersion> foreignLanguageVersions =
+        contentRelatedIndexing.foreignLanguageVersions();
+
+    for (int i = 0; i < foreignLanguageVersions.size(); i++) {
+      foreignLanguageVersionDTOs.add(
+          ForeignLanguageVersionDTO.builder()
+              .documentationUnit(currentDto)
+              .url(foreignLanguageVersions.get(i).link())
+              .languageCode(
+                  LanguageCodeTransformer.transformToDTO(
+                      foreignLanguageVersions.get(i).languageCode()))
+              .rank(i + 1L)
+              .build());
+    }
+
+    builder.foreignLanguageVersions(foreignLanguageVersionDTOs);
+  }
+
   public static Decision transformToDomain(DecisionDTO decisionDTO) {
     return transformToDomain(decisionDTO, null);
   }
@@ -666,6 +696,14 @@ public class DecisionTransformer extends DocumentableTransformer {
 
     contentRelatedIndexingBuilder.hasLegislativeMandate(decisionDTO.isHasLegislativeMandate());
     contentRelatedIndexingBuilder.evsf(decisionDTO.getEvsf());
+
+    if (decisionDTO.getForeignLanguageVersions() != null) {
+      List<ForeignLanguageVersion> foreignLanguageVersions =
+          decisionDTO.getForeignLanguageVersions().stream()
+              .map(ForeignLanguageTransformer::transformToDomain)
+              .toList();
+      contentRelatedIndexingBuilder.foreignLanguageVersions(foreignLanguageVersions);
+    }
 
     return contentRelatedIndexingBuilder.build();
   }
