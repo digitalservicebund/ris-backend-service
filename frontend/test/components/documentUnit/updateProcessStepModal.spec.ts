@@ -11,7 +11,6 @@ import routes from "~/test-helper/routes"
 
 const currentProcessStep: DocumentationUnitProcessStep = {
   id: "c-id",
-  userId: "user2-id",
   createdAt: new Date(),
   processStep: { uuid: "fertig-id", name: "Fertig", abbreviation: "F" },
 }
@@ -20,7 +19,6 @@ const docUnitProcessSteps: DocumentationUnitProcessStep[] = [
   currentProcessStep,
   {
     id: "b-id",
-    userId: "user1-id",
     createdAt: new Date(),
     processStep: {
       uuid: "blockiert-id",
@@ -30,7 +28,6 @@ const docUnitProcessSteps: DocumentationUnitProcessStep[] = [
   },
   {
     id: "a-id",
-    userId: "user1-id",
     createdAt: new Date(),
     processStep: { uuid: "neu-id", name: "Neu", abbreviation: "N" },
   },
