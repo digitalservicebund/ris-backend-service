@@ -93,7 +93,7 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
             PROCESS_STEP_ENDPOINT
                 + "documentationUnits/"
                 + testDocumentationUnitBGH.getId()
-                + "/processteps/next")
+                + "/processsteps/next")
         .exchange()
         .expectStatus()
         .isOk()
@@ -126,7 +126,7 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
             PROCESS_STEP_ENDPOINT
                 + "documentationUnits/"
                 + testDocumentationUnitBGH.getId()
-                + "/processteps/next")
+                + "/processsteps/next")
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -144,7 +144,7 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
             PROCESS_STEP_ENDPOINT
                 + "documentationUnits/"
                 + testDocumentationUnitBGH.getId()
-                + "/processteps/next")
+                + "/processsteps/next")
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -171,7 +171,7 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withLogin("/BGH")
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + "processteps")
+        .uri(PROCESS_STEP_ENDPOINT + "processsteps")
         .exchange()
         .expectStatus()
         .isOk()
@@ -200,7 +200,7 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withLogin("/BZSt")
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + "processteps")
+        .uri(PROCESS_STEP_ENDPOINT + "processsteps")
         .exchange()
         .expectStatus()
         .isOk()
@@ -218,7 +218,7 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withLogin("/random")
         .get()
-        .uri(PROCESS_STEP_ENDPOINT + "processteps")
+        .uri(PROCESS_STEP_ENDPOINT + "processsteps")
         .exchange()
         .expectStatus()
         .isNotFound();

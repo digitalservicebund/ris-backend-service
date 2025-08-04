@@ -35,14 +35,14 @@ public class ProcessStepController {
   /**
    * Retrieves the next logical process step for a given documentation unit, based on its current
    * step and the defined process flow for its office. GET
-   * /api/v1/caselaw/documentationUnits/{documentationUnitId}/processteps/next
+   * /api/v1/caselaw/documentationUnits/{documentationUnitId}/processsteps/next
    *
    * @param documentationUnitId The ID of the documentation unit.
    * @return ResponseEntity with ProcessStep if a next step is defined (200 OK), or 204 No Content
    *     if no next step is defined for the current state. Returns 404 Not Found if the
    *     documentation unit does not exist.
    */
-  @GetMapping("/documentationUnits/{documentationUnitId}/processteps/next")
+  @GetMapping("/documentationUnits/{documentationUnitId}/processsteps/next")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<ProcessStep> getNextProcessStepForDocOffice(
       @PathVariable UUID documentationUnitId) {
@@ -59,7 +59,7 @@ public class ProcessStepController {
 
   /**
    * Retrieves a list of all possible process steps for the user's documentation office, ordered by
-   * their defined rank. GET /api/v1/caselaw/processteps
+   * their defined rank. GET /api/v1/caselaw/processsteps
    *
    * @param oidcUser the logged-in user, to retrieve the docoffice from
    * @return ResponseEntity with a list of ProcessStep objects (200 OK), potentially an empty list
@@ -67,7 +67,7 @@ public class ProcessStepController {
    *     documentation office is not found, or if an associated process step is not found (data
    *     inconsistency).
    */
-  @GetMapping("/processteps")
+  @GetMapping("/processsteps")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<List<ProcessStep>> getAllPossibleProcessStepsForDocOffice(
       @AuthenticationPrincipal OidcUser oidcUser) {

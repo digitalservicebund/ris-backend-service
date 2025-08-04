@@ -3,15 +3,30 @@ import ProcessStep from "@/domain/processStep"
 import errorMessages from "@/i18n/errors.json"
 
 interface ProcessStepService {
+  getProcessSteps(): Promise<ServiceResponse<ProcessStep[]>>
+
   getNextProcessStep(
     documentUnitId: string,
   ): Promise<ServiceResponse<ProcessStep>>
 }
 
 const service: ProcessStepService = {
+  async getProcessSteps() {
+    const response = await httpClient.get<ProcessStep[]>("caselaw/processsteps")
+    if (response.status >= 300 || response.error) {
+      response.data = undefined
+      response.error = {
+        title:
+          errorMessages.DOCUMENTATION_UNIT_PROCESS_STEP_COULD_NOT_BE_LOADED
+            .title,
+      }
+    }
+    return response
+  },
+
   async getNextProcessStep(docUnitId: string) {
     const response = await httpClient.get<ProcessStep>(
-      `caselaw/documentationUnits/${docUnitId}/processteps/next`,
+      `caselaw/documentationUnits/${docUnitId}/processsteps/next`,
     )
     if (response.status >= 300 || response.error) {
       response.data = undefined

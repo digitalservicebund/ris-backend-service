@@ -2,89 +2,113 @@
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import Dialog from "primevue/dialog"
-import { onMounted, Ref, ref } from "vue"
-import IconBadge from "@/components/IconBadge.vue"
-import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
+import Select from "primevue/select"
+import { Ref, ref, watch } from "vue"
+import ComboboxInput from "@/components/ComboboxInput.vue"
+import InputField from "@/components/input/InputField.vue"
+import { ComboboxItem } from "@/components/input/types"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import ProcessStep from "@/domain/processStep"
+import ComboboxItemService from "@/services/comboboxItemService"
 import processStepService from "@/services/processStepService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import IconApprovalDelegation from "~icons/material-symbols/approval-delegation-outline"
+
+const props = defineProps<{
+  showDialog: boolean
+}>()
+
+const emit = defineEmits<{
+  onProcessStepUpdated: []
+  onCancelled: []
+}>()
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
-  documentUnit: Ref<DocumentationUnit | undefined>
+  documentUnit: Ref<DocumentationUnit>
 }
-const showDialog = ref(false)
-
-let nextProcessStep: ProcessStep | undefined
-
-async function triggerUpdateProcessStep(): Promise<void> {
-  if (documentUnit.value?.uuid)
-    nextProcessStep = (
-      await processStepService.getNextProcessStep(documentUnit.value?.uuid)
-    ).data
-  showDialog.value = true
-}
+const selectedUser = ref<ComboboxItem>()
+const processSteps = ref<ProcessStep[]>()
+const nextProcessStep = ref<ProcessStep>()
 
 async function updateProcessStep(): Promise<void> {
-  if (nextProcessStep)
-    documentUnit.value!.currentProcessStep = { processStep: nextProcessStep }
+  if (nextProcessStep.value)
+    documentUnit.value!.currentProcessStep = {
+      processStep: nextProcessStep.value,
+    }
   await store.updateDocumentUnit()
-  showDialog.value = false
+  emit("onProcessStepUpdated")
 }
 
-onMounted(async () => {
-  await store.loadDocumentUnit
-})
+// The logic you want to run every time the dialog is shown
+const fetchData = async () => {
+  processSteps.value = (await processStepService.getProcessSteps()).data
+  nextProcessStep.value = (
+    await processStepService.getNextProcessStep(documentUnit.value.uuid)
+  ).data
+}
+
+watch(
+  () => props.showDialog,
+  async (newValue) => {
+    if (newValue) {
+      await fetchData()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
-  <Button
-    v-tooltip.bottom="'Dokumentationseinheit weitergeben'"
-    aria-label="Dokumentationseinheit weitergeben"
-    severity="secondary"
-    size="small"
-    @click="triggerUpdateProcessStep"
-  >
-    <template #icon>
-      <IconApprovalDelegation />
-    </template>
-  </Button>
-
   <Dialog
     class="max-h-[768px] max-w-[1024px]"
     :closable="false"
     header="Dokumentationseinheit weitergeben"
     modal
-    :visible="showDialog"
+    :visible="props.showDialog"
   >
-    <div v-if="nextProcessStep" class="mb-12 flex items-center">
-      Nächster Schritt:
-      <IconBadge
-        :background-color="
-          useProcessStepBadge(nextProcessStep).value.backgroundColor
-        "
-        :border-color="useProcessStepBadge(nextProcessStep).value.borderColor"
-        :label="nextProcessStep.name"
-      />
-    </div>
+    <div class="flex w-full flex-col pt-32">
+      <div class="flex gap-32">
+        <div class="flex-1">
+          <InputField id="nextProcessStep" label="Neuer Schritt">
+            <Select
+              v-model="nextProcessStep"
+              aria-label="Neuer Schritt"
+              class="w-full"
+              option-label="name"
+              :options="processSteps"
+            ></Select>
+          </InputField>
+        </div>
+        <div class="flex-1">
+          <InputField id="processStepPerson" label="Neue Person">
+            <ComboboxInput
+              id="processStepPerson"
+              v-model="selectedUser"
+              aria-label="Neue Person"
+              :item-service="ComboboxItemService.getUsersForDocOffice"
+            ></ComboboxInput>
+          </InputField>
+        </div>
+      </div>
 
-    <div class="modal-buttons-container flex w-full flex-row gap-[1rem]">
-      <Button
-        aria-label="Weitergeben"
-        label="Weitergeben"
-        severity="primary"
-        size="small"
-        @click="updateProcessStep"
-      ></Button>
-      <Button
-        aria-label="Abbrechen"
-        label="Abbrechen"
-        severity="secondary"
-        size="small"
-        @click="showDialog = false"
-      ></Button>
+      <div
+        class="modal-buttons-container flex w-full flex-row gap-[1rem] pt-32"
+      >
+        <Button
+          aria-label="Weitergeben"
+          label="Weitergeben"
+          severity="primary"
+          size="small"
+          @click="updateProcessStep"
+        ></Button>
+        <Button
+          aria-label="Abbrechen"
+          label="Abbrechen"
+          severity="secondary"
+          size="small"
+          @click="$emit('onCancelled')"
+        ></Button>
+      </div>
     </div>
   </Dialog>
 </template>

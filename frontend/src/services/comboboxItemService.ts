@@ -28,6 +28,7 @@ enum Endpoint {
   legalPeriodicals = `legalperiodicals`,
   documentationOffices = `documentationoffices`,
   languageCodes = `languagecodes`,
+  usersForDocOffice = "users",
 }
 
 function formatDropdownItems(
@@ -111,6 +112,9 @@ function formatDropdownItems(
         label: item.label,
         value: item,
       }))
+    }
+    case Endpoint.usersForDocOffice: {
+      return []
     }
   }
 }
@@ -210,6 +214,8 @@ const service: ComboboxItemService = {
     fetchFromEndpoint(Endpoint.documentationOffices, filter),
   getLanguageCodes: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.languageCodes, filter),
+  getUsersForDocOffice: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.usersForDocOffice, filter),
 }
 
 export default service

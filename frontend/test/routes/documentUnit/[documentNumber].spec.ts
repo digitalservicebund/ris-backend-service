@@ -16,6 +16,10 @@ function renderComponent() {
   const user = userEvent.setup()
   const head = createHead()
 
+  vi.mock("primevue/usetoast", () => ({
+    useToast: () => ({ add: vi.fn() }),
+  }))
+
   const router = createRouter({
     history: createWebHistory(),
     routes: [

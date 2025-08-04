@@ -51,6 +51,7 @@ function renderComponent() {
   return {
     user,
     ...render(UpdateProcessStepDialog, {
+      props: { showDialog: true },
       global: {
         directives: { tooltip: Tooltip },
         plugins: [
@@ -69,52 +70,42 @@ function renderComponent() {
 }
 
 describe("update process step modal", () => {
-  it("renders proccess steps modal", async () => {
-    vi.spyOn(processStepService, "getNextProcessStep").mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: {
-          uuid: "qs-formal-id",
-          name: "QS formal",
-          abbreviation: "QS",
-        },
-      }),
-    )
+  vi.spyOn(processStepService, "getNextProcessStep").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: {
+        uuid: "qs-formal-id",
+        name: "QS formal",
+        abbreviation: "QS",
+      },
+    }),
+  )
+  vi.spyOn(processStepService, "getProcessSteps").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: [
+        { uuid: "neu-id", name: "Neu", abbreviation: "N" },
+        { uuid: "blockiert-id", name: "Blockiert", abbreviation: "B" },
+        { uuid: "qs-formal-id", name: "QS formal", abbreviation: "QS" },
+      ],
+    }),
+  )
 
-    const { user } = renderComponent()
-    expect(
-      await screen.findByLabelText("Dokumentationseinheit weitergeben"),
-    ).toBeInTheDocument()
-
-    // Open move proccess step dialog
-    await user.click(
-      await screen.findByLabelText("Dokumentationseinheit weitergeben"),
-    )
+  test("shows next step and closes after updating process step", async () => {
+    const { user, emitted } = renderComponent()
 
     expect(await screen.findByText("Weitergeben")).toBeInTheDocument()
     expect(await screen.findByText("Abbrechen")).toBeInTheDocument()
     expect(await screen.findByText("QS formal")).toBeInTheDocument()
 
-    // Move process
     await user.click(await screen.findByLabelText("Weitergeben"))
-    expect(
-      screen.queryByText("Dokumentationseinheit weitergeben"),
-    ).not.toBeInTheDocument()
-    // TODO new process step is not updated immediately
-    // expect(screen.queryByText("Fertig")).not.toBeInTheDocument()
-    // expect(await screen.findByText("F")).toBeInTheDocument()
-    // expect(await screen.findByText("QS formal")).toBeInTheDocument()
+    expect(emitted().onProcessStepUpdated).toBeTruthy()
+  })
 
-    // Cancel
-    await user.click(
-      await screen.findByLabelText("Dokumentationseinheit weitergeben"),
-    )
-    expect(
-      await screen.findByText("Dokumentationseinheit weitergeben"),
-    ).toBeInTheDocument()
+  test("closes after cancel", async () => {
+    const { user, emitted } = renderComponent()
+
     await user.click(await screen.findByLabelText("Abbrechen"))
-    expect(
-      screen.queryByText("Dokumentationseinheit weitergeben"),
-    ).not.toBeInTheDocument()
+    expect(emitted().onCancelled).toBeTruthy()
   })
 })
