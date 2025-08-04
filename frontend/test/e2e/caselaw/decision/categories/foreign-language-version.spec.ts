@@ -67,7 +67,16 @@ test.describe(
         const actualTexts = await Promise.all(
           dropdownOptions.map((opt) => opt.textContent()),
         )
-        expect(actualTexts).toEqual(languages)
+
+        // Locally, our db collation is different -> different sorting
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (process.env.E2E_BASE_URL) {
+          // eslint-disable-next-line playwright/no-conditional-expect
+          expect(actualTexts).toEqual(languages)
+        } else {
+          // eslint-disable-next-line playwright/no-conditional-expect
+          expect(actualTexts.slice().sort()).toEqual(languages.slice().sort())
+        }
       })
 
       await test.step("'Sprache' zeigt bei Suche zwei gefilterte ISO-639-Sprachcodes", async () => {
