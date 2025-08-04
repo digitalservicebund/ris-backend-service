@@ -10,4 +10,5 @@ import org.springframework.context.annotation.Configuration;
 public class LanguageToolConfig {
   private String url;
   private String language;
+  private boolean enabled;
 }

@@ -65,7 +65,8 @@ public interface DocumentationUnitRepository {
       Status status,
       Reference createdFromReference,
       String fileNumber,
-      User user);
+      User user,
+      DocumentationUnitProcessStep initialProcessStep);
 
   /**
    * Save a documentation unit
@@ -163,4 +164,6 @@ public interface DocumentationUnitRepository {
   List<Decision> getScheduledDocumentationUnitsDueNow();
 
   List<String> findAllDocumentNumbersByMatchingPublishCriteria();
+
+  void saveProcessSteps(DocumentationUnit documentationUnit);
 }

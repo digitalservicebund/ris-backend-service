@@ -46,25 +46,25 @@ function handleClick() {
       <IconBadge
         v-if="!hasContent"
         background-color="bg-blue-300"
-        color="text-blue-900"
         :data-testid="label + '-empty'"
         :icon="IconInfo"
+        icon-color="text-blue-900"
         label="Quellrubrik leer"
       />
       <IconBadge
         v-if="importSuccess"
         background-color="bg-green-300"
-        color="text-green-800"
         :data-testid="label + '-success'"
         :icon="IconCheck"
+        icon-color="text-green-800"
         label="Übernommen"
       />
       <IconBadge
         v-else-if="!importable"
         background-color="bg-blue-300"
-        color="text-blue-900"
         :data-testid="label + '-empty'"
         :icon="IconInfo"
+        icon-color="text-blue-900"
         label="Zielrubrik ausgefüllt"
       />
     </div>

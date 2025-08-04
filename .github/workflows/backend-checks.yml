@@ -25,7 +25,8 @@ jobs:
 
   backend-unit-tests:
     needs: scan-backend-changes
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main'  }}
+    # Disabled as tests run in sonar job
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && false  }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,12 +35,12 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@ae2b61dbc685e60e4427b2e8ed4f0135c6ea8597
+        uses: actions/setup-java@e9343db97e09d87a3c50e544105d99fe912c204b
         with:
           java-version: "21.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@b7d91bc60ec15329f5761d9de99f657dbdf59b54
+        uses: gradle/actions/setup-gradle@b65944464e3d6ea5b462dd9ca3e388e7f377b284
         with:
           gradle-version: ${{ env.GRADLE_VERSION}}
       - name: Run backend tests
@@ -58,7 +59,8 @@ jobs:
 
   backend-integration-tests:
     needs: scan-backend-changes
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main'  }}
+    # Disabled as tests run in sonar job
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref != 'refs/heads/main' && false  }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -67,12 +69,12 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@ae2b61dbc685e60e4427b2e8ed4f0135c6ea8597
+        uses: actions/setup-java@e9343db97e09d87a3c50e544105d99fe912c204b
         with:
           java-version: "21.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@b7d91bc60ec15329f5761d9de99f657dbdf59b54
+        uses: gradle/actions/setup-gradle@b65944464e3d6ea5b462dd9ca3e388e7f377b284
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run backend tests
@@ -92,14 +94,14 @@ jobs:
 
   backend-tests-and-code-quality:
     needs: scan-backend-changes
-    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' &&  github.ref == 'refs/heads/main'  }}
+    if: ${{ needs.scan-backend-changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK
-        uses: actions/setup-java@ae2b61dbc685e60e4427b2e8ed4f0135c6ea8597
+        uses: actions/setup-java@e9343db97e09d87a3c50e544105d99fe912c204b
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -109,7 +111,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@b7d91bc60ec15329f5761d9de99f657dbdf59b54
+        uses: gradle/actions/setup-gradle@b65944464e3d6ea5b462dd9ca3e388e7f377b284
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run tests and scan with SonarQube
@@ -133,6 +135,6 @@ jobs:
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
-        if: ${{ failure() }}
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -95,4 +95,8 @@ public class RisMeta {
   @XmlElementWrapper(name = "foreignLanguageVersions", namespace = CaseLawLdml.RIS_NS)
   @XmlElement(name = "foreignLanguageVersion", namespace = CaseLawLdml.RIS_NS)
   private List<ForeignLanguageVersion> foreignLanguageVersions;
+
+  /** Elektronische Vorschriftensammlung Bundesfinanzverwaltung */
+  @XmlElement(name = "evfs", namespace = CaseLawLdml.RIS_NS)
+  private String evfs;
 }

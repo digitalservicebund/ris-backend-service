@@ -2,15 +2,20 @@
 import dayjs from "dayjs"
 import { computed, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
+import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
+import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import { isDecision } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
 
-const props = defineProps<{ documentUnit: DocumentationUnit }>()
+const props = defineProps<{
+  documentUnit: DocumentationUnit
+}>()
 
 const route = useRoute()
 
@@ -64,6 +69,8 @@ const managementDataRoute = computed(() => ({
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
 
+const processStepsEnabled = useFeatureToggle("neuris.process-steps")
+
 watchEffect(() => {
   statusBadge.value = useStatusBadge(props.documentUnit.status).value
 })
@@ -86,7 +93,6 @@ watchEffect(() => {
       v-if="statusBadge"
       :background-color="statusBadge.backgroundColor"
       class="ml-12"
-      :color="statusBadge.color"
       :icon="toRaw(statusBadge.icon)"
       :label="statusBadge.label"
     />
@@ -94,9 +100,13 @@ watchEffect(() => {
       v-if="hasErrorStatus"
       background-color="bg-red-300"
       class="ml-12"
-      color="text-red-900"
       :icon="IconError"
+      icon-color="text-red-900"
       label="Fehler"
+    />
+    <CurrentAndLastProcessStepBadge
+      v-if="processStepsEnabled"
+      :process-steps="props.documentUnit.processSteps"
     />
 
     <span class="flex-grow"></span>
@@ -107,9 +117,9 @@ watchEffect(() => {
       <IconBadge
         background-color="bg-red-300"
         class="ml-12"
-        color="text-red-900"
         data-testid="duplicate-icon"
         :icon="IconError"
+        icon-color="text-red-900"
         label="Dublettenverdacht"
       />
       <RouterLink
@@ -121,10 +131,13 @@ watchEffect(() => {
       >
       <span v-if="isRouteWithSaveButton && isInternalUser">|</span>
     </div>
+
     <SaveButton
       v-if="isRouteWithSaveButton"
       aria-label="Speichern Button"
       data-testid="document-unit-save-button"
-    />
+    >
+      <UpdateProcessStepDialog v-if="processStepsEnabled" />
+    </SaveButton>
   </div>
 </template>

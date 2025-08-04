@@ -10,11 +10,13 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExce
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImageNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +54,7 @@ public class DocumentationUnitService {
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
   private final DocumentationOfficeService documentationOfficeService;
+  private final ProcessStepService processStepService;
   private static final List<String> pathsForDuplicateCheck =
       List.of(
           "/coreData/ecli",
@@ -81,7 +84,8 @@ public class DocumentationUnitService {
       DuplicateCheckService duplicateCheckService,
       DocumentationOfficeService documentationOfficeService,
       DocumentationUnitHistoryLogService historyLogService,
-      DocumentationUnitSearchRepository docUnitSearchRepository) {
+      DocumentationUnitSearchRepository docUnitSearchRepository,
+      ProcessStepService processStepService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -98,6 +102,7 @@ public class DocumentationUnitService {
     this.documentationOfficeService = documentationOfficeService;
     this.historyLogService = historyLogService;
     this.docUnitSearchRepository = docUnitSearchRepository;
+    this.processStepService = processStepService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -157,9 +162,23 @@ public class DocumentationUnitService {
     Status status =
         Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build();
 
+    ProcessStep initialProcessStep = getInitialProcessStep(null, false);
+    // create new DocumentationUnitProcessStep with first process step for dooffice
+    var initialDocUnitProcessStep =
+        DocumentationUnitProcessStep.builder()
+            .createdAt(LocalDateTime.now())
+            .processStep(initialProcessStep)
+            .user(user)
+            .build();
+
     return (PendingProceeding)
         repository.createNewDocumentationUnit(
-            docUnit, status, params.reference(), params.fileNumber(), user);
+            docUnit,
+            status,
+            params.reference(),
+            params.fileNumber(),
+            user,
+            initialDocUnitProcessStep);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -237,9 +256,23 @@ public class DocumentationUnitService {
             .withError(false)
             .build();
 
+    ProcessStep initialProcessStep = getInitialProcessStep(celexNumber, isExternalHandover);
+    // create new DocumentationUnitProcessStep with first process step for dooffice
+    var initialDocUnitProcessStep =
+        DocumentationUnitProcessStep.builder()
+            .createdAt(LocalDateTime.now())
+            .processStep(initialProcessStep)
+            .user(user)
+            .build();
+
     var newDocumentationUnit =
         repository.createNewDocumentationUnit(
-            docUnit, status, params.reference(), params.fileNumber(), user);
+            docUnit,
+            status,
+            params.reference(),
+            params.fileNumber(),
+            user,
+            initialDocUnitProcessStep);
 
     if (isExternalHandover) {
       String description =
@@ -254,6 +287,24 @@ public class DocumentationUnitService {
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
 
     return (Decision) newDocumentationUnit;
+  }
+
+  private ProcessStep getInitialProcessStep(String celexNumber, boolean isExternalHandover) {
+    // if decision origin is Eurlex or external handover, the initial status is 'Neu'
+    if (celexNumber != null || isExternalHandover) {
+      return processStepService
+          .getProcessStepForName("Neu")
+          .orElseThrow(
+              () ->
+                  new ProcessStepNotFoundException("Could not find Process Step with name 'Neu'"));
+    }
+    // otherwise the initial status is 'Ersterfassung'
+    return processStepService
+        .getProcessStepForName("Ersterfassung")
+        .orElseThrow(
+            () ->
+                new ProcessStepNotFoundException(
+                    "Could not find Process Step with name 'Ersterfassung'"));
   }
 
   private String generateDocumentNumber(String documentationOfficeAbbreviation) {
@@ -633,6 +684,7 @@ public class DocumentationUnitService {
     repository.saveKeywords(decision);
     repository.saveFieldsOfLaw(decision);
     repository.saveProcedures(decision, user);
+    repository.saveProcessSteps(decision);
 
     repository.save(decision, user);
 
@@ -651,6 +703,7 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException {
     repository.saveKeywords(pendingProceeding);
     repository.saveFieldsOfLaw(pendingProceeding);
+    repository.saveProcessSteps(pendingProceeding);
 
     repository.save(pendingProceeding, user);
 

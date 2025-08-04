@@ -2,12 +2,15 @@
 import { computed } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
+import DefinitionList from "@/components/DefinitionList.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
 import ForeignLanguageVersions from "@/components/ForeignLanguageVersions.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
+import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import laborCourtTypes from "@/data/laborCourtTypes.json"
+import { contentRelatedIndexingLabels } from "@/domain/decision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
@@ -39,6 +42,10 @@ const hasJobProfiles = computed<boolean>(() =>
 const hasLegislativeMandate = computed(() => {
   return contentRelatedIndexing.value.hasLegislativeMandate
 })
+const evsf = computed({
+  get: () => contentRelatedIndexing.value.evsf,
+  set: (value) => (store.documentUnit!.contentRelatedIndexing.evsf = value),
+})
 
 const hasForeignLanguageVersion = computed(() => {
   return contentRelatedIndexing.value.foreignLanguageVersions
@@ -60,6 +67,12 @@ const isLaborCourt = computed(() =>
   ),
 )
 
+const isFinanceCourt = computed(() =>
+  ["BFH", "FG", "OFH", "RFH"].includes(
+    store.documentUnit?.coreData.court?.type ?? "",
+  ),
+)
+
 const shouldDisplayDismissalAttributes = computed(
   () => isLaborCourt.value || hasDismissalInput.value,
 )
@@ -67,12 +80,20 @@ const shouldDisplayDismissalAttributes = computed(
 const shouldDisplayCollectiveAgreements = computed(
   () => isLaborCourt.value || hasCollectiveAgreement.value,
 )
+
+const shouldDisplayEvsf = computed(() => isFinanceCourt.value || evsf.value)
 </script>
 
 <template>
   <div aria-label="Weitere Rubriken">
     <h2 class="ris-label1-bold mb-16">Weitere Rubriken</h2>
     <div class="flex flex-col gap-24">
+      <CategoryWrapper
+        label="Definition"
+        :should-show-button="!contentRelatedIndexing.definitions?.length"
+      >
+        <DefinitionList label="Definition" />
+      </CategoryWrapper>
       <CategoryWrapper
         v-if="shouldDisplayCollectiveAgreements"
         v-slot="slotProps"
@@ -107,6 +128,15 @@ const shouldDisplayCollectiveAgreements = computed(
       >
         <ForeignLanguageVersions label="Fremdsprachige Fassung" />
       </CategoryWrapper>
+      <TextInputCategory
+        v-if="shouldDisplayEvsf"
+        id="evsf"
+        v-model="evsf"
+        :data-testid="contentRelatedIndexingLabels.evsf"
+        editable
+        :label="contentRelatedIndexingLabels.evsf"
+        :should-show-button="!evsf"
+      />
     </div>
   </div>
 </template>

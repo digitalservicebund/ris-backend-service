@@ -288,7 +288,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
         await test.step("test opening and closing panel with keyboard", async () => {
           await page.getByTestId("Rubriken").click()
           await expect(
-            page.getByRole("heading", { name: "Stammdaten" }),
+            page.getByRole("heading", { name: "Formaldaten" }),
           ).toBeVisible()
           await page
             .getByRole("button", { name: "Seitenpanel schließen" })

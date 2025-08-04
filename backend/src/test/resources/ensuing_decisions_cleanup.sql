@@ -12,6 +12,3 @@ delete from
 
 delete from
   incremental_migration.court;
-
-delete from
-  incremental_migration.document_category;

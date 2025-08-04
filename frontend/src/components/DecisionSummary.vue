@@ -45,7 +45,6 @@ const divider = computed(() => (props.documentNumber ? ` | ` : undefined))
             v-if="status"
             :background-color="statusBadge.backgroundColor"
             class="ml-4 inline-block"
-            :color="statusBadge.color"
             :icon="toRaw(statusBadge.icon)"
             :label="statusBadge.label"
           />

@@ -4,6 +4,9 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.util.List;
 import lombok.Builder;
 
+/**
+ * @param evsf Elektronische Vorschriftensammlung Bundesfinanzverwaltung
+ */
 @Builder(toBuilder = true)
 public record ContentRelatedIndexing(
     List<String> keywords,
@@ -14,5 +17,7 @@ public record ContentRelatedIndexing(
     List<String> dismissalGrounds,
     List<String> dismissalTypes,
     List<String> collectiveAgreements,
+    List<Definition> definitions,
+    List<ForeignLanguageVersion> foreignLanguageVersions,
     boolean hasLegislativeMandate,
-    List<ForeignLanguageVersion> foreignLanguageVersions) {}
+    String evsf) {}

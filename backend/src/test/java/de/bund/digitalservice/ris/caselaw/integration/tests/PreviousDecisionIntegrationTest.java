@@ -68,9 +68,7 @@ class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
     documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
-    category =
-        databaseDocumentCategoryRepository.saveAndFlush(
-            DocumentCategoryDTO.builder().label("R").build());
+    category = databaseDocumentCategoryRepository.findFirstByLabel("R");
 
     testCourt =
         databaseCourtRepository.save(
@@ -90,7 +88,6 @@ class PreviousDecisionIntegrationTest extends BaseIntegrationTest {
     databaseDocumentTypeRepository.deleteAll();
     databaseHandoverReportRepository.deleteAll();
     databaseCourtRepository.deleteAll();
-    databaseDocumentCategoryRepository.delete(category);
     databaseFileNumberRepository.deleteAll();
   }
 

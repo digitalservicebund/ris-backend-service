@@ -534,6 +534,7 @@ class DecisionFullLdmlTransformerTest {
                                       showAs="Französisch"/>
                   </ris:foreignLanguageVersion>
                </ris:foreignLanguageVersions>
+               <ris:evfs>evsf test</ris:evfs>
             </ris:meta>
          </akn:proprietary>
       </akn:meta>
@@ -605,8 +606,7 @@ class DecisionFullLdmlTransformerTest {
     // Assert
     Assertions.assertNotNull(ldml);
     Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-    Assertions.assertTrue(fileContent.isPresent());
-    Assertions.assertEquals(expected, fileContent.get());
+    assertThat(fileContent).isPresent().get().isEqualTo(expected);
   }
 
   Decision getEntireDocumentationUnit() {
@@ -761,6 +761,7 @@ class DecisionFullLdmlTransformerTest {
                                     .build())
                             .link("https://ihre-url-zur-französischen-übersetzung")
                             .build()))
+                .evsf("evsf test")
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))
         .ensuingDecisions(List.of(ensuingDecision1, ensuingDecision2))

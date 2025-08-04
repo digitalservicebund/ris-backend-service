@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreeme
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO.DecisionDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DefinitionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO;
@@ -22,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
@@ -126,10 +128,12 @@ public class DecisionTransformer extends DocumentableTransformer {
 
       addActiveCitations(builder, contentRelatedIndexing);
       addJobProfiles(builder, contentRelatedIndexing);
+      addDefinitions(builder, contentRelatedIndexing);
       addDismissalGrounds(builder, contentRelatedIndexing);
       addDismissalTypes(builder, contentRelatedIndexing);
       addCollectiveAgreements(builder, contentRelatedIndexing);
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
+      builder.evsf(contentRelatedIndexing.evsf());
       addForeignLanguageVersions(currentDto, builder, contentRelatedIndexing);
     }
 
@@ -287,6 +291,29 @@ public class DecisionTransformer extends DocumentableTransformer {
     }
 
     builder.jobProfiles(jobProfileDTOs);
+  }
+
+  private static void addDefinitions(
+      DecisionDTOBuilder<?, ?> builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.definitions() == null) {
+      return;
+    }
+
+    List<Definition> definitions = contentRelatedIndexing.definitions();
+
+    List<DefinitionDTO> definitionDTOs =
+        definitions.stream()
+            .map(
+                def ->
+                    DefinitionDTO.builder()
+                        .id(def.newEntry() ? null : def.id())
+                        .value(def.definedTerm())
+                        .borderNumber(def.definingBorderNumber())
+                        .rank(definitions.indexOf(def) + 1L)
+                        .build())
+            .toList();
+
+    builder.definitions(definitionDTOs);
   }
 
   private static void addDismissalGrounds(
@@ -546,6 +573,12 @@ public class DecisionTransformer extends DocumentableTransformer {
         .ensuingDecisions(buildEnsuingDecisions(decisionDTO))
         .status(getStatus(decisionDTO))
         .inboxStatus(decisionDTO.getInboxStatus())
+        .currentProcessStep(
+            DocumentationUnitProcessStepTransformer.toDomain(decisionDTO.getCurrentProcessStep()))
+        .processSteps(
+            decisionDTO.getProcessSteps().stream()
+                .map(DocumentationUnitProcessStepTransformer::toDomain)
+                .toList())
         .build();
   }
 
@@ -645,7 +678,24 @@ public class DecisionTransformer extends DocumentableTransformer {
       contentRelatedIndexingBuilder.collectiveAgreements(collectiveAgreements);
     }
 
+    if (decisionDTO.getDefinitions() != null) {
+      List<Definition> definitions =
+          decisionDTO.getDefinitions().stream()
+              .map(
+                  def ->
+                      Definition.builder()
+                          .id(def.getId())
+                          .definedTerm(def.getValue())
+                          .definingBorderNumber(def.getBorderNumber())
+                          .build())
+              .toList();
+      contentRelatedIndexingBuilder.definitions(definitions);
+    } else {
+      contentRelatedIndexingBuilder.definitions(List.of());
+    }
+
     contentRelatedIndexingBuilder.hasLegislativeMandate(decisionDTO.isHasLegislativeMandate());
+    contentRelatedIndexingBuilder.evsf(decisionDTO.getEvsf());
 
     if (decisionDTO.getForeignLanguageVersions() != null) {
       List<ForeignLanguageVersion> foreignLanguageVersions =

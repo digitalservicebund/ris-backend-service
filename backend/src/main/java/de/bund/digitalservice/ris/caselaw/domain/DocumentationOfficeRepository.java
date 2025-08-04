@@ -10,4 +10,7 @@ public interface DocumentationOfficeRepository {
   List<DocumentationOffice> findBySearchStr(String searchStr);
 
   List<DocumentationOffice> findAllOrderByAbbreviationAsc();
+
+  List<ProcessStep> findAllProcessStepsForDocOffice(UUID uuid)
+      throws DocumentationOfficeNotExistsException;
 }

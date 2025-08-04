@@ -1,15 +1,8 @@
-import {
-  APIRequestContext,
-  Cookie,
-  Locator,
-  Page,
-  test,
-} from "@playwright/test"
+import { APIRequestContext, Cookie, Page, test } from "@playwright/test"
 import { mergeDeep } from "@tiptap/vue-3"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import jsonPatch from "fast-json-patch"
-import { navigateToCategories } from "./utils/e2e-utils"
 import { Page as Pagination } from "@/components/Pagination.vue"
 import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
@@ -28,7 +21,6 @@ type MyFixtures = {
   prefilledDocumentUnit: Decision
   secondPrefilledDocumentUnit: Decision
   linkedDocumentNumber: string
-  editorField: Locator
   pageWithBghUser: Page
   pageWithBfhUser: Page
   pageWithExternalUser: Page
@@ -600,6 +592,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             appraisalBody: "1. Senat, 2. Kammer",
           },
           shortTexts: {
+            decisionName: "Test Entscheidungsname",
             headnote: "Test Orientierungssatz",
             guidingPrinciple: "Test Leitsatz",
             headline: "Test Titelzeile",
@@ -614,6 +607,21 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
             participatingJudges: [{ name: "Test Richter" }],
             otherLongText: "Test Sonstiger Langtext",
             outline: "Test Gliederung",
+          },
+          contentRelatedIndexing: {
+            evsf: "Test E-VSF",
+            definitions: [
+              {
+                definedTerm: "Test Definition",
+                definingBorderNumber: 2,
+                newEntry: true,
+              },
+              { definedTerm: "Test Definition2", newEntry: true },
+            ],
+            dismissalTypes: ["Test Kündigungsarten"],
+            dismissalGrounds: ["Test Kündigungsgründe"],
+            jobProfiles: ["Test Berufsbild"],
+            hasLegislativeMandate: true,
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
@@ -702,15 +710,6 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
         `DocumentUnit with number ${documentNumber}, linked to ${prefilledDocumentUnit} couldn't be deleted: ${error}`,
       )
     }
-  },
-
-  editorField: async ({ page, documentNumber }, use) => {
-    await navigateToCategories(page, documentNumber)
-    const editorField = page.locator("[data-testid='Entscheidungsname'] >> div")
-    await editorField.click()
-    await editorField.type("this is text")
-
-    await use(editorField)
   },
 
   pageWithBghUser: async ({ browser }, use) => {
