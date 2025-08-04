@@ -618,6 +618,26 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
               },
               { definedTerm: "Test Definition2", newEntry: true },
             ],
+            foreignLanguageVersions: [
+              {
+                link: "Test Fremdsprachige Fassung",
+                languageCode: {
+                  id: "fdbccbc3-0860-5c49-914a-759c31e68c85",
+                  label: "Akan",
+                  isoCode: "ak",
+                },
+                newEntry: true,
+              },
+              {
+                link: "Test Fremdsprachige Fassung2",
+                languageCode: {
+                  id: "0d430058-b2a5-540b-aa2d-e3627cdc1d8b",
+                  label: "Afar",
+                  isoCode: "aa",
+                },
+                newEntry: true,
+              },
+            ],
             dismissalTypes: ["Test Kündigungsarten"],
             dismissalGrounds: ["Test Kündigungsgründe"],
             jobProfiles: ["Test Berufsbild"],

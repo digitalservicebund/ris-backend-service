@@ -96,7 +96,7 @@ test.describe("category import", () => {
       await test.step("disable import for empty source categories", async () => {
         await navigateToCategoryImport(page, documentNumber)
         await searchForDocumentUnitToImport(page, documentNumber)
-        await expect(page.getByText("Quellrubrik leer")).toHaveCount(26) // total number of importable categories
+        await expect(page.getByText("Quellrubrik leer")).toHaveCount(27) // total number of importable categories
       })
     },
   )
@@ -117,7 +117,7 @@ test.describe("category import", () => {
           prefilledDocumentUnitWithTexts.documentNumber,
         )
 
-        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(19) // number of non-importable categories, if target category already filled
+        await expect(page.getByText("Zielrubrik ausgefüllt")).toHaveCount(20) // number of non-importable categories, if target category already filled
       })
     },
   )
@@ -704,71 +704,108 @@ test.describe("category import", () => {
   })
 
   // Definition
-  test("import definition", async ({
-    page,
-    linkedDocumentNumber,
-    prefilledDocumentUnitWithTexts,
-  }) => {
-    await navigateToCategoryImport(page, linkedDocumentNumber)
+  test(
+    "import definition",
+    { tag: ["@RISDEV-6688"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
 
-    await test.step("import into empty category", async () => {
-      await searchForDocumentUnitToImport(
-        page,
-        prefilledDocumentUnitWithTexts.documentNumber,
-      )
-      await expect(page.getByLabel("Definition übernehmen")).toBeVisible()
-      await page.getByLabel("Definition übernehmen").click()
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("Definition übernehmen")).toBeVisible()
+        await page.getByLabel("Definition übernehmen").click()
 
-      await expect(
-        page.getByText("Test Definition", { exact: true }),
-      ).toBeVisible()
-      await expect(
-        page.getByText("Test Definition2", { exact: true }),
-      ).toBeVisible()
-    })
+        await expect(
+          page.getByText("Test Definition", { exact: true }),
+        ).toBeVisible()
+        await expect(
+          page.getByText("Test Definition2", { exact: true }),
+        ).toBeVisible()
+      })
 
-    await test.step("show success badge", async () => {
-      await expect(page.getByText("Übernommen")).toBeVisible()
-    })
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
 
-    await test.step("scroll to category", async () => {
-      await expect(
-        page.getByText("Test Definition2", { exact: true }),
-      ).toBeInViewport()
-    })
-  })
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("Test Definition2", { exact: true }),
+        ).toBeInViewport()
+      })
+    },
+  )
+
+  // Fremdsprachige Fassung
+  test(
+    "import foreignLanguageVersions",
+    { tag: ["@RISDEV-8469"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Fremdsprachige Fassung übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Fremdsprachige Fassung übernehmen").click()
+
+        await expect(
+          page.getByText("Akan: Test Fremdsprachige Fassung", { exact: true }),
+        ).toBeVisible()
+        await expect(
+          page.getByText("Afar: Test Fremdsprachige Fassung2", { exact: true }),
+        ).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByText("Afar: Test Fremdsprachige Fassung2", { exact: true }),
+        ).toBeInViewport()
+      })
+    },
+  )
 
   // E-VSF
-  test("import evsf", async ({
-    page,
-    linkedDocumentNumber,
-    prefilledDocumentUnitWithTexts,
-  }) => {
-    await navigateToCategoryImport(page, linkedDocumentNumber)
+  test(
+    "import evsf",
+    { tag: ["@RISDEV-8501"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
 
-    await test.step("import into empty category", async () => {
-      await searchForDocumentUnitToImport(
-        page,
-        prefilledDocumentUnitWithTexts.documentNumber,
-      )
-      await expect(page.getByLabel("E-VSF übernehmen")).toBeVisible()
-      await page.getByLabel("E-VSF übernehmen").click()
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnitWithTexts.documentNumber,
+        )
+        await expect(page.getByLabel("E-VSF übernehmen")).toBeVisible()
+        await page.getByLabel("E-VSF übernehmen").click()
 
-      await expect(page.getByRole("textbox", { name: "E-VSF" })).toHaveValue(
-        "Test E-VSF",
-      )
-    })
+        await expect(page.getByRole("textbox", { name: "E-VSF" })).toHaveValue(
+          "Test E-VSF",
+        )
+      })
 
-    await test.step("show success badge", async () => {
-      await expect(page.getByText("Übernommen")).toBeVisible()
-    })
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
 
-    await test.step("scroll to category", async () => {
-      await expect(
-        page.getByRole("textbox", { name: "E-VSF" }),
-      ).toBeInViewport()
-    })
-  })
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByRole("textbox", { name: "E-VSF" }),
+        ).toBeInViewport()
+      })
+    },
+  )
 
   // Gesetzgebungsauftrag
   test("import hasLegislativeMandate", async ({
