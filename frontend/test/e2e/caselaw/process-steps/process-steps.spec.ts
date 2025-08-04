@@ -14,7 +14,7 @@ test.describe("process steps", () => {
       .click()
 
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-    await expect(infoPanel).toContainText("Neu")
+    await expect(infoPanel).toContainText("Ersterfassung")
 
     await pageWithBghUser
       .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
@@ -28,7 +28,7 @@ test.describe("process steps", () => {
     await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
     await expect(
       dialog.getByRole("combobox", { name: "Neuer Schritt" }),
-    ).toContainText("Ersterfassung")
+    ).toContainText("QS formal")
 
     const weitergebenButton = dialog.getByRole("button", {
       name: "Weitergeben",
@@ -42,8 +42,8 @@ test.describe("process steps", () => {
 
     await expect(dialog).toBeHidden()
 
-    await expect(infoPanel).toContainText("N")
-    await expect(infoPanel).toContainText("Ersterfassung")
+    await expect(infoPanel).toContainText("EE")
+    await expect(infoPanel).toContainText("QS formal")
   })
 
   test("rendering initial state, click on 'Abbrechen'", async ({
@@ -57,7 +57,7 @@ test.describe("process steps", () => {
       .click()
 
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-    await expect(infoPanel).toContainText("Neu")
+    await expect(infoPanel).toContainText("Ersterfassung")
 
     await pageWithBghUser
       .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
@@ -71,7 +71,7 @@ test.describe("process steps", () => {
     await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
     await expect(
       dialog.getByRole("combobox", { name: "Neuer Schritt" }),
-    ).toContainText("Ersterfassung")
+    ).toContainText("QS formal")
     await expect(
       dialog.getByRole("button", { name: "Weitergeben" }),
     ).toBeVisible()
@@ -83,10 +83,10 @@ test.describe("process steps", () => {
 
     await expect(dialog).toBeHidden()
 
-    await expect(infoPanel).toContainText("Neu")
+    await expect(infoPanel).toContainText("Ersterfassung")
   })
 
-  test("rendering initial state, select 'QS formal', click on 'Weitergeben'", async ({
+  test("rendering initial state, select 'Fachdokumentation', click on 'Weitergeben'", async ({
     pageWithBghUser,
   }) => {
     await navigateToSearch(pageWithBghUser)
@@ -97,7 +97,7 @@ test.describe("process steps", () => {
       .click()
 
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-    await expect(infoPanel).toContainText("Neu")
+    await expect(infoPanel).toContainText("Ersterfassung")
 
     await pageWithBghUser
       .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
@@ -112,13 +112,13 @@ test.describe("process steps", () => {
     const processStepDropBox = dialog.getByRole("combobox", {
       name: "Neuer Schritt",
     })
-    await expect(processStepDropBox).toContainText("Ersterfassung")
-
-    await processStepDropBox.click()
-    await pageWithBghUser.getByText("QS formal").click()
-
     await expect(processStepDropBox).toContainText("QS formal")
 
+    await processStepDropBox.click()
+    await pageWithBghUser.getByText("Fachdokumentation").click()
+
+    await expect(processStepDropBox).toContainText("Fachdokumentation")
+
     const weitergebenButton = dialog.getByRole("button", {
       name: "Weitergeben",
     })
@@ -131,11 +131,11 @@ test.describe("process steps", () => {
 
     await expect(dialog).toBeHidden()
 
-    await expect(infoPanel).toContainText("N")
-    await expect(infoPanel).toContainText("QS formal")
+    await expect(infoPanel).toContainText("EE")
+    await expect(infoPanel).toContainText("Fachdokumentation")
   })
 
-  test("rendering initial state, select 'Neu', click on 'Weitergeben'", async ({
+  test("rendering initial state, select 'Ersterfassung', click on 'Weitergeben'", async ({
     pageWithBghUser,
   }) => {
     await navigateToSearch(pageWithBghUser)
@@ -146,7 +146,7 @@ test.describe("process steps", () => {
       .click()
 
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-    await expect(infoPanel).toContainText("Neu")
+    await expect(infoPanel).toContainText("Ersterfassung")
 
     await pageWithBghUser
       .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
@@ -161,12 +161,12 @@ test.describe("process steps", () => {
     const processStepDropBox = dialog.getByRole("combobox", {
       name: "Neuer Schritt",
     })
-    await expect(processStepDropBox).toContainText("Ersterfassung")
+    await expect(processStepDropBox).toContainText("QS formal")
 
     await processStepDropBox.click()
-    await pageWithBghUser.getByLabel("Neu", { exact: true }).click()
+    await pageWithBghUser.getByLabel("Ersterfassung", { exact: true }).click()
 
-    await expect(processStepDropBox).toContainText("Neu")
+    await expect(processStepDropBox).toContainText("Ersterfassung")
 
     const weitergebenButton = dialog.getByRole("button", {
       name: "Weitergeben",
@@ -180,6 +180,6 @@ test.describe("process steps", () => {
 
     await expect(dialog).toBeHidden()
 
-    await expect(infoPanel).toContainText("Neu")
+    await expect(infoPanel).toContainText("Ersterfassung")
   })
 })
