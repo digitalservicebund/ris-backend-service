@@ -96,6 +96,10 @@ const sourceValue = computed(() =>
         {{ coreData.deviatingDocumentNumbers.join(", ") }}
       </PreviewContent>
     </PreviewRow>
+    <PreviewRow v-if="coreData.celexNumber">
+      <PreviewCategory>CELEX-Nummer</PreviewCategory>
+      <PreviewContent>{{ coreData.celexNumber }}</PreviewContent>
+    </PreviewRow>
     <PreviewRow v-if="coreData.ecli">
       <PreviewCategory>ECLI</PreviewCategory>
       <PreviewContent>{{ coreData.ecli }}</PreviewContent>

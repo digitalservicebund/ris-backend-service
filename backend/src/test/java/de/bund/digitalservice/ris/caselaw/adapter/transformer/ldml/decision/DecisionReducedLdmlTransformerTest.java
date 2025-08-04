@@ -116,6 +116,7 @@ class DecisionReducedLdmlTransformerTest {
                                <akn:FRBRuri value="YYTestDoc0013"/>
                                <akn:FRBRalias name="uebergreifende-id" value="%s"/>
                                <akn:FRBRalias name="ecli" value="ecli test"/>
+                               <akn:FRBRalias name="celex" value="celex test"/>
                                <akn:FRBRdate date="2020-01-01" name="entscheidungsdatum"/>
                                <akn:FRBRauthor href="attributsemantik-noch-undefiniert"/>
                                <akn:FRBRcountry value="de"/>
@@ -278,6 +279,7 @@ class DecisionReducedLdmlTransformerTest {
             .coreData(
                 CoreData.builder()
                     .ecli("ecli test")
+                    .celexNumber("celex test")
                     .documentationOffice(
                         DocumentationOffice.builder()
                             .abbreviation("documentationOffice test")

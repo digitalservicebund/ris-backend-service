@@ -56,6 +56,9 @@ public class DecisionDTO extends DocumentationUnitDTO {
   @Builder.Default
   private List<DecisionNameDTO> decisionNames = new ArrayList<>();
 
+  @Column(name = "celex")
+  private String celexNumber;
+
   @Column private String ecli;
 
   /** Gründe */

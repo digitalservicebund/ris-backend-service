@@ -15,6 +15,7 @@ test.describe("preview pending proceeding", () => {
             isResolved: true,
             decisionDate: "2025-02-24",
             resolutionDate: "2025-06-06",
+            deviatingDocumentNumbers: ["STRE123456789"],
           },
           shortTexts: {
             headline: "Anhängiges Verfahren am BFH ",
@@ -59,6 +60,11 @@ test.describe("preview pending proceeding", () => {
       ).toBeVisible()
       await expect(
         pageWithBfhUser.getByText("DokumenttypAnhängiges Verfahren", {
+          exact: true,
+        }),
+      ).toBeVisible()
+      await expect(
+        pageWithBfhUser.getByText("Abweichende DokumentnummerSTRE123456789", {
           exact: true,
         }),
       ).toBeVisible()

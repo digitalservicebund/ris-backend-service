@@ -290,6 +290,10 @@ public abstract class DecisionCommonLdmlTransformer
       aliases.add(new FrbrAlias("ecli", decision.coreData().ecli()));
     }
 
+    if (decision.coreData() != null && decision.coreData().celexNumber() != null) {
+      aliases.add(new FrbrAlias("celex", decision.coreData().celexNumber()));
+    }
+
     return aliases;
   }
 
