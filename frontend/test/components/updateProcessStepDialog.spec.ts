@@ -101,6 +101,16 @@ it("renders proccess steps modal", async () => {
       },
     }),
   )
+  vi.spyOn(processStepService, "getProcessSteps").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: [
+        { uuid: "neu-id", name: "Neu", abbreviation: "N" },
+        { uuid: "blockiert-id", name: "Blockiert", abbreviation: "B" },
+        { uuid: "qs-formal-id", name: "QS formal", abbreviation: "QS" },
+      ],
+    }),
+  )
 
   renderComponent()
   // Open update proccess step dialog

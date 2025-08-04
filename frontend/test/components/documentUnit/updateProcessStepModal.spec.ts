@@ -80,6 +80,16 @@ describe("update process step modal", () => {
         },
       }),
     )
+    vi.spyOn(processStepService, "getProcessSteps").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: [
+          { uuid: "neu-id", name: "Neu", abbreviation: "N" },
+          { uuid: "blockiert-id", name: "Blockiert", abbreviation: "B" },
+          { uuid: "qs-formal-id", name: "QS formal", abbreviation: "QS" },
+        ],
+      }),
+    )
 
     const { user } = renderComponent()
     expect(
@@ -100,10 +110,6 @@ describe("update process step modal", () => {
     expect(
       screen.queryByText("Dokumentationseinheit weitergeben"),
     ).not.toBeInTheDocument()
-    // TODO new process step is not updated immediately
-    // expect(screen.queryByText("Fertig")).not.toBeInTheDocument()
-    // expect(await screen.findByText("F")).toBeInTheDocument()
-    // expect(await screen.findByText("QS formal")).toBeInTheDocument()
 
     // Cancel
     await user.click(
