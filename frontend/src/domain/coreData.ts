@@ -15,6 +15,7 @@ export type CoreData = {
   procedure?: Procedure
   previousProcedures?: string[]
   ecli?: string
+  celexNumber?: string
   deviatingEclis?: string[]
   appraisalBody?: string
   decisionDate?: string

@@ -242,4 +242,41 @@ describe("Core Data", () => {
 
     expect(model.value.deviatingDocumentNumbers).toEqual(["XXRE123456789"])
   })
+
+  test.each(["EuG", "EuGH"] as const)(
+    "renders celex number editable with court %s",
+    async (courtLabel) => {
+      const documentUnit = new Decision("1", {
+        coreData: {
+          court: {
+            label: courtLabel,
+          },
+          celexNumber: "62023CJ0538",
+        },
+        documentNumber: "ABCD2022000001",
+      })
+
+      renderComponent({ initialModelValue: documentUnit.coreData })
+      const inputField = await screen.findByLabelText("CELEX-Nummer")
+      expect(inputField).toHaveValue("62023CJ0538")
+      expect(inputField).not.toHaveAttribute("readonly")
+    },
+  )
+
+  test("renders celex number readonly", async () => {
+    const documentUnit = new Decision("1", {
+      coreData: {
+        court: {
+          label: "AG Aachen",
+        },
+        celexNumber: "62023CJ0538",
+      },
+      documentNumber: "ABCD2022000001",
+    })
+
+    renderComponent({ initialModelValue: documentUnit.coreData })
+    const inputField = await screen.findByLabelText("CELEX-Nummer")
+    expect(inputField).toHaveValue("62023CJ0538")
+    expect(inputField).toHaveAttribute("readonly")
+  })
 })

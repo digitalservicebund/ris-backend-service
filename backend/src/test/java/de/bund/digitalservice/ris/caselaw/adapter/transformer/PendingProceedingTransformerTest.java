@@ -12,7 +12,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDocument
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
@@ -192,7 +191,6 @@ class PendingProceedingTransformerTest {
             .date(decisionDate)
             .documentType(DocumentTypeDTO.builder().id(documentTypeId).abbreviation("Urt").build())
             .court(CourtDTO.builder().id(courtId).type("BVerfG").build())
-            .celexNumber(celexNumber)
             .judicialBody(judicialBody) // Mapped to coreData.appraisalBody
             .fileNumbers(
                 List.of(
@@ -235,7 +233,6 @@ class PendingProceedingTransformerTest {
     assertThat(coreData).isNotNull();
 
     // --- Assert mutual CoreData fields that are transformed from DocumentableTransformer ---
-    assertThat(coreData.celexNumber()).isEqualTo(celexNumber);
     assertThat(coreData.appraisalBody()).isEqualTo(judicialBody);
     assertThat(coreData.decisionDate()).isEqualTo(decisionDate);
     assertThat(coreData.documentType().jurisShortcut()).isEqualTo("Urt");
@@ -395,7 +392,7 @@ class PendingProceedingTransformerTest {
 
   @Test
   void testTransformToDomain_withDeviatingDocumentNumbers_shouldAdd() {
-    PendingProceedingDTO decisionDTO =
+    PendingProceedingDTO pendingProceedingDTO =
         generateSimpleDTOBuilder()
             .deviatingDocumentNumbers(
                 List.of(
@@ -403,24 +400,26 @@ class PendingProceedingTransformerTest {
                     DeviatingDocumentNumberDTO.builder().value("XXRE234567890").rank(2L).build()))
             .build();
 
-    PendingProceeding decision = PendingProceedingTransformer.transformToDomain(decisionDTO);
+    PendingProceeding pendingProceeding =
+        PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
 
-    assertThat(decision.coreData().deviatingDocumentNumbers())
+    assertThat(pendingProceeding.coreData().deviatingDocumentNumbers())
         .containsExactly("XXRE123456789", "XXRE234567890");
   }
 
   @Test
   void testTransformToDomain_withoutDeviatingDocumentNumbers_shouldNotAdd() {
-    PendingProceedingDTO decisionDTO = generateSimpleDTOBuilder().build();
+    PendingProceedingDTO pendingProceedingDTO = generateSimpleDTOBuilder().build();
 
-    PendingProceeding decision = PendingProceedingTransformer.transformToDomain(decisionDTO);
+    PendingProceeding pendingProceeding =
+        PendingProceedingTransformer.transformToDomain(pendingProceedingDTO);
 
-    assertThat(decision.coreData().deviatingDocumentNumbers()).isEmpty();
+    assertThat(pendingProceeding.coreData().deviatingDocumentNumbers()).isEmpty();
   }
 
   @Test
   void testTransformToDTO_withDeviatingDocumentNumbers_shouldAdd() {
-    PendingProceeding decision =
+    PendingProceeding pendingProceeding =
         PendingProceeding.builder()
             .coreData(
                 CoreData.builder()
@@ -428,23 +427,25 @@ class PendingProceedingTransformerTest {
                     .build())
             .build();
 
-    DocumentationUnitDTO documentationUnitDTO =
-        PendingProceedingTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+    PendingProceedingDTO pendingProceedingDTO =
+        PendingProceedingTransformer.transformToDTO(
+            generateSimpleDTOBuilder().build(), pendingProceeding);
 
-    assertThat(documentationUnitDTO.getDeviatingDocumentNumbers())
+    assertThat(pendingProceedingDTO.getDeviatingDocumentNumbers())
         .extracting("value")
         .containsExactly("XXRE123456789", "XXRE234567890");
   }
 
   @Test
   void testTransformToDTO_withoutDeviatingDocumentNumbers_shouldNotAdd() {
-    PendingProceeding decision =
+    PendingProceeding pendingProceeding =
         PendingProceeding.builder().coreData(CoreData.builder().build()).build();
 
-    DocumentationUnitDTO documentationUnitDTO =
-        PendingProceedingTransformer.transformToDTO(generateSimpleDTOBuilder().build(), decision);
+    PendingProceedingDTO pendingProceedingDTO =
+        PendingProceedingTransformer.transformToDTO(
+            generateSimpleDTOBuilder().build(), pendingProceeding);
 
-    assertThat(documentationUnitDTO.getDeviatingDocumentNumbers()).isEmpty();
+    assertThat(pendingProceedingDTO.getDeviatingDocumentNumbers()).isEmpty();
   }
 
   private PendingProceedingDTO.PendingProceedingDTOBuilder<?, ?> generateSimpleDTOBuilder() {

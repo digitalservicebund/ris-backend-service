@@ -462,6 +462,13 @@ test.describe("core data", () => {
         await expect(deviatingDocumentNumber).toBeHidden()
       })
 
+      await test.step("Celex Nummer ist nicht sichtbar", async () => {
+        const celexNumber = pageWithExternalUser.getByLabel("CELEX-Nummer", {
+          exact: true,
+        })
+        await expect(celexNumber).toBeHidden()
+      })
+
       await test.step("ECLI und abweichender ECLI sind nicht sichtbar", async () => {
         const ecli = pageWithExternalUser.getByLabel("ECLI", { exact: true })
         const deviatingEcli = pageWithExternalUser.getByTestId(
@@ -581,6 +588,18 @@ test.describe("core data", () => {
         await expect(deviatingDocumentNumber).toBeEditable()
       })
 
+      await test.step("Celex Nummer ist bearbeitbar", async () => {
+        const court = page.getByLabel("Gericht", { exact: true })
+        await expect(court).toHaveValue("")
+        await court.fill("EuGH")
+        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+        await expect(court).toHaveValue("EuGH")
+        await page.getByText("EuGH", { exact: true }).click()
+        await expect(court).toHaveValue("EuGH")
+        const celexNumber = page.getByLabel("Celex-Nummer", { exact: true })
+        await expect(celexNumber).toBeEditable()
+      })
+
       await test.step("ECLI und abweichender ECLI sind bearbeitbar", async () => {
         const ecli = page.getByLabel("ECLI", { exact: true })
         const deviatingEcli = page.getByTestId("chips-input_deviatingEclis")
@@ -642,6 +661,66 @@ test.describe("core data", () => {
         await page.getByLabel("Gericht", { exact: true }).fill("GStA")
         await page.getByText("GStA Berlin").click()
         await expect(jurisidictionType).toHaveValue("")
+      })
+    },
+  )
+
+  test(
+    "can only edit celex number if court is eugh or eug",
+    {
+      tag: ["@RISDEV-8469"],
+    },
+    async ({ page, documentNumber }) => {
+      await test.step("Navigiere zu Rubriken als interner Nutzer", async () => {
+        await navigateToCategories(page, documentNumber)
+      })
+
+      await test.step("set court to EuGH", async () => {
+        const court = page.getByLabel("Gericht", { exact: true })
+        await expect(court).toHaveValue("")
+        await court.fill("EuGH")
+        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+        await expect(court).toHaveValue("EuGH")
+        await page.getByText("EuGH", { exact: true }).click()
+        await expect(court).toHaveValue("EuGH")
+      })
+
+      await test.step("check celex number is editable", async () => {
+        const celexNumber = page.getByLabel("Celex-Nummer", { exact: true })
+        await expect(celexNumber).toBeEditable()
+        await expect(celexNumber).not.toHaveAttribute("readonly")
+        await celexNumber.fill("abc")
+        await expect(celexNumber).toHaveValue("abc")
+      })
+
+      await test.step("set court to BGH", async () => {
+        const court = page.getByLabel("Gericht", { exact: true })
+        await court.fill("BGH")
+        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+        await expect(court).toHaveValue("BGH")
+        await page.getByText("BGH", { exact: true }).click()
+        await expect(court).toHaveValue("BGH")
+      })
+
+      await test.step("check celex number is not editable", async () => {
+        const celexNumber = page.getByLabel("Celex-Nummer", { exact: true })
+        await expect(celexNumber).not.toBeEditable()
+        await expect(celexNumber).toHaveAttribute("readonly")
+      })
+
+      await test.step("set court to EuG", async () => {
+        const court = page.getByLabel("Gericht", { exact: true })
+        await court.fill("EuG")
+        await expect(page.getByTestId("combobox-spinner")).toBeHidden()
+        await expect(court).toHaveValue("EuG")
+        await page.getByText("EuG", { exact: true }).click()
+        await expect(court).toHaveValue("EuG")
+      })
+
+      await test.step("check celex number is editable", async () => {
+        const celexNumber = page.getByLabel("Celex-Nummer", { exact: true })
+        await expect(celexNumber).toBeEditable()
+        await expect(celexNumber).not.toHaveAttribute("readonly")
       })
     },
   )
