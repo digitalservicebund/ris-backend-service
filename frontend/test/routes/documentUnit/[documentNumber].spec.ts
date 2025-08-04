@@ -10,7 +10,6 @@ import DocumentNumber from "@/routes/caselaw/documentUnit/[documentNumber].vue"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
-import processStepService from "@/services/processStepService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 function renderComponent() {
@@ -130,12 +129,6 @@ describe("Document Number Route", () => {
             documentNumber: "1234567891234",
           }),
         }),
-    )
-    vi.spyOn(processStepService, "getProcessSteps").mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: [],
-      }),
     )
     vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
       status: 200,

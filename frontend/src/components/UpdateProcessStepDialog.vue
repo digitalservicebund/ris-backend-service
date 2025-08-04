@@ -20,18 +20,17 @@ const { documentUnit } = storeToRefs(store) as {
 }
 const showDialog = ref(false)
 const selectedUser = ref<ComboboxItem>()
-const processSteps = ref<ProcessStep[]>()
+
+let processSteps: ProcessStep[] | undefined
 let nextProcessStep: ProcessStep | undefined
 
-onMounted(async () => {
-  processSteps.value = (await processStepService.getProcessSteps()).data
-})
-
 async function triggerUpdateProcessStep(): Promise<void> {
-  if (documentUnit.value?.uuid)
+  if (documentUnit.value?.uuid) {
+    processSteps = (await processStepService.getProcessSteps()).data
     nextProcessStep = (
       await processStepService.getNextProcessStep(documentUnit.value?.uuid)
     ).data
+  }
   showDialog.value = true
 }
 
