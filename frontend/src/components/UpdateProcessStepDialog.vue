@@ -1,12 +1,17 @@
 <script setup lang="ts" generic="TDocument">
+import dayjs from "dayjs"
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
+import Column from "primevue/column"
+import DataTable from "primevue/datatable"
 import Dialog from "primevue/dialog"
 import Select from "primevue/select"
 import { Ref, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import IconBadge from "@/components/IconBadge.vue"
 import InputField from "@/components/input/InputField.vue"
 import { ComboboxItem } from "@/components/input/types"
+import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import ProcessStep from "@/domain/processStep"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -109,6 +114,26 @@ watch(
           @click="$emit('onCancelled')"
         ></Button>
       </div>
+
+      <DataTable class="pt-32" :value="documentUnit.processSteps">
+        <Column field="createdAt" header="Datum">
+          <template #body="{ data: item }">
+            {{ dayjs(item.decisionDate).format("DD.MM.YYYY") }}
+          </template>
+        </Column>
+        <Column field="processStep.name" header="Schritt">
+          <template #body="{ data: item }">
+            <IconBadge
+              class="px-8"
+              v-bind="useProcessStepBadge(item.processStep).value"
+              :label="item.processStep.name"
+            />
+          </template>
+        </Column>
+
+        <Column field="user.name" header="Person" />
+        <template #empty>Keine Prozessschritte</template>
+      </DataTable>
     </div>
   </Dialog>
 </template>

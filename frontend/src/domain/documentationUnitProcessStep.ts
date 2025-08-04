@@ -1,8 +1,9 @@
 import ProcessStep from "@/domain/processStep"
+import { User } from "@/domain/user"
 
 type DocumentationUnitProcessStep = {
   id?: string
-  userId?: string
+  user?: User
   createdAt?: Date
   processStep: ProcessStep
 }
