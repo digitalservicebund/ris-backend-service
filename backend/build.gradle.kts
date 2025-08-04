@@ -168,7 +168,7 @@ dependencies {
     implementation("com.google.protobuf:protobuf-java:4.31.1")
 
     // CVE-2024-57699
-    implementation("net.minidev:json-smart:2.5.2")
+    implementation("net.minidev:json-smart:2.6.0")
 
     // CVE-2025-24970
     implementation("io.netty:netty-handler:4.2.3.Final")
@@ -252,7 +252,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.23.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.24.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
