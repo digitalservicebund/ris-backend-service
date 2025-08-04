@@ -47,6 +47,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -92,6 +93,24 @@ class DocumentationUnitServiceTest {
 
   @Nested
   class GenerateNew {
+
+    ProcessStep proccessStepNeu =
+        ProcessStep.builder().abbreviation("N").name("Neu").uuid(UUID.randomUUID()).build();
+    ProcessStep processStepErsterfassung =
+        ProcessStep.builder()
+            .abbreviation("EE")
+            .name("Ersterfassung")
+            .uuid(UUID.randomUUID())
+            .build();
+
+    @BeforeEach
+    void setup() {
+      when(processStepService.getProcessStepForName("Neu"))
+          .thenReturn(Optional.of(proccessStepNeu));
+      when(processStepService.getProcessStepForName("Ersterfassung"))
+          .thenReturn(Optional.of(processStepErsterfassung));
+    }
+
     @Test
     void testGenerateNewDecision()
         throws DocumentationUnitExistsException,
@@ -107,14 +126,6 @@ class DocumentationUnitServiceTest {
           .thenReturn(decision);
       when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
           .thenReturn("nextDocumentNumber");
-
-      ProcessStep firstProcessStep =
-          ProcessStep.builder().abbreviation("A").name("Step A").uuid(UUID.randomUUID()).build();
-
-      ProcessStep secondProcessStep =
-          ProcessStep.builder().abbreviation("B").name("Step B").uuid(UUID.randomUUID()).build();
-      when(processStepService.getAllProcessStepsForDocOffice(any()))
-          .thenReturn(List.of(firstProcessStep, secondProcessStep));
 
       LocalDateTime startTime = LocalDateTime.now();
       assertNotNull(service.generateNewDecision(user, Optional.empty()));
@@ -164,7 +175,8 @@ class DocumentationUnitServiceTest {
           "The createdAt timestamp should be within a reasonable range of the test execution time.");
 
       assertEquals(user, capturedStep.getUser());
-      assertEquals(firstProcessStep, capturedStep.getProcessStep());
+      assertEquals(
+          processStepErsterfassung, capturedStep.getProcessStep()); // 'Neu' because of Neuanlage
     }
 
     @Test
@@ -200,14 +212,6 @@ class DocumentationUnitServiceTest {
       when(documentNumberService.generateDocumentNumber(
               designatedDocumentationOffice.abbreviation()))
           .thenReturn("nextDocumentNumber");
-
-      ProcessStep firstProcessStep =
-          ProcessStep.builder().abbreviation("A").name("Step A").uuid(UUID.randomUUID()).build();
-
-      ProcessStep secondProcessStep =
-          ProcessStep.builder().abbreviation("B").name("Step B").uuid(UUID.randomUUID()).build();
-      when(processStepService.getAllProcessStepsForDocOffice(any()))
-          .thenReturn(List.of(firstProcessStep, secondProcessStep));
 
       // To check the createdAt range later
       LocalDateTime startTime = LocalDateTime.now();
@@ -261,7 +265,8 @@ class DocumentationUnitServiceTest {
           "The createdAt timestamp should be within a reasonable range of the test execution time.");
 
       assertEquals(user, capturedStep.getUser());
-      assertEquals(firstProcessStep, capturedStep.getProcessStep());
+      assertEquals(
+          proccessStepNeu, capturedStep.getProcessStep()); // 'Ersterfassung' because of Fremdanlage
     }
 
     @Test
@@ -280,14 +285,6 @@ class DocumentationUnitServiceTest {
               .label("Anhängiges Verfahren")
               .jurisShortcut("Anh")
               .build();
-
-      ProcessStep firstProcessStep =
-          ProcessStep.builder().abbreviation("A").name("Step A").uuid(UUID.randomUUID()).build();
-
-      ProcessStep secondProcessStep =
-          ProcessStep.builder().abbreviation("B").name("Step B").uuid(UUID.randomUUID()).build();
-      when(processStepService.getAllProcessStepsForDocOffice(any()))
-          .thenReturn(List.of(firstProcessStep, secondProcessStep));
 
       when(documentTypeService.getPendingProceedingType()).thenReturn(documentType);
       when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
@@ -347,7 +344,7 @@ class DocumentationUnitServiceTest {
               && capturedTime.isBefore(endTime.plusSeconds(1)),
           "The createdAt timestamp should be within a reasonable range of the test execution time.");
 
-      assertEquals(firstProcessStep, capturedStep.getProcessStep());
+      assertEquals(processStepErsterfassung, capturedStep.getProcessStep());
     }
 
     @Test
@@ -380,13 +377,6 @@ class DocumentationUnitServiceTest {
                       .legalPeriodical(LegalPeriodical.builder().abbreviation("BAG").build())
                       .build())
               .build();
-      ProcessStep firstProcessStep =
-          ProcessStep.builder().abbreviation("A").name("Step A").uuid(UUID.randomUUID()).build();
-
-      ProcessStep secondProcessStep =
-          ProcessStep.builder().abbreviation("B").name("Step B").uuid(UUID.randomUUID()).build();
-      when(processStepService.getAllProcessStepsForDocOffice(any()))
-          .thenReturn(List.of(firstProcessStep, secondProcessStep));
 
       when(documentTypeService.getPendingProceedingType()).thenReturn(documentType);
       when(repository.createNewDocumentationUnit(any(), any(), any(), any(), any(), any()))
@@ -445,7 +435,7 @@ class DocumentationUnitServiceTest {
               && capturedTime.isBefore(endTime.plusSeconds(1)),
           "The createdAt timestamp should be within a reasonable range of the test execution time.");
 
-      assertEquals(firstProcessStep, capturedStep.getProcessStep());
+      assertEquals(processStepErsterfassung, capturedStep.getProcessStep());
     }
 
     @Test

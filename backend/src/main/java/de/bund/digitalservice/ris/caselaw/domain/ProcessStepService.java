@@ -13,14 +13,17 @@ public class ProcessStepService {
 
   private final DocumentationUnitProcessStepRepository documentationUnitProcessStepRepository;
   private final DocumentationUnitRepository documentationUnitRepository;
+  private final ProcessStepRepository processStepRepository;
   private final DocumentationOfficeService documentationOfficeService;
 
   public ProcessStepService(
       DocumentationUnitProcessStepRepository documentationUnitProcessStepRepository,
       DocumentationUnitRepository documentationUnitRepository,
+      ProcessStepRepository processStepRepository,
       DocumentationOfficeService documentationOfficeService) {
     this.documentationUnitProcessStepRepository = documentationUnitProcessStepRepository;
     this.documentationUnitRepository = documentationUnitRepository;
+    this.processStepRepository = processStepRepository;
     this.documentationOfficeService = documentationOfficeService;
   }
 
@@ -72,5 +75,9 @@ public class ProcessStepService {
   public List<ProcessStep> getAllProcessStepsForDocOffice(UUID docOfficeId)
       throws DocumentationOfficeNotExistsException {
     return documentationOfficeService.getProcessStepsForDocumentationOffice(docOfficeId);
+  }
+
+  public Optional<ProcessStep> getProcessStepForName(String name) {
+    return processStepRepository.findByName(name);
   }
 }

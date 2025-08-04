@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExce
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImageNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -161,20 +162,14 @@ public class DocumentationUnitService {
     Status status =
         Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build();
 
-    // get all process steps associated with doc office
-    var docOfficeProcessSteps =
-        processStepService.getAllProcessStepsForDocOffice(
-            docUnit.coreData().documentationOffice().id());
-
-    DocumentationUnitProcessStep initialDocUnitProcessStep = null;
-    if (!docOfficeProcessSteps.isEmpty()) {
-      // create new DocumentationUnitProcessStep with first process step for docoffice
-      initialDocUnitProcessStep =
-          DocumentationUnitProcessStep.builder()
-              .createdAt(LocalDateTime.now())
-              .processStep(docOfficeProcessSteps.getFirst())
-              .build();
-    }
+    ProcessStep initialProcessStep = getInitialProcessStep(null, false);
+    // create new DocumentationUnitProcessStep with first process step for dooffice
+    var initialDocUnitProcessStep =
+        DocumentationUnitProcessStep.builder()
+            .createdAt(LocalDateTime.now())
+            .processStep(initialProcessStep)
+            .user(user)
+            .build();
 
     return (PendingProceeding)
         repository.createNewDocumentationUnit(
@@ -261,21 +256,14 @@ public class DocumentationUnitService {
             .withError(false)
             .build();
 
-    // get all process steps associated with doc office
-    var docOfficeProcessSteps =
-        processStepService.getAllProcessStepsForDocOffice(
-            docUnit.coreData().documentationOffice().id());
-
-    DocumentationUnitProcessStep initialDocUnitProcessStep = null;
-    if (!docOfficeProcessSteps.isEmpty()) {
-      // create new DocumentationUnitProcessStep with first process step for dooffice
-      initialDocUnitProcessStep =
-          DocumentationUnitProcessStep.builder()
-              .createdAt(LocalDateTime.now())
-              .processStep(docOfficeProcessSteps.getFirst())
-              .user(user)
-              .build();
-    }
+    ProcessStep initialProcessStep = getInitialProcessStep(celexNumber, isExternalHandover);
+    // create new DocumentationUnitProcessStep with first process step for dooffice
+    var initialDocUnitProcessStep =
+        DocumentationUnitProcessStep.builder()
+            .createdAt(LocalDateTime.now())
+            .processStep(initialProcessStep)
+            .user(user)
+            .build();
 
     var newDocumentationUnit =
         repository.createNewDocumentationUnit(
@@ -299,6 +287,24 @@ public class DocumentationUnitService {
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
 
     return (Decision) newDocumentationUnit;
+  }
+
+  private ProcessStep getInitialProcessStep(String celexNumber, boolean isExternalHandover) {
+    // if decision origin is Eurlex or external handover, the initial status is 'Neu'
+    if (celexNumber != null || isExternalHandover) {
+      return processStepService
+          .getProcessStepForName("Neu")
+          .orElseThrow(
+              () ->
+                  new ProcessStepNotFoundException("Could not find Process Step with name 'Neu'"));
+    }
+    // otherwise the initial status is 'Ersterfassung'
+    return processStepService
+        .getProcessStepForName("Ersterfassung")
+        .orElseThrow(
+            () ->
+                new ProcessStepNotFoundException(
+                    "Could not find Process Step with name 'Ersterfassung'"));
   }
 
   private String generateDocumentNumber(String documentationOfficeAbbreviation) {
