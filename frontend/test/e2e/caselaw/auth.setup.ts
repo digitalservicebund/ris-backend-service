@@ -1,3 +1,4 @@
+import fs from "fs"
 import { expect, test as setup } from "@playwright/test"
 
 function authenticateUser(user: {
@@ -6,20 +7,23 @@ function authenticateUser(user: {
   password: string
 }) {
   setup(`authenticate ${user.name}`, async ({ page, browser }) => {
-    const context = await browser.newContext({
-      storageState: `test/e2e/caselaw/.auth/${user.name}.json`,
-    })
+    const cookieFile = `test/e2e/caselaw/.auth/${user.name}.json`
+    if (fs.existsSync(cookieFile)) {
+      const context = await browser.newContext({
+        storageState: cookieFile,
+      })
 
-    const cookies = await context.cookies()
-    let sessionCookie = null
-    cookies.forEach((cookie) => {
-      if (cookie.name === "SESSION") {
-        sessionCookie = cookie
+      const cookies = await context.cookies()
+      let sessionCookie = null
+      cookies.forEach((cookie) => {
+        if (cookie.name === "SESSION") {
+          sessionCookie = cookie
+        }
+      })
+
+      if (sessionCookie !== null) {
+        return
       }
-    })
-
-    if (sessionCookie !== null) {
-      return
     }
 
     await page.goto("/")
