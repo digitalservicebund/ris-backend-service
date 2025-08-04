@@ -12,7 +12,7 @@ interface ProcessStepService {
 
 const service: ProcessStepService = {
   async getProcessSteps() {
-    const response = await httpClient.get<ProcessStep[]>(`caselaw/processsteps`)
+    const response = await httpClient.get<ProcessStep[]>("caselaw/processsteps")
     if (response.status >= 300 || response.error) {
       response.data = undefined
       response.error = {
