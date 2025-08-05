@@ -55,7 +55,7 @@ public class OtcObsConfig {
   }
 
   @Bean(name = "portalS3Client")
-  @Profile({"staging"})
+  @Profile({"staging", "uat"})
   public S3Client portalS3Client() throws URISyntaxException {
     return S3Client.builder()
         .credentialsProvider(
@@ -69,7 +69,7 @@ public class OtcObsConfig {
   }
 
   @Bean(name = "portalS3Client")
-  @Profile({"production", "uat"})
+  @Profile({"production"})
   public S3Client portalS3NoopClient() {
     return new S3NoOpClient();
   }

@@ -9,14 +9,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
-import de.bund.digitalservice.ris.caselaw.adapter.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationJobService;
-import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationService;
-import de.bund.digitalservice.ris.caselaw.adapter.StagingPortalPublicationService;
-import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -33,7 +27,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublication
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskType;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -69,23 +62,6 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
   @TestConfiguration
   static class PortalPublicationConfig {
-    @Bean
-    @Primary
-    public PortalPublicationService stagingPortalPublicationService(
-        DocumentationUnitRepository documentationUnitRepository,
-        AttachmentRepository attachmentRepository,
-        XmlUtilService xmlUtilService,
-        PortalBucket portalBucket,
-        ObjectMapper objectMapper,
-        de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer portalTransformer) {
-      return new StagingPortalPublicationService(
-          documentationUnitRepository,
-          attachmentRepository,
-          xmlUtilService,
-          portalBucket,
-          objectMapper,
-          portalTransformer);
-    }
 
     @Bean
     @Primary

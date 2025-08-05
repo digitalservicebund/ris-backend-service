@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.bund.digitalservice.ris.caselaw.adapter.NoOpPortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalBucket;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationService;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer;
@@ -43,7 +42,7 @@ public class PortalPublicationConfig {
   }
 
   @Bean
-  @Profile({"staging", "local"})
+  @Profile({"!production"})
   public PortalPublicationService stagingPortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
       AttachmentRepository attachmentRepository,
@@ -58,12 +57,6 @@ public class PortalPublicationConfig {
         portalBucket,
         objectMapper,
         portalTransformer);
-  }
-
-  @Bean
-  @Profile({"!production & !staging & !local"})
-  public PortalPublicationService noOpPortalPublicationService() {
-    return new NoOpPortalPublicationService();
   }
 
   @Bean
