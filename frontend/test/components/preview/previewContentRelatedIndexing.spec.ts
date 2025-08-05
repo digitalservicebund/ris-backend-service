@@ -82,11 +82,15 @@ describe("preview content related indexing", () => {
       foreignLanguageVersions: [
         new ForeignLanguageVersion({
           languageCode: { id: "1", label: "Englisch" },
-          link: "https://link-to-tranlsation.en",
+          link: "http://link-to-translation.en",
         }),
         new ForeignLanguageVersion({
           languageCode: { id: "2", label: "Französisch" },
-          link: "https://link-to-tranlsation.fr",
+          link: "https://link-to-translation.fr",
+        }),
+        new ForeignLanguageVersion({
+          languageCode: { id: "3", label: "Spanisch" },
+          link: "www.link-to-translation.es",
         }),
       ],
       evsf: "X 00 00-0-0",
@@ -457,12 +461,31 @@ describe("preview content related indexing", () => {
       foreignLanguageVersions: [
         new ForeignLanguageVersion({
           languageCode: { id: "1", label: "Englisch" },
-          link: "https://link-to-tranlsation.en",
+          link: "http://link-to-translation.en",
+        }),
+        new ForeignLanguageVersion({
+          languageCode: { id: "2", label: "Französisch" },
+          link: "https://link-to-translation.fr",
+        }),
+        new ForeignLanguageVersion({
+          languageCode: { id: "3", label: "Spanisch" },
+          link: "www.link-to-translation.es",
         }),
       ],
     })
 
     expect(screen.getByText("Fremdsprachige Fassung")).toBeInTheDocument()
+    expect(screen.getByText("Englisch:")).toBeInTheDocument()
+    expect(screen.getByText("Französisch:")).toBeInTheDocument()
+    expect(screen.getByText("Spanisch:")).toBeInTheDocument()
+    const links = screen.getAllByRole("link")
+    expect(links).toHaveLength(3)
+    expect(links[0]).toHaveAttribute("href", "http://link-to-translation.en")
+    expect(links[1]).toHaveAttribute("href", "https://link-to-translation.fr")
+    expect(links[2]).toHaveAttribute(
+      "href",
+      "https://www.link-to-translation.es",
+    )
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()

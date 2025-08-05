@@ -210,8 +210,13 @@ const hasDefinitions = computed(() => {
         >
           {{ foreignLanguageVersion.languageCode?.label }}:
           <a
+            v-if="foreignLanguageVersion.link"
             class="ris-link1-bold whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
-            :href="foreignLanguageVersion.link"
+            :href="
+              /^https?:\/\//i.test(foreignLanguageVersion.link)
+                ? foreignLanguageVersion.link
+                : `https://${foreignLanguageVersion.link}`
+            "
             rel="noopener noreferrer"
             target="_blank"
           >
