@@ -436,6 +436,9 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException {
     var documentable =
         repository.findByDocumentNumber(documentNumber, userService.getUser(oidcUser));
+
+    retrieveProcessStepsUsers(documentable);
+
     switch (documentable) {
       case Decision decision -> {
         return decision.toBuilder()
@@ -462,6 +465,19 @@ public class DocumentationUnitService {
         return documentable;
       }
     }
+  }
+
+  private void retrieveProcessStepsUsers(DocumentationUnit documentable) {
+    if (documentable.currentProcessStep() != null) {
+      documentable
+          .currentProcessStep()
+          .setUser(userService.getUser(documentable.currentProcessStep().getUser().id()));
+    }
+
+    documentable
+        .processSteps()
+        .forEach(
+            processStep -> processStep.setUser(userService.getUser(processStep.getUser().id())));
   }
 
   public DocumentationUnit getByUuid(UUID documentationUnitId)
