@@ -7,14 +7,17 @@ import DataTable from "primevue/datatable"
 import Dialog from "primevue/dialog"
 import Select from "primevue/select"
 import { Ref, ref, watch } from "vue"
+import { InfoStatus } from "./enumInfoStatus"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import IconBadge from "@/components/IconBadge.vue"
+import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import { ComboboxItem } from "@/components/input/types"
 import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import ProcessStep from "@/domain/processStep"
 import ComboboxItemService from "@/services/comboboxItemService"
+import { ResponseError } from "@/services/httpClient"
 import processStepService from "@/services/processStepService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -34,22 +37,42 @@ const { documentUnit } = storeToRefs(store) as {
 const selectedUser = ref<ComboboxItem>()
 const processSteps = ref<ProcessStep[]>()
 const nextProcessStep = ref<ProcessStep>()
+const serviceError1 = ref<ResponseError>()
+const serviceError2 = ref<ResponseError>()
 
 async function updateProcessStep(): Promise<void> {
   if (nextProcessStep.value)
     documentUnit.value!.currentProcessStep = {
       processStep: nextProcessStep.value,
     }
-  await store.updateDocumentUnit()
-  emit("onProcessStepUpdated")
+  const response = await store.updateDocumentUnit()
+  if (response.error) {
+    serviceError1.value = {
+      title: "Die Dokumentationseinheit konnte nicht weitergegeben werden.",
+      description: "Versuchen Sie es erneut.",
+    }
+  } else {
+    emit("onProcessStepUpdated")
+  }
 }
 
 // The logic you want to run every time the dialog is shown
 const fetchData = async () => {
-  processSteps.value = (await processStepService.getProcessSteps()).data
-  nextProcessStep.value = (
-    await processStepService.getNextProcessStep(documentUnit.value.uuid)
-  ).data
+  const processStepsResponse = await processStepService.getProcessSteps()
+  if (processStepsResponse.error) {
+    serviceError1.value = processStepsResponse.error
+  } else {
+    processSteps.value = processStepsResponse.data
+  }
+
+  const nextProcessStepResponse = await processStepService.getNextProcessStep(
+    documentUnit.value.uuid,
+  )
+  if (nextProcessStepResponse.error) {
+    serviceError2.value = nextProcessStepResponse.error
+  } else {
+    nextProcessStep.value = nextProcessStepResponse.data
+  }
 }
 
 watch(
@@ -72,6 +95,24 @@ watch(
     :visible="props.showDialog"
   >
     <div class="flex w-full flex-col pt-32">
+      <div v-if="serviceError1 || serviceError2" class="mb-48 flex flex-col">
+        <InfoModal
+          v-if="serviceError1"
+          data-testid="service-error"
+          :description="serviceError1.description"
+          :status="InfoStatus.ERROR"
+          :title="serviceError1.title"
+        />
+        <InfoModal
+          v-if="serviceError2"
+          :class="serviceError1 ? 'mt-16' : ''"
+          data-testid="service-error"
+          :description="serviceError2.description"
+          :status="InfoStatus.ERROR"
+          :title="serviceError2.title"
+        />
+      </div>
+
       <div class="flex gap-32">
         <div class="flex-1">
           <InputField id="nextProcessStep" label="Neuer Schritt">

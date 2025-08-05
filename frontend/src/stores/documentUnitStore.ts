@@ -167,6 +167,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
 
   return {
     documentUnit,
+    originalDocumentUnit,
     loadDocumentUnit,
     unloadDocumentUnit,
     updateDocumentUnit,

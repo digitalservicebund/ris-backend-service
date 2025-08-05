@@ -7,10 +7,10 @@ function authenticateUser(user: {
   password: string
 }) {
   setup(`authenticate ${user.name}`, async ({ page, browser }) => {
-    const cookieFile = `test/e2e/caselaw/.auth/${user.name}.json`
-    if (fs.existsSync(cookieFile)) {
+    const cookieFilePath = `test/e2e/caselaw/.auth/${user.name}.json`
+    if (fs.existsSync(cookieFilePath)) {
       const context = await browser.newContext({
-        storageState: cookieFile,
+        storageState: cookieFilePath,
       })
 
       const cookies = await context.cookies()
@@ -36,9 +36,7 @@ function authenticateUser(user: {
     // Otherwise, the location cookie might not be unset and redirect to '/' on page load
     await expect(page.getByText("Starten Sie die Suche")).toBeVisible()
 
-    await page
-      .context()
-      .storageState({ path: `test/e2e/caselaw/.auth/${user.name}.json` })
+    await page.context().storageState({ path: cookieFilePath })
   })
 }
 

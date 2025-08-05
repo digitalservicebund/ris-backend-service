@@ -51,8 +51,8 @@ describe("ProcessStepService", () => {
       const result = await service.getNextProcessStep("testDocUnitId123")
 
       expect(result.data).toBeUndefined()
-      expect(result.error?.title).toEqual(
-        errorMessages.DOCUMENTATION_UNIT_PROCESS_STEP_COULD_NOT_BE_LOADED.title,
+      expect(result.error).toEqual(
+        errorMessages.NEXT_PROCESS_STEP_FOR_DOCUMENATION_UNIT_COULD_NOT_BE_LOADED,
       )
     })
 
@@ -65,8 +65,8 @@ describe("ProcessStepService", () => {
       const result = await service.getNextProcessStep("testDocUnitId123")
 
       expect(result.data).toBeUndefined()
-      expect(result.error?.title).toEqual(
-        errorMessages.DOCUMENTATION_UNIT_PROCESS_STEP_COULD_NOT_BE_LOADED.title,
+      expect(result.error).toEqual(
+        errorMessages.NEXT_PROCESS_STEP_FOR_DOCUMENATION_UNIT_COULD_NOT_BE_LOADED,
       )
     })
   })
@@ -100,8 +100,8 @@ describe("ProcessStepService", () => {
       const result = await service.getProcessSteps()
 
       expect(result.data).toBeUndefined()
-      expect(result.error?.title).toEqual(
-        errorMessages.DOCUMENTATION_UNIT_PROCESS_STEP_COULD_NOT_BE_LOADED.title,
+      expect(result.error).toEqual(
+        errorMessages.PROCESS_STEPS_OF_DOCUMENTATION_OFFICE_COULD_NOT_BE_LOADED,
       )
     })
 
@@ -114,8 +114,8 @@ describe("ProcessStepService", () => {
       const result = await service.getProcessSteps()
 
       expect(result.data).toBeUndefined()
-      expect(result.error?.title).toEqual(
-        errorMessages.DOCUMENTATION_UNIT_PROCESS_STEP_COULD_NOT_BE_LOADED.title,
+      expect(result.error).toEqual(
+        errorMessages.PROCESS_STEPS_OF_DOCUMENTATION_OFFICE_COULD_NOT_BE_LOADED,
       )
     })
   })

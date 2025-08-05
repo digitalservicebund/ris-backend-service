@@ -15,11 +15,8 @@ const service: ProcessStepService = {
     const response = await httpClient.get<ProcessStep[]>("caselaw/processsteps")
     if (response.status >= 300 || response.error) {
       response.data = undefined
-      response.error = {
-        title:
-          errorMessages.DOCUMENTATION_UNIT_PROCESS_STEP_COULD_NOT_BE_LOADED
-            .title,
-      }
+      response.error =
+        errorMessages.PROCESS_STEPS_OF_DOCUMENTATION_OFFICE_COULD_NOT_BE_LOADED
     }
     return response
   },
@@ -30,11 +27,8 @@ const service: ProcessStepService = {
     )
     if (response.status >= 300 || response.error) {
       response.data = undefined
-      response.error = {
-        title:
-          errorMessages.DOCUMENTATION_UNIT_PROCESS_STEP_COULD_NOT_BE_LOADED
-            .title,
-      }
+      response.error =
+        errorMessages.NEXT_PROCESS_STEP_FOR_DOCUMENATION_UNIT_COULD_NOT_BE_LOADED
     }
     return response
   },
