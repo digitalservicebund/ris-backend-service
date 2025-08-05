@@ -29,7 +29,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22.18.0"
+          node-version: "22.17.1"
           # node-version-file: ./frontend/package.json
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
@@ -66,7 +66,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22.18.0"
+          node-version: "22.17.1"
           # node-version-file: ./frontend/package.json
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
@@ -104,7 +104,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22.18.0"
+          node-version: "22.17.1"
           # node-version-file: ./frontend/package.json
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
