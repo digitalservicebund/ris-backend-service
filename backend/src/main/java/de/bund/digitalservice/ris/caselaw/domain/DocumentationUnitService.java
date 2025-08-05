@@ -468,13 +468,16 @@ public class DocumentationUnitService {
   }
 
   private void retrieveProcessStepsUsers(DocumentationUnit documentable) {
+    if (documentable.currentProcessStep() != null) {
+      documentable
+          .currentProcessStep()
+          .setUser(userService.getUser(documentable.currentProcessStep().getUser().id()));
+    }
+
     documentable
         .processSteps()
         .forEach(
             processStep -> processStep.setUser(userService.getUser(processStep.getUser().id())));
-    documentable
-        .currentProcessStep()
-        .setUser(userService.getUser(documentable.currentProcessStep().getUser().id()));
   }
 
   public DocumentationUnit getByUuid(UUID documentationUnitId)
