@@ -217,6 +217,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               assertThat(response.getResponseBody().coreData().fileNumbers()).hasSize(1);
               assertThat(response.getResponseBody().coreData().fileNumbers().getFirst())
                   .isEqualTo("abc");
+              assertThat(response.getResponseBody().currentProcessStep().getProcessStep().name())
+                  .isEqualTo("Ersterfassung");
             });
 
     List<DocumentationUnitDTO> list = repository.findAll();
@@ -2145,6 +2147,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
       assertThat(decision.getCelexNumber()).isEqualTo(celexNumber + "(02)");
       assertThat(inputTypeRepository.findAll().get(0).getValue())
           .isEqualTo("EUR-LEX-Schnittstelle");
+      assertThat(decision.getCurrentProcessStep().getProcessStep().getName()).isEqualTo("Neu");
       eurLexResultRepository.deleteAllByCelexNumbers(List.of(celexNumber + "(02)"));
     }
   }

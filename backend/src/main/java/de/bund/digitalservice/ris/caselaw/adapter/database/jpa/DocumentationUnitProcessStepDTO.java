@@ -30,7 +30,7 @@ public class DocumentationUnitProcessStepDTO {
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "process_step_id", nullable = false)
   private ProcessStepDTO processStep;
 

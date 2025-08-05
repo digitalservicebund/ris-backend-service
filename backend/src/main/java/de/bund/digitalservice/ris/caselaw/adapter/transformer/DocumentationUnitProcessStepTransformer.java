@@ -34,8 +34,10 @@ public class DocumentationUnitProcessStepTransformer {
       return null;
     }
     return DocumentationUnitProcessStepDTO.builder()
-        //            .userId()
+        .userId(documentationUnitProcessStep.getUser().id())
         .processStep(ProcessStepTransformer.toDto(documentationUnitProcessStep.getProcessStep()))
+        .createdAt(documentationUnitProcessStep.getCreatedAt())
+        .id(documentationUnitProcessStep.getId())
         .build();
   }
 }

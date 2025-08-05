@@ -176,7 +176,8 @@ class DocumentationUnitServiceTest {
 
       assertEquals(user, capturedStep.getUser());
       assertEquals(
-          processStepErsterfassung, capturedStep.getProcessStep()); // 'Neu' because of Neuanlage
+          processStepErsterfassung,
+          capturedStep.getProcessStep()); // 'Ersterfassung' because of Neuanlage
     }
 
     @Test
@@ -265,8 +266,7 @@ class DocumentationUnitServiceTest {
           "The createdAt timestamp should be within a reasonable range of the test execution time.");
 
       assertEquals(user, capturedStep.getUser());
-      assertEquals(
-          proccessStepNeu, capturedStep.getProcessStep()); // 'Ersterfassung' because of Fremdanlage
+      assertEquals(proccessStepNeu, capturedStep.getProcessStep()); // 'Neu' because of Fremdanlage
     }
 
     @Test
@@ -344,7 +344,9 @@ class DocumentationUnitServiceTest {
               && capturedTime.isBefore(endTime.plusSeconds(1)),
           "The createdAt timestamp should be within a reasonable range of the test execution time.");
 
-      assertEquals(processStepErsterfassung, capturedStep.getProcessStep());
+      assertEquals(
+          processStepErsterfassung,
+          capturedStep.getProcessStep()); // 'Ersterfassung' because of Neuanalage
     }
 
     @Test
@@ -435,7 +437,9 @@ class DocumentationUnitServiceTest {
               && capturedTime.isBefore(endTime.plusSeconds(1)),
           "The createdAt timestamp should be within a reasonable range of the test execution time.");
 
-      assertEquals(processStepErsterfassung, capturedStep.getProcessStep());
+      assertEquals(
+          processStepErsterfassung,
+          capturedStep.getProcessStep()); // 'Ersterfassung' because of Neuanalage
     }
 
     @Test
