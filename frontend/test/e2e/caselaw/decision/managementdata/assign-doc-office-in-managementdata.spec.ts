@@ -85,9 +85,6 @@ test.describe(
       })
 
       await test.step("Ziel-Dokumentationsstelle auswählen und bestätigen", async () => {
-        page.on("request", (request) => {
-          console.log("[Request]", request.method(), request.url())
-        })
         const dropdown = page.getByLabel("Dokumentationsstelle auswählen")
         await dropdown.click()
         await page.getByLabel("dropdown-option").getByText("BGH").click()

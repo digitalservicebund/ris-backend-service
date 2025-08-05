@@ -473,11 +473,12 @@ public class DocumentationUnitService {
           .currentProcessStep()
           .setUser(userService.getUser(documentable.currentProcessStep().getUser().id()));
     }
-
-    documentable
-        .processSteps()
-        .forEach(
-            processStep -> processStep.setUser(userService.getUser(processStep.getUser().id())));
+    if (documentable.processSteps() != null) {
+      documentable
+          .processSteps()
+          .forEach(
+              processStep -> processStep.setUser(userService.getUser(processStep.getUser().id())));
+    }
   }
 
   public DocumentationUnit getByUuid(UUID documentationUnitId)
