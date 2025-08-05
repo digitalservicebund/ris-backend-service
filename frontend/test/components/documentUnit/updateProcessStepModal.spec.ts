@@ -91,10 +91,22 @@ describe("update process step modal", () => {
   test("shows next step and closes after updating process step", async () => {
     const { user, emitted } = renderComponent()
 
-    expect(await screen.findByText("Weitergeben")).toBeInTheDocument()
-    expect(await screen.findByText("Abbrechen")).toBeInTheDocument()
-    expect(await screen.findByText("QS formal")).toBeInTheDocument()
+    // Dropdown is preselected with next step
+    expect(await screen.findByLabelText("Neuer Schritt")).toHaveTextContent(
+      "QS formal",
+    )
 
+    // Buttons
+    expect(await screen.findByText("Weitergeben")).toBeVisible()
+    expect(await screen.findByText("Abbrechen")).toBeVisible()
+
+    // Data Table
+    expect(await screen.findByRole("table")).toBeVisible()
+    await expect(screen.getByRole("cell", { name: "Neu" })).toBeVisible()
+    await expect(screen.getByRole("cell", { name: "Blockiert" })).toBeVisible()
+    await expect(screen.getByRole("cell", { name: "Fertig" })).toBeVisible()
+
+    // Dialog is closed on Submit
     await user.click(await screen.findByLabelText("Weitergeben"))
     expect(emitted().onProcessStepUpdated).toBeTruthy()
   })
@@ -102,6 +114,7 @@ describe("update process step modal", () => {
   test("closes after cancel", async () => {
     const { user, emitted } = renderComponent()
 
+    // Dialog is closed on Cancel
     await user.click(await screen.findByLabelText("Abbrechen"))
     expect(emitted().onCancelled).toBeTruthy()
   })
