@@ -242,6 +242,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     initialStepDTO = databaseDocumentationUnitProcessStepRepository.save(initialStepDTO);
 
     documentationUnitDTO.setCurrentProcessStep(initialStepDTO);
+    documentationUnitDTO.getProcessSteps().add(initialStepDTO);
 
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       decisionDTO.setSource(sources);

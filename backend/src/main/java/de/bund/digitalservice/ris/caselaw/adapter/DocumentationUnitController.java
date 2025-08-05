@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDele
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImageNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ProcessStepNotFoundException;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -395,6 +396,8 @@ public class DocumentationUnitController {
       return ResponseEntity.ok().body(newPatch);
     } catch (DocumentationUnitNotExistsException e) {
       return ResponseEntity.internalServerError().build();
+    } catch (ProcessStepNotFoundException e) {
+      return ResponseEntity.notFound().build();
     } catch (Exception e) {
       log.error("Error by updating documentation unit '{}/{}'", uuid, documentNumber, e);
       return ResponseEntity.internalServerError().build();

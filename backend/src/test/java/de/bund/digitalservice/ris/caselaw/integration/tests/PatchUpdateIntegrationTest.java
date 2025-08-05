@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcessStepRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRelatedDocumentationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
@@ -31,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedDocumentationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -76,6 +78,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentationUnitPatchRepository patchRepository;
   @Autowired private DatabaseCourtRepository courtRepository;
   @Autowired private DatabaseRegionRepository regionRepository;
+  @Autowired private DatabaseProcessStepRepository processStepRepository;
   @Autowired private DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseProcedureRepository procedureRepository;
@@ -4475,6 +4478,152 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
               new AddOperation("/shortTexts/resolutionNote", resolutionNote));
 
       return new RisJsonPatch(0L, new JsonPatch(operationsUser1), Collections.emptyList());
+    }
+  }
+
+  @Nested
+  class ProcessStepPatchUpdate {
+    @Test
+    @Transactional
+    void testPartialUpdateByUuid_withProcessStepUpdate_shouldApplyChangesIfNextLogicalStep() {
+      TestTransaction.flagForCommit();
+      TestTransaction.end();
+
+      Decision decision = generateEmptyDocumentationUnit();
+      assertThat(decision.currentProcessStep().getProcessStep().name()).isEqualTo("Ersterfassung");
+      ProcessStepDTO fachdokumentationProcessStep =
+          processStepRepository.findByName("Fachdokumentation").orElseThrow();
+
+      List<JsonPatchOperation> operationsUser1 =
+          List.of(
+              new ReplaceOperation(
+                  "/currentProcessStep/processStep/abbreviation", new TextNode("FD")),
+              new ReplaceOperation(
+                  "/currentProcessStep/processStep/name", new TextNode("Fachdokumentation")),
+              new ReplaceOperation(
+                  "/currentProcessStep/processStep/uuid",
+                  new TextNode(fachdokumentationProcessStep.getId().toString())),
+              new RemoveOperation("/currentProcessStep/createdAt"),
+              new RemoveOperation("/currentProcessStep/user"),
+              new RemoveOperation("/currentProcessStep/id"));
+      RisJsonPatch patchUser1 =
+          new RisJsonPatch(0L, new JsonPatch(operationsUser1), Collections.emptyList());
+
+      risWebTestClient
+          .withDefaultLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
+          .bodyValue(patchUser1)
+          .exchange()
+          .expectStatus()
+          .is2xxSuccessful()
+          .expectBody(RisJsonPatch.class)
+          .consumeWith(
+              response -> {
+                RisJsonPatch responsePatch = response.getResponseBody();
+                assertThat(responsePatch).isNotNull();
+                assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
+                assertThat(responsePatch.patch().getOperations()).hasSize(12);
+
+                // [op: replace; path: "/managementData/lastUpdatedByDocOffice"; value: "DS",
+                // op: replace; path: "/managementData/lastUpdatedAtDateTime"; value:
+                // "2025-08-04T14:08:10.056065Z",
+                // op: replace; path: "/managementData/lastUpdatedByName"; value: "testUser",
+                // op: replace; path: "/currentProcessStep/createdAt"; value:
+                // "2025-08-04T14:08:10.028623",
+                // op: replace; path: "/currentProcessStep/id"; value:
+                // "4a21dd8a-6adc-4e09-a9e5-ab9071606c9d",
+                // op: replace; path: "/currentProcessStep/user"; value:
+                // {"id":null,"name":null,"email":null,"documentationOffice":null,"roles":null},
+                // op: replace; path: "/processSteps/0/createdAt"; value:
+                // "2025-08-04T14:08:10.028623",
+                // op: replace; path: "/processSteps/0/processStep/name"; value:
+                // "Fachdokumentation",
+                // op: replace; path: "/processSteps/0/processStep/abbreviation"; value: "FD",
+                // op: replace; path: "/processSteps/0/processStep/uuid"; value:
+                // "3f851d35-2c9c-446d-8a7a-40ece141b9b1",
+                // op: replace; path: "/processSteps/0/id"; value:
+                // "4a21dd8a-6adc-4e09-a9e5-ab9071606c9d",
+                // op: add; path: "/processSteps/-"; value:
+                // {"id":"73a7146f-1c6f-4c3f-be4b-6d1b5e41a2d2","user":{"id":null,"name":null,"email":null,"documentationOffice":null,"roles":null},"createdAt":"2025-08-04T14:08:08.601447","processStep":{"uuid":"24e751b0-d5e6-49c1-983a-924a320f2ff7","name":"Ersterfassung","abbreviation":"EE"}}]
+
+                // Assert new process step as last item in list
+                assertThat(responsePatch.patch().getOperations())
+                    .filteredOn(
+                        op ->
+                            "replace".equals(op.getOp())
+                                && "/processSteps/0/processStep/name".equals(op.getPath()))
+                    .first()
+                    .satisfies(
+                        operation -> {
+                          assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                          ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                          assertThat(replaceOperation.getValue().asText())
+                              .isEqualTo("Fachdokumentation");
+                        });
+
+                // Assert a new add operation, a new process step is added to processSteps
+                assertThat(responsePatch.patch().getOperations())
+                    .filteredOn(
+                        op -> "add".equals(op.getOp()) && "/processSteps/-".equals(op.getPath()))
+                    .first()
+                    .satisfies(
+                        operation -> {
+                          assertThat(operation).isInstanceOf(AddOperation.class);
+                          AddOperation addOperation = (AddOperation) operation;
+                          assertThat(
+                                  addOperation.getValue().get("processStep").get("name").asText())
+                              .isEqualTo("Ersterfassung");
+                        });
+              });
+
+      TestTransaction.start();
+      List<DocumentationUnitDTO> allDocumentationUnits = repository.findAll();
+      assertThat(allDocumentationUnits).hasSize(1);
+      DocumentationUnitDTO documentationUnitDTO = allDocumentationUnits.get(0);
+      assertThat(documentationUnitDTO.getDocumentNumber()).isEqualTo(decision.documentNumber());
+      assertThat(documentationUnitDTO.getCurrentProcessStep().getProcessStep().getName())
+          .isEqualTo("Fachdokumentation");
+      assertThat(documentationUnitDTO.getProcessSteps()).hasSize(2);
+      assertThat(documentationUnitDTO.getProcessSteps().getFirst().getProcessStep().getName())
+          .isEqualTo("Fachdokumentation");
+      assertThat(documentationUnitDTO.getProcessSteps().get(1).getProcessStep().getName())
+          .isEqualTo("Ersterfassung");
+      TestTransaction.end();
+    }
+
+    @Test
+    @Transactional
+    void testPartialUpdateByUuid_withProcessStepUpdate_shouldThrow_IfProcessStepNotFound() {
+      TestTransaction.flagForCommit();
+      TestTransaction.end();
+
+      Decision decision = generateEmptyDocumentationUnit();
+      assertThat(decision.currentProcessStep().getProcessStep().name()).isEqualTo("Ersterfassung");
+
+      List<JsonPatchOperation> operationsUser1 =
+          List.of(
+              new ReplaceOperation(
+                  "/currentProcessStep/processStep/abbreviation", new TextNode("B")),
+              new ReplaceOperation(
+                  "/currentProcessStep/processStep/name", new TextNode("Blockiert")),
+              new ReplaceOperation(
+                  "/currentProcessStep/processStep/uuid",
+                  new TextNode(UUID.randomUUID().toString())),
+              new RemoveOperation("/currentProcessStep/createdAt"),
+              new RemoveOperation("/currentProcessStep/user"),
+              new RemoveOperation("/currentProcessStep/id"));
+      RisJsonPatch patchUser1 =
+          new RisJsonPatch(0L, new JsonPatch(operationsUser1), Collections.emptyList());
+
+      risWebTestClient
+          .withDefaultLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
+          .bodyValue(patchUser1)
+          .exchange()
+          .expectStatus()
+          .isNotFound();
     }
   }
 

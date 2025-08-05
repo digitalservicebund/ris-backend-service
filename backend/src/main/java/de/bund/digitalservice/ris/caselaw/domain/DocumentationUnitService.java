@@ -546,7 +546,9 @@ public class DocumentationUnitService {
    */
   public RisJsonPatch updateDocumentationUnit(
       UUID documentationUnitId, RisJsonPatch patch, User user)
-      throws DocumentationUnitNotExistsException, DocumentationUnitPatchException {
+      throws DocumentationUnitNotExistsException,
+          DocumentationUnitPatchException,
+          ProcessStepNotFoundException {
 
     /*
      next iteration:
@@ -676,7 +678,7 @@ public class DocumentationUnitService {
       User user,
       DocumentationUnit patchedDocumentationUnit,
       DuplicateCheckStatus duplicateCheckStatus)
-      throws DocumentationUnitNotExistsException {
+      throws DocumentationUnitNotExistsException, ProcessStepNotFoundException {
     DocumentationUnit updatedDocumentationUnit;
     if (patchedDocumentationUnit instanceof Decision docUnit) {
       updatedDocumentationUnit = updateDocumentationUnit(docUnit, duplicateCheckStatus, user);
@@ -696,7 +698,7 @@ public class DocumentationUnitService {
 
   public Decision updateDocumentationUnit(
       Decision decision, DuplicateCheckStatus duplicateCheckStatus, User user)
-      throws DocumentationUnitNotExistsException {
+      throws DocumentationUnitNotExistsException, ProcessStepNotFoundException {
     repository.saveKeywords(decision);
     repository.saveFieldsOfLaw(decision);
     repository.saveProcedures(decision, user);

@@ -58,6 +58,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParame
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.EurlexCreationParameters;
@@ -2149,6 +2150,32 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
           .isEqualTo("EUR-LEX-Schnittstelle");
       assertThat(decision.getCurrentProcessStep().getProcessStep().getName()).isEqualTo("Neu");
       eurLexResultRepository.deleteAllByCelexNumbers(List.of(celexNumber + "(02)"));
+      // New from eurlex sets correct process step
+      assertThat(decision.getCurrentProcessStep().getProcessStep().getName()).isEqualTo("Neu");
     }
+  }
+
+  @Test
+  void testGenerateNewDocumentationUnit_shouldSetInitialProcessStepForDocOffice() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "XXRE0******YY"));
+
+    var createdDocUnit =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/new")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful()
+            .expectBody(Decision.class)
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(createdDocUnit.currentProcessStep().getProcessStep().name())
+        .isEqualTo("Ersterfassung");
+    List<DocumentationUnitProcessStep> processSteps = createdDocUnit.processSteps();
+    assertThat(processSteps).hasSize(1);
+    assertThat(processSteps.getFirst().getProcessStep().name()).isEqualTo("Ersterfassung");
   }
 }
