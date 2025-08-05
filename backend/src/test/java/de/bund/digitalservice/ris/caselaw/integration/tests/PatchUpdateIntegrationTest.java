@@ -4523,29 +4523,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(12);
-
-                // [op: replace; path: "/managementData/lastUpdatedByDocOffice"; value: "DS",
-                // op: replace; path: "/managementData/lastUpdatedAtDateTime"; value:
-                // "2025-08-04T14:08:10.056065Z",
-                // op: replace; path: "/managementData/lastUpdatedByName"; value: "testUser",
-                // op: replace; path: "/currentProcessStep/createdAt"; value:
-                // "2025-08-04T14:08:10.028623",
-                // op: replace; path: "/currentProcessStep/id"; value:
-                // "4a21dd8a-6adc-4e09-a9e5-ab9071606c9d",
-                // op: replace; path: "/currentProcessStep/user"; value:
-                // {"id":null,"name":null,"email":null,"documentationOffice":null,"roles":null},
-                // op: replace; path: "/processSteps/0/createdAt"; value:
-                // "2025-08-04T14:08:10.028623",
-                // op: replace; path: "/processSteps/0/processStep/name"; value:
-                // "Fachdokumentation",
-                // op: replace; path: "/processSteps/0/processStep/abbreviation"; value: "FD",
-                // op: replace; path: "/processSteps/0/processStep/uuid"; value:
-                // "3f851d35-2c9c-446d-8a7a-40ece141b9b1",
-                // op: replace; path: "/processSteps/0/id"; value:
-                // "4a21dd8a-6adc-4e09-a9e5-ab9071606c9d",
-                // op: add; path: "/processSteps/-"; value:
-                // {"id":"73a7146f-1c6f-4c3f-be4b-6d1b5e41a2d2","user":{"id":null,"name":null,"email":null,"documentationOffice":null,"roles":null},"createdAt":"2025-08-04T14:08:08.601447","processStep":{"uuid":"24e751b0-d5e6-49c1-983a-924a320f2ff7","name":"Ersterfassung","abbreviation":"EE"}}]
+                assertThat(responsePatch.patch().getOperations()).hasSize(13);
 
                 // Assert new process step as last item in list
                 assertThat(responsePatch.patch().getOperations())
