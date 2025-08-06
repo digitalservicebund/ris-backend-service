@@ -21,7 +21,7 @@ services:
       - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-08-31
 
   traefik:
-    image: traefik:v3.4
+    image: traefik:v3.5
     extra_hosts:
       - localhost:host-gateway
     container_name: traefik
