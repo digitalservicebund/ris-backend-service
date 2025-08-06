@@ -14,6 +14,7 @@ import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import { Procedure } from "@/domain/procedure"
+import { User } from "@/domain/user"
 import errorMessages from "@/i18n/errors.json"
 
 enum Endpoint {
@@ -114,7 +115,10 @@ function formatDropdownItems(
       }))
     }
     case Endpoint.usersForDocOffice: {
-      return []
+      return (responseData as User[]).map((item) => ({
+        label: item.name,
+        value: item,
+      }))
     }
   }
 }

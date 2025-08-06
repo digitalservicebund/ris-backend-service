@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -28,13 +27,18 @@ import org.springframework.web.client.RestTemplate;
 @Import({BareIdUserApiService.class})
 class BareIdUserApiServiceTest {
 
-  @Autowired BareIdUserApiService bareIdUserApiService;
+  BareIdUserApiService bareIdUserApiService;
 
   @MockitoBean RestTemplate restTemplate;
   @MockitoBean BareIdUserApiTokenService bareIdUserApiTokenService;
 
+  String instanceId = UUID.randomUUID().toString();
+
   @BeforeEach
   void setUp() {
+    bareIdUserApiService =
+        new BareIdUserApiService(bareIdUserApiTokenService, restTemplate, instanceId);
+
     OAuth2AccessToken mockToken =
         new OAuth2AccessToken(
             OAuth2AccessToken.TokenType.BEARER,
@@ -131,5 +135,30 @@ class BareIdUserApiServiceTest {
         "e2e_tests_bfh@digitalservice.bund.de",
         "e2e_tests_bfh@digitalservice.bund.de",
         attributes);
+  }
+
+  @Test
+  void testGetUsers() {
+
+    BareUserApiResponse.Group group = generateBareUserGroup("DS");
+    BareUserApiResponse.GroupApiResponse userApiResponse =
+        new BareUserApiResponse.GroupApiResponse(List.of(group));
+
+    ResponseEntity<BareUserApiResponse.GroupApiResponse> mockResponse =
+        ResponseEntity.ok(userApiResponse);
+
+    doReturn(mockResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.GroupApiResponse.class));
+
+    bareIdUserApiService.getUsers("/DS/Intern");
+  }
+
+  private BareUserApiResponse.Group generateBareUserGroup(String groupPath) {
+    return new BareUserApiResponse.Group(UUID.randomUUID(), groupPath, "/" + groupPath);
   }
 }

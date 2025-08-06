@@ -58,6 +58,15 @@ public class KeycloakUserService implements UserService {
   }
 
   @Override
+  public List<User> getUsers(OidcUser oidcUser) {
+    var optionalUserGroup = getUserGroup(oidcUser);
+    if (optionalUserGroup.isPresent()) {
+      return userApiService.getUsers(optionalUserGroup.get().userGroupPathName());
+    }
+    return List.of();
+  }
+
+  @Override
   public Optional<UserGroup> getUserGroup(OidcUser oidcUser) {
     List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
     var matchingUserGroup =

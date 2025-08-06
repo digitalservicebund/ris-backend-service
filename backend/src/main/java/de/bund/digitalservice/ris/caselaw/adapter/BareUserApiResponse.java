@@ -14,6 +14,8 @@ public class BareUserApiResponse {
 
   public record UserApiResponse(BareUser user) {}
 
+  public record UsersApiResponse(List<BareUser> users) {}
+
   public record BareUser(
       UUID uuid,
       boolean enabled,
@@ -21,6 +23,10 @@ public class BareUserApiResponse {
       String username,
       String email,
       Map<String, AttributeValues> attributes) {}
+
+  public record GroupApiResponse(List<Group> groups) {}
+
+  public record Group(UUID uuid, String name, String path) {}
 
   public record AttributeValues(List<String> values) {}
 }

@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.UserException;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,13 +24,15 @@ public class BareIdUserApiService implements UserApiService {
 
   private final RestTemplate restTemplate;
 
-  @Value("${bareid.instance}")
-  private String bareidInstance;
+  private final String bareidInstance;
 
   public BareIdUserApiService(
-      BareIdUserApiTokenService bareIdUserApiTokenService, RestTemplate restTemplate) {
+      BareIdUserApiTokenService bareIdUserApiTokenService,
+      RestTemplate restTemplate,
+      @Value("${bareid.instance}") String bareidInstance) {
     this.bareIdUserApiTokenService = bareIdUserApiTokenService;
     this.restTemplate = restTemplate;
+    this.bareidInstance = bareidInstance;
   }
 
   @Override
@@ -57,6 +60,42 @@ public class BareIdUserApiService implements UserApiService {
     } catch (Exception e) {
       log.error("Error reading the user information", e);
       return User.builder().id(userId).build();
+    }
+  }
+
+  @Override
+  public List<User> getUsers(String userGroupPathName) {
+
+    try {
+
+      String topLevelUserGroup = userGroupPathName.substring(0, userGroupPathName.indexOf('/', 1));
+
+      HttpHeaders headers = new HttpHeaders();
+      headers.setBearerAuth(bareIdUserApiTokenService.getAccessToken().getTokenValue());
+      HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
+
+      String url = String.format("https://api.bare.id/user/v1/%s/groups", bareidInstance);
+      ResponseEntity<BareUserApiResponse.GroupApiResponse> response =
+          restTemplate.exchange(
+              url, HttpMethod.GET, request, BareUserApiResponse.GroupApiResponse.class);
+      var groups = response.getBody().groups();
+
+      var topLevelGroup =
+          groups.stream().filter(item -> item.path().equals(topLevelUserGroup)).findFirst().get();
+
+      String subGroupUrl =
+          String.format(
+              "https://api.bare.id/user/v1/%s/groups/%s/users",
+              bareidInstance, topLevelGroup.uuid());
+      ResponseEntity<BareUserApiResponse.UsersApiResponse> subGroupResponse =
+          restTemplate.exchange(
+              subGroupUrl, HttpMethod.GET, request, BareUserApiResponse.UsersApiResponse.class);
+      return subGroupResponse.getBody().users().stream()
+          .map(UserTransformer::transformToDomain)
+          .toList();
+
+    } catch (Exception e) {
+      return List.of();
     }
   }
 }
