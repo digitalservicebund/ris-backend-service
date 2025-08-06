@@ -60,11 +60,14 @@ public class EurLexSearchResultTransformer {
             .htmlLink(eurLexResultDTO.getHtmlLink())
             .uri(eurLexResultDTO.getUri());
 
-    if (eurLexResultDTO.getCreatedAt() == null) {
-      log.error("No created at date found. Should be set by database.");
-    } else {
+    if (eurLexResultDTO.getUpdatedAt() != null) {
+      builder.publicationDate(
+          LocalDate.ofInstant(eurLexResultDTO.getUpdatedAt(), ZoneId.of("Europe/Berlin")));
+    } else if (eurLexResultDTO.getCreatedAt() != null) {
       builder.publicationDate(
           LocalDate.ofInstant(eurLexResultDTO.getCreatedAt(), ZoneId.of("Europe/Berlin")));
+    } else {
+      log.error("No created or updated at date found. Should be set by database.");
     }
 
     if (eurLexResultDTO.getCourt() != null) {
