@@ -111,13 +111,13 @@ test.describe(
 
         await otherCategoriesContainer
           .getByTestId("foreign-language-version-link-input")
-          .fill("https://link-to-tranlsation.af")
+          .fill("https://link-to-translation.af")
 
         await expect(acceptButton).toBeEnabled()
         await acceptButton.click()
         await expect(
           otherCategoriesContainer.getByText(
-            "Afrikaans: https://link-to-tranlsation.af",
+            "Afrikaans: https://link-to-translation.af",
           ),
         ).toBeVisible()
       })
@@ -141,12 +141,12 @@ test.describe(
 
         await otherCategoriesContainer
           .getByTestId("foreign-language-version-link-input")
-          .fill("https://link-to-tranlsation.fr")
+          .fill("www.link-to-translation.fr")
 
         await acceptButton.click()
         await expect(
           otherCategoriesContainer.getByText(
-            "Französisch: https://link-to-tranlsation.fr",
+            "Französisch: www.link-to-translation.fr",
           ),
         ).toBeVisible()
         await save(page)
@@ -156,19 +156,27 @@ test.describe(
         await navigateToPreview(page, prefilledDocumentUnit.documentNumber!)
         await expect(page.getByText("Fremdsprachige Fassung")).toBeVisible()
         await expect(
-          page.getByText("Afrikaans: https://link-to-tranlsation.af"),
+          page.getByText("Afrikaans: https://link-to-translation.af"),
         ).toBeVisible()
         await expect(
-          page.getByText("Französisch: https://link-to-tranlsation.fr"),
+          page.getByText("Französisch: www.link-to-translation.fr"),
         ).toBeVisible()
       })
 
       await test.step("Der Link ist in der Vorschau klickbar", async () => {
-        const firstLink = page.getByText("https://link-to-tranlsation.af")
-        const secondLink = page.getByText("https://link-to-tranlsation.fr")
+        const firstLink = page.getByText("https://link-to-translation.af")
+        const secondLink = page.getByText("www.link-to-translation.fr")
         await expect(firstLink).toBeEnabled()
+        await expect(firstLink).toHaveAttribute(
+          "href",
+          "https://link-to-translation.af",
+        )
         await firstLink.click({ trial: true })
         await expect(secondLink).toBeEnabled()
+        await expect(secondLink).toHaveAttribute(
+          "href",
+          "https://www.link-to-translation.fr",
+        )
         await secondLink.click({ trial: true })
       })
     })

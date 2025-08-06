@@ -10,12 +10,22 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DatabaseLanguageCodeRepository extends JpaRepository<LanguageCodeDTO, UUID> {
+  @Query(
+      value =
+          """
+          SELECT languageCode FROM LanguageCodeDTO languageCode
+            WHERE UPPER(languageCode.value) LIKE UPPER(CONCAT('%', :searchString, '%'))
+            ORDER BY UPPER(languageCode.value)
+          """)
   List<LanguageCodeDTO> findLanguageCodeDTOByValueContainsIgnoreCase(
-      String searchString, Limit limit);
+      @Param("searchString") String searchString, Limit limit);
 
   @Query(
       value =
-          "SELECT * FROM incremental_migration.language_codes l ORDER BY UPPER(l.value) LIMIT :limit",
-      nativeQuery = true)
+          """
+          SELECT languageCode FROM LanguageCodeDTO languageCode
+            ORDER BY UPPER(languageCode.value)
+            LIMIT :limit
+          """)
   List<LanguageCodeDTO> findAllOrderByValueIgnoreCaseLimit(@Param("limit") int limit);
 }

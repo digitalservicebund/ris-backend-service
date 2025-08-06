@@ -40,7 +40,7 @@ class LanguageCodeIntegrationTest extends BaseIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/languagecodes?q=deu")
+        .uri("/api/v1/caselaw/languagecodes?q=de")
         .exchange()
         .expectStatus()
         .isOk()
@@ -48,8 +48,16 @@ class LanguageCodeIntegrationTest extends BaseIntegrationTest {
         .consumeWith(
             response -> {
               LanguageCode[] body = response.getResponseBody();
-              assertThat(body).hasSize(1);
-              assertThat(body[0].label()).isEqualTo("Deutsch");
+              assertThat(body).hasSize(6);
+              assertThat(body)
+                  .extracting(LanguageCode::label)
+                  .containsExactly(
+                      "Belgisches Niederländisch",
+                      "Deutsch",
+                      "Fulfulde",
+                      "Niederländisch",
+                      "Nord-Ndebele",
+                      "Süd-Ndebele");
             });
   }
 
