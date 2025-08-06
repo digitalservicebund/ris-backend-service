@@ -46,7 +46,7 @@ const selectedUser = computed({
   get: () =>
     user.value
       ? {
-          label: user.value.name || user.value.email,
+          label: user.value.name || user.value.email || "Keine Information",
           value: user.value,
         }
       : undefined,

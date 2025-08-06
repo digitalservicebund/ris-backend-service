@@ -116,7 +116,7 @@ function formatDropdownItems(
     }
     case Endpoint.usersForDocOffice: {
       return (responseData as User[]).map((item) => ({
-        label: item.name,
+        label: item.name ?? item.email,
         value: item,
       }))
     }
