@@ -50,6 +50,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -568,17 +569,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                     .equals(processStepDTO)) {
                   changed = true;
                 }
-                // Todo: check userId too if a change in assigned user makes it a "new" step entry.
-                // if (!Objects.equals(currentDocumentationUnitProcessStepDTOFromDB.getUserId(),
-                // currentDocunitProcessStepFromFrontend.getUserId())) {
-                //    changed = true;
-                // }
+                if (!Objects.equals(
+                    currentDocumentationUnitProcessStepDTOFromDB.getUserId(),
+                    currentDocunitProcessStepFromFrontend.getUser().id())) {
+                  changed = true;
+                }
               }
 
               if (changed) {
                 DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
                     DocumentationUnitProcessStepDTO.builder()
-                        // .userId(currentDocunitProcessStepFromFrontend.getUser().id())
+                        .userId(currentDocunitProcessStepFromFrontend.getUser().id())
                         .createdAt(LocalDateTime.now())
                         .processStep(processStepDTO)
                         .documentationUnit(documentationUnitDTO)

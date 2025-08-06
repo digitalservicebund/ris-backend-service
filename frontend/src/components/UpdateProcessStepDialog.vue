@@ -37,21 +37,24 @@ const processSteps = ref<ProcessStep[]>()
 const nextProcessStep = ref<ProcessStep>()
 const serviceError1 = ref<ResponseError>()
 const serviceError2 = ref<ResponseError>()
-const user = ref<User>()
+const nextProcessStepUser = ref<User>()
 
 /**
  * Data restructuring from user props to combobox item.
  */
 const selectedUser = computed({
   get: () =>
-    user.value
+    nextProcessStepUser.value
       ? {
-          label: user.value.name || user.value.email || "Keine Information",
-          value: user.value,
+          label:
+            nextProcessStepUser.value.name ||
+            nextProcessStepUser.value.email ||
+            "Keine Information",
+          value: nextProcessStepUser.value,
         }
       : undefined,
   set: (newValue) => {
-    user.value = { ...newValue?.value } as User
+    nextProcessStepUser.value = { ...newValue } as User
   },
 })
 
@@ -59,6 +62,7 @@ async function updateProcessStep(): Promise<void> {
   if (nextProcessStep.value)
     documentUnit.value!.currentProcessStep = {
       processStep: nextProcessStep.value,
+      user: nextProcessStepUser.value,
     }
   const response = await store.updateDocumentUnit()
   if (response.error) {

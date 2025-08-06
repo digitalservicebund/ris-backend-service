@@ -611,6 +611,8 @@ public class DocumentationUnitService {
         DocumentationUnit updatedDocumentationUnit =
             updateDocumentationUnit(user, patchedDocumentationUnit, duplicateCheckStatus);
 
+        retrieveProcessStepsUsers(updatedDocumentationUnit);
+
         toFrontendJsonPatch =
             patchMapperService.getDiffPatch(
                 patchedDocumentationUnitWithBase64Images, updatedDocumentationUnit);
