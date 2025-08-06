@@ -167,7 +167,7 @@ watchEffect(() => {
     </SaveButton>
     <UpdateProcessStepDialog
       v-if="processStepsEnabled"
-      v-model:show-dialog="showProcessStepDialog"
+      :show-dialog="showProcessStepDialog"
       @on-cancelled="showProcessStepDialog = false"
       @on-process-step-updated="onProcessStepUpdated"
     />

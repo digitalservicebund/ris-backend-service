@@ -26,7 +26,7 @@ const emit = defineEmits<{
   onCancelled: []
 }>()
 
-const showDialog = defineModel("showDialog", { type: Boolean })
+const showDialog = defineModel("showDialog", { type: Boolean, default: false })
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
@@ -74,9 +74,9 @@ const fetchData = async () => {
 }
 
 watch(
-  () => showDialog,
+  showDialog,
   async (newValue) => {
-    if (newValue) {
+    if (newValue === true) {
       await fetchData()
     }
   },
