@@ -177,7 +177,6 @@ class FmxImportServiceTest {
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Urteil");
     assertThat(savedDocUnit.coreData().source().value()).isEqualTo(SourceValue.L);
-    assertThat(savedDocUnit.shortTexts().headnote()).isEqualTo("CELEX Nummer: " + celexNumber);
     assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
@@ -225,7 +224,6 @@ class FmxImportServiceTest {
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Beschluss");
     assertThat(savedDocUnit.coreData().source().value()).isEqualTo(SourceValue.L);
-    assertThat(savedDocUnit.shortTexts().headnote()).isEqualTo("CELEX Nummer: " + celexNumber);
     assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 
@@ -273,7 +271,6 @@ class FmxImportServiceTest {
     assertThat(savedDocUnit.coreData().celexNumber()).isEqualTo(celexNumber);
     assertThat(savedDocUnit.coreData().documentType().label()).isEqualTo("Gutachten");
     assertThat(savedDocUnit.coreData().source().value()).isEqualTo(SourceValue.L);
-    assertThat(savedDocUnit.shortTexts().headnote()).isEqualTo("CELEX Nummer: " + celexNumber);
     assertThat(savedDocUnit.inboxStatus()).isEqualTo(InboxStatus.EU);
   }
 

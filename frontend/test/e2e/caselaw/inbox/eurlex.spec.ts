@@ -210,9 +210,7 @@ test.describe("eurlex", () => {
           newTab.getByText("GerichtsbarkeitBesondere Gerichtsbarkeit"),
         ).toBeVisible()
         await expect(newTab.getByText("RegionEU")).toBeVisible()
-        await expect(
-          newTab.getByText("OrientierungssatzCELEX Nummer: 62024CO0878"),
-        ).toBeVisible()
+        await expect(newTab.getByText("CELEX-Nummer62024CO0878")).toBeVisible()
         await expect(
           newTab.getByText("TenorAus diesen Gründen hat"),
         ).toBeVisible()
