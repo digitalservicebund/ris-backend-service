@@ -77,6 +77,14 @@ jobs:
           path: |
             ./frontend/node_modules
           key: modules-${{ hashFiles('./frontend/package-lock.json') }}
+      - name: Cache style checks
+        uses: actions/cache@v4
+        id: style-check-cache
+        with:
+          path: ./frontend/.cache
+          key: style-check-${{ github.sha }}
+          # If no direct cache hit for the current commit, fallback to the latest cache
+          restore-keys: style-check-
       - name: Install dependencies
         if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: |
