@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
-import de.bund.digitalservice.ris.caselaw.domain.UserException;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +52,7 @@ public class BareIdUserApiService implements UserApiService {
       var responseBody = response.getBody();
 
       if (responseBody == null || responseBody.user() == null) {
-        throw new UserException("User not found or could not be parsed");
+        throw new UserApiException("User not found or could not be parsed");
       }
 
       return UserTransformer.transformToDomain(responseBody.user());
@@ -82,7 +81,7 @@ public class BareIdUserApiService implements UserApiService {
         restTemplate.exchange(
             url, HttpMethod.GET, request, BareUserApiResponse.GroupApiResponse.class);
     if (response.getBody() == null) {
-      throw new UserException("User group could not be found");
+      throw new UserApiException("User group could not be found");
     }
 
     var rootUserGroup =
