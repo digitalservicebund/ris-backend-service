@@ -27,3 +27,6 @@ blob-report/
 .auth/
 
 frontend-licence-report.csv
+
+# Caching for vue-ts, prettier, eslint and stylelint
+.cache
