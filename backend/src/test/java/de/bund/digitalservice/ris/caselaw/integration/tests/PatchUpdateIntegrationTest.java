@@ -4523,7 +4523,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(13);
+                assertThat(responsePatch.patch().getOperations()).hasSize(12);
 
                 // Assert new process step as last item in list
                 assertThat(responsePatch.patch().getOperations())
