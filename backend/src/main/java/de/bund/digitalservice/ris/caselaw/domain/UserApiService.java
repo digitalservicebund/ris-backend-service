@@ -8,4 +8,6 @@ public interface UserApiService {
   User getUser(UUID userId);
 
   List<User> getUsers(String userGroupPathName);
+
+  List<User> getUsers(UUID userGroupId);
 }
