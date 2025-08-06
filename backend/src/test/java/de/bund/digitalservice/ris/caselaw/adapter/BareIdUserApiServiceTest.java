@@ -138,9 +138,9 @@ class BareIdUserApiServiceTest {
   }
 
   @Test
-  void testGetUsers() {
+  void testGetUsers_shouldSuccess() {
 
-    BareUserApiResponse.Group group = generateBareUserGroup("DS");
+    BareUserApiResponse.Group group = generateBareUserGroup();
     BareUserApiResponse.GroupApiResponse userApiResponse =
         new BareUserApiResponse.GroupApiResponse(List.of(group));
 
@@ -155,10 +155,11 @@ class BareIdUserApiServiceTest {
             any(HttpEntity.class),
             eq(BareUserApiResponse.GroupApiResponse.class));
 
-    bareIdUserApiService.getUsers("/DS/Intern");
+    var results = bareIdUserApiService.getUsers("/DS/Intern");
+    Assertions.assertNotNull(results);
   }
 
-  private BareUserApiResponse.Group generateBareUserGroup(String groupPath) {
-    return new BareUserApiResponse.Group(UUID.randomUUID(), groupPath, "/" + groupPath);
+  private BareUserApiResponse.Group generateBareUserGroup() {
+    return new BareUserApiResponse.Group(UUID.randomUUID(), "DS", "/" + "DS");
   }
 }

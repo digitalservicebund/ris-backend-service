@@ -1,9 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.UserException;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -67,8 +70,11 @@ public class BareIdUserApiService implements UserApiService {
   public List<User> getUsers(String userGroupPathName) {
 
     try {
+      if (StringUtils.isNullOrBlank(userGroupPathName)) {
+        throw new UserException("User group path is empty or blank");
+      }
 
-      String topLevelUserGroup = userGroupPathName.substring(0, userGroupPathName.indexOf('/', 1));
+      String rootLevelUserGroup = userGroupPathName.substring(0, userGroupPathName.indexOf('/', 1));
 
       HttpHeaders headers = new HttpHeaders();
       headers.setBearerAuth(bareIdUserApiTokenService.getAccessToken().getTokenValue());
@@ -78,24 +84,35 @@ public class BareIdUserApiService implements UserApiService {
       ResponseEntity<BareUserApiResponse.GroupApiResponse> response =
           restTemplate.exchange(
               url, HttpMethod.GET, request, BareUserApiResponse.GroupApiResponse.class);
-      var groups = response.getBody().groups();
+      if (response.getBody() == null) {
+        throw new UserException("User group could not be found");
+      }
 
-      var topLevelGroup =
-          groups.stream().filter(item -> item.path().equals(topLevelUserGroup)).findFirst().get();
+      var rootUserGroup =
+          response.getBody().groups().stream()
+              .filter(item -> item.path().equals(rootLevelUserGroup))
+              .findFirst()
+              .orElseThrow(() -> new UserApiException("Root user group was not found for path"));
 
       String subGroupUrl =
           String.format(
               "https://api.bare.id/user/v1/%s/groups/%s/users",
-              bareidInstance, topLevelGroup.uuid());
+              bareidInstance, rootUserGroup.uuid());
       ResponseEntity<BareUserApiResponse.UsersApiResponse> subGroupResponse =
           restTemplate.exchange(
               subGroupUrl, HttpMethod.GET, request, BareUserApiResponse.UsersApiResponse.class);
+
+      if (subGroupResponse.getBody() == null) {
+        throw new UserException("No users were found");
+      }
+
       return subGroupResponse.getBody().users().stream()
           .map(UserTransformer::transformToDomain)
           .toList();
 
     } catch (Exception e) {
-      return List.of();
+      log.error("Error reading group user information: ", e);
+      return Collections.emptyList();
     }
   }
 }

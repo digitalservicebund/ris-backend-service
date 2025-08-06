@@ -602,13 +602,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     if (!currentDocumentationUnitProcessStepDTOFromDB.getProcessStep().equals(processStepDTO)) {
       return true;
     }
-    // If User id has changed in the process
-    if (!Objects.equals(
+    // If User id has changed in process step
+    return !Objects.equals(
         currentDocumentationUnitProcessStepDTOFromDB.getUserId(),
-        currentDocunitProcessStepFromFrontend.getUser().id())) {
-      return true;
-    }
-    return false;
+        currentDocunitProcessStepFromFrontend.getUser().id());
   }
 
   @Override
