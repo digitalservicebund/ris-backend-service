@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructu
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Definition;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
@@ -72,6 +73,19 @@ public class DecisionFullLdmlTransformer extends DecisionCommonLdmlTransformer {
       applyIfNotEmpty(
           contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
           builder::fieldOfLaw);
+    }
+
+    if (contentRelatedIndexing != null && contentRelatedIndexing.definitions() != null) {
+      applyIfNotEmpty(
+          contentRelatedIndexing.definitions().stream()
+              .map(
+                  definition ->
+                      Definition.builder()
+                          .definedTerm(definition.definedTerm())
+                          .definingBorderNumber(definition.definingBorderNumber())
+                          .build())
+              .toList(),
+          builder::definitions);
     }
 
     Optional.ofNullable(contentRelatedIndexing)
