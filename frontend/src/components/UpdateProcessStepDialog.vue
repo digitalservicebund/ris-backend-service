@@ -21,14 +21,12 @@ import { ResponseError } from "@/services/httpClient"
 import processStepService from "@/services/processStepService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const props = defineProps<{
-  showDialog: boolean
-}>()
-
 const emit = defineEmits<{
   onProcessStepUpdated: []
   onCancelled: []
 }>()
+
+const showDialog = defineModel("showDialog", { type: Boolean, default: false })
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
@@ -76,9 +74,9 @@ const fetchData = async () => {
 }
 
 watch(
-  () => props.showDialog,
+  showDialog,
   async (newValue) => {
-    if (newValue) {
+    if (newValue === true) {
       await fetchData()
     }
   },
@@ -88,11 +86,12 @@ watch(
 
 <template>
   <Dialog
+    v-model:visible="showDialog"
     class="max-h-[768px] max-w-[1024px]"
     :closable="false"
+    dismissable-mask
     header="Dokumentationseinheit weitergeben"
     modal
-    :visible="props.showDialog"
   >
     <div class="flex w-full flex-col pt-32">
       <div v-if="serviceError1 || serviceError2" class="mb-48 flex flex-col">
@@ -164,11 +163,7 @@ watch(
         </Column>
         <Column field="processStep.name" header="Schritt">
           <template #body="{ data: item }">
-            <IconBadge
-              class="px-8"
-              v-bind="useProcessStepBadge(item.processStep).value"
-              :label="item.processStep.name"
-            />
+            <IconBadge v-bind="useProcessStepBadge(item.processStep).value" />
           </template>
         </Column>
 
