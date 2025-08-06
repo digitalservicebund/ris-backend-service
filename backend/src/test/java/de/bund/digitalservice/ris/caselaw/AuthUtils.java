@@ -166,6 +166,7 @@ public class AuthUtils {
    * @param userApiService the mocked service to adjust return to
    */
   public static void mockUserApi(UserApiService userApiService) {
+
     doAnswer(
             invocation -> {
               UUID id = invocation.getArgument(0);
@@ -175,6 +176,6 @@ public class AuthUtils {
               return User.builder().id(id).build();
             })
         .when(userApiService)
-        .getUser(any());
+        .getUser(any(UUID.class));
   }
 }

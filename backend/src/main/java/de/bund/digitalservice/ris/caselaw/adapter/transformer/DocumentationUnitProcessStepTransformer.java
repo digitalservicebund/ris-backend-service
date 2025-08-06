@@ -19,10 +19,13 @@ public class DocumentationUnitProcessStepTransformer {
     if (entity == null) {
       return null;
     }
-
+    User user = null;
+    if (entity.getUserId() != null) {
+      user = User.builder().id(entity.getUserId()).build();
+    }
     return DocumentationUnitProcessStep.builder()
         .id(entity.getId())
-        .user(User.builder().id(entity.getUserId()).build())
+        .user(user)
         .createdAt(entity.getCreatedAt())
         .processStep(ProcessStepTransformer.toDomain(entity.getProcessStep()))
         .build();

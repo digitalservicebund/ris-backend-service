@@ -468,7 +468,8 @@ public class DocumentationUnitService {
   }
 
   private void retrieveProcessStepsUsers(DocumentationUnit documentable) {
-    if (documentable.currentProcessStep() != null) {
+    if (documentable.currentProcessStep() != null
+        && documentable.currentProcessStep().getUser() != null) {
       documentable
           .currentProcessStep()
           .setUser(userService.getUser(documentable.currentProcessStep().getUser().id()));
@@ -477,7 +478,11 @@ public class DocumentationUnitService {
       documentable
           .processSteps()
           .forEach(
-              processStep -> processStep.setUser(userService.getUser(processStep.getUser().id())));
+              processStep -> {
+                if (processStep.getUser() != null) {
+                  processStep.setUser(userService.getUser(processStep.getUser().id()));
+                }
+              });
     }
   }
 
