@@ -55,7 +55,9 @@ public class ProcessStepService {
                   orderedOfficeProcessSteps.indexOf(currentProcessStep.getProcessStep());
 
               // If the current step was found in the list and it's not the last one
-              if (currentIndex != -1 && currentIndex < orderedOfficeProcessSteps.size() - 1) {
+              if (currentIndex != -1
+                  && orderedOfficeProcessSteps.size() > currentIndex
+                  && orderedOfficeProcessSteps.get(currentIndex + 1) != null) {
                 return Optional.of(orderedOfficeProcessSteps.get(currentIndex + 1));
               } else {
                 return Optional.empty(); // No next step
