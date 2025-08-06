@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserApi;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
@@ -104,6 +105,7 @@ public abstract class BaseIntegrationTest {
     // Replace with test configuration instead of mocking difficult because doc offices are not
     // available on startup when needed by user group service
     mockUserGroups(userGroupService);
+    mockUserApi(userApiService);
   }
 
   @AfterEach
