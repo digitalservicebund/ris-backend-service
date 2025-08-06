@@ -4,6 +4,7 @@ import com.github.jk1.license.filter.DependencyFilter
 import com.github.jk1.license.filter.LicenseBundleNormalizer
 import com.github.jk1.license.render.CsvReportRenderer
 import com.github.jk1.license.render.ReportRenderer
+import io.franzbecker.gradle.lombok.task.DelombokTask
 import org.flywaydb.gradle.task.FlywayMigrateTask
 import java.io.Serializable
 
@@ -18,7 +19,7 @@ plugins {
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
-    id ("io.freefair.lombok") version "8.14"
+    id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "11.10.5"
     id("io.sentry.jvm.gradle") version "5.8.0"
 }
@@ -342,18 +343,24 @@ tasks {
         }
     }
 
-    javadoc {
-        options {
-            val coreOptions = this as CoreJavadocOptions
-
-            // To silence warnings regarding missing @params etc.
-            coreOptions.addBooleanOption("Xdoclint:none", true)
-
-            // To silence errors due to unkown tags
-            coreOptions.addStringOption("tag", "text-check:a:")
-            coreOptions.addStringOption("tag", "noindex:a:")
+    val delombok by registering(DelombokTask::class) {
+        dependsOn(compileJava)
+        mainClass.set("lombok.launch.Main")
+        val outputDir by extra { file("${project.layout.buildDirectory}/delombok") }
+        outputs.dir(outputDir)
+        sourceSets["main"].java.srcDirs.forEach {
+            inputs.dir(it)
+            args(it, "-d", outputDir)
+        }
+        doFirst {
+            outputDir.delete()
         }
     }
 
+    javadoc {
+        dependsOn(delombok)
+        val outputDir: File by delombok.get().extra
+        source = fileTree(outputDir)
+        isFailOnError = false
+    }
 }
-
