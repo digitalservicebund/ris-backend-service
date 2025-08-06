@@ -116,9 +116,9 @@ describe("update process step modal", () => {
 
     // Data Table
     expect(await screen.findByRole("table")).toBeVisible()
-    await expect(screen.getByRole("cell", { name: "Neu" })).toBeVisible()
-    await expect(screen.getByRole("cell", { name: "Blockiert" })).toBeVisible()
-    await expect(screen.getByRole("cell", { name: "Fertig" })).toBeVisible()
+    expect(screen.getByRole("cell", { name: "Neu" })).toBeVisible()
+    expect(screen.getByRole("cell", { name: "Blockiert" })).toBeVisible()
+    expect(screen.getByRole("cell", { name: "Fertig" })).toBeVisible()
 
     // Dialog is closed on Submit
     await user.click(await screen.findByLabelText("Weitergeben"))

@@ -83,10 +83,6 @@ async function onProcessStepUpdated() {
     summary: "Weitergeben erfolgreich",
     life: 5_000,
   })
-  onProcessStepDialogClosed()
-}
-
-function onProcessStepDialogClosed() {
   showProcessStepDialog.value = false
 }
 
@@ -171,8 +167,8 @@ watchEffect(() => {
     </SaveButton>
     <UpdateProcessStepDialog
       v-if="processStepsEnabled"
-      :show-dialog="showProcessStepDialog"
-      @on-cancelled="onProcessStepDialogClosed"
+      v-model:show-dialog="showProcessStepDialog"
+      @on-cancelled="showProcessStepDialog = false"
       @on-process-step-updated="onProcessStepUpdated"
     />
   </div>

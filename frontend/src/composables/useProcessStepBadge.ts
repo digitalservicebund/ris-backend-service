@@ -4,12 +4,16 @@ import ProcessStep from "@/domain/processStep"
 export interface StepBadge {
   borderColor: string
   backgroundColor: string
+  class: string
+  label: string
 }
 
 export function useProcessStepBadge(step: ProcessStep) {
   const badge: StepBadge = {
     borderColor: "black",
     backgroundColor: "white",
+    class: "px-8",
+    label: step.name,
   }
 
   return computed(() => {
