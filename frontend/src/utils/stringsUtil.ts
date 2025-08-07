@@ -13,4 +13,13 @@ export default class StringsUtil {
   public static readonly countWords = (text: string): number => {
     return text.trim().split(/\s+/).length
   }
+
+  public static getFirstAndLastChars(string?: string): string {
+    if (!string) return "-"
+
+    const words = string.trim().toUpperCase().split(/\s+/).filter(Boolean)
+    if (words.length === 0) return "-"
+    if (words.length === 1) return words[0].charAt(0)
+    return words[0].charAt(0) + words[words.length - 1].charAt(0)
+  }
 }
