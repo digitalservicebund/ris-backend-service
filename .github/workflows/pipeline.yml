@@ -6,7 +6,7 @@ on:
     paths-ignore:
       - '**/*.md'
   pull_request:
-    branches: [ main ]
+    branches: [ main, kim-test ]
   schedule:
     - cron: "0 18 * * *" # Every day at 8pm
   # Allow to run this workflow manually
