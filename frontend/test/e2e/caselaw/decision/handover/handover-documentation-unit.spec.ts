@@ -7,6 +7,7 @@ import {
 } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
   fillActiveCitationInputs,
+  fillCombobox,
   fillEnsuingDecisionInputs,
   fillPreviousDecisionInputs,
   navigateToCategories,
@@ -550,6 +551,39 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
 
         await expect(
           page.getByText("Es wurden Rechtschreibfehler identifiziert:"),
+        ).toBeVisible()
+      })
+    },
+  )
+
+  test(
+    "Warnung: CELEX-Nummer kann nicht an jDV exportiert werden",
+    {
+      tag: ["@RISDEV-8469"],
+    },
+    async ({ page, prefilledDocumentUnit }) => {
+      await test.step("Befülle CELEX-Nummer", async () => {
+        await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
+        await fillCombobox(page, "Gericht", "EuG")
+        await page.getByLabel("Celex-Nummer", { exact: true }).fill("1234/5678")
+        await save(page)
+      })
+
+      await test.step("Auf Übergabeseite erscheint Warnung, dass die Rubrik nicht übergeben wird", async () => {
+        await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
+        await expect(
+          page.getByText(
+            "Folgende Rubriken sind befüllt und können nicht an die jDV exportiert werden",
+          ),
+        ).toBeVisible()
+        await expect(page.getByText("CELEX-Nummer")).toBeVisible()
+        await page
+          .getByRole("button", {
+            name: "Dokumentationseinheit an jDV übergeben",
+          })
+          .click()
+        await expect(
+          page.getByRole("button", { name: "Trotzdem übergeben" }),
         ).toBeVisible()
       })
     },

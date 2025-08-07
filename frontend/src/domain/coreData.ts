@@ -30,3 +30,10 @@ export type CoreData = {
   isResolved?: boolean
   resolutionDate?: string
 }
+
+// Should be "keyof Required<CoreData>" to ensure all fields are included
+export const coreDataLabels: {
+  [coreDataKeyKey in keyof Required<Pick<CoreData, "celexNumber">>]: string
+} = {
+  celexNumber: "CELEX-Nummer",
+}

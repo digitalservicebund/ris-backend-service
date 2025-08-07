@@ -14,7 +14,7 @@ import NestedComponent from "@/components/NestedComponents.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
-import { CoreData } from "@/domain/coreData"
+import { CoreData, coreDataLabels } from "@/domain/coreData"
 import { Kind } from "@/domain/documentationUnitKind"
 import { pendingProceedingLabels } from "@/domain/pendingProceeding"
 import { SourceValue } from "@/domain/source"
@@ -294,7 +294,7 @@ onBeforeUnmount(() => {
         id="celex"
         v-slot="slotProps"
         class="flex-col"
-        label="CELEX-Nummer"
+        :label="coreDataLabels.celexNumber"
       >
         <InputText
           id="celex"
