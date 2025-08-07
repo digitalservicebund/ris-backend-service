@@ -27,8 +27,8 @@ export default class ForeignLanguageVersion implements EditableListItem {
   get renderSummary(): string {
     return [
       ...(this.languageCode?.label ? [this.languageCode.label] : []),
-      ...(this.link ? [`: ${this.link}`] : []),
-    ].join("")
+      ...(this.link ? [this.link] : []),
+    ].join(": ")
   }
 
   get isEmpty(): boolean {
