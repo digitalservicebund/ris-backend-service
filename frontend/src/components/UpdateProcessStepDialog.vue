@@ -8,6 +8,7 @@ import Dialog from "primevue/dialog"
 import Select from "primevue/select"
 import { computed, Ref, ref, watch } from "vue"
 import { InfoStatus } from "./enumInfoStatus"
+import AssigneeBadge from "@/components/AssigneeBadge.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
@@ -198,7 +199,11 @@ watch(
           </template>
         </Column>
 
-        <Column field="user.name" header="Person" />
+        <Column field="user.name" header="Person">
+          <template #body="{ data: item }">
+            <AssigneeBadge :name="item.user.name" />
+          </template>
+        </Column>
         <template #empty>Keine Prozessschritte</template>
       </DataTable>
     </div>
