@@ -29,7 +29,7 @@ function renderComponent() {
                       foreignLanguageVersions: [
                         new ForeignLanguageVersion({
                           languageCode: { id: "en", label: "Englisch" },
-                          link: "https://link-to-tranlsation.en",
+                          link: "https://link-to-translation.en",
                         }),
                       ],
                     },
@@ -49,8 +49,7 @@ describe("ForeignLanguageVersions.vue", () => {
     renderComponent()
 
     expect(screen.getByText("Fremdsprachige Fassung")).toBeVisible()
-    expect(
-      screen.getByText("Englisch: https://link-to-tranlsation.en"),
-    ).toBeVisible()
+    expect(screen.getByText("Englisch:")).toBeVisible()
+    expect(screen.getByText("https://link-to-translation.en")).toBeVisible()
   })
 })

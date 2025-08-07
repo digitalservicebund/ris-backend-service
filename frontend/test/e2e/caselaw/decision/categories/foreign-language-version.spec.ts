@@ -121,6 +121,9 @@ test.describe(
             "Afrikaans: https://link-to-translation.af",
           ),
         ).toBeVisible()
+        const link = page.getByText("https://link-to-translation.af")
+        // Link is clickable in the editable list summary
+        await link.click({ trial: true })
       })
 
       await test.step("Mehrfacheinträge sind möglich", async () => {

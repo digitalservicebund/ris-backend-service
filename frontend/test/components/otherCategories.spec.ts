@@ -344,7 +344,7 @@ describe("other categories", () => {
               id: "3",
               label: "Englisch",
             },
-            link: "https://link-to-tranlsation.en",
+            link: "http://link-to-translation.en",
           }),
           new ForeignLanguageVersion({
             id: "2",
@@ -352,7 +352,15 @@ describe("other categories", () => {
               id: "4",
               label: "Französisch",
             },
-            link: "https://link-to-tranlsation.fr",
+            link: "https://link-to-translation.fr",
+          }),
+          new ForeignLanguageVersion({
+            id: "3",
+            languageCode: {
+              id: "5",
+              label: "Spanisch",
+            },
+            link: "link-to-translation.es",
           }),
         ],
       })
@@ -366,12 +374,12 @@ describe("other categories", () => {
 
       // Assert
       expect(await screen.findByText("Fremdsprachige Fassung")).toBeVisible()
-      expect(
-        await screen.findByText("Englisch: https://link-to-tranlsation.en"),
-      ).toBeVisible()
-      expect(
-        await screen.findByText("Französisch: https://link-to-tranlsation.fr"),
-      ).toBeVisible()
+
+      const links = screen.getAllByRole("link")
+      expect(links).toHaveLength(3)
+      expect(links[0]).toHaveAttribute("href", "http://link-to-translation.en")
+      expect(links[1]).toHaveAttribute("href", "https://link-to-translation.fr")
+      expect(links[2]).toHaveAttribute("href", "https://link-to-translation.es")
     })
   })
 })
