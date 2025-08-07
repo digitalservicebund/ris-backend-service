@@ -58,7 +58,6 @@ public class BareIdUserApiService implements UserApiService {
       return UserTransformer.transformToDomain(responseBody.user());
 
     } catch (Exception e) {
-      log.error("Error reading the user information", e);
       return User.builder().id(userId).build();
     }
   }
