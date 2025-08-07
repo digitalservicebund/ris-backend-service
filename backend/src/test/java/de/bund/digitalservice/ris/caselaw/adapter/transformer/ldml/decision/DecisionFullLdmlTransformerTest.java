@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.Definition;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ForeignLanguageVersion;
@@ -535,6 +536,10 @@ class DecisionFullLdmlTransformerTest {
                                       showAs="Französisch"/>
                   </ris:foreignLanguageVersion>
                </ris:foreignLanguageVersions>
+               <ris:definitions>
+                  <ris:definition ris:definedTerm="indirekte Steuern" ris:definingBorderNumber="2"/>
+                  <ris:definition ris:definedTerm="Sachgesamtheit"/>
+               </ris:definitions>
                <ris:evfs>evsf test</ris:evfs>
             </ris:meta>
          </akn:proprietary>
@@ -763,6 +768,13 @@ class DecisionFullLdmlTransformerTest {
                                     .build())
                             .link("https://ihre-url-zur-französischen-übersetzung")
                             .build()))
+                .definitions(
+                    List.of(
+                        Definition.builder()
+                            .definedTerm("indirekte Steuern")
+                            .definingBorderNumber(2L)
+                            .build(),
+                        Definition.builder().definedTerm("Sachgesamtheit").build()))
                 .evsf("evsf test")
                 .build())
         .previousDecisions(List.of(previousDecision1, previousDecision2))
