@@ -21,7 +21,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "11.10.5"
-    id("io.sentry.jvm.gradle") version "5.8.0"
+    id("io.sentry.jvm.gradle") version "5.8.1"
 }
 
 group = "de.bund.digitalservice"
@@ -180,7 +180,7 @@ dependencies {
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.43")
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.44")
 
     implementation(platform("software.amazon.awssdk:bom:2.32.13"))
     implementation("software.amazon.awssdk:netty-nio-client")
