@@ -36,6 +36,7 @@ const { documentUnit } = storeToRefs(store) as {
 
 const processSteps = ref<ProcessStep[]>()
 const nextProcessStep = ref<ProcessStep>()
+const errors = ref<ResponseError[]>()
 const serviceError1 = ref<ResponseError>()
 const serviceError2 = ref<ResponseError>()
 const nextProcessStepUser = ref<User>()
@@ -60,19 +61,20 @@ const selectedUser = computed({
 })
 
 async function updateProcessStep(): Promise<void> {
-  if (nextProcessStep.value)
+  if (nextProcessStep.value) {
     documentUnit.value!.currentProcessStep = {
       processStep: nextProcessStep.value,
       user: nextProcessStepUser.value,
     }
-  const response = await store.updateDocumentUnit()
-  if (response.error) {
-    serviceError1.value = {
-      title: "Die Dokumentationseinheit konnte nicht weitergegeben werden.",
-      description: "Versuchen Sie es erneut.",
+    const response = await store.updateDocumentUnit()
+    if (response.error) {
+      errors.value?.push({
+        title: "Die Dokumentationseinheit konnte nicht weitergegeben werden.",
+        description: "Versuchen Sie es erneut.",
+      })
+    } else {
+      emit("onProcessStepUpdated")
     }
-  } else {
-    emit("onProcessStepUpdated")
   }
 }
 
@@ -169,6 +171,7 @@ watch(
       >
         <Button
           aria-label="Weitergeben"
+          :disabled="!nextProcessStep"
           label="Weitergeben"
           severity="primary"
           size="small"
