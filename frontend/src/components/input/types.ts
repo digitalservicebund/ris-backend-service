@@ -13,6 +13,7 @@ import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import { Procedure } from "@/domain/procedure"
+import { User } from "@/domain/user"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import { Match } from "@/types/textCheck"
 
@@ -144,6 +145,7 @@ export type ComboboxInputModelType =
   | LegalPeriodical
   | DocumentationOffice
   | LanguageCode
+  | User
 
 export type ComboboxItem = {
   label: string

@@ -1,12 +1,15 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -14,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -28,13 +30,18 @@ import org.springframework.web.client.RestTemplate;
 @Import({BareIdUserApiService.class})
 class BareIdUserApiServiceTest {
 
-  @Autowired BareIdUserApiService bareIdUserApiService;
+  BareIdUserApiService bareIdUserApiService;
 
   @MockitoBean RestTemplate restTemplate;
   @MockitoBean BareIdUserApiTokenService bareIdUserApiTokenService;
 
+  String instanceId = UUID.randomUUID().toString();
+
   @BeforeEach
   void setUp() {
+    bareIdUserApiService =
+        new BareIdUserApiService(bareIdUserApiTokenService, restTemplate, instanceId);
+
     OAuth2AccessToken mockToken =
         new OAuth2AccessToken(
             OAuth2AccessToken.TokenType.BEARER,
@@ -42,10 +49,39 @@ class BareIdUserApiServiceTest {
             Instant.now(),
             Instant.now().plusSeconds(3600));
     when(bareIdUserApiTokenService.getAccessToken()).thenReturn(mockToken);
+
+    BareUserApiResponse.Group group = generateBareUserGroup();
+    BareUserApiResponse.GroupApiResponse groupApiResponse =
+        new BareUserApiResponse.GroupApiResponse(List.of(group));
+
+    ResponseEntity<BareUserApiResponse.GroupApiResponse> mockGroupResponse =
+        ResponseEntity.ok(groupApiResponse);
+
+    doReturn(mockGroupResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.GroupApiResponse.class));
+
+    BareUserApiResponse.UsersApiResponse userApiResponse =
+        new BareUserApiResponse.UsersApiResponse(Collections.emptyList());
+
+    ResponseEntity<BareUserApiResponse.UsersApiResponse> mockUsersResponse =
+        ResponseEntity.ok(userApiResponse);
+
+    doReturn(mockUsersResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UsersApiResponse.class));
   }
 
   @Test
-  void testGetUser() {
+  void testGetUser_shouldSucceed() {
     final UUID userId = UUID.randomUUID();
 
     var attributes =
@@ -131,5 +167,41 @@ class BareIdUserApiServiceTest {
         "e2e_tests_bfh@digitalservice.bund.de",
         "e2e_tests_bfh@digitalservice.bund.de",
         attributes);
+  }
+
+  @Test
+  void testGetUsersByPath_shouldSucceed() {
+    var results = bareIdUserApiService.getUsers("/DS/Intern");
+    Assertions.assertNotNull(results);
+  }
+
+  @Test
+  void testGetUsers_withEmptyPath_shouldThrowException() {
+    var exception = assertThrows(UserApiException.class, () -> bareIdUserApiService.getUsers(""));
+    Assertions.assertEquals("User group path is empty or blank", exception.getMessage());
+  }
+
+  @Test
+  void testGetUsers_withBadRequest_shouldThrowException() {
+    ResponseEntity<BareUserApiResponse.UsersApiResponse> mockUsersResponse =
+        ResponseEntity.badRequest().build();
+
+    doReturn(mockUsersResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UsersApiResponse.class));
+
+    UUID userGroupId = UUID.randomUUID();
+
+    var exception =
+        assertThrows(UserApiException.class, () -> bareIdUserApiService.getUsers(userGroupId));
+    Assertions.assertEquals("Could not fetch users", exception.getMessage());
+  }
+
+  private BareUserApiResponse.Group generateBareUserGroup() {
+    return new BareUserApiResponse.Group(UUID.randomUUID(), "DS", "/" + "DS");
   }
 }

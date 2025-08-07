@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,6 +56,21 @@ public class KeycloakUserService implements UserService {
   @Override
   public User getUser(UUID uuid) {
     return userApiService.getUser(uuid);
+  }
+
+  @Override
+  public List<User> getUsers(OidcUser oidcUser) {
+    try {
+      var optionalUserGroup = getUserGroup(oidcUser);
+      if (optionalUserGroup.isPresent()) {
+        return userApiService.getUsers(optionalUserGroup.get().userGroupPathName());
+      } else {
+        return Collections.emptyList();
+      }
+    } catch (Exception e) {
+      LOGGER.error("Error reading group user information: ", e);
+      return Collections.emptyList();
+    }
   }
 
   @Override

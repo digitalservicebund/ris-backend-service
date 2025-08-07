@@ -2,12 +2,14 @@ package de.bund.digitalservice.ris.caselaw;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import java.util.Collections;
@@ -156,5 +158,24 @@ public class AuthUtils {
                     .build()))
         .when(userGroupService)
         .getAllUserGroups();
+  }
+
+  /**
+   * For testing getUser should return a user with id as the api service is unreachable
+   *
+   * @param userApiService the mocked service to adjust return to
+   */
+  public static void mockUserApi(UserApiService userApiService) {
+
+    doAnswer(
+            invocation -> {
+              UUID id = invocation.getArgument(0);
+              if (id == null) {
+                return null;
+              }
+              return User.builder().id(id).build();
+            })
+        .when(userApiService)
+        .getUser(any(UUID.class));
   }
 }

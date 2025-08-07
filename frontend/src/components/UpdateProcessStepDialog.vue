@@ -6,16 +6,16 @@ import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import Dialog from "primevue/dialog"
 import Select from "primevue/select"
-import { Ref, ref, watch } from "vue"
+import { computed, Ref, ref, watch } from "vue"
 import { InfoStatus } from "./enumInfoStatus"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
-import { ComboboxItem } from "@/components/input/types"
 import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import ProcessStep from "@/domain/processStep"
+import { User } from "@/domain/user"
 import ComboboxItemService from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import processStepService from "@/services/processStepService"
@@ -32,16 +32,37 @@ const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
   documentUnit: Ref<DocumentationUnit>
 }
-const selectedUser = ref<ComboboxItem>()
+
 const processSteps = ref<ProcessStep[]>()
 const nextProcessStep = ref<ProcessStep>()
 const serviceError1 = ref<ResponseError>()
 const serviceError2 = ref<ResponseError>()
+const nextProcessStepUser = ref<User>()
+
+/**
+ * Data restructuring from user props to combobox item.
+ */
+const selectedUser = computed({
+  get: () =>
+    nextProcessStepUser.value
+      ? {
+          label:
+            nextProcessStepUser.value.name ||
+            nextProcessStepUser.value.email ||
+            "Keine Information",
+          value: nextProcessStepUser.value,
+        }
+      : undefined,
+  set: (newValue) => {
+    nextProcessStepUser.value = { ...newValue } as User
+  },
+})
 
 async function updateProcessStep(): Promise<void> {
   if (nextProcessStep.value)
     documentUnit.value!.currentProcessStep = {
       processStep: nextProcessStep.value,
+      user: nextProcessStepUser.value,
     }
   const response = await store.updateDocumentUnit()
   if (response.error) {

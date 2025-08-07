@@ -50,6 +50,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -557,28 +558,22 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                                           .uuid()
                                           .toString()));
 
-              boolean changed = false;
-              if (currentDocumentationUnitProcessStepDTOFromDB == null) {
-                // If there was no current step in DB, but frontend provides one, it's a change.
-                changed = true;
-              } else {
-                // Compare DB processStepDTO and processStepDTO form frontend
-                if (!currentDocumentationUnitProcessStepDTOFromDB
-                    .getProcessStep()
-                    .equals(processStepDTO)) {
-                  changed = true;
-                }
-                // Todo: check userId too if a change in assigned user makes it a "new" step entry.
-                // if (!Objects.equals(currentDocumentationUnitProcessStepDTOFromDB.getUserId(),
-                // currentDocunitProcessStepFromFrontend.getUserId())) {
-                //    changed = true;
-                // }
-              }
+              boolean shouldUpdateProcessStep =
+                  processStepHasChanged(
+                      currentDocumentationUnitProcessStepDTOFromDB,
+                      processStepDTO,
+                      currentDocunitProcessStepFromFrontend);
 
-              if (changed) {
+              if (shouldUpdateProcessStep) {
+                UUID processStepUserId = null;
+
+                if (currentDocunitProcessStepFromFrontend.getUser() != null) {
+                  processStepUserId = currentDocunitProcessStepFromFrontend.getUser().id();
+                }
+
                 DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
                     DocumentationUnitProcessStepDTO.builder()
-                        // .userId(currentDocunitProcessStepFromFrontend.getUser().id())
+                        .userId(processStepUserId)
                         .createdAt(LocalDateTime.now())
                         .processStep(processStepDTO)
                         .documentationUnit(documentationUnitDTO)
@@ -593,6 +588,24 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                 repository.save(documentationUnitDTO);
               }
             });
+  }
+
+  private static boolean processStepHasChanged(
+      DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB,
+      ProcessStepDTO processStepDTO,
+      DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend) {
+    if (currentDocumentationUnitProcessStepDTOFromDB == null) {
+      // If there was no current step in DB, but frontend provides one, it's a change.
+      return true;
+    }
+    // Compare DB processStepDTO and processStepDTO form frontend
+    if (!currentDocumentationUnitProcessStepDTOFromDB.getProcessStep().equals(processStepDTO)) {
+      return true;
+    }
+    // If User id has changed in process step
+    return !Objects.equals(
+        currentDocumentationUnitProcessStepDTOFromDB.getUserId(),
+        currentDocunitProcessStepFromFrontend.getUser().id());
   }
 
   @Override
