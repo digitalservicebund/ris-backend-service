@@ -123,7 +123,7 @@ watch(
     modal
   >
     <div class="flex w-full flex-col pt-32">
-      <div v-if="errors" class="mb-48 flex flex-col">
+      <div v-if="errors.length > 0" class="mb-48 flex flex-col">
         <InfoModal
           v-for="(error, index) in errors"
           :key="index"
