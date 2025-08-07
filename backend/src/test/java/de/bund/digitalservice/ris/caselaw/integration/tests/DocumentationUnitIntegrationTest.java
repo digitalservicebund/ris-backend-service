@@ -167,16 +167,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .findByName("Ersterfassung")
             .orElseThrow(
                 () -> new AssertionError("Process step 'Ersterfassung' not found in repository."));
-    qsformalProcessStep =
-        processStepRepository
-            .findByName("QS formal")
-            .orElseThrow(
-                () -> new AssertionError("Process step 'QS formal' not found in repository."));
-    blockiertProcessStep =
-        processStepRepository
-            .findByName("Blockiert")
-            .orElseThrow(
-                () -> new AssertionError("Process step 'Blockiert' not found in repository."));
   }
 
   @AfterEach
