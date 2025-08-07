@@ -14,6 +14,7 @@ import routes from "~/test-helper/routes"
 function mockSessionStore(
   contentRelatedIndexing: ContentRelatedIndexing,
   courtType: string = "",
+  jurisdictionType: string = "",
 ) {
   const mockedSessionStore = useDocumentUnitStore()
   mockedSessionStore.documentUnit = new Decision("q834", {
@@ -22,6 +23,7 @@ function mockSessionStore(
       court: {
         label: courtType,
         type: courtType,
+        jurisdictionType,
       },
     },
   })
@@ -245,7 +247,7 @@ describe("other categories", () => {
 
     test("should display E-VSF button when it is empty and financial court", async () => {
       // Arrange
-      mockSessionStore({ evsf: undefined }, "BFH")
+      mockSessionStore({ evsf: undefined }, "BFH", "Finanzgerichtsbarkeit")
 
       // Act
       render(OtherCategories)

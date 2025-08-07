@@ -67,10 +67,10 @@ const isLaborCourt = computed(() =>
   ),
 )
 
-const isFinanceCourt = computed(() =>
-  ["BFH", "FG", "OFH", "RFH"].includes(
-    store.documentUnit?.coreData.court?.type ?? "",
-  ),
+const isFinanceCourt = computed(
+  () =>
+    store.documentUnit?.coreData.court?.jurisdictionType ===
+    "Finanzgerichtsbarkeit",
 )
 
 const shouldDisplayDismissalAttributes = computed(
