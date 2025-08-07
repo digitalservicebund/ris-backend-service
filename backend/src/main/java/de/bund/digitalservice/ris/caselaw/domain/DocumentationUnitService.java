@@ -772,6 +772,23 @@ public class DocumentationUnitService {
       // Procedures need to be unassigned as they are linked to the previous documentation Office
       repository.unassignProcedures(decision.uuid());
       repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
+      decision =
+          decision.toBuilder()
+              .currentProcessStep(
+                  DocumentationUnitProcessStep.builder()
+                      .id(UUID.randomUUID())
+                      .user(user)
+                      .createdAt(LocalDateTime.now())
+                      .processStep(
+                          processStepService
+                              .getProcessStepForName("Neu")
+                              .orElseThrow(
+                                  () ->
+                                      new ProcessStepNotFoundException(
+                                          "Process Step 'Neu' not found")))
+                      .build())
+              .build();
+      repository.saveProcessSteps(decision);
       return "The documentation office [%s] has been successfully assigned."
           .formatted(documentationOffice.abbreviation());
     }

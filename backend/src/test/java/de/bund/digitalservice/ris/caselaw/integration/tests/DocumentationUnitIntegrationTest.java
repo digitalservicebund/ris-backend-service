@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumbe
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseInputTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcessStepRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
@@ -34,6 +35,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EurLexResultDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
@@ -43,6 +45,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalXmlReposi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexResultRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -89,6 +92,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,6 +140,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @Autowired private DocumentationUnitHistoryLogService historyLogService;
   @Autowired private EurLexResultRepository eurLexResultRepository;
   @Autowired private DatabaseInputTypeRepository inputTypeRepository;
+  @Autowired private DatabaseProcessStepRepository processStepRepository;
 
   @MockitoBean private MailService mailService;
   @MockitoBean private AttachmentService attachmentService;
@@ -144,11 +149,36 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
+  private ProcessStepDTO neuProcessStep;
+  private ProcessStepDTO ersterfassungProcessStep;
+  private ProcessStepDTO qsformalProcessStep;
+  private ProcessStepDTO blockiertProcessStep;
 
   @BeforeEach
   void setUp() {
     documentationOffice =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
+
+    neuProcessStep =
+        processStepRepository
+            .findByName("Neu")
+            .orElseThrow(() -> new AssertionError("Process step 'Neu' not found in repository."));
+
+    ersterfassungProcessStep =
+        processStepRepository
+            .findByName("Ersterfassung")
+            .orElseThrow(
+                () -> new AssertionError("Process step 'Ersterfassung' not found in repository."));
+    qsformalProcessStep =
+        processStepRepository
+            .findByName("QS formal")
+            .orElseThrow(
+                () -> new AssertionError("Process step 'QS formal' not found in repository."));
+    blockiertProcessStep =
+        processStepRepository
+            .findByName("Blockiert")
+            .orElseThrow(
+                () -> new AssertionError("Process step 'Blockiert' not found in repository."));
   }
 
   @AfterEach
@@ -2040,6 +2070,99 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(docUnitWithProcedure.get().getProcedureHistory().get(0).getLabel())
         .isEqualTo("vorgang2");
     return decision.getId();
+  }
+
+  @Transactional
+  @Test
+  void assignDocumentationOffice_withProcessStep_shouldAddProcessStepNeu() {
+    // Arrange
+    var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+    var decisionBuilder =
+        DecisionDTO.builder()
+            .documentNumber("DOCNUMBER_001")
+            .documentationOffice(documentationOffice); // DS doc office
+    var documentationUnit =
+        EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder);
+
+    decisionBuilder =
+        ((DecisionDTO) documentationUnit)
+            .toBuilder()
+                .processSteps(
+                    List.of(
+                        DocumentationUnitProcessStepDTO.builder()
+                            .documentationUnit(documentationUnit)
+                            .processStep(ersterfassungProcessStep)
+                            .createdAt(LocalDateTime.now())
+                            .build()));
+
+    repository.save(decisionBuilder.build());
+
+    // Act
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentationUnit.getId()
+                + "/assign/"
+                + bghDocOffice.getId())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              assertThat(response.getResponseBody())
+                  .isEqualTo("The documentation office [BGH] has been successfully assigned.");
+              var docUnit = repository.findById(documentationUnit.getId());
+              assertThat(docUnit.get().getProcessSteps()).size().isEqualTo(2);
+              assertThat(docUnit.get().getCurrentProcessStep().getProcessStep())
+                  .isEqualTo(neuProcessStep);
+              assertThat(docUnit.get().getProcessSteps().get(0).getProcessStep())
+                  .isEqualTo(ersterfassungProcessStep);
+              assertThat(docUnit.get().getProcessSteps().get(1).getProcessStep())
+                  .isEqualTo(neuProcessStep);
+            });
+  }
+
+  @Transactional
+  @Test
+  void assignDocumentationOffice_withoutProcessStep_shouldAddProcessStepNeu() {
+    // Arrange
+    var bghDocOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+    var decisionBuilder =
+        DecisionDTO.builder()
+            .documentNumber("DOCNUMBER_001")
+            .documentationOffice(documentationOffice); // DS doc office
+    var documentationUnit =
+        EntityBuilderTestUtil.createAndSaveDecision(repository, decisionBuilder);
+
+    // Act
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentationUnit.getId()
+                + "/assign/"
+                + bghDocOffice.getId())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              // Assert
+              assertThat(response.getResponseBody())
+                  .isEqualTo("The documentation office [BGH] has been successfully assigned.");
+              var docUnit = repository.findById(documentationUnit.getId());
+              assertThat(docUnit.get().getProcessSteps()).size().isEqualTo(1);
+              assertThat(docUnit.get().getCurrentProcessStep().getProcessStep())
+                  .isEqualTo(neuProcessStep);
+              assertThat(docUnit.get().getProcessSteps().get(0).getProcessStep())
+                  .isEqualTo(neuProcessStep);
+            });
   }
 
   @Test
