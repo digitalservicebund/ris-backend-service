@@ -66,17 +66,19 @@ public class ProcessStepService {
   }
 
   /**
-   * Retrieves a list of all process steps associated with the given documentation office, ordered
-   * by rank.
+   * Retrieves a list of all process steps associated with the given documentation office but the
+   * 'Neu' (because it's not assignable). The process steps are ordered by rank.
    *
    * @param docOfficeId The ID of the documentation office.
    * @return A list of ProcessSteps associated with the given documentation office, ordered by rank.
    * @throws DocumentationOfficeNotExistsException if the documentation office with the given ID is
    *     not found.
    */
-  public List<ProcessStep> getAllProcessStepsForDocOffice(UUID docOfficeId)
+  public List<ProcessStep> getAssignableProcessStepsForDocOffice(UUID docOfficeId)
       throws DocumentationOfficeNotExistsException {
-    return documentationOfficeService.getProcessStepsForDocumentationOffice(docOfficeId);
+    return documentationOfficeService.getProcessStepsForDocumentationOffice(docOfficeId).stream()
+        .filter((step) -> !step.name().equals("Neu"))
+        .toList();
   }
 
   public Optional<ProcessStep> getProcessStepForName(String name) {

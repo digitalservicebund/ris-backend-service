@@ -179,8 +179,7 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
         .consumeWith(
             response -> {
               List<ProcessStep> possibleSteps = response.getResponseBody();
-              assertThat(possibleSteps).isNotNull().hasSize(8);
-              assertThat(possibleSteps.get(0).name()).isEqualTo("Neu");
+              assertThat(possibleSteps).isNotNull().hasSize(7);
               assertThat(possibleSteps.get(1).name()).isEqualTo("Ersterfassung");
               assertThat(possibleSteps.get(2).name()).isEqualTo("QS formal");
               assertThat(possibleSteps.get(3).name()).isEqualTo("Fachdokumentation");
