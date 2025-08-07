@@ -2,6 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import Tooltip from "primevue/tooltip"
+import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
 import { Decision } from "@/domain/decision"
@@ -71,36 +72,42 @@ function renderComponent() {
 }
 
 describe("update process step modal", () => {
-  vi.spyOn(processStepService, "getNextProcessStep").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: {
-        uuid: "qs-formal-id",
-        name: "QS formal",
-        abbreviation: "QS",
-      },
-    }),
-  )
-  vi.spyOn(processStepService, "getProcessSteps").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: [
-        { uuid: "neu-id", name: "Neu", abbreviation: "N" },
-        { uuid: "blockiert-id", name: "Blockiert", abbreviation: "B" },
-        { uuid: "qs-formal-id", name: "QS formal", abbreviation: "QS" },
-      ],
-    }),
-  )
-  vi.spyOn(documentationUnitSerice, "update").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: {
-        documentationUnitVersion: 1,
-        patch: [],
-        errorPaths: [],
-      },
-    }),
-  )
+  beforeEach(() => {
+    vi.spyOn(processStepService, "getNextProcessStep").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          uuid: "qs-formal-id",
+          name: "QS formal",
+          abbreviation: "QS",
+        },
+      }),
+    )
+    vi.spyOn(processStepService, "getProcessSteps").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: [
+          { uuid: "neu-id", name: "Neu", abbreviation: "N" },
+          { uuid: "blockiert-id", name: "Blockiert", abbreviation: "B" },
+          { uuid: "qs-formal-id", name: "QS formal", abbreviation: "QS" },
+        ],
+      }),
+    )
+    vi.spyOn(documentationUnitSerice, "update").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          documentationUnitVersion: 1,
+          patch: [],
+          errorPaths: [],
+        },
+      }),
+    )
+  })
+
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
 
   test("shows next step and closes after updating process step", async () => {
     const { user, emitted } = renderComponent()

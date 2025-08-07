@@ -36,9 +36,7 @@ const { documentUnit } = storeToRefs(store) as {
 
 const processSteps = ref<ProcessStep[]>()
 const nextProcessStep = ref<ProcessStep>()
-const errors = ref<ResponseError[]>()
-const serviceError1 = ref<ResponseError>()
-const serviceError2 = ref<ResponseError>()
+const errors = ref<ResponseError[]>([])
 const nextProcessStepUser = ref<User>()
 
 /**
@@ -82,7 +80,7 @@ async function updateProcessStep(): Promise<void> {
 const fetchData = async () => {
   const processStepsResponse = await processStepService.getProcessSteps()
   if (processStepsResponse.error) {
-    serviceError1.value = processStepsResponse.error
+    errors.value?.push(processStepsResponse.error)
   } else {
     processSteps.value = processStepsResponse.data
   }
@@ -91,7 +89,7 @@ const fetchData = async () => {
     documentUnit.value.uuid,
   )
   if (nextProcessStepResponse.error) {
-    serviceError2.value = nextProcessStepResponse.error
+    errors.value?.push(nextProcessStepResponse.error)
   } else {
     nextProcessStep.value = nextProcessStepResponse.data
   }
@@ -107,6 +105,7 @@ watch(
   showDialog,
   async (newValue) => {
     if (newValue === true) {
+      errors.value = []
       await fetchData()
     }
   },
@@ -124,21 +123,15 @@ watch(
     modal
   >
     <div class="flex w-full flex-col pt-32">
-      <div v-if="serviceError1 || serviceError2" class="mb-48 flex flex-col">
+      <div v-if="errors" class="mb-48 flex flex-col">
         <InfoModal
-          v-if="serviceError1"
+          v-for="(error, index) in errors"
+          :key="index"
+          :class="index !== 0 ? 'mt-16' : ''"
           data-testid="service-error"
-          :description="serviceError1.description"
+          :description="error.description"
           :status="InfoStatus.ERROR"
-          :title="serviceError1.title"
-        />
-        <InfoModal
-          v-if="serviceError2"
-          :class="serviceError1 ? 'mt-16' : ''"
-          data-testid="service-error"
-          :description="serviceError2.description"
-          :status="InfoStatus.ERROR"
-          :title="serviceError2.title"
+          :title="error.title"
         />
       </div>
 
