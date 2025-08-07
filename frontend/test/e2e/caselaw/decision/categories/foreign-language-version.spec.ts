@@ -2,6 +2,7 @@ import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   navigateToCategories,
+  navigateToHandover,
   navigateToPreview,
   save,
 } from "~/e2e/caselaw/utils/e2e-utils"
@@ -19,7 +20,7 @@ test.describe(
   },
   () => {
     test("Fremdsprachige Fassung", async ({ page, prefilledDocumentUnit }) => {
-      await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
 
       const otherCategoriesContainer = page.getByLabel("Weitere Rubriken")
       const foreignLanguageVersionButton = otherCategoriesContainer.getByRole(
@@ -153,7 +154,7 @@ test.describe(
       })
 
       await test.step("Fremdsprachige Fassung erscheint in der Vorschau", async () => {
-        await navigateToPreview(page, prefilledDocumentUnit.documentNumber!)
+        await navigateToPreview(page, prefilledDocumentUnit.documentNumber)
         await expect(page.getByText("Fremdsprachige Fassung")).toBeVisible()
         await expect(
           page.getByText("Afrikaans: https://link-to-translation.af"),
@@ -178,6 +179,24 @@ test.describe(
           "https://www.link-to-translation.fr",
         )
         await secondLink.click({ trial: true })
+      })
+
+      await test.step("Auf Übergabeseite erscheint Warnung, dass die Rubrik nicht übergeben wird", async () => {
+        await navigateToHandover(page, prefilledDocumentUnit.documentNumber)
+        await expect(
+          page.getByText(
+            "Folgende Rubriken sind befüllt und können nicht an die jDV exportiert werden",
+          ),
+        ).toBeVisible()
+        await expect(page.getByText("Fremdsprachige Fassung")).toBeVisible()
+        await page
+          .getByRole("button", {
+            name: "Dokumentationseinheit an jDV übergeben",
+          })
+          .click()
+        await expect(
+          page.getByRole("button", { name: "Trotzdem übergeben" }),
+        ).toBeVisible()
       })
     })
   },

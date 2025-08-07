@@ -15,6 +15,7 @@ import HandoverTextCheckView from "@/components/text-check/HandoverTextCheckView
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
+import { coreDataLabels } from "@/domain/coreData"
 import {
   contentRelatedIndexingLabels,
   Decision,
@@ -140,7 +141,7 @@ function handoverDocumentUnit() {
     if (fieldsWithoutJdvExport.value.length > 0)
       warnings.push(
         "Die folgenden Rubriken können nicht an die jDV exportiert werden: \n" +
-          fieldsWithoutJdvExport.value.map((field) => `- ${field}`).join(", "),
+          fieldsWithoutJdvExport.value.map((field) => `- ${field}`).join("\n"),
       )
     warnings.push("Wollen Sie das Dokument dennoch übergeben?")
     warningModalReasons.value = warnings.join("\n\n")
@@ -164,8 +165,12 @@ const pendingDuplicates = ref(
 // Labels of non-empty fields that won't be exported to the jDV
 const fieldsWithoutJdvExport = computed<string[]>(() => {
   const fieldLabels: string[] = []
-  if (decision.value?.contentRelatedIndexing.evsf)
+  if (decision.value?.contentRelatedIndexing?.evsf)
     fieldLabels.push(contentRelatedIndexingLabels.evsf)
+  if (decision.value?.contentRelatedIndexing?.foreignLanguageVersions)
+    fieldLabels.push(contentRelatedIndexingLabels?.foreignLanguageVersions)
+  if (decision.value?.coreData?.celexNumber)
+    fieldLabels.push(coreDataLabels.celexNumber)
   return fieldLabels
 })
 
