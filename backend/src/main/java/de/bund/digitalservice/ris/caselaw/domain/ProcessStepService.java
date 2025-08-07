@@ -77,7 +77,7 @@ public class ProcessStepService {
   public List<ProcessStep> getAssignableProcessStepsForDocOffice(UUID docOfficeId)
       throws DocumentationOfficeNotExistsException {
     return documentationOfficeService.getProcessStepsForDocumentationOffice(docOfficeId).stream()
-        .filter((step) -> !step.name().equals("Neu"))
+        .filter(step -> !step.name().equals("Neu"))
         .toList();
   }
 
