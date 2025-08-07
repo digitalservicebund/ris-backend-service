@@ -151,8 +151,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   private DocumentationOfficeDTO documentationOffice;
   private ProcessStepDTO neuProcessStep;
   private ProcessStepDTO ersterfassungProcessStep;
-  private ProcessStepDTO qsformalProcessStep;
-  private ProcessStepDTO blockiertProcessStep;
 
   @BeforeEach
   void setUp() {
