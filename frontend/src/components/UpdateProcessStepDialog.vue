@@ -14,6 +14,7 @@ import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
+import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import ProcessStep from "@/domain/processStep"
 import { User } from "@/domain/user"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -92,6 +93,12 @@ const fetchData = async () => {
   } else {
     nextProcessStep.value = nextProcessStepResponse.data
   }
+}
+
+function rowClass(data: DocumentationUnitProcessStep): string {
+  return data.id !== documentUnit.value.processSteps?.at(0)?.id
+    ? "bg-blue-100"
+    : ""
 }
 
 watch(
@@ -176,7 +183,11 @@ watch(
         ></Button>
       </div>
 
-      <DataTable class="pt-32" :value="documentUnit.processSteps">
+      <DataTable
+        class="overflow-x-scroll pt-32"
+        :row-class="rowClass"
+        :value="documentUnit.processSteps"
+      >
         <Column field="createdAt" header="Datum">
           <template #body="{ data: item }">
             {{ dayjs(item.decisionDate).format("DD.MM.YYYY") }}
