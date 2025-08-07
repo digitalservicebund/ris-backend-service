@@ -7,7 +7,7 @@ function renderComponent() {
     props: {
       data: new ForeignLanguageVersion({
         languageCode: { id: "id", label: "Englisch" },
-        link: "https://link-to-tranlsation.en",
+        link: "https://link-to-translation.en",
       }),
     },
   })
@@ -16,8 +16,7 @@ function renderComponent() {
 describe("Foreign Language Version summary", () => {
   it("renders summary correctly", async () => {
     renderComponent()
-    expect(
-      await screen.findByText("Englisch: https://link-to-tranlsation.en"),
-    ).toBeVisible()
+    expect(screen.getByText("Englisch:")).toBeVisible()
+    expect(screen.getByText("https://link-to-translation.en")).toBeVisible()
   })
 })
