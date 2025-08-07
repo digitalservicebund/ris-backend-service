@@ -40,7 +40,7 @@ const onSelect = (index: number) => {
       <CellHeaderItem> Dateiname</CellHeaderItem>
       <CellHeaderItem> Format</CellHeaderItem>
       <CellHeaderItem> Hochgeladen am</CellHeaderItem>
-      <CellHeaderItem></CellHeaderItem>
+      <CellHeaderItem>I</CellHeaderItem>
     </TableHeader>
     <TableRow
       v-for="(file, index) in props.files"
