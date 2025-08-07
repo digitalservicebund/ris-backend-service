@@ -180,13 +180,13 @@ class ProcessStepIntegrationTest extends BaseIntegrationTest {
             response -> {
               List<ProcessStep> possibleSteps = response.getResponseBody();
               assertThat(possibleSteps).isNotNull().hasSize(7);
-              assertThat(possibleSteps.get(1).name()).isEqualTo("Ersterfassung");
-              assertThat(possibleSteps.get(2).name()).isEqualTo("QS formal");
-              assertThat(possibleSteps.get(3).name()).isEqualTo("Fachdokumentation");
-              assertThat(possibleSteps.get(4).name()).isEqualTo("QS fachlich");
-              assertThat(possibleSteps.get(5).name()).isEqualTo("Fertig");
-              assertThat(possibleSteps.get(6).name()).isEqualTo("Wiedervorlage");
-              assertThat(possibleSteps.get(7).name()).isEqualTo("Blockiert");
+              assertThat(possibleSteps.get(0).name()).isEqualTo("Ersterfassung");
+              assertThat(possibleSteps.get(1).name()).isEqualTo("QS formal");
+              assertThat(possibleSteps.get(2).name()).isEqualTo("Fachdokumentation");
+              assertThat(possibleSteps.get(3).name()).isEqualTo("QS fachlich");
+              assertThat(possibleSteps.get(4).name()).isEqualTo("Fertig");
+              assertThat(possibleSteps.get(5).name()).isEqualTo("Wiedervorlage");
+              assertThat(possibleSteps.get(6).name()).isEqualTo("Blockiert");
             });
   }
 
