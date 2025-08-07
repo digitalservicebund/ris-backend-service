@@ -98,7 +98,7 @@ public interface PatchMapperService {
   }
 
   /**
-   * Remove all informational tags for the text check.
+   * Remove all informational tags for the text check. <text-check></text-check>
    *
    * @param patch with text check tags
    * @return patch without text check tags.
