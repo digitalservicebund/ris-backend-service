@@ -91,25 +91,24 @@ class DocumentationUnitServiceTest {
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
+  ProcessStep proccessStepNeu =
+      ProcessStep.builder().abbreviation("N").name("Neu").uuid(UUID.randomUUID()).build();
+  ProcessStep processStepErsterfassung =
+      ProcessStep.builder()
+          .abbreviation("EE")
+          .name("Ersterfassung")
+          .uuid(UUID.randomUUID())
+          .build();
+
+  @BeforeEach
+  void setup() {
+    when(processStepService.getProcessStepForName("Neu")).thenReturn(Optional.of(proccessStepNeu));
+    when(processStepService.getProcessStepForName("Ersterfassung"))
+        .thenReturn(Optional.of(processStepErsterfassung));
+  }
+
   @Nested
   class GenerateNew {
-
-    ProcessStep proccessStepNeu =
-        ProcessStep.builder().abbreviation("N").name("Neu").uuid(UUID.randomUUID()).build();
-    ProcessStep processStepErsterfassung =
-        ProcessStep.builder()
-            .abbreviation("EE")
-            .name("Ersterfassung")
-            .uuid(UUID.randomUUID())
-            .build();
-
-    @BeforeEach
-    void setup() {
-      when(processStepService.getProcessStepForName("Neu"))
-          .thenReturn(Optional.of(proccessStepNeu));
-      when(processStepService.getProcessStepForName("Ersterfassung"))
-          .thenReturn(Optional.of(processStepErsterfassung));
-    }
 
     @Test
     void testGenerateNewDecision()
