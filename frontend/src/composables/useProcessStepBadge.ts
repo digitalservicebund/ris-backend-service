@@ -37,7 +37,7 @@ export function useProcessStepBadge(step: ProcessStep) {
         badge.borderColor = "border-gray-800"
         break
       case "QS formal":
-        badge.backgroundColor = "bg-blue-200"
+        badge.backgroundColor = "bg-blue-300"
         badge.borderColor = "border-blue-800"
         break
       case "QS fachlich":
@@ -49,6 +49,9 @@ export function useProcessStepBadge(step: ProcessStep) {
         badge.borderColor = "border-red-600"
         break
       case "Terminiert":
+        badge.backgroundColor = "bg-green-200"
+        badge.borderColor = "border-green-800"
+        break
       case "Abgabe":
         badge.backgroundColor = "bg-green-100"
         badge.borderColor = "border-green-800"
