@@ -8,7 +8,7 @@ import dayjsUtc from "dayjs/plugin/utc"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
-import { computed, ref, watch } from "vue"
+import { computed, ref, watch, onMounted, onUnmounted } from "vue"
 
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
@@ -59,6 +59,36 @@ const popupModalText = computed(
     `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry?.value?.documentNumber} wirklich dauerhaft löschen?`,
 )
 const scrollLock = useScrollLock(document)
+
+// --- START: sticky header logic ---
+
+const tableWrapper = ref<HTMLElement | null>(null)
+const isSticky = ref(false)
+
+const handleScroll = () => {
+  if (tableWrapper.value) {
+    const top = tableWrapper.value.getBoundingClientRect().top
+    isSticky.value = top <= 0
+  }
+}
+
+const stickyHeaderPT = computed(() => {
+  return isSticky.value
+    ? {
+        thead: {
+          class:
+            "sticky top-0 bg-white shadow-[0_1px_0_var(--color-blue-300)] z-999",
+        },
+        tablecontainer: {
+          style: {
+            overflow: "visible !important",
+          },
+        },
+      }
+    : {}
+})
+
+// --- END: sticky header logic ---
 
 const attachmentText = (listEntry: DocumentUnitListEntry) =>
   listEntry.hasAttachments ? "Anhang vorhanden" : "Kein Anhang vorhanden"
@@ -135,10 +165,18 @@ watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
 defineSlots<{
   "empty-state-content"?: (props: Record<string, never>) => unknown
 }>()
+
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll)
+})
 </script>
 
 <template>
-  <div data-testId="search-result-list">
+  <div ref="tableWrapper" data-testId="search-result-list">
     <PopupModal
       v-if="showDeleteModal"
       aria-label="Dokumentationseinheit löschen"
@@ -155,7 +193,7 @@ defineSlots<{
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
     >
-      <DataTable :loading="loading" :value="entries">
+      <DataTable :loading="loading" :pt="stickyHeaderPT" :value="entries">
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
