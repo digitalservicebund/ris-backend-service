@@ -13,7 +13,6 @@ import { computed, ref, watch, onMounted, onUnmounted } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
-import Tooltip from "@/components/Tooltip.vue"
 
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { Kind } from "@/domain/documentationUnitKind"
@@ -199,20 +198,29 @@ onUnmounted(() => {
             <div class="flex flex-row items-center gap-8">
               <div class="min-w-[130px]">{{ item.documentNumber }}</div>
               <template v-if="isDecision">
-                <Tooltip :text="attachmentText(item)">
+                <span
+                  v-tooltip.bottom="{
+                    value: attachmentText(item),
+                    appendTo: 'body',
+                  }"
+                  :aria-label="attachmentText(item)"
+                >
                   <IconAttachedFile
-                    :aria-label="attachmentText(item)"
                     class="flex-end h-20 w-20"
                     :class="
                       item.hasAttachments ? 'text-blue-800' : 'text-gray-500'
                     "
                     data-testid="file-attached-icon"
                   />
-                </Tooltip>
-
-                <Tooltip :text="headNoteOrPrincipleText(item)">
+                </span>
+                <span
+                  v-tooltip.bottom="{
+                    value: headNoteOrPrincipleText(item),
+                    appendTo: 'body',
+                  }"
+                  :aria-label="headNoteOrPrincipleText(item)"
+                >
                   <IconSubject
-                    :aria-label="headNoteOrPrincipleText(item)"
                     class="flex-end flex h-20 w-20"
                     :class="
                       item.hasHeadnoteOrPrinciple
@@ -221,24 +229,31 @@ onUnmounted(() => {
                     "
                     data-testid="headnote-principle-icon"
                   />
-                </Tooltip>
-
-                <Tooltip :text="noteTooltip(item)">
+                </span>
+                <span
+                  v-tooltip.bottom="{
+                    value: noteTooltip(item),
+                    appendTo: 'body',
+                  }"
+                  :aria-label="noteTooltip(item)"
+                >
                   <IconNote
-                    :aria-label="noteTooltip(item)"
                     class="flex-end flex h-20 w-20"
                     :class="!!item.note ? 'text-blue-800' : 'text-gray-500'"
                     data-testid="note-icon"
                   />
-                </Tooltip>
+                </span>
 
-                <Tooltip
-                  :text="schedulingTooltip(item.scheduledPublicationDateTime)"
+                <span
+                  v-tooltip.bottom="{
+                    value: schedulingTooltip(item.scheduledPublicationDateTime),
+                    appendTo: 'body',
+                  }"
+                  :aria-label="
+                    schedulingTooltip(item.scheduledPublicationDateTime)
+                  "
                 >
                   <IconClock
-                    :aria-label="
-                      schedulingTooltip(item.scheduledPublicationDateTime)
-                    "
                     class="flex-end flex h-20 w-20"
                     :class="
                       item.scheduledPublicationDateTime
@@ -247,7 +262,7 @@ onUnmounted(() => {
                     "
                     data-testid="scheduling-icon"
                   />
-                </Tooltip>
+                </span>
               </template>
             </div>
           </template>
