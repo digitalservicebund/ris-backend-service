@@ -65,7 +65,7 @@ test.describe("procedure", () => {
 
     await test.step("reuse created procedure", async () => {
       await page.goto("/caselaw")
-      await page.getByText("Neue Dokumentationseinheit").first().click()
+      await page.getByText("Neue Entscheidung").first().click()
       await page.getByText("Rubriken").click()
 
       await page
@@ -83,10 +83,7 @@ test.describe("procedure", () => {
 
     await test.step("new procedure not visible for different docOffice", async () => {
       await pageWithBghUser.goto("/caselaw")
-      await pageWithBghUser
-        .getByText("Neue Dokumentationseinheit")
-        .first()
-        .click()
+      await pageWithBghUser.getByText("Neue Entscheidung").first().click()
       await pageWithBghUser.getByText("Rubriken").click()
 
       await pageWithBghUser

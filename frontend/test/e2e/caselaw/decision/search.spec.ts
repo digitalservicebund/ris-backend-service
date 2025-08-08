@@ -43,7 +43,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
       ).toBeVisible()
       await expect(
         page.getByRole("button", {
-          name: "Neue Dokumentationseinheit erstellen",
+          name: "Neue Entscheidung erstellen",
         }),
       ).toBeVisible()
     })
@@ -58,9 +58,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await expect(
         page.getByText("Keine Suchergebnisse gefunden"),
       ).toBeVisible()
-      await expect(
-        page.getByText("Neue Dokumentationseinheit erstellen"),
-      ).toBeVisible()
+      await expect(page.getByText("Neue Entscheidung erstellen")).toBeVisible()
       await expect(loadingIndicator).toBeHidden()
     })
   })
@@ -419,9 +417,9 @@ test.describe("Große Suche nach Entscheidungen", () => {
 
   test("Entscheidung neu erstellen und löschen", async ({ page }) => {
     await navigateToSearch(page)
-    await test.step("Klicke auf 'Neue Dokumentationseinheit'", async () => {
+    await test.step("Klicke auf 'Neue Entscheidung'", async () => {
       await page
-        .getByRole("button", { name: "Neue Dokumentationseinheit" })
+        .getByRole("button", { name: "Neue Entscheidung" })
         .first()
         .click()
     })

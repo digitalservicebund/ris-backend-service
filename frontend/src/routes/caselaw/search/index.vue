@@ -35,9 +35,7 @@ onMounted(() => {
 
 watch(value, async (newVal) => {
   buttonLabel.value =
-    value.value === "0"
-      ? "Neue Dokumentationseinheit"
-      : "Neues Anhängiges Verfahren"
+    value.value === "0" ? "Neue Entscheidung" : "Neues Anhängiges Verfahren"
   const pathKey =
     Object.entries(tabMap).find(([, v]) => v === newVal)?.[0] ?? "decisions"
   if (pathKey !== tabParam.value) {

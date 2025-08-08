@@ -242,7 +242,7 @@ test.describe("core data", () => {
 
       await page
         .getByRole("button", {
-          name: "Neue Dokumentationseinheit",
+          name: "Neue Entscheidung",
           exact: true,
         })
         .click()
@@ -269,7 +269,7 @@ test.describe("core data", () => {
       await pageWithBghUser.goto("/caselaw")
       await pageWithBghUser
         .getByRole("button", {
-          name: "Neue Dokumentationseinheit",
+          name: "Neue Entscheidung",
           exact: true,
         })
         .click()

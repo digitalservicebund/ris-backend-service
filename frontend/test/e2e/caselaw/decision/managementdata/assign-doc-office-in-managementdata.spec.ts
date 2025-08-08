@@ -23,7 +23,7 @@ test.describe(
       await test.step("Erstelle neue Dokumentationseinheit", async () => {
         await page
           .getByRole("button", {
-            name: "Neue Dokumentationseinheit",
+            name: "Neue Entscheidung",
             exact: true,
           })
           .click()

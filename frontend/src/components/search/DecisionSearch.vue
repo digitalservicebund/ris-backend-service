@@ -263,8 +263,8 @@ async function createNewFromSearch() {
           </div>
           <div v-else-if="isInternalUser && !isLoading">
             <Button
-              aria-label="Neue Dokumentationseinheit erstellen"
-              label="Neue Dokumentationseinheit erstellen"
+              aria-label="Neue Entscheidung erstellen"
+              label="Neue Entscheidung erstellen"
               text
               @click="createNew"
             />

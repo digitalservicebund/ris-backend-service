@@ -24,7 +24,7 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
     await test.step("Erstelle neue Dokumentationseinheit", async () => {
       await page
         .getByRole("button", {
-          name: "Neue Dokumentationseinheit",
+          name: "Neue Entscheidung",
           exact: true,
         })
         .click()

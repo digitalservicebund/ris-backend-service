@@ -7,7 +7,7 @@ test.describe("a11y of start page (/caselaw)", () => {
     await page.goto("/")
     await expect(
       page.getByRole("button", {
-        name: "Neue Dokumentationseinheit",
+        name: "Neue Entscheidung",
         exact: true,
       }),
     ).toBeVisible()
@@ -19,7 +19,7 @@ test.describe("a11y of start page (/caselaw)", () => {
     await page.goto("/")
     await expect(
       page.getByRole("button", {
-        name: "Neue Dokumentationseinheit",
+        name: "Neue Entscheidung",
         exact: true,
       }),
     ).toBeVisible()

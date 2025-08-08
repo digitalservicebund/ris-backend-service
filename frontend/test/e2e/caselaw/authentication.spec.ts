@@ -17,7 +17,7 @@ test.describe("authentication", () => {
     await page.goto("/")
     await expect(
       page.getByRole("button", {
-        name: "Neue Dokumentationseinheit",
+        name: "Neue Entscheidung",
         exact: true,
       }),
     ).toBeVisible()
@@ -39,7 +39,7 @@ test.describe("authentication", () => {
     await page.goto("/")
     await expect(
       page.getByRole("button", {
-        name: "Neue Dokumentationseinheit",
+        name: "Neue Entscheidung",
         exact: true,
       }),
     ).toBeVisible()
@@ -61,7 +61,7 @@ test.describe("authentication", () => {
     await page.goto("/")
     await expect(
       page.getByRole("button", {
-        name: "Neue Dokumentationseinheit",
+        name: "Neue Entscheidung",
         exact: true,
       }),
     ).toBeVisible()

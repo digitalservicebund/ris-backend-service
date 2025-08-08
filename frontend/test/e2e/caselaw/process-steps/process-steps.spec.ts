@@ -9,7 +9,7 @@ test.describe("process steps", () => {
     await navigateToSearch(pageWithBghUser)
 
     await pageWithBghUser
-      .getByRole("button", { name: "Neue Dokumentationseinheit" })
+      .getByRole("button", { name: "Neue Entscheidung" })
       .first()
       .click()
 
@@ -52,7 +52,7 @@ test.describe("process steps", () => {
     await navigateToSearch(pageWithBghUser)
 
     await pageWithBghUser
-      .getByRole("button", { name: "Neue Dokumentationseinheit" })
+      .getByRole("button", { name: "Neue Entscheidung" })
       .first()
       .click()
 
@@ -92,7 +92,7 @@ test.describe("process steps", () => {
     await navigateToSearch(pageWithBghUser)
 
     await pageWithBghUser
-      .getByRole("button", { name: "Neue Dokumentationseinheit" })
+      .getByRole("button", { name: "Neue Entscheidung" })
       .first()
       .click()
 
@@ -141,7 +141,7 @@ test.describe("process steps", () => {
     await navigateToSearch(pageWithBghUser)
 
     await pageWithBghUser
-      .getByRole("button", { name: "Neue Dokumentationseinheit" })
+      .getByRole("button", { name: "Neue Entscheidung" })
       .first()
       .click()
 
