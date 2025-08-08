@@ -93,6 +93,8 @@ npm run coverage
 **To run the E2E tests:**
 
 (Requires the application to run locally.)
+> [!IMPORTANT]
+> Tests that depend on other services running, such as LanguageTool or the importer, are skipped when running against the local environment.
 
 ```bash
 # run all
