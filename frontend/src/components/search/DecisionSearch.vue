@@ -31,6 +31,10 @@ const searchQuery = ref<Query<DocumentationUnitSearchParameter>>()
 const isInternalUser = useInternalUser()
 
 const emptyStateMessage = computed(() => {
+  if (isLoading.value) {
+    return undefined
+  }
+
   if (!currentPage.value?.content) {
     return isInternalUser.value
       ? "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
@@ -257,7 +261,7 @@ async function createNewFromSearch() {
               @click="createNewFromSearch"
             />
           </div>
-          <div v-else-if="isInternalUser">
+          <div v-else-if="isInternalUser && !isLoading">
             <Button
               aria-label="Neue Dokumentationseinheit erstellen"
               label="Neue Dokumentationseinheit erstellen"

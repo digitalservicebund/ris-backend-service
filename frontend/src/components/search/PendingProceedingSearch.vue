@@ -31,6 +31,9 @@ const searchQuery = ref<Query<DocumentationUnitSearchParameter>>()
 const isInternalUser = useInternalUser()
 
 const emptyStateMessage = computed(() => {
+  if (isLoading.value) {
+    return undefined
+  }
   if (!currentPage.value?.content) {
     return isInternalUser.value
       ? "Starten Sie die Suche oder erstellen Sie ein neues Anhängiges Verfahren."
@@ -255,7 +258,7 @@ async function createNewFromSearch() {
               @click="createNewFromSearch"
             />
           </div>
-          <div v-else-if="isInternalUser">
+          <div v-else-if="isInternalUser && !isLoading">
             <Button
               aria-label="Neues Anhängiges Verfahren erstellen"
               label="Neues Anhängiges Verfahren erstellen"
