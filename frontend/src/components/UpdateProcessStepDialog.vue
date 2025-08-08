@@ -27,7 +27,10 @@ const emit = defineEmits<{
   onCancelled: []
 }>()
 
-const showDialog = defineModel("showDialog", { type: Boolean, default: false })
+const visible = defineModel<boolean>("visible", {
+  default: false,
+  type: Boolean,
+})
 
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store) as {
@@ -102,7 +105,7 @@ function rowClass(data: DocumentationUnitProcessStep): string {
 }
 
 watch(
-  showDialog,
+  visible,
   async (newValue) => {
     if (newValue === true) {
       errors.value = []
@@ -115,7 +118,7 @@ watch(
 
 <template>
   <Dialog
-    v-model:visible="showDialog"
+    v-model:visible="visible"
     class="max-h-[768px] max-w-[1024px]"
     :closable="false"
     dismissable-mask

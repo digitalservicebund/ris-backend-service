@@ -51,7 +51,7 @@ function renderComponent() {
   return {
     user,
     ...render(UpdateProcessStepDialog, {
-      props: { showDialog: true },
+      props: { visible: true },
       global: {
         directives: { tooltip: Tooltip },
         plugins: [
