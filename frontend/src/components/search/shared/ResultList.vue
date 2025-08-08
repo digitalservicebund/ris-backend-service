@@ -375,6 +375,7 @@ onUnmounted(() => {
           <template #body="{ data: item }">
             <div class="flex flex-row justify-end -space-x-2">
               <router-link
+                tabindex="-1"
                 target="_blank"
                 :to="getRouterLinkTo(item, 'categories')"
               >
@@ -399,6 +400,7 @@ onUnmounted(() => {
               </router-link>
 
               <router-link
+                tabindex="-1"
                 target="_blank"
                 :to="getRouterLinkTo(item, 'preview')"
               >
