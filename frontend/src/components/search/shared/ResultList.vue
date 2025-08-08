@@ -197,7 +197,7 @@ onUnmounted(() => {
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
-              <div>{{ item.documentNumber }}</div>
+              <div class="min-w-[130px]">{{ item.documentNumber }}</div>
               <template v-if="isDecision">
                 <Tooltip :text="attachmentText(item)">
                   <IconAttachedFile
