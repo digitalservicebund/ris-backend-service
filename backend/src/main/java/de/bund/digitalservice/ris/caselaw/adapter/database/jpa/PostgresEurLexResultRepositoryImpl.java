@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.time.LocalDate;
@@ -24,8 +25,6 @@ import org.springframework.stereotype.Repository;
 public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepository {
   private final DatabaseEurLexResultRepository repository;
   private final EntityManager entityManager;
-
-  private static final String CREATED_AT = "createdAt";
 
   public PostgresEurLexResultRepositoryImpl(
       DatabaseEurLexResultRepository repository, EntityManager entityManager) {
@@ -55,7 +54,14 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
       builderQuery.where(predicates.toArray(new Predicate[0]));
     }
 
-    builderQuery.orderBy(builder.desc(root.get(CREATED_AT)));
+    // Order by updatedAt with nulls last, then by created at and finally by decision date.
+    List<Order> dateTimeDescOrder =
+        List.of(
+            builder.desc(builder.selectCase().when(root.get("updatedAt").isNull(), 0).otherwise(1)),
+            builder.desc(root.get("updatedAt")),
+            builder.desc(root.get("createdAt")),
+            builder.desc(root.get("date")));
+    builderQuery.orderBy(dateTimeDescOrder);
 
     Query query =
         entityManager
@@ -130,10 +136,9 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
     }
 
     startDate.ifPresent(
-        date -> predicates.add(builder.greaterThanOrEqualTo(root.get(CREATED_AT), date)));
+        date -> predicates.add(builder.greaterThanOrEqualTo(root.get("date"), date)));
 
-    endDate.ifPresent(
-        date -> predicates.add(builder.lessThanOrEqualTo(root.get(CREATED_AT), date)));
+    endDate.ifPresent(date -> predicates.add(builder.lessThanOrEqualTo(root.get("date"), date)));
 
     predicates.add(builder.equal(root.get("status"), EurLexResultStatus.NEW));
 
