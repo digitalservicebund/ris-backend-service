@@ -100,7 +100,7 @@ const fetchData = async () => {
 
 function rowClass(data: DocumentationUnitProcessStep): string {
   return data.id !== documentUnit.value.processSteps?.at(0)?.id
-    ? "bg-blue-100"
+    ? "bg-gray-100"
     : ""
 }
 
