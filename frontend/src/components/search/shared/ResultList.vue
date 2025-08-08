@@ -203,9 +203,9 @@ onUnmounted(() => {
                     value: attachmentText(item),
                     appendTo: 'body',
                   }"
-                  :aria-label="attachmentText(item)"
                 >
                   <IconAttachedFile
+                    :aria-label="attachmentText(item)"
                     class="flex-end h-20 w-20"
                     :class="
                       item.hasAttachments ? 'text-blue-800' : 'text-gray-500'
@@ -218,9 +218,9 @@ onUnmounted(() => {
                     value: headNoteOrPrincipleText(item),
                     appendTo: 'body',
                   }"
-                  :aria-label="headNoteOrPrincipleText(item)"
                 >
                   <IconSubject
+                    :aria-label="headNoteOrPrincipleText(item)"
                     class="flex-end flex h-20 w-20"
                     :class="
                       item.hasHeadnoteOrPrinciple
@@ -235,9 +235,9 @@ onUnmounted(() => {
                     value: noteTooltip(item),
                     appendTo: 'body',
                   }"
-                  :aria-label="noteTooltip(item)"
                 >
                   <IconNote
+                    :aria-label="noteTooltip(item)"
                     class="flex-end flex h-20 w-20"
                     :class="!!item.note ? 'text-blue-800' : 'text-gray-500'"
                     data-testid="note-icon"
@@ -249,11 +249,11 @@ onUnmounted(() => {
                     value: schedulingTooltip(item.scheduledPublicationDateTime),
                     appendTo: 'body',
                   }"
-                  :aria-label="
-                    schedulingTooltip(item.scheduledPublicationDateTime)
-                  "
                 >
                   <IconClock
+                    :aria-label="
+                      schedulingTooltip(item.scheduledPublicationDateTime)
+                    "
                     class="flex-end flex h-20 w-20"
                     :class="
                       item.scheduledPublicationDateTime
