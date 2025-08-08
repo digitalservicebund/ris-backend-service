@@ -89,19 +89,15 @@ where word LIKE 'etoe%';
 -- EURLEX Decisions
 delete from incremental_migration.attachment
 where documentation_unit_id in (
-    select id from incremental_migration.documentation_unit
-    where celex_number = '62019CV0001(02)' or celex_number = '62024CO0878' or celex_number = '62023CJ0538'
+    select id from incremental_migration.decision
+    where celex = '62019CV0001(02)' or celex = '62024CO0878' or celex = '62023CJ0538'
 );
 
-delete from incremental_migration.decision
+delete from incremental_migration.documentation_unit
 where id in (
-    select id from incremental_migration.documentation_unit
-    where celex_number = '62019CV0001(02)' or celex_number = '62024CO0878' or celex_number = '62023CJ0538'
+    select id from incremental_migration.decision
+    where celex = '62019CV0001(02)' or celex = '62024CO0878' or celex = '62023CJ0538'
 );
-
-delete
-from incremental_migration.documentation_unit
-where celex_number = '62019CV0001(02)' or celex_number = '62024CO0878' or celex_number = '62023CJ0538';
 
 delete from incremental_migration.eurlex
 where celex = '62019CV0001(02)' or celex = '62024CO0878' or celex = '62023CJ0538';
