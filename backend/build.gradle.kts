@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.52.0"
     id ("io.freefair.lombok") version "8.14"
-    id("org.flywaydb.flyway") version "11.10.5"
+    id("org.flywaydb.flyway") version "11.11.0"
     id("io.sentry.jvm.gradle") version "5.8.1"
 }
 
@@ -195,7 +195,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.4")
-    implementation("com.icegreen:greenmail:2.1.4")
+    implementation("com.icegreen:greenmail:2.1.5")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.40") {
@@ -232,10 +232,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.10.5"
+    val flywayCore = "org.flywaydb:flyway-core:11.11.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.5")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.11.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -252,7 +252,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.24.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.25.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
