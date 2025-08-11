@@ -581,7 +581,7 @@ onBeforeUnmount(() => {
               <DateInput
                 id="decisionDate"
                 v-model="relatedDocumentationUnit.decisionDate"
-                aria-label="Entscheidungsdatum"
+                aria-label="Datum"
                 :has-error="slotProps.hasError"
                 @focus="validationStore.remove('decisionDate')"
                 @update:validation-error="slotProps.updateValidationError"

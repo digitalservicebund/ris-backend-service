@@ -220,7 +220,7 @@ test.describe("Literature references", () => {
         await expect(page.getByLabel("Klammernzusatz")).toBeEmpty()
         await expect(page.getByLabel("Gericht")).toBeEmpty()
         await expect(page.getByLabel("Aktenzeichen")).toBeEmpty()
-        await expect(page.getByLabel("Entscheidungsdatum")).toBeEmpty()
+        await expect(page.getByLabel("Datum")).toBeEmpty()
         await expect(page.getByLabel("Dokumenttyp")).toBeEmpty()
       })
     },

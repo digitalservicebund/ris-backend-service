@@ -202,7 +202,7 @@ test.describe(
           await expect(page.getByLabel("Klammernzusatz")).toBeEmpty()
           await expect(page.getByLabel("Gericht")).toBeEmpty()
           await expect(page.getByLabel("Aktenzeichen")).toBeEmpty()
-          await expect(page.getByLabel("Entscheidungsdatum")).toBeEmpty()
+          await expect(page.getByLabel("Datum")).toBeEmpty()
           await expect(page.getByLabel("Dokumenttyp")).toBeEmpty()
         })
       },
@@ -272,7 +272,7 @@ test.describe(
           await expect(page.getByLabel("Klammernzusatz")).toBeEmpty()
           await expect(page.getByLabel("Gericht")).toBeEmpty()
           await expect(page.getByLabel("Aktenzeichen")).toBeEmpty()
-          await expect(page.getByLabel("Entscheidungsdatum")).toBeEmpty()
+          await expect(page.getByLabel("Datum")).toBeEmpty()
           await expect(page.getByLabel("Dokumenttyp")).toBeEmpty()
         })
       },
@@ -680,7 +680,7 @@ test.describe(
         await fillInput(page, "Gericht", court)
         await page.getByText(court, { exact: true }).click()
         await fillInput(page, "Aktenzeichen", fileNumber)
-        await fillInput(page, "Entscheidungsdatum", date)
+        await fillInput(page, "Datum", date)
 
         await page.getByText("Suchen").click()
 
