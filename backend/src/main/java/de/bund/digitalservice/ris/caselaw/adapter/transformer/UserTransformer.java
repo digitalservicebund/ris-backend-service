@@ -48,7 +48,7 @@ public class UserTransformer {
   }
 
   private static String getInitials(String firstName, String lastName) {
-    if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
+    if (firstName == null || firstName.isEmpty() || lastName == null || lastName.isEmpty()) {
       return null;
     }
 
