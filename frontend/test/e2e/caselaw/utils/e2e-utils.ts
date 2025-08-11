@@ -858,7 +858,7 @@ export async function searchForDocUnit(
     await fillCombobox(page, "Gericht", court)
   }
   if (date) {
-    await fillInput(page, "Entscheidungsdatum", date)
+    await fillInput(page, "Datum", date)
   }
   if (documentType) {
     await fillCombobox(page, "Dokumenttyp", documentType)

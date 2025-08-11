@@ -670,7 +670,7 @@ test.describe(
         await page.getByText(court, { exact: true }).click()
       }
       if (date) {
-        await fillInput(page, "Entscheidungsdatum", date)
+        await fillInput(page, "Datum", date)
       }
       if (documentType) {
         await fillInput(page, "Dokumenttyp", documentType)
