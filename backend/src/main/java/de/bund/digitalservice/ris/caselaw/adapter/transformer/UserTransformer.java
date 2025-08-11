@@ -48,9 +48,10 @@ public class UserTransformer {
   }
 
   private static String getInitials(String firstName, String lastName) {
-    if (firstName.isEmpty() && lastName.isEmpty()) {
+    if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
       return null;
     }
+
     return ""
         + Character.toUpperCase(firstName.charAt(0))
         + Character.toUpperCase(lastName.charAt(0));
