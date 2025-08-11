@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import StringsUtil from "@/utils/stringsUtil"
 import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 
 defineProps<{
@@ -8,7 +9,7 @@ defineProps<{
 
 <template>
   <div class="flex flex-row gap-8">
-    <IconPermIdentity />
-    {{ name }}
+    <IconPermIdentity data-testid="assignee-icon" />
+    <span>{{ !StringsUtil.isEmpty(name) ? name : "-" }}</span>
   </div>
 </template>
