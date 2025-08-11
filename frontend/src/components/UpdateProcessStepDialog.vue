@@ -51,9 +51,9 @@ const selectedUser = computed({
     nextProcessStepUser.value
       ? {
           label:
-            nextProcessStepUser.value.name ||
+            nextProcessStepUser.value.initials ||
             nextProcessStepUser.value.email ||
-            "Keine Information",
+            undefined,
           value: nextProcessStepUser.value,
         }
       : undefined,
@@ -202,7 +202,9 @@ watch(
         <Column field="user.name" header="Person">
           <template #body="{ data: item }">
             <AssigneeBadge
-              :name="item.user && item.user.name ? item.user.name : undefined"
+              :name="
+                item.user && item.user.initials ? item.user.initials : undefined
+              "
             />
           </template>
         </Column>

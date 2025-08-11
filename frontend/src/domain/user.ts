@@ -6,4 +6,5 @@ export type User = {
   }
   email?: string
   roles?: string[]
+  initials: string
 }
