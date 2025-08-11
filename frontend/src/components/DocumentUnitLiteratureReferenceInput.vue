@@ -196,16 +196,14 @@ watch(
           ></Button>
         </div>
       </div>
-
       <Button
         v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
         label="Eintrag löschen"
-        severity="destructive"
+        severity="danger"
         size="small"
         @click.stop="emit('removeEntry', true)"
-      >
-      </Button>
+      ></Button>
     </div>
   </div>
 </template>
