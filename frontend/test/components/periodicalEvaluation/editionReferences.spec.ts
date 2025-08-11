@@ -143,9 +143,7 @@ describe("Legal periodical edition evaluation", () => {
     expect(
       screen.getByLabelText("Aktenzeichen", { exact: true }),
     ).toBeInTheDocument()
-    expect(
-      screen.getByLabelText("Entscheidungsdatum", { exact: true }),
-    ).toBeInTheDocument()
+    expect(screen.getByLabelText("Datum", { exact: true })).toBeInTheDocument()
     expect(
       screen.getByLabelText("Dokumenttyp", { exact: true }),
     ).toBeInTheDocument()
