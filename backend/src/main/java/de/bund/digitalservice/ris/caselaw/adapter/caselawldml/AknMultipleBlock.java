@@ -18,7 +18,6 @@ public class AknMultipleBlock {
   // A Map is used with @XmlElement added to a helper getter/setter to facilitate easier use.
   @XmlTransient private Map<String, AknBlock> blocks = new LinkedHashMap<>();
 
-  @XmlElement(name = "block", namespace = CaseLawLdml.AKN_NS)
   public void setJaxbBlocks(List<AknBlock> blocks) {
     for (AknBlock block : blocks) {
       this.blocks.put(block.getName(), block);
