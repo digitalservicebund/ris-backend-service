@@ -366,7 +366,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             documentationUnitDTO.getId(),
             currentUser,
             HistoryLogEventType.RESOLVE_PENDING_PROCEEDING,
-            "Verfahren als \"Erledigt\" markiert");
+            "Dokument als \"Erledigt\" markiert");
       }
       documentationUnitDTO =
           PendingProceedingTransformer.transformToDTO(

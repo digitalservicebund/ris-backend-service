@@ -74,7 +74,7 @@ test.describe("Verwaltungsdaten", { tag: ["@RISDEV-8004"] }, () => {
         page,
         0,
         "DS (e2e_tests DigitalService)",
-        `Verfahren als "Erledigt" markiert`,
+        `Dokument als "Erledigt" markiert`,
       )
 
       await expectHistoryLogRow(
