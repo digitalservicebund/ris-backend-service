@@ -39,9 +39,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOffic
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.Kind;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
@@ -68,6 +71,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @Slf4j
 @SuppressWarnings("java:S5961")
@@ -253,50 +259,43 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     assertThat(logs2.get(3).description()).isEqualTo("Dokeinheit angelegt");
   }
 
-  // Todo: Uncomment this test, when new endpoint also creates pending proceeding
-  //  @Test
-  //  @Transactional
-  //  void testPartialUpdateByUuid_withIsResolvedAdded_shouldWriteHistoryEntries() {
-  //    TestTransaction.flagForCommit();
-  //    TestTransaction.end();
-  //
-  //    PendingProceeding pendingProceeding = generateEmptyDocumentationUnit();
-  //
-  //    List<JsonPatchOperation> operations1 =
-  //            List.of(
-  //                    new AddOperation(
-  //                            "/coreData/isResolved",
-  //                            BooleanNode.TRUE));
-  //    RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1),
-  // Collections.emptyList());
-  //
-  //    risWebTestClient
-  //            .withDefaultLogin()
-  //            .patch()
-  //            .uri("/api/v1/caselaw/documentunits/" + pendingProceeding.uuid())
-  //            .bodyValue(patch1)
-  //            .exchange()
-  //            .expectStatus()
-  //            .is2xxSuccessful();
-  //
-  //    var user = User.builder().documentationOffice(buildDSDocOffice()).build();
-  //    var logs = documentationUnitHistoryLogService.getHistoryLogs(pendingProceeding.uuid(),
-  // user);
-  //    assertThat(logs).hasSize(3);
-  //    assertThat(logs)
-  //            .map(HistoryLog::eventType)
-  //            .containsExactly(
-  //                    HistoryLogEventType.UPDATE,
-  //                    HistoryLogEventType.RESOLVE_PENDING_PROCEEDING,
-  //                    HistoryLogEventType.CREATE);
-  //    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser",
-  // "testUser");
-  //    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
-  //    assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
-  //    assertThat(logs.get(1).description())
-  //            .isEqualTo("Dokument als \"Erledigt\" markiert");
-  //    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
-  //  }
+  @Test
+  @Transactional
+  void testPartialUpdateByUuid_withIsResolvedAdded_shouldWriteHistoryEntries() {
+    TestTransaction.flagForCommit();
+    TestTransaction.end();
+
+    PendingProceeding pendingProceeding =
+        (PendingProceeding) generateEmptyDocumentationUnit(Kind.PENDING_PROCEEDING);
+
+    List<JsonPatchOperation> operations1 =
+        List.of(new AddOperation("/coreData/isResolved", BooleanNode.TRUE));
+    RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .patch()
+        .uri("/api/v1/caselaw/documentunits/" + pendingProceeding.uuid())
+        .bodyValue(patch1)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    var user = User.builder().documentationOffice(buildDSDocOffice()).build();
+    var logs = documentationUnitHistoryLogService.getHistoryLogs(pendingProceeding.uuid(), user);
+    assertThat(logs).hasSize(3);
+    assertThat(logs)
+        .map(HistoryLog::eventType)
+        .containsExactly(
+            HistoryLogEventType.RESOLVE_PENDING_PROCEEDING,
+            HistoryLogEventType.UPDATE,
+            HistoryLogEventType.CREATE);
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
+    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
+    assertThat(logs.get(0).description()).isEqualTo("Verfahren als \"Erledigt\" markiert");
+    assertThat(logs.get(1).description()).isEqualTo("Dokeinheit bearbeitet");
+    assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
+  }
 
   @Test
   @Transactional
@@ -4895,15 +4894,31 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
   }
 
   private Decision generateEmptyDocumentationUnit() {
-    RisEntityExchangeResult<Decision> result =
+    return (Decision)
+        generateEmptyDocumentationUnit(null); // Call the more specific function with a null kind
+  }
+
+  private DocumentationUnit generateEmptyDocumentationUnit(Kind kind) {
+    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
+    if (kind != null) {
+      queryParams.add("kind", kind.toString());
+    }
+
+    RisEntityExchangeResult<DocumentationUnit> result =
         risWebTestClient
             .withDefaultLogin()
             .put()
-            .uri("/api/v1/caselaw/documentunits/new")
+            .uri(
+                new DefaultUriBuilderFactory()
+                    .builder()
+                    .path("/api/v1/caselaw/documentunits/new")
+                    .queryParams(queryParams)
+                    .build())
             .exchange()
             .expectStatus()
             .isCreated()
-            .expectBody(Decision.class)
+            .expectBody(DocumentationUnit.class)
             .returnResult();
 
     assertThat(result.getResponseBody()).isNotNull();

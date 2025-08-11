@@ -671,7 +671,7 @@ export async function searchForDocUnitWithFileNumberAndDecisionDate(
   await fillInput(page, "Gericht", "AG Aachen")
   await page.getByText("AG Aachen", { exact: true }).click()
   await fillInput(page, "Aktenzeichen", fileNumber)
-  await fillInput(page, "Entscheidungsdatum", date)
+  await fillInput(page, "Datum", date)
   await fillInput(page, "Dokumenttyp", "AnU")
 
   await page
