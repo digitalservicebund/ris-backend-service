@@ -36,13 +36,14 @@ public class UserController {
 
     var users = service.getUsers(oidcUser);
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      String search = searchStr.get();
+      String search = searchStr.get().toLowerCase();
       return users.stream()
           .filter(
               user ->
                   (user.email() != null && user.email().startsWith(search))
-                      || (user.initials() != null && user.initials().startsWith(search))
-                      || (user.name() != null && user.name().startsWith(search)))
+                      || (user.initials() != null
+                          && user.initials().toLowerCase().startsWith(search))
+                      || (user.name() != null && user.name().toLowerCase().startsWith(search)))
           .toList();
     }
 
