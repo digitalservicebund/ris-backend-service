@@ -53,7 +53,7 @@ const selectedUser = computed({
           label:
             nextProcessStepUser.value.initials ||
             nextProcessStepUser.value.email ||
-            undefined,
+            "",
           value: nextProcessStepUser.value,
         }
       : undefined,

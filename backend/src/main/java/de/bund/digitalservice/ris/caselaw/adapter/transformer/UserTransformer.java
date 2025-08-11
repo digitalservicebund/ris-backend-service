@@ -1,11 +1,15 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.BareUserApiResponse;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 public class UserTransformer {
 
@@ -23,6 +27,17 @@ public class UserTransformer {
         .build();
   }
 
+  public static User transformToDomain(OidcUser oidcUser, DocumentationOffice documentationOffice) {
+    return User.builder()
+        .name(oidcUser.getAttribute("name"))
+        .id(getUserId(oidcUser))
+        .email(oidcUser.getEmail())
+        .documentationOffice(documentationOffice)
+        .roles(oidcUser.getClaimAsStringList("roles"))
+        .initials(getInitials(oidcUser.getGivenName(), oidcUser.getFamilyName()))
+        .build();
+  }
+
   private static String getFullName(List<String> firstNames, List<String> lastNames) {
     if (firstNames.isEmpty() && lastNames.isEmpty()) {
       return null;
@@ -32,32 +47,37 @@ public class UserTransformer {
         " ", java.util.stream.Stream.concat(firstNames.stream(), lastNames.stream()).toList());
   }
 
+  private static String getInitials(String firstName, String lastName) {
+    if (firstName.isEmpty() && lastName.isEmpty()) {
+      return null;
+    }
+    return ""
+        + Character.toUpperCase(firstName.charAt(0))
+        + Character.toUpperCase(lastName.charAt(0));
+  }
+
   private static String getInitials(List<String> firstNames, List<String> lastNames) {
     if (firstNames.isEmpty() && lastNames.isEmpty()) {
       return null;
     }
 
-    String firstInitial =
+    Optional<String> firstName =
         firstNames.stream()
             .filter(Objects::nonNull)
             .map(String::trim)
             .filter(s -> !s.isEmpty())
-            .map(s -> String.valueOf(Character.toUpperCase(s.charAt(0))))
-            .findFirst()
-            .orElse(null);
+            .findFirst();
 
-    String lastInitial =
-        lastNames.stream()
+    Optional<String> lastName =
+        firstNames.stream()
             .filter(Objects::nonNull)
             .map(String::trim)
             .filter(s -> !s.isEmpty())
-            .map(s -> String.valueOf(Character.toUpperCase(s.charAt(0))))
-            .findFirst()
-            .orElse(null);
+            .findFirst();
 
-    if (firstInitial == null || lastInitial == null) return null;
+    if (firstName.isEmpty() || lastName.isEmpty()) return null;
 
-    return firstInitial + lastInitial;
+    return getInitials(firstName.get(), lastName.get());
   }
 
   public static List<String> getValues(
@@ -66,5 +86,9 @@ public class UserTransformer {
       return Collections.emptyList();
     }
     return attributes.get(key).values();
+  }
+
+  public static UUID getUserId(OidcUser oidcUser) {
+    return Optional.ofNullable(oidcUser.getSubject()).map(UUID::fromString).orElse(null);
   }
 }

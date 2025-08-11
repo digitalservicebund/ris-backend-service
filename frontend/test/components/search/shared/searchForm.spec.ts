@@ -86,7 +86,8 @@ describe("Documentunit Search", () => {
     Promise.resolve({
       status: 200,
       data: {
-        name: "username",
+        name: "Test User",
+        initials: "TU",
         documentationOffice: {
           abbreviation: "DS",
         },

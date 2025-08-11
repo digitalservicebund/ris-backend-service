@@ -1,4 +1,4 @@
-import { setActivePinia, createPinia } from "pinia"
+import { createPinia, setActivePinia } from "pinia"
 import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
 import adminService from "@/services/adminService"
@@ -20,7 +20,10 @@ describe("Session store", () => {
   it("calls the authService upon authentication check", async () => {
     const authServiceMock = vi
       .spyOn(authService, "getName")
-      .mockResolvedValueOnce({ status: 200, data: { name: "fooUser" } })
+      .mockResolvedValueOnce({
+        status: 200,
+        data: { name: "fooUser", initials: "fU" },
+      })
 
     const { isAuthenticated } = useSessionStore()
     await isAuthenticated()
@@ -29,9 +32,13 @@ describe("Session store", () => {
   })
 
   it.each([
-    { name: "fooUser" },
-    { name: "fooUser", documentationOffice: { abbreviation: "DS" } },
-    { name: "fooUser", email: "foo@mail.de" },
+    { name: "Test User", initials: "TU" },
+    {
+      name: "Test User",
+      documentationOffice: { abbreviation: "DS" },
+      initials: "TU",
+    },
+    { name: "Test User", email: "foo@mail.de", initials: "TU" },
   ])("set's and returns the correct user", async (user: User) => {
     vi.mocked(authService).getName.mockResolvedValue({
       status: 200,

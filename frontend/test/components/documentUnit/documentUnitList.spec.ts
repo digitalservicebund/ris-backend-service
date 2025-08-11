@@ -320,6 +320,7 @@ describe("documentUnit list", () => {
       activeUser: {
         name: "fooUser",
         documentationOffice: { abbreviation: "fooDocumentationOffice" },
+        initials: "FU",
       },
     })
 
