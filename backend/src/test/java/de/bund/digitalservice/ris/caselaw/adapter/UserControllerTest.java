@@ -116,6 +116,8 @@ class UserControllerTest {
             .returnResult();
 
     Assertions.assertEquals(1, result.getResponseBody().size());
+    Assertions.assertEquals(testUsers.getFirst(), result.getResponseBody().getFirst());
+    Assertions.assertEquals("Clara Hoffmann", result.getResponseBody().getFirst().name());
   }
 
   private List<User> generateTestUsers() {
