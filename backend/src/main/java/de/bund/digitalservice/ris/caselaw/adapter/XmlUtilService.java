@@ -92,6 +92,7 @@ public class XmlUtilService {
     }
   }
 
+  @SuppressWarnings("java:S1141") // only temporary for extra logging
   public Optional<String> ldmlToString(CaseLawLdml ldml) {
     StringWriter jaxbOutput = new StringWriter();
     JAXB.marshal(ldml, jaxbOutput);
