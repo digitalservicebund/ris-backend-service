@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.apache.commons.text.RandomStringGenerator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +29,7 @@ class ScheduledPublicationServiceTest {
   private HandoverService handoverService;
   private HttpMailSender httpMailSender;
   private final LocalDateTime pastDate = LocalDateTime.now().minusDays(1);
+  private int docUnitCounter = 0;
 
   @BeforeEach
   void beforeEach() {
@@ -140,16 +140,17 @@ class ScheduledPublicationServiceTest {
 
   private Decision createDocUnit(
       LocalDateTime lastPublicationDateTime, LocalDateTime scheduledPublicationDateTime) {
-    String randomName = RandomStringGenerator.builder().selectFrom('a', 'b', 'c').get().generate(5);
+    docUnitCounter++;
+    String docNumber = String.format("KORE12345%05d", docUnitCounter);
     return Decision.builder()
         .uuid(UUID.randomUUID())
-        .documentNumber("KORE12345" + randomName)
+        .documentNumber(docNumber)
         .managementData(
             ManagementData.builder()
                 .borderNumbers(Collections.emptyList())
                 .lastPublicationDateTime(lastPublicationDateTime)
                 .scheduledPublicationDateTime(scheduledPublicationDateTime)
-                .scheduledByEmail(randomName + "@example.local")
+                .scheduledByEmail(docUnitCounter + "@example.local")
                 .duplicateRelations(List.of())
                 .build())
         .build();
