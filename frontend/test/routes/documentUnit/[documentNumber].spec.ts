@@ -68,6 +68,13 @@ function renderComponent() {
         },
       },
       {
+        path: "/caselaw/documentUnit/:documentNumber/publication",
+        name: "caselaw-documentUnit-documentNumber-publication",
+        component: {
+          template: "<div data-testid='publication'>Publication</div>",
+        },
+      },
+      {
         path: "/caselaw/documentUnit/:documentNumber/preview",
         name: "caselaw-documentUnit-documentNumber-preview",
         component: {
