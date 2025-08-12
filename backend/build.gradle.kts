@@ -16,11 +16,11 @@ plugins {
     id("org.sonarqube") version "6.2.0.5505"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
-    id("se.patrikerdes.use-latest-versions") version "0.2.18"
+    id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.52.0"
     id ("io.freefair.lombok") version "8.14"
     id("org.flywaydb.flyway") version "11.11.0"
-    id("io.sentry.jvm.gradle") version "5.8.1"
+    id("io.sentry.jvm.gradle") version "5.9.0"
 }
 
 group = "de.bund.digitalservice"
@@ -222,7 +222,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
-    implementation("io.getunleash:unleash-client-java:11.0.2")
+    implementation("io.getunleash:unleash-client-java:11.1.0")
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.1")
 
@@ -243,7 +243,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.8")
+    testImplementation("io.projectreactor:reactor-test:3.7.9")
     testImplementation("org.springframework.security:spring-security-test:6.5.2")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
