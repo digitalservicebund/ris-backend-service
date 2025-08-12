@@ -54,17 +54,14 @@ const route = useRoute()
 
 const { pushQueryToRoute } = useQuery()
 
-const menuItems = computed<MenuItem[]>(() => {
-  let itemsRef
-  if (props.kind === Kind.DECISION) {
-    itemsRef = useCaseLawMenuItems(props.documentNumber!, route.query)
-  } else if (props.kind === Kind.PENDING_PROCEEDING) {
-    itemsRef = usePendingProceedingMenuItems(props.documentNumber!, route.query)
-  } else {
-    return []
-  }
-  return itemsRef.value
-})
+let menuItems: Ref<MenuItem[]>
+if (props.kind === Kind.DECISION) {
+  menuItems = useCaseLawMenuItems(props.documentNumber!, route.query)
+} else if (props.kind === Kind.PENDING_PROCEEDING) {
+  menuItems = usePendingProceedingMenuItems(props.documentNumber!, route.query)
+} else {
+  menuItems = ref([])
+}
 
 const showNavigationPanelRef: Ref<boolean> = ref(
   route.query.showNavigationPanel !== "false",
@@ -212,6 +209,7 @@ onMounted(async () => {
             v-if="
               documentUnit &&
               !route.path.includes('handover') &&
+              !route.path.includes('publication') &&
               !route.path.includes('preview')
             "
             v-bind="{ jumpToMatch }"
