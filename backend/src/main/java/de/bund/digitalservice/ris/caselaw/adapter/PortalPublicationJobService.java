@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
-import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
-import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskType;
+import de.bund.digitalservice.ris.caselaw.domain.PubcliationJobStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -74,26 +74,26 @@ public class PortalPublicationJobService {
   }
 
   private PortalPublicationResult executeJob(PortalPublicationJobDTO job) {
-    if (job.getPublicationType() == PortalPublicationTaskType.PUBLISH) {
+    if (job.getPublicationJobType() == PublicationJobType.PUBLISH) {
       try {
         var result =
             this.portalPublicationService.publishDocumentationUnit(job.getDocumentNumber());
-        job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
+        job.setPublicationJobStatus(PubcliationJobStatus.SUCCESS);
         return result;
       } catch (Exception e) {
         log.error("Could not publish documentation unit {}", job.getDocumentNumber(), e);
-        job.setPublicationStatus(PortalPublicationTaskStatus.ERROR);
+        job.setPublicationJobStatus(PubcliationJobStatus.ERROR);
       }
     }
 
-    if (job.getPublicationType() == PortalPublicationTaskType.DELETE) {
+    if (job.getPublicationJobType() == PublicationJobType.DELETE) {
       try {
         var result = this.portalPublicationService.deleteDocumentationUnit(job.getDocumentNumber());
-        job.setPublicationStatus(PortalPublicationTaskStatus.SUCCESS);
+        job.setPublicationJobStatus(PubcliationJobStatus.SUCCESS);
         return result;
       } catch (Exception e) {
         log.error("Could not unpublish documentation unit {}", job.getDocumentNumber(), e);
-        job.setPublicationStatus(PortalPublicationTaskStatus.ERROR);
+        job.setPublicationJobStatus(PubcliationJobStatus.ERROR);
       }
     }
     return null;
@@ -103,7 +103,7 @@ public class PortalPublicationJobService {
       List<PortalPublicationResult> results, List<PortalPublicationJobDTO> pendingJobs) {
     Map<String, PortalPublicationJobDTO> jobsWithoutDuplicates =
         pendingJobs.stream()
-            .filter(job -> job.getPublicationStatus() == PortalPublicationTaskStatus.SUCCESS)
+            .filter(job -> job.getPublicationJobStatus() == PubcliationJobStatus.SUCCESS)
             .collect(
                 Collectors.toMap(
                     job -> job.getDocumentNumber() + "/" + job.getDocumentNumber() + ".xml",
@@ -131,7 +131,7 @@ public class PortalPublicationJobService {
             publishDocNumbers.remove(duplicate);
             deletedDocNumbers.remove(duplicate);
           } else {
-            if (job.getPublicationType() == PortalPublicationTaskType.PUBLISH) {
+            if (job.getPublicationJobType() == PublicationJobType.PUBLISH) {
               deletedDocNumbers.removeIf(it -> it.equals(duplicate));
             } else {
               publishDocNumbers.removeIf(it -> it.equals(duplicate));
