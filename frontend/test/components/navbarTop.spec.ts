@@ -77,8 +77,9 @@ describe("navbar top", () => {
     renderComponent({
       env: "staging",
       activeUser: {
-        name: "fooUser",
+        name: "Test User",
         documentationOffice: { abbreviation: "fooDocumentationOffice" },
+        initials: "TU",
       },
     })
 
@@ -89,7 +90,7 @@ describe("navbar top", () => {
     expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
     expect(screen.getByText("Vorgänge")).toBeInTheDocument()
     expect(screen.getByText("des Bundes")).toBeInTheDocument()
-    expect(screen.getByText("fooUser")).toBeInTheDocument()
+    expect(screen.getByText("Test User")).toBeInTheDocument()
     expect(
       screen.getByText("fooDocumentationOffice | Staging"),
     ).toBeInTheDocument()

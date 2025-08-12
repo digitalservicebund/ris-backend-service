@@ -11,6 +11,7 @@ function mockUser(role: string) {
     email: undefined,
     name: "",
     roles: [role],
+    initials: "",
   }
   return mockedSessionStore
 }

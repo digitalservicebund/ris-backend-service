@@ -10,4 +10,5 @@ public record User(
     String name,
     String email,
     DocumentationOffice documentationOffice,
-    List<String> roles) {}
+    List<String> roles,
+    String initials) {}

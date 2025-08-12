@@ -21,6 +21,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -46,17 +48,16 @@ class UserControllerTest {
 
   @MockitoSpyBean private KeycloakUserService userService;
 
+  private List<User> testUsers = generateTestUsers();
+
   @Test
   void testGetUsers_shouldSucceed() {
-
-    var user =
-        User.builder().id(UUID.randomUUID()).name("user").email("test@email.bund.de").build();
 
     doReturn(Optional.of(UserGroup.builder().userGroupPathName("test").build()))
         .when(userService)
         .getUserGroup(any(OidcUser.class));
 
-    when(userApiService.getUsers(anyString())).thenReturn(List.of(user));
+    when(userApiService.getUsers(anyString())).thenReturn(testUsers);
 
     var result =
         risWebClient
@@ -70,7 +71,7 @@ class UserControllerTest {
             .returnResult();
 
     List<User> users = result.getResponseBody();
-    assertThat(users).containsExactlyInAnyOrderElementsOf(List.of(user));
+    assertThat(users).containsExactlyInAnyOrderElementsOf(testUsers);
   }
 
   @Test
@@ -91,5 +92,52 @@ class UserControllerTest {
 
     Assertions.assertEquals(0, result.getResponseBody().size());
     verify(userApiService, never()).getUsers(anyString());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"clara.hoffmann@", "ch", "CH", "clara hoff", "Clara H"})
+  void testGetUsersWithFilter_shouldReturnEmptyList_onFailed(String queryFilter) {
+
+    doReturn(Optional.of(UserGroup.builder().userGroupPathName("test").build()))
+        .when(userService)
+        .getUserGroup(any(OidcUser.class));
+
+    when(userApiService.getUsers(anyString())).thenReturn(testUsers);
+
+    var result =
+        risWebClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/users?q=" + queryFilter)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<List<User>>() {})
+            .returnResult();
+
+    Assertions.assertEquals(1, result.getResponseBody().size());
+    Assertions.assertEquals(testUsers.getFirst(), result.getResponseBody().getFirst());
+    Assertions.assertEquals("Clara Hoffmann", result.getResponseBody().getFirst().name());
+  }
+
+  private List<User> generateTestUsers() {
+
+    var firstUser =
+        User.builder()
+            .id(UUID.randomUUID())
+            .name("Clara Hoffmann")
+            .email("clara.hoffmann@digitalservice.bund.de")
+            .initials("CH")
+            .build();
+
+    var secondUser =
+        User.builder()
+            .id(UUID.randomUUID())
+            .name("Jonas Bergmann")
+            .email("jonas.bergmann@digitalservice.bund.de")
+            .initials("JB")
+            .build();
+
+    return List.of(firstUser, secondUser);
   }
 }

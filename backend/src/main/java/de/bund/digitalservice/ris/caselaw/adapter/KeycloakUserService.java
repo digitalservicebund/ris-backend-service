@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
@@ -88,22 +89,10 @@ public class KeycloakUserService implements UserService {
   }
 
   private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
-    UUID id = getUserId(oidcUser);
-
-    return User.builder()
-        .name(oidcUser.getAttribute("name"))
-        .id(id)
-        .email(oidcUser.getEmail())
-        .documentationOffice(documentationOffice)
-        .roles(oidcUser.getClaimAsStringList("roles"))
-        .build();
+    return UserTransformer.transformToDomain(oidcUser, documentationOffice);
   }
 
   private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
     return getUserGroup(oidcUser).map(UserGroup::docOffice);
-  }
-
-  public static UUID getUserId(OidcUser oidcUser) {
-    return Optional.ofNullable(oidcUser.getSubject()).map(UUID::fromString).orElse(null);
   }
 }

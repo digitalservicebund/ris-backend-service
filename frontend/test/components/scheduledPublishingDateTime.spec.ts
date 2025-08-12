@@ -62,7 +62,11 @@ describe("ScheduledPublishingDateTime", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
     const sessionStore = useSessionStore()
-    sessionStore.user = { name: "test user", email: "test@mail.local" }
+    sessionStore.user = {
+      name: "Test User",
+      email: "test@mail.local",
+      initials: "TU",
+    }
   })
 
   it("should show empty default state if no date is set and doc unit is publishable", async () => {
