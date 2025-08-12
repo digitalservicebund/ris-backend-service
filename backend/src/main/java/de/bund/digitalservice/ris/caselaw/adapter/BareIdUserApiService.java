@@ -19,6 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Service for retrieving user and group information from the BareId User API.
+ *
+ * @see <a href="https://api.bare.id/?urls.primaryName=user%2Fv1">Bare User API</a> for more
+ *     details.
+ */
 @Service
 @Slf4j
 public class BareIdUserApiService implements UserApiService {
@@ -81,11 +87,11 @@ public class BareIdUserApiService implements UserApiService {
 
     // List all top level groups and get the current
     BareUserApiResponse.Group current =
-        findFirstByGroupName(getTopLevelGroups(), userGroupsPathSegments.getFirst());
+        getGroupByName(getTopLevelGroups(), userGroupsPathSegments.getFirst());
 
     // Get the group court like the BGH
     BareUserApiResponse.Group court =
-        findFirstByGroupName(getGroupChildren(current.uuid()), userGroupsPathSegments.get(1));
+        getGroupByName(getGroupChildren(current.uuid()), userGroupsPathSegments.get(1));
 
     // Get all users under the  court
     return getUsersRecursively(court);
@@ -103,7 +109,7 @@ public class BareIdUserApiService implements UserApiService {
     return result;
   }
 
-  private BareUserApiResponse.Group findFirstByGroupName(
+  private BareUserApiResponse.Group getGroupByName(
       List<BareUserApiResponse.Group> groups, String groupName) {
     return groups.stream()
         .filter(item -> item.name().equals(groupName))
