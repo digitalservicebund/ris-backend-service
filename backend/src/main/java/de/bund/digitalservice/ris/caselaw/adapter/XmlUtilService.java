@@ -31,6 +31,7 @@ import org.springframework.util.ResourceUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 @Service
 @Slf4j
@@ -110,7 +111,13 @@ public class XmlUtilService {
         return Optional.empty();
       }
 
-      schema.newValidator().validate(new StreamSource(new StringReader(ldmlAsXmlString)));
+      try {
+        schema.newValidator().validate(new StreamSource(new StringReader(ldmlAsXmlString)));
+      } catch (SAXParseException e) {
+        log.error("Validation error: {}", e.getMessage());
+        log.info("Invalid LDML ({}): {}", ldml.getUniqueId(), ldmlAsXmlString);
+      }
+
       return Optional.of(ldmlAsXmlString);
     } catch (SAXException | MappingException | IOException e) {
       logXsdError(ldml.getUniqueId(), jaxbOutput.toString(), e);
