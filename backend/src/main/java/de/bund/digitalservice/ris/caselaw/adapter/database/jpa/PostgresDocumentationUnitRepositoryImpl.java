@@ -48,6 +48,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -140,15 +141,42 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Nullable
-  private static DocumentationUnit getDocumentationUnit(
+  private DocumentationUnit getDocumentationUnit(
       DocumentationUnitDTO documentationUnit, @Nullable User user) {
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
-      return DecisionTransformer.transformToDomain(decisionDTO, user);
+      Decision decision = DecisionTransformer.transformToDomain(decisionDTO, user);
+      return filterProcessStepsOfOtherDocumentationOffices(decision, user);
     }
     if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
       return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO, user);
     }
     return null;
+  }
+
+  private DocumentationUnit filterProcessStepsOfOtherDocumentationOffices(
+      Decision decision, User user) {
+    if (user == null || user.documentationOffice() == null) {
+      return decision.toBuilder().processSteps(Collections.emptyList()).build();
+    }
+
+    Optional<DocumentationOfficeDTO> documentationOfficeDTOOptional =
+        documentationOfficeRepository.findById(user.documentationOffice().id());
+    if (documentationOfficeDTOOptional.isPresent()
+        && documentationOfficeDTOOptional.get().getProcessSteps() != null) {
+      List<UUID> processStepIds =
+          documentationOfficeDTOOptional.get().getProcessSteps().stream()
+              .map(ProcessStepDTO::getId)
+              .toList();
+
+      List<DocumentationUnitProcessStep> processStepsOfMyDocumentationOffice =
+          decision.processSteps().stream()
+              .filter(processStep -> processStepIds.contains(processStep.getProcessStep().uuid()))
+              .toList();
+
+      return decision.toBuilder().processSteps(processStepsOfMyDocumentationOffice).build();
+    }
+
+    return decision.toBuilder().processSteps(Collections.emptyList()).build();
   }
 
   @Override
