@@ -118,9 +118,6 @@ public class BareIdUserApiService implements UserApiService {
 
     String url = String.format("https://api.bare.id/user/v1/%s/groups/%s", bareidInstance, groupId);
 
-    System.out.println(url);
-    System.out.println();
-
     ResponseEntity<BareUserApiResponse.GroupApiResponse> response =
         restTemplate.exchange(
             url, HttpMethod.GET, request, BareUserApiResponse.GroupApiResponse.class);
