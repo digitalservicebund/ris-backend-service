@@ -29,7 +29,7 @@ import org.springframework.web.client.RestTemplate;
 
 @ExtendWith(SpringExtension.class)
 @Import({BareIdUserApiService.class})
-class BareIdBareUserApiServiceTest {
+class BareIdUserApiServiceTest {
 
   BareIdUserApiService bareIdUserApiService;
 
