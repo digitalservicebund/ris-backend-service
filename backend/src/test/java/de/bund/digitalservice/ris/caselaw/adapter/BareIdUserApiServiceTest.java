@@ -149,8 +149,10 @@ class BareIdUserApiServiceTest {
 
   @Test
   void testGetUsersWithRoot_shouldSucceed() {
-    var results = bareIdUserApiService.getUsers("/caselaw/BGH/Intern");
-    Assertions.assertNotNull(results);
+    var results = bareIdUserApiService.getUsers(UUID.randomUUID());
+    Assertions.assertEquals(1, results.size());
+    Assertions.assertEquals("Tina Taxpayer", results.getFirst().name());
+    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", results.getFirst().email());
   }
 
   @Test
@@ -227,8 +229,16 @@ class BareIdUserApiServiceTest {
   }
 
   private void mockUserApiResponse() {
+
+    var attributes =
+        Map.of(
+            "firstName", new BareUserApiResponse.AttributeValues(List.of("Tina")),
+            "lastName", new BareUserApiResponse.AttributeValues(List.of("Taxpayer")));
+
+    BareUserApiResponse.BareUser user = generateBareUser(UUID.randomUUID(), attributes);
+
     BareUserApiResponse.UsersApiResponse userApiResponse =
-        new BareUserApiResponse.UsersApiResponse(Collections.emptyList());
+        new BareUserApiResponse.UsersApiResponse(List.of(user));
 
     ResponseEntity<BareUserApiResponse.UsersApiResponse> mockUsersResponse =
         ResponseEntity.ok(userApiResponse);
