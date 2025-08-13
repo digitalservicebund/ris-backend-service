@@ -38,7 +38,7 @@ class BareIdUserApiServiceTest {
 
   String instanceId = UUID.randomUUID().toString();
 
-  private final BareUserApiResponse.Group topLevelGroup =
+  private final BareUserApiResponse.Group caselawGroup =
       generateBareUserGroup(UUID.fromString("00000000-0000-0000-0000-000000000001"), "caselaw");
 
   private final BareUserApiResponse.Group courtGroup =
@@ -191,7 +191,7 @@ class BareIdUserApiServiceTest {
 
   private void mockRootGroupsResponse() {
     BareUserApiResponse.GroupResponse groupResponse =
-        new BareUserApiResponse.GroupResponse(List.of(topLevelGroup));
+        new BareUserApiResponse.GroupResponse(List.of(caselawGroup));
 
     ResponseEntity<BareUserApiResponse.GroupResponse> mockGroupResponse =
         ResponseEntity.ok(groupResponse);
@@ -213,7 +213,7 @@ class BareIdUserApiServiceTest {
         new BareUserApiResponse.GroupApiResponse(UUID.randomUUID(), "BGH", "/BGH", groupsResponse);
 
     stubGroupAPIResponse(
-        topLevelGroup.uuid().toString(),
+        caselawGroup.uuid().toString(),
         BareUserApiResponse.GroupApiResponse.class,
         groupApiTopLevelResponse);
   }
