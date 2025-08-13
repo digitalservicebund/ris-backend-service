@@ -44,6 +44,9 @@ class BareIdUserApiServiceTest {
   private final BareUserApiResponse.Group courtGroup =
       generateBareUserGroup(UUID.fromString("00000000-0000-0000-0000-000000000002"), "BGH");
 
+  private final BareUserApiResponse.Group internGroup =
+      generateBareUserGroup(UUID.fromString("00000000-0000-0000-0000-000000000003"), "Intern");
+
   @BeforeEach
   void setUp() {
     bareIdUserApiService =
@@ -53,9 +56,10 @@ class BareIdUserApiServiceTest {
     mockUserApiResponse();
 
     // caselaw/BGH/Intern
-    mockGroupTopLevelApiResponse(); // caselaw
-    mockCourtResponse(); // BGH
-    mockInternalResponse(); // Intern
+    mockRootGroupsResponse(); // returns top-level groups, including "caselaw"
+    mockCaselawChildrenResponse(); // returns caselaw children ("BGH")
+    mockCourtChildrenResponse(); // returns BGH children, including "Intern"
+    mockInternResponse(); // returns Intern's children (empty)
   }
 
   @Test
@@ -148,8 +152,8 @@ class BareIdUserApiServiceTest {
   }
 
   @Test
-  void testGetUsersWithRoot_shouldSucceed() {
-    var results = bareIdUserApiService.getUsers(UUID.randomUUID());
+  void testGetUsers_shouldSucceed() {
+    var results = bareIdUserApiService.getUsers("/caselaw/BGH/Intern");
     Assertions.assertEquals(1, results.size());
     Assertions.assertEquals("Tina Taxpayer", results.getFirst().name());
     Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", results.getFirst().email());
@@ -185,7 +189,7 @@ class BareIdUserApiServiceTest {
     return new BareUserApiResponse.Group(uuid, name, "/" + name);
   }
 
-  private void mockGroupTopLevelApiResponse() {
+  private void mockRootGroupsResponse() {
     BareUserApiResponse.GroupResponse groupResponse =
         new BareUserApiResponse.GroupResponse(List.of(topLevelGroup));
 
@@ -201,7 +205,7 @@ class BareIdUserApiServiceTest {
             eq(BareUserApiResponse.GroupResponse.class));
   }
 
-  private void mockCourtResponse() {
+  private void mockCaselawChildrenResponse() {
     BareUserApiResponse.GroupResponse groupsResponse =
         new BareUserApiResponse.GroupResponse(List.of(courtGroup));
 
@@ -214,18 +218,28 @@ class BareIdUserApiServiceTest {
         groupApiTopLevelResponse);
   }
 
-  private void mockInternalResponse() {
-    BareUserApiResponse.GroupApiResponse courtChildRespone =
+  private void mockCourtChildrenResponse() {
+    BareUserApiResponse.GroupResponse children =
+        new BareUserApiResponse.GroupResponse(List.of(internGroup));
+
+    BareUserApiResponse.GroupApiResponse courtWithIntern =
         new BareUserApiResponse.GroupApiResponse(
-            UUID.randomUUID(),
-            "Intern",
-            "/Intern",
-            new BareUserApiResponse.GroupResponse(Collections.emptyList()));
+            courtGroup.uuid(), courtGroup.name(), courtGroup.path(), children);
 
     stubGroupAPIResponse(
-        courtGroup.uuid().toString(),
-        BareUserApiResponse.GroupApiResponse.class,
-        courtChildRespone);
+        courtGroup.uuid().toString(), BareUserApiResponse.GroupApiResponse.class, courtWithIntern);
+  }
+
+  private void mockInternResponse() {
+    BareUserApiResponse.GroupResponse children =
+        new BareUserApiResponse.GroupResponse(Collections.emptyList());
+
+    BareUserApiResponse.GroupApiResponse courtWithIntern =
+        new BareUserApiResponse.GroupApiResponse(
+            internGroup.uuid(), internGroup.name(), internGroup.path(), children);
+
+    stubGroupAPIResponse(
+        internGroup.uuid().toString(), BareUserApiResponse.GroupApiResponse.class, courtWithIntern);
   }
 
   private void mockUserApiResponse() {
