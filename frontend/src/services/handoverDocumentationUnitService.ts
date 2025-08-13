@@ -14,7 +14,6 @@ interface HandoverDocumentationUnitService {
   ): Promise<ServiceResponse<HandoverMail>>
   getEventLog(documentUnitUuid: string): Promise<ServiceResponse<EventRecord[]>>
   getPreview(documentUnitUuid: string): Promise<ServiceResponse<Preview>>
-  publishDocument(documentUnitUuid: string): Promise<ServiceResponse<void>>
 }
 
 const service: HandoverDocumentationUnitService = {
@@ -101,24 +100,6 @@ const service: HandoverDocumentationUnitService = {
           response.data.statusMessages.length > 0
             ? response.data?.statusMessages
             : errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.description,
-      }
-    }
-
-    return response
-  },
-
-  async publishDocument(documentUnitUuid: string) {
-    const response = await httpClient.put<string, void>(
-      `caselaw/documentunits/${documentUnitUuid}/publish`,
-    )
-
-    if (response.status >= 300) {
-      const description =
-        "Die Dokumentationseinheit konnte nicht veröffentlicht werden."
-
-      response.error = {
-        title: errorMessages.DOCUMENT_UNIT_HANDOVER_FAILED.title,
-        description,
       }
     }
 
