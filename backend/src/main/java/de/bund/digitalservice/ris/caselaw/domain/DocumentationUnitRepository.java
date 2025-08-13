@@ -4,9 +4,11 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotE
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Domain repository for documentation units */
 @NoRepositoryBean
@@ -86,6 +88,9 @@ public interface DocumentationUnitRepository {
    */
   void saveKeywords(DocumentationUnit documentationUnit);
 
+  @Transactional
+  void saveProcessSteps(DocumentationUnit documentationUnit, @Nullable User currentUser);
+
   /**
    * Save the fields of law of a documentation unit
    *
@@ -164,6 +169,4 @@ public interface DocumentationUnitRepository {
   List<Decision> getScheduledDocumentationUnitsDueNow();
 
   List<String> findAllDocumentNumbersByMatchingPublishCriteria();
-
-  void saveProcessSteps(DocumentationUnit documentationUnit);
 }
