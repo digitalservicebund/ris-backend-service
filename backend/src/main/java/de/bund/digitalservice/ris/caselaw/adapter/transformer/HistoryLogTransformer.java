@@ -44,6 +44,8 @@ public class HistoryLogTransformer {
         Optional.ofNullable(currentUser).map(User::documentationOffice).orElse(null);
 
     // The creator's office from the API call.
+    // Todo: creatorDocumentationOffice currently null, blocked by this BareID ticket:
+    //  https://support.bare.id/de/tickets/VTZV-2308-IQGJ
     DocumentationOffice creatorDocumentationOffice =
         Optional.ofNullable(creatorUser).map(User::documentationOffice).orElse(null);
 
@@ -136,7 +138,8 @@ public class HistoryLogTransformer {
     //    return creatorDocumentationOffice.id().equals(currentUserDocumentationOffice.id());
 
     // Todo: uncomment the above code, as soon as the API returns the group path name for the
-    // retrieved user
+    // retrieved user:
+    //  link to BareID Support Ticket: https://support.bare.id/de/tickets/VTZV-2308-IQGJ
     return true;
   }
 }
