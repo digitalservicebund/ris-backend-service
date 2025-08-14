@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.util.Strings;
+import org.hibernate.query.NullPrecedence;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +43,8 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
       Optional<LocalDate> startDate,
       Optional<LocalDate> endDate) {
 
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    HibernateCriteriaBuilder builder =
+        (HibernateCriteriaBuilder) entityManager.getCriteriaBuilder();
     CriteriaQuery<EurLexResultDTO> builderQuery = builder.createQuery(EurLexResultDTO.class);
 
     Root<EurLexResultDTO> root = builderQuery.from(EurLexResultDTO.class);
@@ -57,10 +60,9 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
     // Order by updatedAt with nulls last, then by created at and finally by decision date.
     List<Order> dateTimeDescOrder =
         List.of(
-            builder.desc(builder.selectCase().when(root.get("updatedAt").isNull(), 0).otherwise(1)),
-            builder.desc(root.get("updatedAt")),
-            builder.desc(root.get("createdAt")),
-            builder.desc(root.get("date")));
+            builder.desc(root.get(EurLexResultDTO_.updatedAt)).nullPrecedence(NullPrecedence.LAST),
+            builder.desc(root.get(EurLexResultDTO_.createdAt)),
+            builder.desc(root.get(EurLexResultDTO_.date)));
     builderQuery.orderBy(dateTimeDescOrder);
 
     Query query =

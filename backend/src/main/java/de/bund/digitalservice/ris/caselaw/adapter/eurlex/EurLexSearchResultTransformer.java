@@ -11,7 +11,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -61,11 +60,9 @@ public class EurLexSearchResultTransformer {
             .uri(eurLexResultDTO.getUri());
 
     if (eurLexResultDTO.getUpdatedAt() != null) {
-      builder.publicationDate(
-          LocalDate.ofInstant(eurLexResultDTO.getUpdatedAt(), ZoneId.of("Europe/Berlin")));
+      builder.publicationDate(eurLexResultDTO.getUpdatedAt());
     } else if (eurLexResultDTO.getCreatedAt() != null) {
-      builder.publicationDate(
-          LocalDate.ofInstant(eurLexResultDTO.getCreatedAt(), ZoneId.of("Europe/Berlin")));
+      builder.publicationDate(eurLexResultDTO.getCreatedAt());
     } else {
       log.error("No created or updated at date found. Should be set by database.");
     }
