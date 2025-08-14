@@ -12,6 +12,7 @@ import LegalForce from "@/domain/legalForce"
 import { ManagementData } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
+import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import PreviousDecision from "@/domain/previousDecision"
 import { PublicationStatus } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
@@ -89,6 +90,8 @@ export class Decision {
   readonly id?: string
   readonly documentNumber: string = ""
   readonly status?: PublicationStatus
+  readonly portalPublicationStatus: PortalPublicationStatus =
+    PortalPublicationStatus.UNPUBLISHED
   readonly kind = Kind.DECISION
   public version: number = 0
   public attachments: Attachment[] = []

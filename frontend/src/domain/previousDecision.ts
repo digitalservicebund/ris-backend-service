@@ -112,7 +112,10 @@ export default class PreviousDecision
   }
 }
 
-export const previousDecisionFieldLabels: { [name: string]: string } = {
+export const previousDecisionFieldLabels: Record<
+  (typeof PreviousDecision.fields)[number],
+  string
+> = {
   court: "Gericht",
   decisionDate: "Entscheidungsdatum",
   fileNumber: "Aktenzeichen",

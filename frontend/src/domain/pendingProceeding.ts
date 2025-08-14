@@ -10,6 +10,7 @@ import { Kind } from "@/domain/documentationUnitKind"
 import LegalForce from "@/domain/legalForce"
 import { ManagementData } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
+import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import { PublicationStatus } from "@/domain/publicationStatus"
 import SingleNorm from "@/domain/singleNorm"
 
@@ -36,6 +37,8 @@ export default class PendingProceeding {
   readonly id?: string
   readonly documentNumber: string = ""
   readonly status?: PublicationStatus
+  readonly portalPublicationStatus: PortalPublicationStatus =
+    PortalPublicationStatus.UNPUBLISHED
   readonly kind = Kind.PENDING_PROCEEDING
   public version: number = 0
   public coreData: CoreData = {}

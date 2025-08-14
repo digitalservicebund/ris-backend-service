@@ -18,9 +18,6 @@ async function handoverDocument() {
   const response = await handoverDocumentationUnitService.handoverDocument(
     store.documentUnit!.uuid,
   )
-  await handoverDocumentationUnitService.publishDocument(
-    store.documentUnit!.uuid,
-  )
   if (!eventLog.value) eventLog.value = []
   if (response.data && response.data?.success) {
     const handover = new HandoverMail(response.data)
