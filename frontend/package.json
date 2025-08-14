@@ -114,7 +114,7 @@
     "eslint-plugin-jest-dom": "^5.5.0",
     "eslint-plugin-playwright": "^2.2.2",
     "eslint-plugin-prettier": "^5.5.4",
-    "eslint-plugin-testing-library": "^7.6.6",
+    "eslint-plugin-testing-library": "7.6.3",
     "eslint-plugin-vue": "^10.4.0",
     "eslint-plugin-vue-scoped-css": "^2.11.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
