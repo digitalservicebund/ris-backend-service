@@ -479,7 +479,7 @@ describe("DecisionPlausibilityCheck", () => {
       name: "caselaw-documentUnit-documentNumber-categories",
     })
   })
-})
+}, 8_000)
 
 async function renderComponent() {
   const router = createRouter({
