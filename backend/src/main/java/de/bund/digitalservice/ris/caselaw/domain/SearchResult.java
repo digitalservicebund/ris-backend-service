@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import lombok.Builder;
 
@@ -11,6 +12,6 @@ public record SearchResult(
     String courtLocation,
     LocalDate date,
     String fileNumber,
-    LocalDate publicationDate,
+    Instant publicationDate,
     String uri,
     String htmlLink) {}
