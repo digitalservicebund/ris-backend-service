@@ -39,7 +39,6 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
     builder
         .id(pendingProceeding.uuid())
         .documentNumber(pendingProceeding.documentNumber())
-        .portalPublicationStatus(pendingProceeding.portalPublicationStatus())
         .version(pendingProceeding.version());
     addPreviousDecisions(pendingProceeding, builder);
 

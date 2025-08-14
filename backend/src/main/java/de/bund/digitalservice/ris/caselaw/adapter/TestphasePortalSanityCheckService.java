@@ -1,53 +1,33 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
+@Service
 @Slf4j
-public class PrototypePortalPublicationService extends CommonPortalPublicationService {
+public class TestphasePortalSanityCheckService {
 
+  private final PortalPublicationService portalPublicationService;
   private final RiiService riiService;
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final PrototypePortalBucket prototypePortalBucket;
+  private final PortalBucket portalBucket;
 
-  public PrototypePortalPublicationService(
+  public TestphasePortalSanityCheckService(
+      PortalPublicationService portalPublicationService,
+      RiiService riiService,
       DocumentationUnitRepository documentationUnitRepository,
-      AttachmentRepository attachmentRepository,
-      XmlUtilService xmlUtilService,
-      PrototypePortalBucket prototypePortalBucket,
-      ObjectMapper objectMapper,
-      PortalTransformer portalTransformer,
-      RiiService riiService) {
-    super(
-        documentationUnitRepository,
-        attachmentRepository,
-        xmlUtilService,
-        prototypePortalBucket,
-        objectMapper,
-        portalTransformer);
+      PortalBucket portalBucket) {
+    this.portalPublicationService = portalPublicationService;
     this.riiService = riiService;
     this.documentationUnitRepository = documentationUnitRepository;
-    this.prototypePortalBucket = prototypePortalBucket;
-  }
-
-  @Override
-  public void publishDocumentationUnitWithChangelog(UUID documentationUnitId) {
-    // no-op in prototype
-  }
-
-  @Override
-  public void uploadChangelog(
-      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers) {
-    // no-op in prototype - delta changelog uploads currently disabled
+    this.portalBucket = portalBucket;
   }
 
   //                        ↓ day of month (1-31)
@@ -59,7 +39,7 @@ public class PrototypePortalPublicationService extends CommonPortalPublicationSe
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logPortalPublicationSanityCheck() {
     List<String> portalBucketDocumentNumbers =
-        prototypePortalBucket.getAllFilenames().stream()
+        portalBucket.getAllFilenames().stream()
             .filter(fileName -> fileName.contains(".xml"))
             .map(fileName -> fileName.substring(fileName.lastIndexOf("/") + 1))
             .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
@@ -104,8 +84,8 @@ public class PrototypePortalPublicationService extends CommonPortalPublicationSe
             inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
         log.info("Deleting documents not in Rechtsprechung im Internet...");
         try {
-          inPortalNotInRii.forEach(this::deleteDocumentationUnit);
-          uploadDeletionChangelog(
+          inPortalNotInRii.forEach(portalPublicationService::deleteDocumentationUnit);
+          portalPublicationService.uploadDeletionChangelog(
               inPortalNotInRii.stream().map(documentNumber -> documentNumber + ".xml").toList());
 
         } catch (JsonProcessingException | PublishException e) {

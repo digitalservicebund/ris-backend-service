@@ -105,7 +105,7 @@ class DocumentationUnitControllerTest {
   @MockitoBean private DocumentationUnitService service;
   @MockitoBean private DocumentationUnitDocxMetadataInitializationService docUnitAttachmentService;
   @MockitoBean private HandoverService handoverService;
-  @MockitoBean private StagingPortalPublicationService stagingPortalPublicationService;
+  @MockitoBean private PortalPublicationService portalPublicationService;
   @MockitoBean private UserService userService;
   @MockitoBean private ConverterService converterService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
@@ -884,7 +884,7 @@ class DocumentationUnitControllerTest {
       throws DocumentationUnitNotExistsException {
 
     doThrow(DocumentationUnitNotExistsException.class)
-        .when(stagingPortalPublicationService)
+        .when(portalPublicationService)
         .publishDocumentationUnitWithChangelog(TEST_UUID);
 
     risWebClient
@@ -895,7 +895,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(stagingPortalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
+    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
   }
 
   @Test
@@ -903,7 +903,7 @@ class DocumentationUnitControllerTest {
       throws DocumentationUnitNotExistsException {
 
     doThrow(LdmlTransformationException.class)
-        .when(stagingPortalPublicationService)
+        .when(portalPublicationService)
         .publishDocumentationUnitWithChangelog(TEST_UUID);
 
     risWebClient
@@ -914,14 +914,14 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .isBadRequest();
 
-    verify(stagingPortalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
+    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
   }
 
   @Test
   void testPublish_withServiceThrowsPublishException() throws DocumentationUnitNotExistsException {
 
     doThrow(PublishException.class)
-        .when(stagingPortalPublicationService)
+        .when(portalPublicationService)
         .publishDocumentationUnitWithChangelog(TEST_UUID);
 
     risWebClient
@@ -932,7 +932,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(stagingPortalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
+    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
   }
 
   @Test

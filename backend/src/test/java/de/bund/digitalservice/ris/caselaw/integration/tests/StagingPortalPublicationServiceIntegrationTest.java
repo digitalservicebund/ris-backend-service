@@ -82,6 +82,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
   void setUp() {
     documentationOffice =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
+    when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
   }
 
   @AfterEach
@@ -243,7 +244,8 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
     assertThat(capturedRequests.get(2).key()).isEqualTo("1234567890123/bild2.png");
     assertThat(capturedRequests.get(3).key()).contains("changelogs/");
 
-    dto.setAttachments(
+    var updatedDto = repository.findById(dto.getId()).orElseThrow();
+    updatedDto.setAttachments(
         List.of(
             AttachmentDTO.builder()
                 .content(new byte[] {1, 2, 3})
@@ -252,7 +254,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
                 .uploadTimestamp(Instant.now())
                 .documentationUnit(dto)
                 .build()));
-    dto = repository.save(dto);
+    updatedDto = repository.save(updatedDto);
 
     var response =
         ListObjectsV2Response.builder()
@@ -269,7 +271,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .uri("/api/v1/caselaw/documentunits/" + updatedDto.getId() + "/publish")
         .exchange()
         .expectStatus()
         .isOk();
