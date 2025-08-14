@@ -57,13 +57,18 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
                         .orElse(null);
                 if (historyLogProcessStepDTO != null) {
                   fromUser =
-                      userService.getUser(
-                          historyLogProcessStepDTO
-                              .getFromDocumentationUnitProcessStep()
-                              .getUserId());
+                      Optional.ofNullable(
+                              historyLogProcessStepDTO.getFromDocumentationUnitProcessStep())
+                          .map(DocumentationUnitProcessStepDTO::getUserId)
+                          .map(userService::getUser)
+                          .orElse(null);
+
                   toUser =
-                      userService.getUser(
-                          historyLogProcessStepDTO.getToDocumentationUnitProcessStep().getUserId());
+                      Optional.ofNullable(
+                              historyLogProcessStepDTO.getToDocumentationUnitProcessStep())
+                          .map(DocumentationUnitProcessStepDTO::getUserId)
+                          .map(userService::getUser)
+                          .orElse(null);
                 }
               }
 

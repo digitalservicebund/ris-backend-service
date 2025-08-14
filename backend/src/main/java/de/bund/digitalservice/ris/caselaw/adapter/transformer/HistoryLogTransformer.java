@@ -106,7 +106,7 @@ public class HistoryLogTransformer {
         if (oldPersonName == null && newPersonName != null) {
           return "Person gesetzt: " + newPersonName;
         } else if (oldPersonName != null && newPersonName == null) {
-          return "Person gelöscht: " + oldPersonName; // Or your desired string for removal
+          return "Person entfernt: " + oldPersonName;
         } else if (oldPersonName != null
             && newPersonName != null
             && !oldPersonName.equals(newPersonName)) {

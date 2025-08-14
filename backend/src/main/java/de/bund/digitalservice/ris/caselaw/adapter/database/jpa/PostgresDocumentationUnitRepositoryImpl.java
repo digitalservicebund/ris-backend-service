@@ -630,20 +630,25 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private static String getProcessStepHistoryLogDescription(
       DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB,
       DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO) {
-    ProcessStepDTO fromProcess = currentDocumentationUnitProcessStepDTOFromDB.getProcessStep();
-    ProcessStepDTO toProcess = newDocumentationUnitProcessStepDTO.getProcessStep();
+    Optional<ProcessStepDTO> fromProcess =
+        Optional.ofNullable(currentDocumentationUnitProcessStepDTOFromDB)
+            .map(DocumentationUnitProcessStepDTO::getProcessStep);
+    Optional<ProcessStepDTO> toProcess =
+        Optional.ofNullable(newDocumentationUnitProcessStepDTO)
+            .map(DocumentationUnitProcessStepDTO::getProcessStep);
 
-    if (toProcess == null) {
+    if (toProcess.isEmpty()) {
       throw new IllegalStateException(
           "Could not save history log because new process step is null");
     }
 
-    if (fromProcess == null) {
-      return "Schritt gesetzt: " + toProcess.getName();
-    } else {
-      return String.format(
-          "Schritt geändert: %s -> %s", fromProcess.getName(), toProcess.getName());
-    }
+    return fromProcess
+        .map(
+            processStepDTO ->
+                String.format(
+                    "Schritt geändert: %s -> %s",
+                    processStepDTO.getName(), toProcess.get().getName()))
+        .orElseGet(() -> "Schritt gesetzt: " + toProcess.get().getName());
   }
 
   private boolean stepChanged(
@@ -664,6 +669,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private boolean userChanged(
       DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB,
       DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend) {
+
+    if (currentDocumentationUnitProcessStepDTOFromDB == null) {
+      // If there was no current step in DB, but frontend provides one, it's a change.
+      return true;
+    }
 
     if (currentDocumentationUnitProcessStepDTOFromDB.getUserId() != null
         && currentDocunitProcessStepFromFrontend.getUser() == null) {
