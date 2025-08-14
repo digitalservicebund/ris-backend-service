@@ -267,7 +267,7 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @Builder.Default
   @NotNull
   @Enumerated(EnumType.STRING)
-  @Column(name = "portal_publication_status", nullable = false)
+  @Column(name = "portal_publication_status", nullable = false, insertable = false)
   PortalPublicationStatus portalPublicationStatus = PortalPublicationStatus.UNPUBLISHED;
 
   @Override

@@ -34,12 +34,6 @@ public class OtcObsConfig {
   @Value("${s3.file-storage.case-law.secret-access-key:test}")
   private String portalSecretAccessKey;
 
-  @Value("${s3.file-storage.case-law-prototype.access-key-id:test}")
-  private String prototypePortalAccessKeyId;
-
-  @Value("${s3.file-storage.case-law-prototype.access-key:test}")
-  private String prototypePortalAccessKey;
-
   @Bean(name = "docxS3Client")
   @Profile({"staging", "production", "uat"})
   public S3Client docxS3Client() throws URISyntaxException {
@@ -74,26 +68,6 @@ public class OtcObsConfig {
     return new S3NoOpClient();
   }
 
-  @Bean(name = "prototypePortalS3Client")
-  @Profile({"staging", "production"})
-  public S3Client prototypePortalS3Client() throws URISyntaxException {
-    return S3Client.builder()
-        .credentialsProvider(
-            StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(prototypePortalAccessKeyId, prototypePortalAccessKey)))
-        .endpointOverride(new URI(endpoint))
-        .region(Region.of(EU_DE))
-        .responseChecksumValidation(ResponseChecksumValidation.WHEN_REQUIRED)
-        .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
-        .build();
-  }
-
-  @Bean(name = "prototypePortalS3Client")
-  @Profile({"uat"})
-  public S3Client prototypePortalS3NoopClient() {
-    return new S3NoOpClient();
-  }
-
   @Bean(name = "docxS3Client")
   @Profile({"!production & !staging & !uat"})
   public S3Client docxS3MockClient() {
@@ -103,12 +77,6 @@ public class OtcObsConfig {
   @Bean(name = "portalS3Client")
   @Profile({"!production & !staging & !uat"})
   public S3Client portalS3MockClient() {
-    return new S3MockClient();
-  }
-
-  @Bean(name = "prototypePortalS3Client")
-  @Profile({"!production & !staging & !uat"})
-  public S3Client prototypePortalS3MockClient() {
     return new S3MockClient();
   }
 }
