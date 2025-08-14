@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -37,47 +38,28 @@ class BareIdUserApiServiceTest {
 
   String instanceId = UUID.randomUUID().toString();
 
+  private final BareUserApiResponse.Group caselawGroup =
+      generateBareUserGroup(UUID.fromString("00000000-0000-0000-0000-000000000001"), "caselaw");
+
+  private final BareUserApiResponse.Group courtGroup =
+      generateBareUserGroup(UUID.fromString("00000000-0000-0000-0000-000000000002"), "BGH");
+
+  private final BareUserApiResponse.Group internGroup =
+      generateBareUserGroup(UUID.fromString("00000000-0000-0000-0000-000000000003"), "Intern");
+
   @BeforeEach
   void setUp() {
     bareIdUserApiService =
         new BareIdUserApiService(bareIdUserApiTokenService, restTemplate, instanceId);
 
-    OAuth2AccessToken mockToken =
-        new OAuth2AccessToken(
-            OAuth2AccessToken.TokenType.BEARER,
-            "mocked-token-value",
-            Instant.now(),
-            Instant.now().plusSeconds(3600));
-    when(bareIdUserApiTokenService.getAccessToken()).thenReturn(mockToken);
+    mockTokenResponse();
+    mockUserApiResponse();
 
-    BareUserApiResponse.Group group = generateBareUserGroup();
-    BareUserApiResponse.GroupApiResponse groupApiResponse =
-        new BareUserApiResponse.GroupApiResponse(List.of(group));
-
-    ResponseEntity<BareUserApiResponse.GroupApiResponse> mockGroupResponse =
-        ResponseEntity.ok(groupApiResponse);
-
-    doReturn(mockGroupResponse)
-        .when(restTemplate)
-        .exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.GroupApiResponse.class));
-
-    BareUserApiResponse.UsersApiResponse userApiResponse =
-        new BareUserApiResponse.UsersApiResponse(Collections.emptyList());
-
-    ResponseEntity<BareUserApiResponse.UsersApiResponse> mockUsersResponse =
-        ResponseEntity.ok(userApiResponse);
-
-    doReturn(mockUsersResponse)
-        .when(restTemplate)
-        .exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(BareUserApiResponse.UsersApiResponse.class));
+    // caselaw/BGH/Intern
+    mockRootGroupsResponse(); // returns top-level groups, including "caselaw"
+    mockCaselawChildrenResponse(); // returns caselaw children ("BGH")
+    mockCourtChildrenResponse(); // returns BGH children, including "Intern"
+    mockInternResponse(); // returns Intern's children (empty)
   }
 
   @Test
@@ -89,12 +71,12 @@ class BareIdUserApiServiceTest {
             "firstName", new BareUserApiResponse.AttributeValues(List.of("Tina")),
             "lastName", new BareUserApiResponse.AttributeValues(List.of("Taxpayer")));
 
-    BareUserApiResponse.BareUser bareUser = generateBareUser(userId, attributes);
-    BareUserApiResponse.UserApiResponse userApiResponse =
-        new BareUserApiResponse.UserApiResponse(bareUser);
+    BareUserApiResponse.BareUser user = generateBareUser(userId, attributes);
+    BareUserApiResponse.UserApiResponse userResponse =
+        new BareUserApiResponse.UserApiResponse(user);
 
     ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
-        ResponseEntity.ok(userApiResponse);
+        ResponseEntity.ok(userResponse);
 
     doReturn(mockResponse)
         .when(restTemplate)
@@ -136,12 +118,12 @@ class BareIdUserApiServiceTest {
   void testGetUser_withEmptyNamesAttributes_shouldReturnNullName() {
     final UUID userId = UUID.randomUUID();
 
-    BareUserApiResponse.BareUser bareUser = generateBareUser(userId, null);
-    BareUserApiResponse.UserApiResponse userApiResponse =
-        new BareUserApiResponse.UserApiResponse(bareUser);
+    BareUserApiResponse.BareUser user = generateBareUser(userId, null);
+    BareUserApiResponse.UserApiResponse userResponse =
+        new BareUserApiResponse.UserApiResponse(user);
 
     ResponseEntity<BareUserApiResponse.UserApiResponse> mockResponse =
-        ResponseEntity.ok(userApiResponse);
+        ResponseEntity.ok(userResponse);
 
     doReturn(mockResponse)
         .when(restTemplate)
@@ -170,9 +152,11 @@ class BareIdUserApiServiceTest {
   }
 
   @Test
-  void testGetUsersByPath_shouldSucceed() {
-    var results = bareIdUserApiService.getUsers("/DS/Intern");
-    Assertions.assertNotNull(results);
+  void testGetUsers_shouldSucceed() {
+    var results = bareIdUserApiService.getUsers("/caselaw/BGH/Intern");
+    Assertions.assertEquals(1, results.size());
+    Assertions.assertEquals("Tina Taxpayer", results.getFirst().name());
+    Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", results.getFirst().email());
   }
 
   @Test
@@ -201,7 +185,101 @@ class BareIdUserApiServiceTest {
     Assertions.assertEquals("Could not fetch users", exception.getMessage());
   }
 
-  private BareUserApiResponse.Group generateBareUserGroup() {
-    return new BareUserApiResponse.Group(UUID.randomUUID(), "DS", "/" + "DS");
+  private BareUserApiResponse.Group generateBareUserGroup(UUID uuid, String name) {
+    return new BareUserApiResponse.Group(uuid, name, "/" + name);
+  }
+
+  private void mockRootGroupsResponse() {
+    BareUserApiResponse.GroupResponse groupResponse =
+        new BareUserApiResponse.GroupResponse(List.of(caselawGroup));
+
+    ResponseEntity<BareUserApiResponse.GroupResponse> mockGroupResponse =
+        ResponseEntity.ok(groupResponse);
+
+    doReturn(mockGroupResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.GroupResponse.class));
+  }
+
+  private void mockCaselawChildrenResponse() {
+    BareUserApiResponse.GroupResponse groupsResponse =
+        new BareUserApiResponse.GroupResponse(List.of(courtGroup));
+
+    BareUserApiResponse.GroupApiResponse groupApiTopLevelResponse =
+        new BareUserApiResponse.GroupApiResponse(UUID.randomUUID(), "BGH", "/BGH", groupsResponse);
+
+    stubGroupAPIResponse(
+        caselawGroup.uuid().toString(),
+        BareUserApiResponse.GroupApiResponse.class,
+        groupApiTopLevelResponse);
+  }
+
+  private void mockCourtChildrenResponse() {
+    BareUserApiResponse.GroupResponse children =
+        new BareUserApiResponse.GroupResponse(List.of(internGroup));
+
+    BareUserApiResponse.GroupApiResponse courtWithIntern =
+        new BareUserApiResponse.GroupApiResponse(
+            courtGroup.uuid(), courtGroup.name(), courtGroup.path(), children);
+
+    stubGroupAPIResponse(
+        courtGroup.uuid().toString(), BareUserApiResponse.GroupApiResponse.class, courtWithIntern);
+  }
+
+  private void mockInternResponse() {
+    BareUserApiResponse.GroupResponse children =
+        new BareUserApiResponse.GroupResponse(Collections.emptyList());
+
+    BareUserApiResponse.GroupApiResponse courtWithIntern =
+        new BareUserApiResponse.GroupApiResponse(
+            internGroup.uuid(), internGroup.name(), internGroup.path(), children);
+
+    stubGroupAPIResponse(
+        internGroup.uuid().toString(), BareUserApiResponse.GroupApiResponse.class, courtWithIntern);
+  }
+
+  private void mockUserApiResponse() {
+
+    var attributes =
+        Map.of(
+            "firstName", new BareUserApiResponse.AttributeValues(List.of("Tina")),
+            "lastName", new BareUserApiResponse.AttributeValues(List.of("Taxpayer")));
+
+    BareUserApiResponse.BareUser user = generateBareUser(UUID.randomUUID(), attributes);
+
+    BareUserApiResponse.UsersApiResponse userApiResponse =
+        new BareUserApiResponse.UsersApiResponse(List.of(user));
+
+    ResponseEntity<BareUserApiResponse.UsersApiResponse> mockUsersResponse =
+        ResponseEntity.ok(userApiResponse);
+
+    doReturn(mockUsersResponse)
+        .when(restTemplate)
+        .exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UsersApiResponse.class));
+  }
+
+  private void mockTokenResponse() {
+
+    OAuth2AccessToken mockToken =
+        new OAuth2AccessToken(
+            OAuth2AccessToken.TokenType.BEARER,
+            "mocked-token-value",
+            Instant.now(),
+            Instant.now().plusSeconds(3600));
+    when(bareIdUserApiTokenService.getAccessToken()).thenReturn(mockToken);
+  }
+
+  private <T> void stubGroupAPIResponse(String urlEndsWith, Class<T> type, T body) {
+    doReturn(ResponseEntity.ok(body))
+        .when(restTemplate)
+        .exchange(endsWith(urlEndsWith), eq(HttpMethod.GET), any(HttpEntity.class), eq(type));
   }
 }

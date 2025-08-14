@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-public enum PortalPublicationTaskStatus {
+public enum PubcliationJobStatus {
   PENDING,
   SUCCESS,
   ERROR,

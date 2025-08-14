@@ -12,6 +12,7 @@ import java.util.UUID;
  */
 public class BareUserApiResponse {
 
+  // User
   public record UserApiResponse(BareUser user) {}
 
   public record UsersApiResponse(List<BareUser> users) {}
@@ -24,9 +25,12 @@ public class BareUserApiResponse {
       String email,
       Map<String, AttributeValues> attributes) {}
 
-  public record GroupApiResponse(List<Group> groups) {}
+  public record AttributeValues(List<String> values) {}
 
+  // Groups
   public record Group(UUID uuid, String name, String path) {}
 
-  public record AttributeValues(List<String> values) {}
+  public record GroupResponse(List<Group> groups) {}
+
+  public record GroupApiResponse(UUID uuid, String name, String path, GroupResponse children) {}
 }
