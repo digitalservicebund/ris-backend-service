@@ -2,17 +2,21 @@
 import { computed, ref } from "vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
+import DecisionPlausibilityCheck from "@/components/publication/DecisionPlausibilityCheck.vue"
 import PublicationActions from "@/components/publication/PublicationActions.vue"
-import PublicationPlausibilityCheck from "@/components/publication/PublicationPlausibilityCheck.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 
+const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
 const isPlausibilityCheckValid = ref(false)
-const isPublishable = computed(() => isPlausibilityCheckValid.value)
+const isPublishable = computed(
+  () => isPlausibilityCheckValid.value && isPortalPublicationEnabled.value,
+)
 </script>
 
 <template>
   <div class="w-full flex-1 grow p-24">
     <div class="flex w-full flex-col gap-24 bg-white p-24">
-      <PublicationPlausibilityCheck
+      <DecisionPlausibilityCheck
         @update-plausibility-check="
           (isValid) => (isPlausibilityCheckValid = isValid)
         "

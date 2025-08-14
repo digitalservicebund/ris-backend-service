@@ -36,7 +36,6 @@ const withdrawDocUnit = async () => {
   docUnitPublicationError.value = null
   isWithdrawing.value = true
   await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulate API call
-  console.log("withdraw")
   isWithdrawing.value = false
 }
 </script>
@@ -44,7 +43,7 @@ const withdrawDocUnit = async () => {
 <template>
   <div class="flex flex-col gap-24">
     <div class="flex flex-col gap-16">
-      <h3 class="ris-label1-bold">Aktueller Status Test-Portal</h3>
+      <h3 class="ris-label1-bold">Aktueller Status Portal</h3>
       <PortalPublicationStatusBadge
         :status="decision.portalPublicationStatus"
       />
@@ -57,7 +56,7 @@ const withdrawDocUnit = async () => {
     />
     <div class="flex flex-row gap-24">
       <Button
-        aria-label="Dokumentationseinheit ans Portal veröffentlichen"
+        aria-label="Veröffentlichen"
         :disabled="!props.isPublishable || isWithdrawing || isPublishing"
         label="Veröffentlichen"
         :loading="isPublishing"
@@ -68,8 +67,8 @@ const withdrawDocUnit = async () => {
         v-if="
           decision.portalPublicationStatus === PortalPublicationStatus.PUBLISHED
         "
-        aria-label="Dokumentationseinheit aus dem Portal zurückziehen"
-        :disabled="!isPublishing || isWithdrawing"
+        aria-label="Zurückziehen"
+        :disabled="isPublishing || isWithdrawing"
         label="Zurückziehen"
         :loading="isWithdrawing"
         severity="secondary"

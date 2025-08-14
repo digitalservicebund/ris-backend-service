@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
-import { computed, Ref, ref, watch } from "vue"
+import { computed, Ref, watch } from "vue"
 import { RouterLink, useRouter } from "vue-router"
+import { useScroll } from "@/composables/useScroll"
 import {
   contentRelatedIndexingLabels,
   Decision,
@@ -65,15 +66,14 @@ const categoriesWithMissingData = computed<CategoryWithMissingData[]>(() => {
   }
 
   if (decision.value?.contentRelatedIndexing?.activeCitations) {
-    const activeCitationsCount =
-      decision.value.contentRelatedIndexing.activeCitations.filter(
-        (citations) => citations.hasMissingRequiredFields,
-      ).length
-    if (activeCitationsCount > 0) {
+    const count = decision.value.contentRelatedIndexing.activeCitations.filter(
+      (citations) => citations.hasMissingRequiredFields,
+    ).length
+    if (count > 0) {
       categories.push({
         field: "activeCitations",
         label: contentRelatedIndexingLabels.activeCitations,
-        entriesWithMissingDataCount: activeCitationsCount,
+        entriesWithMissingDataCount: count,
       })
     }
   }
@@ -94,7 +94,7 @@ const categoriesWithMissingData = computed<CategoryWithMissingData[]>(() => {
   return categories
 })
 
-const missingCoreDataFields = ref(
+const missingCoreDataFields = computed(() =>
   decision.value.missingRequiredFields.map((field) => fieldLabels[field]),
 )
 
@@ -122,17 +122,10 @@ watch(
 )
 
 const router = useRouter()
+const { scrollIntoViewportById } = useScroll()
 async function scrollToCategory(key: string) {
   await router.push(categoriesRoute)
-  setTimeout(() => {
-    const element = document.getElementById(key)
-    if (element) {
-      const headerOffset = 80
-      const offsetPosition =
-        element.getBoundingClientRect().top + window.scrollY - headerOffset
-      window.scrollTo({ top: offsetPosition, behavior: "smooth" })
-    }
-  })
+  await scrollIntoViewportById(key)
 }
 </script>
 
