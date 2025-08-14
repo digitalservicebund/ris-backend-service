@@ -11,6 +11,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -70,6 +72,7 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       deleteDocumentationUnit(documentationUnit.documentNumber());
       throw new PublishException("Could not save changelog to bucket.", e);
     }
+    updatePortalPublicationStatus(documentationUnit);
   }
 
   /**
@@ -87,7 +90,9 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       throws DocumentationUnitNotExistsException {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByDocumentNumber(documentNumber);
-    return publishToBucket(documentationUnit);
+    var publicationResult = publishToBucket(documentationUnit);
+    updatePortalPublicationStatus(documentationUnit);
+    return publicationResult;
   }
 
   protected PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {
@@ -207,5 +212,18 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
 
   private String createChangelogFileName() {
     return "changelogs/" + Instant.now().toString() + "-caselaw.json";
+  }
+
+  private void updatePortalPublicationStatus(DocumentationUnit documentationUnit) {
+    if (documentationUnit instanceof Decision decision) {
+      documentationUnit =
+          decision.toBuilder().portalPublicationStatus(PortalPublicationStatus.PUBLISHED).build();
+    } else if (documentationUnit instanceof PendingProceeding pendingProceeding) {
+      documentationUnit =
+          pendingProceeding.toBuilder()
+              .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+              .build();
+    }
+    documentationUnitRepository.save(documentationUnit);
   }
 }

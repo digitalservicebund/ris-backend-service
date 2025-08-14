@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -262,6 +263,12 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @Builder.Default
   @JsonManagedReference
   private List<DocumentationUnitProcessStepDTO> processSteps = new ArrayList<>();
+
+  @Builder.Default
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  @Column(name = "portal_publication_status", nullable = false)
+  PortalPublicationStatus portalPublicationStatus = PortalPublicationStatus.UNPUBLISHED;
 
   @Override
   @Nullable
