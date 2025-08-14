@@ -56,6 +56,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Pageable;
@@ -601,21 +602,47 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               documentationUnitDTO, processStepDTO, currentDocunitProcessStepFromFrontend);
 
       if (stepChanged) {
+        String description =
+            getProcessStepHistoryLogDescription(
+                currentDocumentationUnitProcessStepDTOFromDB, newDocumentationUnitProcessStepDTO);
+
         historyLogService.saveProcessStepHistoryLog(
             documentationUnit.uuid(),
-            HistoryLogEventType.PROCESS_STEP,
             currentUser,
-            newDocumentationUnitProcessStepDTO,
-            currentDocumentationUnitProcessStepDTOFromDB);
+            HistoryLogEventType.PROCESS_STEP,
+            description,
+            currentDocumentationUnitProcessStepDTOFromDB,
+            newDocumentationUnitProcessStepDTO);
       }
       if (userChanged) {
         historyLogService.saveProcessStepHistoryLog(
             documentationUnit.uuid(),
-            HistoryLogEventType.PROCESS_STEP_USER,
             currentUser,
-            newDocumentationUnitProcessStepDTO,
-            currentDocumentationUnitProcessStepDTOFromDB);
+            HistoryLogEventType.PROCESS_STEP_USER,
+            null, // description will be set dynamically in transformer.toDomain
+            currentDocumentationUnitProcessStepDTOFromDB,
+            newDocumentationUnitProcessStepDTO);
       }
+    }
+  }
+
+  @NotNull
+  private static String getProcessStepHistoryLogDescription(
+      DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB,
+      DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO) {
+    ProcessStepDTO fromProcess = currentDocumentationUnitProcessStepDTOFromDB.getProcessStep();
+    ProcessStepDTO toProcess = newDocumentationUnitProcessStepDTO.getProcessStep();
+
+    if (toProcess == null) {
+      throw new IllegalStateException(
+          "Could not save history log because new process step is null");
+    }
+
+    if (fromProcess == null) {
+      return "Schritt gesetzt: " + toProcess.getName();
+    } else {
+      return String.format(
+          "Schritt geändert: %s -> %s", fromProcess.getName(), toProcess.getName());
     }
   }
 

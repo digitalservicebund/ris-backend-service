@@ -49,37 +49,34 @@ public class DocumentationUnitHistoryLogService {
         existingLogId, documentationUnitId, user, eventType, description);
   }
 
-  private Optional<HistoryLog> findUpdateHistoryLogForToday(UUID uuid, User user) {
-    Instant startOfDay = Instant.now().truncatedTo(ChronoUnit.DAYS);
-    Instant endOfDay = startOfDay.plus(1, ChronoUnit.DAYS);
-
-    return repository.findUpdateLogForDuration(uuid, user, startOfDay, endOfDay);
-  }
-
-  // Handles changes to the step name
   @Transactional
   public void saveProcessStepHistoryLog(
       UUID documentationUnitId,
-      HistoryLogEventType eventType,
       @Nullable User user,
-      @Nullable DocumentationUnitProcessStepDTO toStepDto,
-      @Nullable DocumentationUnitProcessStepDTO fromStepDto) {
+      HistoryLogEventType eventType,
+      String description,
+      @Nullable DocumentationUnitProcessStepDTO fromStepDto,
+      @Nullable DocumentationUnitProcessStepDTO toStepDto) {
 
     HistoryLogDTO savedHistoryLogDto =
-        saveHistoryLog(
-            documentationUnitId,
-            user,
-            eventType,
-            null // description will be set dynamically in transformer.toDomain
-            );
+        saveHistoryLog(documentationUnitId, user, eventType, description);
 
-    HistoryLogDocumentationUnitProcessStepDTO mappingDto =
+    HistoryLogDocumentationUnitProcessStepDTO historyLogDocumentationUnitProcessStepDTO =
         HistoryLogDocumentationUnitProcessStepDTO.builder()
+            .createdAt(Instant.now())
             .historyLog(savedHistoryLogDto)
             .toDocumentationUnitProcessStep(toStepDto)
             .fromDocumentationUnitProcessStep(fromStepDto)
             .build();
 
-    historyLogDocumentationUnitProcessStepRepository.save(mappingDto);
+    historyLogDocumentationUnitProcessStepRepository.save(
+        historyLogDocumentationUnitProcessStepDTO);
+  }
+
+  private Optional<HistoryLog> findUpdateHistoryLogForToday(UUID uuid, User user) {
+    Instant startOfDay = Instant.now().truncatedTo(ChronoUnit.DAYS);
+    Instant endOfDay = startOfDay.plus(1, ChronoUnit.DAYS);
+
+    return repository.findUpdateLogForDuration(uuid, user, startOfDay, endOfDay);
   }
 }

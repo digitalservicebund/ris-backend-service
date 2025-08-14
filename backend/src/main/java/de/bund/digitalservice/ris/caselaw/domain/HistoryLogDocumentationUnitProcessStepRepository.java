@@ -6,5 +6,5 @@ import org.springframework.data.repository.NoRepositoryBean;
 /** Domain repository for documentation units */
 @NoRepositoryBean
 public interface HistoryLogDocumentationUnitProcessStepRepository {
-  void save(HistoryLogDocumentationUnitProcessStepDTO mappingDto);
+  void save(HistoryLogDocumentationUnitProcessStepDTO historyLogDocumentationUnitProcessStepDTO);
 }

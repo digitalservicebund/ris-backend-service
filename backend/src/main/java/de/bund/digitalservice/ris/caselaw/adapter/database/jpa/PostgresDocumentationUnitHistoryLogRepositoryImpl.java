@@ -7,14 +7,9 @@ import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,76 +42,33 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     List<HistoryLogDTO> historyLogDTOs =
         databaseRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId);
 
-    // --- 1. Collect all unique IDs for creators and process step users ---
-    Set<UUID> allUserIds = new HashSet<>();
-    Set<UUID> logIdsWithProcessSteps = new HashSet<>();
-
-    historyLogDTOs.forEach(
-        dto -> {
-          allUserIds.add(dto.getUserId());
-          if (dto.getEventType() == HistoryLogEventType.PROCESS_STEP
-              || dto.getEventType() == HistoryLogEventType.PROCESS_STEP_USER) {
-            logIdsWithProcessSteps.add(dto.getId());
-          }
-        });
-    allUserIds.remove(null);
-
-    // a) Fetch all mappings for the relevant logs in a single query
-    List<HistoryLogDocumentationUnitProcessStepDTO> mappings =
-        historyLogDocumentationUnitProcessStepRepository.findByHistoryLogIdIn(
-            logIdsWithProcessSteps);
-    Map<UUID, HistoryLogDocumentationUnitProcessStepDTO> mappingMap =
-        mappings.stream().collect(Collectors.toMap(m -> m.getHistoryLog().getId(), m -> m));
-
-    // b) Add from/to user IDs to the collection for batch fetching
-    mappings.forEach(
-        m -> {
-          Optional.ofNullable(m.getToDocumentationUnitProcessStep())
-              .map(DocumentationUnitProcessStepDTO::getUserId)
-              .ifPresent(allUserIds::add);
-          Optional.ofNullable(m.getFromDocumentationUnitProcessStep())
-              .map(DocumentationUnitProcessStepDTO::getUserId)
-              .ifPresent(allUserIds::add);
-        });
-
-    // --- 2. Fetch all User objects in a single batch query to the API ---
-    Map<UUID, User> allUserMap = new HashMap<>();
-    for (UUID userId : allUserIds) {
-      allUserMap.put(userId, userService.getUser(userId));
-    }
-
-    // --- 3. Transform the DTOs and pass all the data to the transformer ---
     return historyLogDTOs.stream()
         .map(
             dto -> {
               // Get the user from the map for this specific history log
-              User creatorUser = allUserMap.get(dto.getUserId());
+              User creatorUser = userService.getUser(dto.getUserId());
+              User fromUser = null;
+              User toUser = null;
 
-              // Get the mapping for this log
-              HistoryLogDocumentationUnitProcessStepDTO mapping = mappingMap.get(dto.getId());
+              if (dto.getEventType() == HistoryLogEventType.PROCESS_STEP_USER) {
+                HistoryLogDocumentationUnitProcessStepDTO historyLogProcessStepDTO =
+                    historyLogDocumentationUnitProcessStepRepository
+                        .findByHistoryLogId(dto.getId())
+                        .orElse(null);
+                if (historyLogProcessStepDTO != null) {
+                  fromUser =
+                      userService.getUser(
+                          historyLogProcessStepDTO
+                              .getFromDocumentationUnitProcessStep()
+                              .getUserId());
+                  toUser =
+                      userService.getUser(
+                          historyLogProcessStepDTO.getToDocumentationUnitProcessStep().getUserId());
+                }
+              }
 
-              // Get the from and to users from the mapping
-              User fromUser =
-                  Optional.ofNullable(mapping)
-                      .map(
-                          HistoryLogDocumentationUnitProcessStepDTO
-                              ::getFromDocumentationUnitProcessStep)
-                      .map(DocumentationUnitProcessStepDTO::getUserId)
-                      .map(allUserMap::get)
-                      .orElse(null);
-
-              User toUser =
-                  Optional.ofNullable(mapping)
-                      .map(
-                          HistoryLogDocumentationUnitProcessStepDTO
-                              ::getToDocumentationUnitProcessStep)
-                      .map(DocumentationUnitProcessStepDTO::getUserId)
-                      .map(allUserMap::get)
-                      .orElse(null);
-
-              // Pass all the necessary data to your transformer
               return HistoryLogTransformer.transformToDomain(
-                  dto, currentUser, creatorUser, mapping, fromUser, toUser);
+                  dto, currentUser, creatorUser, fromUser, toUser);
             })
         .toList();
   }
@@ -132,7 +84,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     return databaseRepository
         .findFirstByDocumentationUnitIdAndUserIdAndEventTypeAndCreatedAtBetween(
             documentationUnitId, userId, HistoryLogEventType.UPDATE, start, end)
-        .map(dto -> HistoryLogTransformer.transformToDomain(dto, user, user, null, null, null));
+        .map(dto -> HistoryLogTransformer.transformToDomain(dto, user, user, null, null));
   }
 
   @Override

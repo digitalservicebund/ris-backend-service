@@ -1,9 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDocumentationUnitProcessStepDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
@@ -40,7 +37,6 @@ public class HistoryLogTransformer {
       HistoryLogDTO historyLogDTO,
       @Nullable User currentUser,
       @Nullable User creatorUser,
-      @Nullable HistoryLogDocumentationUnitProcessStepDTO historyLogDocumentationUnitProcessStepDTO,
       @Nullable User fromUser,
       @Nullable User toUser) {
     // The currently logged-in user's office.
@@ -51,15 +47,6 @@ public class HistoryLogTransformer {
     DocumentationOffice creatorDocumentationOffice =
         Optional.ofNullable(creatorUser).map(User::documentationOffice).orElse(null);
 
-    String description =
-        getDescription(
-            historyLogDTO,
-            historyLogDocumentationUnitProcessStepDTO,
-            userDocumentationOffice,
-            creatorDocumentationOffice,
-            fromUser,
-            toUser);
-
     return HistoryLog.builder()
         .id(historyLogDTO.getId())
         .createdAt(historyLogDTO.getCreatedAt())
@@ -68,7 +55,13 @@ public class HistoryLogTransformer {
                 historyLogDTO, creatorUser, userDocumentationOffice, creatorDocumentationOffice))
         .documentationOffice(
             creatorDocumentationOffice != null ? creatorDocumentationOffice.abbreviation() : null)
-        .description(description)
+        .description(
+            transformDescription(
+                historyLogDTO,
+                userDocumentationOffice,
+                creatorDocumentationOffice,
+                fromUser,
+                toUser))
         .eventType(historyLogDTO.getEventType())
         .build();
   }
@@ -79,7 +72,6 @@ public class HistoryLogTransformer {
       DocumentationOffice currentUserDocumentationOffice,
       DocumentationOffice creatorDocumentationOffice) {
 
-    // Todo: Add return for inactive /deleted users
     String creatorUserName = Optional.ofNullable(creatorUser).map(User::name).orElse(null);
 
     if (creatorUserName != null
@@ -90,85 +82,43 @@ public class HistoryLogTransformer {
     return historyLogDTO.getSystemName();
   }
 
-  private static String getDescription(
+  private static String transformDescription(
       HistoryLogDTO historyLogDTO,
-      @Nullable HistoryLogDocumentationUnitProcessStepDTO historyLogDocumentationUnitProcessStepDTO,
       DocumentationOffice currentUserDocumentationOffice,
       DocumentationOffice creatorDocumentationOffice,
       User fromUser,
       User toUser) {
 
     // If the description is already set, or no mapping exists, return the existing description
-    if (historyLogDTO.getDescription() != null
-        || historyLogDocumentationUnitProcessStepDTO == null) {
+    if (historyLogDTO.getDescription() != null) {
       return historyLogDTO.getDescription();
     }
 
-    // Logic for a process step change
-    if (historyLogDTO.getEventType() == HistoryLogEventType.PROCESS_STEP) {
-      String newStepName =
-          Optional.ofNullable(
-                  historyLogDocumentationUnitProcessStepDTO.getToDocumentationUnitProcessStep())
-              .map(DocumentationUnitProcessStepDTO::getProcessStep)
-              .map(ProcessStepDTO::getName)
-              .orElse("Unbekannt");
-
-      if (historyLogDocumentationUnitProcessStepDTO.getFromDocumentationUnitProcessStep() == null) {
-        // Case for "Schritt gesetzt"
-        return "Schritt gesetzt: " + newStepName;
-      } else {
-        // Case for "Schritt geändert"
-        String oldStepName =
-            Optional.of(
-                    historyLogDocumentationUnitProcessStepDTO.getFromDocumentationUnitProcessStep())
-                .map(DocumentationUnitProcessStepDTO::getProcessStep)
-                .map(ProcessStepDTO::getName)
-                .orElse("Unbekannt");
-        return String.format("Schritt geändert: %s -> %s", oldStepName, newStepName);
-      }
-    }
-
-    // Logic for a process step user change
+    // In case of PROCESS_STEP_USER we need to hydrate the description entry with dynamic user data
     if (historyLogDTO.getEventType() == HistoryLogEventType.PROCESS_STEP_USER) {
-      // Determine if the current user is in the same office as the person in the log
       boolean isSameOffice =
           isUserAllowedToSeeUserName(currentUserDocumentationOffice, creatorDocumentationOffice);
 
       if (isSameOffice) {
-        // Get the names, they will be null if the user is null
         String newPersonName = Optional.ofNullable(toUser).map(User::name).orElse(null);
         String oldPersonName = Optional.ofNullable(fromUser).map(User::name).orElse(null);
 
-        // Case 1: A person was newly assigned (from null to a name)
         if (oldPersonName == null && newPersonName != null) {
           return "Person gesetzt: " + newPersonName;
-        }
-        // Case 2: A person was removed (from a name to null)
-        else if (oldPersonName != null && newPersonName == null) {
-          return "Person geändert: " + oldPersonName + " -> "; // Or your desired string for removal
-        }
-        // Case 3: A person was changed (from one name to another)
-        else if (oldPersonName != null
+        } else if (oldPersonName != null && newPersonName == null) {
+          return "Person gelöscht: " + oldPersonName; // Or your desired string for removal
+        } else if (oldPersonName != null
             && newPersonName != null
             && !oldPersonName.equals(newPersonName)) {
           return String.format("Person geändert: %s -> %s", oldPersonName, newPersonName);
         }
       } else {
         // Generic description for other offices
-        if (Optional.ofNullable(
-                historyLogDocumentationUnitProcessStepDTO.getFromDocumentationUnitProcessStep())
-            .isEmpty()) {
+        if (fromUser == null) {
           return "Person gesetzt";
         } else {
           return "Person geändert";
         }
-      }
-    } else {
-      // Generic description for other offices
-      if (historyLogDocumentationUnitProcessStepDTO.getFromDocumentationUnitProcessStep() == null) {
-        return "Person gesetzt";
-      } else {
-        return "Person geändert";
       }
     }
 
