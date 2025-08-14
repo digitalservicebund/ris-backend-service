@@ -15,7 +15,7 @@ VALUES
     );
 
 INSERT INTO
-  incremental_migration.eurlex (id, celex, file_number, court_id, status, decision_date, html_link, uri, created_at, updated_at)
+  incremental_migration.eurlex (id, celex, file_number, court_id, status, decision_date, html_link, uri, created_at)
 VALUES
   (
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
@@ -25,9 +25,8 @@ VALUES
     'NEW',
     '2025-05-10',
     'eurlex-url',
-    'decision-uri',
-    '2010-06-21 00:00:00',
-    '2010-06-22 00:00:00'
+   'decision-uri',
+   '2010-06-21 00:00:00'
   ),
   (
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaab',
@@ -35,11 +34,10 @@ VALUES
     'C-77/25',
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
     'NEW',
-    '2025-05-09',
+    '2025-05-11',
     'eurlex-url',
     'decision-uri',
-    '2010-06-21 00:00:00',
-    '2010-06-22 00:00:00'
+    '2011-06-21 00:00:00'
   ),
   (
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaac',
@@ -50,8 +48,7 @@ VALUES
     '2025-05-12',
     'eurlex-url',
     'decision-uri',
-    '2010-06-20 00:00:00',
-    '2010-06-22 00:00:00'
+    '2012-06-21 00:00:00'
   ),
   (
       'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaad',
@@ -59,81 +56,30 @@ VALUES
       'C-99/25,C-98/25',
       'cccccccc-cccc-cccc-cccc-cccccccccccc',
       'NEW',
-      '2025-05-11',
+      '2025-05-13',
       'eurlex-url',
       'decision-uri',
-      '2010-06-20 00:00:00',
-      '2010-06-22 00:00:00'
+      '2013-06-21 00:00:00'
   ),
   (
       'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaae',
-      '62017BA0579',
-      'X-01/99',
-      'cccccccc-cccc-cccc-cccc-cccccccccccd',
-      'NEW',
-      '2025-06-12',
-      'eurlex-url',
-      'decision-uri',
-      '2010-06-21 00:00:00',
-      null
-  ),
-  (
-      'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaf',
-      '62017CA0580',
-      'X-02/99',
-      'cccccccc-cccc-cccc-cccc-cccccccccccc',
-      'NEW',
-      '2025-05-11',
-      'eurlex-url',
-      'decision-uri',
-      '2010-06-21 00:00:00',
-      null
-  ),
-  (
-      'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaba',
-      '62017BA0581',
-      'X-03/99',
-      'cccccccc-cccc-cccc-cccc-cccccccccccd',
-      'NEW',
-      '2025-06-12',
-      'eurlex-url',
-      'decision-uri',
-      '2010-06-20 00:00:00',
-      null
-  ),
-  (
-      'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaabb',
-      '62017CA0582',
-      'X-04/99',
-      'cccccccc-cccc-cccc-cccc-cccccccccccc',
-      'NEW',
-      '2025-05-11',
-      'eurlex-url',
-      'decision-uri',
-      '2010-06-20 00:00:00',
-      null
-  ),
-  (
-      'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaabc',
-      '62017CA0583',
+      '62017CA0579',
       'C-11/25',
       'cccccccc-cccc-cccc-cccc-cccccccccccc',
       'ASSIGNED',
       '2025-05-14',
       'eurlex-url',
       'decision-uri',
-      '2010-06-21 00:00:00',
-      null
+      '2012-06-21 00:00:00'
   ),
   (
-      'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaabd',
-      '62017CA0584',
+      'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaf',
+      '62017CA0580',
       'C-12/25',
       'cccccccc-cccc-cccc-cccc-cccccccccccc',
       'NEW',
       '2025-05-15',
       'eurlex-url',
       null,
-      '2010-06-21 00:00:00',
-      '2010-06-21 00:00:00'
+      '2012-06-21 00:00:00'
   );

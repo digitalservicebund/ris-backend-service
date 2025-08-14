@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.caselaw.domain.SearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.SearchService;
 import java.io.IOException;
 import java.io.StringReader;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -155,7 +154,6 @@ public class EurLexSOAPSearchService implements SearchService {
             if (existing.isPresent()) { // update entry by overriding everything except status
               result.setId(existing.get().getId());
               result.setStatus(existing.get().getStatus());
-              result.setUpdatedAt(Instant.now());
             }
           });
 

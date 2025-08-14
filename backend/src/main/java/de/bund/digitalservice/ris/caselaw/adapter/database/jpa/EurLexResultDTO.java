@@ -60,7 +60,4 @@ public class EurLexResultDTO {
 
   @Column(name = "created_at", insertable = false, updatable = false)
   private Instant createdAt;
-
-  @Column(name = "updated_at")
-  private Instant updatedAt;
 }

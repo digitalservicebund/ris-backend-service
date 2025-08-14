@@ -27,7 +27,7 @@ jobs:
   backend-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Get Gradle version
         working-directory: ./backend
         run: |
@@ -67,7 +67,7 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Get Gradle version
         working-directory: ./backend
         run: |
@@ -158,7 +158,7 @@ jobs:
   audit-licenses-backend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Set up JDK
         uses: actions/setup-java@e9343db97e09d87a3c50e544105d99fe912c204b
         with:
@@ -188,7 +188,7 @@ jobs:
   audit-licenses-frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -221,7 +221,7 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Build frontend image
         run: docker build --file frontend/Dockerfile.prod --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }} ./frontend
       - name: Run Trivy vulnerability image scanner
@@ -423,7 +423,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@2cb024c203beac9650fa199c1618e5a729418c70
+      - uses: chainguard-dev/actions/setup-gitsign@b1933e3d1f574c772dc7efd68c2060dafbc25e8c
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -480,7 +480,7 @@ jobs:
     needs: [ e2e-tests ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -534,13 +534,13 @@ jobs:
     environment: production
     steps:
       - name: Checkout infra repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           repository: digitalservicebund/neuris-infra
           ssh-key: ${{ secrets.DEPLOY_KEY }}
           path: infra
       - name: Checkout main repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           path: main
@@ -574,7 +574,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@2cb024c203beac9650fa199c1618e5a729418c70
+      - uses: chainguard-dev/actions/setup-gitsign@b1933e3d1f574c772dc7efd68c2060dafbc25e8c
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -616,7 +616,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@2cb024c203beac9650fa199c1618e5a729418c70
+      - uses: chainguard-dev/actions/setup-gitsign@b1933e3d1f574c772dc7efd68c2060dafbc25e8c
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -660,7 +660,7 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Install uuid-ossp extension
         run: docker exec postgres psql -d ${{ env.POSTGRES_DB }}  -U ${{ env.POSTGRES_USER }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
       - name: Apply incremental migration structure
@@ -705,7 +705,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Set up JDK
         uses: actions/setup-java@e9343db97e09d87a3c50e544105d99fe912c204b
         with:
@@ -745,7 +745,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
       # Setup
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           repository: ${{ env.REPORTS_REPOSITORY }}
           ssh-key: ${{ secrets.REPORTS_DEPLOY_KEY }}
@@ -756,7 +756,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       # First checkout ris-backend-service because of ADRs
       - name: Checkout ris-backend-service repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           path: ris-backend-service
       # Copy ADRs into tmp folder

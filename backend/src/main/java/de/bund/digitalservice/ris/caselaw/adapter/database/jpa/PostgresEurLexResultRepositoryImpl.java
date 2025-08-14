@@ -8,7 +8,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.time.LocalDate;
@@ -16,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.util.Strings;
-import org.hibernate.query.NullPrecedence;
-import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +24,8 @@ import org.springframework.stereotype.Repository;
 public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepository {
   private final DatabaseEurLexResultRepository repository;
   private final EntityManager entityManager;
+
+  private static final String CREATED_AT = "createdAt";
 
   public PostgresEurLexResultRepositoryImpl(
       DatabaseEurLexResultRepository repository, EntityManager entityManager) {
@@ -43,8 +42,7 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
       Optional<LocalDate> startDate,
       Optional<LocalDate> endDate) {
 
-    HibernateCriteriaBuilder builder =
-        (HibernateCriteriaBuilder) entityManager.getCriteriaBuilder();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<EurLexResultDTO> builderQuery = builder.createQuery(EurLexResultDTO.class);
 
     Root<EurLexResultDTO> root = builderQuery.from(EurLexResultDTO.class);
@@ -57,13 +55,7 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
       builderQuery.where(predicates.toArray(new Predicate[0]));
     }
 
-    // Order by updatedAt with nulls last, then by created at and finally by decision date.
-    List<Order> dateTimeDescOrder =
-        List.of(
-            builder.desc(root.get(EurLexResultDTO_.updatedAt)).nullPrecedence(NullPrecedence.LAST),
-            builder.desc(root.get(EurLexResultDTO_.createdAt)),
-            builder.desc(root.get(EurLexResultDTO_.date)));
-    builderQuery.orderBy(dateTimeDescOrder);
+    builderQuery.orderBy(builder.desc(root.get(CREATED_AT)));
 
     Query query =
         entityManager
@@ -138,9 +130,10 @@ public class PostgresEurLexResultRepositoryImpl implements EurLexResultRepositor
     }
 
     startDate.ifPresent(
-        date -> predicates.add(builder.greaterThanOrEqualTo(root.get("date"), date)));
+        date -> predicates.add(builder.greaterThanOrEqualTo(root.get(CREATED_AT), date)));
 
-    endDate.ifPresent(date -> predicates.add(builder.lessThanOrEqualTo(root.get("date"), date)));
+    endDate.ifPresent(
+        date -> predicates.add(builder.lessThanOrEqualTo(root.get(CREATED_AT), date)));
 
     predicates.add(builder.equal(root.get("status"), EurLexResultStatus.NEW));
 

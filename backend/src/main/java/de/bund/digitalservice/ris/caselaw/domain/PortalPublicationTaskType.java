@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-public enum PublicationJobType {
+public enum PortalPublicationTaskType {
   PUBLISH,
   DELETE,
 }

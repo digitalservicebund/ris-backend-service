@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.domain.PubcliationJobStatus;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -39,13 +39,13 @@ public class PortalPublicationJobDTO {
   @Include
   private String documentNumber;
 
-  @Column(name = "publication_job_type")
+  @Column(name = "portal_publication_type")
   @NotNull
   @Enumerated(EnumType.STRING)
-  private PublicationJobType publicationJobType;
+  private PortalPublicationTaskType publicationType;
 
-  @Column(name = "publication_job_status")
+  @Column(name = "portal_publication_status")
   @NotNull
   @Enumerated(EnumType.STRING)
-  private PubcliationJobStatus publicationJobStatus;
+  private PortalPublicationTaskStatus publicationStatus;
 }

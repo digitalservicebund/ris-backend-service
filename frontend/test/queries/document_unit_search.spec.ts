@@ -201,7 +201,7 @@ test.describe("document unit search queries", () => {
         myDocOfficeOnly: "true",
         kind: "DECISION",
       },
-      maxDuration: 600, // last max 798, average 505, min 460
+      maxDuration: 450, // last max 556, average 304, min 241
       minResults: 5,
     },
     {
@@ -231,7 +231,7 @@ test.describe("document unit search queries", () => {
         withDuplicateWarning: "true",
         kind: "DECISION",
       },
-      maxDuration: 600, // last max 799, average 505, min 463
+      maxDuration: 500,
       minResults: 3,
     },
   ]

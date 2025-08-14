@@ -15,7 +15,7 @@ public interface PortalPublicationJobRepository
           """
       SELECT portalPublicationJob
       FROM PortalPublicationJobDTO portalPublicationJob
-      WHERE portalPublicationJob.publicationJobStatus = 'PENDING'
+      WHERE portalPublicationJob.publicationStatus = 'PENDING'
       ORDER BY portalPublicationJob.createdAt ASC LIMIT 500
     """)
   List<PortalPublicationJobDTO> findNextPendingJobsBatch();

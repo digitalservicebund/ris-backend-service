@@ -338,7 +338,7 @@
     |ris:yearOfDispute|ris:deviatingCourts|ris:deviatingCourt|ris:deviatingDates|ris:deviatingDate
     |ris:deviatingEclis|ris:deviatingEcli|ris:inputTypes|ris:inputType|ris:foreignLanguageVersions|ris:foreignLanguageVersion|ris:evfs
     |ris:definitions|ris:definition|@ris:definedTerm|@ris:definingBorderNumber
-    |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@value|@date|@href|@language|@class|@colspan|@rowspan
+    |@xsi:schemaLocation|@xsi:type|@name|@source|@dictionary|@showAs|@value|@date|@href|@language|@class|@colspan|@rowspan
     |@style|@alt|@height|@width|@src|@title|@xml:space|@border">
 
         <xsl:copy>

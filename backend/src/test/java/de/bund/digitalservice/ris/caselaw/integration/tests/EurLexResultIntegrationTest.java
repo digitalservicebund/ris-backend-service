@@ -48,15 +48,7 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
     List<SearchResult> searchResults = searchResultPage.getContent();
     assertThat(searchResults)
         .extracting("celex")
-        .containsExactly(
-            "62017TB0575",
-            "62017CB0576",
-            "62017TA0577",
-            "62017CA0578",
-            "62017BA0579",
-            "62017CA0580",
-            "62017BA0581",
-            "62017CA0582");
+        .containsExactly("62017CA0578", "62017TA0577", "62017CB0576", "62017TB0575");
   }
 
   @Test
@@ -75,9 +67,7 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
 
     assertThat(searchResultPage.hasContent()).isTrue();
     List<SearchResult> searchResults = searchResultPage.getContent();
-    assertThat(searchResults)
-        .extracting("celex")
-        .containsExactly("62017TB0575", "62017TA0577", "62017BA0579", "62017BA0581");
+    assertThat(searchResults).extracting("celex").containsExactly("62017TA0577", "62017TB0575");
   }
 
   @Test
@@ -96,9 +86,7 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
 
     assertThat(searchResultPage.hasContent()).isTrue();
     List<SearchResult> searchResults = searchResultPage.getContent();
-    assertThat(searchResults)
-        .extracting("celex")
-        .containsExactly("62017CB0576", "62017CA0578", "62017CA0580", "62017CA0582");
+    assertThat(searchResults).extracting("celex").containsExactly("62017CA0578", "62017CB0576");
   }
 
   @Test
@@ -134,9 +122,7 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
 
     assertThat(searchResultPage.hasContent()).isTrue();
     List<SearchResult> searchResults = searchResultPage.getContent();
-    assertThat(searchResults)
-        .extracting("celex")
-        .containsExactly("62017TB0575", "62017TA0577", "62017BA0579", "62017BA0581");
+    assertThat(searchResults).extracting("celex").containsExactly("62017TA0577", "62017TB0575");
   }
 
   @Test
@@ -155,9 +141,7 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
 
     assertThat(searchResultPage.hasContent()).isTrue();
     List<SearchResult> searchResults = searchResultPage.getContent();
-    assertThat(searchResults)
-        .extracting("celex")
-        .containsExactly("62017CB0576", "62017CA0578", "62017CA0580", "62017CA0582");
+    assertThat(searchResults).extracting("celex").containsExactly("62017CA0578", "62017CB0576");
   }
 
   @Test
@@ -166,7 +150,7 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/eurlex?start-date=2025-06-01")
+            .uri("/api/v1/caselaw/eurlex?start-date=2012-01-01")
             .exchange()
             .expectStatus()
             .isOk()
@@ -176,7 +160,7 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
 
     assertThat(searchResultPage.hasContent()).isTrue();
     List<SearchResult> searchResults = searchResultPage.getContent();
-    assertThat(searchResults).extracting("celex").containsExactly("62017BA0579", "62017BA0581");
+    assertThat(searchResults).extracting("celex").containsExactly("62017CA0578", "62017TA0577");
   }
 
   @Test
@@ -185,7 +169,7 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/eurlex?start-date=2025-05-12&end-date=2025-05-15")
+            .uri("/api/v1/caselaw/eurlex?start-date=2012-01-01&end-date=2013-01-01")
             .exchange()
             .expectStatus()
             .isOk()
@@ -233,7 +217,7 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
 
     assertThat(searchResultPage.hasContent()).isTrue();
     List<SearchResult> searchResults = searchResultPage.getContent();
-    assertThat(searchResults).extracting("celex").containsExactly("62017TB0575", "62017TA0577");
+    assertThat(searchResults).extracting("celex").containsExactly("62017TA0577", "62017TB0575");
   }
 
   @Test
@@ -242,7 +226,7 @@ class EurLexResultIntegrationTest extends BaseIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/eurlex?celex=62017CA0583")
+            .uri("/api/v1/caselaw/eurlex?celex=62017CA0579")
             .exchange()
             .expectStatus()
             .isOk()
