@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,7 +79,14 @@ public class S3MockClient implements S3Client {
   public ListObjectsV2Response listObjectsV2(ListObjectsV2Request listObjectsV2Request) {
 
     String[] nameList = null;
-    File localFileStorage = localStorageDirectory.toFile();
+    File localFileStorage;
+    String prefix = listObjectsV2Request.prefix();
+    if (Strings.isNotBlank(prefix)) {
+      localFileStorage = localStorageDirectory.resolve(prefix).toFile();
+    } else {
+      localFileStorage = localStorageDirectory.toFile();
+    }
+
     if (localFileStorage.isDirectory()) {
       nameList = localFileStorage.list();
     }

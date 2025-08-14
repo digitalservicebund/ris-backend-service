@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
-import static de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus.SUCCESS;
+import static de.bund.digitalservice.ris.caselaw.domain.PubcliationJobStatus.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -35,8 +35,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublication
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.ReducedLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskStatus;
-import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationTaskType;
+import de.bund.digitalservice.ris.caselaw.domain.PubcliationJobStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -133,7 +133,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
 
     portalPublicationJobRepository.saveAll(
-        List.of(createPublicationJob(dto, PortalPublicationTaskType.PUBLISH)));
+        List.of(createPublicationJob(dto, PublicationJobType.PUBLISH)));
 
     portalPublicationJobService.executePendingJobs();
 
@@ -162,12 +162,12 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     portalPublicationJobRepository.saveAll(
         List.of(
-            createPublicationJob(dto1, PortalPublicationTaskType.PUBLISH),
-            createPublicationJob(dto2, PortalPublicationTaskType.DELETE),
-            createPublicationJob(dto1, PortalPublicationTaskType.PUBLISH),
-            createPublicationJob(dto2, PortalPublicationTaskType.PUBLISH),
-            createPublicationJob(dto1, PortalPublicationTaskType.DELETE),
-            createPublicationJob(dto2, PortalPublicationTaskType.PUBLISH)));
+            createPublicationJob(dto1, PublicationJobType.PUBLISH),
+            createPublicationJob(dto2, PublicationJobType.DELETE),
+            createPublicationJob(dto1, PublicationJobType.PUBLISH),
+            createPublicationJob(dto2, PublicationJobType.PUBLISH),
+            createPublicationJob(dto1, PublicationJobType.DELETE),
+            createPublicationJob(dto2, PublicationJobType.PUBLISH)));
 
     when(s3Client.listObjectsV2(
             ListObjectsV2Request.builder().bucket("no-bucket").prefix("1/").build()))
@@ -206,7 +206,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     assertThat(capturedDeleteRequests.get(1).key()).isEqualTo("1/1.xml");
 
     assertThat(portalPublicationJobRepository.findAll())
-        .allMatch(job -> job.getPublicationStatus() == SUCCESS);
+        .allMatch(job -> job.getPublicationJobStatus() == SUCCESS);
   }
 
   @Test
@@ -222,8 +222,8 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     portalPublicationJobRepository.saveAll(
         List.of(
-            createPublicationJob(dto, PortalPublicationTaskType.PUBLISH),
-            createPublicationJob(dto2, PortalPublicationTaskType.DELETE)));
+            createPublicationJob(dto, PublicationJobType.PUBLISH),
+            createPublicationJob(dto2, PublicationJobType.DELETE)));
 
     when(s3Client.listObjectsV2(any(ListObjectsV2Request.class)))
         .thenReturn(
@@ -240,9 +240,9 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     assertThat(
             portalPublicationJobRepository.findAll().stream()
-                .map(PortalPublicationJobDTO::getPublicationStatus)
+                .map(PortalPublicationJobDTO::getPublicationJobStatus)
                 .toList())
-        .isEqualTo(List.of(PortalPublicationTaskStatus.ERROR, PortalPublicationTaskStatus.SUCCESS));
+        .isEqualTo(List.of(PubcliationJobStatus.ERROR, PubcliationJobStatus.SUCCESS));
   }
 
   @Test
@@ -256,16 +256,16 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     doThrow(NoSuchKeyException.class).when(s3Client).deleteObject(any(Consumer.class));
 
     portalPublicationJobRepository.saveAll(
-        List.of(createPublicationJob(dto, PortalPublicationTaskType.DELETE)));
+        List.of(createPublicationJob(dto, PublicationJobType.DELETE)));
 
     portalPublicationJobService.executePendingJobs();
 
     assertThat(
             portalPublicationJobRepository.findAll().stream()
-                .map(PortalPublicationJobDTO::getPublicationStatus)
+                .map(PortalPublicationJobDTO::getPublicationJobStatus)
                 .toList())
         .hasSize(1)
-        .isEqualTo(List.of(PortalPublicationTaskStatus.SUCCESS));
+        .isEqualTo(List.of(PubcliationJobStatus.SUCCESS));
   }
 
   @Test
@@ -291,12 +291,12 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   }
 
   private PortalPublicationJobDTO createPublicationJob(
-      DocumentationUnitDTO dto, PortalPublicationTaskType publicationType) {
+      DocumentationUnitDTO dto, PublicationJobType publicationType) {
     return PortalPublicationJobDTO.builder()
         .documentNumber(dto.getDocumentNumber())
         .createdAt(Instant.now())
-        .publicationStatus(PortalPublicationTaskStatus.PENDING)
-        .publicationType(publicationType)
+        .publicationJobStatus(PubcliationJobStatus.PENDING)
+        .publicationJobType(publicationType)
         .build();
   }
 

@@ -16,11 +16,11 @@ plugins {
     id("org.sonarqube") version "6.2.0.5505"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
-    id("se.patrikerdes.use-latest-versions") version "0.2.18"
+    id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.52.0"
     id ("io.freefair.lombok") version "8.14"
     id("org.flywaydb.flyway") version "11.11.0"
-    id("io.sentry.jvm.gradle") version "5.8.1"
+    id("io.sentry.jvm.gradle") version "5.9.0"
 }
 
 group = "de.bund.digitalservice"
@@ -171,7 +171,10 @@ dependencies {
     implementation("net.minidev:json-smart:2.6.0")
 
     // CVE-2025-24970
-    implementation("io.netty:netty-handler:4.2.3.Final")
+    implementation("io.netty:netty-handler:4.2.4.Final")
+
+    // CVE-2025-55163
+    implementation("io.netty:netty-codec-http2:4.1.124.Final")
 
     implementation("org.postgresql:postgresql:42.7.7")
 
@@ -182,7 +185,7 @@ dependencies {
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.44")
 
-    implementation(platform("software.amazon.awssdk:bom:2.32.19"))
+    implementation(platform("software.amazon.awssdk:bom:2.32.21"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -206,9 +209,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.84")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.85")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.84.jar"))
+//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.85.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.19.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
@@ -222,7 +225,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
-    implementation("io.getunleash:unleash-client-java:11.0.2")
+    implementation("io.getunleash:unleash-client-java:11.1.0")
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.1")
 
@@ -243,7 +246,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.8")
+    testImplementation("io.projectreactor:reactor-test:3.7.9")
     testImplementation("org.springframework.security:spring-security-test:6.5.2")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")

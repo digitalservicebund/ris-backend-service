@@ -11,7 +11,6 @@ import java.io.StringReader;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.ZoneId;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +55,7 @@ class EurLexSearchResultTransformerTest {
             .ecli("ecli")
             .fileNumber("T-123/45")
             .date(LocalDate.of(2024, Month.DECEMBER, 24))
-            .publicationDate(LocalDate.ofInstant(now, ZoneId.of("Europe/Berlin")))
+            .publicationDate(now)
             .build();
 
     SearchResult result = EurLexSearchResultTransformer.transformDTOToDomain(dto);
