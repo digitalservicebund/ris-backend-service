@@ -37,15 +37,8 @@ public class HistoryLogDTO {
   @Column(name = "documentation_unit_id", nullable = false)
   private UUID documentationUnitId;
 
-  @OneToOne()
-  @JoinColumn(name = "documentation_office", referencedColumnName = "id")
-  private DocumentationOfficeDTO documentationOffice;
-
   @Column(name = "user_id")
   private UUID userId;
-
-  @Column(name = "user_name")
-  private String userName;
 
   @Column(name = "system_name")
   private String systemName;
@@ -56,4 +49,8 @@ public class HistoryLogDTO {
   @Column(name = "event_type")
   @Enumerated(EnumType.STRING)
   private HistoryLogEventType eventType;
+
+  @OneToOne()
+  @JoinColumn(name = "documentation_office", referencedColumnName = "id")
+  private DocumentationOfficeDTO documentationOffice;
 }

@@ -7,59 +7,106 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepo
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     implements DocumentationUnitHistoryLogRepository {
 
   private final DatabaseDocumentationUnitHistoryLogRepository databaseRepository;
+  private final DatabaseHistoryLogDocumentationUnitProcessStepRepository
+      historyLogDocumentationUnitProcessStepRepository;
+  private final UserService userService;
 
   public PostgresDocumentationUnitHistoryLogRepositoryImpl(
-      DatabaseDocumentationUnitHistoryLogRepository databaseRepository) {
+      DatabaseDocumentationUnitHistoryLogRepository databaseRepository,
+      UserService userService,
+      DatabaseHistoryLogDocumentationUnitProcessStepRepository
+          historyLogDocumentationUnitProcessStepRepository) {
     this.databaseRepository = databaseRepository;
+    this.userService = userService;
+    this.historyLogDocumentationUnitProcessStepRepository =
+        historyLogDocumentationUnitProcessStepRepository;
   }
 
+  @Transactional
   @Override
-  public List<HistoryLog> findByDocumentationUnitId(UUID documentationUnitId, @Nullable User user) {
-    return databaseRepository
-        .findByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId)
-        .stream()
-        .map(historyLogDTO -> HistoryLogTransformer.transformToDomain(historyLogDTO, user))
+  public List<HistoryLog> findByDocumentationUnitId(
+      UUID documentationUnitId, @Nullable User currentUser) {
+
+    List<HistoryLogDTO> historyLogDTOs =
+        databaseRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId);
+
+    return historyLogDTOs.stream()
+        .map(
+            dto -> {
+              User creatorUser = userService.getUser(dto.getUserId());
+              User fromUser = null;
+              User toUser = null;
+
+              if (dto.getEventType() == HistoryLogEventType.PROCESS_STEP_USER) {
+                HistoryLogDocumentationUnitProcessStepDTO historyLogProcessStepDTO =
+                    historyLogDocumentationUnitProcessStepRepository
+                        .findByHistoryLogId(dto.getId())
+                        .orElse(null);
+                if (historyLogProcessStepDTO != null) {
+                  fromUser =
+                      Optional.ofNullable(
+                              historyLogProcessStepDTO.getFromDocumentationUnitProcessStep())
+                          .map(DocumentationUnitProcessStepDTO::getUserId)
+                          .map(userService::getUser)
+                          .orElse(null);
+
+                  toUser =
+                      Optional.ofNullable(
+                              historyLogProcessStepDTO.getToDocumentationUnitProcessStep())
+                          .map(DocumentationUnitProcessStepDTO::getUserId)
+                          .map(userService::getUser)
+                          .orElse(null);
+                }
+              }
+
+              return HistoryLogTransformer.transformToDomain(
+                  dto, currentUser, creatorUser, fromUser, toUser);
+            })
         .toList();
   }
 
   @Override
   public Optional<HistoryLog> findUpdateLogForDuration(
       UUID documentationUnitId, @Nullable User user, Instant start, Instant end) {
-    String userName = Optional.ofNullable(user).map(User::name).orElse(null);
+    UUID userId = Optional.ofNullable(user).map(User::id).orElse(null);
+
+    if (userId == null) {
+      return Optional.empty();
+    }
     return databaseRepository
-        .findFirstByDocumentationUnitIdAndUserNameAndEventTypeAndCreatedAtBetween(
-            documentationUnitId, userName, HistoryLogEventType.UPDATE, start, end)
-        .map(dto -> HistoryLogTransformer.transformToDomain(dto, user));
+        .findFirstByDocumentationUnitIdAndUserIdAndEventTypeAndCreatedAtBetween(
+            documentationUnitId, userId, HistoryLogEventType.UPDATE, start, end)
+        .map(dto -> HistoryLogTransformer.transformToDomain(dto, user, user, null, null));
   }
 
   @Override
-  public void saveHistoryLog(
+  public HistoryLogDTO saveHistoryLog(
       UUID existingId,
       UUID documentationUnitId,
       @Nullable User user,
       HistoryLogEventType eventType,
       String description) {
-    String userName = null;
     String systemName = null;
-    DocumentationOffice office = null;
     UUID userId = null;
+    DocumentationOffice office = null;
 
     if (user != null) {
-      userName = user.name();
-      office = user.documentationOffice();
       userId = user.id();
+      office = user.documentationOffice();
     } else {
       systemName = "NeuRIS";
     }
@@ -72,13 +119,12 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
             .id(historyLogId)
             .createdAt(Instant.now())
             .documentationUnitId(documentationUnitId)
-            .documentationOffice(DocumentationOfficeTransformer.transformToDTO(office))
             .userId(userId)
-            .userName(userName)
             .systemName(systemName)
             .description(description)
             .eventType(eventType)
+            .documentationOffice(DocumentationOfficeTransformer.transformToDTO(office))
             .build();
-    databaseRepository.save(dto);
+    return databaseRepository.save(dto);
   }
 }

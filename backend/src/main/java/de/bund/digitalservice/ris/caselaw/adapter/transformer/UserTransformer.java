@@ -24,6 +24,7 @@ public class UserTransformer {
         .name(getFullName(firstNames, lastNames))
         .email(bareUser.email())
         .initials(getInitials(firstNames, lastNames))
+        // Todo: add documentationOffice here, as soon as API returns group path name
         .build();
   }
 
