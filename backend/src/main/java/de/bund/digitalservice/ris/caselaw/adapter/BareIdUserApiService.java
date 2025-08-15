@@ -5,8 +5,6 @@ import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * Service for retrieving user and group information from the BareId User API.
- *
- * @see <a href="https://api.bare.id/?urls.primaryName=user%2Fv1">Bare User API</a> for more
- *     details.
- */
 @Service
 @Slf4j
 public class BareIdUserApiService implements UserApiService {
@@ -72,83 +64,32 @@ public class BareIdUserApiService implements UserApiService {
 
   @Override
   public List<User> getUsers(String userGroupPathName) {
+
     if (StringUtils.isNullOrBlank(userGroupPathName)) {
       throw new UserApiException("User group path is empty or blank");
     }
 
-    // Normalize and split: "/caselaw/BGH/Intern"
-    List<String> userGroupsPathSegments =
-        Arrays.stream(userGroupPathName.split("/")).filter(s -> !s.isBlank()).toList();
+    String rootLevelUserGroup = userGroupPathName.substring(0, userGroupPathName.indexOf('/', 1));
 
-    if (userGroupsPathSegments.size() < 2) {
-      throw new UserApiException(
-          "User group path must contain at least two segments, e.g., \"caselaw/court\"");
-    }
-
-    // List all top level groups and get the current
-    BareUserApiResponse.Group current =
-        getGroupByName(getTopLevelGroups(), userGroupsPathSegments.getFirst());
-
-    // Get the group court like the BGH
-    BareUserApiResponse.Group court =
-        getGroupByName(getGroupChildren(current.uuid()), userGroupsPathSegments.get(1));
-
-    // Get all users under the  court
-    return getUsersRecursively(court);
-  }
-
-  private List<User> getUsersRecursively(BareUserApiResponse.Group group) {
-    List<User> result = new ArrayList<>();
-
-    var children = getGroupChildren(group.uuid());
-    for (BareUserApiResponse.Group child : children) {
-      result.addAll(getUsers(child.uuid()));
-      result.addAll(getUsersRecursively(child));
-    }
-
-    return result;
-  }
-
-  private BareUserApiResponse.Group getGroupByName(
-      List<BareUserApiResponse.Group> groups, String groupName) {
-    return groups.stream()
-        .filter(item -> item.name().equals(groupName))
-        .findFirst()
-        .orElseThrow(() -> new UserApiException(groupName + " was not found in list"));
-  }
-
-  private List<BareUserApiResponse.Group> getGroupChildren(UUID groupId) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setBearerAuth(bareIdUserApiTokenService.getAccessToken().getTokenValue());
-    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
-
-    String url = String.format("https://api.bare.id/user/v1/%s/groups/%s", bareidInstance, groupId);
-
-    ResponseEntity<BareUserApiResponse.GroupApiResponse> response =
-        restTemplate.exchange(
-            url, HttpMethod.GET, request, BareUserApiResponse.GroupApiResponse.class);
-    if (response.getBody() == null) {
-      throw new UserApiException("Children group could not be found");
-    }
-
-    return response.getBody().children().groups();
-  }
-
-  private List<BareUserApiResponse.Group> getTopLevelGroups() {
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(bareIdUserApiTokenService.getAccessToken().getTokenValue());
     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
 
     String url = String.format("https://api.bare.id/user/v1/%s/groups", bareidInstance);
-
-    ResponseEntity<BareUserApiResponse.GroupResponse> response =
+    ResponseEntity<BareUserApiResponse.GroupApiResponse> response =
         restTemplate.exchange(
-            url, HttpMethod.GET, request, BareUserApiResponse.GroupResponse.class);
+            url, HttpMethod.GET, request, BareUserApiResponse.GroupApiResponse.class);
     if (response.getBody() == null) {
-      throw new UserApiException("Top level groups could not be found");
+      throw new UserApiException("User group could not be found");
     }
 
-    return response.getBody().groups();
+    var rootUserGroup =
+        response.getBody().groups().stream()
+            .filter(item -> item.path().equals(rootLevelUserGroup))
+            .findFirst()
+            .orElseThrow(() -> new UserApiException("Root user group was not found for path"));
+
+    return getUsers(rootUserGroup.uuid());
   }
 
   public List<User> getUsers(UUID userGroupId) {
