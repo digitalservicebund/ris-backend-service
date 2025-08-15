@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HistoryLogTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
@@ -45,7 +47,6 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
     return historyLogDTOs.stream()
         .map(
             dto -> {
-              // Get the user from the map for this specific history log
               User creatorUser = userService.getUser(dto.getUserId());
               User fromUser = null;
               User toUser = null;
@@ -101,9 +102,11 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
       String description) {
     String systemName = null;
     UUID userId = null;
+    DocumentationOffice office = null;
 
     if (user != null) {
       userId = user.id();
+      office = user.documentationOffice();
     } else {
       systemName = "NeuRIS";
     }
@@ -120,6 +123,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
             .systemName(systemName)
             .description(description)
             .eventType(eventType)
+            .documentationOffice(DocumentationOfficeTransformer.transformToDTO(office))
             .build();
     return databaseRepository.save(dto);
   }

@@ -39,13 +39,11 @@ public class HistoryLogTransformer {
       @Nullable User creatorUser,
       @Nullable User fromUser,
       @Nullable User toUser) {
-    // The currently logged-in user's office.
-    DocumentationOffice userDocumentationOffice =
+    // The currently logged-in user's doc office.
+    DocumentationOffice currentUserDocumentationOffice =
         Optional.ofNullable(currentUser).map(User::documentationOffice).orElse(null);
 
-    // The creator's office from the API call.
-    // Todo: creatorDocumentationOffice currently null, blocked by this BareID ticket:
-    //  https://support.bare.id/de/tickets/VTZV-2308-IQGJ
+    // The history log creators' doc office
     DocumentationOffice creatorDocumentationOffice =
         Optional.ofNullable(creatorUser).map(User::documentationOffice).orElse(null);
 
@@ -54,16 +52,14 @@ public class HistoryLogTransformer {
         .createdAt(historyLogDTO.getCreatedAt())
         .createdBy(
             transformCreatedBy(
-                historyLogDTO, creatorUser, userDocumentationOffice, creatorDocumentationOffice))
+                historyLogDTO,
+                creatorUser,
+                currentUserDocumentationOffice,
+                creatorDocumentationOffice))
         .documentationOffice(
             creatorDocumentationOffice != null ? creatorDocumentationOffice.abbreviation() : null)
         .description(
-            transformDescription(
-                historyLogDTO,
-                userDocumentationOffice,
-                creatorDocumentationOffice,
-                fromUser,
-                toUser))
+            transformDescription(historyLogDTO, currentUserDocumentationOffice, fromUser, toUser))
         .eventType(historyLogDTO.getEventType())
         .build();
   }
@@ -76,8 +72,15 @@ public class HistoryLogTransformer {
 
     String creatorUserName = Optional.ofNullable(creatorUser).map(User::name).orElse(null);
 
+    // workaround until we get the docOffice information from the user API
+    if (creatorDocumentationOffice == null) {
+      creatorDocumentationOffice =
+          DocumentationOfficeTransformer.transformToDomain(historyLogDTO.getDocumentationOffice());
+    }
+
     if (creatorUserName != null
-        && isUserAllowedToSeeUserName(currentUserDocumentationOffice, creatorDocumentationOffice)) {
+        && isUserAllowedToSeeCreatorUserName(
+            currentUserDocumentationOffice, creatorDocumentationOffice)) {
       return creatorUserName;
     }
 
@@ -87,9 +90,12 @@ public class HistoryLogTransformer {
   private static String transformDescription(
       HistoryLogDTO historyLogDTO,
       DocumentationOffice currentUserDocumentationOffice,
-      DocumentationOffice creatorDocumentationOffice,
-      User fromUser,
-      User toUser) {
+      @Nullable User fromUser,
+      @Nullable User toUser) {
+    DocumentationOffice fromDocumentationOffice =
+        Optional.ofNullable(fromUser).map(User::documentationOffice).orElse(null);
+    DocumentationOffice toDocumentationOffice =
+        Optional.ofNullable(toUser).map(User::documentationOffice).orElse(null);
 
     // If the description is already set, or no mapping exists, return the existing description
     if (historyLogDTO.getDescription() != null) {
@@ -99,7 +105,8 @@ public class HistoryLogTransformer {
     // In case of PROCESS_STEP_USER we need to hydrate the description entry with dynamic user data
     if (historyLogDTO.getEventType() == HistoryLogEventType.PROCESS_STEP_USER) {
       boolean isSameOffice =
-          isUserAllowedToSeeUserName(currentUserDocumentationOffice, creatorDocumentationOffice);
+          isUserAllowedToSeeDescriptionUserNames(
+              currentUserDocumentationOffice, fromDocumentationOffice, toDocumentationOffice);
 
       if (isSameOffice) {
         String newPersonName = Optional.ofNullable(toUser).map(User::name).orElse(null);
@@ -127,19 +134,52 @@ public class HistoryLogTransformer {
     return historyLogDTO.getDescription();
   }
 
-  private static boolean isUserAllowedToSeeUserName(
+  private static boolean isUserAllowedToSeeCreatorUserName(
       DocumentationOffice currentUserDocumentationOffice,
       DocumentationOffice creatorDocumentationOffice) {
 
-    //    if (currentUserDocumentationOffice == null || creatorDocumentationOffice == null) {
-    //      return false;
-    //    }
-    //
-    //    return creatorDocumentationOffice.id().equals(currentUserDocumentationOffice.id());
+    if (currentUserDocumentationOffice == null || creatorDocumentationOffice == null) {
+      return false;
+    }
 
-    // Todo: uncomment the above code, as soon as the API returns the group path name for the
-    // retrieved user:
-    //  link to BareID Support Ticket: https://support.bare.id/de/tickets/VTZV-2308-IQGJ
-    return true;
+    return creatorDocumentationOffice.id().equals(currentUserDocumentationOffice.id());
+  }
+
+  private static boolean isUserAllowedToSeeDescriptionUserNames(
+      @Nullable DocumentationOffice currentUserDocumentationOffice,
+      @Nullable DocumentationOffice fromDocumentationOffice,
+      @Nullable DocumentationOffice toDocumentationOffice) {
+
+    // If the current user's office is null, they can't see the names.
+    if (currentUserDocumentationOffice == null) {
+      return false;
+    }
+
+    // --- Scenario 1: Person was newly set (from is null) ---
+    if (fromDocumentationOffice == null) {
+      return areSameOffice(toDocumentationOffice, currentUserDocumentationOffice);
+    }
+
+    // --- Scenario 2: Person was removed (to is null) ---
+    if (toDocumentationOffice == null) {
+      return areSameOffice(fromDocumentationOffice, currentUserDocumentationOffice);
+    }
+
+    // --- Scenario 3: Both 'from' and 'to' users are present ---
+    // The user must be in the same office as BOTH users to see the names.
+    return areSameOffice(fromDocumentationOffice, currentUserDocumentationOffice)
+        && areSameOffice(toDocumentationOffice, currentUserDocumentationOffice);
+  }
+
+  /**
+   * Helper method to check if two DocumentationOffice objects are not null and have the same ID.
+   */
+  private static boolean areSameOffice(
+      @Nullable DocumentationOffice officeA, @Nullable DocumentationOffice officeB) {
+
+    if (officeA == null || officeB == null) {
+      return false;
+    }
+    return officeA.id().equals(officeB.id());
   }
 }
