@@ -53,6 +53,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
@@ -1831,6 +1832,7 @@ class DecisionTransformerTest {
 
   private Decision.DecisionBuilder generateSimpleDocumentationUnitBuilder() {
     return Decision.builder()
+        .portalPublicationStatus(PortalPublicationStatus.UNPUBLISHED)
         .previousDecisions(Collections.emptyList())
         .ensuingDecisions(Collections.emptyList())
         .shortTexts(ShortTexts.builder().build())

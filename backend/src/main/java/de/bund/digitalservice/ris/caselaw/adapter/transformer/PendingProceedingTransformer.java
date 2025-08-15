@@ -123,6 +123,7 @@ public class PendingProceedingTransformer extends DocumentableTransformer {
         .uuid(pendingProceedingDTO.getId())
         .version(pendingProceedingDTO.getVersion())
         .documentNumber(pendingProceedingDTO.getDocumentNumber())
+        .portalPublicationStatus(pendingProceedingDTO.getPortalPublicationStatus())
         .coreData(buildCoreData(pendingProceedingDTO))
         .shortTexts(
             PendingProceedingShortTexts.builder()

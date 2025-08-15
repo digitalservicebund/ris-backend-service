@@ -28,6 +28,8 @@ public interface DocumentationUnit {
 
   Status status();
 
+  PortalPublicationStatus portalPublicationStatus();
+
   ContentRelatedIndexing contentRelatedIndexing();
 
   List<Reference> caselawReferences();

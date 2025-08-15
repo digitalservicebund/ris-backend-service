@@ -31,7 +31,6 @@ class AdminControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockitoBean private MailTrackingService mailTrackingService;
   @MockitoBean private EnvironmentService environmentService;
-  @MockitoBean StagingPortalPublicationService stagingPortalPublicationService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager;
 

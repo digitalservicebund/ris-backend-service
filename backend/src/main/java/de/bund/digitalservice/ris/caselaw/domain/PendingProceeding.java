@@ -33,6 +33,7 @@ public record PendingProceeding(
     PendingProceedingShortTexts shortTexts,
     @Valid ManagementData managementData,
     Status status,
+    PortalPublicationStatus portalPublicationStatus,
     ContentRelatedIndexing contentRelatedIndexing,
     List<Reference> caselawReferences,
     List<Reference> literatureReferences,
