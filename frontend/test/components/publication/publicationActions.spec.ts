@@ -260,7 +260,7 @@ describe("PublicationActions", () => {
     it("should update the status", async () => {
       const store = mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED)
       await renderComponent({ isPublishable: true })
-      const updateDocUnitSpy = vi.spyOn(store, "updateDocumentUnit")
+      const loadDocUnitSpy = vi.spyOn(store, "loadDocumentUnit")
       vi.spyOn(
         publishDocumentationUnitService,
         "publishDocument",
@@ -273,7 +273,7 @@ describe("PublicationActions", () => {
         screen.getByRole("button", { name: "Veröffentlichen" }),
       )
 
-      expect(updateDocUnitSpy).toHaveBeenCalledOnce()
+      expect(loadDocUnitSpy).toHaveBeenCalledOnce()
       expect(screen.getByText("Veröffentlicht")).toBeVisible()
     })
 

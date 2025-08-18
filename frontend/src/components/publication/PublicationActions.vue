@@ -27,7 +27,7 @@ const publishDocUnit = async () => {
     store.documentUnit!.uuid!,
   )
   docUnitPublicationError.value = error ?? null
-  await store.updateDocumentUnit()
+  await store.loadDocumentUnit(decision.value.documentNumber)
   isPublishing.value = false
 }
 
