@@ -125,15 +125,16 @@ public class BareIdUserApiService implements UserApiService {
   }
 
   private List<User> getUsersRecursively(BareUserApiResponse.Group group) {
-    List<User> result = new ArrayList<>();
-
-    var children = getGroupChildren(group.uuid());
-    for (BareUserApiResponse.Group child : children) {
-      result.addAll(getUsers(child.uuid()));
-      result.addAll(getUsersRecursively(child));
+    List<User> users = new ArrayList<>();
+    try {
+      users.addAll(getUsers(group.uuid()));
+    } catch (UserApiException exception) {
+      log.error("Error while fetching users: ", exception);
     }
-
-    return result;
+    for (BareUserApiResponse.Group child : getGroupChildren(group.uuid())) {
+      users.addAll(getUsersRecursively(child));
+    }
+    return users;
   }
 
   private BareUserApiResponse.Group getGroupByName(
@@ -219,7 +220,7 @@ public class BareIdUserApiService implements UserApiService {
     if (uniqueDocOffices.size() > 1) {
       LOGGER.warn(
           "More then one doc office associated with given Keycloak user groups: {}", userGroups);
-      throw new IllegalStateException("Multiple doc offices found.");
+      throw new UserApiException("Multiple doc offices found for user.");
     }
     return uniqueDocOffices.stream().findFirst();
   }
