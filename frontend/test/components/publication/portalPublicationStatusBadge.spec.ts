@@ -15,7 +15,7 @@ describe("PortalPublicationStatusBadge", () => {
     await renderComponent(PortalPublicationStatus.WITHDRAWN)
     expect(screen.getByText("Zurückgezogen")).toBeInTheDocument()
   })
-  it("should not show anything on empty status", async () => {
+  it("should show unknown status", async () => {
     await renderComponent("Unknown" as unknown as PortalPublicationStatus)
     expect(screen.getByText("Unbekannter Status")).toBeInTheDocument()
   })
