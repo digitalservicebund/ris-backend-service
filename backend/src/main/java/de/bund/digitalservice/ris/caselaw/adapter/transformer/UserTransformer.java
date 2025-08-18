@@ -76,7 +76,7 @@ public class UserTransformer {
             .findFirst();
 
     Optional<String> lastName =
-        firstNames.stream()
+        lastNames.stream()
             .filter(Objects::nonNull)
             .map(String::trim)
             .filter(s -> !s.isEmpty())
