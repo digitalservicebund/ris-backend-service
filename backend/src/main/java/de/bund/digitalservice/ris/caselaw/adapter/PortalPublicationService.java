@@ -79,17 +79,26 @@ public class PortalPublicationService {
     if (!featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
       return;
     }
-    DocumentationUnit documentationUnit =
-        documentationUnitRepository.findByUuid(documentationUnitId);
-    var result = publishToBucket(documentationUnit);
     try {
-      uploadChangelog(result.changedPaths(), result.deletedPaths());
-    } catch (Exception e) {
-      log.error("Could not upload changelog file.");
-      deleteDocumentationUnit(documentationUnit.documentNumber());
-      throw new PublishException("Could not save changelog to bucket.", e);
+      DocumentationUnit documentationUnit =
+          documentationUnitRepository.findByUuid(documentationUnitId);
+      var result = publishToBucket(documentationUnit);
+      try {
+        uploadChangelog(result.changedPaths(), result.deletedPaths());
+      } catch (Exception e) {
+        log.error("Could not upload changelog file.");
+        deleteDocumentationUnit(documentationUnit.documentNumber());
+        throw new PublishException("Could not save changelog to bucket.", e);
+      }
+      updatePortalPublicationStatus(documentationUnit, user);
+    } catch (Exception exception) {
+      historyLogService.saveHistoryLog(
+          documentationUnitId,
+          user,
+          HistoryLogEventType.PORTAL_PUBLICATION,
+          "Dokumentationseinheit konnte nicht veröffentlicht werden");
+      throw exception;
     }
-    updatePortalPublicationStatus(documentationUnit, user);
   }
 
   /**

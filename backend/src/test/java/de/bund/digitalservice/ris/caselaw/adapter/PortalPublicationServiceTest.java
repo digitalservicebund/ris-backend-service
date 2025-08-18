@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,6 +36,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -144,6 +146,7 @@ class PortalPublicationServiceTest {
   void publish_shouldPublishSuccessfully() throws DocumentationUnitNotExistsException {
     UUID documentationUnitId = UUID.randomUUID();
     String transformed = "<akn:akomaNtoso />";
+    User user = mock(User.class);
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
@@ -152,13 +155,13 @@ class PortalPublicationServiceTest {
             .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
             .build();
 
-    subject.publishDocumentationUnitWithChangelog(documentationUnitId, null);
+    subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
 
     verify(caseLawBucket).save(withPrefix(testDocumentNumber), transformed);
     verify(historyLogService)
         .saveHistoryLog(
             testDocumentUnit.uuid(),
-            null,
+            user,
             HistoryLogEventType.PORTAL_PUBLICATION,
             "Dokumentationseinheit veröffentlicht");
     verify(documentationUnitRepository)
@@ -169,12 +172,13 @@ class PortalPublicationServiceTest {
   void publish_withFeatureDisabled_shouldNotPublish() throws DocumentationUnitNotExistsException {
     UUID documentationUnitId = UUID.randomUUID();
     String transformed = "<akn:akomaNtoso />";
+    User user = mock(User.class);
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(false);
 
-    subject.publishDocumentationUnitWithChangelog(documentationUnitId, null);
+    subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
 
     verify(caseLawBucket, never()).save(any(), any());
   }
@@ -214,28 +218,42 @@ class PortalPublicationServiceTest {
   void publish_withEmptyCoreData_shouldThrowLdmlTransformationException()
       throws DocumentationUnitNotExistsException {
     UUID documentationUnitId = UUID.randomUUID();
+    User user = mock(User.class);
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit))
         .thenThrow(new LdmlTransformationException("LDML validation failed.", new Exception()));
 
     assertThatExceptionOfType(LdmlTransformationException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, null))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
         .withMessageContaining("LDML validation failed.");
-    verify(caseLawBucket, times(0)).save(anyString(), anyString());
+    verify(caseLawBucket, never()).save(anyString(), anyString());
+    verify(historyLogService)
+        .saveHistoryLog(
+            documentationUnitId,
+            user,
+            HistoryLogEventType.PORTAL_PUBLICATION,
+            "Dokumentationseinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
   void publish_withMissingJudgmentBody_shouldThrowLdmlTransformationException()
       throws DocumentationUnitNotExistsException {
     UUID documentationUnitId = UUID.randomUUID();
+    User user = mock(User.class);
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit))
         .thenThrow(new LdmlTransformationException("Missing judgment body.", new Exception()));
 
     assertThatExceptionOfType(LdmlTransformationException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, null))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
         .withMessageContaining("Missing judgment body.");
-    verify(caseLawBucket, times(0)).save(anyString(), anyString());
+    verify(caseLawBucket, never()).save(anyString(), anyString());
+    verify(historyLogService)
+        .saveHistoryLog(
+            documentationUnitId,
+            user,
+            HistoryLogEventType.PORTAL_PUBLICATION,
+            "Dokumentationseinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
@@ -243,7 +261,7 @@ class PortalPublicationServiceTest {
   void publish_withChangelogFileCreationError_shouldThrowPublishException()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     UUID documentationUnitId = UUID.randomUUID();
-
+    User user = mock(User.class);
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
@@ -253,16 +271,22 @@ class PortalPublicationServiceTest {
     when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, null))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
         .withMessageContaining("Could not save changelog to bucket");
     verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
+    verify(historyLogService)
+        .saveHistoryLog(
+            documentationUnitId,
+            user,
+            HistoryLogEventType.PORTAL_PUBLICATION,
+            "Dokumentationseinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
   void publish_saveChangelogWithBucketException_shouldThrowPublishException()
       throws DocumentationUnitNotExistsException {
     UUID documentationUnitId = UUID.randomUUID();
-
+    User user = mock(User.class);
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
@@ -272,22 +296,29 @@ class PortalPublicationServiceTest {
     doThrow(BucketException.class).when(caseLawBucket).save(contains("changelogs/"), anyString());
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, null))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
         .withMessageContaining("Could not save changelog to bucket");
     verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
+    verify(historyLogService)
+        .saveHistoryLog(
+            documentationUnitId,
+            user,
+            HistoryLogEventType.PORTAL_PUBLICATION,
+            "Dokumentationseinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
   void publish_saveLdmlWithBucketException_shouldThrowPublishException()
       throws DocumentationUnitNotExistsException {
     UUID documentationUnitId = UUID.randomUUID();
+    User user = mock(User.class);
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     doThrow(BucketException.class).when(caseLawBucket).save(contains(".xml"), anyString());
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, null))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, user))
         .withMessageContaining("Could not save LDML to bucket");
   }
 
