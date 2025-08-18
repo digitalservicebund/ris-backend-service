@@ -135,9 +135,7 @@ test.describe("process steps", () => {
     await expect(infoPanel).toContainText("Fachdokumentation")
   })
 
-  test("rendering initial state, select 'Ersterfassung', click on 'Weitergeben'", async ({
-    pageWithBghUser,
-  }) => {
+  test("Saving a process step without user", async ({ pageWithBghUser }) => {
     await navigateToSearch(pageWithBghUser)
 
     await pageWithBghUser
@@ -180,10 +178,15 @@ test.describe("process steps", () => {
 
     await expect(dialog).toBeHidden()
 
-    await expect(infoPanel).toContainText("Ersterfassung")
+    await test.step("Validate process step is in process steps history logs", async () => {
+      const firstRow = pageWithBghUser.locator("tbody tr").first()
+
+      await expect(firstRow).toContainText("Ersterfassung")
+      await expect(firstRow).toContainText("-")
+    })
   })
 
-  test("rendering initial state, select 'Ersterfassung', select user, click on 'Weitergeben'", async ({
+  test("Saving a process step with a selected user", async ({
     pageWithBghUser,
   }) => {
     await test.step("Create a new decision with BGH court", async () => {
@@ -197,43 +200,36 @@ test.describe("process steps", () => {
       await expect(infoPanel).toContainText("Ersterfassung")
     })
 
-    const dialog = pageWithBghUser.getByRole("dialog")
+    await test.step("Open process step dialog", async () => {
+      await openProcessStepDialog(pageWithBghUser)
+    })
+
+    await test.step("Select bgh test user", async () => {
+      await selectUser(pageWithBghUser, "BgH", "BGH  testUser", "BT")
+    })
+
+    await test.step("Select 'QS fachlich' process step", async () => {
+      await selectProcessStep(pageWithBghUser, "QS fachlich")
+    })
+
+    await test.step("Save changes and close dialog", async () => {
+      await saveChangesAndCloseDialog(pageWithBghUser)
+    })
 
     await test.step("Open process step dialog", async () => {
       await openProcessStepDialog(pageWithBghUser)
     })
 
-    await test.step("Select user bgh test user", async () => {
-      await selectUser(pageWithBghUser, "BgH", "BGH  testUser", "BT")
+    await test.step("Validate process step is in process steps history logs", async () => {
+      const firstRow = pageWithBghUser.locator("tbody tr").first()
+
+      await expect(firstRow).toContainText("QS fachlich")
+      await expect(firstRow).toContainText("BT")
     })
 
-    await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
-    const processStepDropBox = dialog.getByRole("combobox", {
-      name: "Neuer Schritt",
+    await test.step("Close process step dialog", async () => {
+      await closeProcessStepDialog(pageWithBghUser)
     })
-
-    await expect(processStepDropBox).toContainText("QS formal")
-
-    await processStepDropBox.click()
-    await pageWithBghUser.getByLabel("Ersterfassung", { exact: true }).click()
-
-    await expect(processStepDropBox).toContainText("Ersterfassung")
-
-    const weitergebenButton = dialog.getByRole("button", {
-      name: "Weitergeben",
-    })
-    await expect(weitergebenButton).toBeVisible()
-    await expect(
-      dialog.getByRole("button", { name: "Abbrechen" }),
-    ).toBeVisible()
-
-    await weitergebenButton.click()
-
-    await expect(dialog).toBeHidden()
-
-    const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-
-    await expect(infoPanel).toContainText("Ersterfassung")
   })
 
   async function selectUser(
@@ -268,7 +264,6 @@ test.describe("process steps", () => {
     const processStepDropBox = dialog.getByRole("combobox", {
       name: "Neuer Schritt",
     })
-    await expect(processStepDropBox).toContainText(processStepName)
 
     await processStepDropBox.click()
 
@@ -287,5 +282,22 @@ test.describe("process steps", () => {
     await expect(
       dialog.getByText("Dokumentationseinheit weitergeben"),
     ).toBeVisible()
+  }
+
+  async function closeProcessStepDialog(page: Page) {
+    const dialog = page.getByRole("dialog")
+
+    await page.getByRole("button", { name: "Abbrechen" }).click()
+    await expect(dialog).toBeHidden()
+  }
+
+  async function saveChangesAndCloseDialog(page: Page) {
+    const dialog = page.getByRole("dialog")
+    const weitergebenButton = dialog.getByRole("button", {
+      name: "Weitergeben",
+    })
+    await weitergebenButton.click()
+
+    await expect(dialog).toBeHidden()
   }
 })
