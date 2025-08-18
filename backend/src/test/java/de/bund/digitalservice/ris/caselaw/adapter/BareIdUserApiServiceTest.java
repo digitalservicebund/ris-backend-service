@@ -53,7 +53,8 @@ class BareIdUserApiServiceTest {
         new BareIdUserApiService(bareIdUserApiTokenService, restTemplate, instanceId);
 
     mockTokenResponse();
-    mockUserApiResponse();
+    mockEmptyUserApiResponse(); // return empty list for bgh
+    mockInternalUserApiResponse(); // returns user for "intern"
 
     // caselaw/BGH/Intern
     mockRootGroupsResponse(); // returns top-level groups, including "caselaw"
@@ -242,7 +243,7 @@ class BareIdUserApiServiceTest {
         internGroup.uuid().toString(), BareUserApiResponse.GroupApiResponse.class, courtWithIntern);
   }
 
-  private void mockUserApiResponse() {
+  private void mockInternalUserApiResponse() {
 
     var attributes =
         Map.of(
@@ -253,6 +254,23 @@ class BareIdUserApiServiceTest {
 
     BareUserApiResponse.UsersApiResponse userApiResponse =
         new BareUserApiResponse.UsersApiResponse(List.of(user));
+
+    ResponseEntity<BareUserApiResponse.UsersApiResponse> mockUsersResponse =
+        ResponseEntity.ok(userApiResponse);
+
+    doReturn(mockUsersResponse)
+        .when(restTemplate)
+        .exchange(
+            endsWith(internGroup.uuid().toString() + "/users"),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UsersApiResponse.class));
+  }
+
+  private void mockEmptyUserApiResponse() {
+
+    BareUserApiResponse.UsersApiResponse userApiResponse =
+        new BareUserApiResponse.UsersApiResponse(List.of());
 
     ResponseEntity<BareUserApiResponse.UsersApiResponse> mockUsersResponse =
         ResponseEntity.ok(userApiResponse);
