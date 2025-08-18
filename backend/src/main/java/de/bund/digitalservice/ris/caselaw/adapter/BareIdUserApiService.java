@@ -5,9 +5,9 @@ import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,15 +98,12 @@ public class BareIdUserApiService implements UserApiService {
   }
 
   private List<User> getUsersRecursively(BareUserApiResponse.Group group) {
-    List<User> result = new ArrayList<>();
-
-    var children = getGroupChildren(group.uuid());
-    for (BareUserApiResponse.Group child : children) {
-      result.addAll(getUsers(child.uuid()));
-      result.addAll(getUsersRecursively(child));
+    List<User> users = getUsers(group.uuid());
+    for (BareUserApiResponse.Group child : getGroupChildren(group.uuid())) {
+      users.addAll(getUsers(child.uuid()));
+      users.addAll(getUsersRecursively(child));
     }
-
-    return result;
+    return users;
   }
 
   private BareUserApiResponse.Group getGroupByName(
@@ -152,23 +149,29 @@ public class BareIdUserApiService implements UserApiService {
   }
 
   public List<User> getUsers(UUID userGroupId) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setBearerAuth(bareIdUserApiTokenService.getAccessToken().getTokenValue());
-    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
+    try {
+      HttpHeaders headers = new HttpHeaders();
+      headers.setBearerAuth(bareIdUserApiTokenService.getAccessToken().getTokenValue());
+      HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
 
-    String subGroupUrl =
-        String.format(
-            "https://api.bare.id/user/v1/%s/groups/%s/users", bareidInstance, userGroupId);
-    ResponseEntity<BareUserApiResponse.UsersApiResponse> subGroupResponse =
-        restTemplate.exchange(
-            subGroupUrl, HttpMethod.GET, request, BareUserApiResponse.UsersApiResponse.class);
+      String subGroupUrl =
+          String.format(
+              "https://api.bare.id/user/v1/%s/groups/%s/users", bareidInstance, userGroupId);
 
-    if (subGroupResponse.getBody() == null) {
-      throw new UserApiException("Could not fetch users");
+      ResponseEntity<BareUserApiResponse.UsersApiResponse> subGroupResponse =
+          restTemplate.exchange(
+              subGroupUrl, HttpMethod.GET, request, BareUserApiResponse.UsersApiResponse.class);
+
+      List<BareUserApiResponse.BareUser> apiUsers =
+          Optional.ofNullable(subGroupResponse.getBody())
+              .map(BareUserApiResponse.UsersApiResponse::users)
+              .orElse(List.of());
+
+      return apiUsers.stream().map(UserTransformer::transformToDomain).toList();
+
+    } catch (Exception e) {
+      log.error("Failed to fetch users for group {}: {}", userGroupId, e.getMessage(), e);
+      return List.of();
     }
-
-    return subGroupResponse.getBody().users().stream()
-        .map(UserTransformer::transformToDomain)
-        .toList();
   }
 }
