@@ -136,46 +136,31 @@ test.describe("process steps", () => {
   })
 
   test("Saving a process step without user", async ({ pageWithBghUser }) => {
-    await navigateToSearch(pageWithBghUser)
-
-    await pageWithBghUser
-      .getByRole("button", { name: "Neue Entscheidung" })
-      .first()
-      .click()
-
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-    await expect(infoPanel).toContainText("Ersterfassung")
+    await test.step("Create a new decision with BGH court", async () => {
+      await navigateToSearch(pageWithBghUser)
+      await pageWithBghUser
+        .getByRole("button", { name: "Neue Entscheidung" })
+        .first()
+        .click()
 
-    await pageWithBghUser
-      .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
-      .click()
-
-    const dialog = pageWithBghUser.getByRole("dialog")
-    await expect(dialog).toBeVisible()
-    await expect(
-      dialog.getByText("Dokumentationseinheit weitergeben"),
-    ).toBeVisible()
-    await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
-    const processStepDropBox = dialog.getByRole("combobox", {
-      name: "Neuer Schritt",
+      await expect(infoPanel).toContainText("Ersterfassung")
     })
-    await expect(processStepDropBox).toContainText("QS formal")
 
-    await processStepDropBox.click()
-    await pageWithBghUser.getByLabel("Ersterfassung", { exact: true }).click()
-
-    await expect(processStepDropBox).toContainText("Ersterfassung")
-
-    const weitergebenButton = dialog.getByRole("button", {
-      name: "Weitergeben",
+    await test.step("Open process step dialog", async () => {
+      await openProcessStepDialog(pageWithBghUser)
     })
-    await expect(weitergebenButton).toBeVisible()
-    await expect(
-      dialog.getByRole("button", { name: "Abbrechen" }),
-    ).toBeVisible()
+
+    await test.step("Select 'Ersterfassung' process step", async () => {
+      await selectProcessStep(pageWithBghUser, "Ersterfassung")
+    })
 
     await test.step("Save changes and close dialog", async () => {
       await saveChangesAndCloseDialog(pageWithBghUser)
+    })
+
+    await test.step("Validate process step is displayed in info panel", async () => {
+      await expect(infoPanel).toContainText("Ersterfassung")
     })
 
     await test.step("Open process step dialog", async () => {
@@ -193,6 +178,8 @@ test.describe("process steps", () => {
   test("Saving a process step with a selected user", async ({
     pageWithBghUser,
   }) => {
+    const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
+
     await test.step("Create a new decision with BGH court", async () => {
       await navigateToSearch(pageWithBghUser)
       await pageWithBghUser
@@ -200,7 +187,6 @@ test.describe("process steps", () => {
         .first()
         .click()
 
-      const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
       await expect(infoPanel).toContainText("Ersterfassung")
     })
 
@@ -218,6 +204,10 @@ test.describe("process steps", () => {
 
     await test.step("Save changes and close dialog", async () => {
       await saveChangesAndCloseDialog(pageWithBghUser)
+    })
+
+    await test.step("Validate process step is displayed in info panel", async () => {
+      await expect(infoPanel).toContainText("QS fachlich")
     })
 
     await test.step("Open process step dialog", async () => {
