@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationEx
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -57,6 +58,7 @@ class PortalPublicationServiceTest {
   @MockitoBean private ObjectMapper objectMapper;
   @MockitoBean private PortalTransformer portalTransformer;
   @MockitoBean private FeatureToggleService featureToggleService;
+  @MockitoBean private DocumentationUnitHistoryLogService historyLogService;
 
   private static Decision testDocumentUnit;
   private static String testDocumentNumber;
@@ -127,7 +129,8 @@ class PortalPublicationServiceTest {
             caseLawBucket,
             objectMapper,
             portalTransformer,
-            featureToggleService);
+            featureToggleService,
+            historyLogService);
     when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
   }
@@ -140,8 +143,9 @@ class PortalPublicationServiceTest {
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
+    when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
 
-    subject.publishDocumentationUnitWithChangelog(documentationUnitId);
+    subject.publishDocumentationUnitWithChangelog(documentationUnitId, null);
 
     verify(caseLawBucket, times(1))
         .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
@@ -189,7 +193,7 @@ class PortalPublicationServiceTest {
         .thenThrow(new LdmlTransformationException("LDML validation failed.", new Exception()));
 
     assertThatExceptionOfType(LdmlTransformationException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, null))
         .withMessageContaining("LDML validation failed.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
@@ -203,7 +207,7 @@ class PortalPublicationServiceTest {
         .thenThrow(new LdmlTransformationException("Missing judgment body.", new Exception()));
 
     assertThatExceptionOfType(LdmlTransformationException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, null))
         .withMessageContaining("Missing judgment body.");
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
@@ -255,7 +259,7 @@ class PortalPublicationServiceTest {
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId))
+        .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, null))
         .withMessageContaining("Could not save LDML to bucket");
   }
 }

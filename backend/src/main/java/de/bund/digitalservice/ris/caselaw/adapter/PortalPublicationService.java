@@ -10,10 +10,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationEx
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -34,6 +37,9 @@ public class PortalPublicationService {
   private final XmlUtilService xmlUtilService;
   private final PortalTransformer ldmlTransformer;
   private final FeatureToggleService featureToggleService;
+  private final DocumentationUnitHistoryLogService historyLogService;
+
+  private static final String PUBLICATION_FEATURE_FLAG = "neuris.portal-publication";
 
   public PortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
@@ -42,7 +48,8 @@ public class PortalPublicationService {
       S3Bucket portalBucket,
       ObjectMapper objectMapper,
       PortalTransformer portalTransformer,
-      FeatureToggleService featureToggleService) {
+      FeatureToggleService featureToggleService,
+      DocumentationUnitHistoryLogService historyLogService) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.attachmentRepository = attachmentRepository;
@@ -51,6 +58,7 @@ public class PortalPublicationService {
     this.xmlUtilService = xmlUtilService;
     this.ldmlTransformer = portalTransformer;
     this.featureToggleService = featureToggleService;
+    this.historyLogService = historyLogService;
   }
 
   /**
@@ -66,9 +74,9 @@ public class PortalPublicationService {
    * @throws PublishException if the changelog file could not be created or either of the files
    *     could not be saved in the bucket
    */
-  public void publishDocumentationUnitWithChangelog(UUID documentationUnitId)
+  public void publishDocumentationUnitWithChangelog(UUID documentationUnitId, User user)
       throws DocumentationUnitNotExistsException {
-    if (!featureToggleService.isEnabled("neuris.portal-publication")) {
+    if (!featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
       return;
     }
     DocumentationUnit documentationUnit =
@@ -81,7 +89,7 @@ public class PortalPublicationService {
       deleteDocumentationUnit(documentationUnit.documentNumber());
       throw new PublishException("Could not save changelog to bucket.", e);
     }
-    updatePortalPublicationStatus(documentationUnit);
+    updatePortalPublicationStatus(documentationUnit, user);
   }
 
   /**
@@ -100,7 +108,7 @@ public class PortalPublicationService {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByDocumentNumber(documentNumber);
     var publicationResult = publishToBucket(documentationUnit);
-    updatePortalPublicationStatus(documentationUnit);
+    updatePortalPublicationStatus(documentationUnit, null);
     return publicationResult;
   }
 
@@ -174,7 +182,7 @@ public class PortalPublicationService {
    * @throws JsonProcessingException if the changelog cannot be generated.
    */
   public void uploadFullReindexChangelog() throws JsonProcessingException {
-    if (featureToggleService.isEnabled("neuris.portal-publication")) {
+    if (featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
       return; // only needed for testphase portal
     }
     uploadChangelog(null, null, true);
@@ -192,7 +200,7 @@ public class PortalPublicationService {
   public void uploadChangelog(
       List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
       throws JsonProcessingException {
-    if (!featureToggleService.isEnabled("neuris.portal-publication")) {
+    if (!featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
       return;
     }
     uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers, false);
@@ -228,7 +236,7 @@ public class PortalPublicationService {
     return "changelogs/" + Instant.now().toString() + "-caselaw.json";
   }
 
-  private void updatePortalPublicationStatus(DocumentationUnit documentationUnit) {
+  private void updatePortalPublicationStatus(DocumentationUnit documentationUnit, User user) {
     if (documentationUnit instanceof Decision decision) {
       documentationUnit =
           decision.toBuilder().portalPublicationStatus(PortalPublicationStatus.PUBLISHED).build();
@@ -238,6 +246,12 @@ public class PortalPublicationService {
               .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
               .build();
     }
-    documentationUnitRepository.save(documentationUnit);
+    historyLogService.saveHistoryLog(
+        documentationUnit.uuid(),
+        user,
+        HistoryLogEventType.PORTAL_PUBLICATION,
+        "Dokumentationseinheit veröffentlicht");
+    documentationUnitRepository.save(
+        documentationUnit, null, "Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
   }
 }

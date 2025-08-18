@@ -885,7 +885,7 @@ class DocumentationUnitControllerTest {
 
     doThrow(DocumentationUnitNotExistsException.class)
         .when(portalPublicationService)
-        .publishDocumentationUnitWithChangelog(TEST_UUID);
+        .publishDocumentationUnitWithChangelog(TEST_UUID, null);
 
     risWebClient
         .withDefaultLogin()
@@ -895,7 +895,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
+    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
   }
 
   @Test
@@ -904,7 +904,7 @@ class DocumentationUnitControllerTest {
 
     doThrow(LdmlTransformationException.class)
         .when(portalPublicationService)
-        .publishDocumentationUnitWithChangelog(TEST_UUID);
+        .publishDocumentationUnitWithChangelog(TEST_UUID, null);
 
     risWebClient
         .withDefaultLogin()
@@ -914,7 +914,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .isBadRequest();
 
-    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
+    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
   }
 
   @Test
@@ -922,7 +922,7 @@ class DocumentationUnitControllerTest {
 
     doThrow(PublishException.class)
         .when(portalPublicationService)
-        .publishDocumentationUnitWithChangelog(TEST_UUID);
+        .publishDocumentationUnitWithChangelog(TEST_UUID, null);
 
     risWebClient
         .withDefaultLogin()
@@ -932,7 +932,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID);
+    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
   }
 
   @Test
