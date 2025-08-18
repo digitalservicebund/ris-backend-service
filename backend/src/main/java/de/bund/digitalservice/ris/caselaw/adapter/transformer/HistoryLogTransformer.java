@@ -72,12 +72,6 @@ public class HistoryLogTransformer {
 
     String creatorUserName = Optional.ofNullable(creatorUser).map(User::name).orElse(null);
 
-    // workaround until we get the docOffice information from the user API
-    if (creatorDocumentationOffice == null) {
-      creatorDocumentationOffice =
-          DocumentationOfficeTransformer.transformToDomain(historyLogDTO.getDocumentationOffice());
-    }
-
     if (creatorUserName != null
         && isUserAllowedToSeeCreatorUserName(
             currentUserDocumentationOffice, creatorDocumentationOffice)) {
