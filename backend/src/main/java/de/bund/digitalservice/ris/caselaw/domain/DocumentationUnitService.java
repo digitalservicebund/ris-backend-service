@@ -710,9 +710,9 @@ public class DocumentationUnitService {
     repository.saveKeywords(decision);
     repository.saveFieldsOfLaw(decision);
     repository.saveProcedures(decision, user);
-    repository.saveProcessSteps(decision, user);
+    var processStepChanged = repository.saveProcessSteps(decision, user);
 
-    repository.save(decision, user);
+    repository.save(decision, user, null, processStepChanged);
 
     if (duplicateCheckStatus == DuplicateCheckStatus.ENABLED) {
       try {

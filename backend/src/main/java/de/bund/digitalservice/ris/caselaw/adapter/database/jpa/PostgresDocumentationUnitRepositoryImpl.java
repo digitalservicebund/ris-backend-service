@@ -339,13 +339,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(DocumentationUnit documentationUnit) {
-    saveNonTransactional(documentationUnit, null, null);
+    saveNonTransactional(documentationUnit, null, null, false);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(DocumentationUnit documentationUnit, @Nullable User currentUser) {
-    saveNonTransactional(documentationUnit, currentUser, null);
+    saveNonTransactional(documentationUnit, currentUser, null, false);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -353,12 +353,16 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   public void save(
       DocumentationUnit documentationUnit,
       @Nullable User currentUser,
-      @Nullable String description) {
-    saveNonTransactional(documentationUnit, currentUser, description);
+      @Nullable String description,
+      @Nullable boolean processStepChanged) {
+    saveNonTransactional(documentationUnit, currentUser, description, processStepChanged);
   }
 
   private void saveNonTransactional(
-      DocumentationUnit documentationUnit, @Nullable User currentUser, String description) {
+      DocumentationUnit documentationUnit,
+      @Nullable User currentUser,
+      String description,
+      boolean processStepChanged) {
     DocumentationUnitDTO documentationUnitDTO =
         repository.findById(documentationUnit.uuid()).orElse(null);
     if (documentationUnitDTO == null) {
@@ -375,11 +379,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     saveHistoryLogForScheduledPublication(documentationUnit, documentationUnitDTO, currentUser);
 
-    historyLogService.saveHistoryLog(
-        documentationUnitDTO.getId(),
-        currentUser,
-        HistoryLogEventType.UPDATE,
-        description == null ? "Dokeinheit bearbeitet" : description);
+    if (!processStepChanged) {
+      historyLogService.saveHistoryLog(
+          documentationUnitDTO.getId(),
+          currentUser,
+          HistoryLogEventType.UPDATE,
+          description == null ? "Dokeinheit bearbeitet" : description);
+    }
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
@@ -554,19 +560,21 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Transactional
   @Override
-  public void saveProcessSteps(DocumentationUnit documentationUnit, @Nullable User currentUser) {
+  public boolean saveProcessSteps(DocumentationUnit documentationUnit, @Nullable User currentUser) {
     if (documentationUnit == null) {
-      return;
+      return false;
+    }
+    boolean processStepChanged = false;
+    Optional<DocumentationUnitDTO> optionalDTO = repository.findById(documentationUnit.uuid());
+    if (optionalDTO.isPresent()) {
+      DocumentationUnitDTO documentationUnitDTO = optionalDTO.get();
+      return handleProcessStepUpdate(documentationUnitDTO, documentationUnit, currentUser);
     }
 
-    repository
-        .findById(documentationUnit.uuid())
-        .ifPresent(
-            documentationUnitDTO ->
-                handleProcessStepUpdate(documentationUnitDTO, documentationUnit, currentUser));
+    return processStepChanged;
   }
 
-  private void handleProcessStepUpdate(
+  private boolean handleProcessStepUpdate(
       DocumentationUnitDTO documentationUnitDTO,
       DocumentationUnit documentationUnit,
       @Nullable User currentUser) {
@@ -578,7 +586,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     // --- SCENARIO 1: A process step can be null only from migrated data ---
     if (currentDocunitProcessStepFromFrontend == null) {
-      return;
+      return false;
     }
 
     // --- SCENARIO 2: A process step is being added ---
@@ -596,7 +604,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         userChanged(
             currentDocumentationUnitProcessStepDTOFromDB, currentDocunitProcessStepFromFrontend);
 
+    boolean processStepChanged = false;
     if (stepChanged || userChanged) {
+      processStepChanged = true;
       DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
           createAndSaveNewProcessStep(
               documentationUnitDTO, processStepDTO, currentDocunitProcessStepFromFrontend);
@@ -624,6 +634,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             newDocumentationUnitProcessStepDTO);
       }
     }
+    return processStepChanged;
   }
 
   @NotNull

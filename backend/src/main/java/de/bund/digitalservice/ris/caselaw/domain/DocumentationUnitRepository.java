@@ -77,9 +77,15 @@ public interface DocumentationUnitRepository {
    */
   void save(DocumentationUnit documentationUnit);
 
-  void save(DocumentationUnit documentationUnit, User currentUser);
+  @Transactional(transactionManager = "jpaTransactionManager")
+  void save(DocumentationUnit documentationUnit, @Nullable User currentUser);
 
-  void save(DocumentationUnit documentationUnit, User currentUser, String description);
+  @Transactional(transactionManager = "jpaTransactionManager")
+  void save(
+      DocumentationUnit documentationUnit,
+      @Nullable User currentUser,
+      @Nullable String description,
+      @Nullable boolean processStepChanged);
 
   /**
    * Save the keywords of a documentation unit
@@ -89,7 +95,7 @@ public interface DocumentationUnitRepository {
   void saveKeywords(DocumentationUnit documentationUnit);
 
   @Transactional
-  void saveProcessSteps(DocumentationUnit documentationUnit, @Nullable User currentUser);
+  boolean saveProcessSteps(DocumentationUnit documentationUnit, @Nullable User currentUser);
 
   /**
    * Save the fields of law of a documentation unit
