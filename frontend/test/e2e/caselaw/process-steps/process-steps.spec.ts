@@ -174,9 +174,13 @@ test.describe("process steps", () => {
       dialog.getByRole("button", { name: "Abbrechen" }),
     ).toBeVisible()
 
-    await weitergebenButton.click()
+    await test.step("Save changes and close dialog", async () => {
+      await saveChangesAndCloseDialog(pageWithBghUser)
+    })
 
-    await expect(dialog).toBeHidden()
+    await test.step("Open process step dialog", async () => {
+      await openProcessStepDialog(pageWithBghUser)
+    })
 
     await test.step("Validate process step is in process steps history logs", async () => {
       const firstRow = pageWithBghUser.locator("tbody tr").first()
