@@ -112,7 +112,65 @@ public class PortalPublicationService {
     return publicationResult;
   }
 
-  protected PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {
+  /**
+   * Delete the documentation unit with the given documentNumber, including all attachments, from
+   * the portal bucket.
+   *
+   * @param documentNumber the document number of the documentation unit to be deleted.
+   */
+  public PortalPublicationResult deleteDocumentationUnit(String documentNumber) {
+    try {
+      var deletableFiles = portalBucket.getAllFilenamesByPath(documentNumber + "/");
+      deletableFiles.forEach(portalBucket::delete);
+      return new PortalPublicationResult(List.of(), deletableFiles);
+    } catch (BucketException e) {
+      throw new PublishException("Could not delete LDML from bucket.", e);
+    }
+  }
+
+  /**
+   * Generates a changelog file with the given parameters and saves it to the portal bucket.
+   *
+   * @param publishedDocumentNumbers the document numbers of the documentation units which have been
+   *     changed or added.
+   * @param deletedDocumentNumbers the document numbers of the documentation units which have been
+   *     deleted.
+   * @throws JsonProcessingException if the changelog cannot be generated.
+   */
+  public void uploadChangelog(
+      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
+      throws JsonProcessingException {
+    if (!featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
+      return;
+    }
+    uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers, false);
+  }
+
+  /**
+   * Generates a changelog file to trigger a full re-indexing of all documents in the bucket
+   *
+   * @throws JsonProcessingException if the changelog cannot be generated.
+   */
+  public void uploadFullReindexChangelog() throws JsonProcessingException {
+    if (featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
+      return; // only needed for testphase portal
+    }
+    uploadChangelog(null, null, true);
+  }
+
+  /**
+   * Generates a changelog file with the given parameters and saves it to the portal bucket.
+   *
+   * @param deletedDocumentNumbers the document numbers of the documentation units which have been
+   *     deleted.
+   * @throws JsonProcessingException if the changelog cannot be generated.
+   */
+  public void uploadDeletionChangelog(List<String> deletedDocumentNumbers)
+      throws JsonProcessingException {
+    uploadChangelog(null, deletedDocumentNumbers, false);
+  }
+
+  private PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {
     if (!(documentationUnit instanceof Decision)) {
       // for now pending proceedings can not be processed by the portal, so they are ignored.
       return null;
@@ -129,7 +187,7 @@ public class PortalPublicationService {
         ldml.getUniqueId() + "/", ldml.getFileName(), fileContent.get(), attachments);
   }
 
-  protected PortalPublicationResult saveToBucket(
+  private PortalPublicationResult saveToBucket(
       String path, String fileName, String fileContent, List<AttachmentDTO> attachments) {
     try {
       List<String> existingFiles = portalBucket.getAllFilenamesByPath(path);
@@ -158,64 +216,6 @@ public class PortalPublicationService {
     } catch (BucketException e) {
       throw new PublishException("Could not save LDML to bucket.", e);
     }
-  }
-
-  /**
-   * Delete the documentation unit with the given documentNumber, including all attachments, from
-   * the portal bucket.
-   *
-   * @param documentNumber the document number of the documentation unit to be deleted.
-   */
-  public PortalPublicationResult deleteDocumentationUnit(String documentNumber) {
-    try {
-      var deletableFiles = portalBucket.getAllFilenamesByPath(documentNumber + "/");
-      deletableFiles.forEach(portalBucket::delete);
-      return new PortalPublicationResult(List.of(), deletableFiles);
-    } catch (BucketException e) {
-      throw new PublishException("Could not delete LDML from bucket.", e);
-    }
-  }
-
-  /**
-   * Generates a changelog file to trigger a full re-indexing of all documents in the bucket
-   *
-   * @throws JsonProcessingException if the changelog cannot be generated.
-   */
-  public void uploadFullReindexChangelog() throws JsonProcessingException {
-    if (featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
-      return; // only needed for testphase portal
-    }
-    uploadChangelog(null, null, true);
-  }
-
-  /**
-   * Generates a changelog file with the given parameters and saves it to the portal bucket.
-   *
-   * @param publishedDocumentNumbers the document numbers of the documentation units which have been
-   *     changed or added.
-   * @param deletedDocumentNumbers the document numbers of the documentation units which have been
-   *     deleted.
-   * @throws JsonProcessingException if the changelog cannot be generated.
-   */
-  public void uploadChangelog(
-      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
-      throws JsonProcessingException {
-    if (!featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
-      return;
-    }
-    uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers, false);
-  }
-
-  /**
-   * Generates a changelog file with the given parameters and saves it to the portal bucket.
-   *
-   * @param deletedDocumentNumbers the document numbers of the documentation units which have been
-   *     deleted.
-   * @throws JsonProcessingException if the changelog cannot be generated.
-   */
-  public void uploadDeletionChangelog(List<String> deletedDocumentNumbers)
-      throws JsonProcessingException {
-    uploadChangelog(null, deletedDocumentNumbers, false);
   }
 
   private void uploadChangelog(
