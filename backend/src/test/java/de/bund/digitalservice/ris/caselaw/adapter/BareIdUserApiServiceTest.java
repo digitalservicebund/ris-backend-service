@@ -69,7 +69,7 @@ class BareIdUserApiServiceTest {
 
     var attributes =
         Map.of(
-            "firstName", new BareUserApiResponse.AttributeValues(List.of("Tina")),
+            "firstName", new BareUserApiResponse.AttributeValues(List.of("Foo")),
             "lastName", new BareUserApiResponse.AttributeValues(List.of("Taxpayer")));
 
     BareUserApiResponse.BareUser user = generateBareUser(userId, attributes);
@@ -89,7 +89,8 @@ class BareIdUserApiServiceTest {
 
     var userResult = bareIdUserApiService.getUser(userId);
 
-    Assertions.assertEquals("Tina Taxpayer", userResult.name());
+    Assertions.assertEquals("Foo Taxpayer", userResult.name());
+    Assertions.assertEquals("FT", userResult.initials());
     Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
     Assertions.assertEquals(userId, userResult.id());
   }
