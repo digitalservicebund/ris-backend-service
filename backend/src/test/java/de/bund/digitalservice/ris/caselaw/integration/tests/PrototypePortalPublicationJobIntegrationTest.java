@@ -63,7 +63,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   static class PortalPublicationConfig {
     @Bean
     @Primary
-    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer prototypePortalTransformer(
+    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer reducedLdmlTransformer(
         DocumentBuilderFactory documentBuilderFactory) {
       return new ReducedLdmlTransformer(documentBuilderFactory);
     }

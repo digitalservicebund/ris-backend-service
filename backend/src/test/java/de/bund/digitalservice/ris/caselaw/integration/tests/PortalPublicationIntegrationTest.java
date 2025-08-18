@@ -51,15 +51,15 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
-@Import({StagingPortalPublicationServiceIntegrationTest.PortalPublicationConfig.class})
-class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest {
+@Import({PortalPublicationIntegrationTest.PortalPublicationConfig.class})
+class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
   @TestConfiguration
   static class PortalPublicationConfig {
 
     @Bean
     @Primary
-    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer stagingPortalTransformer(
+    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer fullLdmlTransformer(
         DocumentBuilderFactory documentBuilderFactory) {
       return new FullLdmlTransformer(documentBuilderFactory);
     }

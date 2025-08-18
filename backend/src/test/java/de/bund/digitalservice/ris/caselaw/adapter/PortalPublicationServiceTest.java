@@ -29,8 +29,10 @@ import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -98,6 +100,7 @@ class PortalPublicationServiceTest {
                     .decisionDate(LocalDate.of(2020, 1, 1))
                     .build())
             .documentNumber(testDocumentNumber)
+            .portalPublicationStatus(PortalPublicationStatus.UNPUBLISHED)
             .longTexts(LongTexts.builder().caseFacts("<p>Example content 1</p>").build())
             .shortTexts(ShortTexts.builder().build())
             .previousDecisions(List.of(related1, related2))
@@ -144,11 +147,22 @@ class PortalPublicationServiceTest {
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
+    var updatedDocUnit =
+        testDocumentUnit.toBuilder()
+            .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+            .build();
 
     subject.publishDocumentationUnitWithChangelog(documentationUnitId, null);
 
-    verify(caseLawBucket, times(1))
-        .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
+    verify(caseLawBucket).save(withPrefix(testDocumentNumber), transformed);
+    verify(historyLogService)
+        .saveHistoryLog(
+            testDocumentUnit.uuid(),
+            null,
+            HistoryLogEventType.PORTAL_PUBLICATION,
+            "Dokumentationseinheit veröffentlicht");
+    verify(documentationUnitRepository)
+        .save(updatedDocUnit, null, "Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
   }
 
   @Test
@@ -190,8 +204,7 @@ class PortalPublicationServiceTest {
 
     subject.publishDocumentationUnit(testDocumentNumber);
 
-    verify(caseLawBucket, times(1))
-        .save(testDocumentNumber + "/" + testDocumentNumber + ".xml", transformed);
+    verify(caseLawBucket, times(1)).save(withPrefix(testDocumentNumber), transformed);
     verify(caseLawBucket, times(1)).saveBytes(testDocumentNumber + "/bild1.png", content);
     verify(caseLawBucket, never())
         .saveBytes(eq(testDocumentNumber + "/originalenscheidung"), any(byte[].class));
@@ -235,22 +248,14 @@ class PortalPublicationServiceTest {
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
     when(caseLawBucket.getAllFilenamesByPath(testDocumentUnit.documentNumber() + "/"))
-        .thenReturn(
-            new ArrayList<>(),
-            List.of(
-                testDocumentUnit.documentNumber()
-                    + "/"
-                    + testDocumentUnit.documentNumber()
-                    + ".xml"));
+        .thenReturn(new ArrayList<>(), List.of(withPrefix(testDocumentNumber)));
 
     when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, null))
         .withMessageContaining("Could not save changelog to bucket");
-    verify(caseLawBucket)
-        .delete(
-            testDocumentUnit.documentNumber() + "/" + testDocumentUnit.documentNumber() + ".xml");
+    verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
   }
 
   @Test
@@ -261,23 +266,15 @@ class PortalPublicationServiceTest {
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of("<akn:akomaNtoso />"));
-    when(caseLawBucket.getAllFilenamesByPath(testDocumentUnit.documentNumber() + "/"))
-        .thenReturn(
-            new ArrayList<>(),
-            List.of(
-                testDocumentUnit.documentNumber()
-                    + "/"
-                    + testDocumentUnit.documentNumber()
-                    + ".xml"));
+    when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(new ArrayList<>(), List.of(withPrefix(testDocumentNumber)));
 
     doThrow(BucketException.class).when(caseLawBucket).save(contains("changelogs/"), anyString());
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.publishDocumentationUnitWithChangelog(documentationUnitId, null))
         .withMessageContaining("Could not save changelog to bucket");
-    verify(caseLawBucket)
-        .delete(
-            testDocumentUnit.documentNumber() + "/" + testDocumentUnit.documentNumber() + ".xml");
+    verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
   }
 
   @Test
@@ -346,24 +343,35 @@ class PortalPublicationServiceTest {
   @Test
   void delete_shouldDeleteFromBucket() {
     when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
-        .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
+        .thenReturn(List.of(withPrefix(testDocumentNumber)));
 
     subject.deleteDocumentationUnit(testDocumentNumber);
 
-    verify(caseLawBucket, times(1)).delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
+    verify(caseLawBucket, times(1)).delete(withPrefix(testDocumentNumber));
   }
 
   @Test
   void delete_withBucketException_shouldThrowPublishException() {
     when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
-        .thenReturn(List.of(testDocumentNumber + "/" + testDocumentNumber + ".xml"));
-    doThrow(BucketException.class)
-        .when(caseLawBucket)
-        .delete(testDocumentNumber + "/" + testDocumentNumber + ".xml");
+        .thenReturn(List.of(withPrefix(testDocumentNumber)));
+    doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
 
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.deleteDocumentationUnit(testDocumentNumber))
         .withMessageContaining("Could not delete LDML from bucket.");
+  }
+
+  @Test
+  void uploadChangelog_shouldUpload() throws JsonProcessingException {
+    var changelogContent =
+        """
+        {"changed":["1/1.xml"],"deleted":[]}
+        """;
+    when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
+
+    subject.uploadChangelog(List.of("123/123.xml"), List.of("456/456.xml"));
+
+    verify(caseLawBucket).save(contains("changelogs/"), eq(changelogContent));
   }
 
   @Test
@@ -373,5 +381,45 @@ class PortalPublicationServiceTest {
     subject.uploadChangelog(List.of(), List.of());
 
     verify(caseLawBucket, never()).save(contains("changelogs/"), anyString());
+  }
+
+  @Test
+  void uploadDeletionChangelog_shouldUpload() throws JsonProcessingException {
+    var changelogContent =
+        """
+        {"deleted":[123/123.xml]}
+        """;
+    when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
+
+    subject.uploadDeletionChangelog(List.of("123/123.xml"));
+
+    verify(caseLawBucket).save(contains("changelogs/"), eq(changelogContent));
+  }
+
+  @Test
+  void uploadFullReindexChangelog_withFeatureEnabled_shouldNotUpload()
+      throws JsonProcessingException {
+    subject.uploadFullReindexChangelog();
+
+    verify(caseLawBucket, never()).save(contains("changelogs/"), anyString());
+  }
+
+  @Test
+  void uploadFullReindexChangelog_withFeatureDisabled_shouldUpload()
+      throws JsonProcessingException {
+    var changelogContent =
+        """
+        {"changeAll":true}
+        """;
+    when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
+    when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(false);
+
+    subject.uploadFullReindexChangelog();
+
+    verify(caseLawBucket).save(contains("changelogs/"), eq(changelogContent));
+  }
+
+  private String withPrefix(String documentNumber) {
+    return documentNumber + "/" + documentNumber + ".xml";
   }
 }

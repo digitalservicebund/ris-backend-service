@@ -237,14 +237,16 @@ public class PortalPublicationService {
   }
 
   private void updatePortalPublicationStatus(DocumentationUnit documentationUnit, User user) {
+    var oldStatus = documentationUnit.portalPublicationStatus();
     if (documentationUnit instanceof Decision decision) {
       documentationUnit =
           decision.toBuilder().portalPublicationStatus(PortalPublicationStatus.PUBLISHED).build();
-    } else if (documentationUnit instanceof PendingProceeding pendingProceeding) {
-      documentationUnit =
-          pendingProceeding.toBuilder()
-              .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
-              .build();
+    } else if (documentationUnit instanceof PendingProceeding) {
+      return;
+      //      documentationUnit =
+      //          pendingProceeding.toBuilder()
+      //              .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+      //              .build();
     }
     historyLogService.saveHistoryLog(
         documentationUnit.uuid(),
@@ -252,6 +254,11 @@ public class PortalPublicationService {
         HistoryLogEventType.PORTAL_PUBLICATION,
         "Dokumentationseinheit veröffentlicht");
     documentationUnitRepository.save(
-        documentationUnit, null, "Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
+        documentationUnit,
+        null,
+        "Status im Portal geändert: "
+            + oldStatus.humanReadable
+            + " → "
+            + PortalPublicationStatus.PUBLISHED.humanReadable);
   }
 }

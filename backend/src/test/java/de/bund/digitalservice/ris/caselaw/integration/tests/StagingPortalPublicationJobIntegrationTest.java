@@ -65,7 +65,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     @Bean
     @Primary
-    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer stagingPortalTransformer(
+    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer fullLdmlTransformer(
         DocumentBuilderFactory documentBuilderFactory) {
       return new FullLdmlTransformer(documentBuilderFactory);
     }

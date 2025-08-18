@@ -13,20 +13,19 @@ public class PortalPublicationConfig {
 
   @Bean
   @Profile({"production"})
-  public PortalTransformer prototypePortalTransformer(
-      DocumentBuilderFactory documentBuilderFactory) {
+  public PortalTransformer reducedLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     return new ReducedLdmlTransformer(documentBuilderFactory);
   }
 
   @Bean
   @Profile({"staging", "local"})
-  public PortalTransformer stagingPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public PortalTransformer fullLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     return new FullLdmlTransformer(documentBuilderFactory);
   }
 
   @Bean
   @Profile({"!staging & !production & !local"})
-  public PortalTransformer defaultPortalTransformer(DocumentBuilderFactory documentBuilderFactory) {
+  public PortalTransformer defaultLdmlTransformer(DocumentBuilderFactory documentBuilderFactory) {
     return new ReducedLdmlTransformer(documentBuilderFactory);
   }
 }
