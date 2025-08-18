@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
-import static de.bund.digitalservice.ris.caselaw.domain.PubcliationJobStatus.SUCCESS;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationJobStatus.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -27,7 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublication
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.ReducedLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.PubcliationJobStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationJobStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -214,7 +214,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
             portalPublicationJobRepository.findAll().stream()
                 .map(PortalPublicationJobDTO::getPublicationJobStatus)
                 .toList())
-        .isEqualTo(List.of(PubcliationJobStatus.ERROR, PubcliationJobStatus.SUCCESS));
+        .isEqualTo(List.of(PublicationJobStatus.ERROR, PublicationJobStatus.SUCCESS));
   }
 
   @Test
@@ -237,7 +237,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
                 .map(PortalPublicationJobDTO::getPublicationJobStatus)
                 .toList())
         .hasSize(1)
-        .isEqualTo(List.of(PubcliationJobStatus.SUCCESS));
+        .isEqualTo(List.of(PublicationJobStatus.SUCCESS));
   }
 
   @Test
@@ -267,7 +267,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     return PortalPublicationJobDTO.builder()
         .documentNumber(dto.getDocumentNumber())
         .createdAt(Instant.now())
-        .publicationJobStatus(PubcliationJobStatus.PENDING)
+        .publicationJobStatus(PublicationJobStatus.PENDING)
         .publicationJobType(publicationType)
         .build();
   }

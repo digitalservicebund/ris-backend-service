@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
-import de.bund.digitalservice.ris.caselaw.domain.PubcliationJobStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationJobStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.List;
@@ -59,7 +59,7 @@ class PortalPublicationJobServiceTest {
     //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of("123.xml"),
     // List.of());
     verify(publicationJobRepository, times(1)).saveAll(jobs);
-    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PubcliationJobStatus.SUCCESS);
+    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PublicationJobStatus.SUCCESS);
   }
 
   @Test
@@ -75,7 +75,7 @@ class PortalPublicationJobServiceTest {
     //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(),
     // List.of("456.xml"));
     verify(publicationJobRepository, times(1)).saveAll(jobs);
-    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PubcliationJobStatus.SUCCESS);
+    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PublicationJobStatus.SUCCESS);
   }
 
   @Test
@@ -91,7 +91,7 @@ class PortalPublicationJobServiceTest {
     verify(portalPublicationService, never()).deleteDocumentationUnit(anyString());
     verify(portalPublicationService, never()).uploadChangelog(any(), any());
     verify(publicationJobRepository, times(1)).saveAll(jobs);
-    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PubcliationJobStatus.ERROR);
+    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PublicationJobStatus.ERROR);
   }
 
   @Test
@@ -107,7 +107,7 @@ class PortalPublicationJobServiceTest {
     verify(portalPublicationService, times(1)).deleteDocumentationUnit("312");
     verify(portalPublicationService, never()).uploadChangelog(any(), any());
     verify(publicationJobRepository, times(1)).saveAll(jobs);
-    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PubcliationJobStatus.ERROR);
+    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PublicationJobStatus.ERROR);
   }
 
   @Test
@@ -125,7 +125,7 @@ class PortalPublicationJobServiceTest {
     //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(),
     // List.of("312.xml"));
     verify(publicationJobRepository, times(1)).saveAll(jobs);
-    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PubcliationJobStatus.SUCCESS);
+    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PublicationJobStatus.SUCCESS);
   }
 
   @Test
@@ -152,18 +152,18 @@ class PortalPublicationJobServiceTest {
     //    verify(publicPortalPublicationService, times(1))
     //        .uploadChangelog(List.of("3.xml", "5.xml"), List.of("4.xml"));
     verify(publicationJobRepository, times(1)).saveAll(jobs);
-    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PubcliationJobStatus.ERROR);
-    assertThat(jobs.get(1).getPublicationJobStatus()).isEqualTo(PubcliationJobStatus.ERROR);
-    assertThat(jobs.get(2).getPublicationJobStatus()).isEqualTo(PubcliationJobStatus.SUCCESS);
-    assertThat(jobs.get(3).getPublicationJobStatus()).isEqualTo(PubcliationJobStatus.SUCCESS);
-    assertThat(jobs.get(4).getPublicationJobStatus()).isEqualTo(PubcliationJobStatus.SUCCESS);
+    assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PublicationJobStatus.ERROR);
+    assertThat(jobs.get(1).getPublicationJobStatus()).isEqualTo(PublicationJobStatus.ERROR);
+    assertThat(jobs.get(2).getPublicationJobStatus()).isEqualTo(PublicationJobStatus.SUCCESS);
+    assertThat(jobs.get(3).getPublicationJobStatus()).isEqualTo(PublicationJobStatus.SUCCESS);
+    assertThat(jobs.get(4).getPublicationJobStatus()).isEqualTo(PublicationJobStatus.SUCCESS);
   }
 
   private PortalPublicationJobDTO createPublicationJob(String docNumber, PublicationJobType type) {
     return PortalPublicationJobDTO.builder()
         .documentNumber(docNumber)
         .publicationJobType(type)
-        .publicationJobStatus(PubcliationJobStatus.PENDING)
+        .publicationJobStatus(PublicationJobStatus.PENDING)
         .build();
   }
 }
