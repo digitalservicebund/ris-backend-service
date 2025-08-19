@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -164,6 +165,8 @@ public interface DocumentationUnitRepository {
   List<Decision> getScheduledDocumentationUnitsDueNow();
 
   List<String> findAllDocumentNumbersByMatchingPublishCriteria();
+
+  Set<String> findAllPublishedDocumentNumbers();
 
   void saveProcessSteps(DocumentationUnit documentationUnit);
 

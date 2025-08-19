@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -49,4 +50,12 @@ public interface DatabaseDocumentationUnitRepository
           OR (o.abbreviation = 'juris' AND c.type = 'BPatG'))
     """)
   List<String> getAllMatchingPublishCriteria();
+
+  @Query(
+      value =
+          """
+SELECT d.documentNumber FROM DocumentationUnitDTO d
+  WHERE d.portalPublicationStatus = 'PUBLISHED'
+            """)
+  Set<String> findAllPublishedDocumentNumbers();
 }

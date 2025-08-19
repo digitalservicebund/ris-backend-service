@@ -6,7 +6,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.core.read.ListAppender;
+import java.util.List;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.KeyValuePair;
 
 public class TestMemoryAppender extends ListAppender<ILoggingEvent> {
   private final Logger logger;
@@ -41,6 +43,20 @@ public class TestMemoryAppender extends ListAppender<ILoggingEvent> {
     }
 
     return "no logging message";
+  }
+
+  public List<KeyValuePair> getKeyValuePairs(Level level, int index) {
+    var keyValueList =
+        list.stream()
+            .filter(event -> event.getLevel() == level)
+            .map(ILoggingEvent::getKeyValuePairs)
+            .toList();
+
+    if (keyValueList.size() > index) {
+      return keyValueList.get(index);
+    }
+
+    return null;
   }
 
   public IThrowableProxy getCause(Level level, int index) {
