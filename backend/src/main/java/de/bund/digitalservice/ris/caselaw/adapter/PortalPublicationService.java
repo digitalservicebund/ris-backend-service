@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.List;
 import java.util.UUID;
@@ -19,4 +21,7 @@ public interface PortalPublicationService {
       throws JsonProcessingException;
 
   void uploadFullReindexChangelog() throws JsonProcessingException;
+
+  LdmlTransformationResult createLdmlPreview(UUID documentUuid)
+      throws DocumentationUnitNotExistsException, LdmlTransformationException;
 }

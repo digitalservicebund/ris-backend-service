@@ -242,3 +242,9 @@ export type ExtraContentSidePanelProps = {
   icon?: Component
   jumpToMatch?: (match: Match) => void
 }
+
+export type LdmlPreview = {
+  ldml?: string
+  success?: boolean
+  statusMessages?: string[]
+}

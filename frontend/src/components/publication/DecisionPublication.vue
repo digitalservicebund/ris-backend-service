@@ -1,17 +1,44 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { storeToRefs } from "pinia"
+import { computed, onMounted, Ref, ref } from "vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
+import InfoModal from "@/components/InfoModal.vue"
+import { LdmlPreview } from "@/components/input/types"
 import DecisionPlausibilityCheck from "@/components/publication/DecisionPlausibilityCheck.vue"
 import PublicationActions from "@/components/publication/PublicationActions.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
+import { Decision } from "@/domain/decision"
+import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
+const store = useDocumentUnitStore()
+const { documentUnit: decision } = storeToRefs(store) as {
+  documentUnit: Ref<Decision | undefined>
+}
 const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
 const isPlausibilityCheckValid = ref(false)
 const isPublishable = computed(
   () => isPlausibilityCheckValid.value && isPortalPublicationEnabled.value,
 )
+const preview = ref<LdmlPreview>()
+const previewError = ref()
+const fetchPreview = async () => {
+  if (isPublishable.value) return
+
+  const previewResponse = await publishDocumentationUnitService.getPreview(
+    decision.value!.uuid,
+  )
+  if (previewResponse.error) {
+    previewError.value = previewResponse.error
+  } else if (previewResponse.data?.ldml) {
+    preview.value = previewResponse.data
+  }
+}
+onMounted(async () => {
+  await fetchPreview()
+})
 </script>
 
 <template>
@@ -25,16 +52,23 @@ const isPublishable = computed(
       />
       <div class="border-b-1 border-b-gray-400"></div>
       <ExpandableContent
-        v-if="isPlausibilityCheckValid"
+        v-if="isPlausibilityCheckValid && preview?.success && !!preview.ldml"
         as-column
         class="border-b-1 border-gray-400 pb-24"
-        header="XML Vorschau"
+        :data-set="preview"
+        header="LDML Vorschau"
         header-class="ris-body1-bold"
         :is-expanded="false"
-        title="XML Vorschau"
+        title="LDML Vorschau"
       >
-        <CodeSnippet title="" :xml="'<?xml>' + '\nNoch nicht implementiert'" />
+        <CodeSnippet title="" :xml="preview.ldml" />
       </ExpandableContent>
+      <InfoModal
+        v-if="isPlausibilityCheckValid && previewError"
+        aria-label="Fehler beim Laden der LDML-Vorschau"
+        :description="previewError.description"
+        :title="previewError.title"
+      />
       <PublicationActions :is-publishable="isPublishable" />
     </div>
   </div>

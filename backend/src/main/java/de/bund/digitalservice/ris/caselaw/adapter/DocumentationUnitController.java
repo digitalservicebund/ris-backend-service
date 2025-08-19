@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment2Html;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -23,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Kind;
+import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
@@ -50,6 +52,7 @@ import org.apache.coyote.BadRequestException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.mapping.MappingException;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -568,6 +571,31 @@ public class DocumentationUnitController {
           singleNormValidationInfo.singleNorm(),
           ex);
       return ResponseEntity.internalServerError().build();
+    }
+  }
+
+  /**
+   * Get the LDML preview of a documentation unit.
+   *
+   * @param uuid UUID of the documentation unit
+   * @return the LDML preview or an empty response with status code 400 if the user is not
+   *     authorized or an empty response if the documentation unit does not exist
+   */
+  @GetMapping(value = "/{uuid}/preview-ldml", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
+  public LdmlTransformationResult getLdmlPreview(@PathVariable UUID uuid) {
+    try {
+      return portalPublicationService.createLdmlPreview(uuid);
+    } catch (DocumentationUnitNotExistsException e) {
+      return LdmlTransformationResult.builder()
+          .success(false)
+          .statusMessages(List.of("Das Dokument existiert nicht."))
+          .build();
+    } catch (LdmlTransformationException | MappingException | DocumentationUnitException e) {
+      return LdmlTransformationResult.builder()
+          .success(false)
+          .statusMessages(List.of(e.getMessage()))
+          .build();
     }
   }
 
