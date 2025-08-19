@@ -4,30 +4,35 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class TestphasePortalSanityCheckService {
+public class PortalSanityCheckService {
 
   private final PortalPublicationService portalPublicationService;
   private final RiiService riiService;
   private final DocumentationUnitRepository documentationUnitRepository;
   private final PortalBucket portalBucket;
+  private final Environment env;
 
-  public TestphasePortalSanityCheckService(
+  public PortalSanityCheckService(
       PortalPublicationService portalPublicationService,
       RiiService riiService,
       DocumentationUnitRepository documentationUnitRepository,
-      PortalBucket portalBucket) {
+      PortalBucket portalBucket,
+      Environment env) {
     this.portalPublicationService = portalPublicationService;
     this.riiService = riiService;
     this.documentationUnitRepository = documentationUnitRepository;
     this.portalBucket = portalBucket;
+    this.env = env;
   }
 
   //                        ↓ day of month (1-31)
@@ -38,18 +43,23 @@ public class TestphasePortalSanityCheckService {
   @Scheduled(cron = "0 30 5 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "portal-publication-diff-job", lockAtMostFor = "PT15M")
   public void logPortalPublicationSanityCheck() {
-    List<String> portalBucketDocumentNumbers =
+    Set<String> portalBucketDocumentNumbers =
         portalBucket.getAllFilenames().stream()
             .filter(fileName -> fileName.contains(".xml"))
             .map(fileName -> fileName.substring(fileName.lastIndexOf("/") + 1))
             .map(fileName -> fileName.substring(0, fileName.lastIndexOf('.')))
-            .toList();
+            .collect(Collectors.toSet());
 
-    logDatabaseToBucketDiff(portalBucketDocumentNumbers);
-    logBucketToRechtsprechungImInternetDiff(portalBucketDocumentNumbers);
+    logPublicationStatusDiff(portalBucketDocumentNumbers);
+
+    // These checks are only relevant for the Testphase portal
+    if (env.matchesProfiles("production")) {
+      logDatabaseToBucketDiff(portalBucketDocumentNumbers);
+      logBucketToRechtsprechungImInternetDiff(portalBucketDocumentNumbers);
+    }
   }
 
-  private void logBucketToRechtsprechungImInternetDiff(List<String> portalBucketDocumentNumbers) {
+  private void logBucketToRechtsprechungImInternetDiff(Set<String> portalBucketDocumentNumbers) {
     log.info(
         "Checking for discrepancies between published doc units and Rechtsprechung im Internet...");
 
@@ -97,7 +107,7 @@ public class TestphasePortalSanityCheckService {
     }
   }
 
-  private void logDatabaseToBucketDiff(List<String> portalBucketDocumentNumbers) {
+  private void logDatabaseToBucketDiff(Set<String> portalBucketDocumentNumbers) {
     List<String> databaseDocumentNumbers =
         documentationUnitRepository.findAllDocumentNumbersByMatchingPublishCriteria();
     List<String> inBucketNotInDatabase =
@@ -125,6 +135,45 @@ public class TestphasePortalSanityCheckService {
       log.info(
           "Document numbers found in bucket but not in database: {}",
           inBucketNotInDatabase.stream().map(Object::toString).collect(Collectors.joining(", ")));
+    }
+  }
+
+  private void logPublicationStatusDiff(Set<String> portalBucketDocumentNumbers) {
+    Set<String> databasePublishedDocumentNumbers =
+        documentationUnitRepository.findAllPublishedDocumentNumbers();
+    List<String> inBucketNotInDatabase =
+        portalBucketDocumentNumbers.stream()
+            .filter(documentNumber -> !databasePublishedDocumentNumbers.contains(documentNumber))
+            .toList();
+
+    List<String> inDatabaseNotInBucket =
+        databasePublishedDocumentNumbers.stream()
+            .filter(documentNumber -> !portalBucketDocumentNumbers.contains(documentNumber))
+            .toList();
+
+    log.atInfo()
+        .setMessage(
+            "Finished sanity check for published doc units. Compared published doc units in db (status=PUBLISHED) and in bucket (LDML exists).")
+        .addKeyValue("inDatabase", databasePublishedDocumentNumbers.size())
+        .addKeyValue("inBucket", portalBucketDocumentNumbers.size())
+        .addKeyValue("inBucketNotInDatabase", inBucketNotInDatabase.size())
+        .addKeyValue("inDatabaseNotInBucket", inDatabaseNotInBucket.size())
+        .log();
+
+    if (!inDatabaseNotInBucket.isEmpty()) {
+      String docNumbersInDatabaseNotInBucket = String.join(", ", inDatabaseNotInBucket);
+      log.atError()
+          .setMessage("Published document numbers found in database but not in bucket")
+          .addKeyValue("inDatabaseNotInBucket", docNumbersInDatabaseNotInBucket)
+          .log();
+    }
+
+    if (!inBucketNotInDatabase.isEmpty()) {
+      String docNumbersInBucketNotInDatabase = String.join(", ", inBucketNotInDatabase);
+      log.atError()
+          .setMessage("Published document numbers found in bucket but not in database")
+          .addKeyValue("inBucketNotInDatabase", docNumbersInBucketNotInDatabase)
+          .log();
     }
   }
 }

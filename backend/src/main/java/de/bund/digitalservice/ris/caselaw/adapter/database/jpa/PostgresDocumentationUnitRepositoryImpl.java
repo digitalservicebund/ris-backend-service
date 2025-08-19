@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -969,5 +970,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Override
   public List<String> findAllDocumentNumbersByMatchingPublishCriteria() {
     return repository.getAllMatchingPublishCriteria();
+  }
+
+  @Override
+  public Set<String> findAllPublishedDocumentNumbers() {
+    return repository.findAllPublishedDocumentNumbers();
   }
 }
