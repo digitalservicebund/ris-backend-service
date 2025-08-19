@@ -168,7 +168,7 @@ class FmxImportServiceTest {
     service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
-        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"), eq(false));
     Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuGH");
     assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("C-303/22");
@@ -215,7 +215,7 @@ class FmxImportServiceTest {
     service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
-        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"), eq(false));
     Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuG");
     assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("T-235/18");
@@ -262,7 +262,7 @@ class FmxImportServiceTest {
     service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
-        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"), eq(false));
     Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.coreData().court().label()).isEqualTo("EuGH");
     assertThat(savedDocUnit.coreData().fileNumbers().getFirst()).isEqualTo("Avis 1/13");
@@ -306,7 +306,7 @@ class FmxImportServiceTest {
     service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
-        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"), eq(false));
     Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Urteil");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Unterschriften");
@@ -352,7 +352,7 @@ class FmxImportServiceTest {
     service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
-        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"), eq(false));
     Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Beschluss");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Luxemburg, den");
@@ -399,7 +399,7 @@ class FmxImportServiceTest {
     service.getDataFromEurlex(celexNumber, decision, user);
 
     verify(documentationUnitRepository)
-        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"));
+        .save(docUnitCaptor.capture(), eq(user), eq("EU-Entscheidung angelegt für DS"), eq(false));
     Decision savedDocUnit = docUnitCaptor.getValue();
     assertThat(savedDocUnit.longTexts().reasons()).contains("Gutachten");
     assertThat(savedDocUnit.longTexts().reasons()).contains("Unterschriften");

@@ -6,10 +6,12 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginWithDocOf
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import java.util.UUID;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.testcontainers.shaded.org.checkerframework.checker.nullness.qual.Nullable;
 
 public class RisWebTestClient {
   private final MockMvc mockMvc;
@@ -29,12 +31,28 @@ public class RisWebTestClient {
     }
   }
 
+  /**
+   * Performs a request with a default internal login, generating a random user ID.
+   *
+   * @return A RisRequestSpec for building the request.
+   */
   public RisRequestSpec withDefaultLogin() {
-    return new RisRequestSpec(mockMvc, objectMapper, getMockLogin(), csrfCookie);
+    return new RisRequestSpec(
+        mockMvc, objectMapper, getMockLogin(null), csrfCookie); // Pass null to generate random ID
+  }
+
+  /**
+   * Performs a request with a default internal login, using a specified user ID.
+   *
+   * @param userId The UUID to use for the mocked user's 'sub' claim.
+   * @return A RisRequestSpec for building the request.
+   */
+  public RisRequestSpec withDefaultLogin(@Nullable UUID userId) {
+    return new RisRequestSpec(mockMvc, objectMapper, getMockLogin(userId), csrfCookie);
   }
 
   public RisRequestSpec withExternalLogin() {
-    return new RisRequestSpec(mockMvc, objectMapper, getMockLoginExternal(), csrfCookie);
+    return new RisRequestSpec(mockMvc, objectMapper, getMockLoginExternal(null), csrfCookie);
   }
 
   public RisRequestSpec withLogin(String docOfficeGroup) {
@@ -43,7 +61,7 @@ public class RisWebTestClient {
 
   public RisRequestSpec withLogin(String docOfficeGroup, String role) {
     return new RisRequestSpec(
-        mockMvc, objectMapper, getMockLoginWithDocOffice(docOfficeGroup, role), csrfCookie);
+        mockMvc, objectMapper, getMockLoginWithDocOffice(docOfficeGroup, role, null), csrfCookie);
   }
 
   public RisRequestSpec withoutAuthentication() {

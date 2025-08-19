@@ -601,7 +601,7 @@ class DocumentationUnitServiceTest {
     var du = service.updateDocumentationUnit(decision);
     assertEquals(du, decision);
 
-    verify(repository).save(decision, null);
+    verify(repository).save(decision, null, null, false);
   }
 
   @Test

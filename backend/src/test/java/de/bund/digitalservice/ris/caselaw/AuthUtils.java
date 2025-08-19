@@ -18,19 +18,23 @@ import java.util.Objects;
 import java.util.UUID;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor;
+import org.testcontainers.shaded.org.checkerframework.checker.nullness.qual.Nullable;
 
 public class AuthUtils {
 
-  public static OidcLoginRequestPostProcessor getMockLogin() {
-    return getMockLoginWithDocOffice("/DS", "Internal");
+  // Updated to accept a nullable userId
+  public static OidcLoginRequestPostProcessor getMockLogin(@Nullable UUID userId) {
+    return getMockLoginWithDocOffice("/DS", "Internal", userId);
   }
 
-  public static OidcLoginRequestPostProcessor getMockLoginExternal() {
-    return getMockLoginWithDocOffice("/DS/Extern", "External");
+  // Updated to accept a nullable userId
+  public static OidcLoginRequestPostProcessor getMockLoginExternal(@Nullable UUID userId) {
+    return getMockLoginWithDocOffice("/DS/Extern", "External", userId);
   }
 
+  // Modified method to accept a nullable userId for the 'sub' claim
   public static OidcLoginRequestPostProcessor getMockLoginWithDocOffice(
-      String docOfficeGroup, String role) {
+      String docOfficeGroup, String role, @Nullable UUID userId) { // userId is now nullable
     return oidcLogin()
         .idToken(
             token ->
@@ -38,9 +42,10 @@ public class AuthUtils {
                     claims -> {
                       claims.put("groups", Collections.singletonList(docOfficeGroup));
                       claims.put("roles", Collections.singletonList(role));
-                      claims.put("name", "testUser");
+                      claims.put("name", "testUser"); // This is the name from OIDC token
                       claims.put("email", "test@test.com");
-                      claims.put("sub", UUID.randomUUID().toString());
+                      // If userId is null, generate a random one
+                      claims.put("sub", (userId != null ? userId : UUID.randomUUID()).toString());
                     }));
   }
 
