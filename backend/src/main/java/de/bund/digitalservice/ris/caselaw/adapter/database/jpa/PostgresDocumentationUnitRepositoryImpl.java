@@ -621,8 +621,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             currentUser,
             HistoryLogEventType.PROCESS_STEP,
             description,
-            currentDocumentationUnitProcessStepDTOFromDB,
-            newDocumentationUnitProcessStepDTO);
+            DocumentationUnitProcessStepTransformer.toDomain(
+                currentDocumentationUnitProcessStepDTOFromDB),
+            DocumentationUnitProcessStepTransformer.toDomain(newDocumentationUnitProcessStepDTO));
       }
       if (userChanged) {
         historyLogService.saveProcessStepHistoryLog(
@@ -630,8 +631,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             currentUser,
             HistoryLogEventType.PROCESS_STEP_USER,
             null, // description will be set dynamically in transformer.toDomain
-            currentDocumentationUnitProcessStepDTOFromDB,
-            newDocumentationUnitProcessStepDTO);
+            DocumentationUnitProcessStepTransformer.toDomain(
+                currentDocumentationUnitProcessStepDTOFromDB),
+            DocumentationUnitProcessStepTransformer.toDomain(newDocumentationUnitProcessStepDTO));
       }
     }
     return processStepChanged;

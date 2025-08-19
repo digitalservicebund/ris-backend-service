@@ -1,8 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDocumentationUnitProcessStepDTO;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -17,23 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class DocumentationUnitHistoryLogService {
   private final DocumentationUnitHistoryLogRepository repository;
-  private final HistoryLogDocumentationUnitProcessStepRepository
-      historyLogDocumentationUnitProcessStepRepository;
 
-  public DocumentationUnitHistoryLogService(
-      DocumentationUnitHistoryLogRepository repository,
-      HistoryLogDocumentationUnitProcessStepRepository
-          historyLogDocumentationUnitProcessStepRepository) {
+  public DocumentationUnitHistoryLogService(DocumentationUnitHistoryLogRepository repository) {
     this.repository = repository;
-    this.historyLogDocumentationUnitProcessStepRepository =
-        historyLogDocumentationUnitProcessStepRepository;
   }
 
   public List<HistoryLog> getHistoryLogs(UUID documentationUnitId, User user) {
     return repository.findByDocumentationUnitId(documentationUnitId, user);
   }
 
-  public HistoryLogDTO saveHistoryLog(
+  public void saveHistoryLog(
       UUID documentationUnitId,
       @Nullable User user,
       HistoryLogEventType eventType,
@@ -45,32 +35,31 @@ public class DocumentationUnitHistoryLogService {
           findUpdateHistoryLogForToday(documentationUnitId, user).map(HistoryLog::id).orElse(null);
     }
 
-    return repository.saveHistoryLog(
-        existingLogId, documentationUnitId, user, eventType, description);
+    repository.saveHistoryLog(existingLogId, documentationUnitId, user, eventType, description);
   }
 
+  /**
+   * Saves a history log entry specifically for process step changes, including from/to user
+   * context. This method now accepts domain objects for process steps.
+   *
+   * @param documentationUnitId The UUID of the documentation unit.
+   * @param user The user performing the action (can be null for system actions).
+   * @param eventType The type of history log event (e.g., PROCESS_STEP_USER).
+   * @param description A description of the event.
+   * @param fromStep The previous process step (domain object).
+   * @param toStep The new process step (domain object).
+   */
   @Transactional
   public void saveProcessStepHistoryLog(
       UUID documentationUnitId,
       @Nullable User user,
       HistoryLogEventType eventType,
       String description,
-      @Nullable DocumentationUnitProcessStepDTO fromStepDto,
-      @Nullable DocumentationUnitProcessStepDTO toStepDto) {
+      @Nullable DocumentationUnitProcessStep fromStep,
+      @Nullable DocumentationUnitProcessStep toStep) {
 
-    HistoryLogDTO savedHistoryLogDto =
-        saveHistoryLog(documentationUnitId, user, eventType, description);
-
-    HistoryLogDocumentationUnitProcessStepDTO historyLogDocumentationUnitProcessStepDTO =
-        HistoryLogDocumentationUnitProcessStepDTO.builder()
-            .createdAt(Instant.now())
-            .historyLog(savedHistoryLogDto)
-            .toDocumentationUnitProcessStep(toStepDto)
-            .fromDocumentationUnitProcessStep(fromStepDto)
-            .build();
-
-    historyLogDocumentationUnitProcessStepRepository.save(
-        historyLogDocumentationUnitProcessStepDTO);
+    repository.saveProcessStepHistoryLog(
+        documentationUnitId, user, eventType, description, fromStep, toStep);
   }
 
   private Optional<HistoryLog> findUpdateHistoryLogForToday(UUID uuid, User user) {

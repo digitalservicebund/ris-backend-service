@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitProcessStepTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HistoryLogTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
@@ -92,7 +94,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
   }
 
   @Override
-  public HistoryLogDTO saveHistoryLog(
+  public void saveHistoryLog(
       UUID existingId,
       UUID documentationUnitId,
       @Nullable User user,
@@ -120,6 +122,48 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
             .description(description)
             .eventType(eventType)
             .build();
-    return databaseRepository.save(dto);
+    databaseRepository.save(dto);
+  }
+
+  @Transactional
+  @Override
+  public void saveProcessStepHistoryLog(
+      UUID documentationUnitId,
+      @Nullable User user,
+      HistoryLogEventType eventType,
+      String description,
+      @Nullable DocumentationUnitProcessStep fromStep,
+      @Nullable DocumentationUnitProcessStep toStep) {
+
+    // Convert domain objects to DTOs for persistence
+    DocumentationUnitProcessStepDTO fromStepDto =
+        Optional.ofNullable(fromStep)
+            .map(DocumentationUnitProcessStepTransformer::toDto)
+            .orElse(null);
+    DocumentationUnitProcessStepDTO toStepDto =
+        Optional.ofNullable(toStep)
+            .map(DocumentationUnitProcessStepTransformer::toDto)
+            .orElse(null);
+
+    HistoryLogDTO historyLogDTO =
+        HistoryLogDTO.builder()
+            .createdAt(Instant.now())
+            .documentationUnitId(documentationUnitId)
+            .userId(user != null ? user.id() : null) // Handle null user for system logs
+            .description(description)
+            .eventType(eventType)
+            .build();
+    databaseRepository.save(historyLogDTO);
+
+    HistoryLogDocumentationUnitProcessStepDTO historyLogDocumentationUnitProcessStepDTO =
+        HistoryLogDocumentationUnitProcessStepDTO.builder()
+            .createdAt(Instant.now())
+            .historyLog(historyLogDTO)
+            .toDocumentationUnitProcessStep(toStepDto)
+            .fromDocumentationUnitProcessStep(fromStepDto)
+            .build();
+
+    historyLogDocumentationUnitProcessStepRepository.save(
+        historyLogDocumentationUnitProcessStepDTO);
   }
 }

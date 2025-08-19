@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -64,6 +66,9 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
   @Autowired private AttachmentRepository attachmentRepository;
   @MockitoSpyBean private DocumentationUnitDocxMetadataInitializationService service;
   @Autowired private DocumentationUnitHistoryLogService historyLogService;
+  @MockitoSpyBean private UserService userService;
+  private final UUID OIDC_LOGGED_IN_USER_ID = UUID.randomUUID();
+  private final DocumentationOffice docOffice = buildDSDocOffice();
 
   @MockitoBean
   @Qualifier("docxS3Client")
@@ -74,6 +79,16 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
   @BeforeEach
   void setUp() {
     dsDocOffice = documentationOfficeRepository.findByAbbreviation("DS");
+    // Mock the UserService.getUser(UUID) for the OIDC logged-in user
+    // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
+    // We need this to assert on history logs
+    when(userService.getUser(OIDC_LOGGED_IN_USER_ID))
+        .thenReturn(
+            User.builder()
+                .id(OIDC_LOGGED_IN_USER_ID)
+                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
+                .documentationOffice(docOffice)
+                .build());
   }
 
   @AfterEach
@@ -92,7 +107,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
         EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
-        .withDefaultLogin()
+        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
         .contentType(
@@ -411,7 +426,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
 
     // Act
     risWebTestClient
-        .withDefaultLogin()
+        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
         .delete()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/fooPath")
         .exchange()
@@ -420,7 +435,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
 
     var docUnit =
         risWebTestClient
-            .withDefaultLogin()
+            .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
             .get()
             .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
             .exchange()

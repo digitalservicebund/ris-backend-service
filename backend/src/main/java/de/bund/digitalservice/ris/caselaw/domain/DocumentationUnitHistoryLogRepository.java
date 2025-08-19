@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -42,10 +41,18 @@ public interface DocumentationUnitHistoryLogRepository {
    * @param user logged-in user for checking view permissions
    * @return
    */
-  HistoryLogDTO saveHistoryLog(
+  void saveHistoryLog(
       UUID id,
       UUID documentationUnitId,
       User user,
       HistoryLogEventType eventType,
       String description);
+
+  void saveProcessStepHistoryLog(
+      UUID documentationUnitId,
+      User user,
+      HistoryLogEventType eventType,
+      String description,
+      DocumentationUnitProcessStep fromStep,
+      DocumentationUnitProcessStep toStep);
 }
