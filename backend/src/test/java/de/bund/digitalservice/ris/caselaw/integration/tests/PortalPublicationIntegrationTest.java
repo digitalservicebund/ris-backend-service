@@ -34,6 +34,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,8 +101,9 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
 
+    UUID userId = UUID.randomUUID();
     risWebTestClient
-        .withDefaultLogin()
+        .withDefaultLogin(userId)
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
         .exchange()
@@ -128,7 +130,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
             historyLog -> {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getUserName()).isEqualTo("testUser");
+              assertThat(historyLog.getUserId()).isEqualTo(userId);
               assertThat(historyLog.getDescription())
                   .isEqualTo("Dokumentationseinheit veröffentlicht");
             },
@@ -136,7 +138,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
               assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
-              assertThat(historyLog.getUserName()).isNull();
+              assertThat(historyLog.getUserId()).isNull();
               assertThat(historyLog.getDescription())
                   .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
             });
