@@ -9,7 +9,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
-import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +35,6 @@ class BareIdUserApiServiceTest {
 
   @MockitoBean RestTemplate restTemplate;
   @MockitoBean BareIdUserApiTokenService bareIdUserApiTokenService;
-  @MockitoBean UserGroupService userGroupService;
 
   String instanceId = UUID.randomUUID().toString();
 
@@ -52,8 +50,7 @@ class BareIdUserApiServiceTest {
   @BeforeEach
   void setUp() {
     bareIdUserApiService =
-        new BareIdUserApiService(
-            bareIdUserApiTokenService, userGroupService, restTemplate, instanceId);
+        new BareIdUserApiService(bareIdUserApiTokenService, restTemplate, instanceId);
 
     mockTokenResponse();
     mockEmptyUserApiResponse(); // return empty list for bgh

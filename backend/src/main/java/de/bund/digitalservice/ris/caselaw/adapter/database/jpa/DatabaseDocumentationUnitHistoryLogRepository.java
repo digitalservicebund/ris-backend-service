@@ -13,9 +13,9 @@ public interface DatabaseDocumentationUnitHistoryLogRepository
     extends JpaRepository<HistoryLogDTO, UUID> {
   List<HistoryLogDTO> findByDocumentationUnitIdOrderByCreatedAtDesc(UUID documentationUnitId);
 
-  Optional<HistoryLogDTO> findFirstByDocumentationUnitIdAndUserIdAndEventTypeAndCreatedAtBetween(
+  Optional<HistoryLogDTO> findFirstByDocumentationUnitIdAndUserNameAndEventTypeAndCreatedAtBetween(
       UUID documentationUnitId,
-      UUID userId,
+      String userName,
       HistoryLogEventType eventType,
       Instant start,
       Instant end);

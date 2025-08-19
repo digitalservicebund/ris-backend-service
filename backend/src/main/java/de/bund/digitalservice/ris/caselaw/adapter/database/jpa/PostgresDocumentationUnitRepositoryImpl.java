@@ -56,7 +56,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Pageable;
@@ -339,13 +338,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(DocumentationUnit documentationUnit) {
-    saveNonTransactional(documentationUnit, null, null, false);
+    saveNonTransactional(documentationUnit, null, null);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
   public void save(DocumentationUnit documentationUnit, @Nullable User currentUser) {
-    saveNonTransactional(documentationUnit, currentUser, null, false);
+    saveNonTransactional(documentationUnit, currentUser, null);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -353,16 +352,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   public void save(
       DocumentationUnit documentationUnit,
       @Nullable User currentUser,
-      @Nullable String description,
-      @Nullable boolean processStepChanged) {
-    saveNonTransactional(documentationUnit, currentUser, description, processStepChanged);
+      @Nullable String description) {
+    saveNonTransactional(documentationUnit, currentUser, description);
   }
 
   private void saveNonTransactional(
-      DocumentationUnit documentationUnit,
-      @Nullable User currentUser,
-      String description,
-      boolean processStepChanged) {
+      DocumentationUnit documentationUnit, @Nullable User currentUser, String description) {
     DocumentationUnitDTO documentationUnitDTO =
         repository.findById(documentationUnit.uuid()).orElse(null);
     if (documentationUnitDTO == null) {
@@ -379,13 +374,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     saveHistoryLogForScheduledPublication(documentationUnit, documentationUnitDTO, currentUser);
 
-    if (!processStepChanged) {
-      historyLogService.saveHistoryLog(
-          documentationUnitDTO.getId(),
-          currentUser,
-          HistoryLogEventType.UPDATE,
-          description == null ? "Dokeinheit bearbeitet" : description);
-    }
+    historyLogService.saveHistoryLog(
+        documentationUnitDTO.getId(),
+        currentUser,
+        HistoryLogEventType.UPDATE,
+        description == null ? "Dokeinheit bearbeitet" : description);
 
     // Transform non-database-related properties
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
@@ -558,132 +551,85 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             });
   }
 
-  @Transactional
   @Override
-  public boolean saveProcessSteps(DocumentationUnit documentationUnit, @Nullable User currentUser) {
+  @Transactional
+  public void saveProcessSteps(DocumentationUnit documentationUnit) {
     if (documentationUnit == null) {
-      return false;
-    }
-    boolean processStepChanged = false;
-    Optional<DocumentationUnitDTO> optionalDTO = repository.findById(documentationUnit.uuid());
-    if (optionalDTO.isPresent()) {
-      DocumentationUnitDTO documentationUnitDTO = optionalDTO.get();
-      return handleProcessStepUpdate(documentationUnitDTO, documentationUnit, currentUser);
+      return;
     }
 
-    return processStepChanged;
+    repository
+        .findById(documentationUnit.uuid())
+        .ifPresent(
+            documentationUnitDTO -> {
+              DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend =
+                  documentationUnit.currentProcessStep();
+              DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB =
+                  documentationUnitDTO.getCurrentProcessStep();
+
+              if (currentDocunitProcessStepFromFrontend == null) {
+                documentationUnitDTO.setCurrentProcessStep(null);
+                repository.save(documentationUnitDTO);
+                return;
+              }
+
+              // Check that current process step from domain exists in DB
+              ProcessStepDTO processStepDTO =
+                  processStepRepository
+                      .findById(currentDocunitProcessStepFromFrontend.getProcessStep().uuid())
+                      .orElseThrow(
+                          () ->
+                              new ProcessStepNotFoundException( // Throw specific exception
+                                  "Process Step not found for id: "
+                                      + currentDocunitProcessStepFromFrontend
+                                          .getProcessStep()
+                                          .uuid()
+                                          .toString()));
+
+              boolean shouldUpdateProcessStep =
+                  processStepHasChanged(
+                      currentDocumentationUnitProcessStepDTOFromDB,
+                      processStepDTO,
+                      currentDocunitProcessStepFromFrontend);
+
+              if (shouldUpdateProcessStep) {
+                UUID processStepUserId = null;
+
+                if (currentDocunitProcessStepFromFrontend.getUser() != null) {
+                  processStepUserId = currentDocunitProcessStepFromFrontend.getUser().id();
+                }
+
+                DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
+                    DocumentationUnitProcessStepDTO.builder()
+                        .userId(processStepUserId)
+                        .createdAt(LocalDateTime.now())
+                        .processStep(processStepDTO)
+                        .documentationUnit(documentationUnitDTO)
+                        .build();
+
+                newDocumentationUnitProcessStepDTO =
+                    databaseDocumentationUnitProcessStepRepository.save(
+                        newDocumentationUnitProcessStepDTO);
+
+                documentationUnitDTO.getProcessSteps().add(newDocumentationUnitProcessStepDTO);
+                documentationUnitDTO.setCurrentProcessStep(newDocumentationUnitProcessStepDTO);
+                repository.save(documentationUnitDTO);
+              }
+            });
   }
 
-  private boolean handleProcessStepUpdate(
-      DocumentationUnitDTO documentationUnitDTO,
-      DocumentationUnit documentationUnit,
-      @Nullable User currentUser) {
-
-    DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend =
-        documentationUnit.currentProcessStep();
-    DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB =
-        documentationUnitDTO.getCurrentProcessStep();
-
-    // --- SCENARIO 1: A process step can be null only from migrated data ---
-    if (currentDocunitProcessStepFromFrontend == null) {
-      return false;
-    }
-
-    // --- SCENARIO 2: A process step is being added ---
-    ProcessStepDTO processStepDTO =
-        processStepRepository
-            .findById(currentDocunitProcessStepFromFrontend.getProcessStep().uuid())
-            .orElseThrow(
-                () ->
-                    new ProcessStepNotFoundException(
-                        "Process Step not found for id: "
-                            + currentDocunitProcessStepFromFrontend.getProcessStep().uuid()));
-
-    boolean stepChanged = stepChanged(currentDocumentationUnitProcessStepDTOFromDB, processStepDTO);
-    boolean userChanged =
-        userChanged(
-            currentDocumentationUnitProcessStepDTOFromDB, currentDocunitProcessStepFromFrontend);
-
-    boolean processStepChanged = false;
-    if (stepChanged || userChanged) {
-      processStepChanged = true;
-      DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
-          createAndSaveNewProcessStep(
-              documentationUnitDTO, processStepDTO, currentDocunitProcessStepFromFrontend);
-
-      if (stepChanged) {
-        String description =
-            getProcessStepHistoryLogDescription(
-                currentDocumentationUnitProcessStepDTOFromDB, newDocumentationUnitProcessStepDTO);
-
-        historyLogService.saveProcessStepHistoryLog(
-            documentationUnit.uuid(),
-            currentUser,
-            HistoryLogEventType.PROCESS_STEP,
-            description,
-            DocumentationUnitProcessStepTransformer.toDomain(
-                currentDocumentationUnitProcessStepDTOFromDB),
-            DocumentationUnitProcessStepTransformer.toDomain(newDocumentationUnitProcessStepDTO));
-      }
-      if (userChanged) {
-        historyLogService.saveProcessStepHistoryLog(
-            documentationUnit.uuid(),
-            currentUser,
-            HistoryLogEventType.PROCESS_STEP_USER,
-            null, // description will be set dynamically in transformer.toDomain
-            DocumentationUnitProcessStepTransformer.toDomain(
-                currentDocumentationUnitProcessStepDTOFromDB),
-            DocumentationUnitProcessStepTransformer.toDomain(newDocumentationUnitProcessStepDTO));
-      }
-    }
-    return processStepChanged;
-  }
-
-  @NotNull
-  private static String getProcessStepHistoryLogDescription(
+  private static boolean processStepHasChanged(
       DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB,
-      DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO) {
-    Optional<ProcessStepDTO> fromProcess =
-        Optional.ofNullable(currentDocumentationUnitProcessStepDTOFromDB)
-            .map(DocumentationUnitProcessStepDTO::getProcessStep);
-    Optional<ProcessStepDTO> toProcess =
-        Optional.ofNullable(newDocumentationUnitProcessStepDTO)
-            .map(DocumentationUnitProcessStepDTO::getProcessStep);
-
-    if (toProcess.isEmpty()) {
-      throw new IllegalStateException(
-          "Could not save history log because new process step is null");
-    }
-
-    return fromProcess
-        .map(
-            processStepDTO ->
-                String.format(
-                    "Schritt geändert: %s -> %s",
-                    processStepDTO.getName(), toProcess.get().getName()))
-        .orElseGet(() -> "Schritt gesetzt: " + toProcess.get().getName());
-  }
-
-  private boolean stepChanged(
-      DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB,
-      ProcessStepDTO processStepDTO) {
+      ProcessStepDTO processStepDTO,
+      DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend) {
     if (currentDocumentationUnitProcessStepDTOFromDB == null) {
       // If there was no current step in DB, but frontend provides one, it's a change.
       return true;
     }
     // Compare DB processStepDTO and processStepDTO form frontend
-    return !currentDocumentationUnitProcessStepDTOFromDB.getProcessStep().equals(processStepDTO);
-  }
-
-  private boolean userChanged(
-      DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB,
-      DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend) {
-
-    if (currentDocumentationUnitProcessStepDTOFromDB == null) {
-      // If there was no current step in DB, but frontend provides one, it's a change.
+    if (!currentDocumentationUnitProcessStepDTOFromDB.getProcessStep().equals(processStepDTO)) {
       return true;
     }
-
     if (currentDocumentationUnitProcessStepDTOFromDB.getUserId() != null
         && currentDocunitProcessStepFromFrontend.getUser() == null) {
       return true;
@@ -694,34 +640,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             : null;
     // If User id has changed in process step
     return !Objects.equals(currentDocumentationUnitProcessStepDTOFromDB.getUserId(), lastUserId);
-  }
-
-  private DocumentationUnitProcessStepDTO createAndSaveNewProcessStep(
-      DocumentationUnitDTO documentationUnitDTO,
-      ProcessStepDTO processStepDTO,
-      DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend) {
-
-    UUID processStepUserId = null;
-    if (currentDocunitProcessStepFromFrontend.getUser() != null) {
-      processStepUserId = currentDocunitProcessStepFromFrontend.getUser().id();
-    }
-
-    DocumentationUnitProcessStepDTO newDocumentationUnitProcessStepDTO =
-        DocumentationUnitProcessStepDTO.builder()
-            .userId(processStepUserId)
-            .createdAt(LocalDateTime.now())
-            .processStep(processStepDTO)
-            .documentationUnit(documentationUnitDTO)
-            .build();
-
-    newDocumentationUnitProcessStepDTO =
-        databaseDocumentationUnitProcessStepRepository.save(newDocumentationUnitProcessStepDTO);
-
-    documentationUnitDTO.getProcessSteps().add(newDocumentationUnitProcessStepDTO);
-    documentationUnitDTO.setCurrentProcessStep(newDocumentationUnitProcessStepDTO);
-    repository.save(documentationUnitDTO);
-
-    return newDocumentationUnitProcessStepDTO;
   }
 
   @Override

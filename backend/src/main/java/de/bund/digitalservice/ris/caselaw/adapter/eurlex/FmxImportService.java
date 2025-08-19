@@ -200,8 +200,7 @@ public class FmxImportService implements TransformationService {
           updatedDecision,
           user,
           "EU-Entscheidung angelegt für "
-              + decision.coreData().documentationOffice().abbreviation(),
-          false);
+              + decision.coreData().documentationOffice().abbreviation());
     } catch (XPathExpressionException exception) {
       throw new FmxImporterException("Failed to extract data from FMX file.", exception);
     }

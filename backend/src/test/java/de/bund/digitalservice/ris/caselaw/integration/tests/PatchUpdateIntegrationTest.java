@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -50,7 +49,6 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.LocalDate;
@@ -70,7 +68,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,9 +91,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
   @Autowired private ObjectMapper objectMapper;
   @Autowired private DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
-  @MockitoSpyBean private UserService userService;
-  private final UUID oidcLoggedInUserId = UUID.randomUUID();
-  private final DocumentationOffice docOffice = buildDSDocOffice();
+
   private UUID court1Id;
   private UUID court2Id;
   private UUID region1Id;
@@ -138,17 +133,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                     .jurisId(1)
                     .build())
             .getId();
-
-    // Mock the UserService.getUser(UUID) for the OIDC logged-in user
-    // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
-    // We need this to assert on history logs
-    when(userService.getUser(oidcLoggedInUserId))
-        .thenReturn(
-            User.builder()
-                .id(oidcLoggedInUserId)
-                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
-                .documentationOffice(docOffice)
-                .build());
   }
 
   @AfterEach
@@ -210,7 +194,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     TestTransaction.flagForCommit();
     TestTransaction.end();
 
-    Decision decision = generateEmptyDocumentationUnitWithMockedUser();
+    Decision decision = generateEmptyDocumentationUnit();
 
     var procedure1AsNode =
         objectMapper.convertValue(Procedure.builder().label("Vorgang1").build(), JsonNode.class);
@@ -219,7 +203,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
 
     risWebTestClient
-        .withDefaultLogin(oidcLoggedInUserId)
+        .withDefaultLogin()
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch1)
@@ -247,7 +231,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     RisJsonPatch patch2 = new RisJsonPatch(1L, new JsonPatch(operations2), Collections.emptyList());
 
     risWebTestClient
-        .withDefaultLogin(oidcLoggedInUserId)
+        .withDefaultLogin()
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch2)
@@ -282,14 +266,14 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     TestTransaction.end();
 
     PendingProceeding pendingProceeding =
-        (PendingProceeding) generateEmptyDocumentationUnitWithMockedUser(Kind.PENDING_PROCEEDING);
+        (PendingProceeding) generateEmptyDocumentationUnit(Kind.PENDING_PROCEEDING);
 
     List<JsonPatchOperation> operations1 =
         List.of(new AddOperation("/coreData/isResolved", BooleanNode.TRUE));
     RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
 
     risWebTestClient
-        .withDefaultLogin(oidcLoggedInUserId)
+        .withDefaultLogin()
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + pendingProceeding.uuid())
         .bodyValue(patch1)
@@ -319,7 +303,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     TestTransaction.flagForCommit();
     TestTransaction.end();
 
-    Decision decision = generateEmptyDocumentationUnitWithMockedUser();
+    Decision decision = generateEmptyDocumentationUnit();
 
     List<JsonPatchOperation> operations1 =
         List.of(
@@ -329,7 +313,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
 
     risWebTestClient
-        .withDefaultLogin(oidcLoggedInUserId)
+        .withDefaultLogin()
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch1)
@@ -356,7 +340,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
   @Test
   @Transactional
-  void testPartialUpdateByUuid_withRemoveScheduledDate_shouldWriteHistoryEntries() {
+  void testPartialUpdateByUuid_withRemoveScheduledDate_shouldRightHistoryEntries() {
     TestTransaction.flagForCommit();
     TestTransaction.end();
 
@@ -374,7 +358,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
 
     risWebTestClient
-        .withDefaultLogin(oidcLoggedInUserId)
+        .withDefaultLogin()
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch1)
@@ -391,8 +375,8 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
             HistoryLogEventType.UPDATE,
             HistoryLogEventType.SCHEDULED_PUBLICATION,
             HistoryLogEventType.CREATE);
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", null);
-    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", null);
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
+    assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
     assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
     assertThat(logs.get(1).description()).isEqualTo("Terminierte Abgabe gelöscht");
     assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
@@ -3821,7 +3805,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
               decision.uuid(), 0L);
       assertThat(patches).hasSize(1);
       assertThat(patches.getFirst().getDocumentationUnitVersion()).isZero();
-
       assertOnSavedPatchEntry(
           patches.getFirst().getPatch(),
           Map.of("op", "remove", "path", "/previousDecisions/0"),
@@ -4925,40 +4908,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     RisEntityExchangeResult<DocumentationUnit> result =
         risWebTestClient
             .withDefaultLogin()
-            .put()
-            .uri(
-                new DefaultUriBuilderFactory()
-                    .builder()
-                    .path("/api/v1/caselaw/documentunits/new")
-                    .queryParams(queryParams)
-                    .build())
-            .exchange()
-            .expectStatus()
-            .isCreated()
-            .expectBody(DocumentationUnit.class)
-            .returnResult();
-
-    assertThat(result.getResponseBody()).isNotNull();
-
-    return result.getResponseBody();
-  }
-
-  private Decision generateEmptyDocumentationUnitWithMockedUser() {
-    return (Decision)
-        generateEmptyDocumentationUnitWithMockedUser(
-            null); // Call the more specific function with a null kind
-  }
-
-  private DocumentationUnit generateEmptyDocumentationUnitWithMockedUser(Kind kind) {
-    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-
-    if (kind != null) {
-      queryParams.add("kind", kind.toString());
-    }
-
-    RisEntityExchangeResult<DocumentationUnit> result =
-        risWebTestClient
-            .withDefaultLogin(oidcLoggedInUserId)
             .put()
             .uri(
                 new DefaultUriBuilderFactory()

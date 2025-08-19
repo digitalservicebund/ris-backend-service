@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -16,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -24,7 +24,6 @@ import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -65,9 +64,6 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
   @Autowired private AttachmentRepository attachmentRepository;
   @MockitoSpyBean private DocumentationUnitDocxMetadataInitializationService service;
   @Autowired private DocumentationUnitHistoryLogService historyLogService;
-  @MockitoSpyBean private UserService userService;
-  private final UUID oidcLoggedInUserId = UUID.randomUUID();
-  private final DocumentationOffice docOffice = buildDSDocOffice();
 
   @MockitoBean
   @Qualifier("docxS3Client")
@@ -78,16 +74,6 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
   @BeforeEach
   void setUp() {
     dsDocOffice = documentationOfficeRepository.findByAbbreviation("DS");
-    // Mock the UserService.getUser(UUID) for the OIDC logged-in user
-    // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
-    // We need this to assert on history logs
-    when(userService.getUser(oidcLoggedInUserId))
-        .thenReturn(
-            User.builder()
-                .id(oidcLoggedInUserId)
-                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
-                .documentationOffice(docOffice)
-                .build());
   }
 
   @AfterEach
@@ -106,7 +92,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
         EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
-        .withDefaultLogin(oidcLoggedInUserId)
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
         .contentType(
@@ -121,6 +107,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     assertThat(savedAttachment.getUploadTimestamp()).isInstanceOf(Instant.class);
     assertThat(savedAttachment.getId()).isInstanceOf(UUID.class);
 
+    DocumentationOffice docOffice = DocumentationOfficeTransformer.transformToDomain(dsDocOffice);
     User user = User.builder().documentationOffice(docOffice).build();
     var logs = historyLogService.getHistoryLogs(dto.getId(), user);
     assertThat(logs).hasSize(2);
@@ -424,7 +411,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
 
     // Act
     risWebTestClient
-        .withDefaultLogin(oidcLoggedInUserId)
+        .withDefaultLogin()
         .delete()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/fooPath")
         .exchange()
@@ -433,7 +420,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
 
     var docUnit =
         risWebTestClient
-            .withDefaultLogin(oidcLoggedInUserId)
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
             .exchange()
@@ -450,6 +437,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     assertThat(managementData.lastUpdatedAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
 
+    DocumentationOffice docOffice = DocumentationOfficeTransformer.transformToDomain(dsDocOffice);
     User user = User.builder().documentationOffice(docOffice).build();
     var logs = historyLogService.getHistoryLogs(dto.getId(), user);
     assertThat(logs).hasSize(1);
