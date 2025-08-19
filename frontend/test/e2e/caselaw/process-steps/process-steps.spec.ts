@@ -261,7 +261,7 @@ test.describe("process steps", () => {
 
     await processStepDropBox.click()
 
-    await page.getByText(processStepName).click()
+    await page.getByRole("option", { name: processStepName }).click()
 
     await expect(processStepDropBox).toContainText(processStepName)
   }
