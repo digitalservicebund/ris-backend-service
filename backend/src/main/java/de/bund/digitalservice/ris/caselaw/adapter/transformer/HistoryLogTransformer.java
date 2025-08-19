@@ -129,9 +129,7 @@ public class HistoryLogTransformer {
         return "Person gesetzt: " + newPersonName;
       } else if (oldPersonName != null && newPersonName == null) {
         return "Person entfernt: " + oldPersonName;
-      } else if (oldPersonName != null
-          && newPersonName != null
-          && !oldPersonName.equals(newPersonName)) {
+      } else if (oldPersonName != null && !oldPersonName.equals(newPersonName)) {
         return String.format("Person geändert: %s -> %s", oldPersonName, newPersonName);
       }
     } else {
