@@ -404,6 +404,12 @@ describe("DecisionPlausibilityCheck", () => {
 
       expect(
         screen.queryByText(
+          /Die Rubriken "Gründe" und "Tatbestand" sind befüllt/,
+        ),
+      ).not.toBeInTheDocument()
+
+      expect(
+        screen.queryByText(
           "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
         ),
       ).not.toBeInTheDocument()
