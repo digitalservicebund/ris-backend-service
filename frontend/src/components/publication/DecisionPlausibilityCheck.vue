@@ -215,7 +215,7 @@ async function scrollToCategory(key: string) {
         label="Rubriken bearbeiten"
         severity="secondary"
         size="small"
-        ><RouterLink :to="categoriesRoute"
+        ><RouterLink tabindex="-1" :to="categoriesRoute"
           >Rubriken bearbeiten</RouterLink
         ></Button
       >
