@@ -672,11 +672,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return true;
     }
     // Compare DB processStepDTO and processStepDTO form frontend
-    if (!currentDocumentationUnitProcessStepDTOFromDB.getProcessStep().equals(processStepDTO)) {
-      return true;
-    }
-
-    return false;
+    return !currentDocumentationUnitProcessStepDTOFromDB.getProcessStep().equals(processStepDTO);
   }
 
   private boolean userChanged(

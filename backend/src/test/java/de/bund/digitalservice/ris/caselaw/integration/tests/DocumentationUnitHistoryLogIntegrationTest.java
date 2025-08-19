@@ -40,35 +40,32 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DocumentationUnitService documentationUnitService;
   @MockitoSpyBean private UserService userService;
-  private final DocumentationOffice DSDocOffice = buildDSDocOffice();
-  private final DocumentationOffice BGHDocOffice = buildBGHDocOffice();
+  private final DocumentationOffice docOfficeDS = buildDSDocOffice();
+  private final DocumentationOffice docOfficeBGH = buildBGHDocOffice();
   // Define user IDs for mocking
-  private final UUID DSUserId = UUID.randomUUID();
-  private final UUID BGHUserId = UUID.randomUUID();
+  private final UUID userIdDS = UUID.randomUUID();
+  private final UUID userIdBGH = UUID.randomUUID();
   private DocumentationOfficeDTO documentationOffice;
-  private DocumentationOfficeDTO otherDocumentationOffice;
   private static final String HISTORY_LOG_ENDPOINT = "/api/v1/caselaw/documentunits/";
 
   @BeforeEach
   void setUp() {
     documentationOffice =
-        documentationOfficeRepository.findByAbbreviation(DSDocOffice.abbreviation());
-    otherDocumentationOffice =
-        documentationOfficeRepository.findByAbbreviation(BGHDocOffice.abbreviation());
+        documentationOfficeRepository.findByAbbreviation(docOfficeDS.abbreviation());
     // Mock the userService to return fake User objects
-    when(userService.getUser(DSUserId))
+    when(userService.getUser(userIdDS))
         .thenReturn(
             User.builder()
-                .id(DSUserId)
+                .id(userIdDS)
                 .name("testUserDS")
-                .documentationOffice(DSDocOffice)
+                .documentationOffice(docOfficeDS)
                 .build());
-    when(userService.getUser(BGHUserId))
+    when(userService.getUser(userIdBGH))
         .thenReturn(
             User.builder()
-                .id(BGHUserId)
+                .id(userIdBGH)
                 .name("testUserBGH")
-                .documentationOffice(BGHDocOffice)
+                .documentationOffice(docOfficeBGH)
                 .build());
   }
 
@@ -89,8 +86,8 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
 
     assertThat(repository.findById(entityId)).isPresent();
 
-    saveHistoryLog(entityId, DSUserId, null);
-    saveHistoryLog(entityId, BGHUserId, null);
+    saveHistoryLog(entityId, userIdDS, null);
+    saveHistoryLog(entityId, userIdBGH, null);
     HistoryLogDTO historyLog3 = saveHistoryLog(entityId, null, "migration");
 
     assertThat(databaseHistoryLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(entityId))
@@ -119,7 +116,7 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
     // log 3 is historyLog1
     assertThat(log1.createdAt().truncatedTo(ChronoUnit.MILLIS))
         .isEqualTo(historyLog3.getCreatedAt().truncatedTo(ChronoUnit.MILLIS));
-    assertThat(log1.documentationOffice()).isEqualTo(null);
+    assertThat(log1.documentationOffice()).isNull();
     assertThat(log1.eventType()).isEqualTo(historyLog3.getEventType());
     assertThat(log1.description()).isEqualTo(historyLog3.getDescription());
     // user from other doc office is allowed to see system name
@@ -144,7 +141,7 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
         User.builder()
             .id(UUID.randomUUID())
             .name("Al Nam")
-            .documentationOffice(DSDocOffice)
+            .documentationOffice(docOfficeDS)
             .build();
     documentationUnitService.updateDocumentationUnit(
         DecisionTransformer.transformToDomain((DecisionDTO) docUnit),

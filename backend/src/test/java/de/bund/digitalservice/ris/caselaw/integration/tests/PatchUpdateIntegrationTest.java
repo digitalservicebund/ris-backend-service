@@ -95,7 +95,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
   @Autowired private ObjectMapper objectMapper;
   @Autowired private DocumentationUnitHistoryLogService documentationUnitHistoryLogService;
   @MockitoSpyBean private UserService userService;
-  private final UUID OIDC_LOGGED_IN_USER_ID = UUID.randomUUID();
+  private final UUID oidcLoggedInUserId = UUID.randomUUID();
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private UUID court1Id;
   private UUID court2Id;
@@ -142,10 +142,10 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     // Mock the UserService.getUser(UUID) for the OIDC logged-in user
     // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
     // We need this to assert on history logs
-    when(userService.getUser(OIDC_LOGGED_IN_USER_ID))
+    when(userService.getUser(oidcLoggedInUserId))
         .thenReturn(
             User.builder()
-                .id(OIDC_LOGGED_IN_USER_ID)
+                .id(oidcLoggedInUserId)
                 .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
                 .documentationOffice(docOffice)
                 .build());
@@ -219,7 +219,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
 
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch1)
@@ -247,7 +247,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     RisJsonPatch patch2 = new RisJsonPatch(1L, new JsonPatch(operations2), Collections.emptyList());
 
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch2)
@@ -289,7 +289,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
 
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + pendingProceeding.uuid())
         .bodyValue(patch1)
@@ -329,7 +329,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
 
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch1)
@@ -374,7 +374,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
     RisJsonPatch patch1 = new RisJsonPatch(0L, new JsonPatch(operations1), Collections.emptyList());
 
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
         .bodyValue(patch1)
@@ -4958,7 +4958,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
     RisEntityExchangeResult<DocumentationUnit> result =
         risWebTestClient
-            .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+            .withDefaultLogin(oidcLoggedInUserId)
             .put()
             .uri(
                 new DefaultUriBuilderFactory()

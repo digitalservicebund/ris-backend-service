@@ -16,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -67,7 +66,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
   @MockitoSpyBean private DocumentationUnitDocxMetadataInitializationService service;
   @Autowired private DocumentationUnitHistoryLogService historyLogService;
   @MockitoSpyBean private UserService userService;
-  private final UUID OIDC_LOGGED_IN_USER_ID = UUID.randomUUID();
+  private final UUID oidcLoggedInUserId = UUID.randomUUID();
   private final DocumentationOffice docOffice = buildDSDocOffice();
 
   @MockitoBean
@@ -82,10 +81,10 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     // Mock the UserService.getUser(UUID) for the OIDC logged-in user
     // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
     // We need this to assert on history logs
-    when(userService.getUser(OIDC_LOGGED_IN_USER_ID))
+    when(userService.getUser(oidcLoggedInUserId))
         .thenReturn(
             User.builder()
-                .id(OIDC_LOGGED_IN_USER_ID)
+                .id(oidcLoggedInUserId)
                 .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
                 .documentationOffice(docOffice)
                 .build());
@@ -107,7 +106,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
         EntityBuilderTestUtil.createAndSaveDecision(repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
         .contentType(
@@ -122,7 +121,6 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     assertThat(savedAttachment.getUploadTimestamp()).isInstanceOf(Instant.class);
     assertThat(savedAttachment.getId()).isInstanceOf(UUID.class);
 
-    DocumentationOffice docOffice = DocumentationOfficeTransformer.transformToDomain(dsDocOffice);
     User user = User.builder().documentationOffice(docOffice).build();
     var logs = historyLogService.getHistoryLogs(dto.getId(), user);
     assertThat(logs).hasSize(2);
@@ -426,7 +424,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
 
     // Act
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .delete()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/fooPath")
         .exchange()
@@ -435,7 +433,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
 
     var docUnit =
         risWebTestClient
-            .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+            .withDefaultLogin(oidcLoggedInUserId)
             .get()
             .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentNumber())
             .exchange()
@@ -452,7 +450,6 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     assertThat(managementData.lastUpdatedAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
 
-    DocumentationOffice docOffice = DocumentationOfficeTransformer.transformToDomain(dsDocOffice);
     User user = User.builder().documentationOffice(docOffice).build();
     var logs = historyLogService.getHistoryLogs(dto.getId(), user);
     assertThat(logs).hasSize(1);

@@ -98,34 +98,51 @@ public class HistoryLogTransformer {
 
     // In case of PROCESS_STEP_USER we need to hydrate the description entry with dynamic user data
     if (historyLogDTO.getEventType() == HistoryLogEventType.PROCESS_STEP_USER) {
-      boolean isSameOffice =
-          isUserAllowedToSeeDescriptionUserNames(
-              currentUserDocumentationOffice, fromDocumentationOffice, toDocumentationOffice);
-
-      if (isSameOffice) {
-        String newPersonName = Optional.ofNullable(toUser).map(User::name).orElse(null);
-        String oldPersonName = Optional.ofNullable(fromUser).map(User::name).orElse(null);
-
-        if (oldPersonName == null && newPersonName != null) {
-          return "Person gesetzt: " + newPersonName;
-        } else if (oldPersonName != null && newPersonName == null) {
-          return "Person entfernt: " + oldPersonName;
-        } else if (oldPersonName != null
-            && newPersonName != null
-            && !oldPersonName.equals(newPersonName)) {
-          return String.format("Person geändert: %s -> %s", oldPersonName, newPersonName);
-        }
-      } else {
-        // Generic description for other offices
-        if (fromUser == null) {
-          return "Person gesetzt";
-        } else {
-          return "Person geändert";
-        }
-      }
+      String description =
+          getUserDescriptionString(
+              currentUserDocumentationOffice,
+              fromUser,
+              toUser,
+              fromDocumentationOffice,
+              toDocumentationOffice);
+      if (description != null) return description;
     }
 
     return historyLogDTO.getDescription();
+  }
+
+  private static String getUserDescriptionString(
+      DocumentationOffice currentUserDocumentationOffice,
+      @Nullable User fromUser,
+      @Nullable User toUser,
+      DocumentationOffice fromDocumentationOffice,
+      DocumentationOffice toDocumentationOffice) {
+    boolean isSameOffice =
+        isUserAllowedToSeeDescriptionUserNames(
+            currentUserDocumentationOffice, fromDocumentationOffice, toDocumentationOffice);
+
+    if (isSameOffice) {
+      String newPersonName = Optional.ofNullable(toUser).map(User::name).orElse(null);
+      String oldPersonName = Optional.ofNullable(fromUser).map(User::name).orElse(null);
+
+      if (oldPersonName == null && newPersonName != null) {
+        return "Person gesetzt: " + newPersonName;
+      } else if (oldPersonName != null && newPersonName == null) {
+        return "Person entfernt: " + oldPersonName;
+      } else if (oldPersonName != null
+          && newPersonName != null
+          && !oldPersonName.equals(newPersonName)) {
+        return String.format("Person geändert: %s -> %s", oldPersonName, newPersonName);
+      }
+    } else {
+      // Generic description for other offices
+      if (fromUser == null) {
+        return "Person gesetzt";
+      } else {
+        return "Person geändert";
+      }
+    }
+    return null;
   }
 
   private static boolean isUserAllowedToSeeCreatorUserName(

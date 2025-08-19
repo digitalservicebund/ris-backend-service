@@ -90,8 +90,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
   @MockitoSpyBean private UserService userService;
 
   private DocumentationOfficeDTO docOffice;
-  private final UUID OIDC_LOGGED_IN_USER_ID =
-      UUID.fromString("c0a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5");
+  private final UUID oidcLoggedInUserId = UUID.fromString("c0a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5");
 
   @BeforeEach
   void setUp() {
@@ -99,10 +98,10 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
 
     // Mock the UserService.getUser(UUID) for the OIDC logged-in user
     // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
-    when(userService.getUser(OIDC_LOGGED_IN_USER_ID))
+    when(userService.getUser(oidcLoggedInUserId))
         .thenReturn(
             User.builder()
-                .id(OIDC_LOGGED_IN_USER_ID)
+                .id(oidcLoggedInUserId)
                 .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
                 .documentationOffice(DocumentationOfficeTransformer.transformToDomain(docOffice))
                 .build());
@@ -198,7 +197,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
             .build();
 
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .get()
         .uri("/api/v1/caselaw/documentunits/" + entityId + "/preview-xml")
         .exchange()
@@ -307,7 +306,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
             .build();
 
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .put()
         .uri(
             entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)

@@ -149,7 +149,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @MockitoBean private HandoverReportRepository handoverReportRepository;
   @MockitoBean DocumentNumberPatternConfig documentNumberPatternConfig;
   @MockitoSpyBean private UserService userService;
-  private final UUID OIDC_LOGGED_IN_USER_ID = UUID.randomUUID();
+  private final UUID oidcLoggedInUserId = UUID.randomUUID();
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
@@ -175,10 +175,10 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     // Mock the UserService.getUser(UUID) for the OIDC logged-in user
     // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
     // We need this to assert on history logs
-    when(userService.getUser(OIDC_LOGGED_IN_USER_ID))
+    when(userService.getUser(oidcLoggedInUserId))
         .thenReturn(
             User.builder()
-                .id(OIDC_LOGGED_IN_USER_ID)
+                .id(oidcLoggedInUserId)
                 .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
                 .documentationOffice(docOffice)
                 .build());
@@ -1731,7 +1731,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             repository, documentationOffice, creatingDocumentationOffice, documentNumber);
 
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .put()
         .uri("/api/v1/caselaw/documentunits/1234567890123/takeover")
         .exchange()
@@ -1963,7 +1963,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     // Act
     risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .put()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -2205,7 +2205,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
   private RisEntityExchangeResult<Decision> generateNewDecision() {
     return risWebTestClient
-        .withDefaultLogin(OIDC_LOGGED_IN_USER_ID)
+        .withDefaultLogin(oidcLoggedInUserId)
         .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .contentType(MediaType.APPLICATION_JSON)
