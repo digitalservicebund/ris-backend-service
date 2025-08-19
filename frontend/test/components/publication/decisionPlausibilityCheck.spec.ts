@@ -221,7 +221,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(emitted("updatePlausibilityCheck")).toEqual([[false]])
     })
 
-    it("should all incomplete data warnings", async () => {
+    it("should show all incomplete data warnings", async () => {
       mockDocUnitStore({
         coreData: fullCoreData,
         contentRelatedIndexing: {

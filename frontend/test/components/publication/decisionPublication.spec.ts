@@ -11,7 +11,7 @@ describe("DecisionPlausibilityCheck", () => {
     setActivePinia(createTestingPinia())
     useFeatureToggleServiceMock()
   })
-  it("should not show XML preview if plausibility check fails", async () => {
+  it("should not show LDML preview if plausibility check fails", async () => {
     await renderComponent({ hasPlausibilityCheckPassed: false })
 
     // Click simulates updating the plausibility check with mock
@@ -21,7 +21,7 @@ describe("DecisionPlausibilityCheck", () => {
     expect(
       screen.getByText("PublicationActions - publishable: false"),
     ).toBeInTheDocument()
-    expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
+    expect(screen.queryByText("LDML Vorschau")).not.toBeInTheDocument()
   })
 
   it("should render all child components when plausibility check is true", async () => {
@@ -34,7 +34,7 @@ describe("DecisionPlausibilityCheck", () => {
     expect(
       screen.getByText("PublicationActions - publishable: true"),
     ).toBeInTheDocument()
-    expect(screen.getByText("XML Vorschau")).toBeInTheDocument()
+    expect(screen.getByText("LDML Vorschau")).toBeInTheDocument()
   })
 })
 

@@ -28,10 +28,10 @@ const isPublishable = computed(
         v-if="hasPlausibilityCheckPassed"
         as-column
         class="border-b-1 border-gray-400 pb-24"
-        header="XML Vorschau"
+        header="LDML Vorschau"
         header-class="ris-body1-bold"
         :is-expanded="false"
-        title="XML Vorschau"
+        title="LDML Vorschau"
       >
         <CodeSnippet title="" :xml="'<?xml>' + '\nNoch nicht implementiert'" />
       </ExpandableContent>
