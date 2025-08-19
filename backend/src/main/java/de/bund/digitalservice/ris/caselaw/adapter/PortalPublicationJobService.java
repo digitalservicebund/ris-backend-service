@@ -88,7 +88,8 @@ public class PortalPublicationJobService {
 
     if (job.getPublicationJobType() == PublicationJobType.DELETE) {
       try {
-        var result = this.portalPublicationService.deleteDocumentationUnit(job.getDocumentNumber());
+        var result =
+            this.portalPublicationService.withdrawDocumentationUnit(job.getDocumentNumber());
         job.setPublicationJobStatus(PublicationJobStatus.SUCCESS);
         return result;
       } catch (Exception e) {

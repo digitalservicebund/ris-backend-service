@@ -14,7 +14,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogServ
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
-import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -40,6 +39,7 @@ public class PortalPublicationService {
   private final DocumentationUnitHistoryLogService historyLogService;
 
   private static final String PUBLICATION_FEATURE_FLAG = "neuris.portal-publication";
+  private static final String CHANGELOG_FEATURE_FLAG = "neuris.regular-changelogs";
 
   public PortalPublicationService(
       DocumentationUnitRepository documentationUnitRepository,
@@ -83,14 +83,8 @@ public class PortalPublicationService {
       DocumentationUnit documentationUnit =
           documentationUnitRepository.findByUuid(documentationUnitId);
       var result = publishToBucket(documentationUnit);
-      try {
-        uploadChangelog(result.changedPaths(), result.deletedPaths());
-      } catch (Exception e) {
-        log.error("Could not upload changelog file.");
-        deleteDocumentationUnit(documentationUnit.documentNumber());
-        throw new PublishException("Could not save changelog to bucket.", e);
-      }
-      updatePortalPublicationStatus(documentationUnit, user);
+      uploadChangelogWithdrawOnFailure(documentationUnit, result);
+      updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
     } catch (Exception exception) {
       historyLogService.saveHistoryLog(
           documentationUnitId,
@@ -117,17 +111,17 @@ public class PortalPublicationService {
     DocumentationUnit documentationUnit =
         documentationUnitRepository.findByDocumentNumber(documentNumber);
     var publicationResult = publishToBucket(documentationUnit);
-    updatePortalPublicationStatus(documentationUnit, null);
+    updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, null);
     return publicationResult;
   }
 
   /**
-   * Delete the documentation unit with the given documentNumber, including all attachments, from
-   * the portal bucket.
+   * Deletes the documentation unit and its attachments with the given documentNumber from the
+   * portal bucket,
    *
-   * @param documentNumber the document number of the documentation unit to be deleted.
+   * @param documentNumber the document number of the documentation unit to be withdrawn.
    */
-  public PortalPublicationResult deleteDocumentationUnit(String documentNumber) {
+  public PortalPublicationResult withdrawDocumentationUnit(String documentNumber) {
     try {
       var deletableFiles = portalBucket.getAllFilenamesByPath(documentNumber + "/");
       deletableFiles.forEach(portalBucket::delete);
@@ -149,10 +143,9 @@ public class PortalPublicationService {
   public void uploadChangelog(
       List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
       throws JsonProcessingException {
-    if (!featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
-      return;
+    if (featureToggleService.isEnabled(CHANGELOG_FEATURE_FLAG)) {
+      uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers, false);
     }
-    uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers, false);
   }
 
   /**
@@ -161,8 +154,8 @@ public class PortalPublicationService {
    * @throws JsonProcessingException if the changelog cannot be generated.
    */
   public void uploadFullReindexChangelog() throws JsonProcessingException {
-    if (featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
-      return; // only needed for testphase portal
+    if (featureToggleService.isEnabled(CHANGELOG_FEATURE_FLAG)) {
+      return; // regular changelogs are enabled, no nightly re-indexing needed
     }
     uploadChangelog(null, null, true);
   }
@@ -227,6 +220,17 @@ public class PortalPublicationService {
     }
   }
 
+  private void uploadChangelogWithdrawOnFailure(
+      DocumentationUnit documentationUnit, PortalPublicationResult result) {
+    try {
+      uploadChangelog(result.changedPaths(), result.deletedPaths());
+    } catch (Exception e) {
+      log.error("Could not upload changelog file.");
+      withdrawDocumentationUnit(documentationUnit.documentNumber());
+      throw new PublishException("Could not save changelog to bucket.", e);
+    }
+  }
+
   private void uploadChangelog(
       List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers, boolean changeAll)
       throws JsonProcessingException {
@@ -245,29 +249,20 @@ public class PortalPublicationService {
     return "changelogs/" + Instant.now().toString() + "-caselaw.json";
   }
 
-  private void updatePortalPublicationStatus(DocumentationUnit documentationUnit, User user) {
+  private void updatePortalPublicationStatus(
+      DocumentationUnit documentationUnit, PortalPublicationStatus newStatus, User user) {
     var oldStatus = documentationUnit.portalPublicationStatus();
-    if (documentationUnit instanceof Decision decision) {
-      documentationUnit =
-          decision.toBuilder().portalPublicationStatus(PortalPublicationStatus.PUBLISHED).build();
-    } else if (documentationUnit instanceof PendingProceeding) {
+    if (newStatus.equals(oldStatus)) {
       return;
-      //      documentationUnit =
-      //          pendingProceeding.toBuilder()
-      //              .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
-      //              .build();
+    }
+    documentationUnitRepository.updatePortalPublicationStatus(documentationUnit.uuid(), newStatus);
+    String historyLogMessage;
+    if (PortalPublicationStatus.PUBLISHED.equals(newStatus)) {
+      historyLogMessage = "Dokumentationseinheit veröffentlicht";
+    } else {
+      historyLogMessage = "Dokumentationseinheit zurückgezogen";
     }
     historyLogService.saveHistoryLog(
-        documentationUnit.uuid(),
-        user,
-        HistoryLogEventType.PORTAL_PUBLICATION,
-        "Dokumentationseinheit veröffentlicht");
-    documentationUnitRepository.save(
-        documentationUnit,
-        null,
-        "Status im Portal geändert: "
-            + oldStatus.humanReadable
-            + " → "
-            + PortalPublicationStatus.PUBLISHED.humanReadable);
+        documentationUnit.uuid(), user, HistoryLogEventType.PORTAL_PUBLICATION, historyLogMessage);
   }
 }

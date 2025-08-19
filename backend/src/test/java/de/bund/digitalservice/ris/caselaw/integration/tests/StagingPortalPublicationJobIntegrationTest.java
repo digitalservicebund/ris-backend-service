@@ -92,6 +92,7 @@ class StagingPortalPublicationJobIntegrationTest extends BaseIntegrationTest {
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
     portalPublicationJobRepository.deleteAll();
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
+    when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
   }
 
   @AfterEach

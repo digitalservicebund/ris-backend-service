@@ -42,7 +42,7 @@ class PortalPublicationJobServiceTest {
     this.service.executePendingJobs();
 
     verify(portalPublicationService, never()).publishDocumentationUnit(anyString());
-    verify(portalPublicationService, never()).deleteDocumentationUnit(anyString());
+    verify(portalPublicationService, never()).withdrawDocumentationUnit(anyString());
     verify(publicationJobRepository, never()).saveAll(any());
   }
 
@@ -54,7 +54,7 @@ class PortalPublicationJobServiceTest {
     this.service.executePendingJobs();
 
     verify(portalPublicationService, times(1)).publishDocumentationUnit("123");
-    verify(portalPublicationService, never()).deleteDocumentationUnit(anyString());
+    verify(portalPublicationService, never()).withdrawDocumentationUnit(anyString());
     // currently disabled
     //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of("123.xml"),
     // List.of());
@@ -70,7 +70,7 @@ class PortalPublicationJobServiceTest {
     this.service.executePendingJobs();
 
     verify(portalPublicationService, never()).publishDocumentationUnit(anyString());
-    verify(portalPublicationService, times(1)).deleteDocumentationUnit("456");
+    verify(portalPublicationService, times(1)).withdrawDocumentationUnit("456");
     // currently disabled
     //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(),
     // List.of("456.xml"));
@@ -88,7 +88,7 @@ class PortalPublicationJobServiceTest {
     this.service.executePendingJobs();
 
     verify(portalPublicationService, times(1)).publishDocumentationUnit("789");
-    verify(portalPublicationService, never()).deleteDocumentationUnit(anyString());
+    verify(portalPublicationService, never()).withdrawDocumentationUnit(anyString());
     verify(portalPublicationService, never()).uploadChangelog(any(), any());
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PublicationJobStatus.ERROR);
@@ -99,12 +99,12 @@ class PortalPublicationJobServiceTest {
       throws DocumentationUnitNotExistsException, JsonProcessingException {
     var jobs = List.of(createPublicationJob("312", PublicationJobType.DELETE));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
-    doThrow(RuntimeException.class).when(portalPublicationService).deleteDocumentationUnit("312");
+    doThrow(RuntimeException.class).when(portalPublicationService).withdrawDocumentationUnit("312");
 
     this.service.executePendingJobs();
 
     verify(portalPublicationService, never()).publishDocumentationUnit(anyString());
-    verify(portalPublicationService, times(1)).deleteDocumentationUnit("312");
+    verify(portalPublicationService, times(1)).withdrawDocumentationUnit("312");
     verify(portalPublicationService, never()).uploadChangelog(any(), any());
     verify(publicationJobRepository, times(1)).saveAll(jobs);
     assertThat(jobs.getFirst().getPublicationJobStatus()).isEqualTo(PublicationJobStatus.ERROR);
@@ -120,7 +120,7 @@ class PortalPublicationJobServiceTest {
     this.service.executePendingJobs();
 
     verify(portalPublicationService, never()).publishDocumentationUnit(anyString());
-    verify(portalPublicationService, times(1)).deleteDocumentationUnit("312");
+    verify(portalPublicationService, times(1)).withdrawDocumentationUnit("312");
     // currently disabled
     //    verify(publicPortalPublicationService, times(1)).uploadChangelog(List.of(),
     // List.of("312.xml"));
@@ -139,15 +139,15 @@ class PortalPublicationJobServiceTest {
             createPublicationJob("5", PublicationJobType.PUBLISH));
     when(this.publicationJobRepository.findNextPendingJobsBatch()).thenReturn(jobs);
     doThrow(RuntimeException.class).when(portalPublicationService).publishDocumentationUnit("1");
-    doThrow(RuntimeException.class).when(portalPublicationService).deleteDocumentationUnit("2");
+    doThrow(RuntimeException.class).when(portalPublicationService).withdrawDocumentationUnit("2");
 
     this.service.executePendingJobs();
 
     verify(portalPublicationService, times(1)).publishDocumentationUnit("1");
     verify(portalPublicationService, times(1)).publishDocumentationUnit("3");
     verify(portalPublicationService, times(1)).publishDocumentationUnit("5");
-    verify(portalPublicationService, times(1)).deleteDocumentationUnit("2");
-    verify(portalPublicationService, times(1)).deleteDocumentationUnit("4");
+    verify(portalPublicationService, times(1)).withdrawDocumentationUnit("2");
+    verify(portalPublicationService, times(1)).withdrawDocumentationUnit("4");
     // currently disabled
     //    verify(publicPortalPublicationService, times(1))
     //        .uploadChangelog(List.of("3.xml", "5.xml"), List.of("4.xml"));
