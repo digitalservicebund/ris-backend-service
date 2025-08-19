@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Domain repository for documentation units */
 @NoRepositoryBean
@@ -76,9 +78,15 @@ public interface DocumentationUnitRepository {
    */
   void save(DocumentationUnit documentationUnit);
 
-  void save(DocumentationUnit documentationUnit, User currentUser);
+  @Transactional(transactionManager = "jpaTransactionManager")
+  void save(DocumentationUnit documentationUnit, @Nullable User currentUser);
 
-  void save(DocumentationUnit documentationUnit, User currentUser, String description);
+  @Transactional(transactionManager = "jpaTransactionManager")
+  void save(
+      DocumentationUnit documentationUnit,
+      @Nullable User currentUser,
+      @Nullable String description,
+      @Nullable boolean processStepChanged);
 
   /**
    * Save the keywords of a documentation unit
@@ -86,6 +94,9 @@ public interface DocumentationUnitRepository {
    * @param documentationUnit the documentation unit to save the keywords for
    */
   void saveKeywords(DocumentationUnit documentationUnit);
+
+  @Transactional
+  boolean saveProcessSteps(DocumentationUnit documentationUnit, @Nullable User currentUser);
 
   /**
    * Save the fields of law of a documentation unit
@@ -167,8 +178,6 @@ public interface DocumentationUnitRepository {
   List<String> findAllDocumentNumbersByMatchingPublishCriteria();
 
   Set<String> findAllPublishedDocumentNumbers();
-
-  void saveProcessSteps(DocumentationUnit documentationUnit);
 
   void updatePortalPublicationStatus(UUID documentationUnitId, PortalPublicationStatus newStatus);
 }

@@ -15,7 +15,8 @@ public class UserTransformer {
 
   private UserTransformer() {}
 
-  public static User transformToDomain(BareUserApiResponse.BareUser bareUser) {
+  public static User transformToDomain(
+      BareUserApiResponse.BareUser bareUser, DocumentationOffice documentationOffice) {
     List<String> firstNames = getValues(bareUser.attributes(), "firstName");
     List<String> lastNames = getValues(bareUser.attributes(), "lastName");
 
@@ -24,7 +25,12 @@ public class UserTransformer {
         .name(getFullName(firstNames, lastNames))
         .email(bareUser.email())
         .initials(getInitials(firstNames, lastNames))
+        .documentationOffice(documentationOffice)
         .build();
+  }
+
+  public static User transformToDomain(BareUserApiResponse.BareUser bareUser) {
+    return transformToDomain(bareUser, null);
   }
 
   public static User transformToDomain(OidcUser oidcUser, DocumentationOffice documentationOffice) {
@@ -70,7 +76,7 @@ public class UserTransformer {
             .findFirst();
 
     Optional<String> lastName =
-        firstNames.stream()
+        lastNames.stream()
             .filter(Objects::nonNull)
             .map(String::trim)
             .filter(s -> !s.isEmpty())

@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.52.0"
     id ("io.freefair.lombok") version "8.14"
-    id("org.flywaydb.flyway") version "11.11.0"
+    id("org.flywaydb.flyway") version "11.11.1"
     id("io.sentry.jvm.gradle") version "5.9.0"
 }
 
@@ -165,7 +165,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.31.1")
+    implementation("com.google.protobuf:protobuf-java:4.32.0")
 
     // CVE-2024-57699
     implementation("net.minidev:json-smart:2.6.0")
@@ -174,7 +174,7 @@ dependencies {
     implementation("io.netty:netty-handler:4.2.4.Final")
 
     // CVE-2025-55163
-    implementation("io.netty:netty-codec-http2:4.1.124.Final")
+    implementation("io.netty:netty-codec-http2:4.2.4.Final")
 
     implementation("org.postgresql:postgresql:42.7.7")
 
@@ -209,7 +209,7 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.85")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.87")
     // for local development:
 //     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.85.jar"))
 
@@ -235,15 +235,15 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.11.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.11.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.11.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.11.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.19.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.9")
@@ -255,7 +255,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.25.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.26.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

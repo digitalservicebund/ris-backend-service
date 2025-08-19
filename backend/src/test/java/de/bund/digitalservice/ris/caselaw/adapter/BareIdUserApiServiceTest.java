@@ -9,6 +9,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +36,7 @@ class BareIdUserApiServiceTest {
 
   @MockitoBean RestTemplate restTemplate;
   @MockitoBean BareIdUserApiTokenService bareIdUserApiTokenService;
+  @MockitoBean UserGroupService userGroupService;
 
   String instanceId = UUID.randomUUID().toString();
 
@@ -50,10 +52,12 @@ class BareIdUserApiServiceTest {
   @BeforeEach
   void setUp() {
     bareIdUserApiService =
-        new BareIdUserApiService(bareIdUserApiTokenService, restTemplate, instanceId);
+        new BareIdUserApiService(
+            bareIdUserApiTokenService, userGroupService, restTemplate, instanceId);
 
     mockTokenResponse();
-    mockUserApiResponse();
+    mockEmptyUserApiResponse(); // return empty list for bgh
+    mockInternalUserApiResponse(); // returns user for "intern"
 
     // caselaw/BGH/Intern
     mockRootGroupsResponse(); // returns top-level groups, including "caselaw"
@@ -68,7 +72,7 @@ class BareIdUserApiServiceTest {
 
     var attributes =
         Map.of(
-            "firstName", new BareUserApiResponse.AttributeValues(List.of("Tina")),
+            "firstName", new BareUserApiResponse.AttributeValues(List.of("Foo")),
             "lastName", new BareUserApiResponse.AttributeValues(List.of("Taxpayer")));
 
     BareUserApiResponse.BareUser user = generateBareUser(userId, attributes);
@@ -88,7 +92,8 @@ class BareIdUserApiServiceTest {
 
     var userResult = bareIdUserApiService.getUser(userId);
 
-    Assertions.assertEquals("Tina Taxpayer", userResult.name());
+    Assertions.assertEquals("Foo Taxpayer", userResult.name());
+    Assertions.assertEquals("FT", userResult.initials());
     Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
     Assertions.assertEquals(userId, userResult.id());
   }
@@ -242,7 +247,7 @@ class BareIdUserApiServiceTest {
         internGroup.uuid().toString(), BareUserApiResponse.GroupApiResponse.class, courtWithIntern);
   }
 
-  private void mockUserApiResponse() {
+  private void mockInternalUserApiResponse() {
 
     var attributes =
         Map.of(
@@ -253,6 +258,23 @@ class BareIdUserApiServiceTest {
 
     BareUserApiResponse.UsersApiResponse userApiResponse =
         new BareUserApiResponse.UsersApiResponse(List.of(user));
+
+    ResponseEntity<BareUserApiResponse.UsersApiResponse> mockUsersResponse =
+        ResponseEntity.ok(userApiResponse);
+
+    doReturn(mockUsersResponse)
+        .when(restTemplate)
+        .exchange(
+            endsWith(internGroup.uuid().toString() + "/users"),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(BareUserApiResponse.UsersApiResponse.class));
+  }
+
+  private void mockEmptyUserApiResponse() {
+
+    BareUserApiResponse.UsersApiResponse userApiResponse =
+        new BareUserApiResponse.UsersApiResponse(List.of());
 
     ResponseEntity<BareUserApiResponse.UsersApiResponse> mockUsersResponse =
         ResponseEntity.ok(userApiResponse);

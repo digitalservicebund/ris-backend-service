@@ -97,6 +97,7 @@ test.describe(
       })
 
       await test.step("Nach erfolgreichem Zuweisen wird zur Startseite weitergeleitet", async () => {
+        await page.getByTestId("document-unit-search-entry-form").waitFor()
         await expect(page).toHaveURL("/caselaw/search")
       })
 

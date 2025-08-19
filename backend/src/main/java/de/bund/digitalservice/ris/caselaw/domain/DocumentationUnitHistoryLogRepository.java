@@ -39,6 +39,7 @@ public interface DocumentationUnitHistoryLogRepository {
    *     of the day, for the user
    * @param documentationUnitId the id of the documentation unit
    * @param user logged-in user for checking view permissions
+   * @return
    */
   void saveHistoryLog(
       UUID id,
@@ -46,4 +47,12 @@ public interface DocumentationUnitHistoryLogRepository {
       User user,
       HistoryLogEventType eventType,
       String description);
+
+  void saveProcessStepHistoryLog(
+      UUID documentationUnitId,
+      User user,
+      HistoryLogEventType eventType,
+      String description,
+      DocumentationUnitProcessStep fromStep,
+      DocumentationUnitProcessStep toStep);
 }

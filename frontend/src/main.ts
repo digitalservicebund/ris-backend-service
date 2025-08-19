@@ -44,8 +44,6 @@ if (import.meta.env.PROD) {
       Sentry.captureConsoleIntegration(),
     ],
     tracePropagationTargets: targets(),
-    // Performance Monitoring
-    tracesSampleRate: 0.01, // Capture 100% of the transactions, reduce in production!
     attachProps: true,
     ignoreErrors: [
       // Irrelevant ProseMirror warning, see {@link filterConsoleWarnings} for details
