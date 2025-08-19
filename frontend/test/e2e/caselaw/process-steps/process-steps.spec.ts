@@ -6,84 +6,63 @@ test.describe("process steps", () => {
   test("rendering initial state, click on 'Weitergeben'", async ({
     pageWithBghUser,
   }) => {
-    await navigateToSearch(pageWithBghUser)
-
-    await pageWithBghUser
-      .getByRole("button", { name: "Neue Entscheidung" })
-      .first()
-      .click()
-
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-    await expect(infoPanel).toContainText("Ersterfassung")
 
-    await pageWithBghUser
-      .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
-      .click()
+    await test.step("Create a new decision with BGH court", async () => {
+      await navigateToSearch(pageWithBghUser)
+      await pageWithBghUser
+        .getByRole("button", { name: "Neue Entscheidung" })
+        .first()
+        .click()
 
-    const dialog = pageWithBghUser.getByRole("dialog")
-    await expect(dialog).toBeVisible()
-    await expect(
-      dialog.getByText("Dokumentationseinheit weitergeben"),
-    ).toBeVisible()
-    await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
-    await expect(
-      dialog.getByRole("combobox", { name: "Neuer Schritt" }),
-    ).toContainText("QS formal")
-
-    const weitergebenButton = dialog.getByRole("button", {
-      name: "Weitergeben",
+      await expect(infoPanel).toContainText("Ersterfassung")
     })
-    await expect(weitergebenButton).toBeVisible()
-    await expect(
-      dialog.getByRole("button", { name: "Abbrechen" }),
-    ).toBeVisible()
 
-    await weitergebenButton.click()
+    await test.step("Open process step dialog", async () => {
+      await openProcessStepDialog(pageWithBghUser)
+    })
 
-    await expect(dialog).toBeHidden()
+    await test.step("Save changes and close dialog", async () => {
+      await saveChangesAndCloseDialog(pageWithBghUser)
+    })
 
-    await expect(infoPanel).toContainText("EE")
-    await expect(infoPanel).toContainText("QS formal")
+    await test.step("Validate process step is displayed in info panel", async () => {
+      await expect(infoPanel).toContainText("EE")
+      await expect(infoPanel).toContainText("QS formal")
+    })
   })
 
   test("rendering initial state, click on 'Abbrechen'", async ({
     pageWithBghUser,
   }) => {
-    await navigateToSearch(pageWithBghUser)
-
-    await pageWithBghUser
-      .getByRole("button", { name: "Neue Entscheidung" })
-      .first()
-      .click()
-
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-    await expect(infoPanel).toContainText("Ersterfassung")
 
-    await pageWithBghUser
-      .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
-      .click()
+    await test.step("Create a new decision with BGH court", async () => {
+      await navigateToSearch(pageWithBghUser)
+      await pageWithBghUser
+        .getByRole("button", { name: "Neue Entscheidung" })
+        .first()
+        .click()
 
-    const dialog = pageWithBghUser.getByRole("dialog")
-    await expect(dialog).toBeVisible()
-    await expect(
-      dialog.getByText("Dokumentationseinheit weitergeben"),
-    ).toBeVisible()
-    await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
-    await expect(
-      dialog.getByRole("combobox", { name: "Neuer Schritt" }),
-    ).toContainText("QS formal")
-    await expect(
-      dialog.getByRole("button", { name: "Weitergeben" }),
-    ).toBeVisible()
+      await expect(infoPanel).toContainText("Ersterfassung")
+    })
 
-    const abbrechenButton = dialog.getByRole("button", { name: "Abbrechen" })
-    await expect(abbrechenButton).toBeVisible()
+    await test.step("Open process step dialog", async () => {
+      await openProcessStepDialog(pageWithBghUser)
+    })
 
-    await abbrechenButton.click()
+    await test.step("Click on 'Abbrechen' should not save changes", async () => {
+      const dialog = pageWithBghUser.getByRole("dialog")
+      const abbrechenButton = dialog.getByRole("button", { name: "Abbrechen" })
+      await expect(abbrechenButton).toBeVisible()
 
-    await expect(dialog).toBeHidden()
+      await abbrechenButton.click()
+      await expect(dialog).toBeHidden()
+    })
 
-    await expect(infoPanel).toContainText("Ersterfassung")
+    await test.step("Validate process step is displayed in info panel", async () => {
+      await expect(infoPanel).toContainText("Ersterfassung")
+    })
   })
 
   test("rendering initial state, select 'Fachdokumentation', click on 'Weitergeben'", async ({
@@ -135,7 +114,9 @@ test.describe("process steps", () => {
     await expect(infoPanel).toContainText("Fachdokumentation")
   })
 
-  test("Saving a process step without user", async ({ pageWithBghUser }) => {
+  test("rendering initial state, select 'Ersterfassung', click on 'Weitergeben'", async ({
+    pageWithBghUser,
+  }) => {
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
     await test.step("Create a new decision with BGH court", async () => {
       await navigateToSearch(pageWithBghUser)
@@ -175,7 +156,7 @@ test.describe("process steps", () => {
     })
   })
 
-  test("Saving a process step with a selected user", async ({
+  test("rendering initial state, select 'Ersterfassung', select user, click on 'Weitergeben'", async ({
     pageWithBghUser,
   }) => {
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
@@ -275,6 +256,15 @@ test.describe("process steps", () => {
     await expect(dialog).toBeVisible()
     await expect(
       dialog.getByText("Dokumentationseinheit weitergeben"),
+    ).toBeVisible()
+    await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
+
+    const weitergebenButton = dialog.getByRole("button", {
+      name: "Weitergeben",
+    })
+    await expect(weitergebenButton).toBeVisible()
+    await expect(
+      dialog.getByRole("button", { name: "Abbrechen" }),
     ).toBeVisible()
   }
 
