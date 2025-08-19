@@ -12,7 +12,7 @@ describe("DecisionPlausibilityCheck", () => {
     useFeatureToggleServiceMock()
   })
   it("should not show XML preview if plausibility check fails", async () => {
-    await renderComponent({ isPlausibilityCheckValid: false })
+    await renderComponent({ hasPlausibilityCheckPassed: false })
 
     // Click simulates updating the plausibility check with mock
     await fireEvent.click(screen.getByText("DecisionPlausibilityCheck"))
@@ -25,7 +25,7 @@ describe("DecisionPlausibilityCheck", () => {
   })
 
   it("should render all child components when plausibility check is true", async () => {
-    await renderComponent({ isPlausibilityCheckValid: true })
+    await renderComponent({ hasPlausibilityCheckPassed: true })
 
     // Click simulates updating the plausibility check with mock
     await fireEvent.click(screen.getByText("DecisionPlausibilityCheck"))
@@ -38,16 +38,16 @@ describe("DecisionPlausibilityCheck", () => {
   })
 })
 
-const DecisionPlausibilityCheck = (isPlausibilityCheckValid: boolean) => ({
-  template: `<span @click="$emit('update-plausibility-check', ${isPlausibilityCheckValid})">DecisionPlausibilityCheck</span>`,
+const DecisionPlausibilityCheck = (hasPlausibilityCheckPassed: boolean) => ({
+  template: `<span @click="$emit('update-plausibility-check', ${hasPlausibilityCheckPassed})">DecisionPlausibilityCheck</span>`,
 })
 const PublicationActions = {
   props: ["isPublishable"],
   template: `<span>PublicationActions - publishable: {{ isPublishable }}</span>`,
 }
 async function renderComponent(
-  { isPlausibilityCheckValid }: { isPlausibilityCheckValid: boolean } = {
-    isPlausibilityCheckValid: true,
+  { hasPlausibilityCheckPassed }: { hasPlausibilityCheckPassed: boolean } = {
+    hasPlausibilityCheckPassed: true,
   },
 ) {
   const router = createRouter({
@@ -64,7 +64,7 @@ async function renderComponent(
       global: {
         stubs: {
           DecisionPlausibilityCheck: DecisionPlausibilityCheck(
-            isPlausibilityCheckValid,
+            hasPlausibilityCheckPassed,
           ),
           PublicationActions,
         },
