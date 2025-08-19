@@ -84,7 +84,7 @@ public class TestphasePortalSanityCheckService {
             inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
         log.info("Deleting documents not in Rechtsprechung im Internet...");
         try {
-          inPortalNotInRii.forEach(portalPublicationService::deleteDocumentationUnit);
+          inPortalNotInRii.forEach(portalPublicationService::withdrawDocumentationUnit);
           portalPublicationService.uploadDeletionChangelog(
               inPortalNotInRii.stream().map(documentNumber -> documentNumber + ".xml").toList());
 

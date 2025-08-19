@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -969,5 +970,39 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Override
   public List<String> findAllDocumentNumbersByMatchingPublishCriteria() {
     return repository.getAllMatchingPublishCriteria();
+  }
+
+  @Override
+  public void updatePortalPublicationStatus(
+      UUID documentationUnitId, PortalPublicationStatus newStatus) {
+    DocumentationUnitDTO documentationUnitDTO =
+        repository.findById(documentationUnitId).orElse(null);
+    if (documentationUnitDTO == null) {
+      log.info(
+          "Can't update portal publiation status for documentation unti with id: {}",
+          documentationUnitId);
+      return;
+    }
+    var oldStatus = documentationUnitDTO.getPortalPublicationStatus();
+
+    setLastUpdated(null, documentationUnitDTO);
+
+    historyLogService.saveHistoryLog(
+        documentationUnitId,
+        null,
+        HistoryLogEventType.PORTAL_PUBLICATION,
+        "Status im Portal geändert: "
+            + oldStatus.humanReadable
+            + " → "
+            + PortalPublicationStatus.PUBLISHED.humanReadable);
+
+    if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
+      documentationUnitDTO = decisionDTO.toBuilder().portalPublicationStatus(newStatus).build();
+    }
+    if (documentationUnitDTO instanceof PendingProceedingDTO pendingProceedingDTO) {
+      documentationUnitDTO =
+          pendingProceedingDTO.toBuilder().portalPublicationStatus(newStatus).build();
+    }
+    repository.save(documentationUnitDTO);
   }
 }

@@ -166,4 +166,6 @@ public interface DocumentationUnitRepository {
   List<String> findAllDocumentNumbersByMatchingPublishCriteria();
 
   void saveProcessSteps(DocumentationUnit documentationUnit);
+
+  void updatePortalPublicationStatus(UUID documentationUnitId, PortalPublicationStatus newStatus);
 }

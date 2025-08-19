@@ -140,6 +140,7 @@ class PortalPublicationServiceTest {
             historyLogService);
     when(objectMapper.writeValueAsString(any())).thenReturn("");
     when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
+    when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
   }
 
   @Test
@@ -150,10 +151,6 @@ class PortalPublicationServiceTest {
     when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
     when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
     when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
-    var updatedDocUnit =
-        testDocumentUnit.toBuilder()
-            .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
-            .build();
 
     subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
 
@@ -165,7 +162,7 @@ class PortalPublicationServiceTest {
             HistoryLogEventType.PORTAL_PUBLICATION,
             "Dokumentationseinheit veröffentlicht");
     verify(documentationUnitRepository)
-        .save(updatedDocUnit, null, "Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
+        .updatePortalPublicationStatus(testDocumentUnit.uuid(), PortalPublicationStatus.PUBLISHED);
   }
 
   @Test
@@ -376,7 +373,7 @@ class PortalPublicationServiceTest {
     when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
         .thenReturn(List.of(withPrefix(testDocumentNumber)));
 
-    subject.deleteDocumentationUnit(testDocumentNumber);
+    subject.withdrawDocumentationUnit(testDocumentNumber);
 
     verify(caseLawBucket, times(1)).delete(withPrefix(testDocumentNumber));
   }
@@ -388,7 +385,7 @@ class PortalPublicationServiceTest {
     doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> subject.deleteDocumentationUnit(testDocumentNumber))
+        .isThrownBy(() -> subject.withdrawDocumentationUnit(testDocumentNumber))
         .withMessageContaining("Could not delete LDML from bucket.");
   }
 
@@ -407,7 +404,7 @@ class PortalPublicationServiceTest {
 
   @Test
   void uploadChangelog_withDisabledFeatureFlag_shouldDoNothing() throws JsonProcessingException {
-    when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(false);
+    when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(false);
 
     subject.uploadChangelog(List.of(), List.of());
 
@@ -428,7 +425,7 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void uploadFullReindexChangelog_withFeatureEnabled_shouldNotUpload()
+  void uploadFullReindexChangelog_withRegularChangelogsEnabled_shouldNotUpload()
       throws JsonProcessingException {
     subject.uploadFullReindexChangelog();
 
@@ -436,14 +433,14 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void uploadFullReindexChangelog_withFeatureDisabled_shouldUpload()
+  void uploadFullReindexChangelog_withRegularChangelogsDisabled_shouldUpload()
       throws JsonProcessingException {
     var changelogContent =
         """
         {"changeAll":true}
         """;
     when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
-    when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(false);
+    when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(false);
 
     subject.uploadFullReindexChangelog();
 
