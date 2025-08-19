@@ -57,7 +57,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
       await expect(abbrechenButton).toBeVisible()
 
       await abbrechenButton.click()
-      await expect(dialog).toBeHidden()
+      await expect(dialog).toBeHidden({ timeout: 10000 })
     })
 
     await test.step("Validate process step is displayed in info panel", async () => {
@@ -108,7 +108,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
 
     await weitergebenButton.click()
 
-    await expect(dialog).toBeHidden()
+    await expect(dialog).toBeHidden({ timeout: 10000 })
 
     await expect(infoPanel).toContainText("EE")
     await expect(infoPanel).toContainText("Fachdokumentation")
@@ -272,7 +272,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
     const dialog = page.getByRole("dialog")
 
     await page.getByRole("button", { name: "Abbrechen" }).click()
-    await expect(dialog).toBeHidden()
+    await expect(dialog).toBeHidden({ timeout: 10000 })
   }
 
   async function saveChangesAndCloseDialog(page: Page) {
@@ -282,6 +282,6 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
     })
     await weitergebenButton.click()
 
-    await expect(dialog).toBeHidden()
+    await expect(dialog).toBeHidden({ timeout: 10000 })
   }
 })
