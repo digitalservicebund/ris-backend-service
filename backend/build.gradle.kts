@@ -18,7 +18,7 @@ plugins {
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.52.0"
-    id ("io.freefair.lombok") version "8.14"
+    id ("io.freefair.lombok") version "8.14.2"
     id("org.flywaydb.flyway") version "11.11.1"
     id("io.sentry.jvm.gradle") version "5.9.0"
 }
@@ -160,7 +160,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") {
         exclude(group = "net.minidev", module = "json-smart")
     }
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.2")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.5.3")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.3.0")
 
@@ -247,7 +247,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.9")
-    testImplementation("org.springframework.security:spring-security-test:6.5.2")
+    testImplementation("org.springframework.security:spring-security-test:6.5.3")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
