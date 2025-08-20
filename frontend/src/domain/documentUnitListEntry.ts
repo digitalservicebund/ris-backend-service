@@ -1,5 +1,6 @@
 import { Court } from "@/domain/court"
 import DocumentationOffice from "@/domain/documentationOffice"
+import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import { DocumentType } from "@/domain/documentType"
 import { PublicationStatus } from "@/domain/publicationStatus"
 
@@ -24,6 +25,8 @@ export default class DocumentUnitListEntry {
   isEditable?: boolean
   source?: string
   creatingDocumentationOffice?: DocumentationOffice
+  currentProcessStep?: DocumentationUnitProcessStep
+  processSteps?: DocumentationUnitProcessStep[]
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)

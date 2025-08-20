@@ -14,7 +14,7 @@ export function useStatusBadge(status: DocumentationUnit["status"]) {
     label: "",
     icon: undefined,
     backgroundColor: "bg-white",
-    borderColor: "border-white",
+    borderColor: "black",
   }
 
   return computed(() => {
