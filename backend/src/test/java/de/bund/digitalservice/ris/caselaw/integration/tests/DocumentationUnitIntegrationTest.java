@@ -84,6 +84,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -108,6 +109,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -146,6 +148,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @MockitoBean private AttachmentService attachmentService;
   @MockitoBean private HandoverReportRepository handoverReportRepository;
   @MockitoBean DocumentNumberPatternConfig documentNumberPatternConfig;
+  @MockitoSpyBean private UserService userService;
+  private final UUID oidcLoggedInUserId = UUID.randomUUID();
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
@@ -167,6 +171,17 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .findByName("Ersterfassung")
             .orElseThrow(
                 () -> new AssertionError("Process step 'Ersterfassung' not found in repository."));
+
+    // Mock the UserService.getUser(UUID) for the OIDC logged-in user
+    // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
+    // We need this to assert on history logs
+    when(userService.getUser(oidcLoggedInUserId))
+        .thenReturn(
+            User.builder()
+                .id(oidcLoggedInUserId)
+                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
+                .documentationOffice(docOffice)
+                .build());
   }
 
   @AfterEach
@@ -1716,7 +1731,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             repository, documentationOffice, creatingDocumentationOffice, documentNumber);
 
     risWebTestClient
-        .withDefaultLogin()
+        .withDefaultLogin(oidcLoggedInUserId)
         .put()
         .uri("/api/v1/caselaw/documentunits/1234567890123/takeover")
         .exchange()
@@ -1948,7 +1963,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     // Act
     risWebTestClient
-        .withDefaultLogin()
+        .withDefaultLogin(oidcLoggedInUserId)
         .put()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -1975,10 +1990,16 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                               DocumentationOfficeTransformer.transformToDomain(
                                   documentationUnit.getDocumentationOffice()))
                           .build());
-              assertThat(historyLogs).hasSize(1);
+              assertThat(historyLogs).hasSize(3);
               assertThat(historyLogs.get(0).eventType())
+                  .isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
+              assertThat(historyLogs.get(0).description()).isEqualTo("Person gesetzt: testUser");
+              assertThat(historyLogs.get(1).eventType())
+                  .isEqualTo(HistoryLogEventType.PROCESS_STEP);
+              assertThat(historyLogs.get(1).description()).isEqualTo("Schritt gesetzt: Neu");
+              assertThat(historyLogs.get(2).eventType())
                   .isEqualTo(HistoryLogEventType.DOCUMENTATION_OFFICE);
-              assertThat(historyLogs.get(0).description())
+              assertThat(historyLogs.get(2).description())
                   .isEqualTo("Dokstelle geändert: [DS] → [BGH]");
               assertThat(
                       documentationUnitDTO
@@ -2184,7 +2205,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
   private RisEntityExchangeResult<Decision> generateNewDecision() {
     return risWebTestClient
-        .withDefaultLogin()
+        .withDefaultLogin(oidcLoggedInUserId)
         .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .contentType(MediaType.APPLICATION_JSON)

@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitHistoryLogRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
@@ -23,6 +24,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +34,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,15 +55,15 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
-@Import({StagingPortalPublicationServiceIntegrationTest.PortalPublicationConfig.class})
-class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest {
+@Import({PortalPublicationIntegrationTest.PortalPublicationConfig.class})
+class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
   @TestConfiguration
   static class PortalPublicationConfig {
 
     @Bean
     @Primary
-    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer stagingPortalTransformer(
+    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer fullLdmlTransformer(
         DocumentBuilderFactory documentBuilderFactory) {
       return new FullLdmlTransformer(documentBuilderFactory);
     }
@@ -70,6 +74,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
+  @Autowired private DatabaseDocumentationUnitHistoryLogRepository historyLogRepository;
 
   @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
@@ -82,6 +87,8 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
   void setUp() {
     documentationOffice =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
+    when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(true);
+    when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(true);
   }
 
   @AfterEach
@@ -94,8 +101,9 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
 
+    UUID userId = UUID.randomUUID();
     risWebTestClient
-        .withDefaultLogin()
+        .withDefaultLogin(userId)
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
         .exchange()
@@ -109,6 +117,31 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
     var capturedRequests = captor.getAllValues();
     assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
     assertThat(capturedRequests.get(1).key()).contains("changelogs/");
+
+    var updatedDto = repository.findById(dto.getId()).get();
+    assertThat(updatedDto.getPortalPublicationStatus())
+        .isEqualTo(PortalPublicationStatus.PUBLISHED);
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    assertThat(historyLogs)
+        .hasSize(2)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getUserId()).isEqualTo(userId);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokumentationseinheit veröffentlicht");
+            },
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
+              assertThat(historyLog.getUserId()).isNull();
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
+            });
   }
 
   @Test
@@ -243,7 +276,8 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
     assertThat(capturedRequests.get(2).key()).isEqualTo("1234567890123/bild2.png");
     assertThat(capturedRequests.get(3).key()).contains("changelogs/");
 
-    dto.setAttachments(
+    var updatedDto = repository.findById(dto.getId()).orElseThrow();
+    updatedDto.setAttachments(
         List.of(
             AttachmentDTO.builder()
                 .content(new byte[] {1, 2, 3})
@@ -252,7 +286,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
                 .uploadTimestamp(Instant.now())
                 .documentationUnit(dto)
                 .build()));
-    dto = repository.save(dto);
+    updatedDto = repository.save(updatedDto);
 
     var response =
         ListObjectsV2Response.builder()
@@ -269,7 +303,7 @@ class StagingPortalPublicationServiceIntegrationTest extends BaseIntegrationTest
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .uri("/api/v1/caselaw/documentunits/" + updatedDto.getId() + "/publish")
         .exchange()
         .expectStatus()
         .isOk();

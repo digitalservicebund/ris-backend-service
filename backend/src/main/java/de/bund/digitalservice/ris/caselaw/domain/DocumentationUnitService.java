@@ -710,9 +710,9 @@ public class DocumentationUnitService {
     repository.saveKeywords(decision);
     repository.saveFieldsOfLaw(decision);
     repository.saveProcedures(decision, user);
-    repository.saveProcessSteps(decision);
+    var processStepChanged = repository.saveProcessSteps(decision, user);
 
-    repository.save(decision, user);
+    repository.save(decision, user, null, processStepChanged);
 
     if (duplicateCheckStatus == DuplicateCheckStatus.ENABLED) {
       try {
@@ -729,7 +729,7 @@ public class DocumentationUnitService {
       throws DocumentationUnitNotExistsException {
     repository.saveKeywords(pendingProceeding);
     repository.saveFieldsOfLaw(pendingProceeding);
-    repository.saveProcessSteps(pendingProceeding);
+    repository.saveProcessSteps(pendingProceeding, user);
 
     repository.save(pendingProceeding, user);
 
@@ -788,7 +788,7 @@ public class DocumentationUnitService {
                                           "Process Step 'Neu' not found")))
                       .build())
               .build();
-      repository.saveProcessSteps(decision);
+      repository.saveProcessSteps(decision, user);
       return "The documentation office [%s] has been successfully assigned."
           .formatted(documentationOffice.abbreviation());
     }

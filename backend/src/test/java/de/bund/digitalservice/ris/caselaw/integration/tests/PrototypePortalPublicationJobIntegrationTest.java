@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
-import static de.bund.digitalservice.ris.caselaw.domain.PubcliationJobStatus.SUCCESS;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationJobStatus.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -9,15 +9,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationJobService;
-import de.bund.digitalservice.ris.caselaw.adapter.PortalPublicationService;
-import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalBucket;
-import de.bund.digitalservice.ris.caselaw.adapter.PrototypePortalPublicationService;
-import de.bund.digitalservice.ris.caselaw.adapter.RiiService;
-import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -34,8 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublication
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.ReducedLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.PubcliationJobStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationJobStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -69,30 +61,9 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
   @TestConfiguration
   static class PortalPublicationConfig {
-
     @Bean
     @Primary
-    public PortalPublicationService prototypePortalPublicationService(
-        DocumentationUnitRepository documentationUnitRepository,
-        AttachmentRepository attachmentRepository,
-        XmlUtilService xmlUtilService,
-        PrototypePortalBucket prototypePortalBucket,
-        ObjectMapper objectMapper,
-        de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer portalTransformer,
-        RiiService riiService) {
-      return new PrototypePortalPublicationService(
-          documentationUnitRepository,
-          attachmentRepository,
-          xmlUtilService,
-          prototypePortalBucket,
-          objectMapper,
-          portalTransformer,
-          riiService);
-    }
-
-    @Bean
-    @Primary
-    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer prototypePortalTransformer(
+    public de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer reducedLdmlTransformer(
         DocumentBuilderFactory documentBuilderFactory) {
       return new ReducedLdmlTransformer(documentBuilderFactory);
     }
@@ -106,7 +77,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private PortalPublicationJobService portalPublicationJobService;
 
-  @MockitoBean(name = "prototypePortalS3Client")
+  @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
@@ -116,6 +87,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
   void setUp() {
     documentationOffice =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
+    when(featureToggleService.isEnabled("neuris.portal-publication")).thenReturn(false);
 
     portalPublicationJobRepository.deleteAll();
   }
@@ -242,7 +214,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
             portalPublicationJobRepository.findAll().stream()
                 .map(PortalPublicationJobDTO::getPublicationJobStatus)
                 .toList())
-        .isEqualTo(List.of(PubcliationJobStatus.ERROR, PubcliationJobStatus.SUCCESS));
+        .isEqualTo(List.of(PublicationJobStatus.ERROR, PublicationJobStatus.SUCCESS));
   }
 
   @Test
@@ -265,7 +237,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
                 .map(PortalPublicationJobDTO::getPublicationJobStatus)
                 .toList())
         .hasSize(1)
-        .isEqualTo(List.of(PubcliationJobStatus.SUCCESS));
+        .isEqualTo(List.of(PublicationJobStatus.SUCCESS));
   }
 
   @Test
@@ -295,7 +267,7 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
     return PortalPublicationJobDTO.builder()
         .documentNumber(dto.getDocumentNumber())
         .createdAt(Instant.now())
-        .publicationJobStatus(PubcliationJobStatus.PENDING)
+        .publicationJobStatus(PublicationJobStatus.PENDING)
         .publicationJobType(publicationType)
         .build();
   }

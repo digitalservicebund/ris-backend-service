@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
-import de.bund.digitalservice.ris.caselaw.domain.PubcliationJobStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationJobStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -78,22 +78,23 @@ public class PortalPublicationJobService {
       try {
         var result =
             this.portalPublicationService.publishDocumentationUnit(job.getDocumentNumber());
-        job.setPublicationJobStatus(PubcliationJobStatus.SUCCESS);
+        job.setPublicationJobStatus(PublicationJobStatus.SUCCESS);
         return result;
       } catch (Exception e) {
         log.error("Could not publish documentation unit {}", job.getDocumentNumber(), e);
-        job.setPublicationJobStatus(PubcliationJobStatus.ERROR);
+        job.setPublicationJobStatus(PublicationJobStatus.ERROR);
       }
     }
 
     if (job.getPublicationJobType() == PublicationJobType.DELETE) {
       try {
-        var result = this.portalPublicationService.deleteDocumentationUnit(job.getDocumentNumber());
-        job.setPublicationJobStatus(PubcliationJobStatus.SUCCESS);
+        var result =
+            this.portalPublicationService.withdrawDocumentationUnit(job.getDocumentNumber());
+        job.setPublicationJobStatus(PublicationJobStatus.SUCCESS);
         return result;
       } catch (Exception e) {
         log.error("Could not unpublish documentation unit {}", job.getDocumentNumber(), e);
-        job.setPublicationJobStatus(PubcliationJobStatus.ERROR);
+        job.setPublicationJobStatus(PublicationJobStatus.ERROR);
       }
     }
     return null;
@@ -103,7 +104,7 @@ public class PortalPublicationJobService {
       List<PortalPublicationResult> results, List<PortalPublicationJobDTO> pendingJobs) {
     Map<String, PortalPublicationJobDTO> jobsWithoutDuplicates =
         pendingJobs.stream()
-            .filter(job -> job.getPublicationJobStatus() == PubcliationJobStatus.SUCCESS)
+            .filter(job -> job.getPublicationJobStatus() == PublicationJobStatus.SUCCESS)
             .collect(
                 Collectors.toMap(
                     job -> job.getDocumentNumber() + "/" + job.getDocumentNumber() + ".xml",
