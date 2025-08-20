@@ -2,7 +2,7 @@
 
 [![Pipeline](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/pipeline.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/pipeline.yml)
 [![Scan](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/scan.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/scan.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=digitalservicebund_ris-backend-service&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=digitalservicebund_ris-backend-service)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=digitalservicebund_ris-backend-service_backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=digitalservicebund_ris-backend-service_backend)
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
 
 ## Prerequisites
@@ -58,7 +58,7 @@ eval "$(direnv hook zsh)"
 
 ### S3 Credentials for Lookup Table Initialization
 
-The lookup table initialization in your local environment will be performed with data provided by a s3 bucket. Read [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials) on how to retrieve credentials for it. 
+The lookup table initialization in your local environment will be performed with data provided by a s3 bucket. Read [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials) on how to retrieve credentials for it.
 
 Then, store the credentials in 1Password:
 
