@@ -198,11 +198,6 @@ onUnmounted(() => {
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
-              <IconError
-                v-if="item.status?.withError"
-                class="text-red-900"
-                data-testid="publication-error"
-              />
               <div class="min-w-[130px]">{{ item.documentNumber }}</div>
               <template v-if="isDecision">
                 <span
@@ -275,14 +270,17 @@ onUnmounted(() => {
           </template>
         </Column>
 
-        <Column field="court.type" header="Gericht">
+        <Column field="court.type" header="Gerichtstyp">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
               <div>{{ item.court?.type ?? "-" }}</div>
-              <div v-if="isDecision && item.court?.location">
-                {{ item.court?.location }}
-              </div>
             </div>
+          </template>
+        </Column>
+
+        <Column v-if="isDecision" field="court.location" header="Ort">
+          <template #body="{ data: item }">
+            {{ item.court?.location ?? "-" }}
           </template>
         </Column>
 
@@ -374,6 +372,21 @@ onUnmounted(() => {
           </template>
         </Column>
 
+        <Column header="Fehler">
+          <template #body="{ data: item }">
+            <IconBadge
+              v-if="item.status?.withError"
+              background-color="bg-red-300"
+              class="flex"
+              data-testid="publication-error"
+              :icon="IconError"
+              icon-color="text-red-900"
+              label="Fehler"
+            />
+            <span v-else>-</span>
+          </template>
+        </Column>
+
         <Column
           v-if="isPendingProceeding"
           field="resolutionDate"
@@ -393,6 +406,7 @@ onUnmounted(() => {
             {{ publicationDate(item) }}
           </template>
         </Column>
+
         <Column field="actions">
           <template #header>
             <span class="sr-only">Aktionen</span>
