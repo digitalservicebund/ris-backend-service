@@ -1,8 +1,13 @@
 import { createTestingPinia } from "@pinia/testing"
-import { fireEvent, render, screen } from "@testing-library/vue"
-import { setActivePinia } from "pinia"
+import { render, screen } from "@testing-library/vue"
+import { setActivePinia, Store } from "pinia"
+import { Ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DecisionPublication from "@/components/publication/DecisionPublication.vue"
+import { CoreData } from "@/domain/coreData"
+import { Decision } from "@/domain/decision"
+import { DuplicateRelation, ManagementData } from "@/domain/managementData"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
 
@@ -11,45 +16,81 @@ describe("DecisionPlausibilityCheck", () => {
     setActivePinia(createTestingPinia())
     useFeatureToggleServiceMock()
   })
-  it("should not show XML preview if plausibility check fails", async () => {
-    await renderComponent({ isPlausibilityCheckValid: false })
 
-    // Click simulates updating the plausibility check with mock
-    await fireEvent.click(screen.getByText("DecisionPlausibilityCheck"))
+  it("should not show LDML preview if plausibility check fails", async () => {
+    await renderComponent({ hasPlausibilityCheckPassed: false })
 
-    expect(screen.getByText("DecisionPlausibilityCheck")).toBeInTheDocument()
     expect(
-      screen.getByText("PublicationActions - publishable: false"),
+      screen.getByText(
+        "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
+      ),
     ).toBeInTheDocument()
-    expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
+
+    expect(screen.queryByText("LDML Vorschau")).not.toBeInTheDocument()
+  })
+
+  it("should not allow publishing if plausibility check fails", async () => {
+    await renderComponent({ hasPlausibilityCheckPassed: false })
+
+    expect(
+      screen.getByText(
+        "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
+      ),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole("button", { name: "Veröffentlichen" }),
+    ).toBeDisabled()
   })
 
   it("should render all child components when plausibility check is true", async () => {
-    await renderComponent({ isPlausibilityCheckValid: true })
+    await renderComponent({ hasPlausibilityCheckPassed: true })
 
-    // Click simulates updating the plausibility check with mock
-    await fireEvent.click(screen.getByText("DecisionPlausibilityCheck"))
-
-    expect(screen.getByText("DecisionPlausibilityCheck")).toBeInTheDocument()
     expect(
-      screen.getByText("PublicationActions - publishable: true"),
+      screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
     ).toBeInTheDocument()
-    expect(screen.getByText("XML Vorschau")).toBeInTheDocument()
+
+    expect(screen.getByText("Randnummernprüfung")).toBeInTheDocument()
+
+    expect(screen.getByText("Dublettenprüfung")).toBeInTheDocument()
+
+    expect(screen.getByText("Rechtschreibprüfung")).toBeInTheDocument()
+
+    expect(screen.getByText("LDML Vorschau")).toBeInTheDocument()
+
+    expect(
+      screen.getByRole("button", { name: "Veröffentlichen" }),
+    ).toBeEnabled()
   })
 })
 
-const DecisionPlausibilityCheck = (isPlausibilityCheckValid: boolean) => ({
-  template: `<span @click="$emit('update-plausibility-check', ${isPlausibilityCheckValid})">DecisionPlausibilityCheck</span>`,
-})
-const PublicationActions = {
-  props: ["isPublishable"],
-  template: `<span>PublicationActions - publishable: {{ isPublishable }}</span>`,
-}
 async function renderComponent(
-  { isPlausibilityCheckValid }: { isPlausibilityCheckValid: boolean } = {
-    isPlausibilityCheckValid: true,
+  {
+    hasPlausibilityCheckPassed,
+    duplicateRelations = [],
+  }: {
+    hasPlausibilityCheckPassed: boolean
+    duplicateRelations?: DuplicateRelation[]
+  } = {
+    hasPlausibilityCheckPassed: true,
+    duplicateRelations: [],
   },
 ) {
+  let coreData: CoreData = {}
+  if (hasPlausibilityCheckPassed) {
+    coreData = {
+      fileNumbers: ["IZ 1234"],
+      court: { label: "BGH" },
+      decisionDate: "2024-01-01",
+      documentType: { label: "Urteil", jurisShortcut: "U" },
+      legalEffect: "unbestimmt",
+    }
+  }
+  mockDocUnitStore({
+    coreData,
+    managementData: { borderNumbers: [], duplicateRelations },
+  })
+
   const router = createRouter({
     history: createWebHistory(),
     routes: routes,
@@ -62,14 +103,29 @@ async function renderComponent(
     router,
     ...render(DecisionPublication, {
       global: {
-        stubs: {
-          DecisionPlausibilityCheck: DecisionPlausibilityCheck(
-            isPlausibilityCheckValid,
-          ),
-          PublicationActions,
-        },
         plugins: [router],
       },
     }),
   }
+}
+
+function mockDocUnitStore({
+  coreData,
+  managementData,
+}: {
+  coreData?: CoreData
+  managementData?: ManagementData
+}) {
+  const mockedSessionStore = useDocumentUnitStore()
+  mockedSessionStore.documentUnit = new Decision("q834", {
+    coreData,
+    managementData,
+  })
+
+  return mockedSessionStore as Store<
+    "docunitStore",
+    {
+      documentUnit: Ref<Decision>
+    }
+  >
 }

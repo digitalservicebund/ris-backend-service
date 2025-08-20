@@ -95,7 +95,10 @@ const categoriesWithMissingData = computed<CategoryWithMissingData[]>(() => {
 })
 
 const missingCoreDataFields = computed(() =>
-  decision.value.missingRequiredFields.map((field) => fieldLabels[field]),
+  decision.value.missingRequiredFields.map((field) => ({
+    field,
+    label: fieldLabels[field],
+  })),
 )
 
 const isCaseFactsInvalid = computed<boolean>(
@@ -144,8 +147,14 @@ async function scrollToCategory(key: string) {
         <div class="flex flex-col gap-8">
           <p>Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:</p>
           <ul class="ml-32 list-disc">
-            <li v-for="field in missingCoreDataFields" :key="field">
-              {{ field }}
+            <li v-for="{ field, label } in missingCoreDataFields" :key="field">
+              <Button
+                class="h-auto border-none p-0!"
+                text
+                variant="link"
+                @click="scrollToCategory(field)"
+                >{{ label }}</Button
+              >
             </li>
           </ul>
         </div>
