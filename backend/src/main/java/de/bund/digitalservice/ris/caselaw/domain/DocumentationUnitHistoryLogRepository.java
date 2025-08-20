@@ -4,7 +4,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Domain repository for documentation units */
 @NoRepositoryBean
@@ -48,11 +50,13 @@ public interface DocumentationUnitHistoryLogRepository {
       HistoryLogEventType eventType,
       String description);
 
+  @Transactional
   void saveProcessStepHistoryLog(
       UUID documentationUnitId,
-      User user,
+      @Nullable User user,
+      String systemName,
       HistoryLogEventType eventType,
       String description,
-      DocumentationUnitProcessStep fromStep,
-      DocumentationUnitProcessStep toStep);
+      @Nullable DocumentationUnitProcessStep fromStep,
+      @Nullable DocumentationUnitProcessStep toStep);
 }

@@ -621,6 +621,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         historyLogService.saveProcessStepHistoryLog(
             documentationUnit.uuid(),
             currentUser,
+            null,
             HistoryLogEventType.PROCESS_STEP,
             description,
             DocumentationUnitProcessStepTransformer.toDomain(
@@ -631,6 +632,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         historyLogService.saveProcessStepHistoryLog(
             documentationUnit.uuid(),
             currentUser,
+            null,
             HistoryLogEventType.PROCESS_STEP_USER,
             null, // description will be set dynamically in transformer.toDomain
             DocumentationUnitProcessStepTransformer.toDomain(

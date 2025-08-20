@@ -130,6 +130,7 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
   public void saveProcessStepHistoryLog(
       UUID documentationUnitId,
       @Nullable User user,
+      String systemName,
       HistoryLogEventType eventType,
       String description,
       @Nullable DocumentationUnitProcessStep fromStep,
@@ -149,7 +150,8 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
         HistoryLogDTO.builder()
             .createdAt(Instant.now())
             .documentationUnitId(documentationUnitId)
-            .userId(user != null ? user.id() : null) // Handle null user for system logs
+            .userId(user != null ? user.id() : null)
+            .systemName(systemName)
             .description(description)
             .eventType(eventType)
             .build();
