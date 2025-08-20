@@ -5,7 +5,7 @@ import { ref, watch, computed, nextTick, onBeforeUpdate } from "vue"
 import Tooltip from "./Tooltip.vue"
 import DefaultSummary from "@/components/DefaultSummary.vue"
 import { useScroll } from "@/composables/useScroll"
-import ListItem from "@/domain/editableListItem"
+import ListItem from "@/domain/editableListItem" // NOSONAR: Imported needed for generic component
 import IconEdit from "~icons/ic/outline-edit"
 import IconAdd from "~icons/material-symbols/add"
 

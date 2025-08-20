@@ -1,7 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
-import { it } from "vitest"
 import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitManagementData from "@/components/management-data/DocumentUnitManagementData.vue"

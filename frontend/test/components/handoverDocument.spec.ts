@@ -1,7 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
-import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDecisionView from "@/components/HandoverDecisionView.vue"
 import { Decision } from "@/domain/decision"
