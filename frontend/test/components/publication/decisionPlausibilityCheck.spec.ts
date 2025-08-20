@@ -351,7 +351,7 @@ describe("DecisionPlausibilityCheck", () => {
 
       expect(
         screen.getByText(
-          /Die Rubriken "Gründe" und "Entscheidungsgründe" sind befüllt./,
+          /Die Rubriken "Gründe" und "Entscheidungsgründe" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein./,
         ),
       ).toBeVisible()
 
