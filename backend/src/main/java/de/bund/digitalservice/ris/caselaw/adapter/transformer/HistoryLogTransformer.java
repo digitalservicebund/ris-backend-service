@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice.areSameOffice;
+
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
@@ -180,15 +182,5 @@ public class HistoryLogTransformer {
         && areSameOffice(toDocumentationOffice, currentUserDocumentationOffice);
   }
 
-  /**
-   * Helper method to check if two DocumentationOffice objects are not null and have the same ID.
-   */
-  private static boolean areSameOffice(
-      @Nullable DocumentationOffice officeA, @Nullable DocumentationOffice officeB) {
 
-    if (officeA == null || officeB == null) {
-      return false;
-    }
-    return officeA.id().equals(officeB.id());
-  }
 }
