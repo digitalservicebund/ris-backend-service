@@ -136,6 +136,7 @@ licenseReport {
 sonar {
     properties {
         property("sonar.projectKey", "digitalservicebund_ris-backend-service_backend")
+        property("sonar.projectName", "ris-backend-service Backend")
         property("sonar.organization", "digitalservicebund")
         property("sonar.host.url", "https://sonarcloud.io")
         property(
