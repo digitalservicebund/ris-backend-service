@@ -10,6 +10,8 @@ import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import { computed, ref, watch, onMounted, onUnmounted } from "vue"
 
+import AssigneeBadge from "@/components/AssigneeBadge.vue"
+import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
@@ -343,6 +345,26 @@ onUnmounted(() => {
             </span>
           </template>
         </Column>
+
+        <Column header="Schritt">
+          <template #body="{ data: item }">
+            <CurrentAndLastProcessStepBadge
+              :process-steps="item.processSteps"
+            />
+          </template>
+        </Column>
+
+        <Column header="Person">
+          <template #body="{ data: item }">
+            <AssigneeBadge
+              :name="
+                item.currentProcessStep &&
+                item.currentProcessStep.user &&
+                item.currentProcessStep.user.initials
+                  ? item.currentProcessStep.user.initials
+                  : undefined
+              "
+            />
 
         <Column header="Fehler">
           <template #body="{ data: item }">
