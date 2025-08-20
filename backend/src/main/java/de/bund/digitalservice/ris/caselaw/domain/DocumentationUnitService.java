@@ -25,6 +25,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.context.annotation.Lazy;
@@ -386,9 +388,8 @@ public class DocumentationUnitService {
               oidcUser);
     }
 
-    return documentationUnitListItems
-        .map(item -> addPermissions(oidcUser, item))
-        .map(this::addUserInformationToCurrentProcessStep);
+    return addUserInformationToCurrentProcessStep(
+        documentationUnitListItems.map(item -> addPermissions(oidcUser, item)), oidcUser);
   }
 
   public DocumentationUnitListItem takeOverDocumentationUnit(
@@ -469,21 +470,21 @@ public class DocumentationUnitService {
     }
   }
 
-  private DocumentationUnitListItem addUserInformationToCurrentProcessStep(
-      DocumentationUnitListItem documentationUnitListItem) {
+  private Slice<DocumentationUnitListItem> addUserInformationToCurrentProcessStep(
+      Slice<DocumentationUnitListItem> documentationUnitListItems, OidcUser oidcUser) {
 
-    /*
+    Map<UUID, User> userIdMap =
+        userService.getUsers(oidcUser).stream()
+            .collect(Collectors.toMap(User::id, Function.identity()));
 
-    if (documentationUnitListItem.currentProcessStep() != null
-        && documentationUnitListItem.currentProcessStep().getUser() != null) {
-      var currentProcessStep = documentationUnitListItem.currentProcessStep();
-      currentProcessStep.setUser(
-          userService.getUser(documentationUnitListItem.currentProcessStep().getUser().id()));
-      return documentationUnitListItem.toBuilder().currentProcessStep(currentProcessStep).build();
-    }
-
-       */
-    return documentationUnitListItem;
+    return documentationUnitListItems.map(
+        item -> {
+          Optional.ofNullable(item.currentProcessStep())
+              .map(DocumentationUnitProcessStep::getUser)
+              .map(user -> userIdMap.get(user.id()))
+              .ifPresent(user -> item.currentProcessStep().setUser(user));
+          return item;
+        });
   }
 
   private void retrieveProcessStepsUsers(DocumentationUnit documentable) {
