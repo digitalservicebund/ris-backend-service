@@ -928,7 +928,7 @@ class DocumentationUnitControllerTest {
           .expectStatus()
           .isForbidden();
 
-      verify(stagingPortalPublicationService, never()).createLdmlPreview(TEST_UUID);
+      verify(portalPublicationService, never()).createLdmlPreview(TEST_UUID);
     }
 
     @Test
@@ -936,7 +936,7 @@ class DocumentationUnitControllerTest {
         throws DocumentationUnitNotExistsException {
       // Arrange
       doThrow(DocumentationUnitNotExistsException.class)
-          .when(stagingPortalPublicationService)
+          .when(portalPublicationService)
           .createLdmlPreview(TEST_UUID);
 
       // Act + Assert
@@ -948,7 +948,7 @@ class DocumentationUnitControllerTest {
           .expectStatus()
           .isNotFound();
 
-      verify(stagingPortalPublicationService).createLdmlPreview(TEST_UUID);
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
     }
 
     @Test
@@ -956,7 +956,7 @@ class DocumentationUnitControllerTest {
         throws DocumentationUnitNotExistsException {
       // Arrange
       var expectedResult = LdmlTransformationResult.builder().ldml("ldml").success(true).build();
-      when(stagingPortalPublicationService.createLdmlPreview(TEST_UUID)).thenReturn(expectedResult);
+      when(portalPublicationService.createLdmlPreview(TEST_UUID)).thenReturn(expectedResult);
 
       // Act
       var result =
@@ -971,7 +971,7 @@ class DocumentationUnitControllerTest {
               .returnResult();
 
       // Assert
-      verify(stagingPortalPublicationService).createLdmlPreview(TEST_UUID);
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
       assertThat(result.getResponseBody()).isEqualTo(expectedResult);
     }
 
@@ -980,7 +980,7 @@ class DocumentationUnitControllerTest {
         throws DocumentationUnitNotExistsException {
       // Arrange
       doThrow(new LdmlTransformationException("Could not parse transformed LDML as string.", null))
-          .when(stagingPortalPublicationService)
+          .when(portalPublicationService)
           .createLdmlPreview(TEST_UUID);
 
       // Act
@@ -996,7 +996,7 @@ class DocumentationUnitControllerTest {
               .returnResult();
 
       // Assert
-      verify(stagingPortalPublicationService).createLdmlPreview(TEST_UUID);
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
       assertThat(result.getResponseBody())
           .isEqualTo(
               LdmlTransformationResult.builder()
@@ -1010,7 +1010,7 @@ class DocumentationUnitControllerTest {
         throws DocumentationUnitNotExistsException {
       // Arrange
       doThrow(new DocumentationUnitException("Document type PendingProceeding is not supported."))
-          .when(stagingPortalPublicationService)
+          .when(portalPublicationService)
           .createLdmlPreview(TEST_UUID);
 
       // Act
@@ -1026,7 +1026,7 @@ class DocumentationUnitControllerTest {
               .returnResult();
 
       // Assert
-      verify(stagingPortalPublicationService).createLdmlPreview(TEST_UUID);
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
       assertThat(result.getResponseBody())
           .isEqualTo(
               LdmlTransformationResult.builder()
@@ -1042,7 +1042,7 @@ class DocumentationUnitControllerTest {
       doThrow(
               new MappingException(
                   "The element type ... must be terminated by the matchen end-tag ..."))
-          .when(stagingPortalPublicationService)
+          .when(portalPublicationService)
           .createLdmlPreview(TEST_UUID);
 
       // Act
@@ -1058,7 +1058,7 @@ class DocumentationUnitControllerTest {
               .returnResult();
 
       // Assert
-      verify(stagingPortalPublicationService).createLdmlPreview(TEST_UUID);
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
       assertThat(result.getResponseBody())
           .isEqualTo(
               LdmlTransformationResult.builder()
@@ -1073,7 +1073,7 @@ class DocumentationUnitControllerTest {
         throws DocumentationUnitNotExistsException {
       // Arrange
       doThrow(new RuntimeException("Any other exception..."))
-          .when(stagingPortalPublicationService)
+          .when(portalPublicationService)
           .createLdmlPreview(TEST_UUID);
 
       // Act
@@ -1089,7 +1089,7 @@ class DocumentationUnitControllerTest {
               .returnResult();
 
       // Assert
-      verify(stagingPortalPublicationService).createLdmlPreview(TEST_UUID);
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
       assertThat(result.getResponseBody())
           .isEqualTo(
               LdmlTransformationResult.builder()
