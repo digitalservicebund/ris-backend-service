@@ -384,6 +384,6 @@ class PrototypePortalPublicationServiceTest {
     // Act + Assert
     assertThatThrownBy(() -> subject.createLdmlPreview(uuid))
         .isInstanceOf(DocumentationUnitException.class)
-        .hasMessageContaining("Document type not supported: PendingProceeding");
+        .hasMessageContaining("Document type PendingProceeding is not supported.");
   }
 }
