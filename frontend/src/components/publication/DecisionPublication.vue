@@ -15,6 +15,7 @@ import { DuplicateRelationStatus } from "@/domain/managementData"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
+const hasPlausibilityCheckPassed = ref(false)
 const textCheckAllToggle = useFeatureToggle("neuris.text-check-publication")
 
 const store = useDocumentUnitStore()
@@ -30,9 +31,8 @@ async function onBorderNumbersRecalculated() {
   // await fetchPreview()
 }
 
-const isPlausibilityCheckValid = ref(false)
 const isPublishable = computed(
-  () => isPlausibilityCheckValid.value && isPortalPublicationEnabled.value,
+  () => hasPlausibilityCheckPassed.value && isPortalPublicationEnabled.value,
 )
 
 const pendingDuplicates = ref(
@@ -48,7 +48,7 @@ const pendingDuplicates = ref(
       <TitleElement>Veröffentlichen</TitleElement>
       <DecisionPlausibilityCheck
         @update-plausibility-check="
-          (isValid) => (isPlausibilityCheckValid = isValid)
+          (hasPassed) => (hasPlausibilityCheckPassed = hasPassed)
         "
       />
       <BorderNumberCheck
@@ -65,13 +65,13 @@ const pendingDuplicates = ref(
       />
       <div class="border-b-1 border-b-gray-400"></div>
       <ExpandableContent
-        v-if="isPlausibilityCheckValid"
+        v-if="hasPlausibilityCheckPassed"
         as-column
         class="border-b-1 border-gray-400 pb-24"
-        header="XML Vorschau"
+        header="LDML Vorschau"
         header-class="ris-body1-bold"
         :is-expanded="false"
-        title="XML Vorschau"
+        title="LDML Vorschau"
       >
         <CodeSnippet title="" :xml="'<?xml>' + '\nNoch nicht implementiert'" />
       </ExpandableContent>

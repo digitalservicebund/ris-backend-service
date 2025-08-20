@@ -18,7 +18,7 @@ const emits =
   defineEmits<
     (
       event: "updatePlausibilityCheck",
-      isPlausibilityCheckValid: boolean,
+      hasPlausibilityCheckPassed: boolean,
     ) => void
   >()
 const store = useDocumentUnitStore()
@@ -111,7 +111,7 @@ const isDecisionReasonsInvalid = computed<boolean>(
     !!decision.value?.longTexts.reasons &&
     !!decision.value?.longTexts.decisionReasons,
 )
-const isPlausibilityCheckValid = computed<boolean>(
+const hasPlausibilityCheckPassed = computed<boolean>(
   () =>
     missingCoreDataFields.value.length === 0 &&
     categoriesWithMissingData.value.length === 0 &&
@@ -119,8 +119,8 @@ const isPlausibilityCheckValid = computed<boolean>(
     !isDecisionReasonsInvalid.value,
 )
 watch(
-  isPlausibilityCheckValid,
-  (isValid) => emits("updatePlausibilityCheck", isValid),
+  hasPlausibilityCheckPassed,
+  (hasPassed) => emits("updatePlausibilityCheck", hasPassed),
   { immediate: true },
 )
 
@@ -136,7 +136,7 @@ async function scrollToCategory(key: string) {
   <div class="flex flex-col gap-16">
     <h3 class="ris-label1-bold">Plausibilitätsprüfung</h3>
 
-    <div v-if="isPlausibilityCheckValid" class="flex flex-row gap-8">
+    <div v-if="hasPlausibilityCheckPassed" class="flex flex-row gap-8">
       <IconCheck class="text-green-700" />
       <p>Alle Pflichtfelder sind korrekt ausgefüllt.</p>
     </div>
@@ -224,7 +224,7 @@ async function scrollToCategory(key: string) {
         label="Rubriken bearbeiten"
         severity="secondary"
         size="small"
-        ><RouterLink :to="categoriesRoute"
+        ><RouterLink tabindex="-1" :to="categoriesRoute"
           >Rubriken bearbeiten</RouterLink
         ></Button
       >
