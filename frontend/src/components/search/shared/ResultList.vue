@@ -400,7 +400,6 @@ onUnmounted(() => {
             {{ publicationDate(item) }}
           </template>
         </Column>
-
         <Column field="actions">
           <template #header>
             <span class="sr-only">Aktionen</span>
