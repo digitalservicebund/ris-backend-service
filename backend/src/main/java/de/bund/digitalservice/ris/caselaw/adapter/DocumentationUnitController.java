@@ -578,10 +578,11 @@ public class DocumentationUnitController {
    */
   @PutMapping(value = "/{uuid}/publish")
   @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
-  public ResponseEntity<Void> publishDocumentationUnit(@PathVariable UUID uuid) {
-
+  public ResponseEntity<Void> publishDocumentationUnit(
+      @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
+    User user = userService.getUser(oidcUser);
     try {
-      portalPublicationService.publishDocumentationUnitWithChangelog(uuid);
+      portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Error handing over documentation unit '{}' to portal", uuid, e);

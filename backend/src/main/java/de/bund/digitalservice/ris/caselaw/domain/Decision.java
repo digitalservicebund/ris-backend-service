@@ -41,6 +41,7 @@ public record Decision(
     LongTexts longTexts,
     @Valid ManagementData managementData,
     Status status,
+    PortalPublicationStatus portalPublicationStatus,
     String note,
     ContentRelatedIndexing contentRelatedIndexing,
     List<Reference> caselawReferences,
