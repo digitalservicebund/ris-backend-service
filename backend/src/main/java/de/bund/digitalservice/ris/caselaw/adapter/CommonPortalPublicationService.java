@@ -212,8 +212,10 @@ public abstract class CommonPortalPublicationService implements PortalPublicatio
       }
       return LdmlTransformationResult.builder().success(true).ldml(fileContent.get()).build();
     } else {
-      throw new DocumentationUnitException(
-          "Document type not supported: " + documentationUnit.getClass().getSimpleName());
+      var message =
+          String.format(
+              "Document type %s is not supported.", documentationUnit.getClass().getSimpleName());
+      throw new DocumentationUnitException(message);
     }
   }
 

@@ -30,7 +30,19 @@ const service: PublishDocumentationUnitService = {
       `caselaw/documentunits/${documentUnitUuid}/preview-ldml`,
     )
 
-    if (response.status >= 300 || !response.data?.success) {
+    if (
+      response.status >= 400 &&
+      response.status < 500 &&
+      response.status !== 422
+    ) {
+      response.error = {
+        title: errorMessages.DOCUMENT_UNIT_LOADING_LDML_PREVIEW.title,
+        description:
+          errorMessages.DOCUMENT_UNIT_LOADING_LDML_PREVIEW.description +
+          ": " +
+          errorMessages.DOCUMENT_UNIT_NOT_ALLOWED.title,
+      }
+    } else if (response.status >= 300 || !response.data?.success) {
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_LOADING_LDML_PREVIEW.title,
         description:

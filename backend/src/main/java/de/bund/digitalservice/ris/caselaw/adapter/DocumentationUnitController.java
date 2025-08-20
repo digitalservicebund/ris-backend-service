@@ -578,24 +578,30 @@ public class DocumentationUnitController {
    * Get the LDML preview of a documentation unit.
    *
    * @param uuid UUID of the documentation unit
-   * @return the LDML preview or an empty response with status code 400 if the user is not
-   *     authorized or an empty response if the documentation unit does not exist
+   * @return the LDML preview result (including potential error messages)
    */
   @GetMapping(value = "/{uuid}/preview-ldml", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
-  public LdmlTransformationResult getLdmlPreview(@PathVariable UUID uuid) {
+  @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
+  public ResponseEntity<LdmlTransformationResult> getLdmlPreview(@PathVariable UUID uuid) {
     try {
-      return portalPublicationService.createLdmlPreview(uuid);
+      var result = portalPublicationService.createLdmlPreview(uuid);
+      return ResponseEntity.ok(result);
     } catch (DocumentationUnitNotExistsException e) {
-      return LdmlTransformationResult.builder()
-          .success(false)
-          .statusMessages(List.of("Das Dokument existiert nicht."))
-          .build();
-    } catch (LdmlTransformationException | MappingException | DocumentationUnitException e) {
-      return LdmlTransformationResult.builder()
-          .success(false)
-          .statusMessages(List.of(e.getMessage()))
-          .build();
+      return ResponseEntity.notFound().build();
+    } catch (LdmlTransformationException | DocumentationUnitException | MappingException e) {
+      var result =
+          LdmlTransformationResult.builder()
+              .success(false)
+              .statusMessages(List.of(e.getMessage()))
+              .build();
+      return ResponseEntity.unprocessableEntity().body(result);
+    } catch (Exception e) {
+      var result =
+          LdmlTransformationResult.builder()
+              .success(false)
+              .statusMessages(List.of(e.getMessage()))
+              .build();
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
     }
   }
 
