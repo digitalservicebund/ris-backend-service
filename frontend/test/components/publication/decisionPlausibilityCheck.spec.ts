@@ -28,6 +28,7 @@ describe("DecisionPlausibilityCheck", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
     useFeatureToggleServiceMock()
+    vi.resetAllMocks()
   })
 
   describe("Required fields", () => {
@@ -103,6 +104,21 @@ describe("DecisionPlausibilityCheck", () => {
         screen.queryByRole("button", { name: "Rubriken bearbeiten" }),
       ).not.toBeInTheDocument()
       expect(emitted("updatePlausibilityCheck")).toEqual([[true]])
+    })
+
+    it("should redirect to categories and scroll", async () => {
+      const { court, ...incompleteCoreData } = fullCoreData
+      mockDocUnitStore({ coreData: incompleteCoreData })
+      const { router } = await renderComponent()
+      const routerSpy = vi.spyOn(router, "push").mockImplementation(vi.fn())
+
+      await fireEvent.click(screen.getByText("Gericht"))
+
+      expect(scrollIntoViewportByIdMock).toHaveBeenCalledOnce()
+      expect(routerSpy).toHaveBeenCalledOnce()
+      expect(routerSpy).toHaveBeenCalledWith({
+        name: "caselaw-documentUnit-documentNumber-categories",
+      })
     })
 
     it("should update when doc unit changes", async () => {
