@@ -6,6 +6,7 @@ export interface Badge {
   label: string
   icon?: FunctionalComponent<SVGAttributes>
   backgroundColor: string
+  borderColor: string
 }
 
 export function useStatusBadge(status: DocumentationUnit["status"]) {
@@ -13,6 +14,7 @@ export function useStatusBadge(status: DocumentationUnit["status"]) {
     label: "",
     icon: undefined,
     backgroundColor: "bg-white",
+    borderColor: "black",
   }
 
   return computed(() => {

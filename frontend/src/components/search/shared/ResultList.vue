@@ -10,6 +10,8 @@ import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import { computed, ref, watch, onMounted, onUnmounted } from "vue"
 
+import AssigneeBadge from "@/components/AssigneeBadge.vue"
+import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
@@ -196,6 +198,11 @@ onUnmounted(() => {
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
+              <IconError
+                v-if="item.status?.withError"
+                class="text-red-900"
+                data-testid="publication-error"
+              />
               <div class="min-w-[130px]">{{ item.documentNumber }}</div>
               <template v-if="isDecision">
                 <span
@@ -268,17 +275,14 @@ onUnmounted(() => {
           </template>
         </Column>
 
-        <Column field="court.type" header="Gerichtstyp">
+        <Column field="court.type" header="Gericht">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
               <div>{{ item.court?.type ?? "-" }}</div>
+              <div v-if="isDecision && item.court?.location">
+                {{ item.court?.location }}
+              </div>
             </div>
-          </template>
-        </Column>
-
-        <Column v-if="isDecision" field="court.location" header="Ort">
-          <template #body="{ data: item }">
-            {{ item.court?.location ?? "-" }}
           </template>
         </Column>
 
@@ -348,18 +352,25 @@ onUnmounted(() => {
           </template>
         </Column>
 
-        <Column header="Fehler">
+        <Column header="Schritt">
           <template #body="{ data: item }">
-            <IconBadge
-              v-if="item.status?.withError"
-              background-color="bg-red-300"
-              class="flex"
-              data-testid="publication-error"
-              :icon="IconError"
-              icon-color="text-red-900"
-              label="Fehler"
+            <CurrentAndLastProcessStepBadge
+              :process-steps="item.processSteps"
             />
-            <span v-else>-</span>
+          </template>
+        </Column>
+
+        <Column header="Person">
+          <template #body="{ data: item }">
+            <AssigneeBadge
+              :name="
+                item.currentProcessStep &&
+                item.currentProcessStep.user &&
+                item.currentProcessStep.user.initials
+                  ? item.currentProcessStep.user.initials
+                  : undefined
+              "
+            />
           </template>
         </Column>
 
@@ -382,7 +393,6 @@ onUnmounted(() => {
             {{ publicationDate(item) }}
           </template>
         </Column>
-
         <Column field="actions">
           <template #header>
             <span class="sr-only">Aktionen</span>

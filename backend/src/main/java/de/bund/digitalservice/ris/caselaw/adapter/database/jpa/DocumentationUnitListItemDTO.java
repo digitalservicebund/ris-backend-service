@@ -48,4 +48,8 @@ public interface DocumentationUnitListItemDTO {
   ProcedureDTO getProcedure();
 
   List<SourceDTO> getSource();
+
+  DocumentationUnitProcessStepDTO getCurrentProcessStep();
+
+  List<DocumentationUnitProcessStepDTO> getProcessSteps();
 }

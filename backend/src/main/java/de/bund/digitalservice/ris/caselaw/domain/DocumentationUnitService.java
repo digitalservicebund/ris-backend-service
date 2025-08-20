@@ -386,7 +386,9 @@ public class DocumentationUnitService {
               oidcUser);
     }
 
-    return documentationUnitListItems.map(item -> addPermissions(oidcUser, item));
+    return documentationUnitListItems
+        .map(item -> addPermissions(oidcUser, item))
+        .map(this::addUserInformationToCurrentProcessStep);
   }
 
   public DocumentationUnitListItem takeOverDocumentationUnit(
@@ -465,6 +467,23 @@ public class DocumentationUnitService {
         return documentable;
       }
     }
+  }
+
+  private DocumentationUnitListItem addUserInformationToCurrentProcessStep(
+      DocumentationUnitListItem documentationUnitListItem) {
+
+    /*
+
+    if (documentationUnitListItem.currentProcessStep() != null
+        && documentationUnitListItem.currentProcessStep().getUser() != null) {
+      var currentProcessStep = documentationUnitListItem.currentProcessStep();
+      currentProcessStep.setUser(
+          userService.getUser(documentationUnitListItem.currentProcessStep().getUser().id()));
+      return documentationUnitListItem.toBuilder().currentProcessStep(currentProcessStep).build();
+    }
+
+       */
+    return documentationUnitListItem;
   }
 
   private void retrieveProcessStepsUsers(DocumentationUnit documentable) {

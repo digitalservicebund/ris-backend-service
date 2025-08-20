@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -51,4 +52,6 @@ public record DocumentationUnitListItem(
     UserGroup assignedUserGroup,
     String note,
     Boolean isDeletable,
-    Boolean isEditable) {}
+    Boolean isEditable,
+    List<DocumentationUnitProcessStep> processSteps,
+    DocumentationUnitProcessStep currentProcessStep) {}

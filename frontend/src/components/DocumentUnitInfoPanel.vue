@@ -121,6 +121,7 @@ watchEffect(() => {
     />
     <CurrentAndLastProcessStepBadge
       v-if="processStepsEnabled"
+      class="ml-12"
       :process-steps="props.documentUnit.processSteps"
     />
 
