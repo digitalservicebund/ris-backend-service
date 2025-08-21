@@ -333,6 +333,72 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
      {"changed":["1234567890123/1234567890123.xml","1234567890123/bild1.png"],"deleted":["1234567890123/bild2.png"]}""");
   }
 
+  @Test
+  void testWithdrawSuccessfully() throws IOException {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
+    dto.setPortalPublicationStatus(PortalPublicationStatus.PUBLISHED);
+    repository.save(dto);
+
+    var response =
+        ListObjectsV2Response.builder()
+            .contents(S3Object.builder().key("1234567890123/1234567890123.xml").build())
+            .build();
+
+    ListObjectsV2Request request =
+        ListObjectsV2Request.builder().bucket("no-bucket").prefix("1234567890123/").build();
+    when(s3Client.listObjectsV2(request)).thenReturn(response);
+
+    UUID userId = UUID.randomUUID();
+    risWebTestClient
+        .withDefaultLogin(userId)
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/withdraw")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
+    ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
+
+    verify(s3Client, times(1)).putObject(captor.capture(), bodyCaptor.capture());
+
+    var changelogContent =
+        new String(
+            bodyCaptor.getValue().contentStreamProvider().newStream().readAllBytes(),
+            StandardCharsets.UTF_8);
+    assertThat(captor.getValue().key()).contains("changelogs/");
+    assertThat(changelogContent)
+        .isEqualTo(
+            """
+          {"deleted":["1234567890123/1234567890123.xml"]}""");
+
+    var updatedDto = repository.findById(dto.getId()).get();
+    assertThat(updatedDto.getPortalPublicationStatus())
+        .isEqualTo(PortalPublicationStatus.WITHDRAWN);
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    assertThat(historyLogs)
+        .hasSize(2)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getUserId()).isEqualTo(userId);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokumentationseinheit zurückgezogen");
+            },
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
+              assertThat(historyLog.getUserId()).isNull();
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Status im Portal geändert: Veröffentlicht → Zurückgezogen");
+            });
+  }
+
   private DecisionDTO.DecisionDTOBuilder<?, ?> buildValidDocumentationUnit() {
     return buildValidDocumentationUnit(Collections.emptyList());
   }
