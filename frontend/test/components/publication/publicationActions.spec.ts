@@ -291,6 +291,165 @@ describe("PublicationActions", () => {
       expect(publishSpy).toHaveBeenCalledWith("q834")
     })
   })
+
+  describe("Action: Withdraw", () => {
+    describe("Error handling", () => {
+      it("should not show error on mount", async () => {
+        mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
+        await renderComponent({ isPublishable: true })
+
+        expect(
+          screen.queryByLabelText(
+            "Fehler bei der Veröffentlichung/Zurückziehung",
+          ),
+        ).not.toBeInTheDocument()
+      })
+
+      it("should show error when withdrawal fails", async () => {
+        mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
+        await renderComponent({ isPublishable: true })
+        vi.spyOn(
+          publishDocumentationUnitService,
+          "withdrawDocument",
+        ).mockResolvedValue({
+          status: 500,
+          error: { title: "Error-Titel", description: "Error-Beschreibung" },
+        })
+
+        await fireEvent.click(
+          screen.getByRole("button", { name: "Zurückziehen" }),
+        )
+
+        expect(
+          screen.getByLabelText(
+            "Fehler bei der Veröffentlichung/Zurückziehung",
+          ),
+        ).toHaveTextContent("Error-TitelError-Beschreibung")
+      })
+
+      it("should not show error when withdrawal is successful", async () => {
+        mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
+        await renderComponent({ isPublishable: true })
+        vi.spyOn(
+          publishDocumentationUnitService,
+          "withdrawDocument",
+        ).mockResolvedValue({ status: 200, data: undefined })
+
+        await fireEvent.click(
+          screen.getByRole("button", { name: "Zurückziehen" }),
+        )
+
+        expect(
+          screen.queryByLabelText(
+            "Fehler bei der Veröffentlichung/Zurückziehung",
+          ),
+        ).not.toBeInTheDocument()
+      })
+
+      it("should reset previous error when publish is successful", async () => {
+        mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
+        await renderComponent({ isPublishable: true })
+        vi.spyOn(publishDocumentationUnitService, "withdrawDocument")
+          .mockResolvedValueOnce({
+            status: 500,
+            error: { title: "Error-Titel", description: "Error-Beschreibung" },
+          })
+          .mockResolvedValueOnce({ status: 200, data: undefined })
+
+        // This one fails and shows error
+        await fireEvent.click(
+          screen.getByRole("button", { name: "Zurückziehen" }),
+        )
+
+        expect(
+          screen.getByLabelText(
+            "Fehler bei der Veröffentlichung/Zurückziehung",
+          ),
+        ).toHaveTextContent("Error-TitelError-Beschreibung")
+
+        // This one succeeds and resets the error
+        await fireEvent.click(
+          screen.getByRole("button", { name: "Veröffentlichen" }),
+        )
+
+        expect(
+          screen.queryByLabelText(
+            "Fehler bei der Veröffentlichung/Zurückziehung",
+          ),
+        ).not.toBeInTheDocument()
+      })
+    })
+
+    describe("Loading state", () => {
+      it("should not allow publish/withdraw while withdrawing", async () => {
+        mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
+        await renderComponent({ isPublishable: true })
+
+        const { promise: withdrawPromise, resolve: resolveWithdraw } =
+          Promise.withResolvers<ServiceResponse<void>>()
+        vi.spyOn(
+          publishDocumentationUnitService,
+          "withdrawDocument",
+        ).mockImplementation(() => withdrawPromise)
+
+        await fireEvent.click(
+          screen.getByRole("button", { name: "Zurückziehen" }),
+        )
+
+        expect(
+          screen.getByRole("button", { name: "Veröffentlichen" }),
+        ).toBeDisabled()
+        expect(
+          screen.getByRole("button", { name: "Zurückziehen" }),
+        ).toBeDisabled()
+
+        // This simulates the server response
+        resolveWithdraw({ status: 200, data: undefined })
+        await flushPromises()
+
+        expect(
+          screen.getByRole("button", { name: "Veröffentlichen" }),
+        ).toBeEnabled()
+        expect(
+          screen.getByRole("button", { name: "Zurückziehen" }),
+        ).toBeEnabled()
+      })
+    })
+
+    it("should update the status", async () => {
+      const store = mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
+      await renderComponent({ isPublishable: true })
+      const loadDocUnitSpy = vi.spyOn(store, "loadDocumentUnit")
+      vi.spyOn(
+        publishDocumentationUnitService,
+        "withdrawDocument",
+      ).mockResolvedValue({ status: 200, data: undefined })
+
+      store.documentUnit = new Decision("q834", {
+        portalPublicationStatus: PortalPublicationStatus.WITHDRAWN,
+      })
+      await fireEvent.click(
+        screen.getByRole("button", { name: "Zurückziehen" }),
+      )
+
+      expect(loadDocUnitSpy).toHaveBeenCalledOnce()
+      expect(screen.getByText("Zurückgezogen")).toBeVisible()
+    })
+
+    it("should withdraw with the correct id", async () => {
+      mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
+      await renderComponent({ isPublishable: true })
+      const withdrawSpy = vi
+        .spyOn(publishDocumentationUnitService, "withdrawDocument")
+        .mockResolvedValue({ status: 200, data: undefined })
+
+      await fireEvent.click(
+        screen.getByRole("button", { name: "Zurückziehen" }),
+      )
+
+      expect(withdrawSpy).toHaveBeenCalledWith("q834")
+    })
+  })
 })
 
 async function renderComponent(props: { isPublishable: boolean }) {
