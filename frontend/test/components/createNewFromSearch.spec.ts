@@ -1,7 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
-import { describe } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import { Decision } from "@/domain/decision"

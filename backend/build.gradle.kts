@@ -135,7 +135,8 @@ licenseReport {
 
 sonar {
     properties {
-        property("sonar.projectKey", "digitalservicebund_ris-backend-service")
+        property("sonar.projectKey", "digitalservicebund_ris-backend-service_backend")
+        property("sonar.projectName", "ris-backend-service Backend")
         property("sonar.organization", "digitalservicebund")
         property("sonar.host.url", "https://sonarcloud.io")
         property(
@@ -229,8 +230,8 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.1")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.2")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.2")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.10.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.10.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.0")

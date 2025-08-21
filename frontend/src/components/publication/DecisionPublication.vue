@@ -18,9 +18,9 @@ const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision | undefined>
 }
 const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
-const isPlausibilityCheckValid = ref(false)
+const hasPlausibilityCheckPassed = ref(false)
 const isPublishable = computed(
-  () => isPlausibilityCheckValid.value && isPortalPublicationEnabled.value,
+  () => hasPlausibilityCheckPassed.value && isPortalPublicationEnabled.value,
 )
 const preview = ref<LdmlPreview>()
 const previewError = ref()
@@ -47,12 +47,12 @@ onMounted(async () => {
       <TitleElement>Veröffentlichen</TitleElement>
       <DecisionPlausibilityCheck
         @update-plausibility-check="
-          (isValid) => (isPlausibilityCheckValid = isValid)
+          (hasPassed) => (hasPlausibilityCheckPassed = hasPassed)
         "
       />
       <div class="border-b-1 border-b-gray-400"></div>
       <ExpandableContent
-        v-if="isPlausibilityCheckValid && preview?.success && !!preview.ldml"
+        v-if="hasPlausibilityCheckPassed && preview?.success && !!preview.ldml"
         as-column
         class="border-b-1 border-gray-400 pb-24"
         :data-set="preview"
@@ -64,7 +64,7 @@ onMounted(async () => {
         <CodeSnippet title="" :xml="preview.ldml" />
       </ExpandableContent>
       <InfoModal
-        v-if="isPlausibilityCheckValid && previewError"
+        v-if="hasPlausibilityCheckPassed && previewError"
         aria-label="Fehler beim Laden der LDML-Vorschau"
         :description="previewError.description"
         :title="previewError.title"

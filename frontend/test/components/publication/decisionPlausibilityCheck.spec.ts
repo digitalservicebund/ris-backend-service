@@ -221,7 +221,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(emitted("updatePlausibilityCheck")).toEqual([[false]])
     })
 
-    it("should all incomplete data warnings", async () => {
+    it("should show all incomplete data warnings", async () => {
       mockDocUnitStore({
         coreData: fullCoreData,
         contentRelatedIndexing: {
@@ -351,7 +351,7 @@ describe("DecisionPlausibilityCheck", () => {
 
       expect(
         screen.getByText(
-          /Die Rubriken "Gründe" und "Entscheidungsgründe" sind befüllt./,
+          /Die Rubriken "Gründe" und "Entscheidungsgründe" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein./,
         ),
       ).toBeVisible()
 
@@ -401,6 +401,12 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).toBeVisible()
+
+      expect(
+        screen.queryByText(
+          /Die Rubriken "Gründe" und "Tatbestand" sind befüllt/,
+        ),
+      ).not.toBeInTheDocument()
 
       expect(
         screen.queryByText(

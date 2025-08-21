@@ -13,13 +13,11 @@ const service: PublishDocumentationUnitService = {
       `caselaw/documentunits/${documentUnitUuid}/publish`,
     )
 
-    if (response.status >= 300) {
-      const description =
-        "Die Dokumentationseinheit konnte nicht veröffentlicht werden."
-
+    if (response.status >= 400) {
       response.error = {
-        title: errorMessages.DOCUMENT_UNIT_HANDOVER_FAILED.title,
-        description,
+        title: "Fehler beim Veröffentlichen der Dokumentationseinheit",
+        description:
+          "Die Dokumentationseinheit konnte nicht veröffentlicht werden. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support.",
       }
     }
 
