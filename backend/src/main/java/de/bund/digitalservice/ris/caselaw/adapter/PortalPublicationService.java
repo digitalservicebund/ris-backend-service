@@ -90,7 +90,7 @@ public class PortalPublicationService {
           documentationUnitId,
           user,
           HistoryLogEventType.PORTAL_PUBLICATION,
-          "Dokumentationseinheit konnte nicht veröffentlicht werden");
+          "Dokeinheit konnte nicht veröffentlicht werden");
       throw exception;
     }
   }
@@ -154,7 +154,7 @@ public class PortalPublicationService {
           documentationUnitId,
           user,
           HistoryLogEventType.PORTAL_PUBLICATION,
-          "Dokumentationseinheit konnte nicht zurückgezogen werden");
+          "Dokeinheit konnte nicht zurückgezogen werden");
       throw e;
     }
   }

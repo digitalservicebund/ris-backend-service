@@ -585,7 +585,11 @@ public class DocumentationUnitController {
       portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
-      log.error("Could not find documentation unit with id '{}' to publish to portal", uuid, e);
+      log.atError()
+          .setMessage("Could not find documentation unit to publish to portal")
+          .setCause(e)
+          .addKeyValue("id", uuid)
+          .log();
       return ResponseEntity.notFound().build();
     }
   }
@@ -604,7 +608,11 @@ public class DocumentationUnitController {
       portalPublicationService.withdrawDocumentationUnitWithChangelog(uuid, user);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
-      log.error("Could not find documentation unit with id '{}' to withdraw from portal", uuid, e);
+      log.atError()
+          .setMessage("Could not find documentation unit to withdraw from portal")
+          .setCause(e)
+          .addKeyValue("id", uuid)
+          .log();
       return ResponseEntity.notFound().build();
     }
   }
