@@ -140,15 +140,14 @@ public class PortalPublicationService {
    * @throws DocumentationUnitNotExistsException if the documentation unit with the given id could
    *     not be found in the database.
    * @throws ChangelogException if the deletion changelog cannot be generated or saved.
+   * @throws PublishException if the files could not be deleted from the bucket.
    */
   public void withdrawDocumentationUnitWithChangelog(UUID documentationUnitId, User user)
       throws DocumentationUnitNotExistsException {
     try {
       var documentationUnit = documentationUnitRepository.findByUuid(documentationUnitId);
-      var deletableFiles =
-          portalBucket.getAllFilenamesByPath(documentationUnit.documentNumber() + "/");
-      deletableFiles.forEach(portalBucket::delete);
-      uploadDeletionChangelog(deletableFiles);
+      var result = withdrawDocumentationUnit(documentationUnit.documentNumber());
+      uploadDeletionChangelog(result.deletedPaths());
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, user);
     } catch (Exception e) {
       historyLogService.saveHistoryLog(

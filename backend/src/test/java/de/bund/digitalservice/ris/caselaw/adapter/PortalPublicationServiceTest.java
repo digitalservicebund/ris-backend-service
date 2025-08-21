@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -205,8 +205,8 @@ class PortalPublicationServiceTest {
 
     subject.publishDocumentationUnit(testDocumentNumber);
 
-    verify(caseLawBucket, times(1)).save(withPrefix(testDocumentNumber), transformed);
-    verify(caseLawBucket, times(1)).saveBytes(testDocumentNumber + "/bild1.png", content);
+    verify(caseLawBucket).save(withPrefix(testDocumentNumber), transformed);
+    verify(caseLawBucket).saveBytes(testDocumentNumber + "/bild1.png", content);
     verify(caseLawBucket, never())
         .saveBytes(eq(testDocumentNumber + "/originalenscheidung"), any(byte[].class));
   }
@@ -369,17 +369,17 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void delete_shouldDeleteFromBucket() {
+  void withdraw_shouldDeleteFromBucket() {
     when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
         .thenReturn(List.of(withPrefix(testDocumentNumber)));
 
     subject.withdrawDocumentationUnit(testDocumentNumber);
 
-    verify(caseLawBucket, times(1)).delete(withPrefix(testDocumentNumber));
+    verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
   }
 
   @Test
-  void delete_withBucketException_shouldThrowPublishException() {
+  void withdraw_withBucketException_shouldThrowPublishException() {
     when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
         .thenReturn(List.of(withPrefix(testDocumentNumber)));
     doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
@@ -387,6 +387,96 @@ class PortalPublicationServiceTest {
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.withdrawDocumentationUnit(testDocumentNumber))
         .withMessageContaining("Could not delete LDML from bucket.");
+  }
+
+  @Test
+  void withdrawWithChangelog_shouldDeleteFromBucketAndWriteDeletionChangelog()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
+    Decision decision =
+        Decision.builder()
+            .uuid(UUID.randomUUID())
+            .documentNumber(testDocumentNumber)
+            .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+            .build();
+    when(documentationUnitRepository.findByUuid(decision.uuid())).thenReturn(decision);
+    when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(withPrefix(testDocumentNumber)));
+    User user = mock(User.class);
+    var changelogContent =
+        """
+        {"changed":[],"deleted":[TEST123456789/TEST123456789.xml]}
+        """;
+    when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
+
+    subject.withdrawDocumentationUnitWithChangelog(decision.uuid(), user);
+
+    verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
+    verify(caseLawBucket)
+        .save(
+            contains("changelog"),
+            contains("\"deleted\":[" + withPrefix(testDocumentNumber) + "]"));
+    verify(historyLogService)
+        .saveHistoryLog(
+            decision.uuid(),
+            user,
+            HistoryLogEventType.PORTAL_PUBLICATION,
+            "Dokumentationseinheit zurückgezogen");
+    verify(documentationUnitRepository)
+        .updatePortalPublicationStatus(decision.uuid(), PortalPublicationStatus.WITHDRAWN);
+  }
+
+  @Test
+  void withdrawWithChangelog_withBucketException_shouldThrowPublishException()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
+    Decision decision =
+        Decision.builder()
+            .uuid(UUID.randomUUID())
+            .documentNumber(testDocumentNumber)
+            .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+            .build();
+    when(documentationUnitRepository.findByUuid(decision.uuid())).thenReturn(decision);
+    when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(withPrefix(testDocumentNumber)));
+    User user = mock(User.class);
+    doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
+
+    assertThatExceptionOfType(PublishException.class)
+        .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(decision.uuid(), user))
+        .withMessageContaining("Could not delete LDML from bucket.");
+  }
+
+  @Test
+  void withdrawWithChangelog_withJsonProcessingException_shouldThrowChangelogException()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
+    Decision decision =
+        Decision.builder()
+            .uuid(UUID.randomUUID())
+            .documentNumber(testDocumentNumber)
+            .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+            .build();
+    when(documentationUnitRepository.findByUuid(decision.uuid())).thenReturn(decision);
+    when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(withPrefix(testDocumentNumber)));
+    User user = mock(User.class);
+    when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+
+    assertThatExceptionOfType(ChangelogException.class)
+        .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(decision.uuid(), user))
+        .withMessageContaining("Could not create changelog file");
+  }
+
+  @Test
+  void
+      withdrawWithChangelog_withDocumentationNotExists_shouldThrowDocumentationUnitNotExistsException()
+          throws DocumentationUnitNotExistsException, JsonProcessingException {
+    UUID uuid = UUID.randomUUID();
+    when(documentationUnitRepository.findByUuid(uuid))
+        .thenThrow(new DocumentationUnitNotExistsException());
+    User user = mock(User.class);
+
+    assertThatExceptionOfType(DocumentationUnitNotExistsException.class)
+        .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
+        .withMessageContaining("Documentation unit does not exist");
   }
 
   @Test
