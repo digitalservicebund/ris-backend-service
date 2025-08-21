@@ -59,22 +59,25 @@ async function scrollToCategory(key: string) {
 }
 </script>
 <template>
-  <div aria-label="Randnummernprüfung" class="flex flex-col">
-    <h2 class="ris-label1-bold mb-16">Randnummernprüfung</h2>
+  <div aria-label="Randnummernprüfung" class="flex flex-col gap-16">
+    <h2 class="ris-label1-bold">Randnummernprüfung</h2>
 
-    <div v-if="!areBorderNumbersAndLinksValid">
-      <div class="flex flex-row gap-8">
-        <IconErrorOutline class="text-red-800" />
-
-        <div class="ris-body1-regular flex flex-col gap-24">
-          <div
-            v-if="
-              !borderNumberValidationResult.isValid &&
-              !borderNumberValidationResult.hasError
-            "
-          >
+    <div
+      v-if="!areBorderNumbersAndLinksValid"
+      class="ris-body1-regular flex flex-col gap-16"
+    >
+      <div class="flex flex-col gap-16">
+        <div
+          v-if="
+            !borderNumberValidationResult.isValid &&
+            !borderNumberValidationResult.hasError
+          "
+          class="flex flex-row gap-8"
+        >
+          <IconErrorOutline class="text-red-800" />
+          <div class="ris-body1-regular flex flex-col gap-8">
             Die Reihenfolge der Randnummern ist nicht korrekt.
-            <dl class="my-16">
+            <dl>
               <div class="grid grid-cols-2 gap-24 px-0">
                 <dt class="ris-label2-bold self-center">Rubrik</dt>
                 <dd class="ris-body2-regular">
@@ -113,9 +116,16 @@ async function scrollToCategory(key: string) {
               </div>
             </dl>
           </div>
-          <div v-if="!borderNumberLinkValidationResult.isValid">
+        </div>
+
+        <div
+          v-if="!borderNumberLinkValidationResult.isValid"
+          class="flex flex-row gap-8"
+        >
+          <IconErrorOutline class="text-red-800" />
+          <div class="ris-body1-regular flex flex-col gap-8">
             Es gibt ungültige Randnummern-Verweise in folgenden Rubriken:
-            <ul class="list-disc">
+            <ul class="ml-32 list-disc">
               <li
                 v-for="key in borderNumberLinkValidationResult.invalidCategories"
                 :key="key"
@@ -134,25 +144,32 @@ async function scrollToCategory(key: string) {
               </li>
             </ul>
           </div>
-          <div v-if="borderNumberValidationResult.hasError">
+        </div>
+
+        <div
+          v-if="borderNumberValidationResult.hasError"
+          class="flex flex-row gap-8"
+        >
+          <IconErrorOutline class="text-red-800" />
+          <div>
             Bei der Randnummernprüfung ist ein Fehler aufgetreten. Bitte prüfen
             Sie die Randnummern manuell und informieren Sie den Support.
           </div>
         </div>
+        <Button
+          v-if="
+            !borderNumberValidationResult.isValid &&
+            !borderNumberValidationResult.hasError &&
+            !showRecalculatingBorderNumbersFakeDelay
+          "
+          aria-label="Randnummern neu berechnen"
+          class="w-fit"
+          label="Randnummern neu berechnen"
+          severity="secondary"
+          size="small"
+          @click="recalculateBorderNumbers"
+        />
       </div>
-      <Button
-        v-if="
-          !borderNumberValidationResult.isValid &&
-          !borderNumberValidationResult.hasError &&
-          !showRecalculatingBorderNumbersFakeDelay
-        "
-        aria-label="Randnummern neu berechnen"
-        button-type="tertiary"
-        class="mt-8 w-fit"
-        label="Randnummern neu berechnen"
-        size="small"
-        @click="recalculateBorderNumbers"
-      />
     </div>
     <div
       v-else-if="!showRecalculatingBorderNumbersFakeDelay"
