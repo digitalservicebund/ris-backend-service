@@ -428,40 +428,42 @@ class PortalPublicationServiceTest {
   @Test
   void withdrawWithChangelog_withBucketException_shouldThrowPublishException()
       throws DocumentationUnitNotExistsException {
+    UUID uuid = UUID.randomUUID();
     Decision decision =
         Decision.builder()
-            .uuid(UUID.randomUUID())
+            .uuid(uuid)
             .documentNumber(testDocumentNumber)
             .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
             .build();
-    when(documentationUnitRepository.findByUuid(decision.uuid())).thenReturn(decision);
+    when(documentationUnitRepository.findByUuid(uuid)).thenReturn(decision);
     when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
         .thenReturn(List.of(withPrefix(testDocumentNumber)));
     User user = mock(User.class);
     doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
 
     assertThatExceptionOfType(PublishException.class)
-        .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(decision.uuid(), user))
+        .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
         .withMessageContaining("Could not delete LDML from bucket.");
   }
 
   @Test
   void withdrawWithChangelog_withJsonProcessingException_shouldThrowChangelogException()
       throws DocumentationUnitNotExistsException, JsonProcessingException {
+    UUID uuid = UUID.randomUUID();
     Decision decision =
         Decision.builder()
-            .uuid(UUID.randomUUID())
+            .uuid(uuid)
             .documentNumber(testDocumentNumber)
             .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
             .build();
-    when(documentationUnitRepository.findByUuid(decision.uuid())).thenReturn(decision);
+    when(documentationUnitRepository.findByUuid(uuid)).thenReturn(decision);
     when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
         .thenReturn(List.of(withPrefix(testDocumentNumber)));
     User user = mock(User.class);
     when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
 
     assertThatExceptionOfType(ChangelogException.class)
-        .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(decision.uuid(), user))
+        .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
         .withMessageContaining("Could not create changelog file");
   }
 
