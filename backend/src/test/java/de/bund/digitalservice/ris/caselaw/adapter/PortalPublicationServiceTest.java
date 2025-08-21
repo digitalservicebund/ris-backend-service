@@ -427,7 +427,7 @@ class PortalPublicationServiceTest {
 
   @Test
   void withdrawWithChangelog_withBucketException_shouldThrowPublishException()
-      throws DocumentationUnitNotExistsException, JsonProcessingException {
+      throws DocumentationUnitNotExistsException {
     Decision decision =
         Decision.builder()
             .uuid(UUID.randomUUID())
@@ -468,7 +468,7 @@ class PortalPublicationServiceTest {
   @Test
   void
       withdrawWithChangelog_withDocumentationNotExists_shouldThrowDocumentationUnitNotExistsException()
-          throws DocumentationUnitNotExistsException, JsonProcessingException {
+          throws DocumentationUnitNotExistsException {
     UUID uuid = UUID.randomUUID();
     when(documentationUnitRepository.findByUuid(uuid))
         .thenThrow(new DocumentationUnitNotExistsException());
@@ -493,7 +493,7 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void uploadChangelog_withDisabledFeatureFlag_shouldDoNothing() throws JsonProcessingException {
+  void uploadChangelog_withDisabledFeatureFlag_shouldDoNothing() {
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(false);
 
     subject.uploadChangelog(List.of(), List.of());
@@ -515,8 +515,7 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void uploadFullReindexChangelog_withRegularChangelogsEnabled_shouldNotUpload()
-      throws JsonProcessingException {
+  void uploadFullReindexChangelog_withRegularChangelogsEnabled_shouldNotUpload() {
     subject.uploadFullReindexChangelog();
 
     verify(caseLawBucket, never()).save(contains("changelogs/"), anyString());
