@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentReposit
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
-import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -173,10 +172,6 @@ public class PortalPublicationService {
   }
 
   private PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {
-    if (!(documentationUnit instanceof Decision)) {
-      // for now pending proceedings can not be processed by the portal, so they are ignored.
-      return null;
-    }
     List<AttachmentDTO> attachments =
         attachmentRepository.findAllByDocumentationUnitId(documentationUnit.uuid());
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
