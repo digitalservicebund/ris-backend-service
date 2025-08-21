@@ -186,7 +186,7 @@ dependencies {
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.44")
 
-    implementation(platform("software.amazon.awssdk:bom:2.32.21"))
+    implementation(platform("software.amazon.awssdk:bom:2.32.27"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -230,8 +230,8 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.14.0")
     implementation("org.jsoup:jsoup:1.21.1")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.9.2")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.9.2")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.10.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.10.0")
 
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.0")
