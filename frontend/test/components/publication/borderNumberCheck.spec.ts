@@ -122,7 +122,7 @@ describe("BorderNumberCheck", () => {
       validateBorderNumbersMock.mockReturnValue({
         isValid: false,
         hasError: false,
-        invalidCategory: "reasons",
+        invalidCategory: "decisionReasons",
         expectedBorderNumber: 3,
         firstInvalidBorderNumber: "4",
       })
@@ -133,7 +133,7 @@ describe("BorderNumberCheck", () => {
       const { router } = await renderComponent()
       const routerSpy = vi.spyOn(router, "push").mockImplementation(vi.fn())
 
-      await fireEvent.click(screen.getByText("Gründe"))
+      await fireEvent.click(screen.getByText("Entscheidungsgründe"))
 
       expect(scrollIntoViewportByIdMock).toHaveBeenCalledOnce()
       expect(routerSpy).toHaveBeenCalledOnce()

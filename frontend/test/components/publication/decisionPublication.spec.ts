@@ -1,12 +1,16 @@
 import { createTestingPinia } from "@pinia/testing"
-import { render, screen } from "@testing-library/vue"
-import { setActivePinia, Store } from "pinia"
-import { Ref } from "vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
+import { setActivePinia } from "pinia"
 import { createRouter, createWebHistory } from "vue-router"
 import DecisionPublication from "@/components/publication/DecisionPublication.vue"
 import { CoreData } from "@/domain/coreData"
 import { Decision } from "@/domain/decision"
-import { DuplicateRelation, ManagementData } from "@/domain/managementData"
+import {
+  DuplicateRelation,
+  DuplicateRelationStatus,
+  ManagementData,
+} from "@/domain/managementData"
+import borderNumberService from "@/services/borderNumberService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
@@ -62,20 +66,97 @@ describe("DecisionPlausibilityCheck", () => {
       screen.getByRole("button", { name: "Veröffentlichen" }),
     ).toBeEnabled()
   })
+
+  it("should not pass on publication warnings for ignored duplicate warnings", async () => {
+    await renderComponent({
+      hasPlausibilityCheckPassed: true,
+      duplicateRelations: [
+        {
+          documentNumber: "KORE",
+          status: DuplicateRelationStatus.IGNORED,
+          isJdvDuplicateCheckActive: true,
+        },
+      ],
+    })
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Veröffentlichen" }),
+    )
+
+    expect(
+      screen.queryByRole("button", { name: "Trotzdem übergeben" }),
+    ).not.toBeInTheDocument()
+  })
+
+  it("should pass on publication warnings for pending duplicate warnings", async () => {
+    await renderComponent({
+      hasPlausibilityCheckPassed: true,
+      duplicateRelations: [
+        {
+          documentNumber: "KORE",
+          status: DuplicateRelationStatus.PENDING,
+          isJdvDuplicateCheckActive: true,
+        },
+      ],
+    })
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Veröffentlichen" }),
+    )
+
+    expect(
+      screen.getByText(
+        "Es besteht Dublettenverdacht. Wollen Sie das Dokument dennoch übergeben?",
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it("should pass on publication warnings for invalid border numbers", async () => {
+    vi.spyOn(borderNumberService, "validateBorderNumberLinks").mockReturnValue({
+      isValid: false,
+      invalidCategories: [],
+    })
+    await renderComponent({ hasPlausibilityCheckPassed: true })
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Veröffentlichen" }),
+    )
+
+    expect(
+      screen.getByText(
+        "Die Randnummern sind nicht korrekt. Wollen Sie das Dokument dennoch übergeben?",
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it("should reload the doc unit when border numbers are recalculated", async () => {
+    vi.spyOn(borderNumberService, "validateBorderNumbers").mockReturnValue({
+      isValid: false,
+      hasError: false,
+      expectedBorderNumber: 2,
+      invalidCategory: "tenor",
+      firstInvalidBorderNumber: "",
+    })
+    const { store } = await renderComponent({
+      hasPlausibilityCheckPassed: true,
+    })
+    const updateDocUnitSpy = vi.spyOn(store, "updateDocumentUnit")
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Randnummern neu berechnen" }),
+    )
+
+    expect(updateDocUnitSpy).toHaveBeenCalledOnce()
+  })
 })
 
-async function renderComponent(
-  {
-    hasPlausibilityCheckPassed,
-    duplicateRelations = [],
-  }: {
-    hasPlausibilityCheckPassed: boolean
-    duplicateRelations?: DuplicateRelation[]
-  } = {
-    hasPlausibilityCheckPassed: true,
-    duplicateRelations: [],
-  },
-) {
+async function renderComponent({
+  hasPlausibilityCheckPassed,
+  duplicateRelations = [],
+}: {
+  hasPlausibilityCheckPassed: boolean
+  duplicateRelations?: DuplicateRelation[]
+}) {
   let coreData: CoreData = {}
   if (hasPlausibilityCheckPassed) {
     coreData = {
@@ -86,10 +167,10 @@ async function renderComponent(
       legalEffect: "unbestimmt",
     }
   }
-  mockDocUnitStore({
-    coreData,
-    managementData: { borderNumbers: [], duplicateRelations },
-  })
+  const managementData = duplicateRelations
+    ? { borderNumbers: [], duplicateRelations }
+    : undefined
+  const store = mockDocUnitStore({ coreData, managementData })
 
   const router = createRouter({
     history: createWebHistory(),
@@ -100,6 +181,7 @@ async function renderComponent(
     params: { documentNumber: "KORE123412345" },
   })
   return {
+    store,
     router,
     ...render(DecisionPublication, {
       global: {
@@ -122,10 +204,5 @@ function mockDocUnitStore({
     managementData,
   })
 
-  return mockedSessionStore as Store<
-    "docunitStore",
-    {
-      documentUnit: Ref<Decision>
-    }
-  >
+  return mockedSessionStore
 }
