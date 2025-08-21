@@ -8,9 +8,9 @@ import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 
 const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
-const isPlausibilityCheckValid = ref(false)
+const hasPlausibilityCheckPassed = ref(false)
 const isPublishable = computed(
-  () => isPlausibilityCheckValid.value && isPortalPublicationEnabled.value,
+  () => hasPlausibilityCheckPassed.value && isPortalPublicationEnabled.value,
 )
 </script>
 
@@ -20,18 +20,18 @@ const isPublishable = computed(
       <TitleElement>Veröffentlichen</TitleElement>
       <DecisionPlausibilityCheck
         @update-plausibility-check="
-          (isValid) => (isPlausibilityCheckValid = isValid)
+          (hasPassed) => (hasPlausibilityCheckPassed = hasPassed)
         "
       />
       <div class="border-b-1 border-b-gray-400"></div>
       <ExpandableContent
-        v-if="isPlausibilityCheckValid"
+        v-if="hasPlausibilityCheckPassed"
         as-column
         class="border-b-1 border-gray-400 pb-24"
-        header="XML Vorschau"
+        header="LDML Vorschau"
         header-class="ris-body1-bold"
         :is-expanded="false"
-        title="XML Vorschau"
+        title="LDML Vorschau"
       >
         <CodeSnippet title="" :xml="'<?xml>' + '\nNoch nicht implementiert'" />
       </ExpandableContent>

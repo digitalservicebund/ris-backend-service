@@ -139,7 +139,7 @@ SONAR_TOKEN=[sonar-token] ./gradlew sonar
 ```
 
 Go
-to [https://sonarcloud.io](https://sonarcloud.io/dashboard?id=digitalservicebund_ris-backend-service)
+to [https://sonarcloud.io](https://sonarcloud.io/dashboard?id=digitalservicebund_ris-backend-service_backend)
 for the analysis results.
 
 ## Container image

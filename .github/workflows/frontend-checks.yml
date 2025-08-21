@@ -118,17 +118,22 @@ jobs:
           # node-version-file: ./frontend/package.json
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
-      - name: Install SonarScanner
-        uses: digitalservicebund/setup-sonarscanner@3ade23691f865c02dce6b46452947a0e7944196e # v1.0.0
-      - name: Scan with SonarQube
+      - name: Run coverage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           npm install
           npm run coverage
-          sonar-scanner
         working-directory: ./frontend
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@786af10ed495f5fe0d685df87f5f8a075599aa85
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: ./frontend
+          args: >
+            -Dsonar.qualitygate.wait=true
       - name: Check SonarQube Quality Gate
         uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
         with:
