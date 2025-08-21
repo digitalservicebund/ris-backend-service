@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { setActivePinia, Store } from "pinia"
+import { expect } from "vitest"
 import { Ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DecisionPublication from "@/components/publication/DecisionPublication.vue"
@@ -46,6 +47,24 @@ describe("DecisionPlausibilityCheck", () => {
       screen.getByText("PublicationActions - publishable: true"),
     ).toBeInTheDocument()
     expect(screen.getByText("LDML Vorschau")).toBeInTheDocument()
+  })
+
+  it("should show error when preview cannot be loaded", async () => {
+    const description =
+      "Die LDML-Vorschau konnte nicht geladen werden: Aktuelle Fehlermeldung."
+    vi.spyOn(publishDocumentationUnitService, "getPreview").mockResolvedValue({
+      status: 422,
+      error: {
+        title: "Fehler beim Laden der LDML-Vorschau",
+        description: description,
+      },
+    })
+    await renderComponent({ hasPlausibilityCheckPassed: true })
+
+    // Click simulates updating the plausibility check with mock
+    await fireEvent.click(screen.getByText("DecisionPlausibilityCheck"))
+
+    expect(screen.getByText(description)).toBeInTheDocument()
   })
 })
 
