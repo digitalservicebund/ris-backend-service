@@ -48,23 +48,45 @@ describe("DecisionPlausibilityCheck", () => {
     ).toBeInTheDocument()
     expect(screen.getByText("LDML Vorschau")).toBeInTheDocument()
   })
+  describe("ldml preview", () => {
+    it("should display ldml preview", async () => {
+      vi.spyOn(publishDocumentationUnitService, "getPreview").mockResolvedValue(
+        {
+          status: 200,
+          data: {
+            ldml: "ldml",
+            success: true,
+          },
+        },
+      )
+      await renderComponent({ hasPlausibilityCheckPassed: true })
 
-  it("should show error when preview cannot be loaded", async () => {
-    const description =
-      "Die LDML-Vorschau konnte nicht geladen werden: Aktuelle Fehlermeldung."
-    vi.spyOn(publishDocumentationUnitService, "getPreview").mockResolvedValue({
-      status: 422,
-      error: {
-        title: "Fehler beim Laden der LDML-Vorschau",
-        description: description,
-      },
+      // Click simulates updating the plausibility check with mock
+      await fireEvent.click(screen.getByText("DecisionPlausibilityCheck"))
+      // Expand preview
+      await fireEvent.click(screen.getByLabelText("Aufklappen"))
+      expect(screen.getByTestId("code-snippet")).toBeInTheDocument()
     })
-    await renderComponent({ hasPlausibilityCheckPassed: true })
 
-    // Click simulates updating the plausibility check with mock
-    await fireEvent.click(screen.getByText("DecisionPlausibilityCheck"))
+    it("should show error when ldml preview cannot be loaded", async () => {
+      const description =
+        "Die LDML-Vorschau konnte nicht geladen werden: Aktuelle Fehlermeldung."
+      vi.spyOn(publishDocumentationUnitService, "getPreview").mockResolvedValue(
+        {
+          status: 422,
+          error: {
+            title: "Fehler beim Laden der LDML-Vorschau",
+            description: description,
+          },
+        },
+      )
+      await renderComponent({ hasPlausibilityCheckPassed: true })
 
-    expect(screen.getByText(description)).toBeInTheDocument()
+      // Click simulates updating the plausibility check with mock
+      await fireEvent.click(screen.getByText("DecisionPlausibilityCheck"))
+
+      expect(screen.getByText(description)).toBeInTheDocument()
+    })
   })
 })
 
