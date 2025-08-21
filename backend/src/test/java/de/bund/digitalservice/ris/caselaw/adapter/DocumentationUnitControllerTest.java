@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DecisionTransformer;
@@ -893,7 +894,7 @@ class DocumentationUnitControllerTest {
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
         .exchange()
         .expectStatus()
-        .is5xxServerError();
+        .isNotFound();
 
     verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
   }
@@ -933,6 +934,44 @@ class DocumentationUnitControllerTest {
         .is5xxServerError();
 
     verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
+  }
+
+  @Test
+  void testWithdraw_withServiceThrowsDocumentationUnitNotExistsException()
+      throws DocumentationUnitNotExistsException {
+
+    doThrow(DocumentationUnitNotExistsException.class)
+        .when(portalPublicationService)
+        .withdrawDocumentationUnitWithChangelog(TEST_UUID, null);
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/withdraw")
+        .exchange()
+        .expectStatus()
+        .isNotFound();
+
+    verify(portalPublicationService).withdrawDocumentationUnitWithChangelog(TEST_UUID, null);
+  }
+
+  @Test
+  void testWithdraw_withServiceThrowsChangelogException()
+      throws DocumentationUnitNotExistsException {
+
+    doThrow(ChangelogException.class)
+        .when(portalPublicationService)
+        .withdrawDocumentationUnitWithChangelog(TEST_UUID, null);
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/withdraw")
+        .exchange()
+        .expectStatus()
+        .is5xxServerError();
+
+    verify(portalPublicationService).withdrawDocumentationUnitWithChangelog(TEST_UUID, null);
   }
 
   @Test

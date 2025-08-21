@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import java.util.List;
@@ -98,7 +97,7 @@ public class PortalSanityCheckService {
           portalPublicationService.uploadDeletionChangelog(
               inPortalNotInRii.stream().map(documentNumber -> documentNumber + ".xml").toList());
 
-        } catch (JsonProcessingException | PublishException e) {
+        } catch (PublishException e) {
           log.error(
               "Deleting documents not in Rechtsprechung im Internet failed with exception: {}",
               e.getMessage());

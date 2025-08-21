@@ -1079,10 +1079,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         documentationUnitId,
         null,
         HistoryLogEventType.PORTAL_PUBLICATION,
-        "Status im Portal geändert: "
-            + oldStatus.humanReadable
-            + " → "
-            + PortalPublicationStatus.PUBLISHED.humanReadable);
+        "Status im Portal geändert: " + oldStatus.humanReadable + " → " + newStatus.humanReadable);
 
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       documentationUnitDTO = decisionDTO.toBuilder().portalPublicationStatus(newStatus).build();
