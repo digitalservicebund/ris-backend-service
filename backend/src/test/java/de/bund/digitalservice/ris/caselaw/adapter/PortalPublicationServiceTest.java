@@ -160,7 +160,7 @@ class PortalPublicationServiceTest {
             testDocumentUnit.uuid(),
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit veröffentlicht");
+            "Dokeinheit im Portal veröffentlicht");
     verify(documentationUnitRepository)
         .updatePortalPublicationStatus(testDocumentUnit.uuid(), PortalPublicationStatus.PUBLISHED);
   }
@@ -229,7 +229,7 @@ class PortalPublicationServiceTest {
             documentationUnitId,
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit konnte nicht veröffentlicht werden");
+            "Dokeinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
@@ -250,7 +250,7 @@ class PortalPublicationServiceTest {
             documentationUnitId,
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit konnte nicht veröffentlicht werden");
+            "Dokeinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
@@ -276,7 +276,7 @@ class PortalPublicationServiceTest {
             documentationUnitId,
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit konnte nicht veröffentlicht werden");
+            "Dokeinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
@@ -301,7 +301,7 @@ class PortalPublicationServiceTest {
             documentationUnitId,
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit konnte nicht veröffentlicht werden");
+            "Dokeinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
@@ -420,7 +420,7 @@ class PortalPublicationServiceTest {
             decision.uuid(),
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit zurückgezogen");
+            "Dokeinheit wurde aus dem Portal zurückgezogen");
     verify(documentationUnitRepository)
         .updatePortalPublicationStatus(decision.uuid(), PortalPublicationStatus.WITHDRAWN);
   }

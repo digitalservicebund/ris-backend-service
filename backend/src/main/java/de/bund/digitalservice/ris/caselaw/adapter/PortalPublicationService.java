@@ -289,9 +289,9 @@ public class PortalPublicationService {
     documentationUnitRepository.updatePortalPublicationStatus(documentationUnit.uuid(), newStatus);
     String historyLogMessage;
     if (PortalPublicationStatus.PUBLISHED.equals(newStatus)) {
-      historyLogMessage = "Dokumentationseinheit veröffentlicht";
+      historyLogMessage = "Dokeinheit im Portal veröffentlicht";
     } else {
-      historyLogMessage = "Dokumentationseinheit zurückgezogen";
+      historyLogMessage = "Dokeinheit wurde aus dem Portal zurückgezogen";
     }
     historyLogService.saveHistoryLog(
         documentationUnit.uuid(), user, HistoryLogEventType.PORTAL_PUBLICATION, historyLogMessage);

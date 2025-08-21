@@ -132,7 +132,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
               assertThat(historyLog.getUserId()).isEqualTo(userId);
               assertThat(historyLog.getDescription())
-                  .isEqualTo("Dokumentationseinheit veröffentlicht");
+                  .isEqualTo("Dokeinheit im Portal veröffentlicht");
             },
             historyLog -> {
               assertThat(historyLog.getEventType())
@@ -387,7 +387,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
               assertThat(historyLog.getUserId()).isEqualTo(userId);
               assertThat(historyLog.getDescription())
-                  .isEqualTo("Dokumentationseinheit zurückgezogen");
+                  .isEqualTo("Dokeinheit wurde aus dem Portal zurückgezogen");
             },
             historyLog -> {
               assertThat(historyLog.getEventType())
