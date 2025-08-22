@@ -10,7 +10,7 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.5.4"
+    id("org.springframework.boot") version "3.5.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.2.1"
     id("org.sonarqube") version "6.2.0.5505"
@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.52.0"
     id ("io.freefair.lombok") version "8.14.2"
-    id("org.flywaydb.flyway") version "11.11.1"
+    id("org.flywaydb.flyway") version "11.11.2"
     id("io.sentry.jvm.gradle") version "5.9.0"
 }
 
@@ -236,10 +236,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.11.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.11.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.11.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.11.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
