@@ -408,15 +408,6 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
     documentationUnitProcessStepRepository.save(step2DTO);
     documentationUnitProcessStepRepository.save(step3DTO);
 
-    // from and to-user set -> person changed
-    saveProcessStepHistoryLog(
-        testDocumentationUnitDS.getId(),
-        null,
-        HistoryLogEventType.PROCESS_STEP_USER,
-        null,
-        step1DTO,
-        step2DTO);
-
     // only to-user set -> person set
     saveProcessStepHistoryLog(
         testDocumentationUnitDS.getId(),
@@ -424,6 +415,15 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         HistoryLogEventType.PROCESS_STEP_USER,
         null,
         null,
+        step2DTO);
+
+    // from and to-user set -> person changed
+    saveProcessStepHistoryLog(
+        testDocumentationUnitDS.getId(),
+        null,
+        HistoryLogEventType.PROCESS_STEP_USER,
+        null,
+        step1DTO,
         step2DTO);
 
     // only from-user set -> person removed
@@ -472,7 +472,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     assertThat(log3.createdBy()).isNull();
     assertThat(log3.documentationOffice()).isNull();
-    assertThat(log3.description()).isEqualTo("Person gesetzt");
+    assertThat(log3.description()).isEqualTo("Person geändert");
     assertThat(log3.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
   }
 
