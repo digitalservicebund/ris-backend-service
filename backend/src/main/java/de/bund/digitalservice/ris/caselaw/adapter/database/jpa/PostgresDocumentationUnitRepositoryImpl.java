@@ -164,16 +164,22 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
     Optional<DocumentationOfficeDTO> documentationOfficeDTOOptional =
         documentationOfficeRepository.findById(user.documentationOffice().id());
-    if (documentationOfficeDTOOptional.isPresent()
-        && documentationOfficeDTOOptional.get().getProcessSteps() != null) {
-      List<UUID> processStepIds =
-          documentationOfficeDTOOptional.get().getProcessSteps().stream()
-              .map(ProcessStepDTO::getId)
-              .toList();
-
+    if (documentationOfficeDTOOptional.isPresent()) {
       List<DocumentationUnitProcessStep> processStepsOfMyDocumentationOffice =
           decision.processSteps().stream()
-              .filter(processStep -> processStepIds.contains(processStep.getProcessStep().uuid()))
+              .filter(
+                  processStep -> {
+                    if (processStep.getUser() == null) {
+                      return true;
+                    }
+
+                    if (processStep.getUser().documentationOffice() == null) {
+                      return false;
+                    }
+
+                    return processStep.getUser().documentationOffice().id()
+                        == user.documentationOffice().id();
+                  })
               .toList();
 
       return decision.toBuilder().processSteps(processStepsOfMyDocumentationOffice).build();

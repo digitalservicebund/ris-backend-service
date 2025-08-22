@@ -71,6 +71,11 @@ class DocumentationUnitRepositoryTest {
             .build();
     ProcessStepDTO processStep2 =
         ProcessStepDTO.builder().id(UUID.randomUUID()).name("process step 2").build();
+    ProcessStepDTO processStepBoth =
+        ProcessStepDTO.builder()
+            .id(UUID.randomUUID())
+            .name("process step both documentation offices")
+            .build();
     List<DocumentationUnitProcessStepDTO> processStepDTOs =
         List.of(
             DocumentationUnitProcessStepDTO.builder()
@@ -82,7 +87,15 @@ class DocumentationUnitRepositoryTest {
                 .userId(otherDocumentationOfficeId)
                 .build(),
             DocumentationUnitProcessStepDTO.builder()
+                .processStep(processStepBoth)
+                .userId(otherDocumentationOfficeId)
+                .build(),
+            DocumentationUnitProcessStepDTO.builder()
                 .processStep(processStep2)
+                .userId(userId)
+                .build(),
+            DocumentationUnitProcessStepDTO.builder()
+                .processStep(processStepBoth)
                 .userId(userId)
                 .build());
     DecisionDTO decisionDTO =
@@ -95,13 +108,6 @@ class DocumentationUnitRepositoryTest {
                 DocumentationOfficeDTO.builder()
                     .id(documentationOfficeId)
                     .processSteps(List.of(processStep1, processStep2))
-                    .build()));
-    when(documentationOfficeRepository.findById(otherDocumentationOfficeId))
-        .thenReturn(
-            Optional.of(
-                DocumentationOfficeDTO.builder()
-                    .id(otherDocumentationOfficeId)
-                    .processSteps(List.of(processStepOtherDocumentationOffice))
                     .build()));
 
     DocumentationUnit result = repository.findByUuid(documentationUnitId, user);
