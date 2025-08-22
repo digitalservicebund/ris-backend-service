@@ -25,7 +25,7 @@ const isPublishable = computed(
 const preview = ref<LdmlPreview>()
 const previewError = ref()
 const fetchPreview = async () => {
-  if (isPublishable.value) return
+  if (!isPublishable.value) return
 
   const previewResponse = await publishDocumentationUnitService.getPreview(
     decision.value!.uuid,

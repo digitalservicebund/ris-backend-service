@@ -1,7 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { setActivePinia, Store } from "pinia"
-import { expect } from "vitest"
+import { afterEach, expect } from "vitest"
 import { Ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DecisionPublication from "@/components/publication/DecisionPublication.vue"
@@ -11,18 +11,17 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
 
+const getPreviewMock = vi.spyOn(publishDocumentationUnitService, "getPreview")
+
 describe("DecisionPlausibilityCheck", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
     useFeatureToggleServiceMock()
-    vi.spyOn(publishDocumentationUnitService, "getPreview").mockResolvedValue({
-      status: 200,
-      data: {
-        ldml: "ldml",
-        success: true,
-      },
-    })
   })
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+
   it("should not show LDML preview if plausibility check fails", async () => {
     await renderComponent({ hasPlausibilityCheckPassed: false })
 
@@ -34,9 +33,17 @@ describe("DecisionPlausibilityCheck", () => {
       screen.getByText("PublicationActions - publishable: false"),
     ).toBeInTheDocument()
     expect(screen.queryByText("LDML Vorschau")).not.toBeInTheDocument()
+    expect(getPreviewMock).not.toHaveBeenCalled()
   })
 
   it("should render all child components when plausibility check is true", async () => {
+    getPreviewMock.mockResolvedValue({
+      status: 200,
+      data: {
+        ldml: "ldml",
+        success: true,
+      },
+    })
     await renderComponent({ hasPlausibilityCheckPassed: true })
 
     // Click simulates updating the plausibility check with mock
@@ -49,16 +56,14 @@ describe("DecisionPlausibilityCheck", () => {
     expect(screen.getByText("LDML Vorschau")).toBeInTheDocument()
   })
   describe("ldml preview", () => {
-    it("should display ldml preview", async () => {
-      vi.spyOn(publishDocumentationUnitService, "getPreview").mockResolvedValue(
-        {
-          status: 200,
-          data: {
-            ldml: "ldml",
-            success: true,
-          },
+    it("should display ldml preview whit plausible data", async () => {
+      getPreviewMock.mockResolvedValue({
+        status: 200,
+        data: {
+          ldml: "ldml",
+          success: true,
         },
-      )
+      })
       await renderComponent({ hasPlausibilityCheckPassed: true })
 
       // Click simulates updating the plausibility check with mock
@@ -68,18 +73,23 @@ describe("DecisionPlausibilityCheck", () => {
       expect(screen.getByTestId("code-snippet")).toBeInTheDocument()
     })
 
+    it("should not display ldml preview with implausible data", async () => {
+      await renderComponent({ hasPlausibilityCheckPassed: false })
+
+      expect(screen.queryByText("LDML Vorschau")).not.toBeInTheDocument()
+      expect(getPreviewMock).not.toHaveBeenCalled()
+    })
+
     it("should show error when ldml preview cannot be loaded", async () => {
       const description =
         "Die LDML-Vorschau konnte nicht geladen werden: Aktuelle Fehlermeldung."
-      vi.spyOn(publishDocumentationUnitService, "getPreview").mockResolvedValue(
-        {
-          status: 422,
-          error: {
-            title: "Fehler beim Laden der LDML-Vorschau",
-            description: description,
-          },
+      getPreviewMock.mockResolvedValue({
+        status: 422,
+        error: {
+          title: "Fehler beim Laden der LDML-Vorschau",
+          description: description,
         },
-      )
+      })
       await renderComponent({ hasPlausibilityCheckPassed: true })
 
       // Click simulates updating the plausibility check with mock
