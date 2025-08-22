@@ -32,6 +32,15 @@ public class RisStatusAssertions {
     return responseSpec;
   }
 
+  public RisResponseSpec isUnprocessableEntity() {
+    try {
+      resultActions.andExpect(status().isUnprocessableEntity());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    return responseSpec;
+  }
+
   public RisResponseSpec isNotFound() {
     try {
       resultActions.andExpect(status().isNotFound());
