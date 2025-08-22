@@ -37,6 +37,8 @@ const fetchPreview = async () => {
   }
 }
 onMounted(async () => {
+  // Save doc unit in case there are any unsaved local changes before fetching ldml preview
+  await store.updateDocumentUnit()
   await fetchPreview()
 })
 </script>
