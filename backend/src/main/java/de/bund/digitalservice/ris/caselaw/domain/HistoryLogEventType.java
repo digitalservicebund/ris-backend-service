@@ -16,4 +16,6 @@ public enum HistoryLogEventType {
   PROCESS_STEP,
   PROCESS_STEP_USER,
   PORTAL_PUBLICATION
+  // ⚠ CAUTION ⚠: Please add any new Enum in the HistoryLogEventType in the
+  // ris-data-migration repository to avoid errors during migration!
 }

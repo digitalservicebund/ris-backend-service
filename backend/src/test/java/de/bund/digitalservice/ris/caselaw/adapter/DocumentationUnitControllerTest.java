@@ -49,6 +49,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Image;
 import de.bund.digitalservice.ris.caselaw.domain.Kind;
+import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -78,6 +79,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
@@ -89,6 +91,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mapping.MappingException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -120,6 +123,8 @@ class DocumentationUnitControllerTest {
   @MockitoBean private DuplicateCheckService duplicateCheckService;
   @MockitoBean private EurLexSOAPSearchService eurLexSOAPSearchService;
   @MockitoBean private DocumentationOfficeService documentationOfficeService;
+  @MockitoBean private Function<UUID, Boolean> userHasWriteAccess;
+  @MockitoBean private XmlUtilService xmlUtilService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
@@ -282,379 +287,403 @@ class DocumentationUnitControllerTest {
     }
   }
 
-  @Test
-  void testAttachUnsupportedFile_shouldDeleteOnFail()
-      throws IOException, DocumentationUnitNotExistsException {
-    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
-    when(converterService.getConvertedObject(any())).thenThrow(DocxConverterException.class);
+  @Nested
+  class AttachFileToDocumentationUnit {
+    @Test
+    void testAttachUnsupportedFile_shouldDeleteOnFail()
+        throws IOException, DocumentationUnitNotExistsException {
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+      when(converterService.getConvertedObject(any())).thenThrow(DocxConverterException.class);
 
-    when(attachmentService.attachFileToDocumentationUnit(
-            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
-        .thenReturn(Attachment.builder().s3path("fooPath").build());
+      when(attachmentService.attachFileToDocumentationUnit(
+              eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
+          .thenReturn(Attachment.builder().s3path("fooPath").build());
 
-    when(service.getByUuid(TEST_UUID))
-        .thenReturn(
-            Decision.builder()
-                .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-                .build());
+      when(service.getByUuid(TEST_UUID))
+          .thenReturn(
+              Decision.builder()
+                  .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                  .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+                  .build());
 
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
-        .contentType(
-            MediaType.parseMediaType(
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-        .bodyAsByteArray(attachment)
-        .exchange()
-        .expectStatus()
-        .is4xxClientError();
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+          .contentType(
+              MediaType.parseMediaType(
+                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+          .bodyAsByteArray(attachment)
+          .exchange()
+          .expectStatus()
+          .is4xxClientError();
 
-    verify(attachmentService).deleteByS3Path(any(), any(), any());
+      verify(attachmentService).deleteByS3Path(any(), any(), any());
+    }
+
+    @Test
+    void testAttachFile_shouldInitializeCoreDataAndCheckDuplicates()
+        throws IOException, DocumentationUnitNotExistsException {
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
+      var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+
+      when(attachmentService.attachFileToDocumentationUnit(
+              eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
+          .thenReturn(Attachment.builder().s3path("fooPath").build());
+
+      Decision docUnit =
+          Decision.builder()
+              .documentNumber("myDocNumber1")
+              .coreData(CoreData.builder().documentationOffice(docOffice).build())
+              .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+              .build();
+      when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
+
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+          .contentType(
+              MediaType.parseMediaType(
+                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+          .bodyAsByteArray(attachment)
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      verify(duplicateCheckService, times(1)).checkDuplicates(docUnit.documentNumber());
+      verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any(), any());
+
+      verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any(), any());
+    }
   }
 
-  @Test
-  void testAttachFile_shouldInitializeCoreDataAndCheckDuplicates()
-      throws IOException, DocumentationUnitNotExistsException {
-    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+  @Nested
+  class GetByDocumentNumber {
+    @Test
+    void testGetByDocumentnumber() throws DocumentationUnitNotExistsException {
+      when(service.getByDocumentNumber("ABCD202200001"))
+          .thenReturn(
+              Decision.builder()
+                  .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                  .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+                  .build());
 
-    when(attachmentService.attachFileToDocumentationUnit(
-            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class), any()))
-        .thenReturn(Attachment.builder().s3path("fooPath").build());
+      risWebClient
+          .withDefaultLogin()
+          .get()
+          .uri("/api/v1/caselaw/documentunits/ABCD202200001")
+          .exchange()
+          .expectStatus()
+          .isOk()
+          .expectBody(Decision.class);
 
-    Decision docUnit =
-        Decision.builder()
-            .documentNumber("myDocNumber1")
-            .coreData(CoreData.builder().documentationOffice(docOffice).build())
-            .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-            .build();
-    when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
+      // once by the AuthService and once by the controller asking the service
+      verify(service, times(1)).getByDocumentNumber("ABCD202200001");
+      verify(duplicateCheckService, times(1)).checkDuplicates("ABCD202200001");
+    }
 
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
-        .contentType(
-            MediaType.parseMediaType(
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-        .bodyAsByteArray(attachment)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    @Test
+    void testGetByDocumentNumber_withPendingProceeding()
+        throws DocumentationUnitNotExistsException {
+      when(service.getByDocumentNumber("ABCD202200001"))
+          .thenReturn(
+              PendingProceeding.builder()
+                  .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                  .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+                  .build());
 
-    verify(duplicateCheckService, times(1)).checkDuplicates(docUnit.documentNumber());
-    verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any(), any());
+      risWebClient
+          .withDefaultLogin()
+          .get()
+          .uri("/api/v1/caselaw/documentunits/ABCD202200001")
+          .exchange()
+          .expectStatus()
+          .isOk()
+          .expectBody(PendingProceeding.class);
 
-    verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any(), any());
+      // once by the AuthService and once by the controller asking the service
+      verify(service, times(1)).getByDocumentNumber("ABCD202200001");
+    }
+
+    @Test
+    void testGetByDocumentNumber_withInvalidDocumentNumber()
+        throws DocumentationUnitNotExistsException {
+
+      when(service.getByDocumentNumber("abc")).thenReturn(null);
+
+      risWebClient
+          .withDefaultLogin()
+          .get()
+          .uri("/api/v1/caselaw/documentunits/abc")
+          .exchange()
+          .expectStatus()
+          .is4xxClientError();
+    }
   }
 
-  @Test
-  void testGetByDocumentnumber() throws DocumentationUnitNotExistsException {
-    when(service.getByDocumentNumber("ABCD202200001"))
-        .thenReturn(
-            Decision.builder()
-                .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-                .build());
+  @Nested
+  class DeleteByUuid {
+    @Test
+    void testDeleteByUuid_withInternalUser_shouldSucceed()
+        throws DocumentationUnitNotExistsException {
+      when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
+      when(userHasWriteAccess.apply(any())).thenReturn(true);
 
-    risWebClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits/ABCD202200001")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(Decision.class);
+      risWebClient
+          .withDefaultLogin()
+          .delete()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+          .exchange()
+          .expectStatus()
+          .isOk();
 
-    // once by the AuthService and once by the controller asking the service
-    verify(service, times(1)).getByDocumentNumber("ABCD202200001");
-    verify(duplicateCheckService, times(1)).checkDuplicates("ABCD202200001");
+      verify(service).deleteByUuid(TEST_UUID);
+    }
+
+    @Test
+    void testDeleteByUuid_withExternalUser_shouldBeForbidden()
+        throws DocumentationUnitNotExistsException {
+      // userService.getDocumentationOffice is mocked in @BeforeEach
+      when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
+      when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
+
+      risWebClient
+          .withExternalLogin()
+          .delete()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+          .exchange()
+          .expectStatus()
+          .isForbidden();
+
+      verify(service, times(0)).deleteByUuid(TEST_UUID);
+    }
+
+    @Test
+    void testDeleteByUuid_withInvalidUuid() throws DocumentationUnitNotExistsException {
+      when(service.getByDocumentNumber("abc")).thenReturn(null);
+
+      risWebClient
+          .withDefaultLogin()
+          .delete()
+          .uri("/api/v1/caselaw/documentunits/abc")
+          .exchange()
+          .expectStatus()
+          .is4xxClientError();
+    }
   }
 
-  @Test
-  void testGetPendingProceedingByDocumentnumber() throws DocumentationUnitNotExistsException {
-    when(service.getByDocumentNumber("ABCD202200001"))
-        .thenReturn(
-            PendingProceeding.builder()
-                .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-                .build());
+  @Nested
+  class UpdateByUuid {
+    @Test
+    void testUpdateByUuid() throws DocumentationUnitNotExistsException {
+      DecisionDTO documentationUnitDTO =
+          DecisionDTO.builder()
+              .id(TEST_UUID)
+              .documentNumber("ABCD202200001")
+              .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
+              .build();
+      Decision decision = DecisionTransformer.transformToDomain(documentationUnitDTO);
 
-    risWebClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits/ABCD202200001")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(PendingProceeding.class);
+      when(service.updateDocumentationUnit(decision)).thenReturn(null);
 
-    // once by the AuthService and once by the controller asking the service
-    verify(service, times(1)).getByDocumentNumber("ABCD202200001");
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+          .contentType(MediaType.APPLICATION_JSON)
+          .bodyValue(decision)
+          .exchange()
+          .expectStatus()
+          .isOk();
+
+      verify(service).updateDocumentationUnit(decision);
+    }
+
+    @Test
+    void testUpdateByUuid_withInvalidUuid() {
+      Decision decisionDTO = Decision.builder().uuid(TEST_UUID).build();
+
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/abc")
+          .contentType(MediaType.APPLICATION_JSON)
+          .bodyValue(decisionDTO)
+          .exchange()
+          .expectStatus()
+          .is4xxClientError();
+    }
   }
 
-  @Test
-  void testGetByDocumentNumber_withInvalidDocumentNumber()
-      throws DocumentationUnitNotExistsException {
+  @Nested
+  class PartialUpdateByUuid {
+    @Test
+    @Disabled("fix and enable")
+    void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException {
+      DecisionDTO documentationUnitDTO =
+          DecisionDTO.builder()
+              .id(TEST_UUID)
+              .documentNumber("ABCD202200001")
+              .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
+              .build();
+      Decision decision = DecisionTransformer.transformToDomain(documentationUnitDTO);
 
-    when(service.getByDocumentNumber("abc")).thenReturn(null);
+      when(service.updateDocumentationUnit(decision)).thenReturn(decision);
+      when(service.getByUuid(TEST_UUID)).thenReturn(decision);
 
-    risWebClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits/abc")
-        .exchange()
-        .expectStatus()
-        .is4xxClientError();
+      JsonNode valueToReplace = new TextNode("newValue");
+      JsonPatchOperation replaceOp =
+          new ReplaceOperation("/coreData/appraisalBody", valueToReplace);
+      JsonPatch patch = new JsonPatch(List.of(replaceOp));
+      RisJsonPatch risJsonPatch = new RisJsonPatch(0L, patch, Collections.emptyList());
+
+      risWebClient
+          .withDefaultLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+          .contentType(MediaType.APPLICATION_JSON)
+          .bodyValue(risJsonPatch)
+          .exchange()
+          .expectStatus()
+          .isOk();
+    }
   }
 
-  @Test
-  void testDeleteByUuid_withInternalUser_shouldSucceed()
-      throws DocumentationUnitNotExistsException {
-    when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
+  @Nested
+  class HandoverDocumentationUnitAsMail {
+    @Test
+    void testHandoverAsEmail() throws DocumentationUnitNotExistsException {
+      when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
+      when(handoverService.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
+          .thenReturn(
+              HandoverMail.builder()
+                  .entityId(TEST_UUID)
+                  .receiverAddress("receiver address")
+                  .mailSubject("mailSubject")
+                  .attachments(
+                      Collections.singletonList(
+                          MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
+                  .success(true)
+                  .statusMessages(List.of("status-messages"))
+                  .handoverDate(Instant.parse("2020-01-01T01:01:01.00Z"))
+                  .build());
 
-    risWebClient
-        .withDefaultLogin()
-        .delete()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
-        .exchange()
-        .expectStatus()
-        .isOk();
+      HandoverMail responseBody =
+          risWebClient
+              .withDefaultLogin()
+              .put()
+              .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover")
+              .exchange()
+              .expectHeader()
+              .contentType(MediaType.APPLICATION_JSON)
+              .expectStatus()
+              .isOk()
+              .expectBody(HandoverMail.class)
+              .returnResult()
+              .getResponseBody();
 
-    verify(service).deleteByUuid(TEST_UUID);
-  }
+      assertThat(responseBody)
+          .isEqualTo(
+              HandoverMail.builder()
+                  .entityId(TEST_UUID)
+                  .receiverAddress("receiver address")
+                  .mailSubject("mailSubject")
+                  .attachments(
+                      Collections.singletonList(
+                          MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
+                  .success(true)
+                  .statusMessages(List.of("status-messages"))
+                  .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
+                  .build());
 
-  @Test
-  void testDeleteByUuid_withExternalUser_shouldBeForbidden()
-      throws DocumentationUnitNotExistsException {
-    // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
-    when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
+      verify(handoverService).handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null);
+    }
 
-    risWebClient
-        .withExternalLogin()
-        .delete()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
-        .exchange()
-        .expectStatus()
-        .isForbidden();
+    @Test
+    void testHandoverAsEmail_withServiceThrowsException()
+        throws DocumentationUnitNotExistsException {
+      when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
+      when(handoverService.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
+          .thenThrow(DocumentationUnitNotExistsException.class);
 
-    verify(service, times(0)).deleteByUuid(TEST_UUID);
-  }
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover")
+          .exchange()
+          .expectStatus()
+          .is5xxServerError();
 
-  @Test
-  void testDeleteByUuid_withInvalidUuid() throws DocumentationUnitNotExistsException {
-    when(service.getByDocumentNumber("abc")).thenReturn(null);
+      verify(handoverService).handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null);
+    }
 
-    risWebClient
-        .withDefaultLogin()
-        .delete()
-        .uri("/api/v1/caselaw/documentunits/abc")
-        .exchange()
-        .expectStatus()
-        .is4xxClientError();
-  }
+    @Test
+    void testGetLastHandoverXmlMail() {
 
-  @Test
-  void testUpdateByUuid() throws DocumentationUnitNotExistsException {
-    DecisionDTO documentationUnitDTO =
-        DecisionDTO.builder()
-            .id(TEST_UUID)
-            .documentNumber("ABCD202200001")
-            .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
-            .build();
-    Decision decision = DecisionTransformer.transformToDomain(documentationUnitDTO);
+      when(handoverService.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
+          .thenReturn(
+              List.of(
+                  HandoverReport.builder()
+                      .content("<html>2021 Report</html>")
+                      .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
+                      .build(),
+                  HandoverMail.builder()
+                      .entityId(TEST_UUID)
+                      .receiverAddress("receiver address")
+                      .mailSubject("mailSubject")
+                      .attachments(
+                          Collections.singletonList(
+                              MailAttachment.builder()
+                                  .fileContent("xml")
+                                  .fileName("test.xml")
+                                  .build()))
+                      .success(true)
+                      .statusMessages(List.of("status-messages"))
+                      .handoverDate(Instant.parse("2020-01-01T01:01:01.00Z"))
+                      .build(),
+                  HandoverReport.builder()
+                      .content("<html>2019 Report</html>")
+                      .receivedDate(Instant.parse("2019-01-01T01:01:01.00Z"))
+                      .build()));
 
-    when(service.updateDocumentationUnit(decision)).thenReturn(null);
+      List<EventRecord> responseBody =
+          risWebClient
+              .withDefaultLogin()
+              .get()
+              .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover")
+              .exchange()
+              .expectStatus()
+              .isOk()
+              .expectBody(new TypeReference<List<EventRecord>>() {})
+              .returnResult()
+              .getResponseBody();
 
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
-        .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(decision)
-        .exchange()
-        .expectStatus()
-        .isOk();
+      assertThat(responseBody)
+          .containsExactly(
+              HandoverReport.builder()
+                  .content("<html>2021 Report</html>")
+                  .receivedDate(Instant.parse("2021-01-01T01:01:01Z"))
+                  .build(),
+              HandoverMail.builder()
+                  .entityId(TEST_UUID)
+                  .receiverAddress("receiver address")
+                  .mailSubject("mailSubject")
+                  .attachments(
+                      Collections.singletonList(
+                          MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
+                  .success(true)
+                  .statusMessages(List.of("status-messages"))
+                  .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
+                  .build(),
+              HandoverReport.builder()
+                  .content("<html>2019 Report</html>")
+                  .receivedDate(Instant.parse("2019-01-01T01:01:01Z"))
+                  .build());
 
-    verify(service).updateDocumentationUnit(decision);
-  }
-
-  @Test
-  @Disabled("fix and enable")
-  void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException {
-    DecisionDTO documentationUnitDTO =
-        DecisionDTO.builder()
-            .id(TEST_UUID)
-            .documentNumber("ABCD202200001")
-            .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
-            .build();
-    Decision decision = DecisionTransformer.transformToDomain(documentationUnitDTO);
-
-    when(service.updateDocumentationUnit(decision)).thenReturn(decision);
-    when(service.getByUuid(TEST_UUID)).thenReturn(decision);
-
-    JsonNode valueToReplace = new TextNode("newValue");
-    JsonPatchOperation replaceOp = new ReplaceOperation("/coreData/appraisalBody", valueToReplace);
-    JsonPatch patch = new JsonPatch(List.of(replaceOp));
-    RisJsonPatch risJsonPatch = new RisJsonPatch(0L, patch, Collections.emptyList());
-
-    risWebClient
-        .withDefaultLogin()
-        .patch()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
-        .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(risJsonPatch)
-        .exchange()
-        .expectStatus()
-        .isOk();
-  }
-
-  @Test
-  void testUpdateByUuid_withInvalidUuid() {
-    Decision decisionDTO = Decision.builder().uuid(TEST_UUID).build();
-
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/abc")
-        .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(decisionDTO)
-        .exchange()
-        .expectStatus()
-        .is4xxClientError();
-  }
-
-  @Test
-  void testHandoverAsEmail() throws DocumentationUnitNotExistsException {
-    when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(handoverService.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
-        .thenReturn(
-            HandoverMail.builder()
-                .entityId(TEST_UUID)
-                .receiverAddress("receiver address")
-                .mailSubject("mailSubject")
-                .attachments(
-                    Collections.singletonList(
-                        MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
-                .success(true)
-                .statusMessages(List.of("status-messages"))
-                .handoverDate(Instant.parse("2020-01-01T01:01:01.00Z"))
-                .build());
-
-    HandoverMail responseBody =
-        risWebClient
-            .withDefaultLogin()
-            .put()
-            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover")
-            .exchange()
-            .expectHeader()
-            .contentType(MediaType.APPLICATION_JSON)
-            .expectStatus()
-            .isOk()
-            .expectBody(HandoverMail.class)
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody)
-        .isEqualTo(
-            HandoverMail.builder()
-                .entityId(TEST_UUID)
-                .receiverAddress("receiver address")
-                .mailSubject("mailSubject")
-                .attachments(
-                    Collections.singletonList(
-                        MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
-                .success(true)
-                .statusMessages(List.of("status-messages"))
-                .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
-                .build());
-
-    verify(handoverService).handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null);
-  }
-
-  @Test
-  void testHandoverAsEmail_withServiceThrowsException() throws DocumentationUnitNotExistsException {
-    when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(handoverService.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null))
-        .thenThrow(DocumentationUnitNotExistsException.class);
-
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover")
-        .exchange()
-        .expectStatus()
-        .is5xxServerError();
-
-    verify(handoverService).handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS, null);
-  }
-
-  @Test
-  void testGetLastHandoverXmlMail() {
-
-    when(handoverService.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
-        .thenReturn(
-            List.of(
-                HandoverReport.builder()
-                    .content("<html>2021 Report</html>")
-                    .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
-                    .build(),
-                HandoverMail.builder()
-                    .entityId(TEST_UUID)
-                    .receiverAddress("receiver address")
-                    .mailSubject("mailSubject")
-                    .attachments(
-                        Collections.singletonList(
-                            MailAttachment.builder()
-                                .fileContent("xml")
-                                .fileName("test.xml")
-                                .build()))
-                    .success(true)
-                    .statusMessages(List.of("status-messages"))
-                    .handoverDate(Instant.parse("2020-01-01T01:01:01.00Z"))
-                    .build(),
-                HandoverReport.builder()
-                    .content("<html>2019 Report</html>")
-                    .receivedDate(Instant.parse("2019-01-01T01:01:01.00Z"))
-                    .build()));
-
-    List<EventRecord> responseBody =
-        risWebClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<List<EventRecord>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody)
-        .containsExactly(
-            HandoverReport.builder()
-                .content("<html>2021 Report</html>")
-                .receivedDate(Instant.parse("2021-01-01T01:01:01Z"))
-                .build(),
-            HandoverMail.builder()
-                .entityId(TEST_UUID)
-                .receiverAddress("receiver address")
-                .mailSubject("mailSubject")
-                .attachments(
-                    Collections.singletonList(
-                        MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
-                .success(true)
-                .statusMessages(List.of("status-messages"))
-                .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
-                .build(),
-            HandoverReport.builder()
-                .content("<html>2019 Report</html>")
-                .receivedDate(Instant.parse("2019-01-01T01:01:01Z"))
-                .build());
-
-    verify(handoverService).getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
+      verify(handoverService).getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
+    }
   }
 
   @Test
@@ -801,423 +830,637 @@ class DocumentationUnitControllerTest {
     verify(converterService).getConvertedObject("", "123", TEST_UUID);
   }
 
-  @Test
-  void testTakeoverDocumentationUnit_withSameDocOfficeAsDocUnit_shouldSucceed()
-      throws DocumentationUnitNotExistsException {
-    DocumentationOffice documentationOffice =
-        DocumentationOffice.builder()
-            .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
-            .abbreviation("DS")
-            .build();
-    String documentNumber = "ABCD202200001";
+  @Nested
+  class TakeoverDocumentUnit {
+    @Test
+    void testTakeoverDocumentationUnit_withSameDocOfficeAsDocUnit_shouldSucceed()
+        throws DocumentationUnitNotExistsException {
+      DocumentationOffice documentationOffice =
+          DocumentationOffice.builder()
+              .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
+              .abbreviation("DS")
+              .build();
+      String documentNumber = "ABCD202200001";
 
-    Decision decision =
-        Decision.builder()
-            .documentNumber(documentNumber)
-            .status(
-                Status.builder()
-                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
-                    .build())
-            .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
-            .build();
+      Decision decision =
+          Decision.builder()
+              .documentNumber(documentNumber)
+              .status(
+                  Status.builder()
+                      .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                      .build())
+              .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
+              .build();
 
-    when(service.getByDocumentNumber(documentNumber)).thenReturn(decision);
+      when(service.getByDocumentNumber(documentNumber)).thenReturn(decision);
 
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/ABCD202200001/takeover")
-        .exchange()
-        .expectStatus()
-        .isOk();
-    verify(service, times(1)).takeOverDocumentationUnit(any(), any());
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/ABCD202200001/takeover")
+          .exchange()
+          .expectStatus()
+          .isOk();
+      verify(service, times(1)).takeOverDocumentationUnit(any(), any());
+    }
+
+    @Test
+    void testTakeoverDocumentationUnit_withExternalUser_shouldBeForbidden()
+        throws DocumentationUnitNotExistsException {
+      when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
+
+      risWebClient
+          .withExternalLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/ABCD202200001/takeover")
+          .exchange()
+          .expectStatus()
+          .isForbidden();
+
+      verify(service, times(0)).takeOverDocumentationUnit("ABCD202200001", null);
+    }
+
+    @Test
+    void testTakeoverDocumentationUnit_withOtherDocOfficeAsDocUnit_shouldBeForbidden()
+        throws DocumentationUnitNotExistsException {
+      Mockito.reset(userService);
+      DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
+      when(userService.getDocumentationOffice(any())).thenReturn(office);
+      String documentNumber = "ABCD202200001";
+      Decision decision =
+          Decision.builder()
+              .documentNumber(documentNumber)
+              .status(
+                  Status.builder()
+                      .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                      .build())
+              .coreData(CoreData.builder().documentationOffice(office).build())
+              .build();
+
+      when(service.getByDocumentNumber(documentNumber)).thenReturn(decision);
+
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/ABCD202200001/takeover")
+          .exchange()
+          .expectStatus()
+          .isForbidden();
+
+      verify(service, times(0)).takeOverDocumentationUnit(documentNumber, null);
+    }
   }
 
-  @Test
-  void testTakeoverDocumentationUnit_withExternalUser_shouldBeForbidden()
-      throws DocumentationUnitNotExistsException {
-    when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
+  @Nested
+  class CreateLdmlPreview {
+    @Test
+    void createLdmlPreview_withoutWriteAccess_shouldReturnIsForbidden()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      when(userHasWriteAccess.apply(TEST_UUID)).thenReturn(false);
 
-    risWebClient
-        .withExternalLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/ABCD202200001/takeover")
-        .exchange()
-        .expectStatus()
-        .isForbidden();
+      // Act + Assert
+      risWebClient
+          .withDefaultLogin()
+          .get()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-ldml")
+          .exchange()
+          .expectStatus()
+          .isForbidden();
 
-    verify(service, times(0)).takeOverDocumentationUnit("ABCD202200001", null);
+      verify(portalPublicationService, never()).createLdmlPreview(TEST_UUID);
+    }
+
+    @Test
+    void createLdmlPreview_withMissingDocUnit_shouldReturnIsNotFound()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      doThrow(DocumentationUnitNotExistsException.class)
+          .when(portalPublicationService)
+          .createLdmlPreview(TEST_UUID);
+
+      // Act + Assert
+      risWebClient
+          .withDefaultLogin()
+          .get()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-ldml")
+          .exchange()
+          .expectStatus()
+          .isNotFound();
+
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
+    }
+
+    @Test
+    void createLdmlPreview_withoutException_shouldBeSuccessful()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var expectedResult = LdmlTransformationResult.builder().ldml("ldml").success(true).build();
+      when(portalPublicationService.createLdmlPreview(TEST_UUID)).thenReturn(expectedResult);
+
+      // Act
+      var result =
+          risWebClient
+              .withExternalLogin()
+              .get()
+              .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-ldml")
+              .exchange()
+              .expectStatus()
+              .isOk()
+              .expectBody(LdmlTransformationResult.class)
+              .returnResult();
+
+      // Assert
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
+      assertThat(result.getResponseBody()).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void createLdmlPreview_withLdmlTransformationException_shouldReturnUnprocessableEntity()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      doThrow(new LdmlTransformationException("Could not parse transformed LDML as string.", null))
+          .when(portalPublicationService)
+          .createLdmlPreview(TEST_UUID);
+
+      // Act
+      var result =
+          risWebClient
+              .withDefaultLogin()
+              .get()
+              .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-ldml")
+              .exchange()
+              .expectStatus()
+              .isUnprocessableEntity()
+              .expectBody(LdmlTransformationResult.class)
+              .returnResult();
+
+      // Assert
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
+      assertThat(result.getResponseBody())
+          .isEqualTo(
+              LdmlTransformationResult.builder()
+                  .success(false)
+                  .statusMessages(List.of("Could not parse transformed LDML as string."))
+                  .build());
+    }
+
+    @Test
+    void createLdmlPreview_withUnsupportedDocumentType_shouldReturnUnprocessableEntity()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      doThrow(new DocumentationUnitException("Document type PendingProceeding is not supported."))
+          .when(portalPublicationService)
+          .createLdmlPreview(TEST_UUID);
+
+      // Act
+      var result =
+          risWebClient
+              .withDefaultLogin()
+              .get()
+              .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-ldml")
+              .exchange()
+              .expectStatus()
+              .isUnprocessableEntity()
+              .expectBody(LdmlTransformationResult.class)
+              .returnResult();
+
+      // Assert
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
+      assertThat(result.getResponseBody())
+          .isEqualTo(
+              LdmlTransformationResult.builder()
+                  .success(false)
+                  .statusMessages(List.of("Document type PendingProceeding is not supported."))
+                  .build());
+    }
+
+    @Test
+    void createLdmlPreview_withMappingException_shouldReturnUnprocessableEntity()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      doThrow(
+              new MappingException(
+                  "The element type ... must be terminated by the matchen end-tag ..."))
+          .when(portalPublicationService)
+          .createLdmlPreview(TEST_UUID);
+
+      // Act
+      var result =
+          risWebClient
+              .withDefaultLogin()
+              .get()
+              .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-ldml")
+              .exchange()
+              .expectStatus()
+              .isUnprocessableEntity()
+              .expectBody(LdmlTransformationResult.class)
+              .returnResult();
+
+      // Assert
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
+      assertThat(result.getResponseBody())
+          .isEqualTo(
+              LdmlTransformationResult.builder()
+                  .success(false)
+                  .statusMessages(
+                      List.of("The element type ... must be terminated by the matchen end-tag ..."))
+                  .build());
+    }
+
+    @Test
+    void createLdmlPreview_withRuntimeException_shouldReturnInternalServerError()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      doThrow(new RuntimeException("Any other exception..."))
+          .when(portalPublicationService)
+          .createLdmlPreview(TEST_UUID);
+
+      // Act
+      var result =
+          risWebClient
+              .withDefaultLogin()
+              .get()
+              .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-ldml")
+              .exchange()
+              .expectStatus()
+              .is5xxServerError()
+              .expectBody(LdmlTransformationResult.class)
+              .returnResult();
+
+      // Assert
+      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
+      assertThat(result.getResponseBody())
+          .isEqualTo(
+              LdmlTransformationResult.builder()
+                  .success(false)
+                  .statusMessages(List.of("Any other exception..."))
+                  .build());
+    }
   }
 
-  @Test
-  void testTakeoverDocumentationUnit_withOtherDocOfficeAsDocUnit_shouldBeForbidden()
-      throws DocumentationUnitNotExistsException {
-    Mockito.reset(userService);
-    DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
-    when(userService.getDocumentationOffice(any())).thenReturn(office);
-    String documentNumber = "ABCD202200001";
-    Decision decision =
-        Decision.builder()
-            .documentNumber(documentNumber)
-            .status(
-                Status.builder()
-                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
-                    .build())
-            .coreData(CoreData.builder().documentationOffice(office).build())
-            .build();
+  @Nested
+  class PublishDocumentationUnit {
+    @Test
+    void testPublish_withServiceThrowsDocumentationUnitNotExistsException()
+        throws DocumentationUnitNotExistsException {
 
-    when(service.getByDocumentNumber(documentNumber)).thenReturn(decision);
+      doThrow(DocumentationUnitNotExistsException.class)
+          .when(portalPublicationService)
+          .publishDocumentationUnitWithChangelog(TEST_UUID, null);
 
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/ABCD202200001/takeover")
-        .exchange()
-        .expectStatus()
-        .isForbidden();
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+          .exchange()
+          .expectStatus()
+          .is5xxServerError();
 
-    verify(service, times(0)).takeOverDocumentationUnit(documentNumber, null);
-  }
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
+    }
 
-  @Test
-  void testPublish_withServiceThrowsDocumentationUnitNotExistsException()
-      throws DocumentationUnitNotExistsException {
+    @Test
+    void testPublish_withServiceThrowsLdmlTransformationException()
+        throws DocumentationUnitNotExistsException {
 
-    doThrow(DocumentationUnitNotExistsException.class)
-        .when(portalPublicationService)
-        .publishDocumentationUnitWithChangelog(TEST_UUID, null);
+      doThrow(LdmlTransformationException.class)
+          .when(portalPublicationService)
+          .publishDocumentationUnitWithChangelog(TEST_UUID, null);
 
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
-        .exchange()
-        .expectStatus()
-        .is5xxServerError();
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+          .exchange()
+          .expectStatus()
+          .isBadRequest();
 
-    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
-  }
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
+    }
 
-  @Test
-  void testPublish_withServiceThrowsLdmlTransformationException()
-      throws DocumentationUnitNotExistsException {
+    @Test
+    void testPublish_withServiceThrowsPublishException()
+        throws DocumentationUnitNotExistsException {
 
-    doThrow(LdmlTransformationException.class)
-        .when(portalPublicationService)
-        .publishDocumentationUnitWithChangelog(TEST_UUID, null);
+      doThrow(PublishException.class)
+          .when(portalPublicationService)
+          .publishDocumentationUnitWithChangelog(TEST_UUID, null);
 
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
-        .exchange()
-        .expectStatus()
-        .isBadRequest();
+      risWebClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+          .exchange()
+          .expectStatus()
+          .is5xxServerError();
 
-    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
-  }
+      verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
+    }
 
-  @Test
-  void testPublish_withServiceThrowsPublishException() throws DocumentationUnitNotExistsException {
+    @Nested
+    class UpdateDuplicateStatus {
+      @Test
+      void testUpdateDuplicateStatus_withValidStatus() throws DocumentationUnitNotExistsException {
+        var docNumberOrigin = "documentNumber";
+        var docNumberDuplicate = "duplicateNumb";
+        when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+        DocumentationOffice documentationOffice =
+            DocumentationOffice.builder()
+                .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
+                .abbreviation("DS")
+                .build();
 
-    doThrow(PublishException.class)
-        .when(portalPublicationService)
-        .publishDocumentationUnitWithChangelog(TEST_UUID, null);
+        Decision decision =
+            Decision.builder()
+                .documentNumber(docNumberOrigin)
+                .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
+                .build();
 
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
-        .exchange()
-        .expectStatus()
-        .is5xxServerError();
+        when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(decision);
 
-    verify(portalPublicationService).publishDocumentationUnitWithChangelog(TEST_UUID, null);
-  }
+        DuplicateRelationStatusRequest body =
+            DuplicateRelationStatusRequest.builder()
+                .status(DuplicateRelationStatus.IGNORED)
+                .build();
+        risWebClient
+            .withDefaultLogin()
+            .put()
+            .uri(
+                "/api/v1/caselaw/documentunits/"
+                    + docNumberOrigin
+                    + "/duplicate-status/"
+                    + docNumberDuplicate)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(body)
+            .exchange()
+            .expectStatus()
+            .isOk();
+      }
 
-  @Test
-  void testUpdateDuplicateStatus_withValidStatus() throws DocumentationUnitNotExistsException {
-    var docNumberOrigin = "documentNumber";
-    var docNumberDuplicate = "duplicateNumb";
-    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
-    DocumentationOffice documentationOffice =
-        DocumentationOffice.builder()
-            .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
-            .abbreviation("DS")
-            .build();
-
-    Decision decision =
-        Decision.builder()
-            .documentNumber(docNumberOrigin)
-            .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
-            .build();
-
-    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(decision);
-
-    DuplicateRelationStatusRequest body =
-        DuplicateRelationStatusRequest.builder().status(DuplicateRelationStatus.IGNORED).build();
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri(
-            "/api/v1/caselaw/documentunits/"
-                + docNumberOrigin
-                + "/duplicate-status/"
-                + docNumberDuplicate)
-        .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(body)
-        .exchange()
-        .expectStatus()
-        .isOk();
-  }
-
-  @Test
-  void testUpdateDuplicateStatus_withInValidStatus() throws DocumentationUnitNotExistsException {
-    var docNumberOrigin = "documentNumber";
-    var docNumberDuplicate = "duplicateNumb";
-    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
-    DocumentationOffice documentationOffice =
-        DocumentationOffice.builder()
-            .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
-            .abbreviation("DS")
-            .build();
-
-    Decision decision =
-        Decision.builder()
-            .documentNumber(docNumberOrigin)
-            .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
-            .build();
-
-    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(decision);
-
-    String body =
-        """
-                        { "status": "INVALID" }
-                        """;
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri(
-            "/api/v1/caselaw/documentunits/"
-                + docNumberOrigin
-                + "/duplicate-status/"
-                + docNumberDuplicate)
-        .contentType(MediaType.APPLICATION_JSON)
-        .bodyJsonString(body)
-        .exchange()
-        .expectStatus()
-        .isBadRequest();
-  }
-
-  @Test
-  void testUpdateDuplicateStatus_withNonExistingRelation()
-      throws DocumentationUnitNotExistsException {
-    var docNumberOrigin = "documentNumber";
-    var docNumberDuplicate = "duplicateNumb";
-    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
-    DocumentationOffice documentationOffice =
-        DocumentationOffice.builder()
-            .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
-            .abbreviation("DS")
-            .build();
-
-    Decision decision =
-        Decision.builder()
-            .documentNumber(docNumberOrigin)
-            .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
-            .build();
-
-    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(decision);
-
-    when(duplicateCheckService.updateDuplicateStatus(any(), any(), any()))
-        .thenThrow(EntityNotFoundException.class);
-
-    DuplicateRelationStatusRequest body =
-        DuplicateRelationStatusRequest.builder().status(DuplicateRelationStatus.IGNORED).build();
-
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri(
-            "/api/v1/caselaw/documentunits/"
-                + docNumberOrigin
-                + "/duplicate-status/"
-                + docNumberDuplicate)
-        .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(body)
-        .exchange()
-        .expectStatus()
-        .is4xxClientError();
-  }
-
-  @Test
-  void test_assignDocumentationOffice_withoutException_shouldSucceed()
-      throws DocumentationUnitNotExistsException {
-    // Arrange
-    var result = "The documentation office 'Test' has been successfully assigned.";
-    UUID documentationOfficeId = UUID.randomUUID();
-    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
-    when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
-        .thenReturn(result);
-
-    // Act
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
-        .contentType(MediaType.APPLICATION_JSON)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(String.class)
-        .consumeWith(
-            response -> {
-              // Assert
-              assertThat(response.getResponseBody()).isEqualTo(result);
-            });
-  }
-
-  @Test
-  void test_assignDocumentationOffice_withDocumentationUnitNotExistsException_shouldReturnNotFound()
-      throws DocumentationUnitNotExistsException {
-    // Arrange
-    var result = "Documentation unit not found";
-    UUID documentationOfficeId = UUID.randomUUID();
-    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
-    when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
-        .thenThrow(DocumentationUnitNotExistsException.class);
-
-    // Act
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
-        .contentType(MediaType.APPLICATION_JSON)
-        .exchange()
-        .expectStatus()
-        .isNotFound()
-        .expectBody(String.class)
-        .consumeWith(
-            response -> {
-              // Assert
-              assertThat(response.getResponseBody()).isEqualTo(result);
-            });
-  }
-
-  @Test
-  void
-      test_assignDocumentationOffice_withDocumentationOfficeNotExistsException_shouldReturnNotFound()
+      @Test
+      void testUpdateDuplicateStatus_withInValidStatus()
           throws DocumentationUnitNotExistsException {
-    // Arrange
-    var result = "Documentation office not found";
-    UUID documentationOfficeId = UUID.randomUUID();
-    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
-    when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
-        .thenThrow(DocumentationOfficeNotExistsException.class);
+        var docNumberOrigin = "documentNumber";
+        var docNumberDuplicate = "duplicateNumb";
+        when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+        DocumentationOffice documentationOffice =
+            DocumentationOffice.builder()
+                .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
+                .abbreviation("DS")
+                .build();
 
-    // Act
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
-        .contentType(MediaType.APPLICATION_JSON)
-        .exchange()
-        .expectStatus()
-        .isNotFound()
-        .expectBody(String.class)
-        .consumeWith(
-            response -> {
-              // Assert
-              assertThat(response.getResponseBody()).isEqualTo(result);
-            });
-  }
-
-  @Test
-  void test_assignDocumentationOffice_withDocumentationUnitException_shouldReturnBadRequest()
-      throws DocumentationUnitNotExistsException {
-    // Arrange
-    UUID documentationOfficeId = UUID.randomUUID();
-    var result =
-        String.format(
-            "Error assigning documentation office %s to %s", TEST_UUID, documentationOfficeId);
-    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
-    when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
-        .thenThrow(new DocumentationUnitException(result));
-
-    // Act
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
-        .contentType(MediaType.APPLICATION_JSON)
-        .exchange()
-        .expectStatus()
-        .isBadRequest()
-        .expectBody(String.class)
-        .consumeWith(
-            response -> {
-              // Assert
-              assertThat(response.getResponseBody()).isEqualTo(result);
-            });
-  }
-
-  @Test
-  void testGetImage_shouldReturnCorrectContentType()
-      throws DocumentationUnitNotExistsException, ImageNotExistsException {
-    when(service.getByDocumentNumber("ABCD202200001"))
-        .thenReturn(
+        Decision decision =
             Decision.builder()
-                .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-                .build());
-    when(service.getImageBytes("ABCD202200001", "bild.jpg"))
-        .thenReturn(
-            Image.builder()
-                .name("bild.jpg")
-                .contentType("jpg")
-                .content("imageContent".getBytes())
-                .build());
+                .documentNumber(docNumberOrigin)
+                .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
+                .build();
 
-    risWebClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits/ABCD202200001/image/bild.jpg")
-        .contentType(MediaType.APPLICATION_OCTET_STREAM)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectHeader()
-        .contentType(MediaType.parseMediaType("image/jpg"))
-        .expectHeader()
-        .cacheControl(Duration.ofDays(1))
-        .expectBody(byte[].class);
+        when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(decision);
 
-    // once by the AuthService and once by the controller asking the service
-    verify(service, times(1)).getImageBytes("ABCD202200001", "bild.jpg");
-  }
+        String body =
+            """
+                { "status": "INVALID" }
+                """;
+        risWebClient
+            .withDefaultLogin()
+            .put()
+            .uri(
+                "/api/v1/caselaw/documentunits/"
+                    + docNumberOrigin
+                    + "/duplicate-status/"
+                    + docNumberDuplicate)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyJsonString(body)
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
+      }
 
-  @Test
-  void testGetImage_shouldReturnNotFoundForMissingImage()
-      throws DocumentationUnitNotExistsException, ImageNotExistsException {
-    when(service.getByDocumentNumber("ABCD202200001"))
-        .thenReturn(
+      @Test
+      void testUpdateDuplicateStatus_withNonExistingRelation()
+          throws DocumentationUnitNotExistsException {
+        var docNumberOrigin = "documentNumber";
+        var docNumberDuplicate = "duplicateNumb";
+        when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+        DocumentationOffice documentationOffice =
+            DocumentationOffice.builder()
+                .id(UUID.fromString("6be0bb1a-c196-484a-addf-822f2ab557f7"))
+                .abbreviation("DS")
+                .build();
+
+        Decision decision =
             Decision.builder()
-                .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-                .build());
-    when(service.getImageBytes("ABCD202200001", "bild.jpg"))
-        .thenThrow(new ImageNotExistsException("Image not found"));
+                .documentNumber(docNumberOrigin)
+                .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
+                .build();
 
-    risWebClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits/ABCD202200001/image/bild.abc")
-        .contentType(MediaType.APPLICATION_OCTET_STREAM)
-        .exchange()
-        .expectStatus()
-        .isNotFound();
+        when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(decision);
 
-    // once by the AuthService and once by the controller asking the service
-    verify(service, times(1)).getImageBytes("ABCD202200001", "bild.abc");
+        when(duplicateCheckService.updateDuplicateStatus(any(), any(), any()))
+            .thenThrow(EntityNotFoundException.class);
+
+        DuplicateRelationStatusRequest body =
+            DuplicateRelationStatusRequest.builder()
+                .status(DuplicateRelationStatus.IGNORED)
+                .build();
+
+        risWebClient
+            .withDefaultLogin()
+            .put()
+            .uri(
+                "/api/v1/caselaw/documentunits/"
+                    + docNumberOrigin
+                    + "/duplicate-status/"
+                    + docNumberDuplicate)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(body)
+            .exchange()
+            .expectStatus()
+            .is4xxClientError();
+      }
+    }
+
+    @Nested
+    class AssignDocumentationOffice {
+      @Test
+      void test_assignDocumentationOffice_withoutException_shouldSucceed()
+          throws DocumentationUnitNotExistsException {
+        // Arrange
+        var result = "The documentation office 'Test' has been successfully assigned.";
+        UUID documentationOfficeId = UUID.randomUUID();
+        when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+        when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
+            .thenReturn(result);
+        when(userHasWriteAccess.apply(any())).thenReturn(true);
+
+        // Act
+        risWebClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .consumeWith(
+                response -> {
+                  // Assert
+                  assertThat(response.getResponseBody()).isEqualTo(result);
+                });
+      }
+
+      @Test
+      void
+          test_assignDocumentationOffice_withDocumentationUnitNotExistsException_shouldReturnNotFound()
+              throws DocumentationUnitNotExistsException {
+        // Arrange
+        var result = "Documentation unit not found";
+        UUID documentationOfficeId = UUID.randomUUID();
+        when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+        when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
+            .thenThrow(DocumentationUnitNotExistsException.class);
+        when(userHasWriteAccess.apply(any())).thenReturn(true);
+
+        // Act
+        risWebClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isNotFound()
+            .expectBody(String.class)
+            .consumeWith(
+                response -> {
+                  // Assert
+                  assertThat(response.getResponseBody()).isEqualTo(result);
+                });
+      }
+
+      @Test
+      void
+          test_assignDocumentationOffice_withDocumentationOfficeNotExistsException_shouldReturnNotFound()
+              throws DocumentationUnitNotExistsException {
+        // Arrange
+        var result = "Documentation office not found";
+        UUID documentationOfficeId = UUID.randomUUID();
+        when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+        when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
+            .thenThrow(DocumentationOfficeNotExistsException.class);
+        when(userHasWriteAccess.apply(any())).thenReturn(true);
+
+        // Act
+        risWebClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isNotFound()
+            .expectBody(String.class)
+            .consumeWith(
+                response -> {
+                  // Assert
+                  assertThat(response.getResponseBody()).isEqualTo(result);
+                });
+      }
+
+      @Test
+      void test_assignDocumentationOffice_withDocumentationUnitException_shouldReturnBadRequest()
+          throws DocumentationUnitNotExistsException {
+        // Arrange
+        UUID documentationOfficeId = UUID.randomUUID();
+        var result =
+            String.format(
+                "Error assigning documentation office %s to %s", TEST_UUID, documentationOfficeId);
+        when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+        when(service.assignDocumentationOffice(any(UUID.class), any(UUID.class), any()))
+            .thenThrow(new DocumentationUnitException(result));
+        when(userHasWriteAccess.apply(any())).thenReturn(true);
+
+        // Act
+        risWebClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/assign/" + documentationOfficeId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectBody(String.class)
+            .consumeWith(
+                response -> {
+                  // Assert
+                  assertThat(response.getResponseBody()).isEqualTo(result);
+                });
+      }
+    }
+
+    @Nested
+    class GetImage {
+      @Test
+      void testGetImage_shouldReturnCorrectContentType()
+          throws DocumentationUnitNotExistsException, ImageNotExistsException {
+        when(service.getByDocumentNumber("ABCD202200001"))
+            .thenReturn(
+                Decision.builder()
+                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                    .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+                    .build());
+        when(service.getImageBytes("ABCD202200001", "bild.jpg"))
+            .thenReturn(
+                Image.builder()
+                    .name("bild.jpg")
+                    .contentType("jpg")
+                    .content("imageContent".getBytes())
+                    .build());
+
+        risWebClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/ABCD202200001/image/bild.jpg")
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentType(MediaType.parseMediaType("image/jpg"))
+            .expectHeader()
+            .cacheControl(Duration.ofDays(1))
+            .expectBody(byte[].class);
+
+        // once by the AuthService and once by the controller asking the service
+        verify(service, times(1)).getImageBytes("ABCD202200001", "bild.jpg");
+      }
+
+      @Test
+      void testGetImage_shouldReturnNotFoundForMissingImage()
+          throws DocumentationUnitNotExistsException, ImageNotExistsException {
+        when(service.getByDocumentNumber("ABCD202200001"))
+            .thenReturn(
+                Decision.builder()
+                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                    .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+                    .build());
+        when(service.getImageBytes("ABCD202200001", "bild.jpg"))
+            .thenThrow(new ImageNotExistsException("Image not found"));
+
+        risWebClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/ABCD202200001/image/bild.abc")
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
+
+        // once by the AuthService and once by the controller asking the service
+        verify(service, times(1)).getImageBytes("ABCD202200001", "bild.abc");
+      }
+    }
   }
 }

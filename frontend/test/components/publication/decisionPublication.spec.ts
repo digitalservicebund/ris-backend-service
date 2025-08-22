@@ -11,14 +11,27 @@ import {
   ManagementData,
 } from "@/domain/managementData"
 import borderNumberService from "@/services/borderNumberService"
+import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useFeatureToggleServiceMock } from "~/test-helper/useFeatureToggleServiceMock"
 import routes from "~pages"
+
+const previewMock = vi.spyOn(publishDocumentationUnitService, "getPreview")
 
 describe("DecisionPlausibilityCheck", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
     useFeatureToggleServiceMock()
+    previewMock.mockResolvedValue({
+      status: 200,
+      data: {
+        ldml: "ldml",
+        success: true,
+      },
+    })
+  })
+  afterEach(() => {
+    vi.resetAllMocks()
   })
 
   it("should not show LDML preview if plausibility check fails", async () => {
@@ -60,7 +73,7 @@ describe("DecisionPlausibilityCheck", () => {
 
     expect(screen.getByText("Rechtschreibprüfung")).toBeInTheDocument()
 
-    expect(screen.getByText("LDML Vorschau")).toBeInTheDocument()
+    expect(await screen.findByText("LDML Vorschau")).toBeInTheDocument()
 
     expect(
       screen.getByRole("button", { name: "Veröffentlichen" }),
@@ -147,6 +160,46 @@ describe("DecisionPlausibilityCheck", () => {
     )
 
     expect(updateDocUnitSpy).toHaveBeenCalledOnce()
+  })
+
+  describe("ldml preview", () => {
+    it("should display ldml preview whit plausible data", async () => {
+      await renderComponent({
+        hasPlausibilityCheckPassed: true,
+      })
+
+      expect(await screen.findByText("LDML Vorschau")).toBeInTheDocument()
+
+      // Expand preview
+      await fireEvent.click(screen.getByLabelText("Aufklappen"))
+      expect(await screen.findByTestId("code-snippet")).toBeInTheDocument()
+    })
+
+    it("should not display ldml preview with implausible data", async () => {
+      await renderComponent({
+        hasPlausibilityCheckPassed: false,
+      })
+
+      expect(screen.queryByText("LDML Vorschau")).not.toBeInTheDocument()
+      expect(previewMock).not.toHaveBeenCalled()
+    })
+
+    it("should show error when ldml preview cannot be loaded", async () => {
+      const description =
+        "Die LDML-Vorschau konnte nicht geladen werden: Aktuelle Fehlermeldung."
+      previewMock.mockResolvedValue({
+        status: 422,
+        error: {
+          title: "Fehler beim Laden der LDML-Vorschau",
+          description: description,
+        },
+      })
+      await renderComponent({
+        hasPlausibilityCheckPassed: true,
+      })
+
+      expect(await screen.findByText(description)).toBeInTheDocument()
+    })
   })
 })
 

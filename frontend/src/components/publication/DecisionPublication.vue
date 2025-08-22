@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, Ref, ref } from "vue"
+import { computed, onMounted, Ref, ref } from "vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
+import InfoModal from "@/components/InfoModal.vue"
+import { LdmlPreview } from "@/components/input/types"
 import BorderNumberCheck from "@/components/publication/BorderNumberCheck.vue"
 import DecisionPlausibilityCheck from "@/components/publication/DecisionPlausibilityCheck.vue"
 import PublicationActions from "@/components/publication/PublicationActions.vue"
@@ -12,6 +14,7 @@ import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { Decision } from "@/domain/decision"
 import { DuplicateRelationStatus } from "@/domain/managementData"
+import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
@@ -42,12 +45,31 @@ const publicationWarnings = computed(() => {
 const isPublishable = computed(
   () => hasPlausibilityCheckPassed.value && isPortalPublicationEnabled.value,
 )
+const preview = ref<LdmlPreview>()
+const previewError = ref()
+const fetchPreview = async () => {
+  if (!hasPlausibilityCheckPassed.value) return
+
+  const previewResponse = await publishDocumentationUnitService.getPreview(
+    decision.value!.uuid,
+  )
+  if (previewResponse.error) {
+    previewError.value = previewResponse.error
+  } else if (previewResponse.data?.ldml) {
+    preview.value = previewResponse.data
+  }
+}
 
 const pendingDuplicates = ref(
   decision.value!.managementData?.duplicateRelations?.filter(
     (relation) => relation.status === DuplicateRelationStatus.PENDING,
   ) ?? [],
 )
+onMounted(async () => {
+  // Save doc unit in case there are any unsaved local changes before fetching ldml preview
+  await store.updateDocumentUnit()
+  await fetchPreview()
+})
 </script>
 
 <template>
@@ -73,16 +95,23 @@ const pendingDuplicates = ref(
       />
       <div class="border-b-1 border-b-gray-400"></div>
       <ExpandableContent
-        v-if="hasPlausibilityCheckPassed"
+        v-if="hasPlausibilityCheckPassed && preview?.success && !!preview.ldml"
         as-column
         class="border-b-1 border-gray-400 pb-24"
+        :data-set="preview"
         header="LDML Vorschau"
         header-class="ris-body1-bold"
         :is-expanded="false"
         title="LDML Vorschau"
       >
-        <CodeSnippet title="" :xml="'<?xml>' + '\nNoch nicht implementiert'" />
+        <CodeSnippet title="" :xml="preview.ldml" />
       </ExpandableContent>
+      <InfoModal
+        v-if="hasPlausibilityCheckPassed && previewError"
+        aria-label="Fehler beim Laden der LDML-Vorschau"
+        :description="previewError.description"
+        :title="previewError.title"
+      />
       <PublicationActions
         :is-publishable="isPublishable"
         :publication-warnings="publicationWarnings"
