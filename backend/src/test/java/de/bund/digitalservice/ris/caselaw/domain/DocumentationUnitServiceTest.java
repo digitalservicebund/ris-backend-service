@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDele
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ImageNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -466,6 +467,18 @@ class DocumentationUnitServiceTest {
     assertEquals(Decision.class, documentationUnit.getClass());
 
     verify(repository).findByDocumentNumber("ABCDE20220001");
+  }
+
+  @Test
+  void testGetImageBytes() throws DocumentationUnitNotExistsException, ImageNotExistsException {
+    UUID randomUUID = UUID.randomUUID();
+    when(repository.findIdForDocumentNumber("ABCDE20220001")).thenReturn(randomUUID);
+    when(attachmentService.findByDocumentationUnitIdAndFileName(randomUUID, "image1"))
+        .thenReturn(Optional.of(Image.builder().name("image1").build()));
+    Image image = service.getImageBytes("ABCDE20220001", "image1");
+    assertEquals("image1", image.getName());
+
+    verify(repository).findIdForDocumentNumber("ABCDE20220001");
   }
 
   @Test

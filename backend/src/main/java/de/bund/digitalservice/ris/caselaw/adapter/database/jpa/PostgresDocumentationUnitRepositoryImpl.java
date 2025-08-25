@@ -119,6 +119,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         databaseDocumentationUnitProcessStepRepository;
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
+  @Override
+  public UUID findIdForDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException {
+    return repository
+        .findIdByDocumentNumber(documentNumber)
+        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+  }
+
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit findByDocumentNumber(String documentNumber)
