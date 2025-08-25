@@ -181,7 +181,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         testDocumentationUnitDS.getId(),
         creatorUserDS,
         HistoryLogEventType.PROCESS_STEP,
-        "Schritt geändert: Ersterfassung -> QS formal",
+        "Schritt geändert: Ersterfassung → QS formal",
         step1DTO,
         step2DTO);
 
@@ -235,12 +235,12 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     assertThat(log2.createdBy()).isEqualTo("testUserDS");
     assertThat(log2.documentationOffice()).isEqualTo("DS");
-    assertThat(log2.description()).isEqualTo("Person geändert: user1 -> user2");
+    assertThat(log2.description()).isEqualTo("Person geändert: user1 → user2");
     assertThat(log2.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
 
     assertThat(log3.createdBy()).isEqualTo("testUserDS");
     assertThat(log3.documentationOffice()).isEqualTo("DS");
-    assertThat(log3.description()).isEqualTo("Schritt geändert: Ersterfassung -> QS formal");
+    assertThat(log3.description()).isEqualTo("Schritt geändert: Ersterfassung → QS formal");
     assertThat(log3.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP);
 
     assertThat(log4.createdBy()).isEqualTo("testUserDS");
@@ -303,7 +303,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         testDocumentationUnitBGH.getId(),
         creatorUserDS,
         HistoryLogEventType.PROCESS_STEP,
-        "Schritt geändert: Ersterfassung -> QS formal",
+        "Schritt geändert: Ersterfassung → QS formal",
         step1DTO,
         step2DTO);
 
@@ -363,7 +363,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     assertThat(log3.createdBy()).isNull();
     assertThat(log3.documentationOffice()).isEqualTo("DS");
-    assertThat(log3.description()).isEqualTo("Schritt geändert: Ersterfassung -> QS formal");
+    assertThat(log3.description()).isEqualTo("Schritt geändert: Ersterfassung → QS formal");
     assertThat(log3.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP);
 
     assertThat(log4.createdBy()).isNull();

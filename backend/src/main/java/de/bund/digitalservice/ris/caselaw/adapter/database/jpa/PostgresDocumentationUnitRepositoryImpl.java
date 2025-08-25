@@ -644,7 +644,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         .map(
             processStepDTO ->
                 String.format(
-                    "Schritt geändert: %s -> %s",
+                    "Schritt geändert: %s → %s",
                     processStepDTO.getName(), toProcess.get().getName()))
         .orElseGet(() -> "Schritt gesetzt: " + toProcess.get().getName());
   }
@@ -860,7 +860,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                   documentationUnitDTO.getId(),
                   user,
                   HistoryLogEventType.DOCUMENTATION_OFFICE,
-                  "Dokstelle geändert: [%s] → [%s]"
+                  "Dokstelle geändert: %s → %s"
                       .formatted(
                           previousDocumentationOffice.getAbbreviation(),
                           newDocumentationOffice.abbreviation()));
