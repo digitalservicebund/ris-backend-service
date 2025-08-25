@@ -126,6 +126,8 @@ describe("Search Result List", () => {
           resolutionDate: "2025-05-06",
           scheduledPublicationDateTime: undefined,
           source: undefined,
+          currentStatus: undefined,
+          processSteps: undefined,
           status: {
             publicationStatus: "PUBLISHED",
             withError: false,
