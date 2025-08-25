@@ -1061,7 +1061,9 @@ export async function checkContentOfDecisionResultRow(
   const appraisalBodyCell = listRow.getByRole("cell").nth(4)
   const documentTypCell = listRow.getByRole("cell").nth(5)
   const statusCell = listRow.getByRole("cell").nth(6)
-  const errorCell = listRow.getByRole("cell").nth(7)
+  const processStepsHistoryCell = listRow.getByRole("cell").nth(7)
+  const personCell = listRow.getByRole("cell").nth(8)
+  const errorCell = listRow.getByRole("cell").nth(9)
 
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
@@ -1104,6 +1106,12 @@ export async function checkContentOfDecisionResultRow(
   await test.step("Fehler", async () => {
     await expect(errorCell).toHaveText(
       expectedItem.status?.withError ? "Fehler" : "-",
+    )
+  })
+
+  await test.step("Person", async () => {
+    await expect(personCell).toHaveText(
+      expectedItem.currentProcessStep?.user?.initials ?? "-",
     )
   })
 
