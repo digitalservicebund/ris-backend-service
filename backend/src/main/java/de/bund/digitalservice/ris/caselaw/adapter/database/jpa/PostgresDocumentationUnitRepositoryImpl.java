@@ -90,7 +90,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
-  private final UserApiService userApiService;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
