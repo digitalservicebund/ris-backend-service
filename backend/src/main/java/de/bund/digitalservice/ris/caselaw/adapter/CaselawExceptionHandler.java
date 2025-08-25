@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
@@ -31,6 +32,14 @@ public class CaselawExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler({PublishException.class})
   public ResponseEntity<Object> handlePublishException(PublishException ex) {
+
+    ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+
+    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @ExceptionHandler({ChangelogException.class})
+  public ResponseEntity<Object> handleChangelogException(ChangelogException ex) {
 
     ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 

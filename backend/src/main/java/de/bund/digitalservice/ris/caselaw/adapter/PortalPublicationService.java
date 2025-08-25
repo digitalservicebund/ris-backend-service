@@ -1,11 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -74,8 +74,8 @@ public class PortalPublicationService {
    *     not be found in the database
    * @throws LdmlTransformationException if the documentation unit could not be transformed to valid
    *     LDML
-   * @throws PublishException if the changelog file could not be created or either of the files
-   *     could not be saved in the bucket
+   * @throws PublishException if the LDML could not be saved in the bucket
+   * @throws ChangelogException if the changelog cannot be generated or saved
    */
   public void publishDocumentationUnitWithChangelog(UUID documentationUnitId, User user)
       throws DocumentationUnitNotExistsException {
@@ -93,7 +93,7 @@ public class PortalPublicationService {
           documentationUnitId,
           user,
           HistoryLogEventType.PORTAL_PUBLICATION,
-          "Dokumentationseinheit konnte nicht veröffentlicht werden");
+          "Dokeinheit konnte nicht veröffentlicht werden");
       throw exception;
     }
   }
@@ -120,7 +120,7 @@ public class PortalPublicationService {
 
   /**
    * Deletes the documentation unit and its attachments with the given documentNumber from the
-   * portal bucket,
+   * portal bucket.
    *
    * @param documentNumber the document number of the documentation unit to be withdrawn.
    */
@@ -135,17 +135,44 @@ public class PortalPublicationService {
   }
 
   /**
+   * Deletes the documentation unit and its attachments with the given documentNumber from the
+   * portal bucket and writes a changelog file to the bucket, informing about the withdrawal.
+   *
+   * @param documentationUnitId the id of the documentation unit to be withdrawn.
+   * @param user the user that initiated the withdrawal.
+   * @throws DocumentationUnitNotExistsException if the documentation unit with the given id could
+   *     not be found in the database.
+   * @throws ChangelogException if the deletion changelog cannot be generated or saved.
+   * @throws PublishException if the files could not be deleted from the bucket.
+   */
+  public void withdrawDocumentationUnitWithChangelog(UUID documentationUnitId, User user)
+      throws DocumentationUnitNotExistsException {
+    try {
+      var documentationUnit = documentationUnitRepository.findByUuid(documentationUnitId);
+      var result = withdrawDocumentationUnit(documentationUnit.documentNumber());
+      uploadDeletionChangelog(result.deletedPaths());
+      updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, user);
+    } catch (Exception e) {
+      historyLogService.saveHistoryLog(
+          documentationUnitId,
+          user,
+          HistoryLogEventType.PORTAL_PUBLICATION,
+          "Dokeinheit konnte nicht zurückgezogen werden");
+      throw e;
+    }
+  }
+
+  /**
    * Generates a changelog file with the given parameters and saves it to the portal bucket.
    *
    * @param publishedDocumentNumbers the document numbers of the documentation units which have been
    *     changed or added.
    * @param deletedDocumentNumbers the document numbers of the documentation units which have been
    *     deleted.
-   * @throws JsonProcessingException if the changelog cannot be generated.
+   * @throws ChangelogException if the changelog cannot be generated or saved.
    */
   public void uploadChangelog(
-      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers)
-      throws JsonProcessingException {
+      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers) {
     if (featureToggleService.isEnabled(CHANGELOG_FEATURE_FLAG)) {
       uploadChangelog(publishedDocumentNumbers, deletedDocumentNumbers, false);
     }
@@ -154,9 +181,9 @@ public class PortalPublicationService {
   /**
    * Generates a changelog file to trigger a full re-indexing of all documents in the bucket
    *
-   * @throws JsonProcessingException if the changelog cannot be generated.
+   * @throws ChangelogException if the changelog cannot be generated or saved.
    */
-  public void uploadFullReindexChangelog() throws JsonProcessingException {
+  public void uploadFullReindexChangelog() {
     if (featureToggleService.isEnabled(CHANGELOG_FEATURE_FLAG)) {
       return; // regular changelogs are enabled, no nightly re-indexing needed
     }
@@ -168,10 +195,9 @@ public class PortalPublicationService {
    *
    * @param deletedDocumentNumbers the document numbers of the documentation units which have been
    *     deleted.
-   * @throws JsonProcessingException if the changelog cannot be generated.
+   * @throws ChangelogException if the changelog cannot be generated or saved.
    */
-  public void uploadDeletionChangelog(List<String> deletedDocumentNumbers)
-      throws JsonProcessingException {
+  public void uploadDeletionChangelog(List<String> deletedDocumentNumbers) {
     uploadChangelog(null, deletedDocumentNumbers, false);
   }
 
@@ -259,8 +285,9 @@ public class PortalPublicationService {
   }
 
   private void uploadChangelog(
-      List<String> publishedDocumentNumbers, List<String> deletedDocumentNumbers, boolean changeAll)
-      throws JsonProcessingException {
+      List<String> publishedDocumentNumbers,
+      List<String> deletedDocumentNumbers,
+      boolean changeAll) {
     Changelog changelog;
     if (changeAll) {
       changelog = new ChangelogChangeAll(true);
@@ -268,8 +295,12 @@ public class PortalPublicationService {
       changelog = new ChangelogUpdateDelete(publishedDocumentNumbers, deletedDocumentNumbers);
     }
 
-    String changelogString = objectMapper.writeValueAsString(changelog);
-    portalBucket.save(createChangelogFileName(), changelogString);
+    try {
+      String changelogString = objectMapper.writeValueAsString(changelog);
+      portalBucket.save(createChangelogFileName(), changelogString);
+    } catch (Exception e) {
+      throw new ChangelogException("Could not create changelog file", e);
+    }
   }
 
   private String createChangelogFileName() {
@@ -285,9 +316,9 @@ public class PortalPublicationService {
     documentationUnitRepository.updatePortalPublicationStatus(documentationUnit.uuid(), newStatus);
     String historyLogMessage;
     if (PortalPublicationStatus.PUBLISHED.equals(newStatus)) {
-      historyLogMessage = "Dokumentationseinheit veröffentlicht";
+      historyLogMessage = "Dokeinheit im Portal veröffentlicht";
     } else {
-      historyLogMessage = "Dokumentationseinheit zurückgezogen";
+      historyLogMessage = "Dokeinheit wurde aus dem Portal zurückgezogen";
     }
     historyLogService.saveHistoryLog(
         documentationUnit.uuid(), user, HistoryLogEventType.PORTAL_PUBLICATION, historyLogMessage);
