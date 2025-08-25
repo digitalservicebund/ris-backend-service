@@ -1993,7 +1993,10 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               assertThat(historyLogs).hasSize(3);
               assertThat(historyLogs.get(0).eventType())
                   .isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
-              assertThat(historyLogs.get(0).description()).isEqualTo("Person gesetzt: testUser");
+              // This log is actually "Person entfernt: testUser", but the new doc office is not
+              // allowed
+              // to see their name, so the generic 'Person geändert' log appears
+              assertThat(historyLogs.get(0).description()).isEqualTo("Person geändert");
               assertThat(historyLogs.get(1).eventType())
                   .isEqualTo(HistoryLogEventType.PROCESS_STEP);
               assertThat(historyLogs.get(1).description()).isEqualTo("Schritt gesetzt: Neu");
