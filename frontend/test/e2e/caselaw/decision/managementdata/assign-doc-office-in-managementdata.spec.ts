@@ -121,7 +121,7 @@ test.describe(
       await test.step("Die Änderung der Dokumentationsstelle ist in der Historie sichtbar", async () => {
         await navigateToManagementData(pageWithBghUser, documentNumber)
         await expect(
-          pageWithBghUser.getByText("Dokstelle geändert: DS → BGH"),
+          pageWithBghUser.getByText("Dokstelle geändert: [DS] → [BGH]"),
         ).toBeVisible()
       })
 

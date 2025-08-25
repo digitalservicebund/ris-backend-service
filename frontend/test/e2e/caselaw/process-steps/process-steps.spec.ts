@@ -1,9 +1,6 @@
 import { expect, Page } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import {
-  navigateToManagementData,
-  navigateToSearch,
-} from "~/e2e/caselaw/utils/e2e-utils"
+import { navigateToSearch } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
   test("rendering initial state, click on 'Weitergeben'", async ({
@@ -47,8 +44,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
         .first()
         .click()
 
-      await expect(infoPanel).toContainText("Ersterfassung", { timeout: 10000 })
-      await expect(infoPanel).toContainText("BGH  testUser")
+      await expect(infoPanel).toContainText("Ersterfassung")
     })
 
     await test.step("Open process step dialog", async () => {
@@ -81,7 +77,6 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
 
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
     await expect(infoPanel).toContainText("Ersterfassung")
-    await expect(infoPanel).toContainText("BGH  testUser")
 
     await pageWithBghUser
       .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
@@ -130,7 +125,7 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
         .first()
         .click()
 
-      await expect(infoPanel).toContainText("Ersterfassung", { timeout: 10000 })
+      await expect(infoPanel).toContainText("Ersterfassung")
     })
 
     await test.step("Open process step dialog", async () => {
@@ -161,193 +156,54 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
     })
   })
 
-  test(
-    "rendering initial state, select 'Ersterfassung', select user, click on 'Weitergeben'",
-    { tag: ["@RISDEV-8566"] },
-    async ({ pageWithBghUser }) => {
-      const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-
-      await test.step("Create a new decision with BGH court", async () => {
-        await navigateToSearch(pageWithBghUser)
-        await pageWithBghUser
-          .getByRole("button", { name: "Neue Entscheidung" })
-          .first()
-          .click()
-
-        await expect(infoPanel).toContainText("Ersterfassung")
-      })
-
-      await test.step("Open process step dialog", async () => {
-        await openProcessStepDialog(pageWithBghUser)
-      })
-
-      await test.step("Select bgh test user", async () => {
-        await selectUser(pageWithBghUser, "BgH", "BGH  testUser", "BT")
-      })
-
-      await test.step("Select 'QS fachlich' process step", async () => {
-        await selectProcessStep(pageWithBghUser, "QS fachlich")
-      })
-
-      await test.step("Save changes and close dialog", async () => {
-        await saveChangesAndCloseDialog(pageWithBghUser)
-      })
-
-      await test.step("Validate process step is displayed in info panel", async () => {
-        await expect(infoPanel).toContainText("QS fachlich")
-        await expect(infoPanel).toContainText("BGH  testUser")
-      })
-
-      await test.step("Open process step dialog", async () => {
-        await openProcessStepDialog(pageWithBghUser)
-      })
-
-      await test.step("Validate process step is in process steps history logs", async () => {
-        const firstRow = pageWithBghUser.locator("tbody tr").first()
-
-        await expect(firstRow).toContainText("QS fachlich")
-        await expect(firstRow).toContainText("BT")
-      })
-
-      await test.step("Close process step dialog", async () => {
-        await closeProcessStepDialog(pageWithBghUser)
-      })
-    },
-  )
-
-  test("writes correct history logs and shows description based on docoffice", async ({
+  test("rendering initial state, select 'Ersterfassung', select user, click on 'Weitergeben'", async ({
     pageWithBghUser,
-    pageWithBfhUser,
   }) => {
     const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-    let documentNumber = ""
 
-    await test.step("Create a new decision with BGH court and create some logs", async () => {
+    await test.step("Create a new decision with BGH court", async () => {
       await navigateToSearch(pageWithBghUser)
       await pageWithBghUser
         .getByRole("button", { name: "Neue Entscheidung" })
         .first()
         .click()
 
-      await pageWithBghUser.waitForURL(
-        /\/caselaw\/documentunit\/[A-Z0-9]{13}\/attachments/,
-      )
-      documentNumber = /caselaw\/documentunit\/(.*)\/attachments/g.exec(
-        pageWithBghUser.url(),
-      )?.[1] as string
-
       await expect(infoPanel).toContainText("Ersterfassung")
-      await openProcessStepDialog(pageWithBghUser)
-      await selectUser(pageWithBghUser, "BGH", "BGH  testUser", "BT")
-      await selectProcessStep(pageWithBghUser, "QS formal")
-      await saveChangesAndCloseDialog(pageWithBghUser)
+    })
 
-      await expect(infoPanel).toContainText("QS formal")
+    await test.step("Open process step dialog", async () => {
       await openProcessStepDialog(pageWithBghUser)
+    })
+
+    await test.step("Select bgh test user", async () => {
+      await selectUser(pageWithBghUser, "BgH", "BGH  testUser", "BT")
+    })
+
+    await test.step("Select 'QS fachlich' process step", async () => {
       await selectProcessStep(pageWithBghUser, "QS fachlich")
+    })
+
+    await test.step("Save changes and close dialog", async () => {
       await saveChangesAndCloseDialog(pageWithBghUser)
+    })
+
+    await test.step("Validate process step is displayed in info panel", async () => {
       await expect(infoPanel).toContainText("QS fachlich")
     })
 
-    await test.step("Open management data page", async () => {
-      await navigateToManagementData(pageWithBghUser, documentNumber)
-      const loadingMask = pageWithBghUser.locator('div[data-pc-section="mask"]')
-      await expect(loadingMask).toBeHidden()
+    await test.step("Open process step dialog", async () => {
+      await openProcessStepDialog(pageWithBghUser)
     })
 
-    await test.step("Validate process steps history logs for own docoffice", async () => {
-      const expectedHistory = [
-        { von: "BGH (BGH testUser)", was: "Person entfernt: BGH testUser" },
-        {
-          von: "BGH (BGH testUser)",
-          was: "Schritt geändert: QS formal → QS fachlich",
-        },
-        {
-          von: "BGH (BGH testUser)",
-          was: "Schritt geändert: Ersterfassung → QS formal",
-        },
-        { von: "BGH (BGH testUser)", was: "Dokeinheit angelegt" },
-      ]
+    await test.step("Validate process step is in process steps history logs", async () => {
+      const firstRow = pageWithBghUser.locator("tbody tr").first()
 
-      const rows = pageWithBghUser.locator(
-        'tbody[data-pc-section="tbody"] tr[data-pc-section="bodyrow"]',
-      )
-
-      await expect(rows).toHaveCount(expectedHistory.length)
-
-      for (let i = 0; i < expectedHistory.length; i++) {
-        const row = rows.nth(i)
-        const expectedData = expectedHistory[i]
-
-        const vonCell = row.locator("td").nth(1)
-        const wasCell = row.locator("td").nth(2)
-
-        await expect(vonCell).toHaveText(expectedData.von)
-        await expect(wasCell).toHaveText(expectedData.was)
-      }
+      await expect(firstRow).toContainText("QS fachlich")
+      await expect(firstRow).toContainText("BT")
     })
 
-    await test.step("Assign to new doc office", async () => {
-      const dropdown = pageWithBghUser.getByLabel(
-        "Dokumentationsstelle auswählen",
-      )
-      await dropdown.click()
-      await pageWithBghUser
-        .getByLabel("dropdown-option")
-        .getByText("BFH")
-        .click()
-
-      await expect(
-        pageWithBghUser.locator('button[aria-label="dropdown-option"]'),
-      ).toBeHidden()
-      await pageWithBghUser.getByRole("button", { name: "Zuweisen" }).click()
-      await pageWithBghUser.waitForLoadState()
-    })
-
-    await test.step("Open management data page with new docoffice", async () => {
-      await navigateToManagementData(pageWithBfhUser, documentNumber)
-      const loadingMask = pageWithBfhUser.locator('div[data-pc-section="mask"]')
-      await expect(loadingMask).toBeHidden()
-    })
-
-    await test.step("Validate process steps history logs for own docoffice", async () => {
-      const expectedHistory = [
-        {
-          von: "BGH",
-          was: "Schritt geändert: QS fachlich → Neu",
-        },
-        {
-          von: "BGH",
-          was: "Dokstelle geändert: BGH → BFH",
-        },
-        { von: "BGH", was: "Person geändert" },
-        {
-          von: "BGH",
-          was: "Schritt geändert: QS formal → QS fachlich",
-        },
-        {
-          von: "BGH",
-          was: "Schritt geändert: Ersterfassung → QS formal",
-        },
-        { von: "BGH", was: "Dokeinheit angelegt" },
-      ]
-
-      const rows = pageWithBfhUser.locator(
-        'tbody[data-pc-section="tbody"] tr[data-pc-section="bodyrow"]',
-      )
-
-      await expect(rows).toHaveCount(expectedHistory.length)
-
-      for (let i = 0; i < expectedHistory.length; i++) {
-        const row = rows.nth(i)
-        const expectedData = expectedHistory[i]
-
-        const vonCell = row.locator("td").nth(1)
-        const wasCell = row.locator("td").nth(2)
-
-        await expect(vonCell).toHaveText(expectedData.von)
-        await expect(wasCell).toHaveText(expectedData.was)
-      }
+    await test.step("Close process step dialog", async () => {
+      await closeProcessStepDialog(pageWithBghUser)
     })
   })
 

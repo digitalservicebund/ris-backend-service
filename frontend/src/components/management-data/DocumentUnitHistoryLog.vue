@@ -2,6 +2,7 @@
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import { computed } from "vue"
+import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import { DocumentationUnitHistoryLog } from "@/domain/documentationUnitHistoryLog"
 import { ResponseError } from "@/services/httpClient"
 import DateUtil from "@/utils/dateUtil"
@@ -28,19 +29,14 @@ const getColumnWidth = (field: string) => {
   return {} // default style
 }
 
-const formattedData = computed(() => {
-  if (props.loading) {
-    return []
-  }
-
-  return (
+const formattedData = computed(
+  () =>
     props.data?.map((item) => ({
       ...item,
       createdAt: formatTimestamp(item.createdAt),
       createdBy: formatCreatedBy(item.documentationOffice, item.createdBy),
-    })) ?? []
-  )
-})
+    })) ?? [],
+)
 
 const formatTimestamp = (date?: string) =>
   date ? DateUtil.formatDateTime(date) : "–"
@@ -57,8 +53,8 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
   <div class="flex flex-col py-24">
     <h2 class="ris-body1-bold pb-16">Historie</h2>
     <DataTable
+      v-if="formattedData.length > 0 && !loading"
       data-testid="document-unit-history-log"
-      :loading="loading"
       scroll-height="315px"
       scrollable
       :value="formattedData"
@@ -71,7 +67,8 @@ const formatCreatedBy = (docOffice?: string, createdBy?: string) => {
         :style="getColumnWidth(col.field)"
       />
     </DataTable>
-    <div v-if="error" class="bg-blue-100 p-8">
+    <LoadingSpinner v-else-if="loading" class="self-center" size="small" />
+    <div v-else-if="error" class="bg-blue-100 p-8">
       Die Historie konnte nicht geladen werden.
     </div>
     <!-- Empty state -->

@@ -130,7 +130,7 @@ public class HistoryLogTransformer {
       } else if (oldPersonName != null && newPersonName == null) {
         return "Person entfernt: " + oldPersonName;
       } else if (oldPersonName != null && !oldPersonName.equals(newPersonName)) {
-        return String.format("Person geändert: %s → %s", oldPersonName, newPersonName);
+        return String.format("Person geändert: %s -> %s", oldPersonName, newPersonName);
       }
     } else {
       // Generic description for other offices

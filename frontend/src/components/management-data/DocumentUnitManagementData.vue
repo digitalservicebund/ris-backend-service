@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import { useToast } from "primevue/usetoast"
-import { computed, onBeforeMount, Ref, ref, watch } from "vue"
+import { computed, onBeforeMount, Ref, ref } from "vue"
 import { useRouter } from "vue-router"
 import DocumentationOfficeSelector from "@/components/DocumentationOfficeSelector.vue"
 import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
@@ -31,6 +31,8 @@ const toast = useToast()
 onBeforeMount(async () => {
   // Save before navigation
   await updateDocumentUnit()
+  // Load history only after latest changes are saved
+  await loadHistory()
 })
 
 const historyLogs = ref<DocumentationUnitHistoryLog[]>()
@@ -88,20 +90,6 @@ const assignDocumentationOffice = async () => {
     hasDocumentationOfficeError.value = true
   }
 }
-
-watch(
-  () => documentUnit.value,
-  async (newValue, oldValue) => {
-    if (newValue && oldValue) {
-      if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-        await loadHistory()
-      }
-    } else if (newValue) {
-      await loadHistory()
-    }
-  },
-  { deep: true, immediate: true },
-)
 </script>
 
 <template>
