@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
-import { Ref, ref } from "vue"
+import { computed, Ref, ref } from "vue"
 import InfoModal from "@/components/InfoModal.vue"
+import PopupModal from "@/components/PopupModal.vue"
 import PortalPublicationStatusBadge from "@/components/publication/PortalPublicationStatusBadge.vue"
 import { Decision } from "@/domain/decision"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
@@ -10,7 +11,10 @@ import { ResponseError } from "@/services/httpClient"
 import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const props = defineProps<{ isPublishable: boolean }>()
+const props = defineProps<{
+  isPublishable: boolean
+  publicationWarnings: string[]
+}>()
 
 const store = useDocumentUnitStore()
 const { documentUnit: decision } = storeToRefs(store) as {
@@ -19,8 +23,23 @@ const { documentUnit: decision } = storeToRefs(store) as {
 
 const docUnitPublicationError = ref<ResponseError | null>(null)
 
+const showPublicationWarningModal = ref(false)
+const warningModalText = computed(
+  () =>
+    props.publicationWarnings.join("\n") +
+    "\n\nWollen Sie das Dokument dennoch übergeben?",
+)
+const checkWarningsAndPublishDocUnit = async () => {
+  if (props.publicationWarnings.length > 0) {
+    showPublicationWarningModal.value = true
+    return
+  }
+  await publishDocUnit()
+}
+
 const isPublishing = ref(false)
 const publishDocUnit = async () => {
+  showPublicationWarningModal.value = false
   docUnitPublicationError.value = null
   isPublishing.value = true
   const { error } = await publishDocumentationUnitService.publishDocument(
@@ -55,13 +74,23 @@ const withdrawDocUnit = async () => {
       :title="docUnitPublicationError.title"
     />
     <div class="flex flex-row gap-24">
+      <PopupModal
+        v-if="showPublicationWarningModal"
+        aria-label="Bestätigung für Veröffentlichung bei Fehlern"
+        :content-text="warningModalText"
+        header-text="Prüfung hat Warnungen ergeben"
+        primary-button-text="Trotzdem veröffentlichen"
+        primary-button-type="primary"
+        @close-modal="showPublicationWarningModal = false"
+        @primary-action="publishDocUnit"
+      />
       <Button
         aria-label="Veröffentlichen"
         :disabled="!props.isPublishable || isWithdrawing || isPublishing"
         label="Veröffentlichen"
         :loading="isPublishing"
         size="small"
-        @click="publishDocUnit"
+        @click="checkWarningsAndPublishDocUnit"
       />
       <Button
         v-if="
