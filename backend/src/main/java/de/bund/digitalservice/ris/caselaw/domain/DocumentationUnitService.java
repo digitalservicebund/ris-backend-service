@@ -25,6 +25,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.context.annotation.Lazy;
@@ -388,7 +390,8 @@ public class DocumentationUnitService {
               oidcUser);
     }
 
-    return documentationUnitListItems.map(item -> addPermissions(oidcUser, item));
+    return retrieveCurrentProcessStepUser(
+        documentationUnitListItems.map(item -> addPermissions(oidcUser, item)), oidcUser);
   }
 
   public DocumentationUnitListItem takeOverDocumentationUnit(
@@ -470,6 +473,23 @@ public class DocumentationUnitService {
       }
     }
   }
+
+    private Slice<DocumentationUnitListItem> retrieveCurrentProcessStepUser(
+            Slice<DocumentationUnitListItem> documentationUnitListItems, OidcUser oidcUser) {
+
+        Map<UUID, User> userIdMap =
+                userService.getUsers(oidcUser).stream()
+                        .collect(Collectors.toMap(User::id, Function.identity()));
+
+        return documentationUnitListItems.map(
+                item -> {
+                    Optional.ofNullable(item.currentProcessStep())
+                            .map(DocumentationUnitProcessStep::getUser)
+                            .map(user -> userIdMap.get(user.id()))
+                            .ifPresent(user -> item.currentProcessStep().setUser(user));
+                    return item;
+                });
+    }
 
   private DocumentationUnit filterProcessStepsOfOtherDocumentationOffices(
       DocumentationUnit documentable, User user) {
