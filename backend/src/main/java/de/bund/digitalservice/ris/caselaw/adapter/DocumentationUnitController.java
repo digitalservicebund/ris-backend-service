@@ -281,6 +281,7 @@ public class DocumentationUnitController {
       @RequestParam(value = "isResolved") Optional<Boolean> isResolved,
       @RequestParam(value = "inboxStatus") Optional<InboxStatus> inboxStatus,
       @RequestParam(value = "kind") Optional<Kind> kind,
+      @RequestParam(value = "processStepId") Optional<UUID> processStepId,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     return service.searchByDocumentationUnitSearchInput(
@@ -302,7 +303,8 @@ public class DocumentationUnitController {
         resolutionDateEnd,
         isResolved,
         inboxStatus,
-        kind);
+        kind,
+        processStepId);
   }
 
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -879,6 +879,14 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     List<PublicationStatus> statuses =
         List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, PUBLISHED, UNPUBLISHED, PUBLISHED);
     List<Boolean> errorStatuses = List.of(false, true, true, false, true, true);
+    List<ProcessStepDTO> processSteps =
+        List.of(
+            neuProcessStep,
+            ersterfassungProcessStep,
+            ersterfassungProcessStep,
+            ersterfassungProcessStep,
+            neuProcessStep,
+            neuProcessStep);
 
     for (int i = 0; i < 6; i++) {
 
@@ -892,18 +900,31 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                   .jurisId(new Random().nextInt())
                   .build());
 
-      EntityBuilderTestUtil.createAndSaveDecision(
-          repository,
-          DecisionDTO.builder()
-              .documentNumber(documentNumbers.get(i))
-              .court(court)
-              .date(decisionDates.get(i))
-              .documentationOffice(DocumentationOfficeDTO.builder().id(docOfficeIds.get(i)).build())
-              .fileNumbers(
-                  List.of(
-                      FileNumberDTO.builder().value(fileNumbers.get(i)).rank((long) i).build())),
-          statuses.get(i),
-          errorStatuses.get(i));
+      var documentationUnit =
+          EntityBuilderTestUtil.createAndSaveDecision(
+              repository,
+              DecisionDTO.builder()
+                  .documentNumber(documentNumbers.get(i))
+                  .court(court)
+                  .date(decisionDates.get(i))
+                  .documentationOffice(
+                      DocumentationOfficeDTO.builder().id(docOfficeIds.get(i)).build())
+                  .fileNumbers(
+                      List.of(
+                          FileNumberDTO.builder().value(fileNumbers.get(i)).rank((long) i).build()))
+                  .processSteps(
+                      List.of(
+                          DocumentationUnitProcessStepDTO.builder()
+                              .processStep(processSteps.get(i))
+                              .createdAt(LocalDateTime.now())
+                              .build())),
+              statuses.get(i),
+              errorStatuses.get(i));
+
+      repository.save(
+          documentationUnit.toBuilder()
+              .currentProcessStep(documentationUnit.getProcessSteps().getFirst())
+              .build());
     }
 
     DocumentationOfficeDTO otherDocumentationOffice =
@@ -998,6 +1019,12 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         DocumentationUnitSearchInput.builder().decisionDate(start).decisionDateEnd(end).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .contains("EFGH202200123", "IJKL202101234", "MNOP202300099");
+
+    // by process step
+    searchInput =
+        DocumentationUnitSearchInput.builder().processStepId(neuProcessStep.getId()).build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains("ABCD202300007", "UVWX202311090");
 
     // all combined
     searchInput =
@@ -1341,6 +1368,9 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     if (searchInput.kind() != null) {
       queryParams.add("kind", searchInput.kind().toString());
+    }
+    if (searchInput.processStepId() != null) {
+      queryParams.add("processStepId", searchInput.processStepId().toString());
     }
 
     queryParams.add("myDocOfficeOnly", String.valueOf(searchInput.myDocOfficeOnly()));

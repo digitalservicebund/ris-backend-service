@@ -810,6 +810,7 @@ class DocumentationUnitServiceTest {
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
+        Optional.empty(),
         Optional.empty());
     verify(docUnitSearchRepository)
         .searchByDocumentationUnitSearchInput(documentationUnitSearchInput, pageRequest, oidcUser);
@@ -836,6 +837,7 @@ class DocumentationUnitServiceTest {
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courttype\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courtlocation\u180Ewith\u2060spaces"),
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),

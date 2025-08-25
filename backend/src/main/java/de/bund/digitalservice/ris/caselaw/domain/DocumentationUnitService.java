@@ -334,7 +334,8 @@ public class DocumentationUnitService {
       Optional<LocalDate> resolutionDateEnd,
       Optional<Boolean> isResolved,
       Optional<InboxStatus> inboxStatus,
-      Optional<Kind> kind) {
+      Optional<Kind> kind,
+      Optional<UUID> processStepId) {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
@@ -361,6 +362,7 @@ public class DocumentationUnitService {
             .resolutionDateEnd(resolutionDateEnd.orElse(null))
             .isResolved(isResolved.orElse(false))
             .kind(kind.orElse(null))
+            .processStepId(processStepId.orElse(null))
             .build();
 
     Slice<DocumentationUnitListItem> documentationUnitListItems;
