@@ -110,14 +110,18 @@ public class DocumentationUnitService {
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit generateNewDocumentationUnit(
       User user, Optional<DocumentationUnitCreationParameters> parameters, Kind kind) {
+
+    DocumentationUnit documentationUnit;
     if (kind.equals(Kind.DECISION)) {
-      return generateNewDecision(user, parameters);
+      documentationUnit = generateNewDecision(user, parameters);
     } else if (kind.equals(Kind.PENDING_PROCEEDING)) {
-      return generateNewPendingProceeding(user, parameters);
+      documentationUnit = generateNewPendingProceeding(user, parameters);
     } else {
       throw new DocumentationUnitException(
           "DocumentationUnit is neither decision nor pending proceeding.");
     }
+    retrieveProcessStepsUsers(documentationUnit);
+    return documentationUnit;
   }
 
   public Decision generateNewDecision(
@@ -474,22 +478,22 @@ public class DocumentationUnitService {
     }
   }
 
-    private Slice<DocumentationUnitListItem> retrieveCurrentProcessStepUser(
-            Slice<DocumentationUnitListItem> documentationUnitListItems, OidcUser oidcUser) {
+  private Slice<DocumentationUnitListItem> retrieveCurrentProcessStepUser(
+      Slice<DocumentationUnitListItem> documentationUnitListItems, OidcUser oidcUser) {
 
-        Map<UUID, User> userIdMap =
-                userService.getUsers(oidcUser).stream()
-                        .collect(Collectors.toMap(User::id, Function.identity()));
+    Map<UUID, User> userIdMap =
+        userService.getUsers(oidcUser).stream()
+            .collect(Collectors.toMap(User::id, Function.identity()));
 
-        return documentationUnitListItems.map(
-                item -> {
-                    Optional.ofNullable(item.currentProcessStep())
-                            .map(DocumentationUnitProcessStep::getUser)
-                            .map(user -> userIdMap.get(user.id()))
-                            .ifPresent(user -> item.currentProcessStep().setUser(user));
-                    return item;
-                });
-    }
+    return documentationUnitListItems.map(
+        item -> {
+          Optional.ofNullable(item.currentProcessStep())
+              .map(DocumentationUnitProcessStep::getUser)
+              .map(user -> userIdMap.get(user.id()))
+              .ifPresent(user -> item.currentProcessStep().setUser(user));
+          return item;
+        });
+  }
 
   private DocumentationUnit filterProcessStepsOfOtherDocumentationOffices(
       DocumentationUnit documentable, User user) {
