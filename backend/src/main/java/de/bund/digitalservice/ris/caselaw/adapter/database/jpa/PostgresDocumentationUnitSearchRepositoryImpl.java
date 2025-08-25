@@ -462,7 +462,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
               root.get(DocumentationUnitDTO_.currentProcessStep)
                   .get(DocumentationUnitProcessStepDTO_.processStep)
                   .get(ProcessStepDTO_.id),
-              parameters.processStepId().get());
+              parameters.processStepId.get());
       predicates.add(processStepPredicate);
     }
     return predicates;
