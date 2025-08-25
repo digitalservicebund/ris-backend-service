@@ -887,14 +887,14 @@ public class DocumentationUnitService {
 
   public Image getImageBytes(String documentNumber, String imageName)
       throws ImageNotExistsException, DocumentationUnitNotExistsException {
-    var docUnitId = repository.findIdForDocumentNumber(documentNumber);
+    var docUnit = getByDocumentNumber(documentNumber);
     return attachmentService
-        .findByDocumentationUnitIdAndFileName(docUnitId, imageName)
+        .findByDocumentationUnitIdAndFileName(docUnit.uuid(), imageName)
         .orElseThrow(
             () ->
                 new ImageNotExistsException(
                     "Image not found for documentation unit: "
-                        + docUnitId
+                        + docUnit.uuid()
                         + " and image name: "
                         + imageName));
   }

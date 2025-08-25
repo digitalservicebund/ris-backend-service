@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -11,9 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface DatabaseDocumentationUnitRepository
     extends JpaRepository<DocumentationUnitDTO, UUID> {
   Optional<DocumentationUnitDTO> findByDocumentNumber(String documentNumber);
-
-  @Query("SELECT d.id FROM DocumentationUnitDTO d where d.documentNumber = :documentNumber")
-  Optional<UUID> findIdByDocumentNumber(@Param("documentNumber") String documentNumber);
 
   Optional<DocumentationUnitListItemDTO> findDocumentationUnitListItemByDocumentNumber(
       String documentNumber);

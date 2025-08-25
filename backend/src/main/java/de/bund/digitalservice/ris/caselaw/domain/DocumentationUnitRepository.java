@@ -15,9 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @NoRepositoryBean
 public interface DocumentationUnitRepository {
 
-  @Transactional(transactionManager = "jpaTransactionManager")
-  UUID findIdForDocumentNumber(String documentNumber) throws DocumentationUnitNotExistsException;
-
   /**
    * Find a documentation unit by its document number
    *
