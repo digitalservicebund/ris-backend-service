@@ -15,6 +15,7 @@ sentry:
 
 neuris:
   environment: production
+  portalUrl: https://testphase.rechtsinformationen.bund.de/
   document-number-patterns:
     BGH: KORE7****YYYY # results in e.g. KORE 7 0001 2024
     BVerfG: KVRE*****YY42 # results in e.g. KVRE 00001 24 42

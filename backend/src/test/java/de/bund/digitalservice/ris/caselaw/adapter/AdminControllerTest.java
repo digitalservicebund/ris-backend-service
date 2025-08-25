@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.EnvironmentResponse;
 import de.bund.digitalservice.ris.caselaw.domain.MailStatus;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -136,7 +137,9 @@ class AdminControllerTest {
 
   @Test
   void testGetEnv() {
-    when(environmentService.getEnvironment()).thenReturn("staging");
+    when(environmentService.getEnvironment())
+        .thenReturn(
+            EnvironmentResponse.builder().environment("staging").portalUrl("portal-url").build());
 
     var result =
         risWebTestClient
@@ -149,7 +152,8 @@ class AdminControllerTest {
             .expectBody(String.class)
             .returnResult();
 
-    assertThat(result.getResponseBody()).isEqualTo("staging");
+    assertThat(result.getResponseBody())
+        .isEqualTo("{\"environment\":\"staging\",\"portalUrl\":\"portal-url\"}");
   }
 
   @Test

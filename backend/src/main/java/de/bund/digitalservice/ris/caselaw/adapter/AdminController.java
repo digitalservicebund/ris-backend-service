@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.EnvironmentResponse;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class AdminController {
 
   @GetMapping("/env")
   @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<String> getEnvironment() {
+  public ResponseEntity<EnvironmentResponse> getEnvironment() {
     return ResponseEntity.ok(environmentService.getEnvironment());
   }
 
