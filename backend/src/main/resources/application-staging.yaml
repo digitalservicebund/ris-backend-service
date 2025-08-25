@@ -21,6 +21,7 @@ sentry:
 
 neuris:
   environment: staging
+  portalUrl: https://ris-portal.dev.ds4g.net/
   document-number-patterns:
     DS: XXRE0******YY
     DS-Anh: XXAH0******YY
