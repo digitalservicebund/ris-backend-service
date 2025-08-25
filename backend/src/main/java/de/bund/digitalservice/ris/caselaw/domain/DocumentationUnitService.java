@@ -476,26 +476,29 @@ public class DocumentationUnitService {
       return addProcessSteps(documentable, Collections.emptyList());
     }
 
-    List<DocumentationUnitProcessStep> processStepsOfMyDocumentationOffice =
-        documentable.processSteps().stream()
-            .filter(
-                processStep -> {
-                  if (processStep.getUser() == null) {
-                    return true;
-                  }
+    List<DocumentationUnitProcessStep> processStepsOfMyDocumentationOffice = new ArrayList<>();
+    if (documentable.processSteps() != null) {
+      processStepsOfMyDocumentationOffice =
+          documentable.processSteps().stream()
+              .filter(
+                  processStep -> {
+                    if (processStep.getUser() == null) {
+                      return true;
+                    }
 
-                  if (processStep.getUser().id() == null) {
-                    return false;
-                  }
+                    if (processStep.getUser().id() == null) {
+                      return false;
+                    }
 
-                  if (processStep.getUser().documentationOffice() == null) {
-                    return false;
-                  }
+                    if (processStep.getUser().documentationOffice() == null) {
+                      return false;
+                    }
 
-                  return processStep.getUser().documentationOffice().id()
-                      == user.documentationOffice().id();
-                })
-            .toList();
+                    return processStep.getUser().documentationOffice().id()
+                        == user.documentationOffice().id();
+                  })
+              .toList();
+    }
 
     return addProcessSteps(documentable, processStepsOfMyDocumentationOffice);
   }
