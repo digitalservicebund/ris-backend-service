@@ -447,7 +447,7 @@ class HistoryLogTransformerTest {
             .createdAt(now)
             .createdBy("creatorUser")
             .documentationOffice(office.abbreviation())
-            .description("Person geändert: Old Person -> New Person")
+            .description("Person geändert: Old Person → New Person")
             .eventType(eventType)
             .build();
 

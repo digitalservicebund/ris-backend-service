@@ -778,7 +778,6 @@ public class DocumentationUnitService {
               .currentProcessStep(
                   DocumentationUnitProcessStep.builder()
                       .id(UUID.randomUUID())
-                      .user(user)
                       .createdAt(LocalDateTime.now())
                       .processStep(
                           processStepService

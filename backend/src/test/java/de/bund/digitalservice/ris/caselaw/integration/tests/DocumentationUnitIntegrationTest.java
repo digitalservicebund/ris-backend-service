@@ -2000,7 +2000,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               assertThat(historyLogs.get(2).eventType())
                   .isEqualTo(HistoryLogEventType.DOCUMENTATION_OFFICE);
               assertThat(historyLogs.get(2).description())
-                  .isEqualTo("Dokstelle geändert: [DS] → [BGH]");
+                  .isEqualTo("Dokstelle geändert: DS → BGH");
               assertThat(
                       documentationUnitDTO
                           .get()
