@@ -29,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -49,7 +50,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -90,6 +90,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final EntityManager entityManager;
   private final DatabaseReferenceRepository referenceRepository;
   private final DocumentationUnitHistoryLogService historyLogService;
+  private final UserApiService userApiService;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -103,7 +104,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseDocumentationUnitProcessStepRepository databaseDocumentationUnitProcessStepRepository,
       EntityManager entityManager,
       DatabaseReferenceRepository referenceRepository,
-      DocumentationUnitHistoryLogService historyLogService) {
+      DocumentationUnitHistoryLogService historyLogService,
+      UserApiService userApiService) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -118,6 +120,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.processStepRepository = processStepRepository;
     this.databaseDocumentationUnitProcessStepRepository =
         databaseDocumentationUnitProcessStepRepository;
+    this.userApiService = userApiService;
   }
 
   @Override
@@ -147,45 +150,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private DocumentationUnit getDocumentationUnit(
       DocumentationUnitDTO documentationUnit, @Nullable User user) {
     if (documentationUnit instanceof DecisionDTO decisionDTO) {
-      Decision decision = DecisionTransformer.transformToDomain(decisionDTO, user);
-      return filterProcessStepsOfOtherDocumentationOffices(decision, user);
+      return DecisionTransformer.transformToDomain(decisionDTO, user);
     }
     if (documentationUnit instanceof PendingProceedingDTO pendingProceedingDTO) {
       return PendingProceedingTransformer.transformToDomain(pendingProceedingDTO, user);
     }
     return null;
-  }
-
-  private DocumentationUnit filterProcessStepsOfOtherDocumentationOffices(
-      Decision decision, User user) {
-    if (user == null || user.documentationOffice() == null) {
-      return decision.toBuilder().processSteps(Collections.emptyList()).build();
-    }
-
-    Optional<DocumentationOfficeDTO> documentationOfficeDTOOptional =
-        documentationOfficeRepository.findById(user.documentationOffice().id());
-    if (documentationOfficeDTOOptional.isPresent()) {
-      List<DocumentationUnitProcessStep> processStepsOfMyDocumentationOffice =
-          decision.processSteps().stream()
-              .filter(
-                  processStep -> {
-                    if (processStep.getUser() == null) {
-                      return true;
-                    }
-
-                    if (processStep.getUser().documentationOffice() == null) {
-                      return false;
-                    }
-
-                    return processStep.getUser().documentationOffice().id()
-                        == user.documentationOffice().id();
-                  })
-              .toList();
-
-      return decision.toBuilder().processSteps(processStepsOfMyDocumentationOffice).build();
-    }
-
-    return decision.toBuilder().processSteps(Collections.emptyList()).build();
   }
 
   @Override

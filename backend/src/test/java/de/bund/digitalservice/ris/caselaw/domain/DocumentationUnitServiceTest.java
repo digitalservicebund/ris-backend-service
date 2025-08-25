@@ -1040,6 +1040,173 @@ class DocumentationUnitServiceTest {
     verify(repository, never()).saveDocumentationOffice(decision.uuid(), documentationOffice, user);
   }
 
+  @Test
+  void testGetDocumentationUnit_withProcessStepsOfDifferentDocOffices()
+      throws DocumentationUnitNotExistsException {
+    UUID docOfficeId = UUID.randomUUID();
+    DocumentationOffice docOffice = DocumentationOffice.builder().id(docOfficeId).build();
+    UUID userId = UUID.randomUUID();
+    User user = User.builder().id(userId).documentationOffice(docOffice).build();
+    UUID otherDocOfficeId = UUID.randomUUID();
+    DocumentationOffice otherDocOffice = DocumentationOffice.builder().id(otherDocOfficeId).build();
+    UUID otherUserId = UUID.randomUUID();
+    User otherUser = User.builder().id(otherUserId).documentationOffice(otherDocOffice).build();
+    DocumentationUnitProcessStep processStep1 =
+        DocumentationUnitProcessStep.builder()
+            .processStep(ProcessStep.builder().name("process step 1").build())
+            .user(User.builder().id(userId).documentationOffice(docOffice).build())
+            .build();
+    DocumentationUnitProcessStep processStepOtherDocOffice =
+        DocumentationUnitProcessStep.builder()
+            .processStep(ProcessStep.builder().name("process step other doc office").build())
+            .user(User.builder().id(otherUserId).documentationOffice(otherDocOffice).build())
+            .build();
+    DocumentationUnitProcessStep processStep2 =
+        DocumentationUnitProcessStep.builder()
+            .processStep(ProcessStep.builder().name("process step 2").build())
+            .user(User.builder().id(userId).documentationOffice(docOffice).build())
+            .build();
+    Decision decision =
+        Decision.builder()
+            .coreData(
+                CoreData.builder()
+                    .creatingDocOffice(docOffice)
+                    .documentationOffice(docOffice)
+                    .build())
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .currentProcessStep(processStep1)
+            .processSteps(List.of(processStep1, processStepOtherDocOffice, processStep2))
+            .build();
+    when(userService.getUser(oidcUser)).thenReturn(user);
+    when(userService.getUser(userId)).thenReturn(user);
+    when(userService.getUser(otherUserId)).thenReturn(otherUser);
+    when(repository.findByDocumentNumber("XXRE200000001", user)).thenReturn(decision);
+
+    DocumentationUnit result = service.getByDocumentNumberWithUser("XXRE200000001", oidcUser);
+
+    assertThat(result.processSteps())
+        .extracting("processStep.name")
+        .containsExactly("process step 1", "process step 2");
+  }
+
+  @Test
+  void
+      testGetDocumentationUnit_withProcessStepsOfDifferentDocOfficesAndProcessStepWithoutUser_shouldReturnThisProcessStep()
+          throws DocumentationUnitNotExistsException {
+    UUID docOfficeId = UUID.randomUUID();
+    DocumentationOffice docOffice = DocumentationOffice.builder().id(docOfficeId).build();
+    UUID userId = UUID.randomUUID();
+    User user = User.builder().id(userId).documentationOffice(docOffice).build();
+    UUID otherDocOfficeId = UUID.randomUUID();
+    DocumentationOffice otherDocOffice = DocumentationOffice.builder().id(otherDocOfficeId).build();
+    UUID otherUserId = UUID.randomUUID();
+    User otherUser = User.builder().id(otherUserId).documentationOffice(otherDocOffice).build();
+    DocumentationUnitProcessStep processStep1 =
+        DocumentationUnitProcessStep.builder()
+            .processStep(ProcessStep.builder().name("process step 1").build())
+            .user(User.builder().id(userId).documentationOffice(docOffice).build())
+            .build();
+    DocumentationUnitProcessStep processStepOtherDocOffice =
+        DocumentationUnitProcessStep.builder()
+            .processStep(ProcessStep.builder().name("process step other doc office").build())
+            .user(User.builder().id(otherUserId).documentationOffice(otherDocOffice).build())
+            .build();
+    DocumentationUnitProcessStep processStep2 =
+        DocumentationUnitProcessStep.builder()
+            .processStep(ProcessStep.builder().name("process step 2").build())
+            .user(User.builder().id(userId).documentationOffice(docOffice).build())
+            .build();
+    DocumentationUnitProcessStep processStepWithoutUser =
+        DocumentationUnitProcessStep.builder()
+            .processStep(ProcessStep.builder().name("process step without user").build())
+            .user(null)
+            .build();
+    Decision decision =
+        Decision.builder()
+            .coreData(
+                CoreData.builder()
+                    .creatingDocOffice(docOffice)
+                    .documentationOffice(docOffice)
+                    .build())
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .currentProcessStep(processStep1)
+            .processSteps(
+                List.of(
+                    processStep1, processStepOtherDocOffice, processStep2, processStepWithoutUser))
+            .build();
+    when(userService.getUser(oidcUser)).thenReturn(user);
+    when(userService.getUser(userId)).thenReturn(user);
+    when(userService.getUser(otherUserId)).thenReturn(otherUser);
+    when(repository.findByDocumentNumber("XXRE200000001", user)).thenReturn(decision);
+
+    DocumentationUnit result = service.getByDocumentNumberWithUser("XXRE200000001", oidcUser);
+
+    assertThat(result.processSteps())
+        .extracting("processStep.name")
+        .containsExactly("process step 1", "process step 2", "process step without user");
+  }
+
+  @Test
+  void
+      testGetDocumentationUnit_withProcessStepsOfDifferentDocOfficesAndProcessStepWithUserWithoutDocOffice_shouldNotReturnThisProcessStep()
+          throws DocumentationUnitNotExistsException {
+    UUID docOfficeId = UUID.randomUUID();
+    DocumentationOffice docOffice = DocumentationOffice.builder().id(docOfficeId).build();
+    UUID userId = UUID.randomUUID();
+    User user = User.builder().id(userId).documentationOffice(docOffice).build();
+    UUID otherDocOfficeId = UUID.randomUUID();
+    DocumentationOffice otherDocOffice = DocumentationOffice.builder().id(otherDocOfficeId).build();
+    UUID otherUserId = UUID.randomUUID();
+    User otherUser = User.builder().id(otherUserId).documentationOffice(otherDocOffice).build();
+    DocumentationUnitProcessStep processStep1 =
+        DocumentationUnitProcessStep.builder()
+            .processStep(ProcessStep.builder().name("process step 1").build())
+            .user(User.builder().id(userId).documentationOffice(docOffice).build())
+            .build();
+    DocumentationUnitProcessStep processStepOtherDocOffice =
+        DocumentationUnitProcessStep.builder()
+            .processStep(ProcessStep.builder().name("process step other doc office").build())
+            .user(User.builder().id(otherUserId).documentationOffice(otherDocOffice).build())
+            .build();
+    DocumentationUnitProcessStep processStep2 =
+        DocumentationUnitProcessStep.builder()
+            .processStep(ProcessStep.builder().name("process step 2").build())
+            .user(User.builder().id(userId).documentationOffice(docOffice).build())
+            .build();
+    DocumentationUnitProcessStep processStepWithUserWithoutDocOffice =
+        DocumentationUnitProcessStep.builder()
+            .processStep(
+                ProcessStep.builder().name("process step with user without doc office").build())
+            .user(User.builder().id(otherUserId).documentationOffice(null).build())
+            .build();
+    Decision decision =
+        Decision.builder()
+            .coreData(
+                CoreData.builder()
+                    .creatingDocOffice(docOffice)
+                    .documentationOffice(docOffice)
+                    .build())
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .currentProcessStep(processStep1)
+            .processSteps(
+                List.of(
+                    processStep1,
+                    processStepOtherDocOffice,
+                    processStep2,
+                    processStepWithUserWithoutDocOffice))
+            .build();
+    when(userService.getUser(oidcUser)).thenReturn(user);
+    when(userService.getUser(userId)).thenReturn(user);
+    when(userService.getUser(otherUserId)).thenReturn(otherUser);
+    when(repository.findByDocumentNumber("XXRE200000001", user)).thenReturn(decision);
+
+    DocumentationUnit result = service.getByDocumentNumberWithUser("XXRE200000001", oidcUser);
+
+    assertThat(result.processSteps())
+        .extracting("processStep.name")
+        .containsExactly("process step 1", "process step 2");
+  }
+
   static Stream<String> provideDuplicateCheckPaths() {
     return Stream.of(
         "/coreData/ecli",
