@@ -346,7 +346,7 @@ onUnmounted(() => {
           </template>
         </Column>
 
-        <Column header="Schritt">
+        <Column v-if="isDecision" header="Schritt">
           <template #body="{ data: item }">
             <CurrentAndLastProcessStepBadge
               :process-steps="item.processSteps"
@@ -354,7 +354,7 @@ onUnmounted(() => {
           </template>
         </Column>
 
-        <Column header="Person">
+        <Column v-if="isDecision" header="Person">
           <template #body="{ data: item }">
             <AssigneeBadge
               :name="
