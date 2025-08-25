@@ -1,15 +1,15 @@
-import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
+import {expect, JSHandle, Locator, Page, Request} from "@playwright/test"
 import dayjs from "dayjs"
-import { PublicationState } from "./../../../../src/domain/publicationStatus"
-import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
-import { Decision } from "@/domain/decision"
-import { Kind } from "@/domain/documentationUnitKind"
+import {PublicationState} from "./../../../../src/domain/publicationStatus"
+import {DocumentUnitCategoriesEnum} from "@/components/enumDocumentUnitCategories"
+import {Decision} from "@/domain/decision"
+import {Kind} from "@/domain/documentationUnitKind"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import PendingProceeding from "@/domain/pendingProceeding"
 import SingleNorm from "@/domain/singleNorm"
-import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
-import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import { generateString } from "~/test-helper/dataGenerators"
+import {isDecision, isPendingProceeding} from "@/utils/typeGuards"
+import {caselawTest as test} from "~/e2e/caselaw/fixtures"
+import {generateString} from "~/test-helper/dataGenerators"
 
 /* eslint-disable playwright/no-conditional-in-test */
 
@@ -1061,7 +1061,9 @@ export async function checkContentOfDecisionResultRow(
   const appraisalBodyCell = listRow.getByRole("cell").nth(4)
   const documentTypCell = listRow.getByRole("cell").nth(5)
   const statusCell = listRow.getByRole("cell").nth(6)
-  const errorCell = listRow.getByRole("cell").nth(7)
+  const processStepsHistoryCell = listRow.getByRole("cell").nth(7)
+  const personCell = listRow.getByRole("cell").nth(8)
+  const errorCell = listRow.getByRole("cell").nth(9)
 
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
@@ -1101,12 +1103,16 @@ export async function checkContentOfDecisionResultRow(
         : "Veröffentlicht",
     )
   })
+  await test.step("Person", async () => {
+    await expect(personCell).toHaveText(
+      expectedItem.currentProcessStep?.user?.initials ?? "-",
+    )
+  })
   await test.step("Fehler", async () => {
     await expect(errorCell).toHaveText(
       expectedItem.status?.withError ? "Fehler" : "-",
     )
   })
-
   await test.step("Kann bearbeitet, angesehen und gelöscht werden", async () => {
     await expect(
       listRow.getByLabel("Dokumentationseinheit bearbeiten"),
