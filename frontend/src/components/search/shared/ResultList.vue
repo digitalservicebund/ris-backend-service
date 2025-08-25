@@ -365,6 +365,8 @@ onUnmounted(() => {
                   : undefined
               "
             />
+          </template>
+        </Column>
 
         <Column header="Fehler">
           <template #body="{ data: item }">
