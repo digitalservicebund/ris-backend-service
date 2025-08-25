@@ -134,7 +134,7 @@ public class HistoryLogTransformer {
       }
     } else {
       // Generic description for other offices
-      if (fromUser == null) {
+      if (fromUser == null && toUser != null) {
         return "Person gesetzt";
       } else {
         return "Person geändert";

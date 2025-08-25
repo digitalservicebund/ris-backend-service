@@ -161,6 +161,7 @@ onBeforeUnmount(() => {
 
     <div :class="layoutClass">
       <NestedComponent
+        id="fileNumbers"
         aria-label="Abweichendes Aktenzeichen"
         class="w-full min-w-0"
         :is-open="!!coreDataModel.deviatingFileNumbers?.length"

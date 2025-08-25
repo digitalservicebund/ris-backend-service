@@ -9,28 +9,11 @@ import {
   DuplicateRelationStatus,
 } from "@/domain/managementData"
 import { PublicationState } from "@/domain/publicationStatus"
-import routes from "~/test-helper/routes"
-
-const router = createRouter({
-  history: createWebHistory(),
-  routes: routes,
-})
-
-const isInternalUser = ref(true)
-vi.mock("@/composables/useInternalUser", () => {
-  return {
-    useInternalUser: () => isInternalUser,
-  }
-})
+import routes from "~pages"
 
 describe("HandoverDocumentDuplicateCheckView:", () => {
   test("without duplicates", async () => {
-    render(HandoverDuplicateCheckView, {
-      props: { documentNumber: "documentNumber", pendingDuplicates: [] },
-      global: {
-        plugins: [router],
-      },
-    })
+    await renderComponent([])
 
     expect(screen.getByText("Dublettenprüfung")).toBeInTheDocument()
     expect(
@@ -58,12 +41,8 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
       isJdvDuplicateCheckActive: true,
       publicationStatus: PublicationState.UNPUBLISHED,
     }
-    render(HandoverDuplicateCheckView, {
-      props: { documentNumber: "numberOrigin", pendingDuplicates: [duplicate] },
-      global: {
-        plugins: [[createTestingPinia()], [router]],
-      },
-    })
+    const pendingDuplicates = [duplicate]
+    await renderComponent(pendingDuplicates)
 
     expect(screen.getByText("Dublettenprüfung")).toBeInTheDocument()
     expect(
@@ -99,15 +78,7 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
       isJdvDuplicateCheckActive: true,
       publicationStatus: PublicationState.PUBLISHED,
     }
-    render(HandoverDuplicateCheckView, {
-      props: {
-        documentNumber: "numberOrigin",
-        pendingDuplicates: [publishedDuplicate, unpublishedDuplicate],
-      },
-      global: {
-        plugins: [[createTestingPinia()], [router]],
-      },
-    })
+    await renderComponent([publishedDuplicate, unpublishedDuplicate])
 
     expect(screen.getByText("Dublettenprüfung")).toBeInTheDocument()
     expect(
@@ -134,15 +105,7 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
       isJdvDuplicateCheckActive: true,
       publicationStatus: PublicationState.PUBLISHED,
     }
-    render(HandoverDuplicateCheckView, {
-      props: {
-        documentNumber: "numberOrigin",
-        pendingDuplicates: [duplicate],
-      },
-      global: {
-        plugins: [[createTestingPinia()], [router]],
-      },
-    })
+    await renderComponent([duplicate])
 
     expect(screen.getByText("Dublettenprüfung")).toBeInTheDocument()
     expect(
@@ -159,3 +122,28 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
     ).not.toBeInTheDocument()
   })
 })
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+})
+
+const isInternalUser = ref(true)
+vi.mock("@/composables/useInternalUser", () => {
+  return {
+    useInternalUser: () => isInternalUser,
+  }
+})
+
+async function renderComponent(pendingDuplicates: DuplicateRelation[]) {
+  await router.push({
+    name: "caselaw-documentUnit-documentNumber-publication",
+    params: { documentNumber: "KORE123412345" },
+  })
+  render(HandoverDuplicateCheckView, {
+    props: { pendingDuplicates },
+    global: {
+      plugins: [[createTestingPinia()], [router]],
+    },
+  })
+}

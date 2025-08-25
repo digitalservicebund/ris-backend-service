@@ -434,10 +434,12 @@ public class DocumentationUnitService {
 
   public DocumentationUnit getByDocumentNumberWithUser(String documentNumber, OidcUser oidcUser)
       throws DocumentationUnitNotExistsException {
-    var documentable =
-        repository.findByDocumentNumber(documentNumber, userService.getUser(oidcUser));
+    User user = userService.getUser(oidcUser);
+
+    var documentable = repository.findByDocumentNumber(documentNumber, user);
 
     retrieveProcessStepsUsers(documentable);
+    documentable = filterProcessStepsOfOtherDocumentationOffices(documentable, user);
 
     switch (documentable) {
       case Decision decision -> {
@@ -465,6 +467,51 @@ public class DocumentationUnitService {
         return documentable;
       }
     }
+  }
+
+  private DocumentationUnit filterProcessStepsOfOtherDocumentationOffices(
+      DocumentationUnit documentable, User user) {
+
+    if (user == null || user.documentationOffice() == null) {
+      return addProcessSteps(documentable, Collections.emptyList());
+    }
+
+    List<DocumentationUnitProcessStep> processStepsOfMyDocumentationOffice = new ArrayList<>();
+    if (documentable.processSteps() != null) {
+      processStepsOfMyDocumentationOffice =
+          documentable.processSteps().stream()
+              .filter(
+                  processStep -> {
+                    if (processStep.getUser() == null) {
+                      return true;
+                    }
+
+                    if (processStep.getUser().id() == null) {
+                      return false;
+                    }
+
+                    if (processStep.getUser().documentationOffice() == null) {
+                      return false;
+                    }
+
+                    return processStep.getUser().documentationOffice().id()
+                        == user.documentationOffice().id();
+                  })
+              .toList();
+    }
+
+    return addProcessSteps(documentable, processStepsOfMyDocumentationOffice);
+  }
+
+  private DocumentationUnit addProcessSteps(
+      DocumentationUnit documentable, List<DocumentationUnitProcessStep> processSteps) {
+    if (documentable instanceof Decision decision) {
+      return decision.toBuilder().processSteps(processSteps).build();
+    } else if (documentable instanceof PendingProceeding pendingProceeding) {
+      return pendingProceeding.toBuilder().processSteps(processSteps).build();
+    }
+
+    return documentable;
   }
 
   private void retrieveProcessStepsUsers(DocumentationUnit documentable) {
@@ -617,6 +664,7 @@ public class DocumentationUnitService {
             updateDocumentationUnit(user, patchedDocumentationUnit, duplicateCheckStatus);
 
         retrieveProcessStepsUsers(updatedDocumentationUnit);
+        retrieveProcessStepsUsers(patchedDocumentationUnitWithBase64Images);
 
         toFrontendJsonPatch =
             patchMapperService.getDiffPatch(
