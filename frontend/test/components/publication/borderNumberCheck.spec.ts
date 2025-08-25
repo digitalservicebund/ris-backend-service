@@ -25,7 +25,7 @@ describe("BorderNumberCheck", () => {
 
       const { emitted } = await renderComponent()
 
-      expect(emitted("borderNumberValidationUpdated")).toEqual([[true]])
+      expect(emitted("borderNumberCheckUpdated")).toEqual([[true]])
     })
 
     it("should show the success message", async () => {
@@ -94,7 +94,7 @@ describe("BorderNumberCheck", () => {
 
       const { emitted } = await renderComponent()
 
-      expect(emitted("borderNumberValidationUpdated")).toEqual([[false]])
+      expect(emitted("borderNumberCheckUpdated")).toEqual([[false]])
     })
 
     it("should show error message", async () => {
@@ -275,7 +275,7 @@ describe("BorderNumberCheck", () => {
 
       const { emitted } = await renderComponent()
 
-      expect(emitted("borderNumberValidationUpdated")).toEqual([[false]])
+      expect(emitted("borderNumberCheckUpdated")).toEqual([[false]])
     })
 
     it("should show error message", async () => {

@@ -17,7 +17,7 @@ import IconErrorOutline from "~icons/ic/baseline-error-outline"
 const emits =
   defineEmits<
     (
-      event: "updatePlausibilityCheck",
+      event: "plausibilityCheckUpdated",
       hasPlausibilityCheckPassed: boolean,
     ) => void
   >()
@@ -120,7 +120,7 @@ const hasPlausibilityCheckPassed = computed<boolean>(
 )
 watch(
   hasPlausibilityCheckPassed,
-  (hasPassed) => emits("updatePlausibilityCheck", hasPassed),
+  (hasPassed) => emits("plausibilityCheckUpdated", hasPassed),
   { immediate: true },
 )
 

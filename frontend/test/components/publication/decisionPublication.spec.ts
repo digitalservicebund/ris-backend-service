@@ -162,6 +162,23 @@ describe("DecisionPlausibilityCheck", () => {
     expect(updateDocUnitSpy).toHaveBeenCalledOnce()
   })
 
+  it("should reload the preview when border numbers are recalculated", async () => {
+    vi.spyOn(borderNumberService, "validateBorderNumbers").mockReturnValue({
+      isValid: false,
+      hasError: false,
+      expectedBorderNumber: 2,
+      invalidCategory: "tenor",
+      firstInvalidBorderNumber: "",
+    })
+    await renderComponent({ hasPlausibilityCheckPassed: true })
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Randnummern neu berechnen" }),
+    )
+
+    expect(previewMock).toHaveBeenCalledTimes(2)
+  })
+
   describe("ldml preview", () => {
     it("should display ldml preview whit plausible data", async () => {
       await renderComponent({

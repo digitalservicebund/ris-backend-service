@@ -525,7 +525,7 @@ const isPublishable = computed<boolean>(
         </div>
       </div>
       <BorderNumberCheck
-        @border-number-validation-updated="
+        @border-number-check-updated="
           (isValid) => (areBorderNumbersAndLinksValid = isValid)
         "
         @border-numbers-recalculated="onBorderNumbersRecalculated"

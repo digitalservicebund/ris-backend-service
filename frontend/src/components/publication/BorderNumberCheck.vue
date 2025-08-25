@@ -11,7 +11,7 @@ import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const emits = defineEmits<{
   borderNumbersRecalculated: []
-  borderNumberValidationUpdated: [areBorderNumbersAndLinksValid: boolean]
+  borderNumberCheckUpdated: [areBorderNumbersAndLinksValid: boolean]
 }>()
 
 const borderNumberValidationResult = ref(
@@ -27,7 +27,7 @@ const areBorderNumbersAndLinksValid = computed<boolean>(
 )
 watch(
   areBorderNumbersAndLinksValid,
-  (isValid) => emits("borderNumberValidationUpdated", isValid),
+  (isValid) => emits("borderNumberCheckUpdated", isValid),
   { immediate: true },
 )
 

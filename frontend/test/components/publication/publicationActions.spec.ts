@@ -317,7 +317,7 @@ describe("PublicationActions", () => {
         )
 
         expect(
-          screen.getByRole("button", { name: "Trotzdem übergeben" }),
+          screen.getByRole("button", { name: "Trotzdem veröffentlichen" }),
         ).toBeVisible()
         expect(
           screen.getByText(
@@ -340,7 +340,7 @@ describe("PublicationActions", () => {
           screen.getByRole("button", { name: "Veröffentlichen" }),
         )
         await fireEvent.click(
-          screen.getByRole("button", { name: "Trotzdem übergeben" }),
+          screen.getByRole("button", { name: "Trotzdem veröffentlichen" }),
         )
 
         expect(publishServiceSpy).toHaveBeenCalledWith("q834")

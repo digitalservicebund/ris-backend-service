@@ -76,10 +76,10 @@ const withdrawDocUnit = async () => {
     <div class="flex flex-row gap-24">
       <PopupModal
         v-if="showPublicationWarningModal"
-        aria-label="Bestätigung für Übergabe bei Fehlern"
+        aria-label="Bestätigung für Veröffentlichung bei Fehlern"
         :content-text="warningModalText"
         header-text="Prüfung hat Warnungen ergeben"
-        primary-button-text="Trotzdem übergeben"
+        primary-button-text="Trotzdem veröffentlichen"
         primary-button-type="primary"
         @close-modal="showPublicationWarningModal = false"
         @primary-action="publishDocUnit"
