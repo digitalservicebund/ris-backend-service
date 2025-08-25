@@ -772,6 +772,7 @@ class DocumentationUnitControllerTest {
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
+            Optional.empty(),
             Optional.empty()))
         .thenReturn(new PageImpl<>(List.of(), pageRequest, 0));
 
@@ -795,6 +796,7 @@ class DocumentationUnitControllerTest {
             eq(Optional.empty()),
             eq(Optional.empty()),
             eq(Optional.empty()),
+            Optional.empty(),
             eq(Optional.empty()),
             eq(Optional.empty()),
             eq(Optional.empty()),

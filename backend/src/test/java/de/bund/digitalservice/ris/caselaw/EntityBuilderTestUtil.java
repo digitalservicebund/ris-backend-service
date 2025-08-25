@@ -175,15 +175,20 @@ public class EntityBuilderTestUtil {
     dtoBeforeSave.setDeviatingFileNumbers(null);
     var attachments = dtoBeforeSave.getAttachments();
     dtoBeforeSave.setAttachments(null);
+    var processSteps = dtoBeforeSave.getProcessSteps();
+    dtoBeforeSave.setProcessSteps(null);
 
     DecisionDTO dto = repository.save(dtoBeforeSave);
 
     fileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
     deviatingFileNumbers.forEach(fn -> fn.setDocumentationUnit(dto));
     attachments.forEach(a -> a.setDocumentationUnit(dto));
+    processSteps.forEach(p -> p.setDocumentationUnit(dto));
+
     dto.setFileNumbers(fileNumbers);
     dto.setDeviatingFileNumbers(deviatingFileNumbers);
     dto.setAttachments(attachments);
+    dto.setProcessSteps(processSteps);
 
     return repository.save(
         dto.toBuilder()
