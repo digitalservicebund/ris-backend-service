@@ -28,6 +28,7 @@ describe("DecisionPlausibilityCheck", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
     useFeatureToggleServiceMock()
+    vi.resetAllMocks()
   })
 
   describe("Required fields", () => {
@@ -53,7 +54,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.getByRole("button", { name: "Rubriken bearbeiten" }),
       ).toBeVisible()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[false]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[false]])
     })
 
     it("should warn about one required field", async () => {
@@ -78,7 +79,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.getByRole("button", { name: "Rubriken bearbeiten" }),
       ).toBeVisible()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[false]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[false]])
     })
 
     it("should show success with complete core data", async () => {
@@ -102,7 +103,22 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.queryByRole("button", { name: "Rubriken bearbeiten" }),
       ).not.toBeInTheDocument()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[true]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[true]])
+    })
+
+    it("should redirect to categories and scroll", async () => {
+      const { court, ...incompleteCoreData } = fullCoreData
+      mockDocUnitStore({ coreData: incompleteCoreData })
+      const { router } = await renderComponent()
+      const routerSpy = vi.spyOn(router, "push").mockImplementation(vi.fn())
+
+      await fireEvent.click(screen.getByText("Gericht"))
+
+      expect(scrollIntoViewportByIdMock).toHaveBeenCalledOnce()
+      expect(routerSpy).toHaveBeenCalledOnce()
+      expect(routerSpy).toHaveBeenCalledWith({
+        name: "caselaw-documentUnit-documentNumber-categories",
+      })
     })
 
     it("should update when doc unit changes", async () => {
@@ -133,7 +149,7 @@ describe("DecisionPlausibilityCheck", () => {
         screen.queryByRole("button", { name: "Rubriken bearbeiten" }),
       ).not.toBeInTheDocument()
       // plausibility check value changes from false to true
-      expect(emitted("updatePlausibilityCheck")).toEqual([[false], [true]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[false], [true]])
     })
   })
 
@@ -165,7 +181,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.getByRole("button", { name: "Rubriken bearbeiten" }),
       ).toBeVisible()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[false]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[false]])
     })
 
     it("should redirect to categories and scroll", async () => {
@@ -218,7 +234,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.getByRole("button", { name: "Rubriken bearbeiten" }),
       ).toBeVisible()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[false]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[false]])
     })
 
     it("should show all incomplete data warnings", async () => {
@@ -258,7 +274,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.getByRole("button", { name: "Rubriken bearbeiten" }),
       ).toBeInTheDocument()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[false]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[false]])
     })
 
     it("should show success with complete data", async () => {
@@ -299,7 +315,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.queryByRole("button", { name: "Rubriken bearbeiten" }),
       ).not.toBeInTheDocument()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[true]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[true]])
     })
 
     it("should update when doc unit changes", async () => {
@@ -326,7 +342,7 @@ describe("DecisionPlausibilityCheck", () => {
         screen.queryByRole("button", { name: "Rubriken bearbeiten" }),
       ).not.toBeInTheDocument()
       // plausibility check value changes from false to true
-      expect(emitted("updatePlausibilityCheck")).toEqual([[false], [true]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[false], [true]])
     })
   })
 
@@ -358,7 +374,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.getByRole("button", { name: "Rubriken bearbeiten" }),
       ).toBeVisible()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[false]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[false]])
     })
 
     it("should warn about Gründe with Tatbestand", async () => {
@@ -386,7 +402,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.getByRole("button", { name: "Rubriken bearbeiten" }),
       ).toBeVisible()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[false]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[false]])
     })
 
     it("should show success with Entscheidungsgründe+Tatbestand", async () => {
@@ -417,7 +433,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.queryByRole("button", { name: "Rubriken bearbeiten" }),
       ).not.toBeInTheDocument()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[true]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[true]])
     })
 
     it("should show success with Gründe", async () => {
@@ -443,7 +459,7 @@ describe("DecisionPlausibilityCheck", () => {
       expect(
         screen.queryByRole("button", { name: "Rubriken bearbeiten" }),
       ).not.toBeInTheDocument()
-      expect(emitted("updatePlausibilityCheck")).toEqual([[true]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[true]])
     })
 
     it("should update when long text is removed", async () => {
@@ -471,7 +487,7 @@ describe("DecisionPlausibilityCheck", () => {
         screen.queryByRole("button", { name: "Rubriken bearbeiten" }),
       ).not.toBeInTheDocument()
       // plausibility check value changes from false to true
-      expect(emitted("updatePlausibilityCheck")).toEqual([[false], [true]])
+      expect(emitted("plausibilityCheckUpdated")).toEqual([[false], [true]])
     })
   })
 

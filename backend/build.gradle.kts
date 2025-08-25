@@ -10,7 +10,7 @@ import java.io.Serializable
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.5.4"
+    id("org.springframework.boot") version "3.5.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.2.1"
     id("org.sonarqube") version "6.2.0.5505"
@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
     id("com.github.ben-manes.versions") version "0.52.0"
     id ("io.freefair.lombok") version "8.14.2"
-    id("org.flywaydb.flyway") version "11.11.1"
+    id("org.flywaydb.flyway") version "11.11.2"
     id("io.sentry.jvm.gradle") version "5.9.0"
 }
 
@@ -186,7 +186,7 @@ dependencies {
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.44")
 
-    implementation(platform("software.amazon.awssdk:bom:2.32.27"))
+    implementation(platform("software.amazon.awssdk:bom:2.32.29"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -228,7 +228,7 @@ dependencies {
 
     implementation("io.getunleash:unleash-client-java:11.1.0")
     implementation("org.apache.commons:commons-text:1.14.0")
-    implementation("org.jsoup:jsoup:1.21.1")
+    implementation("org.jsoup:jsoup:1.21.2")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.10.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.10.0")
@@ -236,10 +236,10 @@ dependencies {
     // CVE-2023-3635
     implementation("com.squareup.okio:okio-jvm:3.16.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.11.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.11.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.11.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.11.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -256,7 +256,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.26.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.27.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

@@ -44,6 +44,7 @@ public class DocumentationUnitHistoryLogService {
    *
    * @param documentationUnitId The UUID of the documentation unit.
    * @param user The user performing the action (can be null for system actions).
+   * @param systemName Or a sysmtem name instead of a user, if step was set by the system
    * @param eventType The type of history log event (e.g., PROCESS_STEP_USER).
    * @param description A description of the event.
    * @param fromStep The previous process step (domain object).
@@ -53,13 +54,14 @@ public class DocumentationUnitHistoryLogService {
   public void saveProcessStepHistoryLog(
       UUID documentationUnitId,
       @Nullable User user,
+      String systemName,
       HistoryLogEventType eventType,
       String description,
       @Nullable DocumentationUnitProcessStep fromStep,
       @Nullable DocumentationUnitProcessStep toStep) {
 
     repository.saveProcessStepHistoryLog(
-        documentationUnitId, user, eventType, description, fromStep, toStep);
+        documentationUnitId, user, systemName, eventType, description, fromStep, toStep);
   }
 
   private Optional<HistoryLog> findUpdateHistoryLogForToday(UUID uuid, User user) {

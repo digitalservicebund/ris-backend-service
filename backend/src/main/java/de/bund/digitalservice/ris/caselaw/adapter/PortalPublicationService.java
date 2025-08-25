@@ -14,8 +14,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogServ
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mapping.MappingException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -196,6 +199,30 @@ public class PortalPublicationService {
    */
   public void uploadDeletionChangelog(List<String> deletedDocumentNumbers) {
     uploadChangelog(null, deletedDocumentNumbers, false);
+  }
+
+  /**
+   * Create a LDML preview for a documentation unit.
+   *
+   * @param documentUuid the UUID of the documentation unit
+   * @return the export result, containing the LDML
+   */
+  public LdmlTransformationResult createLdmlPreview(UUID documentUuid)
+      throws DocumentationUnitNotExistsException, LdmlTransformationException, MappingException {
+    DocumentationUnit documentationUnit = documentationUnitRepository.findByUuid(documentUuid);
+    if (documentationUnit instanceof Decision) {
+      CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
+      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+      if (fileContent.isEmpty()) {
+        throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
+      }
+      return LdmlTransformationResult.builder().success(true).ldml(fileContent.get()).build();
+    } else {
+      var message =
+          String.format(
+              "Document type %s is not supported.", documentationUnit.getClass().getSimpleName());
+      throw new DocumentationUnitException(message);
+    }
   }
 
   private PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {

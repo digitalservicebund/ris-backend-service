@@ -87,6 +87,10 @@
     "title": "Fehler beim Laden der XML-Vorschau",
     "description": "Die XML-Vorschau konnte nicht geladen werden."
   },
+  "DOCUMENT_UNIT_LOADING_LDML_PREVIEW": {
+    "title": "Fehler beim Laden der LDML-Vorschau",
+    "description": "Die LDML-Vorschau konnte nicht geladen werden"
+  },
   "NORM_COULD_NOT_BE_VALIDATED": {
     "title": "Einzelnorm konnte nicht validiert werden.",
     "description": ""

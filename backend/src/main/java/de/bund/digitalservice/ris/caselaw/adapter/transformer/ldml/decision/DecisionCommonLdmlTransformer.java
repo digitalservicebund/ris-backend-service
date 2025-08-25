@@ -58,7 +58,7 @@ public abstract class DecisionCommonLdmlTransformer
     this.htmlTransformer = new HtmlTransformer(documentBuilderFactory);
   }
 
-  public CaseLawLdml transformToLdml(Decision decision) {
+  public CaseLawLdml transformToLdml(Decision decision) throws LdmlTransformationException {
     try {
       return CaseLawLdml.builder().judgment(buildJudgment(decision)).build();
     } catch (ValidationException e) {
@@ -111,10 +111,10 @@ public abstract class DecisionCommonLdmlTransformer
       applyIfNotEmpty(buildRelatedDecisions(decision.ensuingDecisions()), builder::ensuingDecision);
     }
 
-    var contentRelatedIndexing = decision.contentRelatedIndexing();
-    if (contentRelatedIndexing != null && contentRelatedIndexing.norms() != null) {
+    if (decision.contentRelatedIndexing() != null
+        && decision.contentRelatedIndexing().norms() != null) {
       applyIfNotEmpty(
-          contentRelatedIndexing.norms().stream()
+          decision.contentRelatedIndexing().norms().stream()
               .flatMap(normReference -> normReference.singleNorms().stream())
               .filter(Objects::nonNull)
               .map(
@@ -126,10 +126,10 @@ public abstract class DecisionCommonLdmlTransformer
               .toList(),
           builder::legalForce);
     }
-    if (contentRelatedIndexing != null
-        && contentRelatedIndexing.foreignLanguageVersions() != null) {
+    if (decision.contentRelatedIndexing() != null
+        && decision.contentRelatedIndexing().foreignLanguageVersions() != null) {
       applyIfNotEmpty(
-          contentRelatedIndexing.foreignLanguageVersions().stream()
+          decision.contentRelatedIndexing().foreignLanguageVersions().stream()
               .map(
                   foreignLanguageVersion ->
                       ForeignLanguageVersion.builder()

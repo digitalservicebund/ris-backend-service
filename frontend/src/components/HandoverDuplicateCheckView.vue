@@ -9,7 +9,6 @@ import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const props = defineProps<{
-  documentNumber: string
   pendingDuplicates: DuplicateRelation[]
 }>()
 
@@ -33,7 +32,6 @@ function renderSummary(duplicateRelation: DuplicateRelation) {
 
 const managementDataRoute = computed(() => ({
   name: "caselaw-documentUnit-documentNumber-managementdata",
-  params: { documentNumber: props.documentNumber },
 }))
 </script>
 <template>
@@ -71,7 +69,7 @@ const managementDataRoute = computed(() => ({
           </div>
         </div>
       </div>
-      <RouterLink v-if="isInternalUser" :to="managementDataRoute">
+      <RouterLink v-if="isInternalUser" tabindex="-1" :to="managementDataRoute">
         <Button
           aria-label="Dublettenwarnung prüfen"
           class="mt-8 w-fit"

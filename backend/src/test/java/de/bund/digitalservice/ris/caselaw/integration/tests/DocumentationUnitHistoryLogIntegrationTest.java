@@ -86,9 +86,9 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
 
     assertThat(repository.findById(entityId)).isPresent();
 
-    saveHistoryLog(entityId, userIdDS, null);
-    saveHistoryLog(entityId, userIdBGH, null);
-    HistoryLogDTO historyLog3 = saveHistoryLog(entityId, null, "migration");
+    HistoryLogDTO dto1 = saveHistoryLog(entityId, userIdDS, null);
+    HistoryLogDTO dto2 = saveHistoryLog(entityId, userIdBGH, null);
+    HistoryLogDTO dto3 = saveHistoryLog(entityId, null, "migration");
 
     assertThat(databaseHistoryLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(entityId))
         .hasSize(3);
@@ -111,20 +111,34 @@ class DocumentationUnitHistoryLogIntegrationTest extends BaseIntegrationTest {
     HistoryLog log3 = historyLogs.get(2);
 
     // Order is now descending, by created at
-    // log 1 is historyLog3
-    // log 2 is historyLog2
-    // log 3 is historyLog1
+    // log 1 is dto3
     assertThat(log1.createdAt().truncatedTo(ChronoUnit.MILLIS))
-        .isEqualTo(historyLog3.getCreatedAt().truncatedTo(ChronoUnit.MILLIS));
+        .isEqualTo(dto3.getCreatedAt().truncatedTo(ChronoUnit.MILLIS));
+    // no user, no docoffice, only system name
+    assertThat(log1.createdBy()).isEqualTo(dto3.getSystemName());
     assertThat(log1.documentationOffice()).isNull();
-    assertThat(log1.eventType()).isEqualTo(historyLog3.getEventType());
-    assertThat(log1.description()).isEqualTo(historyLog3.getDescription());
-    // user from other doc office is allowed to see system name
-    assertThat(log1.createdBy()).isEqualTo(historyLog3.getSystemName());
+    assertThat(log1.description()).isEqualTo(dto3.getDescription());
+    assertThat(log1.eventType()).isEqualTo(dto3.getEventType());
+
+    // log 2 is dto2
+    assertThat(log2.createdAt().truncatedTo(ChronoUnit.MILLIS))
+        .isEqualTo(dto2.getCreatedAt().truncatedTo(ChronoUnit.MILLIS));
     // usernames from other doc offices are not visible in logs
     assertThat(log2.createdBy()).isNull();
+    // doc office derived from user API via userId
+    assertThat(log2.documentationOffice()).isEqualTo("BGH");
+    assertThat(log1.description()).isEqualTo(dto2.getDescription());
+    assertThat(log2.eventType()).isEqualTo(dto2.getEventType());
+
+    // log 3 is dto1
+    assertThat(log3.createdAt().truncatedTo(ChronoUnit.MILLIS))
+        .isEqualTo(dto1.getCreatedAt().truncatedTo(ChronoUnit.MILLIS));
     // user from same doc office is allowed to see username
     assertThat(log3.createdBy()).isEqualTo("testUserDS");
+    // doc office derived from user API via userId
+    assertThat(log3.documentationOffice()).isEqualTo("DS");
+    assertThat(log3.description()).isEqualTo(dto1.getDescription());
+    assertThat(log3.eventType()).isEqualTo(dto1.getEventType());
   }
 
   @Test

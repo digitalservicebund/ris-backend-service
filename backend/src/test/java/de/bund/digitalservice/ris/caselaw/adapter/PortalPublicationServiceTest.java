@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
@@ -31,13 +33,16 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogServ
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PendingProceeding;
+import de.bund.digitalservice.ris.caselaw.domain.PendingProceedingShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
@@ -49,6 +54,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -540,5 +546,87 @@ class PortalPublicationServiceTest {
 
   private String withPrefix(String documentNumber) {
     return documentNumber + "/" + documentNumber + ".xml";
+  }
+
+  @Nested
+  class CreateLdmlPreview {
+    @Test
+    void createLdmlPreview_withValidDecision_shouldThrowDocumentationUnitNotExistsException()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      when(documentationUnitRepository.findByUuid(testDocumentUnit.uuid()))
+          .thenThrow(DocumentationUnitNotExistsException.class);
+      // Act + Assert
+      assertThatThrownBy(() -> subject.createLdmlPreview(testDocumentUnit.uuid()))
+          .isInstanceOf(DocumentationUnitNotExistsException.class);
+    }
+
+    @Test
+    void createLdmlPreview_withValidDecision_shouldReturnLdml()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      String transformed = "ldml";
+      when(documentationUnitRepository.findByUuid(testDocumentUnit.uuid()))
+          .thenReturn(testDocumentUnit);
+      when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+      when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
+      // Act
+      LdmlTransformationResult result = subject.createLdmlPreview(testDocumentUnit.uuid());
+      // Assert
+      assertThat(result)
+          .isEqualTo(LdmlTransformationResult.builder().ldml(transformed).success(true).build());
+    }
+
+    @Test
+    void createLdmlPreview_withInvalidDecision_shouldThrowLdmlTransformationException()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var uuid = testDocumentUnit.uuid();
+      when(documentationUnitRepository.findByUuid(uuid)).thenReturn(testDocumentUnit);
+      when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+      when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.empty());
+      // Act + Assert
+      assertThatThrownBy(() -> subject.createLdmlPreview(uuid))
+          .isInstanceOf(LdmlTransformationException.class)
+          .hasMessage("Could not parse transformed LDML as string.");
+    }
+
+    @Test
+    void createLdmlPreview_withPendingProceeding_shouldThrowDocumentationUnitException()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      String transformed = "ldml";
+      var uuid = UUID.randomUUID();
+      var testPendingProceeding =
+          PendingProceeding.builder()
+              .uuid(uuid)
+              .coreData(
+                  CoreData.builder()
+                      .ecli("testecli")
+                      .court(
+                          Court.builder()
+                              .type("testCourtType")
+                              .location("testCourtLocation")
+                              .build())
+                      .documentType(
+                          DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                      .legalEffect("ja")
+                      .fileNumbers(List.of("testFileNumber"))
+                      .decisionDate(LocalDate.of(2020, 1, 1))
+                      .build())
+              .documentNumber(testDocumentNumber)
+              .shortTexts(
+                  PendingProceedingShortTexts.builder()
+                      .admissionOfAppeal("AdmissionOfAppeal")
+                      .build())
+              .build();
+      when(documentationUnitRepository.findByUuid(uuid)).thenReturn(testPendingProceeding);
+      when(portalTransformer.transformToLdml(testPendingProceeding)).thenReturn(testLdml);
+      when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
+      // Act + Assert
+      assertThatThrownBy(() -> subject.createLdmlPreview(uuid))
+          .isInstanceOf(DocumentationUnitException.class)
+          .hasMessageContaining("Document type PendingProceeding is not supported.");
+    }
   }
 }
