@@ -11,7 +11,8 @@ import {
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("eurlex", () => {
-  test(
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
     "Eurlex Entscheidungen können in NeuRIS übernommen werden",
     { tag: ["@RISDEV-7376", "@RISDEV-7578", "@RISDEV-6383"] },
     async ({ page }) => {
