@@ -1,5 +1,6 @@
 import { computed, Ref } from "vue"
 import { LocationQuery } from "vue-router"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
 import MenuItem from "@/domain/menuItem"
 
@@ -13,6 +14,9 @@ export function usePendingProceedingMenuItems(
   }
 
   const isInternalUser = useInternalUser()
+  const isPortalPublicationEnabled = useFeatureToggle(
+    "neuris.portal-publication",
+  )
 
   return computed(() => [
     {
@@ -78,6 +82,17 @@ export function usePendingProceedingMenuItems(
             route: {
               ...baseRoute,
               name: "caselaw-pending-proceeding-documentNumber-managementdata",
+            },
+          },
+        ]
+      : []),
+    ...(isPortalPublicationEnabled.value
+      ? [
+          {
+            label: "Veröffentlichen",
+            route: {
+              ...baseRoute,
+              name: "caselaw-pending-proceeding-documentNumber-publication",
             },
           },
         ]

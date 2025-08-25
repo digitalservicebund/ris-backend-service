@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, onMounted, Ref, ref } from "vue"
+import { computed, onBeforeMount, Ref, ref } from "vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
@@ -65,7 +65,8 @@ const pendingDuplicates = ref(
     (relation) => relation.status === DuplicateRelationStatus.PENDING,
   ) ?? [],
 )
-onMounted(async () => {
+
+onBeforeMount(async () => {
   // Save doc unit in case there are any unsaved local changes before fetching ldml preview
   await store.updateDocumentUnit()
   await fetchPreview()
