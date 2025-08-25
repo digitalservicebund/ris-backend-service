@@ -288,6 +288,7 @@ public class DocumentationUnitService {
     }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
 
+    retrieveProcessStepsUsers(newDocumentationUnit);
     return (Decision) newDocumentationUnit;
   }
 
@@ -474,22 +475,22 @@ public class DocumentationUnitService {
     }
   }
 
-    private Slice<DocumentationUnitListItem> retrieveCurrentProcessStepUser(
-            Slice<DocumentationUnitListItem> documentationUnitListItems, OidcUser oidcUser) {
+  private Slice<DocumentationUnitListItem> retrieveCurrentProcessStepUser(
+      Slice<DocumentationUnitListItem> documentationUnitListItems, OidcUser oidcUser) {
 
-        Map<UUID, User> userIdMap =
-                userService.getUsers(oidcUser).stream()
-                        .collect(Collectors.toMap(User::id, Function.identity()));
+    Map<UUID, User> userIdMap =
+        userService.getUsers(oidcUser).stream()
+            .collect(Collectors.toMap(User::id, Function.identity()));
 
-        return documentationUnitListItems.map(
-                item -> {
-                    Optional.ofNullable(item.currentProcessStep())
-                            .map(DocumentationUnitProcessStep::getUser)
-                            .map(user -> userIdMap.get(user.id()))
-                            .ifPresent(user -> item.currentProcessStep().setUser(user));
-                    return item;
-                });
-    }
+    return documentationUnitListItems.map(
+        item -> {
+          Optional.ofNullable(item.currentProcessStep())
+              .map(DocumentationUnitProcessStep::getUser)
+              .map(user -> userIdMap.get(user.id()))
+              .ifPresent(user -> item.currentProcessStep().setUser(user));
+          return item;
+        });
+  }
 
   private DocumentationUnit filterProcessStepsOfOtherDocumentationOffices(
       DocumentationUnit documentable, User user) {
