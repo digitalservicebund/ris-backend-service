@@ -228,7 +228,7 @@ dependencies {
 
     implementation("io.getunleash:unleash-client-java:11.1.0")
     implementation("org.apache.commons:commons-text:1.14.0")
-    implementation("org.jsoup:jsoup:1.21.1")
+    implementation("org.jsoup:jsoup:1.21.2")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.10.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.10.0")
@@ -256,7 +256,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.26.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.27.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
