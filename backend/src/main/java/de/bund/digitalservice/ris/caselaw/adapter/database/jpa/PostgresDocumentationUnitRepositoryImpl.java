@@ -29,7 +29,6 @@ import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -103,8 +102,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseDocumentationUnitProcessStepRepository databaseDocumentationUnitProcessStepRepository,
       EntityManager entityManager,
       DatabaseReferenceRepository referenceRepository,
-      DocumentationUnitHistoryLogService historyLogService,
-      UserApiService userApiService) {
+      DocumentationUnitHistoryLogService historyLogService) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -119,7 +117,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.processStepRepository = processStepRepository;
     this.databaseDocumentationUnitProcessStepRepository =
         databaseDocumentationUnitProcessStepRepository;
-    this.userApiService = userApiService;
   }
 
   @Override
