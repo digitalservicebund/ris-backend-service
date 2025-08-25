@@ -1109,6 +1109,13 @@ export async function checkContentOfDecisionResultRow(
   })
 
   await test.step("Kann bearbeitet und angesehen werden", async () => {
+  await test.step("Person", async () => {
+    await expect(personCell).toHaveText(
+      expectedItem.currentProcessStep?.user?.initials ?? "-",
+    )
+  })
+
+  await test.step("Kann bearbeitet, angesehen und gelöscht werden", async () => {
     await expect(
       listRow.getByLabel("Dokumentationseinheit bearbeiten"),
     ).toBeEnabled()
