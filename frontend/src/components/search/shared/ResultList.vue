@@ -268,17 +268,13 @@ onUnmounted(() => {
           </template>
         </Column>
 
-        <Column field="court.type" header="Gerichtstyp">
+        <Column field="court" header="Gericht">
           <template #body="{ data: item }">
-            <div class="flex flex-row items-center gap-8">
-              <div>{{ item.court?.type ?? "-" }}</div>
-            </div>
-          </template>
-        </Column>
-
-        <Column v-if="isDecision" field="court.location" header="Ort">
-          <template #body="{ data: item }">
-            {{ item.court?.location ?? "-" }}
+            {{
+              [item.court?.type, item.court?.location]
+                .filter(Boolean)
+                .join(" ") || "-"
+            }}
           </template>
         </Column>
 

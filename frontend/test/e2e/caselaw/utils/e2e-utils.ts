@@ -995,7 +995,7 @@ export async function checkContentOfPendingProceedingResultRow(
   expectedItem: PendingProceeding,
 ) {
   const docNumberCell = listRow.getByRole("cell").nth(0)
-  const courtTypeCell = listRow.getByRole("cell").nth(1)
+  const courtCell = listRow.getByRole("cell").nth(1)
   const decisionDateCell = listRow.getByRole("cell").nth(2)
   const fileNumberCell = listRow.getByRole("cell").nth(3)
   const statusCell = listRow.getByRole("cell").nth(4)
@@ -1005,9 +1005,11 @@ export async function checkContentOfPendingProceedingResultRow(
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
-  await test.step("Gerichtstyp", async () => {
-    await expect(courtTypeCell).toHaveText(
-      expectedItem.coreData.court?.type ?? "-",
+  await test.step("Gericht", async () => {
+    await expect(courtCell).toHaveText(
+      [expectedItem.coreData.court?.type, expectedItem.coreData.court?.location]
+        .filter(Boolean)
+        .join(" ") || "-",
     )
   })
   await test.step("Mitteilungsdatum", async () => {
@@ -1053,26 +1055,22 @@ export async function checkContentOfDecisionResultRow(
   expectedItem: Decision,
 ) {
   const docNumberCell = listRow.getByRole("cell").nth(0)
-  const courtTypeCell = listRow.getByRole("cell").nth(1)
-  const courtLocationCell = listRow.getByRole("cell").nth(2)
-  const decisionDateCell = listRow.getByRole("cell").nth(3)
-  const fileNumberCell = listRow.getByRole("cell").nth(4)
-  const appraisalBodyCell = listRow.getByRole("cell").nth(5)
-  const documentTypCell = listRow.getByRole("cell").nth(6)
-  const statusCell = listRow.getByRole("cell").nth(7)
-  const errorCell = listRow.getByRole("cell").nth(8)
+  const courtCell = listRow.getByRole("cell").nth(1)
+  const decisionDateCell = listRow.getByRole("cell").nth(2)
+  const fileNumberCell = listRow.getByRole("cell").nth(3)
+  const appraisalBodyCell = listRow.getByRole("cell").nth(4)
+  const documentTypCell = listRow.getByRole("cell").nth(5)
+  const statusCell = listRow.getByRole("cell").nth(6)
+  const errorCell = listRow.getByRole("cell").nth(7)
 
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
-  await test.step("Gerichtstyp", async () => {
-    await expect(courtTypeCell).toHaveText(
-      expectedItem.coreData.court?.type ?? "-",
-    )
-  })
-  await test.step("Gerichtsort", async () => {
-    await expect(courtLocationCell).toHaveText(
-      expectedItem.coreData.court?.location ?? "-",
+  await test.step("Gericht", async () => {
+    await expect(courtCell).toHaveText(
+      [expectedItem.coreData.court?.type, expectedItem.coreData.court?.location]
+        .filter(Boolean)
+        .join(" ") || "-",
     )
   })
   await test.step("Entscheidungsdatum", async () => {
