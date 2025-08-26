@@ -24,13 +24,13 @@ const previousProcessBadge = computed(() =>
 <template>
   <div class="flex flex-row">
     <IconBadge
-      v-if="props.previousProcessStep"
+      v-if="props.previousProcessStep && previousProcessBadge"
       v-bind="previousProcessBadge"
       :label="props.previousProcessStep.abbreviation"
       text-color="text-gray-900"
     />
     <IconBadge
-      v-if="props.currentProcessStep"
+      v-if="props.currentProcessStep && currentProcessBadge"
       v-bind="currentProcessBadge"
       :class="{ 'ml-[-5px]': previousProcessBadge }"
       :label="props.currentProcessStep.name"
