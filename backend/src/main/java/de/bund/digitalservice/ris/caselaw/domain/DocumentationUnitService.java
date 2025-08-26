@@ -484,10 +484,10 @@ public class DocumentationUnitService {
 
     return documentationUnitListItems.map(
         item -> {
-          Optional.ofNullable(item.currentProcessStep())
+          Optional.ofNullable(item.currentDocumentationUnitProcessStep())
               .map(DocumentationUnitProcessStep::getUser)
               .map(user -> userIdMap.get(user.id()))
-              .ifPresent(user -> item.currentProcessStep().setUser(user));
+              .ifPresent(user -> item.currentDocumentationUnitProcessStep().setUser(user));
           return item;
         });
   }

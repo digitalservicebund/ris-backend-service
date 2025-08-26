@@ -2,37 +2,21 @@
 import { computed } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
 import { useProcessStepBadge } from "@/composables/useProcessStepBadge"
-import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
+import ProcessStep from "@/domain/processStep"
 
 const props = defineProps<{
-  processSteps: DocumentationUnitProcessStep[] | undefined
+  currentProcessStep?: ProcessStep
+  previousProcessStep?: ProcessStep
 }>()
 
-const currentProcessStep = computed(
-  () => props.processSteps?.at(0)?.processStep,
-)
-
-const lastProcessStep = computed(() => {
-  if (!props.processSteps || props.processSteps.length < 2) {
-    return null
-  }
-
-  const currentId = currentProcessStep.value?.uuid
-  // Find the first item after the current one where the processStep ID is different
-  const lastStep = props.processSteps
-    .slice(1)
-    .find((step) => step.processStep.uuid !== currentId)
-  return lastStep ? lastStep.processStep : null
-})
-
 const currentProcessBadge = computed(() =>
-  currentProcessStep.value
-    ? useProcessStepBadge(currentProcessStep.value).value
+  props.currentProcessStep
+    ? useProcessStepBadge(props.currentProcessStep).value
     : null,
 )
-const lastProcessBadge = computed(() =>
-  lastProcessStep.value
-    ? useProcessStepBadge(lastProcessStep.value).value
+const previousProcessBadge = computed(() =>
+  props.previousProcessStep
+    ? useProcessStepBadge(props.previousProcessStep).value
     : null,
 )
 </script>
@@ -40,15 +24,16 @@ const lastProcessBadge = computed(() =>
 <template>
   <div class="flex flex-row">
     <IconBadge
-      v-if="lastProcessStep && lastProcessBadge"
-      v-bind="lastProcessBadge"
-      :label="lastProcessStep.abbreviation"
+      v-if="props.previousProcessStep"
+      v-bind="previousProcessBadge"
+      :label="props.previousProcessStep.abbreviation"
       text-color="text-gray-900"
     />
     <IconBadge
-      v-if="currentProcessStep && currentProcessBadge"
+      v-if="props.currentProcessStep"
       v-bind="currentProcessBadge"
-      :class="{ 'ml-[-5px]': lastProcessBadge }"
+      :class="{ 'ml-[-5px]': previousProcessBadge }"
+      :label="props.currentProcessStep.name"
     />
   </div>
 </template>

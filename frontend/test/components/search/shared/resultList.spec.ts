@@ -35,8 +35,12 @@ const mockEntries = [
       publicationStatus: PublicationState.UNPUBLISHED,
       withError: true,
     },
-    currentProcessStep: generateProcessStep(),
-    processSteps: [generateProcessStep()],
+    currentDocumentationUnitProcessStep: generateProcessStep(),
+    previousProcessStep: {
+      uuid: "1",
+      name: "Ersterfassung",
+      abbreviation: "EF",
+    },
     resolutionDate: "2000-04-06",
   }),
 ]
@@ -49,9 +53,9 @@ function generateProcessStep() {
       name: "Test Name",
     },
     processStep: {
-      uuid: "3",
-      name: "Ersterfassung",
-      abbreviation: "EF",
+      uuid: "2",
+      name: "QS Formal",
+      abbreviation: "QS",
     },
   }
 }
