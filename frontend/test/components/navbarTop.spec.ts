@@ -2,10 +2,10 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import NavbarTop from "@/components/NavbarTop.vue"
-import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
 import featureToggleService from "@/services/featureToggleService"
 import useSessionStore from "@/stores/sessionStore"
+import { Env } from "@/types/env"
 
 function renderComponent(options?: { env?: Env; activeUser?: User }) {
   render(NavbarTop, {
@@ -15,7 +15,7 @@ function renderComponent(options?: { env?: Env; activeUser?: User }) {
         createTestingPinia({
           initialState: {
             session: {
-              env: options?.env ?? "uat",
+              env: options?.env ?? { environment: "uat" },
               user: options?.activeUser || {
                 name: "user",
                 documentationOffice: { abbreviation: "DS" },
@@ -75,7 +75,7 @@ describe("navbar top", () => {
 
   test("navbar top should be rendered with user and doc office badge", async () => {
     renderComponent({
-      env: "staging",
+      env: { environment: "staging" },
       activeUser: {
         name: "Test User",
         documentationOffice: { abbreviation: "fooDocumentationOffice" },
@@ -86,7 +86,7 @@ describe("navbar top", () => {
     const sessionStore = useSessionStore()
     await sessionStore.initSession()
 
-    expect(sessionStore.env).toBe("staging")
+    expect(sessionStore.env?.environment).toBe("staging")
     expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
     expect(screen.getByText("Vorgänge")).toBeInTheDocument()
     expect(screen.getByText("des Bundes")).toBeInTheDocument()

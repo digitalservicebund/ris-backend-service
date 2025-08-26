@@ -1,10 +1,10 @@
 import { useFavicon } from "@vueuse/core"
 import { defineStore } from "pinia"
 import { Ref, ref } from "vue"
-import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
 import adminService from "@/services/adminService"
 import authService from "@/services/authService"
+import { Env } from "@/types/env"
 import { getFavicon } from "@/utils/getFavicon"
 
 type SessionStore = {
@@ -39,10 +39,10 @@ const useSessionStore = defineStore("session", (): SessionStore => {
 
   async function initSession(): Promise<void> {
     env.value = await fetchEnv()
-    useFavicon(getFavicon(env.value))
+    useFavicon(getFavicon(env.value?.environment))
   }
 
-  return { user, env, isAuthenticated, initSession }
+  return { user, env: env, isAuthenticated, initSession }
 })
 
 export default useSessionStore

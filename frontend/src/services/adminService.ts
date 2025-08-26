@@ -1,6 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { Env } from "@/domain/env"
 import errorMessages from "@/i18n/errors.json"
+import { Env } from "@/types/env"
 
 interface AdminService {
   getEnv(): Promise<ServiceResponse<Env>>
