@@ -180,4 +180,6 @@ public interface DocumentationUnitRepository {
   Set<String> findAllPublishedDocumentNumbers();
 
   void updatePortalPublicationStatus(UUID documentationUnitId, PortalPublicationStatus newStatus);
+
+  void savePublicationDateTime(UUID documentationUnitId);
 }

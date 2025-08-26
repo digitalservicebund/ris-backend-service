@@ -469,10 +469,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return;
     }
 
-    if (docUnitDTO.getManagementData() == null) {
-      docUnitDTO.setManagementData(new ManagementDataDTO());
-      docUnitDTO.getManagementData().setDocumentationUnit(docUnitDTO);
-    }
+    setManagementData(docUnitDTO);
 
     DocumentationOfficeDTO docOffice =
         DocumentationOfficeTransformer.transformToDTO(currentUser.documentationOffice());
@@ -1048,6 +1045,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     var oldStatus = documentationUnitDTO.getPortalPublicationStatus();
 
     setLastUpdated(null, documentationUnitDTO);
+    savePublicationDateTime(documentationUnitId);
 
     historyLogService.saveHistoryLog(
         documentationUnitId,
@@ -1066,5 +1064,35 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           pendingProceedingDTO.toBuilder().portalPublicationStatus(newStatus).build();
     }
     repository.save(documentationUnitDTO);
+  }
+
+  @Override
+  public void savePublicationDateTime(UUID documentationUnitId) {
+    repository
+        .findById(documentationUnitId)
+        .ifPresentOrElse(
+            documentationUnitDTO -> {
+              setManagementData(documentationUnitDTO);
+
+              Instant now = Instant.now();
+              if (documentationUnitDTO.getFirstPublicationDateTime() != null) {
+                documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
+              } else {
+                documentationUnitDTO.getManagementData().setFirstPublishedAtDateTime(now);
+                documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
+              }
+              repository.save(documentationUnitDTO);
+            },
+            () ->
+                log.info(
+                    "Can't set publication date time for documentation unit with id: {}",
+                    documentationUnitId));
+  }
+
+  private static void setManagementData(DocumentationUnitDTO documentationUnitDTO) {
+    if (documentationUnitDTO.getManagementData() == null) {
+      documentationUnitDTO.setManagementData(new ManagementDataDTO());
+      documentationUnitDTO.getManagementData().setDocumentationUnit(documentationUnitDTO);
+    }
   }
 }

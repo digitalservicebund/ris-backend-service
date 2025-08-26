@@ -217,6 +217,9 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @OrderBy("documentationUnitRank")
   private List<LiteratureReferenceDTO> literatureReferences = new ArrayList<>();
 
+  @Column(name = "first_publication_date_time")
+  private LocalDateTime firstPublicationDateTime;
+
   @Column(name = "last_publication_date_time")
   private LocalDateTime lastPublicationDateTime;
 
