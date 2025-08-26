@@ -1063,7 +1063,6 @@ export async function checkContentOfDecisionResultRow(
   const statusCell = listRow.getByRole("cell").nth(6)
   const personCell = listRow.getByRole("cell").nth(8)
 
-
   await test.step("Fehler", async () => {
     if (expectedItem.status?.withError) {
       await expect(docNumberCell.locator("div > svg:first-child")).toBeVisible()
@@ -1110,7 +1109,6 @@ export async function checkContentOfDecisionResultRow(
     )
   })
 
-  await test.step("Kann bearbeitet und angesehen werden", async () => {
   await test.step("Person", async () => {
     await expect(personCell).toHaveText(
       expectedItem.currentProcessStep?.user?.initials ?? "-",
