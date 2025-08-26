@@ -149,7 +149,12 @@ onUnmounted(() => {
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
     >
-      <DataTable :loading="loading" :pt="stickyHeaderPT" :value="entries">
+      <DataTable
+        class="w-[95vw]"
+        :loading="loading"
+        :pt="stickyHeaderPT"
+        :value="entries"
+      >
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
@@ -280,7 +285,7 @@ onUnmounted(() => {
           <template #body="{ data: item }">
             <IconBadge
               v-if="item.status?.publicationStatus"
-              class="inline-flex"
+              class="inline-flex whitespace-nowrap"
               v-bind="useStatusBadge(item.status).value"
               data-testid="publication-status"
             />
