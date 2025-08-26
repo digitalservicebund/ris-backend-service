@@ -217,11 +217,9 @@ public abstract class DocumentationUnitDTO implements DocumentationUnitListItemD
   @OrderBy("documentationUnitRank")
   private List<LiteratureReferenceDTO> literatureReferences = new ArrayList<>();
 
-  @Column(name = "first_publication_date_time")
-  private LocalDateTime firstPublicationDateTime;
-
+  /** Stores the last time the document has been handed over to jDV * */
   @Column(name = "last_publication_date_time")
-  private LocalDateTime lastPublicationDateTime;
+  private LocalDateTime lastHandoverDateTime;
 
   @Column(name = "scheduled_publication_date_time")
   private LocalDateTime scheduledPublicationDateTime;

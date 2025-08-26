@@ -94,7 +94,7 @@ class DecisionTransformerTest {
     assertThat(decisionDTO.getJudicialBody()).isNull();
     assertThat(decisionDTO.getDate()).isNull();
     assertThat(decisionDTO.getScheduledPublicationDateTime()).isNull();
-    assertThat(decisionDTO.getLastPublicationDateTime()).isNull();
+    assertThat(decisionDTO.getLastHandoverDateTime()).isNull();
     assertThat(decisionDTO.getCourt()).isNull();
     assertThat(decisionDTO.getDocumentType()).isNull();
     assertThat(decisionDTO.getDocumentationOffice()).isNull();
@@ -1282,7 +1282,7 @@ class DecisionTransformerTest {
   void testTransformLastPublicationDate_withDate_shouldAddLastPublicationDate() {
     DecisionDTO decisionDTO =
         generateSimpleDTOBuilder()
-            .lastPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
+            .lastHandoverDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
             .build();
 
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
@@ -1293,7 +1293,7 @@ class DecisionTransformerTest {
 
   @Test
   void testTransformLastPublicationDate_withoutDate_shouldNotAddLastPublicationDate() {
-    DecisionDTO decisionDTO = generateSimpleDTOBuilder().lastPublicationDateTime(null).build();
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().lastHandoverDateTime(null).build();
 
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 

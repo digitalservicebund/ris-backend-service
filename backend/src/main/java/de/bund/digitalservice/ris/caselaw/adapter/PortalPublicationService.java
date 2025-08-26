@@ -309,13 +309,12 @@ public class PortalPublicationService {
 
   private void updatePortalPublicationStatus(
       DocumentationUnit documentationUnit, PortalPublicationStatus newStatus, User user) {
-    var oldStatus = documentationUnit.portalPublicationStatus();
-    if (newStatus.equals(oldStatus)) {
+    if (newStatus.equals(documentationUnit.portalPublicationStatus())) {
       documentationUnitRepository.savePublicationDateTime(documentationUnit.uuid());
-      addHistoryLog(documentationUnit, newStatus, user);
-      return;
+    } else {
+      documentationUnitRepository.updatePortalPublicationStatus(
+          documentationUnit.uuid(), newStatus);
     }
-    documentationUnitRepository.updatePortalPublicationStatus(documentationUnit.uuid(), newStatus);
     addHistoryLog(documentationUnit, newStatus, user);
   }
 

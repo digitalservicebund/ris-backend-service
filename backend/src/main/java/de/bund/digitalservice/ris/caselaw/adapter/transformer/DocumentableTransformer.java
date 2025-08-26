@@ -120,7 +120,7 @@ public class DocumentableTransformer {
       var managementData = updatedDomainObject.managementData();
 
       builder.scheduledPublicationDateTime(managementData.scheduledPublicationDateTime());
-      builder.lastPublicationDateTime(managementData.lastPublicationDateTime());
+      builder.lastHandoverDateTime(managementData.lastPublicationDateTime());
       builder.scheduledByEmail(managementData.scheduledByEmail());
     }
   }

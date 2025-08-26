@@ -406,8 +406,8 @@ public class DocumentationUnitService {
         oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));
   }
 
-  public void saveSuccessfulPublication(UUID uuid) {
-    repository.saveSuccessfulPublication(uuid);
+  public void saveSuccessfulHandover(UUID uuid) {
+    repository.saveSuccessfulHandover(uuid);
   }
 
   private DocumentationUnitListItem addPermissions(

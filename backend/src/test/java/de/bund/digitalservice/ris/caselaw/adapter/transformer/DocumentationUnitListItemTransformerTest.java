@@ -37,7 +37,7 @@ class DocumentationUnitListItemTransformerTest {
             .fileNumbers(List.of(FileNumberDTO.builder().value("1 BvR 1234/19").build()))
             .date(LocalDate.parse("2021-01-01"))
             .scheduledPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
-            .lastPublicationDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
+            .lastHandoverDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
             .judicialBody("1. Senat")
             .headnote("headnote")
             .creatingDocumentationOffice(
@@ -74,7 +74,7 @@ class DocumentationUnitListItemTransformerTest {
     assertThat(documentationUnitListItem.decisionDate()).isEqualTo(LocalDate.parse("2021-01-01"));
     assertThat(documentationUnitListItem.scheduledPublicationDateTime())
         .isEqualTo(LocalDateTime.parse("2022-01-23T18:25:14"));
-    assertThat(documentationUnitListItem.lastPublicationDateTime())
+    assertThat(documentationUnitListItem.lastHandoverDateTime())
         .isEqualTo(LocalDateTime.parse("2022-01-22T18:27:18"));
     assertThat(documentationUnitListItem.appraisalBody()).isEqualTo("1. Senat");
     assertThat(documentationUnitListItem.hasHeadnoteOrPrinciple()).isTrue();
@@ -101,7 +101,7 @@ class DocumentationUnitListItemTransformerTest {
             .judicialBody("1. Senat")
             .resolutionNote("resolutionNode")
             .scheduledPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
-            .lastPublicationDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
+            .lastHandoverDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
             .isResolved(true)
             .legalIssue("legalIssue")
             .admissionOfAppeal("admissionOfAppeal")
@@ -133,7 +133,7 @@ class DocumentationUnitListItemTransformerTest {
     assertThat(documentationUnitListItem.fileNumber()).isEqualTo("1 BvR 1234/19");
     assertThat(documentationUnitListItem.decisionDate()).isEqualTo(LocalDate.parse("2021-01-01"));
     assertThat(documentationUnitListItem.scheduledPublicationDateTime()).isNull();
-    assertThat(documentationUnitListItem.lastPublicationDateTime()).isNull();
+    assertThat(documentationUnitListItem.lastHandoverDateTime()).isNull();
     assertThat(documentationUnitListItem.appraisalBody()).isEqualTo("1. Senat");
     assertThat(documentationUnitListItem.hasHeadnoteOrPrinciple()).isFalse();
     // status

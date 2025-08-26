@@ -802,7 +802,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void saveSuccessfulPublication(UUID uuid) {
+  public void saveSuccessfulHandover(UUID uuid) {
     if (uuid == null) {
       return;
     }
@@ -812,7 +812,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return;
     }
     var documentationUnitDTO = documentationUnitDTOOptional.get();
-    documentationUnitDTO.setLastPublicationDateTime(LocalDateTime.now());
+    documentationUnitDTO.setLastHandoverDateTime(LocalDateTime.now());
     documentationUnitDTO.setInboxStatus(null);
     repository.save(documentationUnitDTO);
   }
@@ -1081,11 +1081,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               setManagementData(documentationUnitDTO);
 
               Instant now = Instant.now();
-              if (documentationUnitDTO.getFirstPublicationDateTime() != null) {
+              var isFirstPublication =
+                  documentationUnitDTO.getManagementData().getFirstPublishedAtDateTime() == null;
+              if (isFirstPublication) {
+                documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
                 documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
               } else {
                 documentationUnitDTO.getManagementData().setFirstPublishedAtDateTime(now);
-                documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
               }
               repository.save(documentationUnitDTO);
             },
