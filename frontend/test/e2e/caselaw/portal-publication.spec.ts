@@ -4,6 +4,7 @@ import {
   expectHistoryLogRow,
   navigateToManagementData,
   navigateToPublication,
+  save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe("Publish to and withdraw from portal", () => {
@@ -93,6 +94,61 @@ test.describe("Publish to and withdraw from portal", () => {
         "NeuRIS",
         "Status im Portal geändert: Unveröffentlicht → Veröffentlicht",
       )
+    })
+  })
+  test("Plausibilitätsprüfung", async ({
+    page,
+    documentNumber,
+    prefilledDocumentUnit,
+  }) => {
+    await navigateToPublication(page, documentNumber)
+    await expect(
+      page.getByRole("heading", { name: "Plausibilitätsprüfung" }),
+    ).toBeVisible()
+    await test.step("Zeigt alle benötigten, nicht ausgefüllten Rubriken an", async () => {
+      await expect(
+        page.getByText(
+          "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
+        ),
+      ).toBeVisible()
+      await expect(page.locator("li:has-text('Aktenzeichen')")).toBeVisible()
+      await expect(page.locator("li:has-text('Gericht')")).toBeVisible()
+      await expect(
+        page.locator("li:has-text('Entscheidungsdatum')"),
+      ).toBeVisible()
+      await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
+    })
+
+    await test.step("Anzeige wird nach dem Ausfüllen einer Rubrik geupdated", async () => {
+      await page.getByLabel("Rubriken bearbeiten", { exact: true }).click()
+      await page.getByLabel("Aktenzeichen", { exact: true }).fill("abc")
+      await page.keyboard.press("Enter")
+      await save(page)
+      await page.getByLabel("Veröffentlichen", { exact: true }).click()
+      await expect(
+        page.getByText(
+          "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
+        ),
+      ).toBeVisible()
+      await expect(page.locator("li:has-text('Aktenzeichen')")).toBeHidden()
+      await expect(page.locator("li:has-text('Gericht')")).toBeVisible()
+      await expect(
+        page.locator("li:has-text('Entscheidungsdatum')"),
+      ).toBeVisible()
+      await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
+    })
+
+    await test.step("Zeigt keine Fehler an wenn alle benötigten Rubriken ausgefüllt sind", async () => {
+      await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
+      await expect(
+        page.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
+      ).toBeVisible()
+      await expect(page.locator("li:has-text('Aktenzeichen')")).toBeHidden()
+      await expect(page.locator("li:has-text('Gericht')")).toBeHidden()
+      await expect(
+        page.locator("li:has-text('Entscheidungsdatum')"),
+      ).toBeHidden()
+      await expect(page.locator("li:has-text('Dokumenttyp')")).toBeHidden()
     })
   })
 })
