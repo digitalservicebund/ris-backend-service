@@ -64,6 +64,16 @@ public class HistoryLogTransformer {
         .build();
   }
 
+  public static HistoryLog transformToDomain(HistoryLogDTO historyLogDTO) {
+
+    return HistoryLog.builder()
+        .id(historyLogDTO.getId())
+        .createdAt(historyLogDTO.getCreatedAt())
+        .description(historyLogDTO.getDescription())
+        .eventType(historyLogDTO.getEventType())
+        .build();
+  }
+
   private static String transformCreatedBy(
       HistoryLogDTO historyLogDTO,
       @Nullable User creatorUser,
