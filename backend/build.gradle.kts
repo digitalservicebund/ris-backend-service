@@ -197,7 +197,7 @@ dependencies {
     implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7")
     implementation("net.sf.saxon:Saxon-HE:12.8")
 
-    implementation("jakarta.mail:jakarta.mail-api:2.1.3")
+    implementation("jakarta.mail:jakarta.mail-api:2.1.4")
     implementation("org.eclipse.angus:angus-mail:2.0.4")
     implementation("com.icegreen:greenmail:2.1.5")
 
