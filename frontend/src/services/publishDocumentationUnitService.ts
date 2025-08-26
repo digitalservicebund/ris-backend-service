@@ -4,6 +4,7 @@ import errorMessages from "@/i18n/errors.json"
 
 interface PublishDocumentationUnitService {
   publishDocument(documentUnitUuid: string): Promise<ServiceResponse<void>>
+  withdrawDocument(documentUnitUuid: string): Promise<ServiceResponse<void>>
   getPreview(documentUnitUuid: string): Promise<ServiceResponse<LdmlPreview>>
 }
 
@@ -18,6 +19,21 @@ const service: PublishDocumentationUnitService = {
         title: "Fehler beim Veröffentlichen der Dokumentationseinheit",
         description:
           "Die Dokumentationseinheit konnte nicht veröffentlicht werden. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support.",
+      }
+    }
+
+    return response
+  },
+  async withdrawDocument(documentUnitUuid: string) {
+    const response = await httpClient.put<string, void>(
+      `caselaw/documentunits/${documentUnitUuid}/withdraw`,
+    )
+
+    if (response.status >= 400) {
+      response.error = {
+        title: "Fehler beim Zurückziehen der Dokumentationseinheit",
+        description:
+          "Die Dokumentationseinheit konnte nicht zurückgezogen werden. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support.",
       }
     }
 

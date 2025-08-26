@@ -621,8 +621,35 @@ public class DocumentationUnitController {
       portalPublicationService.publishDocumentationUnitWithChangelog(uuid, user);
       return ResponseEntity.ok().build();
     } catch (DocumentationUnitNotExistsException e) {
-      log.error("Error handing over documentation unit '{}' to portal", uuid, e);
-      return ResponseEntity.internalServerError().build();
+      log.atError()
+          .setMessage("Could not find documentation unit to publish to portal")
+          .setCause(e)
+          .addKeyValue("id", uuid)
+          .log();
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  /**
+   * Withdraws the documentation unit from the portal.
+   *
+   * @param uuid UUID of the documentation unit
+   */
+  @PutMapping(value = "/{uuid}/withdraw")
+  @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
+  public ResponseEntity<Void> withdrawDocumentationUnit(
+      @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
+    User user = userService.getUser(oidcUser);
+    try {
+      portalPublicationService.withdrawDocumentationUnitWithChangelog(uuid, user);
+      return ResponseEntity.ok().build();
+    } catch (DocumentationUnitNotExistsException e) {
+      log.atError()
+          .setMessage("Could not find documentation unit to withdraw from portal")
+          .setCause(e)
+          .addKeyValue("id", uuid)
+          .log();
+      return ResponseEntity.notFound().build();
     }
   }
 
