@@ -63,6 +63,7 @@ const handleNewDocumentationUnitClick = async () => {
         v-if="isInternalUser"
         class="z-10"
         :label="buttonLabel"
+        severity="secondary"
         @click="handleNewDocumentationUnitClick"
       ></Button>
     </div>

@@ -132,7 +132,7 @@ describe("Documentunit Search", () => {
     await user.keyboard("{Control>}{Enter}")
     const initialCount = emitted().search.length
 
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
     expect(emitted().search.length).toBe(initialCount + 1)
   })
 

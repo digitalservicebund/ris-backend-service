@@ -58,7 +58,7 @@ test.describe(
           `/caselaw/search/decisions?documentNumber=${documentNumber}&fileNumber=${fileNumber}`,
         )
 
-        await page.getByText("Ergebnisse anzeigen").click()
+        await page.getByText("Ergebnisse zeigen").click()
 
         await expect(
           page.getByText("Keine Suchergebnisse gefunden"),
