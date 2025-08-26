@@ -35,7 +35,7 @@ const mockEntries = [
       publicationStatus: PublicationState.UNPUBLISHED,
       withError: true,
     },
-    currentDocumentationUnitProcessStep: generateProcessStep(),
+    currentDocumentationUnitProcessStep: getCurrentProcessStep(),
     previousProcessStep: {
       uuid: "1",
       name: "Ersterfassung",
@@ -45,7 +45,7 @@ const mockEntries = [
   }),
 ]
 
-function generateProcessStep() {
+function getCurrentProcessStep() {
   return {
     user: {
       id: "2",
@@ -112,7 +112,7 @@ describe("Search Result List", () => {
   it("displays current user of process step", () => {
     renderComponent({ kind: Kind.DECISION })
     const rowWithProcessStep = screen.getAllByRole("row")[2]
-    expect(rowWithProcessStep).toHaveTextContent("Ersterfassung")
+    expect(rowWithProcessStep).toHaveTextContent("QS Formal")
     expect(rowWithProcessStep).toHaveTextContent("TN")
   })
 })

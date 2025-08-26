@@ -306,7 +306,7 @@ onUnmounted(() => {
           <template #body="{ data: item }">
             <CurrentAndPreviousProcessStepBadge
               :current-process-step="
-                item.currentDocumentationUnitProcessStep.processStep
+                item.currentDocumentationUnitProcessStep?.processStep
               "
               :previous-process-step="item.previousProcessStep"
             />
