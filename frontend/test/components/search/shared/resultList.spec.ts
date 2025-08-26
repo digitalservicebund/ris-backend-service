@@ -35,9 +35,27 @@ const mockEntries = [
       publicationStatus: PublicationState.UNPUBLISHED,
       withError: true,
     },
+    currentProcessStep: generateProcessStep(),
+    processSteps: [generateProcessStep()],
     resolutionDate: "2000-04-06",
   }),
 ]
+
+function generateProcessStep() {
+  return {
+    user: {
+      id: "2",
+      initials: "TN",
+      name: "Test Name",
+    },
+    processStep: {
+      uuid: "3",
+      name: "Ersterfassung",
+      abbreviation: "EF",
+    },
+  }
+}
+
 const pageEntries: Page<DocumentUnitListEntry> = {
   content: mockEntries,
   size: 2,
@@ -85,6 +103,13 @@ describe("Search Result List", () => {
     const rows = screen.getAllByRole("row")
     expect(rows[1]).toHaveTextContent("ABC123")
     expect(rows[2]).toHaveTextContent("DEF456")
+  })
+
+  it("displays current user of process step", () => {
+    renderComponent({ kind: Kind.DECISION })
+    const rowWithProcessStep = screen.getAllByRole("row")[2]
+    expect(rowWithProcessStep).toHaveTextContent("Ersterfassung")
+    expect(rowWithProcessStep).toHaveTextContent("TN")
   })
 
   it("opens delete modal on delete button click and emits delete event", async () => {
