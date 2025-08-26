@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, onMounted, Ref, ref } from "vue"
+import { computed, onBeforeMount, Ref, ref } from "vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
@@ -43,7 +43,10 @@ const publicationWarnings = computed(() => {
 })
 
 const isPublishable = computed(
-  () => hasPlausibilityCheckPassed.value && isPortalPublicationEnabled.value,
+  () =>
+    hasPlausibilityCheckPassed.value &&
+    !!preview.value?.success &&
+    isPortalPublicationEnabled.value,
 )
 const preview = ref<LdmlPreview>()
 const previewError = ref()
@@ -65,7 +68,8 @@ const pendingDuplicates = ref(
     (relation) => relation.status === DuplicateRelationStatus.PENDING,
   ) ?? [],
 )
-onMounted(async () => {
+
+onBeforeMount(async () => {
   // Save doc unit in case there are any unsaved local changes before fetching ldml preview
   await store.updateDocumentUnit()
   await fetchPreview()
@@ -73,9 +77,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-full flex-1 grow p-24">
+  <div class="flex w-full flex-1 grow flex-col gap-32 p-24">
     <div class="flex w-full flex-col gap-24 bg-white p-24">
-      <TitleElement>Veröffentlichen</TitleElement>
+      <TitleElement>Prüfen</TitleElement>
       <DecisionPlausibilityCheck
         @plausibility-check-updated="
           (hasPassed) => (hasPlausibilityCheckPassed = hasPassed)
@@ -93,7 +97,10 @@ onMounted(async () => {
         :document-id="decision!.uuid"
         :document-number="decision!.documentNumber"
       />
-      <div class="border-b-1 border-b-gray-400"></div>
+      <div
+        v-if="hasPlausibilityCheckPassed && preview?.success && !!preview.ldml"
+        class="border-b-1 border-b-gray-400"
+      ></div>
       <ExpandableContent
         v-if="hasPlausibilityCheckPassed && preview?.success && !!preview.ldml"
         as-column
@@ -112,6 +119,9 @@ onMounted(async () => {
         :description="previewError.description"
         :title="previewError.title"
       />
+    </div>
+    <div class="flex w-full flex-col gap-24 bg-white p-24">
+      <TitleElement>Veröffentlichen und Zurückziehen</TitleElement>
       <PublicationActions
         :is-publishable="isPublishable"
         :publication-warnings="publicationWarnings"

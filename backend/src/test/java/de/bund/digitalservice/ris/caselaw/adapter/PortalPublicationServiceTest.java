@@ -42,7 +42,6 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
@@ -363,15 +362,31 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void publish_withPendingProceeding_shouldDoNothing() throws DocumentationUnitNotExistsException {
-    PendingProceeding pendingProceeding = PendingProceeding.builder().build();
-    when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
+  void publish_withPendingProceeding_shouldPublishSuccessfully()
+      throws DocumentationUnitNotExistsException {
+    User user = mock(User.class);
+    PendingProceeding pendingProceeding =
+        PendingProceeding.builder()
+            .uuid(UUID.randomUUID())
+            .documentNumber(testDocumentNumber)
+            .build();
+    when(documentationUnitRepository.findByUuid(pendingProceeding.uuid()))
         .thenReturn(pendingProceeding);
+    when(portalTransformer.transformToLdml(any())).thenReturn(testLdml);
+    String transformed = "<akn:akomaNtoso />";
+    when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
 
-    subject.publishDocumentationUnit(testDocumentNumber);
+    subject.publishDocumentationUnitWithChangelog(pendingProceeding.uuid(), user);
 
-    verify(caseLawBucket, never()).save(anyString(), anyString());
-    verify(xmlUtilService, never()).ldmlToString(any());
+    verify(caseLawBucket).save(withPrefix(testDocumentNumber), transformed);
+    verify(historyLogService)
+        .saveHistoryLog(
+            pendingProceeding.uuid(),
+            user,
+            HistoryLogEventType.PORTAL_PUBLICATION,
+            "Dokeinheit im Portal veröffentlicht");
+    verify(documentationUnitRepository)
+        .updatePortalPublicationStatus(pendingProceeding.uuid(), PortalPublicationStatus.PUBLISHED);
   }
 
   @Test
@@ -592,7 +607,7 @@ class PortalPublicationServiceTest {
     }
 
     @Test
-    void createLdmlPreview_withPendingProceeding_shouldThrowDocumentationUnitException()
+    void createLdmlPreview_withPendingProceeding_shouldReturnLdml()
         throws DocumentationUnitNotExistsException {
       // Arrange
       String transformed = "ldml";
@@ -623,10 +638,11 @@ class PortalPublicationServiceTest {
       when(documentationUnitRepository.findByUuid(uuid)).thenReturn(testPendingProceeding);
       when(portalTransformer.transformToLdml(testPendingProceeding)).thenReturn(testLdml);
       when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
-      // Act + Assert
-      assertThatThrownBy(() -> subject.createLdmlPreview(uuid))
-          .isInstanceOf(DocumentationUnitException.class)
-          .hasMessageContaining("Document type PendingProceeding is not supported.");
+      // Act
+      LdmlTransformationResult result = subject.createLdmlPreview(testDocumentUnit.uuid());
+      // Assert
+      assertThat(result)
+          .isEqualTo(LdmlTransformationResult.builder().ldml(transformed).success(true).build());
     }
   }
 }

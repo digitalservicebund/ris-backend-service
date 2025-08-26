@@ -54,6 +54,14 @@ function renderComponent() {
             "<div data-testid='managementdata'>Verwaltungsdaten<input aria-label=\"Verwaltungsdaten\"/></div>",
         },
       },
+      {
+        path: "/caselaw/pendingProceeding/:documentNumber/publication",
+        name: "caselaw-pending-proceeding-documentNumber-publication",
+        component: {
+          template:
+            "<div data-testid='publication'>Veröffentlichen<input aria-label=\"Veröffentlichen\"/></div>",
+        },
+      },
     ],
   })
   return {
