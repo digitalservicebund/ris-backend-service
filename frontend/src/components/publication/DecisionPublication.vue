@@ -74,9 +74,9 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="w-full flex-1 grow p-24">
+  <div class="flex w-full flex-1 grow flex-col gap-32 p-24">
     <div class="flex w-full flex-col gap-24 bg-white p-24">
-      <TitleElement>Veröffentlichen</TitleElement>
+      <TitleElement>Prüfen</TitleElement>
       <DecisionPlausibilityCheck
         @plausibility-check-updated="
           (hasPassed) => (hasPlausibilityCheckPassed = hasPassed)
@@ -94,7 +94,10 @@ onBeforeMount(async () => {
         :document-id="decision!.uuid"
         :document-number="decision!.documentNumber"
       />
-      <div class="border-b-1 border-b-gray-400"></div>
+      <div
+        v-if="hasPlausibilityCheckPassed && preview?.success && !!preview.ldml"
+        class="border-b-1 border-b-gray-400"
+      ></div>
       <ExpandableContent
         v-if="hasPlausibilityCheckPassed && preview?.success && !!preview.ldml"
         as-column
@@ -113,6 +116,9 @@ onBeforeMount(async () => {
         :description="previewError.description"
         :title="previewError.title"
       />
+    </div>
+    <div class="flex w-full flex-col gap-24 bg-white p-24">
+      <TitleElement>Veröffentlichen und Zurückziehen</TitleElement>
       <PublicationActions
         :is-publishable="isPublishable"
         :publication-warnings="publicationWarnings"
