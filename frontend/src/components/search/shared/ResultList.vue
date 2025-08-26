@@ -9,6 +9,8 @@ import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import { computed, ref, onMounted, onUnmounted } from "vue"
 
+import AssigneeBadge from "@/components/AssigneeBadge.vue"
+import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 
@@ -300,6 +302,43 @@ onUnmounted(() => {
           </template>
         </Column>
 
+        <Column v-if="isDecision" header="Schritt">
+          <template #body="{ data: item }">
+            <CurrentAndLastProcessStepBadge
+              :process-steps="item.processSteps"
+            />
+          </template>
+        </Column>
+
+        <Column v-if="isDecision" header="Person">
+          <template #body="{ data: item }">
+            <AssigneeBadge
+              :name="
+                item.currentProcessStep &&
+                item.currentProcessStep.user &&
+                item.currentProcessStep.user.initials
+                  ? item.currentProcessStep.user.initials
+                  : undefined
+              "
+            />
+          </template>
+        </Column>
+
+        <Column header="Fehler">
+          <template #body="{ data: item }">
+            <IconBadge
+              v-if="item.status?.withError"
+              background-color="bg-red-300"
+              class="flex"
+              data-testid="publication-error"
+              :icon="IconError"
+              icon-color="text-red-900"
+              label="Fehler"
+            />
+            <span v-else>-</span>
+          </template>
+        </Column>
+
         <Column
           v-if="isPendingProceeding"
           field="resolutionDate"
@@ -319,7 +358,6 @@ onUnmounted(() => {
             {{ publicationDate(item) }}
           </template>
         </Column>
-
         <Column field="actions">
           <template #header>
             <span class="sr-only">Aktionen</span>
