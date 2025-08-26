@@ -142,7 +142,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="tableWrapper" class="w-[95vw]" data-testId="search-result-list">
+  <div ref="tableWrapper" data-testId="search-result-list">
     <Pagination
       :is-loading="loading"
       navigation-position="bottom"
@@ -280,7 +280,7 @@ onUnmounted(() => {
           <template #body="{ data: item }">
             <IconBadge
               v-if="item.status?.publicationStatus"
-              class="inline-flex whitespace-nowrap"
+              class="inline-flex"
               v-bind="useStatusBadge(item.status).value"
               data-testid="publication-status"
             />
