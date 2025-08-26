@@ -517,12 +517,17 @@ public class DocumentationUnitService {
   }
 
   private void retrieveProcessStepsUsers(DocumentationUnit documentable) {
+    if (documentable == null) {
+      return;
+    }
+
     if (documentable.currentProcessStep() != null
         && documentable.currentProcessStep().getUser() != null) {
       documentable
           .currentProcessStep()
           .setUser(userService.getUser(documentable.currentProcessStep().getUser().id()));
     }
+
     if (documentable.processSteps() != null) {
       documentable
           .processSteps()
