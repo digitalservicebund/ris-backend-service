@@ -149,12 +149,7 @@ onUnmounted(() => {
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
     >
-      <DataTable
-        class="w-[95vw]"
-        :loading="loading"
-        :pt="stickyHeaderPT"
-        :value="entries"
-      >
+      <DataTable :loading="loading" :pt="stickyHeaderPT" :value="entries">
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
