@@ -324,21 +324,6 @@ onUnmounted(() => {
           </template>
         </Column>
 
-        <Column header="Fehler">
-          <template #body="{ data: item }">
-            <IconBadge
-              v-if="item.status?.withError"
-              background-color="bg-red-300"
-              class="flex"
-              data-testid="publication-error"
-              :icon="IconError"
-              icon-color="text-red-900"
-              label="Fehler"
-            />
-            <span v-else>-</span>
-          </template>
-        </Column>
-
         <Column
           v-if="isPendingProceeding"
           field="resolutionDate"
