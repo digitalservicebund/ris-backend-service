@@ -300,15 +300,7 @@ test.describe(
         ).toBeVisible()
       })
       await test.step("Lösche Anhängiges Verfahren", async () => {
-        await pageWithBfhUser
-          .getByRole("button", { name: "Dokumentationseinheit löschen" })
-          .click()
-        await pageWithBfhUser
-          .getByRole("button", { name: "Löschen", exact: true })
-          .click()
-        await expect(
-          pageWithBfhUser.getByText("Keine Suchergebnisse gefunden"),
-        ).toBeVisible()
+        await deleteDocumentUnit(pageWithBfhUser, documentNumberToBeDeleted!)
       })
       await test.step("Suche nach neuer Dokumentnummer ergibt kein Ergebnis", async () => {
         await openSearchWithFileNumberPrefix(

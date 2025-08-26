@@ -999,9 +999,15 @@ export async function checkContentOfPendingProceedingResultRow(
   const decisionDateCell = listRow.getByRole("cell").nth(2)
   const fileNumberCell = listRow.getByRole("cell").nth(3)
   const statusCell = listRow.getByRole("cell").nth(4)
-  const errorCell = listRow.getByRole("cell").nth(5)
-  const resolutionDateCell = listRow.getByRole("cell").nth(6)
+  const resolutionDateCell = listRow.getByRole("cell").nth(5)
 
+  await test.step("Fehler", async () => {
+    if (expectedItem.status?.withError) {
+      await expect(docNumberCell.locator("div > svg:first-child")).toBeVisible()
+    } else {
+      await expect(docNumberCell.locator("div > svg:first-child")).toBeHidden()
+    }
+  })
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
@@ -1026,9 +1032,6 @@ export async function checkContentOfPendingProceedingResultRow(
   await test.step("Veröffentlichungsstatus", async () => {
     await expect(statusCell).toHaveText("Unveröffentlicht")
   })
-  await test.step("Fehler", async () => {
-    await expect(errorCell).toHaveText("-")
-  })
 
   await test.step("Erledigungsmitteilung", async () => {
     const formattedResolutionDate = expectedItem.coreData.resolutionDate
@@ -1037,15 +1040,12 @@ export async function checkContentOfPendingProceedingResultRow(
     await expect(resolutionDateCell).toHaveText(formattedResolutionDate)
   })
 
-  await test.step("Kann bearbeitet, angesehen und gelöscht werden", async () => {
+  await test.step("Kann bearbeitet und angesehen werden", async () => {
     await expect(
       listRow.getByLabel("Dokumentationseinheit bearbeiten"),
     ).toBeEnabled()
     await expect(
       listRow.getByLabel("Dokumentationseinheit ansehen"),
-    ).toBeEnabled()
-    await expect(
-      listRow.getByLabel("Dokumentationseinheit löschen"),
     ).toBeEnabled()
   })
 }
@@ -1108,15 +1108,12 @@ export async function checkContentOfDecisionResultRow(
     )
   })
 
-  await test.step("Kann bearbeitet, angesehen und gelöscht werden", async () => {
+  await test.step("Kann bearbeitet und angesehen werden", async () => {
     await expect(
       listRow.getByLabel("Dokumentationseinheit bearbeiten"),
     ).toBeEnabled()
     await expect(
       listRow.getByLabel("Dokumentationseinheit ansehen"),
-    ).toBeEnabled()
-    await expect(
-      listRow.getByLabel("Dokumentationseinheit löschen"),
     ).toBeEnabled()
   })
 }
