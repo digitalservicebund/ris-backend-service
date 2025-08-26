@@ -76,6 +76,22 @@ const managementDataRoute = computed(() => ({
 const processStepsEnabled =
   useFeatureToggle("neuris.process-steps") && isDecision(props.documentUnit)
 
+const previousProcessStep = computed(() => {
+  if (
+    !props.documentUnit.processSteps ||
+    props.documentUnit.processSteps.length < 2
+  ) {
+    return undefined
+  }
+
+  const currentId = props.documentUnit.currentProcessStep?.processStep.uuid
+  // Find the first item after the current one where the processStep ID is different
+  const lastStep = props.documentUnit.processSteps
+    .slice(1)
+    .find((step) => step.processStep.uuid !== currentId)
+  return lastStep ? lastStep.processStep : undefined
+})
+
 const showProcessStepDialog = ref(false)
 const toast = useToast()
 
@@ -121,9 +137,13 @@ watchEffect(() => {
         icon-color="text-red-900"
         label="Fehler"
       />
+
       <CurrentAndLastProcessStepBadge
         v-if="processStepsEnabled"
-        :process-steps="props.documentUnit.processSteps"
+        :current-process-step="
+          props.documentUnit.currentProcessStep?.processStep
+        "
+        :previous-process-step="previousProcessStep"
       />
       <IconBadge
         v-if="props.documentUnit.currentProcessStep && processStepsEnabled"

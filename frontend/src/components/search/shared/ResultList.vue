@@ -305,7 +305,10 @@ onUnmounted(() => {
         <Column v-if="isDecision" header="Schritt">
           <template #body="{ data: item }">
             <CurrentAndLastProcessStepBadge
-              :process-steps="item.processSteps"
+              :current-process-step="
+                item.currentDocumentationUnitProcessStep.processStep
+              "
+              :previous-process-step="item.previousProcessStep"
             />
           </template>
         </Column>
