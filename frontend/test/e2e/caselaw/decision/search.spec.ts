@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { deleteDocumentUnit } from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import {
   fillInput,
   navigateToSearch,
@@ -446,14 +447,8 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
       await expect(page.getByText(documentNumberToBeDeleted!)).toBeVisible()
     })
-    await test.step("Lösche Anhängiges Verfahren", async () => {
-      await page
-        .getByRole("button", { name: "Dokumentationseinheit löschen" })
-        .click()
-      await page.getByRole("button", { name: "Löschen", exact: true }).click()
-      await expect(
-        page.getByText("Keine Suchergebnisse gefunden"),
-      ).toBeVisible()
+    await test.step("Lösche Entscheidung", async () => {
+      await deleteDocumentUnit(page, documentNumberToBeDeleted!)
     })
     await test.step("Suche nach neuer Dokumentnummer ergibt kein Ergebnis", async () => {
       await navigateToSearch(page)

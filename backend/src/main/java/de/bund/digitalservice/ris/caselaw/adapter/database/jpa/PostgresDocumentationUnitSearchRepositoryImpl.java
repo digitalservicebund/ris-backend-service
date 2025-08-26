@@ -90,6 +90,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     predicates.addAll(getIsResolvedPredicates(parameters, cb, root));
     predicates.addAll(getFileNumberPredicates(parameters, cq, cb, root));
     predicates.addAll(getDocUnitKindPredicates(parameters, cb, root));
+    predicates.addAll(getProcessStepPredicates(parameters, cb, root));
 
     // Use cb.construct() to only select the DTO projection instead of the full entity
     cq.select(root).where(predicates.toArray(new Predicate[0]));
@@ -452,6 +453,21 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     return predicates;
   }
 
+  private List<Predicate> getProcessStepPredicates(
+      SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
+    List<Predicate> predicates = new ArrayList<>();
+    if (parameters.processStepId.isPresent()) {
+      Predicate processStepPredicate =
+          cb.equal(
+              root.get(DocumentationUnitDTO_.currentProcessStep)
+                  .get(DocumentationUnitProcessStepDTO_.processStep)
+                  .get(ProcessStepDTO_.id),
+              parameters.processStepId.get());
+      predicates.add(processStepPredicate);
+    }
+    return predicates;
+  }
+
   @NotNull
   private List<Order> getOrderCriteria(
       SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
@@ -502,6 +518,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .inboxStatus(Optional.ofNullable(searchInput.inboxStatus()))
         .documentationOfficeDTO(documentationOfficeDTO)
         .kind(Optional.ofNullable(searchInput.kind()))
+        .processStepId(Optional.ofNullable(searchInput.processStepId()))
         .build();
   }
 
@@ -524,5 +541,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       boolean isResolved,
       Optional<InboxStatus> inboxStatus,
       DocumentationOfficeDTO documentationOfficeDTO,
-      Optional<Kind> kind) {}
+      Optional<Kind> kind,
+      Optional<UUID> processStepId) {}
 }

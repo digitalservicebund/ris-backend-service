@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useScrollLock } from "@vueuse/core"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjsTimezone from "dayjs/plugin/timezone"
@@ -8,11 +7,12 @@ import dayjsUtc from "dayjs/plugin/utc"
 import Button from "primevue/button"
 import Column from "primevue/column"
 import DataTable from "primevue/datatable"
-import { computed, ref, watch, onMounted, onUnmounted } from "vue"
+import { computed, ref, onMounted, onUnmounted } from "vue"
 
+import AssigneeBadge from "@/components/AssigneeBadge.vue"
+import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
-import PopupModal from "@/components/PopupModal.vue"
 
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { Kind } from "@/domain/documentationUnitKind"
@@ -20,7 +20,6 @@ import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
 
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
-import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
 import IconSubject from "~icons/ic/baseline-subject"
 import IconNote from "~icons/ic/outline-comment-bank"
@@ -37,7 +36,6 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   updatePage: [number]
-  deleteDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
 // Extend Day.js with necessary plugins for proper date handling and timezones
 dayjs.extend(dayjsUtc)
@@ -50,14 +48,6 @@ const isPendingProceeding = computed(
 const isDecision = computed(() => props.kind === Kind.DECISION)
 
 const entries = computed(() => props.pageEntries?.content || [])
-
-const showDeleteModal = ref(false)
-const selectedDocumentUnitListEntry = ref<DocumentUnitListEntry>()
-const popupModalText = computed(
-  () =>
-    `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry?.value?.documentNumber} wirklich dauerhaft löschen?`,
-)
-const scrollLock = useScrollLock(document)
 
 // --- START: sticky header logic ---
 
@@ -138,29 +128,6 @@ const getRouterLinkTo = (
   }
 }
 
-/**
- * Clicking on a delete icon of a list entry shows a modal, which asks for user input to proceed
- * @param {DocumentUnitListEntry} documentUnitListEntry - The documentationunit list entry to be deleted
- */
-function showDeleteConfirmationDialog(
-  documentUnitListEntry: DocumentUnitListEntry,
-) {
-  selectedDocumentUnitListEntry.value = documentUnitListEntry
-  showDeleteModal.value = true
-}
-
-/**
- * Propagates delete event to parent and closes modal again
- */
-function onDelete() {
-  if (selectedDocumentUnitListEntry.value) {
-    emit("deleteDocumentationUnit", selectedDocumentUnitListEntry.value)
-    showDeleteModal.value = false
-  }
-}
-
-watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
-
 defineSlots<{
   "empty-state-content"?: (props: Record<string, never>) => unknown
 }>()
@@ -175,17 +142,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="tableWrapper" data-testId="search-result-list">
-    <PopupModal
-      v-if="showDeleteModal"
-      aria-label="Dokumentationseinheit löschen"
-      :content-text="popupModalText"
-      header-text="Dokumentationseinheit löschen"
-      primary-button-text="Löschen"
-      primary-button-type="destructive"
-      @close-modal="showDeleteModal = false"
-      @primary-action="onDelete"
-    />
+  <div ref="tableWrapper" class="w-[95vw]" data-testId="search-result-list">
     <Pagination
       :is-loading="loading"
       navigation-position="bottom"
@@ -196,6 +153,7 @@ onUnmounted(() => {
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
+              <IconError v-if="item.status?.withError" class="text-red-900" />
               <div class="min-w-[130px]">{{ item.documentNumber }}</div>
               <template v-if="isDecision">
                 <span
@@ -268,17 +226,13 @@ onUnmounted(() => {
           </template>
         </Column>
 
-        <Column field="court.type" header="Gerichtstyp">
+        <Column field="court" header="Gericht">
           <template #body="{ data: item }">
-            <div class="flex flex-row items-center gap-8">
-              <div>{{ item.court?.type ?? "-" }}</div>
-            </div>
-          </template>
-        </Column>
-
-        <Column v-if="isDecision" field="court.location" header="Ort">
-          <template #body="{ data: item }">
-            {{ item.court?.location ?? "-" }}
+            {{
+              [item.court?.type, item.court?.location]
+                .filter(Boolean)
+                .join(" ") || "-"
+            }}
           </template>
         </Column>
 
@@ -326,7 +280,7 @@ onUnmounted(() => {
           <template #body="{ data: item }">
             <IconBadge
               v-if="item.status?.publicationStatus"
-              class="inline-flex"
+              class="inline-flex whitespace-nowrap"
               v-bind="useStatusBadge(item.status).value"
               data-testid="publication-status"
             />
@@ -345,6 +299,28 @@ onUnmounted(() => {
                 ")"
               }}
             </span>
+          </template>
+        </Column>
+
+        <Column v-if="isDecision" header="Schritt">
+          <template #body="{ data: item }">
+            <CurrentAndLastProcessStepBadge
+              :process-steps="item.processSteps"
+            />
+          </template>
+        </Column>
+
+        <Column v-if="isDecision" header="Person">
+          <template #body="{ data: item }">
+            <AssigneeBadge
+              :name="
+                item.currentProcessStep &&
+                item.currentProcessStep.user &&
+                item.currentProcessStep.user.initials
+                  ? item.currentProcessStep.user.initials
+                  : undefined
+              "
+            />
           </template>
         </Column>
 
@@ -382,7 +358,6 @@ onUnmounted(() => {
             {{ publicationDate(item) }}
           </template>
         </Column>
-
         <Column field="actions">
           <template #header>
             <span class="sr-only">Aktionen</span>
@@ -434,26 +409,6 @@ onUnmounted(() => {
                   </template>
                 </Button>
               </router-link>
-
-              <Button
-                v-tooltip.bottom="{
-                  value: 'Löschen',
-                  appendTo: 'body',
-                }"
-                aria-label="Dokumentationseinheit löschen"
-                :disabled="
-                  !item.isDeletable ||
-                  item.status?.publicationStatus ==
-                    PublicationState.EXTERNAL_HANDOVER_PENDING
-                "
-                severity="secondary"
-                size="small"
-                @click="showDeleteConfirmationDialog(item)"
-              >
-                <template #icon>
-                  <IconDelete />
-                </template>
-              </Button>
             </div>
           </template>
         </Column>

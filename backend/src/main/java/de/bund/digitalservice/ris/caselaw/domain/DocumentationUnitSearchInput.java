@@ -23,4 +23,5 @@ public record DocumentationUnitSearchInput(
     LocalDate resolutionDateEnd,
     boolean isResolved,
     InboxStatus inboxStatus,
-    Kind kind) {}
+    Kind kind,
+    UUID processStepId) {}

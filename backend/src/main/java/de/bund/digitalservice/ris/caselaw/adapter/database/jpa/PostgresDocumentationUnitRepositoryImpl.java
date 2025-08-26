@@ -119,6 +119,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         databaseDocumentationUnitProcessStepRepository;
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
+  @Override
+  public UUID findIdForDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException {
+    return repository
+        .findIdByDocumentNumber(documentNumber)
+        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+  }
+
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit findByDocumentNumber(String documentNumber)
@@ -632,7 +641,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         .map(
             processStepDTO ->
                 String.format(
-                    "Schritt geändert: %s -> %s",
+                    "Schritt geändert: %s → %s",
                     processStepDTO.getName(), toProcess.get().getName()))
         .orElseGet(() -> "Schritt gesetzt: " + toProcess.get().getName());
   }
@@ -848,7 +857,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                   documentationUnitDTO.getId(),
                   user,
                   HistoryLogEventType.DOCUMENTATION_OFFICE,
-                  "Dokstelle geändert: [%s] → [%s]"
+                  "Dokstelle geändert: %s → %s"
                       .formatted(
                           previousDocumentationOffice.getAbbreviation(),
                           newDocumentationOffice.abbreviation()));
@@ -1051,10 +1060,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         documentationUnitId,
         null,
         HistoryLogEventType.PORTAL_PUBLICATION,
-        "Status im Portal geändert: "
-            + oldStatus.humanReadable
-            + " → "
-            + PortalPublicationStatus.PUBLISHED.humanReadable);
+        "Status im Portal geändert: " + oldStatus.humanReadable + " → " + newStatus.humanReadable);
 
     if (documentationUnitDTO instanceof DecisionDTO decisionDTO) {
       documentationUnitDTO = decisionDTO.toBuilder().portalPublicationStatus(newStatus).build();

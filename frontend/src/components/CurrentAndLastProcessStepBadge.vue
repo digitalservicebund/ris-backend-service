@@ -25,7 +25,7 @@ const lastProcessBadge = computed(() =>
 </script>
 
 <template>
-  <div class="ml-12 flex flex-row">
+  <div class="flex flex-row">
     <IconBadge
       v-if="lastProcessStep && lastProcessBadge"
       v-bind="lastProcessBadge"

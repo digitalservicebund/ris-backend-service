@@ -234,6 +234,16 @@ test.describe("document unit search queries", () => {
       maxDuration: 600, // last max 799, average 505, min 463
       minResults: 3,
     },
+    {
+      title: "with process step",
+      parameter: {
+        myDocOfficeOnly: "true",
+        processStepId: "24e751b0-d5e6-49c1-983a-924a320f2ff7", // ersterfassung
+        kind: "DECISION",
+      },
+      maxDuration: 600, // last max 799, average 505, min 463
+      minResults: 3,
+    },
   ]
 
   const externalConfigurations = testConfigurations.filter(

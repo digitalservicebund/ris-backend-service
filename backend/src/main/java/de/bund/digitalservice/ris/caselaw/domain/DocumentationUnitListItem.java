@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -24,6 +25,8 @@ import lombok.Builder;
  * @param hasAttachments Search result has attachments
  * @param hasHeadnoteOrPrinciple Search result has headnote or principle
  * @param source the source the documentation unit was created from
+ * @param processSteps (Prozessschritte) history of the search result
+ * @param currentProcessStep (Prozessschritt) of the search result
  * @param creatingDocumentationOffice The documentation office that created the documentation unit
  * @param isDeletable User can delete the documentation unit
  * @param isEditable User can edit the documentation unit
@@ -51,4 +54,6 @@ public record DocumentationUnitListItem(
     UserGroup assignedUserGroup,
     String note,
     Boolean isDeletable,
-    Boolean isEditable) {}
+    Boolean isEditable,
+    List<DocumentationUnitProcessStep> processSteps,
+    DocumentationUnitProcessStep currentProcessStep) {}

@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import java.util.List;
@@ -39,8 +38,7 @@ class PortalSanityCheckServiceTest {
   }
 
   @Test
-  void testphaseSanityCheck_shouldDeleteDocumentNumbersInPortalButNotInRii()
-      throws JsonProcessingException {
+  void testphaseSanityCheck_shouldDeleteDocumentNumbersInPortalButNotInRii() {
     when(env.matchesProfiles("production")).thenReturn(true);
     when(riiService.fetchRiiDocumentNumbers()).thenReturn(List.of("123", "456"));
     when(portalBucket.getAllFilenames()).thenReturn(List.of("123.xml", "456.xml", "789.xml"));
@@ -51,7 +49,7 @@ class PortalSanityCheckServiceTest {
   }
 
   @Test
-  void testphaseSanityCheck_shouldNotRunOnOtherEnvs() throws JsonProcessingException {
+  void testphaseSanityCheck_shouldNotRunOnOtherEnvs() {
     when(env.matchesProfiles("production")).thenReturn(false);
     when(riiService.fetchRiiDocumentNumbers()).thenReturn(List.of("123", "456"));
     when(portalBucket.getAllFilenames()).thenReturn(List.of("123.xml", "456.xml", "789.xml"));

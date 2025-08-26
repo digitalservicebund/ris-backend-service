@@ -35,9 +35,27 @@ const mockEntries = [
       publicationStatus: PublicationState.UNPUBLISHED,
       withError: true,
     },
+    currentProcessStep: generateProcessStep(),
+    processSteps: [generateProcessStep()],
     resolutionDate: "2000-04-06",
   }),
 ]
+
+function generateProcessStep() {
+  return {
+    user: {
+      id: "2",
+      initials: "TN",
+      name: "Test Name",
+    },
+    processStep: {
+      uuid: "3",
+      name: "Ersterfassung",
+      abbreviation: "EF",
+    },
+  }
+}
+
 const pageEntries: Page<DocumentUnitListEntry> = {
   content: mockEntries,
   size: 2,
@@ -87,52 +105,10 @@ describe("Search Result List", () => {
     expect(rows[2]).toHaveTextContent("DEF456")
   })
 
-  it("opens delete modal on delete button click and emits delete event", async () => {
-    const { user, emitted } = renderComponent()
-    const deleteButtons = screen.getAllByRole("button", {
-      name: "Dokumentationseinheit löschen",
-    })
-
-    await user.click(deleteButtons[0])
-    expect(
-      screen.getByText(
-        "Möchten Sie die Dokumentationseinheit ABC123 wirklich dauerhaft löschen?",
-      ),
-    ).toBeVisible()
-
-    await user.click(screen.getByLabelText("Löschen"))
-    expect(emitted()["deleteDocumentationUnit"]).toEqual([
-      [
-        {
-          appraisalBody: undefined,
-          court: {
-            label: "BGH",
-            location: "",
-            type: "BGH",
-          },
-          createdAt: undefined,
-          creatingDocumentationOffice: undefined,
-          decisionDate: undefined,
-          documentNumber: "ABC123",
-          documentType: undefined,
-          fileNumber: undefined,
-          hasAttachments: true,
-          hasHeadnoteOrPrinciple: false,
-          id: undefined,
-          isDeletable: true,
-          isEditable: true,
-          lastPublicationDateTime: undefined,
-          note: undefined,
-          resolutionDate: "2025-05-06",
-          scheduledPublicationDateTime: undefined,
-          source: undefined,
-          status: {
-            publicationStatus: "PUBLISHED",
-            withError: false,
-          },
-          uuid: "1",
-        },
-      ],
-    ])
+  it("displays current user of process step", () => {
+    renderComponent({ kind: Kind.DECISION })
+    const rowWithProcessStep = screen.getAllByRole("row")[2]
+    expect(rowWithProcessStep).toHaveTextContent("Ersterfassung")
+    expect(rowWithProcessStep).toHaveTextContent("TN")
   })
 })

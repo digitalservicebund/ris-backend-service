@@ -25,6 +25,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.context.annotation.Lazy;
@@ -286,6 +288,7 @@ public class DocumentationUnitService {
     }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
 
+    retrieveProcessStepsUsers(newDocumentationUnit);
     return (Decision) newDocumentationUnit;
   }
 
@@ -334,7 +337,8 @@ public class DocumentationUnitService {
       Optional<LocalDate> resolutionDateEnd,
       Optional<Boolean> isResolved,
       Optional<InboxStatus> inboxStatus,
-      Optional<Kind> kind) {
+      Optional<Kind> kind,
+      Optional<UUID> processStepId) {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
@@ -361,6 +365,7 @@ public class DocumentationUnitService {
             .resolutionDateEnd(resolutionDateEnd.orElse(null))
             .isResolved(isResolved.orElse(false))
             .kind(kind.orElse(null))
+            .processStepId(processStepId.orElse(null))
             .build();
 
     Slice<DocumentationUnitListItem> documentationUnitListItems;
@@ -386,7 +391,8 @@ public class DocumentationUnitService {
               oidcUser);
     }
 
-    return documentationUnitListItems.map(item -> addPermissions(oidcUser, item));
+    return retrieveCurrentProcessStepUser(
+        documentationUnitListItems.map(item -> addPermissions(oidcUser, item)), oidcUser);
   }
 
   public DocumentationUnitListItem takeOverDocumentationUnit(
@@ -469,6 +475,23 @@ public class DocumentationUnitService {
     }
   }
 
+  private Slice<DocumentationUnitListItem> retrieveCurrentProcessStepUser(
+      Slice<DocumentationUnitListItem> documentationUnitListItems, OidcUser oidcUser) {
+
+    Map<UUID, User> userIdMap =
+        userService.getUsers(oidcUser).stream()
+            .collect(Collectors.toMap(User::id, Function.identity()));
+
+    return documentationUnitListItems.map(
+        item -> {
+          Optional.ofNullable(item.currentProcessStep())
+              .map(DocumentationUnitProcessStep::getUser)
+              .map(user -> userIdMap.get(user.id()))
+              .ifPresent(user -> item.currentProcessStep().setUser(user));
+          return item;
+        });
+  }
+
   private DocumentationUnit filterProcessStepsOfOtherDocumentationOffices(
       DocumentationUnit documentable, User user) {
 
@@ -515,12 +538,17 @@ public class DocumentationUnitService {
   }
 
   private void retrieveProcessStepsUsers(DocumentationUnit documentable) {
+    if (documentable == null) {
+      return;
+    }
+
     if (documentable.currentProcessStep() != null
         && documentable.currentProcessStep().getUser() != null) {
       documentable
           .currentProcessStep()
           .setUser(userService.getUser(documentable.currentProcessStep().getUser().id()));
     }
+
     if (documentable.processSteps() != null) {
       documentable
           .processSteps()
@@ -825,7 +853,6 @@ public class DocumentationUnitService {
               .currentProcessStep(
                   DocumentationUnitProcessStep.builder()
                       .id(UUID.randomUUID())
-                      .user(user)
                       .createdAt(LocalDateTime.now())
                       .processStep(
                           processStepService
@@ -885,14 +912,14 @@ public class DocumentationUnitService {
 
   public Image getImageBytes(String documentNumber, String imageName)
       throws ImageNotExistsException, DocumentationUnitNotExistsException {
-    var docUnit = getByDocumentNumber(documentNumber);
+    var docUnitId = repository.findIdForDocumentNumber(documentNumber);
     return attachmentService
-        .findByDocumentationUnitIdAndFileName(docUnit.uuid(), imageName)
+        .findByDocumentationUnitIdAndFileName(docUnitId, imageName)
         .orElseThrow(
             () ->
                 new ImageNotExistsException(
                     "Image not found for documentation unit: "
-                        + docUnit.uuid()
+                        + docUnitId
                         + " and image name: "
                         + imageName));
   }

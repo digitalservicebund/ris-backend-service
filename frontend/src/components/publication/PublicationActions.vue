@@ -54,7 +54,11 @@ const isWithdrawing = ref(false)
 const withdrawDocUnit = async () => {
   docUnitPublicationError.value = null
   isWithdrawing.value = true
-  await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulate API call
+  const { error } = await publishDocumentationUnitService.withdrawDocument(
+    store.documentUnit!.uuid!,
+  )
+  docUnitPublicationError.value = error ?? null
+  await store.loadDocumentUnit(decision.value.documentNumber)
   isWithdrawing.value = false
 }
 </script>

@@ -65,6 +65,9 @@ public class DocumentationUnitListItemTransformer {
                 : documentationUnitListItemDTO.getFileNumbers().get(0).getValue())
         .status(StatusTransformer.transformToDomain(documentationUnitListItemDTO.getStatus()))
         .note(documentationUnitListItemDTO.getNote())
+        .currentProcessStep(
+            DocumentationUnitProcessStepTransformer.toDomain(
+                documentationUnitListItemDTO.getCurrentProcessStep()))
         .creatingDocumentationOffice(
             documentationUnitListItemDTO.getCreatingDocumentationOffice() == null
                 ? null
@@ -89,7 +92,11 @@ public class DocumentationUnitListItemTransformer {
                                         + " "
                                         + referenceDTO.getCitation())
                             .orElse(String.valueOf(source.getValue())))
-                .collect(Collectors.joining(", ")));
+                .collect(Collectors.joining(", ")))
+        .processSteps(
+            documentationUnitListItemDTO.getProcessSteps().stream()
+                .map(DocumentationUnitProcessStepTransformer::toDomain)
+                .toList());
 
     ManagementDataDTO managementData = documentationUnitListItemDTO.getManagementData();
     if (managementData != null) {

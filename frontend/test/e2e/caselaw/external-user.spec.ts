@@ -29,7 +29,7 @@ test.describe(
     const procedurePrefix = generateString({ length: 10 })
 
     test(
-      "In doc unit search, external user can not edit/delete unassigned doc units, but preview them",
+      "In doc unit search, external user can not edit unassigned doc units, but preview them",
       { tag: ["@RISDEV-4518", "@RISDEV-4519"] },
       async ({ pageWithExternalUser, documentNumber }) => {
         await test.step("Filter for unassigned doc unit and view in search results as external", async () => {
@@ -45,7 +45,7 @@ test.describe(
           ).toBeVisible()
         })
 
-        await test.step("Check edit/delete/preview buttons for doc unit in search result", async () => {
+        await test.step("Check edit/preview buttons for doc unit in search result", async () => {
           // Preview is allowed
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit ansehen"),
@@ -54,12 +54,9 @@ test.describe(
             pageWithExternalUser.getByLabel("Dokumentationseinheit ansehen"),
           ).toBeEnabled()
 
-          // Edit/delete is not allowed
+          // Edit is not allowed
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit bearbeiten"),
-          ).toBeDisabled()
-          await expect(
-            pageWithExternalUser.getByLabel("Dokumentationseinheit löschen"),
           ).toBeDisabled()
         })
       },
@@ -90,7 +87,7 @@ test.describe(
           ).toBeVisible()
         })
 
-        await test.step("Check edit/delete/preview buttons for doc unit in search result", async () => {
+        await test.step("Check edit/preview buttons for doc unit in search result", async () => {
           // Edit/Preview is allowed
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit bearbeiten"),
@@ -98,11 +95,6 @@ test.describe(
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit ansehen"),
           ).toBeEnabled()
-
-          // Delete is not allowed
-          await expect(
-            pageWithExternalUser.getByLabel("Dokumentationseinheit löschen"),
-          ).toBeDisabled()
         })
 
         await unassignUserGroupFromProcedure(page, procedureName)
@@ -153,14 +145,11 @@ test.describe(
           ).toContainText(procedureName)
         })
 
-        await test.step("External user can edit but not delete doc units from procedure view", async () => {
+        await test.step("External user can edit doc units from procedure view", async () => {
           await pageWithExternalUser.getByLabel("Vorgang Listenelement").click()
           await expect(
             pageWithExternalUser.getByLabel("Dokumentationseinheit bearbeiten"),
           ).toBeEnabled()
-          await expect(
-            pageWithExternalUser.getByLabel("Dokumentationseinheit löschen"),
-          ).toBeDisabled()
         })
       },
     )

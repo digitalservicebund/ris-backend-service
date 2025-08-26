@@ -5,7 +5,7 @@ import { config } from "@vue/test-utils"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
-import { afterEach, beforeEach, expect, MockInstance, vi } from "vitest"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 import { Component, Directive } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { Page } from "@/components/Pagination.vue"
@@ -66,9 +66,6 @@ function renderComponent(
 }
 
 describe("Pending Proceeding Search", () => {
-  let deleteSpy: MockInstance<
-    (uuid: string) => Promise<ServiceResponse<unknown>>
-  >
   beforeAll(() => server.listen())
   afterAll(() => server.close())
   beforeEach(() => {
@@ -79,7 +76,6 @@ describe("Pending Proceeding Search", () => {
     config.global.stubs = {
       InputMask: InputText,
     }
-    deleteSpy = vi.spyOn(documentUnitService, "delete")
     vi.resetAllMocks()
   })
 
@@ -96,33 +92,6 @@ describe("Pending Proceeding Search", () => {
 
     expect(screen.getByTestId("pending-proceeding-search")).toBeInTheDocument()
     expect(screen.getByTestId("search-result-list")).toBeInTheDocument()
-  })
-
-  it("triggers another search when last item was deleted", async () => {
-    // Arrange
-    vi.clearAllMocks()
-    const searchSpy = mockOneSearchResult()
-    deleteSpy.mockResolvedValue({
-      status: 200,
-      data: {},
-    })
-    const { user } = renderComponent(
-      { isInternal: true },
-      {
-        ResultList: {
-          template: `<button aria-label="Dokumentationseinheit löschen" @click="$emit('delete-documentation-unit', { uuid: '123' })">Delete</button>
-              `,
-        },
-      },
-    )
-    await user.type(screen.getByLabelText("Aktenzeichen Suche"), "TEST")
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
-
-    // Act
-    await user.click(screen.getByLabelText("Dokumentationseinheit löschen"))
-
-    // Assert
-    expect(searchSpy).toBeCalledTimes(2)
   })
 
   it("calls service on search and shows error modal on error", async () => {
@@ -251,64 +220,6 @@ describe("Pending Proceeding Search", () => {
     ).toBeVisible()
   })
 
-  it("should call the service on delete with valid input and not show an error on success", async () => {
-    // Arrange
-    mockOneSearchResult()
-    deleteSpy.mockResolvedValue({
-      status: 200,
-      data: {},
-    })
-    const { user } = renderComponent(
-      { isInternal: true },
-      {
-        ResultList: {
-          template: `<button aria-label="Dokumentationseinheit löschen" @click="$emit('delete-documentation-unit', { uuid: '123' })">Delete</button>
-              `,
-        },
-      },
-    )
-    await user.type(screen.getByLabelText("Aktenzeichen Suche"), "TEST")
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
-    const deleteButton = screen.getByLabelText("Dokumentationseinheit löschen")
-
-    // Act
-    await user.click(deleteButton)
-
-    // Assert
-    expect(deleteSpy).toHaveBeenCalledExactlyOnceWith("123")
-  })
-
-  it("displays error on deletion", async () => {
-    // Arrange
-    mockOneSearchResult()
-    deleteSpy.mockResolvedValue({
-      status: 400,
-      error: {
-        title: errorMessages.DOCUMENT_UNIT_DELETE_FAILED.title,
-      },
-    })
-    const { user } = renderComponent(
-      { isInternal: true },
-      {
-        ResultList: {
-          template: `<button aria-label="Dokumentationseinheit löschen" @click="$emit('delete-documentation-unit', { uuid: '123' })">Delete</button>
-              `,
-        },
-      },
-    )
-    await user.type(screen.getByLabelText("Aktenzeichen Suche"), "TEST")
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
-    const deleteButton = screen.getByLabelText("Dokumentationseinheit löschen")
-
-    // Act
-    await user.click(deleteButton)
-
-    // Assert
-    expect(
-      screen.getByText(errorMessages.DOCUMENT_UNIT_DELETE_FAILED.title),
-    ).toBeVisible()
-  })
-
   it("displays court search result", async () => {
     // Arrange
     vi.spyOn(
@@ -356,33 +267,6 @@ describe("Pending Proceeding Search", () => {
     expect(screen.getAllByRole("row").length).toBe(2) // including header
     expect(screen.getAllByText("documentNumber").length).toBe(1)
   })
-
-  function mockOneSearchResult() {
-    return vi
-      .spyOn(documentUnitService, "searchByDocumentUnitSearchInput")
-      .mockImplementation(() =>
-        Promise.resolve({
-          status: 200,
-          data: {
-            content: [
-              new DocumentUnitListEntry({
-                uuid: "123",
-                decisionDate: "01.02.2022",
-                documentNumber: "documentNumber",
-                scheduledPublicationDateTime: "2000-11-23T10:04:22.603",
-                resolutionDate: "01.06.2024",
-              }),
-            ],
-            size: 10,
-            number: 0,
-            numberOfElements: 1,
-            first: true,
-            last: false,
-            empty: false,
-          },
-        }),
-      )
-  }
 
   function mockNoSearchResult() {
     vi.spyOn(
