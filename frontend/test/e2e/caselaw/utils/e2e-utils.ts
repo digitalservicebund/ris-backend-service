@@ -1061,8 +1061,14 @@ export async function checkContentOfDecisionResultRow(
   const appraisalBodyCell = listRow.getByRole("cell").nth(4)
   const documentTypCell = listRow.getByRole("cell").nth(5)
   const statusCell = listRow.getByRole("cell").nth(6)
-  const errorCell = listRow.getByRole("cell").nth(7)
 
+  await test.step("Fehler", async () => {
+    if (expectedItem.status?.withError) {
+      await expect(docNumberCell.locator("div > svg:first-child")).toBeVisible()
+    } else {
+      await expect(docNumberCell.locator("div > svg:first-child")).toBeHidden()
+    }
+  })
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
@@ -1099,11 +1105,6 @@ export async function checkContentOfDecisionResultRow(
       expectedItem.status?.publicationStatus === PublicationState.UNPUBLISHED
         ? "Unveröffentlicht"
         : "Veröffentlicht",
-    )
-  })
-  await test.step("Fehler", async () => {
-    await expect(errorCell).toHaveText(
-      expectedItem.status?.withError ? "Fehler" : "-",
     )
   })
 
