@@ -106,8 +106,6 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
     "rendering initial state, select user, click on 'Weitergeben', validate logs in dialog",
     { tag: ["@RISDEV-8566"] },
     async ({ pageWithBghUser }) => {
-      const infoPanel = pageWithBghUser.getByTestId("document-unit-info-panel")
-
       await test.step("Create a new decision with BGH court", async () => {
         await navigateToSearch(pageWithBghUser)
         await pageWithBghUser
@@ -115,7 +113,11 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
           .first()
           .click()
 
+        const infoPanel = pageWithBghUser.getByTestId(
+          "document-unit-info-panel",
+        )
         await expect(infoPanel).toContainText("Ersterfassung")
+        await expect(infoPanel).toContainText("BGH  testUser")
       })
 
       await test.step("Open process step dialog", async () => {
@@ -131,6 +133,9 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
       })
 
       await test.step("Validate process step is displayed in info panel", async () => {
+        const infoPanel = pageWithBghUser.getByTestId(
+          "document-unit-info-panel",
+        )
         await expect(infoPanel).toContainText("QS formal")
         await expect(infoPanel).toContainText("BGH  testUser")
       })
@@ -148,6 +153,77 @@ test.describe("process steps", { tag: ["@RISDEV-8565"] }, () => {
 
       await test.step("Close process step dialog", async () => {
         await closeProcessStepDialog(pageWithBghUser)
+      })
+    },
+  )
+
+  test(
+    "does not update the current and last process badges in info panel, if only the user changes",
+    { tag: ["@RISDEV-8566"] },
+    async ({ pageWithBghUser }) => {
+      await test.step("Create a new decision with BGH court", async () => {
+        await navigateToSearch(pageWithBghUser)
+        await pageWithBghUser
+          .getByRole("button", { name: "Neue Entscheidung" })
+          .first()
+          .click()
+
+        const infoPanel = pageWithBghUser.getByTestId(
+          "document-unit-info-panel",
+        )
+
+        await expect(infoPanel).toContainText("Ersterfassung")
+        await expect(infoPanel).toContainText("BGH  testUser")
+      })
+
+      await test.step("Set next process step 'QS formal' with same user", async () => {
+        await openProcessStepDialog(pageWithBghUser)
+        const processStepDropBox = pageWithBghUser.getByRole("combobox", {
+          name: "Neuer Schritt",
+        })
+        await expect(processStepDropBox).toContainText("QS formal")
+        await selectUser(pageWithBghUser, "BGH", "BGH  testUser", "BT")
+        await saveChangesAndCloseDialog(pageWithBghUser)
+      })
+
+      await test.step("Expect info panel to contain 'Ersterfassung' as previous and 'QS formal' as current step", async () => {
+        const infoPanel = pageWithBghUser.getByTestId(
+          "document-unit-info-panel",
+        )
+
+        // previous step in short form
+        await expect(infoPanel).toContainText("EE")
+        await expect(infoPanel).toContainText("QS formal")
+        await expect(infoPanel).toContainText("BGH  testUser")
+      })
+
+      await test.step("Manually set to current step 'QS formal', remove user", async () => {
+        await openProcessStepDialog(pageWithBghUser)
+        const processStepDropBox = pageWithBghUser.getByRole("combobox", {
+          name: "Neuer Schritt",
+        })
+        await expect(processStepDropBox).toContainText("Fachdokumentation")
+
+        await processStepDropBox.click()
+        await pageWithBghUser
+          .getByLabel("QS formal")
+          .getByText("QS formal")
+          .click()
+
+        await expect(processStepDropBox).toContainText("QS formal")
+
+        await saveChangesAndCloseDialog(pageWithBghUser)
+      })
+
+      await test.step("Expect info panel to contain 'Ersterfassung' as previous and 'QS formal' as current step", async () => {
+        const infoPanel = pageWithBghUser.getByTestId(
+          "document-unit-info-panel",
+        )
+
+        // previous step in short form
+        await expect(infoPanel).toContainText("EE")
+        await expect(infoPanel).toContainText("QS formal")
+        await expect(infoPanel).not.toContainText("BGH  testUser")
       })
     },
   )
