@@ -4,7 +4,7 @@ import Button from "primevue/button"
 import { useToast } from "primevue/usetoast"
 import { computed, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
-import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
+import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
@@ -138,7 +138,7 @@ watchEffect(() => {
         label="Fehler"
       />
 
-      <CurrentAndLastProcessStepBadge
+      <CurrentAndPreviousProcessStepBadge
         v-if="processStepsEnabled"
         :current-process-step="
           props.documentUnit.currentProcessStep?.processStep
