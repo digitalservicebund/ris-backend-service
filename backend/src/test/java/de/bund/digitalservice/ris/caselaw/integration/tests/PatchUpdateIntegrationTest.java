@@ -4604,7 +4604,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       // because no user was set in the patch, the initial user is removed
       assertThat(logs.get(0).description()).isEqualTo("Person entfernt: testUser");
       assertThat(logs.get(1).description())
-          .isEqualTo("Schritt geändert: Ersterfassung -> Fachdokumentation");
+          .isEqualTo("Schritt geändert: Ersterfassung → Fachdokumentation");
       assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
     }
 
@@ -4703,9 +4703,9 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           .map(HistoryLog::createdBy)
           .containsExactly("testUser", "testUser", "testUser");
       assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
-      assertThat(logs.get(0).description()).isEqualTo("Person geändert: testUser -> testUser2");
+      assertThat(logs.get(0).description()).isEqualTo("Person geändert: testUser → testUser2");
       assertThat(logs.get(1).description())
-          .isEqualTo("Schritt geändert: Ersterfassung -> Fachdokumentation");
+          .isEqualTo("Schritt geändert: Ersterfassung → Fachdokumentation");
       assertThat(logs.get(2).description()).isEqualTo("Dokeinheit angelegt");
     }
 

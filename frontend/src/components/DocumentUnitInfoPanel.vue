@@ -14,6 +14,7 @@ import { useStatusBadge } from "@/composables/useStatusBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import { isDecision } from "@/utils/typeGuards"
 import IconError from "~icons/ic/baseline-error"
+import IconPerson from "~icons/ic/baseline-person"
 import IconApprovalDelegation from "~icons/material-symbols/approval-delegation-outline"
 
 const props = defineProps<{
@@ -104,25 +105,36 @@ watchEffect(() => {
     >
       {{ formattedInfo }}</span
     >
-    <IconBadge
-      v-if="statusBadge"
-      :background-color="statusBadge.backgroundColor"
-      class="ml-12"
-      :icon="toRaw(statusBadge.icon)"
-      :label="statusBadge.label"
-    />
-    <IconBadge
-      v-if="hasErrorStatus"
-      background-color="bg-red-300"
-      class="ml-12"
-      :icon="IconError"
-      icon-color="text-red-900"
-      label="Fehler"
-    />
-    <CurrentAndLastProcessStepBadge
-      v-if="processStepsEnabled"
-      :process-steps="props.documentUnit.processSteps"
-    />
+    <div class="flex flex-row gap-12">
+      <IconBadge
+        v-if="statusBadge"
+        :background-color="statusBadge.backgroundColor"
+        class="ml-12"
+        :icon="toRaw(statusBadge.icon)"
+        :label="statusBadge.label"
+      />
+      <IconBadge
+        v-if="hasErrorStatus"
+        background-color="bg-red-300"
+        :icon="IconError"
+        icon-color="text-red-900"
+        label="Fehler"
+      />
+      <CurrentAndLastProcessStepBadge
+        v-if="processStepsEnabled"
+        :process-steps="props.documentUnit.processSteps"
+      />
+      <IconBadge
+        v-if="
+          props.documentUnit.currentProcessStep &&
+          props.documentUnit.currentProcessStep.user
+        "
+        background-color="bg-white"
+        border-color="border-gray-800"
+        :icon="IconPerson"
+        :label="props.documentUnit.currentProcessStep.user.name"
+      />
+    </div>
 
     <span class="flex-grow"></span>
     <div

@@ -10,7 +10,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -165,7 +165,7 @@ class PortalPublicationServiceTest {
             testDocumentUnit.uuid(),
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit veröffentlicht");
+            "Dokeinheit im Portal veröffentlicht");
     verify(documentationUnitRepository)
         .updatePortalPublicationStatus(testDocumentUnit.uuid(), PortalPublicationStatus.PUBLISHED);
   }
@@ -210,8 +210,8 @@ class PortalPublicationServiceTest {
 
     subject.publishDocumentationUnit(testDocumentNumber);
 
-    verify(caseLawBucket, times(1)).save(withPrefix(testDocumentNumber), transformed);
-    verify(caseLawBucket, times(1)).saveBytes(testDocumentNumber + "/bild1.png", content);
+    verify(caseLawBucket).save(withPrefix(testDocumentNumber), transformed);
+    verify(caseLawBucket).saveBytes(testDocumentNumber + "/bild1.png", content);
     verify(caseLawBucket, never())
         .saveBytes(eq(testDocumentNumber + "/originalenscheidung"), any(byte[].class));
   }
@@ -234,7 +234,7 @@ class PortalPublicationServiceTest {
             documentationUnitId,
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit konnte nicht veröffentlicht werden");
+            "Dokeinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
@@ -255,7 +255,7 @@ class PortalPublicationServiceTest {
             documentationUnitId,
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit konnte nicht veröffentlicht werden");
+            "Dokeinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
@@ -281,7 +281,7 @@ class PortalPublicationServiceTest {
             documentationUnitId,
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit konnte nicht veröffentlicht werden");
+            "Dokeinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
@@ -306,7 +306,7 @@ class PortalPublicationServiceTest {
             documentationUnitId,
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit konnte nicht veröffentlicht werden");
+            "Dokeinheit konnte nicht veröffentlicht werden");
   }
 
   @Test
@@ -390,17 +390,17 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void delete_shouldDeleteFromBucket() {
+  void withdraw_shouldDeleteFromBucket() {
     when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
         .thenReturn(List.of(withPrefix(testDocumentNumber)));
 
     subject.withdrawDocumentationUnit(testDocumentNumber);
 
-    verify(caseLawBucket, times(1)).delete(withPrefix(testDocumentNumber));
+    verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
   }
 
   @Test
-  void delete_withBucketException_shouldThrowPublishException() {
+  void withdraw_withBucketException_shouldThrowPublishException() {
     when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
         .thenReturn(List.of(withPrefix(testDocumentNumber)));
     doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
@@ -408,6 +408,98 @@ class PortalPublicationServiceTest {
     assertThatExceptionOfType(PublishException.class)
         .isThrownBy(() -> subject.withdrawDocumentationUnit(testDocumentNumber))
         .withMessageContaining("Could not delete LDML from bucket.");
+  }
+
+  @Test
+  void withdrawWithChangelog_shouldDeleteFromBucketAndWriteDeletionChangelog()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
+    Decision decision =
+        Decision.builder()
+            .uuid(UUID.randomUUID())
+            .documentNumber(testDocumentNumber)
+            .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+            .build();
+    when(documentationUnitRepository.findByUuid(decision.uuid())).thenReturn(decision);
+    when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(withPrefix(testDocumentNumber)));
+    User user = mock(User.class);
+    var changelogContent =
+        """
+        {"changed":[],"deleted":[TEST123456789/TEST123456789.xml]}
+        """;
+    when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
+
+    subject.withdrawDocumentationUnitWithChangelog(decision.uuid(), user);
+
+    verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
+    verify(caseLawBucket)
+        .save(
+            contains("changelog"),
+            contains("\"deleted\":[" + withPrefix(testDocumentNumber) + "]"));
+    verify(historyLogService)
+        .saveHistoryLog(
+            decision.uuid(),
+            user,
+            HistoryLogEventType.PORTAL_PUBLICATION,
+            "Dokeinheit wurde aus dem Portal zurückgezogen");
+    verify(documentationUnitRepository)
+        .updatePortalPublicationStatus(decision.uuid(), PortalPublicationStatus.WITHDRAWN);
+  }
+
+  @Test
+  void withdrawWithChangelog_withBucketException_shouldThrowPublishException()
+      throws DocumentationUnitNotExistsException {
+    UUID uuid = UUID.randomUUID();
+    Decision decision =
+        Decision.builder()
+            .uuid(uuid)
+            .documentNumber(testDocumentNumber)
+            .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+            .build();
+    when(documentationUnitRepository.findByUuid(uuid)).thenReturn(decision);
+    when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(withPrefix(testDocumentNumber)));
+    User user = mock(User.class);
+    doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
+
+    assertThatExceptionOfType(PublishException.class)
+        .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
+        .withMessageContaining("Could not delete LDML from bucket.");
+  }
+
+  @Test
+  void withdrawWithChangelog_withJsonProcessingException_shouldThrowChangelogException()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
+    UUID uuid = UUID.randomUUID();
+    Decision decision =
+        Decision.builder()
+            .uuid(uuid)
+            .documentNumber(testDocumentNumber)
+            .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+            .build();
+    when(documentationUnitRepository.findByUuid(uuid)).thenReturn(decision);
+    when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+        .thenReturn(List.of(withPrefix(testDocumentNumber)));
+    User user = mock(User.class);
+    when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+
+    assertThatExceptionOfType(ChangelogException.class)
+        .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
+        .withMessageContaining("Could not create changelog file");
+  }
+
+  @Test
+  void
+      withdrawWithChangelog_withDocumentationNotExists_shouldThrowDocumentationUnitNotExistsException()
+          throws DocumentationUnitNotExistsException {
+    UUID uuid = UUID.randomUUID();
+    when(documentationUnitRepository.findByUuid(uuid))
+        .thenThrow(new DocumentationUnitNotExistsException());
+    User user = mock(User.class);
+
+    assertThatExceptionOfType(DocumentationUnitNotExistsException.class)
+        .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
+        .withMessageContaining("Documentation unit does not exist");
   }
 
   @Test
@@ -424,7 +516,7 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void uploadChangelog_withDisabledFeatureFlag_shouldDoNothing() throws JsonProcessingException {
+  void uploadChangelog_withDisabledFeatureFlag_shouldDoNothing() {
     when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(false);
 
     subject.uploadChangelog(List.of(), List.of());
@@ -446,8 +538,7 @@ class PortalPublicationServiceTest {
   }
 
   @Test
-  void uploadFullReindexChangelog_withRegularChangelogsEnabled_shouldNotUpload()
-      throws JsonProcessingException {
+  void uploadFullReindexChangelog_withRegularChangelogsEnabled_shouldNotUpload() {
     subject.uploadFullReindexChangelog();
 
     verify(caseLawBucket, never()).save(contains("changelogs/"), anyString());

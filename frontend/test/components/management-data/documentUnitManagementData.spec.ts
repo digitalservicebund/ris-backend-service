@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
-import { setActivePinia } from "pinia"
+import { setActivePinia, storeToRefs } from "pinia"
 import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitManagementData from "@/components/management-data/DocumentUnitManagementData.vue"
@@ -102,6 +102,43 @@ describe("management data", () => {
 
     expect(screen.getByText(`Historie`)).toBeVisible()
     expect(screen.getByText(`Änderung am`)).toBeVisible()
+  })
+
+  it("should reload history when the document unit changes", async () => {
+    // Arrange: Mock the service to spy on it
+    const getHistorySpy = vi
+      .spyOn(DocumentUnitHistoryLogService, "get")
+      .mockResolvedValue({
+        status: 200,
+        data: [{ id: "1" }],
+      })
+
+    // Act: Render with initial data. This triggers the first watcher call.
+    renderManagementData({ borderNumbers: [], duplicateRelations: [] })
+
+    // Get the store instance directly from the Pinia plugin
+    const store = useDocumentUnitStore()
+    const { documentUnit } = storeToRefs(store)
+
+    // Assert: The service should have been called once on initial load
+    expect(getHistorySpy).toHaveBeenCalledTimes(1)
+
+    documentUnit.value = {
+      ...store.documentUnit,
+      currentProcessStep: {
+        processStep: {
+          uuid: "123",
+          name: "test step",
+          abbreviation: "abc",
+        },
+      },
+    } as Decision
+
+    // Wait for the watcher to run after the state change
+    await nextTick()
+
+    // Assert: The service should have been called a second time with the updated decision
+    expect(getHistorySpy).toHaveBeenCalledTimes(2)
   })
 
   it("should show error for doc unit history", async () => {

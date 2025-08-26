@@ -76,6 +76,7 @@ async function updateProcessStep(): Promise<void> {
       })
     } else {
       emit("onProcessStepUpdated")
+      nextProcessStepUser.value = undefined
     }
   }
 }

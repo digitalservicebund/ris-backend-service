@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDele
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.ImageNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -469,6 +470,18 @@ class DocumentationUnitServiceTest {
   }
 
   @Test
+  void testGetImageBytes() throws DocumentationUnitNotExistsException, ImageNotExistsException {
+    UUID randomUUID = UUID.randomUUID();
+    when(repository.findIdForDocumentNumber("ABCDE20220001")).thenReturn(randomUUID);
+    when(attachmentService.findByDocumentationUnitIdAndFileName(randomUUID, "image1"))
+        .thenReturn(Optional.of(Image.builder().name("image1").build()));
+    Image image = service.getImageBytes("ABCDE20220001", "image1");
+    assertEquals("image1", image.getName());
+
+    verify(repository).findIdForDocumentNumber("ABCDE20220001");
+  }
+
+  @Test
   void testDeleteByUuid_withoutFileAttached() throws DocumentationUnitNotExistsException {
     // I think I shouldn't have to insert a specific DocumentationUnit object here?
     // But if I don't, the test by itself succeeds, but fails if all tests in this class run
@@ -810,6 +823,7 @@ class DocumentationUnitServiceTest {
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
+        Optional.empty(),
         Optional.empty());
     verify(docUnitSearchRepository)
         .searchByDocumentationUnitSearchInput(documentationUnitSearchInput, pageRequest, oidcUser);
@@ -836,6 +850,7 @@ class DocumentationUnitServiceTest {
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courttype\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courtlocation\u180Ewith\u2060spaces"),
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),

@@ -172,7 +172,7 @@ describe("documentUnit list", () => {
     //Spruchkörper visible
     expect(screen.getByText("cba")).toBeVisible()
 
-    // expect only one delete button for 234 documentation unit
+    // expect only one edit button for 234 documentation unit
     const enabledButtons = screen
       .getAllByRole("button", {
         name: "Dokumentationseinheit bearbeiten",
@@ -215,39 +215,6 @@ describe("documentUnit list", () => {
     ).not.toBeInTheDocument()
   })
 
-  test("delete emits event", async () => {
-    const { user, emitted } = renderComponent({
-      documentUnitListEntries: [
-        {
-          id: "id",
-          uuid: "1",
-          documentNumber: "123",
-          decisionDate: "2022-02-10",
-          fileNumber: "",
-          documentType: { label: "Test", jurisShortcut: "T" },
-          court: { type: "typeA", location: "locB", label: "typeA locB" },
-          status: {
-            publicationStatus: PublicationState.PUBLISHED,
-            withError: false,
-          },
-          isDeletable: true,
-          isEditable: true,
-        },
-      ],
-    })
-
-    expect(
-      screen.getByRole("button", { name: "Dokumentationseinheit bearbeiten" }),
-    ).toBeInTheDocument()
-
-    await screen.findByText("123")
-    await user.click(screen.getByLabelText("Dokumentationseinheit löschen"))
-    const confirmButton = screen.getByRole("button", { name: "Löschen" })
-    expect(confirmButton).toBeInTheDocument()
-    await user.click(confirmButton)
-    expect(emitted().deleteDocumentationUnit).toBeTruthy()
-  })
-
   test("disables edit button, if not editable", async () => {
     renderComponent({
       documentUnitListEntries: [
@@ -273,32 +240,7 @@ describe("documentUnit list", () => {
     ).toBeDisabled()
   })
 
-  test("disables delete button, if not deletable", async () => {
-    renderComponent({
-      documentUnitListEntries: [
-        {
-          id: "id",
-          uuid: "1",
-          documentNumber: "123",
-          decisionDate: "2022-02-10",
-          fileNumber: "",
-          documentType: { label: "Test", jurisShortcut: "T" },
-          court: { type: "typeA", location: "locB", label: "typeA locB" },
-          isDeletable: false,
-          status: {
-            publicationStatus: PublicationState.PUBLISHED,
-            withError: false,
-          },
-        },
-      ],
-    })
-
-    expect(
-      screen.getByRole("button", { name: "Dokumentationseinheit löschen" }),
-    ).toBeDisabled()
-  })
-
-  test("disables edit and delete buttons, if status equals EXTERNAL_HANDOVER_PENDING", async () => {
+  test("disables edit button, if status equals EXTERNAL_HANDOVER_PENDING", async () => {
     renderComponent({
       documentUnitListEntries: [
         {
@@ -326,10 +268,6 @@ describe("documentUnit list", () => {
 
     expect(
       screen.getByRole("button", { name: "Dokumentationseinheit bearbeiten" }),
-    ).toBeDisabled()
-
-    expect(
-      screen.getByRole("button", { name: "Dokumentationseinheit löschen" }),
     ).toBeDisabled()
   })
 

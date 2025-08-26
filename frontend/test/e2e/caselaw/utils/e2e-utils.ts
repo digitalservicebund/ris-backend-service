@@ -995,19 +995,27 @@ export async function checkContentOfPendingProceedingResultRow(
   expectedItem: PendingProceeding,
 ) {
   const docNumberCell = listRow.getByRole("cell").nth(0)
-  const courtTypeCell = listRow.getByRole("cell").nth(1)
+  const courtCell = listRow.getByRole("cell").nth(1)
   const decisionDateCell = listRow.getByRole("cell").nth(2)
   const fileNumberCell = listRow.getByRole("cell").nth(3)
   const statusCell = listRow.getByRole("cell").nth(4)
-  const errorCell = listRow.getByRole("cell").nth(5)
-  const resolutionDateCell = listRow.getByRole("cell").nth(6)
+  const resolutionDateCell = listRow.getByRole("cell").nth(5)
 
+  await test.step("Fehler", async () => {
+    if (expectedItem.status?.withError) {
+      await expect(docNumberCell.locator("div > svg:first-child")).toBeVisible()
+    } else {
+      await expect(docNumberCell.locator("div > svg:first-child")).toBeHidden()
+    }
+  })
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
-  await test.step("Gerichtstyp", async () => {
-    await expect(courtTypeCell).toHaveText(
-      expectedItem.coreData.court?.type ?? "-",
+  await test.step("Gericht", async () => {
+    await expect(courtCell).toHaveText(
+      [expectedItem.coreData.court?.type, expectedItem.coreData.court?.location]
+        .filter(Boolean)
+        .join(" ") || "-",
     )
   })
   await test.step("Mitteilungsdatum", async () => {
@@ -1024,9 +1032,6 @@ export async function checkContentOfPendingProceedingResultRow(
   await test.step("Veröffentlichungsstatus", async () => {
     await expect(statusCell).toHaveText("Unveröffentlicht")
   })
-  await test.step("Fehler", async () => {
-    await expect(errorCell).toHaveText("-")
-  })
 
   await test.step("Erledigungsmitteilung", async () => {
     const formattedResolutionDate = expectedItem.coreData.resolutionDate
@@ -1035,15 +1040,12 @@ export async function checkContentOfPendingProceedingResultRow(
     await expect(resolutionDateCell).toHaveText(formattedResolutionDate)
   })
 
-  await test.step("Kann bearbeitet, angesehen und gelöscht werden", async () => {
+  await test.step("Kann bearbeitet und angesehen werden", async () => {
     await expect(
       listRow.getByLabel("Dokumentationseinheit bearbeiten"),
     ).toBeEnabled()
     await expect(
       listRow.getByLabel("Dokumentationseinheit ansehen"),
-    ).toBeEnabled()
-    await expect(
-      listRow.getByLabel("Dokumentationseinheit löschen"),
     ).toBeEnabled()
   })
 }
@@ -1053,26 +1055,28 @@ export async function checkContentOfDecisionResultRow(
   expectedItem: Decision,
 ) {
   const docNumberCell = listRow.getByRole("cell").nth(0)
-  const courtTypeCell = listRow.getByRole("cell").nth(1)
-  const courtLocationCell = listRow.getByRole("cell").nth(2)
-  const decisionDateCell = listRow.getByRole("cell").nth(3)
-  const fileNumberCell = listRow.getByRole("cell").nth(4)
-  const appraisalBodyCell = listRow.getByRole("cell").nth(5)
-  const documentTypCell = listRow.getByRole("cell").nth(6)
-  const statusCell = listRow.getByRole("cell").nth(7)
-  const errorCell = listRow.getByRole("cell").nth(8)
+  const courtCell = listRow.getByRole("cell").nth(1)
+  const decisionDateCell = listRow.getByRole("cell").nth(2)
+  const fileNumberCell = listRow.getByRole("cell").nth(3)
+  const appraisalBodyCell = listRow.getByRole("cell").nth(4)
+  const documentTypCell = listRow.getByRole("cell").nth(5)
+  const statusCell = listRow.getByRole("cell").nth(6)
 
+  await test.step("Fehler", async () => {
+    if (expectedItem.status?.withError) {
+      await expect(docNumberCell.locator("div > svg:first-child")).toBeVisible()
+    } else {
+      await expect(docNumberCell.locator("div > svg:first-child")).toBeHidden()
+    }
+  })
   await test.step("Dokumentnummer", async () => {
     await expect(docNumberCell).toHaveText(expectedItem.documentNumber)
   })
-  await test.step("Gerichtstyp", async () => {
-    await expect(courtTypeCell).toHaveText(
-      expectedItem.coreData.court?.type ?? "-",
-    )
-  })
-  await test.step("Gerichtsort", async () => {
-    await expect(courtLocationCell).toHaveText(
-      expectedItem.coreData.court?.location ?? "-",
+  await test.step("Gericht", async () => {
+    await expect(courtCell).toHaveText(
+      [expectedItem.coreData.court?.type, expectedItem.coreData.court?.location]
+        .filter(Boolean)
+        .join(" ") || "-",
     )
   })
   await test.step("Entscheidungsdatum", async () => {
@@ -1103,21 +1107,13 @@ export async function checkContentOfDecisionResultRow(
         : "Veröffentlicht",
     )
   })
-  await test.step("Fehler", async () => {
-    await expect(errorCell).toHaveText(
-      expectedItem.status?.withError ? "Fehler" : "-",
-    )
-  })
 
-  await test.step("Kann bearbeitet, angesehen und gelöscht werden", async () => {
+  await test.step("Kann bearbeitet und angesehen werden", async () => {
     await expect(
       listRow.getByLabel("Dokumentationseinheit bearbeiten"),
     ).toBeEnabled()
     await expect(
       listRow.getByLabel("Dokumentationseinheit ansehen"),
-    ).toBeEnabled()
-    await expect(
-      listRow.getByLabel("Dokumentationseinheit löschen"),
     ).toBeEnabled()
   })
 }
