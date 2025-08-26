@@ -384,7 +384,7 @@ class PortalPublicationServiceTest {
             pendingProceeding.uuid(),
             user,
             HistoryLogEventType.PORTAL_PUBLICATION,
-            "Dokumentationseinheit veröffentlicht");
+            "Dokeinheit im Portal veröffentlicht");
     verify(documentationUnitRepository)
         .updatePortalPublicationStatus(pendingProceeding.uuid(), PortalPublicationStatus.PUBLISHED);
   }
