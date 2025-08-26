@@ -217,6 +217,20 @@ describe("DecisionPlausibilityCheck", () => {
 
       expect(await screen.findByText(description)).toBeInTheDocument()
     })
+
+    it("should not allow publishing when ldml preview cannot be loaded", async () => {
+      previewMock.mockResolvedValue({
+        status: 422,
+        error: { title: "Error", description: "Error" },
+      })
+      await renderComponent({
+        hasPlausibilityCheckPassed: true,
+      })
+
+      expect(
+        await screen.findByRole("button", { name: "Veröffentlichen" }),
+      ).toBeDisabled()
+    })
   })
 })
 

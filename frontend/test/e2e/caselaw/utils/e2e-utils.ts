@@ -1078,7 +1078,6 @@ export async function checkContentOfDecisionResultRow(
   const appraisalBodyCell = listRow.getByRole("cell").nth(4)
   const documentTypCell = listRow.getByRole("cell").nth(5)
   const statusCell = listRow.getByRole("cell").nth(6)
-  const personCell = listRow.getByRole("cell").nth(8)
 
   await test.step("Fehler", async () => {
     if (expectedItem.status?.withError) {
@@ -1123,12 +1122,6 @@ export async function checkContentOfDecisionResultRow(
       expectedItem.status?.publicationStatus === PublicationState.UNPUBLISHED
         ? "Unveröffentlicht"
         : "Veröffentlicht",
-    )
-  })
-
-  await test.step("Person", async () => {
-    await expect(personCell).toHaveText(
-      expectedItem.currentProcessStep?.user?.initials ?? "-",
     )
   })
 

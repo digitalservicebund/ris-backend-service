@@ -125,10 +125,7 @@ watchEffect(() => {
         :process-steps="props.documentUnit.processSteps"
       />
       <IconBadge
-        v-if="
-          props.documentUnit.currentProcessStep &&
-          props.documentUnit.currentProcessStep.user
-        "
+        v-if="props.documentUnit.currentProcessStep?.user"
         background-color="bg-white"
         border-color="border-gray-800"
         :icon="IconPerson"
