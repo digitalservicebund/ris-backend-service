@@ -16,6 +16,7 @@ const StatusColor: Record<PortalPublicationStatus, string> = {
 
 <template>
   <IconBadge
+    data-testid="portal-publication-status-badge"
     :background-color="StatusColor[status] ?? 'bg-white'"
     class="ml-4 inline-block"
     :label="PortalPublicationStatusLabel[status] ?? 'Unbekannter Status'"

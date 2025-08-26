@@ -229,6 +229,23 @@ export const navigateToHandover = async (
   })
 }
 
+export const navigateToPublication = async (
+  page: Page,
+  documentNumber: string,
+  options?: {
+    type?: "pending-proceeding" | "documentunit"
+  },
+) => {
+  await test.step("Navigate to 'Veröffentlichen'", async () => {
+    const documentType = options?.type ?? "documentunit"
+    const baseUrl = `/caselaw/${documentType}/${documentNumber}/publication`
+    await getRequest(baseUrl, page)
+    await expect(page.getByTestId("title").first()).toHaveText(
+      "Veröffentlichen",
+    )
+  })
+}
+
 export const navigateToSettings = async (page: Page) => {
   await test.step("Navigate to Einstellungen'", async () => {
     await page.goto(`/settings`)
