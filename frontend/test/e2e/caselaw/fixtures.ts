@@ -1280,6 +1280,16 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           .then((json) => json?.[0])
       }
 
+      const docTypeLabel = targetDecision.coreData?.documentType?.label
+      if (docTypeLabel) {
+        const documentTypeResponse = await request.get(
+          `api/v1/caselaw/documenttypes?q=${docTypeLabel}`,
+        )
+        targetDecision.coreData!.documentType = await documentTypeResponse
+          .json()
+          .then((json) => json?.[0])
+      }
+
       const patchedDecision = mergeDeep(newDecision, targetDecision) as Decision
 
       const frontendPatch = jsonPatch.compare(newDecision, patchedDecision)
