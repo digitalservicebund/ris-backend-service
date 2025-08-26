@@ -43,7 +43,10 @@ const publicationWarnings = computed(() => {
 })
 
 const isPublishable = computed(
-  () => hasPlausibilityCheckPassed.value && isPortalPublicationEnabled.value,
+  () =>
+    hasPlausibilityCheckPassed.value &&
+    !!preview.value?.success &&
+    isPortalPublicationEnabled.value,
 )
 const preview = ref<LdmlPreview>()
 const previewError = ref()

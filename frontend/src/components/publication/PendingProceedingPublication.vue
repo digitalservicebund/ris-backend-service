@@ -13,7 +13,9 @@ import publishDocumentationUnitService from "@/services/publishDocumentationUnit
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const isPortalPublicationEnabled = useFeatureToggle("neuris.portal-publication")
-const isPublishable = computed(() => isPortalPublicationEnabled.value)
+const isPublishable = computed(
+  () => !!preview.value?.success && isPortalPublicationEnabled.value,
+)
 
 const store = useDocumentUnitStore()
 const { documentUnit: pendingProceeding } = storeToRefs(store) as {

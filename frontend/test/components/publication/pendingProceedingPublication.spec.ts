@@ -28,21 +28,6 @@ describe("PendingProceedingPlausibilityCheck", () => {
     vi.resetAllMocks()
   })
 
-  // Plausibility check is missing
-  it.skip("should not allow publishing if plausibility check fails", async () => {
-    await renderComponent({ hasPlausibilityCheckPassed: false })
-
-    expect(
-      screen.getByText(
-        "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
-      ),
-    ).toBeInTheDocument()
-
-    expect(
-      screen.getByRole("button", { name: "Veröffentlichen" }),
-    ).toBeDisabled()
-  })
-
   it("should render all child components when plausibility check is true", async () => {
     await renderComponent({ hasPlausibilityCheckPassed: true })
 
@@ -66,16 +51,6 @@ describe("PendingProceedingPlausibilityCheck", () => {
       expect(await screen.findByTestId("code-snippet")).toBeInTheDocument()
     })
 
-    // Plausibility check is missing
-    it.skip("should not display ldml preview with implausible data", async () => {
-      await renderComponent({
-        hasPlausibilityCheckPassed: false,
-      })
-
-      expect(screen.queryByText("LDML Vorschau")).not.toBeInTheDocument()
-      expect(previewMock).not.toHaveBeenCalled()
-    })
-
     it("should show error when ldml preview cannot be loaded", async () => {
       const description =
         "Die LDML-Vorschau konnte nicht geladen werden: Aktuelle Fehlermeldung."
@@ -91,6 +66,20 @@ describe("PendingProceedingPlausibilityCheck", () => {
       })
 
       expect(await screen.findByText(description)).toBeInTheDocument()
+    })
+
+    it("should not allow publishing when ldml preview cannot be loaded", async () => {
+      previewMock.mockResolvedValue({
+        status: 422,
+        error: { title: "Error", description: "Error" },
+      })
+      await renderComponent({
+        hasPlausibilityCheckPassed: true,
+      })
+
+      expect(
+        await screen.findByRole("button", { name: "Veröffentlichen" }),
+      ).toBeDisabled()
     })
   })
 })
