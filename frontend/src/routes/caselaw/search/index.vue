@@ -57,7 +57,7 @@ const handleNewDocumentationUnitClick = async () => {
 </script>
 
 <template>
-  <div class="m-24 flex flex-col">
+  <div class="flex w-full flex-col p-24">
     <div class="mb-16 flex w-full justify-end">
       <Button
         v-if="isInternalUser"
