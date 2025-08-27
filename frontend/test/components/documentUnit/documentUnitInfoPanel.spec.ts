@@ -7,13 +7,10 @@ import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import { CoreData } from "@/domain/coreData"
 import { Decision } from "@/domain/decision"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
-import {
-  DuplicateRelation,
-  DuplicateRelationStatus,
-} from "@/domain/managementData"
+import { DuplicateRelation, DuplicateRelationStatus } from "@/domain/managementData"
 import routes from "~/test-helper/routes"
 
-const currentProcessStep: DocumentationUnitProcessStep = {
+const currentDocumentationUnitProcessStep: DocumentationUnitProcessStep = {
   id: "c-id",
   createdAt: new Date(),
   processStep: { uuid: "fertig-id", name: "Fertig", abbreviation: "F" },
@@ -21,7 +18,7 @@ const currentProcessStep: DocumentationUnitProcessStep = {
 }
 
 const docUnitProcessSteps: DocumentationUnitProcessStep[] = [
-  currentProcessStep,
+  currentDocumentationUnitProcessStep,
   {
     id: "b-id",
     createdAt: new Date(),
@@ -65,7 +62,7 @@ function renderComponent(options?: {
       borderNumbers: [],
       duplicateRelations: options?.duplicateRelations ?? [],
     },
-    currentProcessStep: currentProcessStep,
+    currentDocumentationUnitProcessStep: currentDocumentationUnitProcessStep,
     processSteps: docUnitProcessSteps,
   })
 

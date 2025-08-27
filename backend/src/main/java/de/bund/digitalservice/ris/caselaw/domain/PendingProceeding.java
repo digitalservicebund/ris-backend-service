@@ -38,7 +38,8 @@ public record PendingProceeding(
     List<Reference> caselawReferences,
     List<Reference> literatureReferences,
     List<String> documentalists,
-    DocumentationUnitProcessStep currentProcessStep,
+    DocumentationUnitProcessStep currentDocumentationUnitProcessStep,
+    ProcessStep previousProcessStep,
     List<DocumentationUnitProcessStep> processSteps,
     boolean isEditable,
     boolean isDeletable)

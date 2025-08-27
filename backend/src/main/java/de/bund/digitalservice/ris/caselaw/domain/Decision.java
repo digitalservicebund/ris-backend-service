@@ -48,7 +48,8 @@ public record Decision(
     List<Reference> literatureReferences,
     List<String> documentalists,
     InboxStatus inboxStatus,
-    DocumentationUnitProcessStep currentProcessStep,
+    DocumentationUnitProcessStep currentDocumentationUnitProcessStep,
+    ProcessStep previousProcessStep,
     List<DocumentationUnitProcessStep> processSteps,
     boolean isEditable,
     boolean isDeletable)

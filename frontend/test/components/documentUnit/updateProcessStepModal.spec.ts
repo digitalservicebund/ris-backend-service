@@ -44,7 +44,7 @@ function renderComponent() {
   })
   const documentUnit = new Decision("foo", {
     documentNumber: "1234567891234",
-    currentProcessStep: currentProcessStep,
+    currentDocumentationUnitProcessStep: currentProcessStep,
     processSteps: docUnitProcessSteps,
   })
 
