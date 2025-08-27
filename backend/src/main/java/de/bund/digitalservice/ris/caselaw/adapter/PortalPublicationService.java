@@ -309,12 +309,17 @@ public class PortalPublicationService {
 
   private void updatePortalPublicationStatus(
       DocumentationUnit documentationUnit, PortalPublicationStatus newStatus, User user) {
-    if (newStatus.equals(documentationUnit.portalPublicationStatus())) {
+
+    boolean statusUnchanged = newStatus.equals(documentationUnit.portalPublicationStatus());
+    boolean isPublishAction = newStatus.equals(PortalPublicationStatus.PUBLISHED);
+
+    if (statusUnchanged && isPublishAction) {
       documentationUnitRepository.savePublicationDateTime(documentationUnit.uuid());
-    } else {
+    } else if (!statusUnchanged) {
       documentationUnitRepository.updatePortalPublicationStatus(
           documentationUnit.uuid(), newStatus);
     }
+
     addHistoryLog(documentationUnit, newStatus, user);
   }
 
