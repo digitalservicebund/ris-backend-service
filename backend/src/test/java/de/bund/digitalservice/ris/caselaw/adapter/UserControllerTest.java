@@ -48,7 +48,7 @@ class UserControllerTest {
 
   @MockitoSpyBean private KeycloakUserService userService;
 
-  private List<User> testUsers = generateTestUsers();
+  private final List<User> testUsers = generateTestUsers();
 
   @Test
   void testGetUsers_shouldSucceed() {
@@ -94,8 +94,36 @@ class UserControllerTest {
     verify(userApiService, never()).getUsers(anyString());
   }
 
+  @Test
+  void testGetUsersWithFilter_withEmptyString_shouldReturnAllUsers() {
+
+    doReturn(Optional.of(UserGroup.builder().userGroupPathName("test").build()))
+        .when(userService)
+        .getUserGroup(any(OidcUser.class));
+
+    when(userApiService.getUsers(anyString())).thenReturn(testUsers);
+
+    var result =
+        risWebClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/users?q=")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<List<User>>() {})
+            .returnResult();
+
+    Assertions.assertEquals(3, result.getResponseBody().size());
+
+    var emptyUserInformation = result.getResponseBody().getLast();
+    Assertions.assertNull(emptyUserInformation.name());
+    Assertions.assertNull(emptyUserInformation.email());
+    Assertions.assertNull(emptyUserInformation.initials());
+  }
+
   @ParameterizedTest
-  @ValueSource(strings = {"clara.hoffmann@", "ch", "CH", "clara hoff", "Clara H"})
+  @ValueSource(strings = {"ch", "CH", "clara hoff", "Clara H", "Hoff"})
   void testGetUsersWithFilter_shouldReturnEmptyList_onFailed(String queryFilter) {
 
     doReturn(Optional.of(UserGroup.builder().userGroupPathName("test").build()))
@@ -138,6 +166,8 @@ class UserControllerTest {
             .initials("JB")
             .build();
 
-    return List.of(firstUser, secondUser);
+    var thirdServiceUnreachableUser = User.builder().id(UUID.randomUUID()).build();
+
+    return List.of(firstUser, secondUser, thirdServiceUnreachableUser);
   }
 }

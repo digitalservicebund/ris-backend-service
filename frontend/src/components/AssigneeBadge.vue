@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import StringsUtil from "@/utils/stringsUtil"
+import IconBadge from "@/components/IconBadge.vue"
 import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 
 defineProps<{
@@ -9,7 +9,11 @@ defineProps<{
 
 <template>
   <div class="flex flex-row gap-8">
-    <IconPermIdentity data-testid="assignee-icon" />
-    <span>{{ !StringsUtil.isEmpty(name) ? name : "-" }}</span>
+    <IconBadge
+      class="inline-flex whitespace-nowrap"
+      data-testid="assigned-person"
+      :icon="IconPermIdentity"
+      :label="name || '-'"
+    />
   </div>
 </template>

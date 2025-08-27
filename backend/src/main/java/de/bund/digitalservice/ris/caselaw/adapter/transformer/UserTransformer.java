@@ -96,6 +96,9 @@ public class UserTransformer {
   }
 
   public static UUID getUserId(OidcUser oidcUser) {
-    return Optional.ofNullable(oidcUser.getSubject()).map(UUID::fromString).orElse(null);
+    return Optional.ofNullable(oidcUser)
+        .map(OidcUser::getSubject)
+        .map(UUID::fromString)
+        .orElse(null);
   }
 }

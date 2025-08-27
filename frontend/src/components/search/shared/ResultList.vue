@@ -312,15 +312,7 @@ onUnmounted(() => {
 
         <Column v-if="isDecision" header="Person">
           <template #body="{ data: item }">
-            <AssigneeBadge
-              :name="
-                item.currentProcessStep &&
-                item.currentProcessStep.user &&
-                item.currentProcessStep.user.initials
-                  ? item.currentProcessStep.user.initials
-                  : undefined
-              "
-            />
+            <AssigneeBadge :name="item?.currentProcessStep?.user?.initials" />
           </template>
         </Column>
 
