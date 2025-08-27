@@ -22,6 +22,7 @@ type MyFixtures = {
   secondPrefilledDocumentUnit: Decision
   linkedDocumentNumber: string
   pageWithBghUser: Page
+  decisionBgh: Decision
   pageWithBfhUser: Page
   pageWithExternalUser: Page
   prefilledDocumentUnitBgh: Decision
@@ -823,6 +824,48 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     if (!deleteResponse.ok()) {
       throw Error(`DocumentUnit with number ${prefilledDocumentUnit.documentNumber} couldn't be deleted:
       ${deleteResponse.status()} ${deleteResponse.statusText()}`)
+    }
+  },
+
+  decisionBgh: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      storageState: `test/e2e/caselaw/.auth/user_bgh.json`,
+    })
+    const request = context.request
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    })
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create prefilledDocumentUnit: ${response.status()} ${response.statusText()}`,
+      )
+    }
+
+    const decision = await response.json()
+
+    await use(decision)
+
+    // Teardown: Attempt to delete with the BGH user context first
+    const deleteResponse = await context.request.delete(
+      `/api/v1/caselaw/documentunits/${decision.uuid}`,
+      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    )
+
+    if (!deleteResponse.ok()) {
+      // If the deletion fails with a 403, probably the docoffice ownership changed, we need to handle that gracefully and must be manually deleted in the test
+      if (deleteResponse.status() === 403) {
+        console.warn(
+          `Deletion failed with 403 for BGH user. Ownership likely changed. Document must be deleted manually.`,
+        )
+      } else {
+        throw Error(
+          `DocumentUnit with number ${decision.documentNumber} couldn't be deleted:
+          ${deleteResponse.status()} ${deleteResponse.statusText()}`,
+        )
+      }
     }
   },
 
