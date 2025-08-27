@@ -40,10 +40,8 @@ public class UserController {
       return users.stream()
           .filter(
               user ->
-                  (user.email() != null && user.email().startsWith(search))
-                      || (user.initials() != null
-                          && user.initials().toLowerCase().startsWith(search))
-                      || (user.name() != null && user.name().toLowerCase().startsWith(search)))
+                  (user.initials() != null && user.initials().toLowerCase().contains(search))
+                      || (user.name() != null && user.name().toLowerCase().contains(search)))
           .toList();
     }
 

@@ -9,7 +9,6 @@ import Column from "primevue/column"
 import DataTable from "primevue/datatable"
 import { computed, ref, onMounted, onUnmounted } from "vue"
 
-import AssigneeBadge from "@/components/AssigneeBadge.vue"
 import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
@@ -21,6 +20,7 @@ import { PublicationState } from "@/domain/publicationStatus"
 
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconError from "~icons/ic/baseline-error"
+import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 import IconSubject from "~icons/ic/baseline-subject"
 import IconNote from "~icons/ic/outline-comment-bank"
 import IconEdit from "~icons/ic/outline-edit"
@@ -312,14 +312,16 @@ onUnmounted(() => {
 
         <Column v-if="isDecision" header="Person">
           <template #body="{ data: item }">
-            <AssigneeBadge
-              :name="
+            <IconBadge
+              v-if="
                 item.currentProcessStep &&
                 item.currentProcessStep.user &&
                 item.currentProcessStep.user.initials
-                  ? item.currentProcessStep.user.initials
-                  : undefined
               "
+              class="inline-flex whitespace-nowrap"
+              data-testid="assigned-person"
+              :icon="IconPermIdentity"
+              :label="item.currentProcessStep.user.initials"
             />
           </template>
         </Column>

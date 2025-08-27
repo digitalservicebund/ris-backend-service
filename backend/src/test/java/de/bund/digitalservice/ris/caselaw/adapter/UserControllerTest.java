@@ -94,8 +94,31 @@ class UserControllerTest {
     verify(userApiService, never()).getUsers(anyString());
   }
 
+  @Test
+  void testGetUsersWithFilter_withEmptyString_shouldReturnAllUsers() {
+
+    doReturn(Optional.of(UserGroup.builder().userGroupPathName("test").build()))
+        .when(userService)
+        .getUserGroup(any(OidcUser.class));
+
+    when(userApiService.getUsers(anyString())).thenReturn(testUsers);
+
+    var result =
+        risWebClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/users?q=")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<List<User>>() {})
+            .returnResult();
+
+    Assertions.assertEquals(2, result.getResponseBody().size());
+  }
+
   @ParameterizedTest
-  @ValueSource(strings = {"clara.hoffmann@", "ch", "CH", "clara hoff", "Clara H"})
+  @ValueSource(strings = {"ch", "CH", "clara hoff", "Clara H", "Hoff"})
   void testGetUsersWithFilter_shouldReturnEmptyList_onFailed(String queryFilter) {
 
     doReturn(Optional.of(UserGroup.builder().userGroupPathName("test").build()))
