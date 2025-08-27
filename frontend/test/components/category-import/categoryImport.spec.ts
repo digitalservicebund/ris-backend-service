@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import { beforeEach, describe } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
@@ -10,6 +10,7 @@ import {
   contentRelatedIndexingLabels,
   Decision,
 } from "@/domain/decision"
+import Definition from "@/domain/definition"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import { Kind } from "@/domain/documentationUnitKind"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
@@ -20,31 +21,10 @@ import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import routes from "~/test-helper/routes"
 
-function mockSessionStore(documentUnit: DocumentationUnit) {
-  const mockedSessionStore = useDocumentUnitStore()
-  mockedSessionStore.documentUnit = documentUnit
-  vi.spyOn(mockedSessionStore, "updateDocumentUnit").mockResolvedValue({
-    status: 200,
-    data: { documentationUnitVersion: 0, patch: [], errorPaths: [] },
-  })
-  return mockedSessionStore
-}
-
-function renderComponent() {
-  const user = userEvent.setup()
-  const router = createRouter({
-    history: createWebHistory(),
-    routes: routes,
-  })
-  return {
-    user,
-    ...render(CategoryImport, { global: { plugins: [[router]] } }),
-  }
-}
-
 describe("CategoryImport", () => {
   beforeEach(() => {
     setActivePinia(createTestingPinia())
+    vi.resetAllMocks()
   })
   it("renders component initial state", () => {
     renderComponent()
@@ -87,13 +67,89 @@ describe("CategoryImport", () => {
       "XXRE123456789",
     )
 
-    await user.click(
+    await fireEvent.click(
       screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
     )
 
     expect(
       screen.getByText("Keine Dokumentationseinheit gefunden."),
     ).toBeInTheDocument()
+  })
+
+  it("should import a string (E-VSF) from content related indexing", async () => {
+    const target = new Decision("uuid", {
+      documentNumber: "XXRE123456789",
+      kind: Kind.DECISION,
+    })
+    const source = new Decision("456", {
+      kind: Kind.DECISION,
+      documentNumber: "TARGET3456789",
+      contentRelatedIndexing: { evsf: "X 00 00-0-0" },
+    })
+    vi.spyOn(documentUnitService, "getByDocumentNumber").mockResolvedValueOnce({
+      status: 200,
+      data: source,
+    })
+    const store = mockSessionStore(target)
+
+    const { user } = renderComponent()
+
+    await user.type(
+      screen.getByLabelText("Dokumentnummer Eingabefeld"),
+      "TARGET3456789",
+    )
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
+    )
+
+    await fireEvent.click(screen.getByLabelText("E-VSF übernehmen"))
+
+    expect(store.documentUnit?.contentRelatedIndexing.evsf).toEqual(
+      "X 00 00-0-0",
+    )
+  })
+
+  it("should import an editable list (definitions) from content related indexing", async () => {
+    const target = new Decision("uuid", {
+      documentNumber: "XXRE123456789",
+      kind: Kind.DECISION,
+    })
+    const source = new Decision("456", {
+      kind: Kind.DECISION,
+      documentNumber: "TARGET3456789",
+      contentRelatedIndexing: {
+        definitions: [
+          new Definition({ id: "def-id", definedTerm: "term" }),
+          new Definition({ id: "def-id2", definedTerm: "term2" }),
+        ],
+      },
+    })
+    vi.spyOn(documentUnitService, "getByDocumentNumber").mockResolvedValueOnce({
+      status: 200,
+      data: source,
+    })
+    const store = mockSessionStore(target)
+
+    const { user } = renderComponent()
+
+    await user.type(
+      screen.getByLabelText("Dokumentnummer Eingabefeld"),
+      "TARGET3456789",
+    )
+
+    await fireEvent.click(
+      screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
+    )
+
+    await fireEvent.click(screen.getByLabelText("Definition übernehmen"))
+
+    const definitions = store.documentUnit?.contentRelatedIndexing.definitions
+    expect(definitions).toHaveLength(2)
+    expect(definitions?.[0].definedTerm).toEqual("term")
+    expect(definitions?.[0].id).toBeUndefined()
+    expect(definitions?.[1].definedTerm).toEqual("term2")
+    expect(definitions?.[1].id).toBeUndefined()
   })
 
   it("displays core data when document unit found", async () => {
@@ -124,7 +180,7 @@ describe("CategoryImport", () => {
       "XXRE123456789",
     )
 
-    await user.click(
+    await fireEvent.click(
       screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
     )
 
@@ -152,7 +208,7 @@ describe("CategoryImport", () => {
         "XXRE123456789",
       )
 
-      await user.click(
+      await fireEvent.click(
         screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
       )
 
@@ -185,7 +241,7 @@ describe("CategoryImport", () => {
         "XXRE123456789",
       )
 
-      await user.click(
+      await fireEvent.click(
         screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
       )
 
@@ -230,21 +286,21 @@ describe("CategoryImport", () => {
         "XXRE123456789",
       )
 
-      await user.click(
+      await fireEvent.click(
         screen.getByRole("button", { name: "Dokumentationseinheit laden" }),
       )
 
-      await user.click(
+      await fireEvent.click(
         screen.getByLabelText(
           contentRelatedIndexingLabels.keywords + " übernehmen",
         ),
       )
-      await user.click(
+      await fireEvent.click(
         screen.getByLabelText(
           contentRelatedIndexingLabels.fieldsOfLaw + " übernehmen",
         ),
       )
-      await user.click(
+      await fireEvent.click(
         screen.getByLabelText(
           contentRelatedIndexingLabels.norms + " übernehmen",
         ),
@@ -264,3 +320,25 @@ describe("CategoryImport", () => {
     }
   }
 })
+
+function mockSessionStore(documentUnit: DocumentationUnit) {
+  const mockedSessionStore = useDocumentUnitStore()
+  mockedSessionStore.documentUnit = documentUnit
+  vi.spyOn(mockedSessionStore, "updateDocumentUnit").mockResolvedValue({
+    status: 200,
+    data: { documentationUnitVersion: 0, patch: [], errorPaths: [] },
+  })
+  return mockedSessionStore
+}
+
+function renderComponent() {
+  const user = userEvent.setup()
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: routes,
+  })
+  return {
+    user,
+    ...render(CategoryImport, { global: { plugins: [[router]] } }),
+  }
+}
