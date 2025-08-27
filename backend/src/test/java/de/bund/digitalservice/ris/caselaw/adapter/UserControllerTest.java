@@ -115,6 +115,11 @@ class UserControllerTest {
             .returnResult();
 
     Assertions.assertEquals(3, result.getResponseBody().size());
+
+    var emptyUserInformation = result.getResponseBody().getLast();
+    Assertions.assertNull(emptyUserInformation.name());
+    Assertions.assertNull(emptyUserInformation.email());
+    Assertions.assertNull(emptyUserInformation.initials());
   }
 
   @ParameterizedTest
