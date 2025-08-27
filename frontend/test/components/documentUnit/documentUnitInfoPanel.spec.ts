@@ -17,6 +17,7 @@ const currentProcessStep: DocumentationUnitProcessStep = {
   id: "c-id",
   createdAt: new Date(),
   processStep: { uuid: "fertig-id", name: "Fertig", abbreviation: "F" },
+  user: { id: "user-id", name: "Test User", initials: "TU" },
 }
 
 const docUnitProcessSteps: DocumentationUnitProcessStep[] = [
@@ -169,7 +170,7 @@ describe("documentUnit InfoPanel", () => {
     expect(screen.queryByText("Dublettenverdacht")).not.toBeInTheDocument()
   })
 
-  it("renders proccess steps and move button", async () => {
+  it("renders proccess steps, userand move button", async () => {
     renderComponent()
     expect(screen.queryByText("N")).not.toBeInTheDocument()
     expect(screen.queryByText("Neu")).not.toBeInTheDocument()
@@ -177,5 +178,6 @@ describe("documentUnit InfoPanel", () => {
     expect(screen.queryByText("Blockiert")).not.toBeInTheDocument()
     expect(await screen.findByText("Fertig")).toBeInTheDocument()
     expect(screen.queryByText("F")).not.toBeInTheDocument()
+    expect(await screen.findByText("Test User")).toBeInTheDocument()
   })
 })

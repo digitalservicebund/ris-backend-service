@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.ChangelogException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
-import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHistoryLogService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -17,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.LdmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -210,26 +208,15 @@ public class PortalPublicationService {
   public LdmlTransformationResult createLdmlPreview(UUID documentUuid)
       throws DocumentationUnitNotExistsException, LdmlTransformationException, MappingException {
     DocumentationUnit documentationUnit = documentationUnitRepository.findByUuid(documentUuid);
-    if (documentationUnit instanceof Decision) {
-      CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
-      Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
-      if (fileContent.isEmpty()) {
-        throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
-      }
-      return LdmlTransformationResult.builder().success(true).ldml(fileContent.get()).build();
-    } else {
-      var message =
-          String.format(
-              "Document type %s is not supported.", documentationUnit.getClass().getSimpleName());
-      throw new DocumentationUnitException(message);
+    CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);
+    Optional<String> fileContent = xmlUtilService.ldmlToString(ldml);
+    if (fileContent.isEmpty()) {
+      throw new LdmlTransformationException("Could not parse transformed LDML as string.", null);
     }
+    return LdmlTransformationResult.builder().success(true).ldml(fileContent.get()).build();
   }
 
   private PortalPublicationResult publishToBucket(DocumentationUnit documentationUnit) {
-    if (!(documentationUnit instanceof Decision)) {
-      // for now pending proceedings can not be processed by the portal, so they are ignored.
-      return null;
-    }
     List<AttachmentDTO> attachments =
         attachmentRepository.findAllByDocumentationUnitId(documentationUnit.uuid());
     CaseLawLdml ldml = ldmlTransformer.transformToLdml(documentationUnit);

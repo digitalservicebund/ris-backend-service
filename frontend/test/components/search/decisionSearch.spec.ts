@@ -116,7 +116,7 @@ describe("Decision Search", () => {
 
     // Act
     await user.type(screen.getByLabelText("Aktenzeichen Suche"), "TEST")
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
 
     // Assert
     expect(screen.getByTestId("service-error")).toBeVisible()
@@ -140,7 +140,7 @@ describe("Decision Search", () => {
     ).toBeVisible()
     expect(screen.getByText("Neue Entscheidung erstellen")).toBeVisible()
     await user.type(screen.getByLabelText("Dokumentnummer Suche"), "TEST")
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
 
     // Act
     await user.click(screen.getByText("Neue Entscheidung erstellen"))
@@ -172,7 +172,7 @@ describe("Decision Search", () => {
       "05.05.2005",
     )
 
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
 
     expect(
       screen.getByText(
@@ -208,7 +208,7 @@ describe("Decision Search", () => {
     await user.type(screen.getByLabelText("Aktenzeichen Suche"), "TEST")
 
     // Act
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
 
     // Assert
     expect(
@@ -257,7 +257,7 @@ describe("Decision Search", () => {
     expect(screen.getByLabelText("Gerichtstyp Suche")).toHaveValue("AG")
 
     // Act
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
 
     // Assert
     expect(screen.getAllByRole("row").length).toBe(2) // including header
@@ -293,7 +293,7 @@ describe("Decision Search", () => {
     )
 
     // Act
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
 
     // Assert
     const resultList = screen.getByTestId("search-result-list")
@@ -318,7 +318,7 @@ describe("Decision Search", () => {
     await user.type(screen.getByLabelText("Gerichtstyp Suche"), "BGH")
 
     // Act
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
 
     // Assert
     const resultList = screen.getByTestId("search-result-list")
@@ -348,7 +348,7 @@ describe("Decision Search", () => {
     )
 
     // Act
-    await user.click(screen.getByText("Ergebnisse anzeigen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
 
     // Assert
     const resultList = screen.getByTestId("search-result-list")

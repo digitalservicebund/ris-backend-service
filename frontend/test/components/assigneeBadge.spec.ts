@@ -8,22 +8,16 @@ describe("AssigneeBadge", () => {
       props: { name: "CH" },
     })
     expect(screen.getByText("CH")).toBeInTheDocument()
-    expect(screen.getByTestId("assignee-icon")).toBeInTheDocument()
+    expect(screen.getByTestId("assigned-person")).toBeInTheDocument()
   })
 
-  it("display '-'  when name is undefined", () => {
-    render(AssigneeBadge, {
-      props: {},
-    })
-    expect(screen.getByText("-")).toBeInTheDocument()
-    expect(screen.getByTestId("assignee-icon")).toBeInTheDocument()
-  })
+  it.each([
+    { case: "undefined", props: {} },
+    { case: "blank string", props: { name: "" } },
+  ])("display '-' when name is %s", ({ props }) => {
+    render(AssigneeBadge, { props })
 
-  it("display '-' when name is blank", () => {
-    render(AssigneeBadge, {
-      props: {},
-    })
     expect(screen.getByText("-")).toBeInTheDocument()
-    expect(screen.getByTestId("assignee-icon")).toBeInTheDocument()
+    expect(screen.getByTestId("assigned-person")).toBeInTheDocument()
   })
 })

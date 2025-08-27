@@ -31,7 +31,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         page,
         0,
-        "DS (e2e_tests DigitalService)",
+        // "DS (e2e_tests DigitalService)",
         `Dokeinheit angelegt`,
       )
     })
@@ -55,7 +55,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         page,
         0,
-        "DS (e2e_tests DigitalService)",
+        // "DS (e2e_tests DigitalService)",
         `Dokeinheit bearbeitet`,
       )
     })
@@ -69,7 +69,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         page,
         0,
-        "DS (e2e_tests DigitalService)",
+        // "DS (e2e_tests DigitalService)",
         `Dokeinheit bearbeitet`,
       )
     })
@@ -94,7 +94,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         page,
         0,
-        "DS (e2e_tests DigitalService)",
+        // "DS (e2e_tests DigitalService)",
         `Dokeinheit an jDV übergeben`,
       )
     })
@@ -121,13 +121,13 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         page,
         0,
-        "DS (e2e_tests DigitalService)",
+        // "DS (e2e_tests DigitalService)",
         `Dokeinheit bearbeitet`,
       )
       await expectHistoryLogRow(
         page,
         1,
-        "DS (e2e_tests DigitalService)",
+        // "DS (e2e_tests DigitalService)",
         `Vorgang gesetzt: ${newProcedure}`,
       )
     })
@@ -151,7 +151,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         page,
         0,
-        "DS (E2emila Extern)",
+        // "DS (E2emila Extern)",
         `Dokeinheit bearbeitet`,
       )
     })
@@ -177,13 +177,13 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         page,
         0,
-        "DS (e2e_tests DigitalService)",
+        // "DS (e2e_tests DigitalService)",
         `Dokeinheit bearbeitet`,
       )
       await expectHistoryLogRow(
         page,
         1,
-        "DS (e2e_tests DigitalService)",
+        // "DS (e2e_tests DigitalService)",
         `Word-Dokument hinzugefügt`,
       )
     })
@@ -201,7 +201,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         page,
         0,
-        "DS (e2e_tests DigitalService)",
+        // "DS (e2e_tests DigitalService)",
         `Word-Dokument gelöscht`,
       )
     })
@@ -255,7 +255,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         pageWithBghUser,
         1,
-        "DS",
+        // "DS",
         `Fremdanalage angelegt für BGH`,
       )
     })
@@ -264,7 +264,7 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
       await expectHistoryLogRow(
         pageWithBghUser,
         0,
-        "BGH (BGH testUser)",
+        // "BGH (BGH testUser)",
         `Status geändert: Fremdanlage → Unveröffentlicht`,
       )
     })

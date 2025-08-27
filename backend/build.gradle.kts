@@ -13,7 +13,7 @@ plugins {
     id("org.springframework.boot") version "3.5.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.2.1"
-    id("org.sonarqube") version "6.3.0.5676"
+    id("org.sonarqube") version "6.2.0.5505"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
@@ -197,7 +197,7 @@ dependencies {
     implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7")
     implementation("net.sf.saxon:Saxon-HE:12.8")
 
-    implementation("jakarta.mail:jakarta.mail-api:2.1.3")
+    implementation("jakarta.mail:jakarta.mail-api:2.1.4")
     implementation("org.eclipse.angus:angus-mail:2.0.4")
     implementation("com.icegreen:greenmail:2.1.5")
 

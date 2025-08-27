@@ -42,7 +42,6 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
@@ -413,283 +412,300 @@ class PortalPublicationServiceTest {
     }
 
     @Test
-    void publishDocumentationUnit_withPendingProceeding_shouldDoNothing()
+    void publish_withPendingProceeding_shouldPublishSuccessfully()
         throws DocumentationUnitNotExistsException {
-      PendingProceeding pendingProceeding = PendingProceeding.builder().build();
-      when(documentationUnitRepository.findByDocumentNumber(testDocumentNumber))
+      User user = mock(User.class);
+      PendingProceeding pendingProceeding =
+          PendingProceeding.builder()
+              .uuid(UUID.randomUUID())
+              .documentNumber(testDocumentNumber)
+              .build();
+      when(documentationUnitRepository.findByUuid(pendingProceeding.uuid()))
           .thenReturn(pendingProceeding);
+      when(portalTransformer.transformToLdml(any())).thenReturn(testLdml);
+      String transformed = "<akn:akomaNtoso />";
+      when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
 
       subject.publishDocumentationUnit(testDocumentNumber);
 
-      verify(caseLawBucket, never()).save(anyString(), anyString());
-      verify(xmlUtilService, never()).ldmlToString(any());
-    }
-  }
-
-  @Nested
-  class WithDraw {
-    @Test
-    void withdraw_shouldDeleteFromBucket() {
-      when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
-          .thenReturn(List.of(withPrefix(testDocumentNumber)));
-
-      subject.withdrawDocumentationUnit(testDocumentNumber);
-
-      verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
-    }
-
-    @Test
-    void withdraw_withBucketException_shouldThrowPublishException() {
-      when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
-          .thenReturn(List.of(withPrefix(testDocumentNumber)));
-      doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
-
-      assertThatExceptionOfType(PublishException.class)
-          .isThrownBy(() -> subject.withdrawDocumentationUnit(testDocumentNumber))
-          .withMessageContaining("Could not delete LDML from bucket.");
-    }
-  }
-
-  @Nested
-  class WithdrawWithChangelog {
-    @Test
-    void withdrawWithChangelog_shouldDeleteFromBucketAndWriteDeletionChangelog()
-        throws DocumentationUnitNotExistsException, JsonProcessingException {
-      Decision decision =
-          Decision.builder()
-              .uuid(UUID.randomUUID())
-              .documentNumber(testDocumentNumber)
-              .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
-              .build();
-      when(documentationUnitRepository.findByUuid(decision.uuid())).thenReturn(decision);
-      when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
-          .thenReturn(List.of(withPrefix(testDocumentNumber)));
-      User user = mock(User.class);
-      var changelogContent =
-          """
-          {"changed":[],"deleted":[TEST123456789/TEST123456789.xml]}
-          """;
-      when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
-
-      subject.withdrawDocumentationUnitWithChangelog(decision.uuid(), user);
-
-      verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
-      verify(caseLawBucket)
-          .save(
-              contains("changelog"),
-              contains("\"deleted\":[" + withPrefix(testDocumentNumber) + "]"));
+      verify(caseLawBucket).save(withPrefix(testDocumentNumber), transformed);
       verify(historyLogService)
           .saveHistoryLog(
-              decision.uuid(),
+              pendingProceeding.uuid(),
               user,
               HistoryLogEventType.PORTAL_PUBLICATION,
-              "Dokeinheit wurde aus dem Portal zurückgezogen");
+              "Dokeinheit im Portal veröffentlicht");
       verify(documentationUnitRepository)
-          .updatePortalPublicationStatus(decision.uuid(), PortalPublicationStatus.WITHDRAWN);
+          .updatePortalPublicationStatus(
+              pendingProceeding.uuid(), PortalPublicationStatus.PUBLISHED);
     }
 
-    @Test
-    void withdrawWithChangelog_withBucketException_shouldThrowPublishException()
-        throws DocumentationUnitNotExistsException {
-      UUID uuid = UUID.randomUUID();
-      Decision decision =
-          Decision.builder()
-              .uuid(uuid)
-              .documentNumber(testDocumentNumber)
-              .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
-              .build();
-      when(documentationUnitRepository.findByUuid(uuid)).thenReturn(decision);
-      when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
-          .thenReturn(List.of(withPrefix(testDocumentNumber)));
-      User user = mock(User.class);
-      doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
+    @Nested
+    class WithDraw {
+      @Test
+      void withdraw_shouldDeleteFromBucket() {
+        when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+            .thenReturn(List.of(withPrefix(testDocumentNumber)));
 
-      assertThatExceptionOfType(PublishException.class)
-          .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
-          .withMessageContaining("Could not delete LDML from bucket.");
+        subject.withdrawDocumentationUnit(testDocumentNumber);
+
+        verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
+      }
+
+      @Test
+      void withdraw_withBucketException_shouldThrowPublishException() {
+        when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+            .thenReturn(List.of(withPrefix(testDocumentNumber)));
+        doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
+
+        assertThatExceptionOfType(PublishException.class)
+            .isThrownBy(() -> subject.withdrawDocumentationUnit(testDocumentNumber))
+            .withMessageContaining("Could not delete LDML from bucket.");
+      }
     }
 
-    @Test
-    void withdrawWithChangelog_withJsonProcessingException_shouldThrowChangelogException()
-        throws DocumentationUnitNotExistsException, JsonProcessingException {
-      UUID uuid = UUID.randomUUID();
-      Decision decision =
-          Decision.builder()
-              .uuid(uuid)
-              .documentNumber(testDocumentNumber)
-              .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
-              .build();
-      when(documentationUnitRepository.findByUuid(uuid)).thenReturn(decision);
-      when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
-          .thenReturn(List.of(withPrefix(testDocumentNumber)));
-      User user = mock(User.class);
-      when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+    @Nested
+    class WithdrawWithChangelog {
+      @Test
+      void withdrawWithChangelog_shouldDeleteFromBucketAndWriteDeletionChangelog()
+          throws DocumentationUnitNotExistsException, JsonProcessingException {
+        Decision decision =
+            Decision.builder()
+                .uuid(UUID.randomUUID())
+                .documentNumber(testDocumentNumber)
+                .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+                .build();
+        when(documentationUnitRepository.findByUuid(decision.uuid())).thenReturn(decision);
+        when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+            .thenReturn(List.of(withPrefix(testDocumentNumber)));
+        User user = mock(User.class);
+        var changelogContent =
+            """
+                {"changed":[],"deleted":[TEST123456789/TEST123456789.xml]}
+                """;
+        when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
 
-      assertThatExceptionOfType(ChangelogException.class)
-          .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
-          .withMessageContaining("Could not create changelog file");
+        subject.withdrawDocumentationUnitWithChangelog(decision.uuid(), user);
+
+        verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
+        verify(caseLawBucket)
+            .save(
+                contains("changelog"),
+                contains("\"deleted\":[" + withPrefix(testDocumentNumber) + "]"));
+        verify(historyLogService)
+            .saveHistoryLog(
+                decision.uuid(),
+                user,
+                HistoryLogEventType.PORTAL_PUBLICATION,
+                "Dokeinheit wurde aus dem Portal zurückgezogen");
+        verify(documentationUnitRepository)
+            .updatePortalPublicationStatus(decision.uuid(), PortalPublicationStatus.WITHDRAWN);
+      }
+
+      @Test
+      void withdrawWithChangelog_withBucketException_shouldThrowPublishException()
+          throws DocumentationUnitNotExistsException {
+        UUID uuid = UUID.randomUUID();
+        Decision decision =
+            Decision.builder()
+                .uuid(uuid)
+                .documentNumber(testDocumentNumber)
+                .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+                .build();
+        when(documentationUnitRepository.findByUuid(uuid)).thenReturn(decision);
+        when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+            .thenReturn(List.of(withPrefix(testDocumentNumber)));
+        User user = mock(User.class);
+        doThrow(BucketException.class).when(caseLawBucket).delete(withPrefix(testDocumentNumber));
+
+        assertThatExceptionOfType(PublishException.class)
+            .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
+            .withMessageContaining("Could not delete LDML from bucket.");
+      }
+
+      @Test
+      void withdrawWithChangelog_withJsonProcessingException_shouldThrowChangelogException()
+          throws DocumentationUnitNotExistsException, JsonProcessingException {
+        UUID uuid = UUID.randomUUID();
+        Decision decision =
+            Decision.builder()
+                .uuid(uuid)
+                .documentNumber(testDocumentNumber)
+                .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
+                .build();
+        when(documentationUnitRepository.findByUuid(uuid)).thenReturn(decision);
+        when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
+            .thenReturn(List.of(withPrefix(testDocumentNumber)));
+        User user = mock(User.class);
+        when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+
+        assertThatExceptionOfType(ChangelogException.class)
+            .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
+            .withMessageContaining("Could not create changelog file");
+      }
+
+      @Test
+      void
+          withdrawWithChangelog_withDocumentationNotExists_shouldThrowDocumentationUnitNotExistsException()
+              throws DocumentationUnitNotExistsException {
+        UUID uuid = UUID.randomUUID();
+        when(documentationUnitRepository.findByUuid(uuid))
+            .thenThrow(new DocumentationUnitNotExistsException());
+        User user = mock(User.class);
+
+        assertThatExceptionOfType(DocumentationUnitNotExistsException.class)
+            .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
+            .withMessageContaining("Documentation unit does not exist");
+      }
     }
 
-    @Test
-    void
-        withdrawWithChangelog_withDocumentationNotExists_shouldThrowDocumentationUnitNotExistsException()
-            throws DocumentationUnitNotExistsException {
-      UUID uuid = UUID.randomUUID();
-      when(documentationUnitRepository.findByUuid(uuid))
-          .thenThrow(new DocumentationUnitNotExistsException());
-      User user = mock(User.class);
+    @Nested
+    class uploadChangelog {
+      @Test
+      void uploadChangelog_shouldUpload() throws JsonProcessingException {
+        var changelogContent =
+            """
+                {"changed":["1/1.xml"],"deleted":[]}
+                """;
+        when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
 
-      assertThatExceptionOfType(DocumentationUnitNotExistsException.class)
-          .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
-          .withMessageContaining("Documentation unit does not exist");
-    }
-  }
+        subject.uploadChangelog(List.of("123/123.xml"), List.of("456/456.xml"));
 
-  @Nested
-  class uploadChangelog {
-    @Test
-    void uploadChangelog_shouldUpload() throws JsonProcessingException {
-      var changelogContent =
-          """
-          {"changed":["1/1.xml"],"deleted":[]}
-          """;
-      when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
+        verify(caseLawBucket).save(contains("changelogs/"), eq(changelogContent));
+      }
 
-      subject.uploadChangelog(List.of("123/123.xml"), List.of("456/456.xml"));
+      @Test
+      void uploadChangelog_withDisabledFeatureFlag_shouldDoNothing() {
+        when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(false);
 
-      verify(caseLawBucket).save(contains("changelogs/"), eq(changelogContent));
+        subject.uploadChangelog(List.of(), List.of());
+
+        verify(caseLawBucket, never()).save(contains("changelogs/"), anyString());
+      }
     }
 
-    @Test
-    void uploadChangelog_withDisabledFeatureFlag_shouldDoNothing() {
-      when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(false);
+    @Nested
+    class UploadDeletionChangelog {
+      @Test
+      void uploadDeletionChangelog_shouldUpload() throws JsonProcessingException {
+        var changelogContent =
+            """
+                {"deleted":[123/123.xml]}
+                """;
+        when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
 
-      subject.uploadChangelog(List.of(), List.of());
+        subject.uploadDeletionChangelog(List.of("123/123.xml"));
 
-      verify(caseLawBucket, never()).save(contains("changelogs/"), anyString());
-    }
-  }
-
-  @Nested
-  class UploadDeletionChangelog {
-    @Test
-    void uploadDeletionChangelog_shouldUpload() throws JsonProcessingException {
-      var changelogContent =
-          """
-          {"deleted":[123/123.xml]}
-          """;
-      when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
-
-      subject.uploadDeletionChangelog(List.of("123/123.xml"));
-
-      verify(caseLawBucket).save(contains("changelogs/"), eq(changelogContent));
-    }
-  }
-
-  @Nested
-  class UploadFullReindexChangelog {
-    @Test
-    void uploadFullReindexChangelog_withRegularChangelogsEnabled_shouldNotUpload() {
-      subject.uploadFullReindexChangelog();
-
-      verify(caseLawBucket, never()).save(contains("changelogs/"), anyString());
+        verify(caseLawBucket).save(contains("changelogs/"), eq(changelogContent));
+      }
     }
 
-    @Test
-    void uploadFullReindexChangelog_withRegularChangelogsDisabled_shouldUpload()
-        throws JsonProcessingException {
-      var changelogContent =
-          """
-          {"changeAll":true}
-          """;
-      when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
-      when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(false);
+    @Nested
+    class UploadFullReindexChangelog {
+      @Test
+      void uploadFullReindexChangelog_withRegularChangelogsEnabled_shouldNotUpload() {
+        subject.uploadFullReindexChangelog();
 
-      subject.uploadFullReindexChangelog();
+        verify(caseLawBucket, never()).save(contains("changelogs/"), anyString());
+      }
 
-      verify(caseLawBucket).save(contains("changelogs/"), eq(changelogContent));
-    }
-  }
+      @Test
+      void uploadFullReindexChangelog_withRegularChangelogsDisabled_shouldUpload()
+          throws JsonProcessingException {
+        var changelogContent =
+            """
+                {"changeAll":true}
+                """;
+        when(objectMapper.writeValueAsString(any())).thenReturn(changelogContent);
+        when(featureToggleService.isEnabled("neuris.regular-changelogs")).thenReturn(false);
 
-  @Nested
-  class CreateLdmlPreview {
-    @Test
-    void createLdmlPreview_withValidDecision_shouldThrowDocumentationUnitNotExistsException()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      when(documentationUnitRepository.findByUuid(testDocumentUnit.uuid()))
-          .thenThrow(DocumentationUnitNotExistsException.class);
-      // Act + Assert
-      assertThatThrownBy(() -> subject.createLdmlPreview(testDocumentUnit.uuid()))
-          .isInstanceOf(DocumentationUnitNotExistsException.class);
+        subject.uploadFullReindexChangelog();
+
+        verify(caseLawBucket).save(contains("changelogs/"), eq(changelogContent));
+      }
     }
 
-    @Test
-    void createLdmlPreview_withValidDecision_shouldReturnLdml()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      String transformed = "ldml";
-      when(documentationUnitRepository.findByUuid(testDocumentUnit.uuid()))
-          .thenReturn(testDocumentUnit);
-      when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
-      when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
-      // Act
-      LdmlTransformationResult result = subject.createLdmlPreview(testDocumentUnit.uuid());
-      // Assert
-      assertThat(result)
-          .isEqualTo(LdmlTransformationResult.builder().ldml(transformed).success(true).build());
-    }
+    @Nested
+    class CreateLdmlPreview {
+      @Test
+      void createLdmlPreview_withValidDecision_shouldThrowDocumentationUnitNotExistsException()
+          throws DocumentationUnitNotExistsException {
+        // Arrange
+        when(documentationUnitRepository.findByUuid(testDocumentUnit.uuid()))
+            .thenThrow(DocumentationUnitNotExistsException.class);
+        // Act + Assert
+        assertThatThrownBy(() -> subject.createLdmlPreview(testDocumentUnit.uuid()))
+            .isInstanceOf(DocumentationUnitNotExistsException.class);
+      }
 
-    @Test
-    void createLdmlPreview_withInvalidDecision_shouldThrowLdmlTransformationException()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      var uuid = testDocumentUnit.uuid();
-      when(documentationUnitRepository.findByUuid(uuid)).thenReturn(testDocumentUnit);
-      when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
-      when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.empty());
-      // Act + Assert
-      assertThatThrownBy(() -> subject.createLdmlPreview(uuid))
-          .isInstanceOf(LdmlTransformationException.class)
-          .hasMessage("Could not parse transformed LDML as string.");
-    }
+      @Test
+      void createLdmlPreview_withValidDecision_shouldReturnLdml()
+          throws DocumentationUnitNotExistsException {
+        // Arrange
+        String transformed = "ldml";
+        when(documentationUnitRepository.findByUuid(testDocumentUnit.uuid()))
+            .thenReturn(testDocumentUnit);
+        when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+        when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
+        // Act
+        LdmlTransformationResult result = subject.createLdmlPreview(testDocumentUnit.uuid());
+        // Assert
+        assertThat(result)
+            .isEqualTo(LdmlTransformationResult.builder().ldml(transformed).success(true).build());
+      }
 
-    @Test
-    void createLdmlPreview_withPendingProceeding_shouldThrowDocumentationUnitException()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      String transformed = "ldml";
-      var uuid = UUID.randomUUID();
-      var testPendingProceeding =
-          PendingProceeding.builder()
-              .uuid(uuid)
-              .coreData(
-                  CoreData.builder()
-                      .ecli("testecli")
-                      .court(
-                          Court.builder()
-                              .type("testCourtType")
-                              .location("testCourtLocation")
-                              .build())
-                      .documentType(
-                          DocumentType.builder().label("testDocumentTypeAbbreviation").build())
-                      .legalEffect("ja")
-                      .fileNumbers(List.of("testFileNumber"))
-                      .decisionDate(LocalDate.of(2020, 1, 1))
-                      .build())
-              .documentNumber(testDocumentNumber)
-              .shortTexts(
-                  PendingProceedingShortTexts.builder()
-                      .admissionOfAppeal("AdmissionOfAppeal")
-                      .build())
-              .build();
-      when(documentationUnitRepository.findByUuid(uuid)).thenReturn(testPendingProceeding);
-      when(portalTransformer.transformToLdml(testPendingProceeding)).thenReturn(testLdml);
-      when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
-      // Act + Assert
-      assertThatThrownBy(() -> subject.createLdmlPreview(uuid))
-          .isInstanceOf(DocumentationUnitException.class)
-          .hasMessageContaining("Document type PendingProceeding is not supported.");
+      @Test
+      void createLdmlPreview_withInvalidDecision_shouldThrowLdmlTransformationException()
+          throws DocumentationUnitNotExistsException {
+        // Arrange
+        var uuid = testDocumentUnit.uuid();
+        when(documentationUnitRepository.findByUuid(uuid)).thenReturn(testDocumentUnit);
+        when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+        when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.empty());
+        // Act + Assert
+        assertThatThrownBy(() -> subject.createLdmlPreview(uuid))
+            .isInstanceOf(LdmlTransformationException.class)
+            .hasMessage("Could not parse transformed LDML as string.");
+      }
+
+      @Test
+      void createLdmlPreview_withPendingProceeding_shouldReturnLdml()
+          throws DocumentationUnitNotExistsException {
+        // Arrange
+        String transformed = "ldml";
+        var uuid = UUID.randomUUID();
+        var testPendingProceeding =
+            PendingProceeding.builder()
+                .uuid(uuid)
+                .coreData(
+                    CoreData.builder()
+                        .ecli("testecli")
+                        .court(
+                            Court.builder()
+                                .type("testCourtType")
+                                .location("testCourtLocation")
+                                .build())
+                        .documentType(
+                            DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                        .legalEffect("ja")
+                        .fileNumbers(List.of("testFileNumber"))
+                        .decisionDate(LocalDate.of(2020, 1, 1))
+                        .build())
+                .documentNumber(testDocumentNumber)
+                .shortTexts(
+                    PendingProceedingShortTexts.builder()
+                        .admissionOfAppeal("AdmissionOfAppeal")
+                        .build())
+                .build();
+        when(documentationUnitRepository.findByUuid(uuid)).thenReturn(testPendingProceeding);
+        when(portalTransformer.transformToLdml(testPendingProceeding)).thenReturn(testLdml);
+        when(xmlUtilService.ldmlToString(any())).thenReturn(Optional.of(transformed));
+        // Act
+        LdmlTransformationResult result = subject.createLdmlPreview(testDocumentUnit.uuid());
+        // Assert
+        assertThat(result)
+            .isEqualTo(LdmlTransformationResult.builder().ldml(transformed).success(true).build());
+      }
     }
   }
 

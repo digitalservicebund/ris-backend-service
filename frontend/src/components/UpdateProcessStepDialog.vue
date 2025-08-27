@@ -202,11 +202,7 @@ watch(
 
         <Column field="user.name" header="Person">
           <template #body="{ data: item }">
-            <AssigneeBadge
-              :name="
-                item.user && item.user.initials ? item.user.initials : undefined
-              "
-            />
+            <AssigneeBadge :name="item?.user?.initials" />
           </template>
         </Column>
         <template #empty>Keine Prozessschritte</template>
