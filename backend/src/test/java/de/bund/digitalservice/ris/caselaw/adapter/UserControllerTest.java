@@ -48,7 +48,7 @@ class UserControllerTest {
 
   @MockitoSpyBean private KeycloakUserService userService;
 
-  private List<User> testUsers = generateTestUsers();
+  private final List<User> testUsers = generateTestUsers();
 
   @Test
   void testGetUsers_shouldSucceed() {
@@ -114,7 +114,7 @@ class UserControllerTest {
             .expectBody(new TypeReference<List<User>>() {})
             .returnResult();
 
-    Assertions.assertEquals(2, result.getResponseBody().size());
+    Assertions.assertEquals(3, result.getResponseBody().size());
   }
 
   @ParameterizedTest
@@ -161,6 +161,8 @@ class UserControllerTest {
             .initials("JB")
             .build();
 
-    return List.of(firstUser, secondUser);
+    var thirdServiceUnreachableUser = User.builder().id(UUID.randomUUID()).build();
+
+    return List.of(firstUser, secondUser, thirdServiceUnreachableUser);
   }
 }
