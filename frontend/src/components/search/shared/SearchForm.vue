@@ -356,6 +356,7 @@ watch(
       :class="{
         'grid-layout-decision': isDecision,
         'grid-layout-pending-proceeding': isPendingProceeding,
+        'is-own-docoffice': myDocOfficeOnly,
       }"
     >
       <!-- Common Fields for Decisions and Pending Proceeding-->
@@ -381,6 +382,30 @@ watch(
           ></InputText>
         </InputField>
       </div>
+
+      <div
+        class="ris-body1-regular items-center[grid-area:docnumber-label] flex flex-row"
+      >
+        Dokument&shy;nummer
+      </div>
+      <div class="[grid-area:docnumber-input]">
+        <InputField
+          id="documentNumber"
+          v-slot="{ id }"
+          label="Dokumentnummer"
+          visually-hide-label
+        >
+          <InputText
+            :id="id"
+            v-model="query.documentNumber"
+            aria-label="Dokumentnummer Suche"
+            fluid
+            size="small"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+          ></InputText>
+        </InputField>
+      </div>
+
       <div
         class="ris-body1-regular flex flex-row items-center [grid-area:court-label]"
       >
@@ -423,29 +448,6 @@ watch(
       </div>
 
       <div
-        class="ris-body1-regular items-center[grid-area:docnumber-label] flex flex-row"
-      >
-        Dokumentnummer
-      </div>
-      <div class="[grid-area:docnumber-input]">
-        <InputField
-          id="documentNumber"
-          v-slot="{ id }"
-          label="Dokumentnummer"
-          visually-hide-label
-        >
-          <InputText
-            :id="id"
-            v-model="query.documentNumber"
-            aria-label="Dokumentnummer Suche"
-            fluid
-            size="small"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-          ></InputText>
-        </InputField>
-      </div>
-
-      <div
         class="ris-body1-regular flex flex-row items-center [grid-area:status-label]"
       >
         Status
@@ -474,14 +476,14 @@ watch(
       <div
         class="ris-body1-regular flex flex-row items-center [grid-area:date-label]"
       >
-        {{ isDecision ? "Datum" : "Mitteilungsdatum" }}
+        {{ isDecision ? "Datum" : "Mitteilungs&shy;datum" }}
       </div>
       <div class="flex flex-row gap-10 [grid-area:date-input]">
         <InputField
           id="decisionDate"
           v-slot="{ id, hasError }"
           data-testid="decision-date-input"
-          :label="isDecision ? 'Datum' : 'Mitteilungsdatum'"
+          :label="isDecision ? 'Datum' : 'Mitteilungs&shy;datum'"
           :validation-error="validationStore.getByField('decisionDate')"
           visually-hide-label
         >
@@ -528,59 +530,9 @@ watch(
           ></DateInput>
         </InputField>
       </div>
-
       <!-- Decision Specific Fields -->
       <template v-if="isDecision">
-        <div
-          v-if="myDocOfficeOnly"
-          class="ris-body1-regular flex flex-row items-center [grid-area:jdv-label]"
-        >
-          jDV Übergabe
-        </div>
-
-        <div
-          v-if="myDocOfficeOnly"
-          class="flex flex-row gap-20 [grid-area:jdv-input]"
-        >
-          <InputField
-            id="publicationDate"
-            v-slot="{ id, hasError }"
-            data-testid="publication-date-input"
-            label="jDV Übergabedatum"
-            :validation-error="validationStore.getByField('publicationDate')"
-            visually-hide-label
-          >
-            <DateInput
-              :id="id"
-              v-model="query.publicationDate"
-              aria-label="jDV Übergabedatum Suche"
-              :has-error="hasError"
-              is-future-date
-              @blur="validateSearchInput"
-              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-              @update:validation-error="
-                (validationError: ValidationError | undefined) =>
-                  handleLocalInputError(validationError, id)
-              "
-            ></DateInput>
-          </InputField>
-          <InputField
-            id="scheduled"
-            v-slot="{ id }"
-            label="Nur terminiert"
-            label-class="ris-label1-regular"
-            :label-position="LabelPosition.RIGHT"
-          >
-            <Checkbox
-              v-model="scheduledOnly"
-              aria-label="Terminiert Filter"
-              binary
-              :input-id="id"
-            />
-          </InputField>
-        </div>
-
-        <div class="flex flex-row gap-20 [grid-area:checkbox-group]">
+        <div class="flex flex-row gap-10 py-12 [grid-area:own-docoffice]">
           <InputField
             id="documentationOffice"
             v-slot="{ id }"
@@ -596,39 +548,93 @@ watch(
               @focus="resetErrors(id as DocumentationUnitSearchParameter)"
             />
           </InputField>
-          <InputField
-            v-if="myDocOfficeOnly"
-            id="withErrorsOnly"
-            v-slot="{ id }"
-            label="Nur Fehler"
-            label-class="ris-label1-regular"
-            :label-position="LabelPosition.RIGHT"
-          >
-            <Checkbox
-              v-model="withError"
-              aria-label="Nur fehlerhafte Dokumentationseinheiten"
-              binary
-              :input-id="id"
-              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-            />
-          </InputField>
-          <InputField
-            v-if="myDocOfficeOnly"
-            id="withDuplicateWaring"
-            v-slot="{ id }"
-            label="Dublettenverdacht"
-            label-class="ris-label1-regular"
-            :label-position="LabelPosition.RIGHT"
-          >
-            <Checkbox
-              v-model="withDuplicateWarning"
-              aria-label="Dokumentationseinheiten mit Dublettenverdacht"
-              binary
-              :input-id="id"
-              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-            />
-          </InputField>
         </div>
+
+        <template v-if="myDocOfficeOnly">
+          <div
+            class="ris-body1-regular flex flex-row items-center [grid-area:jdv-label]"
+          >
+            jDV Übergabe
+          </div>
+
+          <div class="flex flex-row gap-20 [grid-area:jdv-input]">
+            <InputField
+              id="publicationDate"
+              v-slot="{ id, hasError }"
+              data-testid="publication-date-input"
+              label="jDV Übergabedatum"
+              :validation-error="validationStore.getByField('publicationDate')"
+              visually-hide-label
+            >
+              <DateInput
+                :id="id"
+                v-model="query.publicationDate"
+                aria-label="jDV Übergabedatum Suche"
+                :has-error="hasError"
+                is-future-date
+                @blur="validateSearchInput"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+                @update:validation-error="
+                  (validationError: ValidationError | undefined) =>
+                    handleLocalInputError(validationError, id)
+                "
+              ></DateInput>
+            </InputField>
+            <InputField
+              id="scheduled"
+              v-slot="{ id }"
+              label="Nur terminiert"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="scheduledOnly"
+                aria-label="Terminiert Filter"
+                binary
+                :input-id="id"
+              />
+            </InputField>
+          </div>
+
+          <div
+            class="ris-body1-regular flex flex-row items-center [grid-area:checkbox-label]"
+          >
+            Fehler
+          </div>
+
+          <div class="flex flex-row gap-20 [grid-area:checkbox-group]">
+            <InputField
+              id="withErrorsOnly"
+              v-slot="{ id }"
+              label="Nur Fehler"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="withError"
+                aria-label="Nur fehlerhafte Dokumentationseinheiten"
+                binary
+                :input-id="id"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              />
+            </InputField>
+            <InputField
+              id="withDuplicateWaring"
+              v-slot="{ id }"
+              label="Dubletten&shy;verdacht"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="withDuplicateWarning"
+                aria-label="Dokumentationseinheiten mit Dublettenverdacht"
+                binary
+                :input-id="id"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              />
+            </InputField>
+          </div>
+        </template>
       </template>
 
       <!-- Pending Proceeding Specific Fields -->
@@ -636,14 +642,14 @@ watch(
         <div
           class="ris-body1-regular 8 flex flex-row items-center [grid-area:resolution-date-label]"
         >
-          Erledigungsmitteilung
+          Erledigungs&shy;mitteilung
         </div>
         <div class="flex flex-row gap-10 [grid-area:resolution-date-input]">
           <InputField
             id="resolutionDate"
             v-slot="{ id, hasError }"
             data-testid="resolution-date-input"
-            label="Erledigungsmitteilung"
+            label="Erledigungs&shy;mitteilung"
             :validation-error="validationStore.getByField('resolutionDate')"
             visually-hide-label
           >
@@ -684,7 +690,7 @@ watch(
             ></DateInput>
           </InputField>
         </div>
-        <div class="flex flex-row [grid-area:resolved-input]">
+        <div class="flex flex-row py-12 [grid-area:resolved-input]">
           <InputField
             id="resolved"
             v-slot="{ id }"
@@ -703,7 +709,16 @@ watch(
       </template>
 
       <!-- Common Search Button -->
-      <div class="flex flex-row [grid-area:search-button]">
+      <div class="flex flex-row justify-end [grid-area:search-button]">
+        <Button
+          v-if="!isEmptySearch"
+          aria-label="Suche zurücksetzen"
+          class="ml-8 self-start"
+          label="Suche zurücksetzen"
+          size="small"
+          text
+          @click="resetSearch"
+        ></Button>
         <div class="flex flex-col gap-8">
           <Button
             :aria-label="
@@ -713,7 +728,7 @@ watch(
             "
             class="self-start"
             :disabled="isLoading"
-            label="Ergebnisse anzeigen"
+            label="Ergebnisse zeigen"
             size="small"
             @click="handleSearchButtonClicked"
           ></Button>
@@ -725,16 +740,6 @@ watch(
             {{ submitButtonError }}
           </span>
         </div>
-
-        <Button
-          v-if="!isEmptySearch"
-          aria-label="Suche zurücksetzen"
-          class="ml-8 self-start"
-          label="Suche zurücksetzen"
-          size="small"
-          text
-          @click="resetSearch"
-        ></Button>
       </div>
     </div>
   </div>
@@ -745,9 +750,21 @@ watch(
   grid-template-areas:
     "az-label az-input docnumber-label docnumber-input"
     "court-label court-input status-label status-input"
-    "date-label date-input . checkbox-group"
-    "jdv-label jdv-input . search-button";
-  grid-template-rows: auto auto auto auto;
+    "date-label date-input . ."
+    "own-docoffice own-docoffice . ."
+    ". . search-button search-button";
+  grid-template-columns: fit-content(150px) 1fr fit-content(150px) 1fr;
+}
+
+.grid-layout-decision.is-own-docoffice {
+  grid-template-areas:
+    "az-label az-input docnumber-label docnumber-input"
+    "court-label court-input status-label status-input"
+    "date-label date-input . ."
+    "own-docoffice own-docoffice . ."
+    "jdv-label jdv-input checkbox-label checkbox-group"
+    ". . search-button search-button";
+  grid-template-columns: fit-content(150px) 1fr fit-content(150px) 1fr;
 }
 
 .grid-layout-pending-proceeding {
@@ -756,7 +773,7 @@ watch(
     "court-label court-input status-label status-input"
     "date-label date-input resolution-date-label resolution-date-input"
     ". . . resolved-input"
-    ". . . search-button";
-  grid-template-rows: auto auto auto auto auto;
+    ". . search-button search-button";
+  grid-template-columns: fit-content(150px) 1fr fit-content(150px) 1fr;
 }
 </style>
