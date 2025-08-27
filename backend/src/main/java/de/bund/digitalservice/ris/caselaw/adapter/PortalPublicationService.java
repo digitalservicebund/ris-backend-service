@@ -91,7 +91,7 @@ public class PortalPublicationService {
           documentationUnitId,
           user,
           HistoryLogEventType.PORTAL_PUBLICATION,
-          "Dokeinheit konnte nicht veröffentlicht werden");
+          "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       throw exception;
     }
   }

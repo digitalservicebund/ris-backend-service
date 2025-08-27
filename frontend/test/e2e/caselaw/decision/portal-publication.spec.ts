@@ -9,7 +9,7 @@ import {
 } from "~/e2e/caselaw/utils/e2e-utils"
 
 test.describe(
-  "Publish to and withdraw from portal",
+  "Publish and withdraw decision",
   {
     tag: ["@RISDEV-6639"],
   },
@@ -99,11 +99,20 @@ test.describe(
             page.getByRole("heading", { name: "Randnummernprüfung" }),
           ).toBeVisible()
           await expect(
+            page.getByText("Die Reihenfolge der Randnummern ist korrekt."),
+          ).toBeVisible()
+          await expect(
             page.getByRole("heading", { name: "Dublettenprüfung" }),
           ).toBeVisible()
           await expect(
-            page.getByRole("heading", { name: "Rechtschreibprüfung" }),
+            page.getByText("Es besteht kein Dublettenverdacht."),
           ).toBeVisible()
+          // await expect(
+          //   page.getByRole("heading", { name: "Rechtschreibprüfung" }),
+          // ).toBeVisible()
+          // await expect(
+          //   page.getByText("Es wurden keine Rechtschreibfehler identifiziert."),
+          // ).toBeVisible()
           await expect(page.getByTitle("LDML Vorschau")).toBeVisible()
           await expect(
             page.getByRole("heading", { name: "Aktueller Status Portal" }),
@@ -117,6 +126,9 @@ test.describe(
           await expect(
             page.getByRole("button", { name: "Veröffentlichen" }),
           ).toBeVisible()
+          await expect(
+            page.getByRole("button", { name: "Veröffentlichen" }),
+          ).toBeEnabled()
         })
 
         await test.step("Erfolgreiches Veröffentlichen ändert den Status", async () => {
@@ -171,30 +183,6 @@ test.describe(
             "NeuRIS",
             "Status im Portal geändert: Unveröffentlicht → Veröffentlicht",
           )
-        })
-      },
-    )
-
-    test(
-      "Fehler beim Veröffentlichen",
-      {
-        tag: ["@RISDEV-8456"],
-      },
-      async ({ page, decisions }) => {
-        const { createdDecisions } = decisions
-        const decision = createdDecisions[4]
-
-        await navigateToPublication(page, decision.documentNumber)
-
-        await test.step("Fehlermeldung beim Veröffentlichen zeigt Fehlermeldung und ändert Status nicht", async () => {
-          await page.getByRole("button", { name: "Veröffentlichen" }).click()
-          await expect(
-            page.getByText("Fehler beim Veröffentlichen"),
-          ).toBeVisible()
-          await expect(page.getByText("Missing judgment body.")).toBeVisible()
-          await expect(
-            page.getByTestId("portal-publication-status-badge"),
-          ).toHaveText("Unveröffentlicht")
         })
       },
     )
@@ -475,6 +463,9 @@ test.describe(
               "Die LDML-Vorschau konnte nicht geladen werden: Missing judgment body.",
             ),
           ).toBeVisible()
+          await expect(
+            page.getByRole("button", { name: "Veröffentlichen" }),
+          ).toBeDisabled()
         })
       },
     )

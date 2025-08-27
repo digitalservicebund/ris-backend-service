@@ -1,11 +1,11 @@
 import { expect, JSHandle, Locator, Page, Request } from "@playwright/test"
 import dayjs from "dayjs"
-import { PublicationState } from "./../../../../src/domain/publicationStatus"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { Decision } from "@/domain/decision"
 import { Kind } from "@/domain/documentationUnitKind"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import PendingProceeding from "@/domain/pendingProceeding"
+import { PublicationState } from "@/domain/publicationStatus"
 import SingleNorm from "@/domain/singleNorm"
 import { isDecision, isPendingProceeding } from "@/utils/typeGuards"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
@@ -240,9 +240,7 @@ export const navigateToPublication = async (
     const documentType = options?.type ?? "documentunit"
     const baseUrl = `/caselaw/${documentType}/${documentNumber}/publication`
     await getRequest(baseUrl, page)
-    await expect(page.getByTestId("title").first()).toHaveText(
-      "Veröffentlichen",
-    )
+    await expect(page.getByTestId("title").first()).toHaveText("Prüfen")
   })
 }
 
