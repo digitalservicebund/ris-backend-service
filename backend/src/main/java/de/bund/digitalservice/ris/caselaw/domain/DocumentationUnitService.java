@@ -542,11 +542,13 @@ public class DocumentationUnitService {
       return;
     }
 
-    if (documentable.currentProcessStep() != null
-        && documentable.currentProcessStep().getUser() != null) {
+    if (documentable.currentDocumentationUnitProcessStep() != null
+        && documentable.currentDocumentationUnitProcessStep().getUser() != null) {
       documentable
-          .currentProcessStep()
-          .setUser(userService.getUser(documentable.currentProcessStep().getUser().id()));
+          .currentDocumentationUnitProcessStep()
+          .setUser(
+              userService.getUser(
+                  documentable.currentDocumentationUnitProcessStep().getUser().id()));
     }
 
     if (documentable.processSteps() != null) {
@@ -850,7 +852,7 @@ public class DocumentationUnitService {
       repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
       decision =
           decision.toBuilder()
-              .currentProcessStep(
+              .currentDocumentationUnitProcessStep(
                   DocumentationUnitProcessStep.builder()
                       .id(UUID.randomUUID())
                       .createdAt(LocalDateTime.now())

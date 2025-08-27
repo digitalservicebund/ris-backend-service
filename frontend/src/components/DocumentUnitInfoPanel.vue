@@ -76,22 +76,6 @@ const managementDataRoute = computed(() => ({
 const processStepsEnabled =
   useFeatureToggle("neuris.process-steps") && isDecision(props.documentUnit)
 
-const previousProcessStep = computed(() => {
-  if (
-    !props.documentUnit.processSteps ||
-    props.documentUnit.processSteps.length < 2
-  ) {
-    return undefined
-  }
-
-  const currentId = props.documentUnit.currentProcessStep?.processStep.uuid
-  // Find the first item after the current one where the processStep ID is different
-  const lastStep = props.documentUnit.processSteps
-    .slice(1)
-    .find((step) => step.processStep.uuid !== currentId)
-  return lastStep ? lastStep.processStep : undefined
-})
-
 const showProcessStepDialog = ref(false)
 const toast = useToast()
 
@@ -141,9 +125,9 @@ watchEffect(() => {
       <CurrentAndPreviousProcessStepBadge
         v-if="processStepsEnabled"
         :current-process-step="
-          props.documentUnit.currentProcessStep?.processStep
+          props.documentUnit.currentDocumentationUnitProcessStep?.processStep
         "
-        :previous-process-step="previousProcessStep"
+        :previous-process-step="props.documentUnit.previousProcessStep"
       />
       <IconBadge
         v-if="props.documentUnit.currentProcessStep && processStepsEnabled"
@@ -152,7 +136,10 @@ watchEffect(() => {
         class="px-8"
         data-testid="info-panel-process-step-initials"
         :icon="IconPerson"
-        :label="props.documentUnit.currentProcessStep?.user?.initials || '-'"
+        :label="
+          props.documentUnit.currentDocumentationUnitProcessStep?.user
+            ?.initials || '-'
+        "
       />
     </div>
 

@@ -4508,7 +4508,8 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       TestTransaction.end();
 
       Decision decision = generateEmptyDocumentationUnitWithMockedUser();
-      assertThat(decision.currentProcessStep().getProcessStep().name()).isEqualTo("Ersterfassung");
+      assertThat(decision.currentDocumentationUnitProcessStep().getProcessStep().name())
+          .isEqualTo("Ersterfassung");
       ProcessStepDTO fachdokumentationProcessStep =
           processStepRepository.findByName("Fachdokumentation").orElseThrow();
 
@@ -4615,7 +4616,8 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       TestTransaction.end();
 
       Decision decision = generateEmptyDocumentationUnitWithMockedUser();
-      assertThat(decision.currentProcessStep().getProcessStep().name()).isEqualTo("Ersterfassung");
+      assertThat(decision.currentDocumentationUnitProcessStep().getProcessStep().name())
+          .isEqualTo("Ersterfassung");
       ProcessStepDTO fachdokumentationProcessStep =
           processStepRepository.findByName("Fachdokumentation").orElseThrow();
 
@@ -4716,7 +4718,8 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       TestTransaction.end();
 
       Decision decision = generateEmptyDocumentationUnit();
-      assertThat(decision.currentProcessStep().getProcessStep().name()).isEqualTo("Ersterfassung");
+      assertThat(decision.currentDocumentationUnitProcessStep().getProcessStep().name())
+          .isEqualTo("Ersterfassung");
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(

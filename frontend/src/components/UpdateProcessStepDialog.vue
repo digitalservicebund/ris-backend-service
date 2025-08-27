@@ -64,7 +64,7 @@ const selectedUser = computed({
 
 async function updateProcessStep(): Promise<void> {
   if (nextProcessStep.value) {
-    documentUnit.value!.currentProcessStep = {
+    documentUnit.value!.currentDocumentationUnitProcessStep = {
       processStep: nextProcessStep.value,
       user: nextProcessStepUser.value,
     }

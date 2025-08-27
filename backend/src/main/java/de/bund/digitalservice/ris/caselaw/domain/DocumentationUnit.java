@@ -40,7 +40,9 @@ public interface DocumentationUnit {
 
   List<String> documentalists();
 
-  DocumentationUnitProcessStep currentProcessStep();
+  DocumentationUnitProcessStep currentDocumentationUnitProcessStep();
+
+  ProcessStep previousProcessStep();
 
   List<DocumentationUnitProcessStep> processSteps();
 

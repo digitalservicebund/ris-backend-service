@@ -1,20 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import static de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransformer.getPreviousProcessStep;
+
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
-import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit.RelatedDocumentationUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
@@ -166,36 +164,6 @@ public class DocumentationUnitListItemTransformer {
     return builder.build();
   }
 
-  /**
-   * Iterate backwards to find the previous process if the process id is different then the last one
-   *
-   * @param documentationUnitProcessStepsDTOs of the list item
-   * @return the previous unique process step
-   */
-  private static ProcessStep getPreviousProcessStep(
-      List<DocumentationUnitProcessStepDTO> documentationUnitProcessStepsDTOs) {
-
-    if (documentationUnitProcessStepsDTOs == null) return null;
-
-    if (documentationUnitProcessStepsDTOs.size() < 2) return null;
-
-    UUID lastId =
-        Optional.ofNullable(documentationUnitProcessStepsDTOs.getLast())
-            .map(DocumentationUnitProcessStepDTO::getProcessStep)
-            .map(ProcessStepDTO::getId)
-            .orElse(null);
-
-    return documentationUnitProcessStepsDTOs
-        .subList(0, documentationUnitProcessStepsDTOs.size() - 1) // exclude last one
-        .reversed()
-        .stream()
-        .map(DocumentationUnitProcessStepDTO::getProcessStep)
-        .filter(Objects::nonNull)
-        .filter(processStepDto -> !Objects.equals(processStepDto.getId(), lastId))
-        .map(ProcessStepTransformer::toDomain)
-        .findFirst()
-        .orElse(null);
-  }
 
   private static DocumentationUnitProcessStep getCurrentDocumentationUnitProcessStep(
       List<DocumentationUnitProcessStepDTO> documentationUnitProcessStepsDTOs) {
