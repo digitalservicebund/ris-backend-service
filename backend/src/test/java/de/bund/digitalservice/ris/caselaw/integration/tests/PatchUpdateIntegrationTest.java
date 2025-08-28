@@ -4516,15 +4516,17 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       List<JsonPatchOperation> operationsUser1 =
           List.of(
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/abbreviation", new TextNode("FD")),
+                  "/currentDocumentationUnitProcessStep/processStep/abbreviation",
+                  new TextNode("FD")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/name", new TextNode("Fachdokumentation")),
+                  "/currentDocumentationUnitProcessStep/processStep/name",
+                  new TextNode("Fachdokumentation")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/uuid",
+                  "/currentDocumentationUnitProcessStep/processStep/uuid",
                   new TextNode(fachdokumentationProcessStep.getId().toString())),
-              new RemoveOperation("/currentProcessStep/createdAt"),
-              new RemoveOperation("/currentProcessStep/user"),
-              new RemoveOperation("/currentProcessStep/id"));
+              new RemoveOperation("/currentDocumentationUnitProcessStep/createdAt"),
+              new RemoveOperation("/currentDocumentationUnitProcessStep/user"),
+              new RemoveOperation("/currentDocumentationUnitProcessStep/id"));
       RisJsonPatch patchUser1 =
           new RisJsonPatch(0L, new JsonPatch(operationsUser1), Collections.emptyList());
 
@@ -4542,7 +4544,21 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(12);
+                assertThat(responsePatch.patch().getOperations()).hasSize(13);
+
+                assertThat(responsePatch.patch().getOperations())
+                    .filteredOn(
+                        op ->
+                            "replace".equals(op.getOp())
+                                && "/previousProcessStep".equals(op.getPath()))
+                    .first()
+                    .satisfies(
+                        operation -> {
+                          assertThat(operation).isInstanceOf(ReplaceOperation.class);
+                          ReplaceOperation replaceOperation = (ReplaceOperation) operation;
+                          assertThat(replaceOperation.getValue().asText())
+                              .isEqualTo("Ersterfassung");
+                        });
 
                 // Assert new process step as last item in list
                 assertThat(responsePatch.patch().getOperations())
@@ -4638,11 +4654,13 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           List.of(
               new ReplaceOperation("/currentProcessStep/user", userNode),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/abbreviation", new TextNode("FD")),
+                  "/currentDocumentationUnitProcessStep/processStep/abbreviation",
+                  new TextNode("FD")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/name", new TextNode("Fachdokumentation")),
+                  "/currentDocumentationUnitProcessStep/processStep/name",
+                  new TextNode("Fachdokumentation")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/uuid",
+                  "/currentDocumentationUnitProcessStep/processStep/uuid",
                   new TextNode(fachdokumentationProcessStep.getId().toString())));
 
       RisJsonPatch patchUser1 =
@@ -4724,15 +4742,17 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       List<JsonPatchOperation> operationsUser1 =
           List.of(
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/abbreviation", new TextNode("B")),
+                  "/currentDocumentationUnitProcessStep/processStep/abbreviation",
+                  new TextNode("B")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/name", new TextNode("Blockiert")),
+                  "/currentDocumentationUnitProcessStep/processStep/name",
+                  new TextNode("Blockiert")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/uuid",
+                  "/currentDocumentationUnitProcessStep/processStep/uuid",
                   new TextNode(UUID.randomUUID().toString())),
-              new RemoveOperation("/currentProcessStep/createdAt"),
-              new RemoveOperation("/currentProcessStep/user"),
-              new RemoveOperation("/currentProcessStep/id"));
+              new RemoveOperation("/currentDocumentationUnitProcessStep/createdAt"),
+              new RemoveOperation("/currentDocumentationUnitProcessStep/user"),
+              new RemoveOperation("/currentDocumentationUnitProcessStep/id"));
       RisJsonPatch patchUser1 =
           new RisJsonPatch(0L, new JsonPatch(operationsUser1), Collections.emptyList());
 

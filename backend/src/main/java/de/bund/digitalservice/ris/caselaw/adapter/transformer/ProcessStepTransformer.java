@@ -36,25 +36,23 @@ public class ProcessStepTransformer {
   public static ProcessStep getPreviousProcessStep(
       List<DocumentationUnitProcessStepDTO> documentationUnitProcessStepsDTOs) {
 
-    if (documentationUnitProcessStepsDTOs == null) return null;
+    if (documentationUnitProcessStepsDTOs == null || documentationUnitProcessStepsDTOs.size() < 2) {
+      return null;
+    }
 
-    if (documentationUnitProcessStepsDTOs.size() < 2) return null;
-
-    UUID lastId =
-        Optional.ofNullable(documentationUnitProcessStepsDTOs.getLast())
+    UUID currentProcessStepId =
+        Optional.ofNullable(documentationUnitProcessStepsDTOs.getFirst())
             .map(DocumentationUnitProcessStepDTO::getProcessStep)
             .map(ProcessStepDTO::getId)
             .orElse(null);
 
-    return documentationUnitProcessStepsDTOs
-        .subList(0, documentationUnitProcessStepsDTOs.size() - 1) // exclude last one
-        .reversed()
-        .stream()
-        .map(DocumentationUnitProcessStepDTO::getProcessStep)
-        .filter(Objects::nonNull)
-        .filter(processStepDto -> !Objects.equals(processStepDto.getId(), lastId))
-        .map(ProcessStepTransformer::toDomain)
-        .findFirst()
-        .orElse(null);
+    for (int i = 1; i < documentationUnitProcessStepsDTOs.size(); i++) {
+      ProcessStepDTO stepDto = documentationUnitProcessStepsDTOs.get(i).getProcessStep();
+      if (stepDto != null && !Objects.equals(stepDto.getId(), currentProcessStepId)) {
+        return ProcessStepTransformer.toDomain(stepDto);
+      }
+    }
+
+    return null;
   }
 }
