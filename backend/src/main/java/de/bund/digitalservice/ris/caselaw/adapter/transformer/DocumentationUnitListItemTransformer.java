@@ -164,7 +164,6 @@ public class DocumentationUnitListItemTransformer {
     return builder.build();
   }
 
-
   private static DocumentationUnitProcessStep getCurrentDocumentationUnitProcessStep(
       List<DocumentationUnitProcessStepDTO> documentationUnitProcessStepsDTOs) {
 
