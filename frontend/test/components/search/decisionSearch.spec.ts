@@ -13,6 +13,7 @@ import DecisionSearch from "@/components/search/DecisionSearch.vue"
 import { Court } from "@/domain/court"
 import { Decision } from "@/domain/decision"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import ProcessStep from "@/domain/processStep"
 import errorMessages from "@/i18n/errors.json"
 import documentUnitService from "@/services/documentUnitService"
 import { ServiceResponse } from "@/services/httpClient"
@@ -27,6 +28,12 @@ const server = setupServer(
       label: "BGH",
     }
     return HttpResponse.json([court])
+  }),
+  http.get("/api/v1/caselaw/processsteps", () => {
+    return HttpResponse.json([
+      { uuid: "a", abbreviation: "A", name: "Step A" },
+      { uuid: "b", abbreviation: "B", name: "Step B" },
+    ] as ProcessStep[])
   }),
 )
 
