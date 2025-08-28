@@ -1,6 +1,9 @@
 import { expect, Page } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import { navigateToCategories, navigateToManagementData } from "~/e2e/caselaw/utils/e2e-utils"
+import {
+  navigateToCategories,
+  navigateToManagementData,
+} from "~/e2e/caselaw/utils/e2e-utils"
 
 // eslint-disable-next-line playwright/no-skipped-test
 test.skip("process steps", { tag: ["@RISDEV-8565"] }, () => {
