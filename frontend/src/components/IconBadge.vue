@@ -18,7 +18,7 @@ const borderClass = computed(() => ({
 
 <template>
   <div
-    class="ris-label2-regular w-[fit-content] rounded-full px-4 py-2"
+    class="ris-label2-regular flex w-[fit-content] rounded-full px-4 py-2"
     :class="[backgroundColor, borderColor, borderClass]"
   >
     <component :is="icon" class="inline-block" :class="[iconColor]" />
