@@ -109,7 +109,7 @@ public class BareIdUserApiService implements UserApiService {
 
     if (userGroupsPathSegments.size() < 2) {
       throw new UserApiException(
-          "User group path must contain at least two segments, e.g., \"caselaw/court\"");
+          "User group path must contain at least two segments:" + userGroupPathName);
     }
 
     // List all top level groups and get the current

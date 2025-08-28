@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -78,9 +79,11 @@ public class KeycloakUserService implements UserService {
   public Optional<UserGroup> getUserGroup(OidcUser oidcUser) {
     List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
     var matchingUserGroup =
-        this.userGroupService.getAllUserGroups().stream()
+        Optional.ofNullable(this.userGroupService.getAllUserGroups())
+            .orElse(Collections.emptyList())
+            .stream()
             .filter(group -> userGroups.contains(group.userGroupPathName()))
-            .findFirst();
+            .max(Comparator.comparingInt(group -> group.userGroupPathName().split("/").length));
     if (matchingUserGroup.isEmpty()) {
       LOGGER.warn(
           "No doc office user group associated with given Keycloak user groups: {}", userGroups);
