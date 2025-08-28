@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import IconBadge from "@/components/IconBadge.vue"
-import IconPermIdentity from "~icons/ic/baseline-perm-identity"
+import IconPerson from "~icons/ic/baseline-person"
 
 defineProps<{
   name?: string
@@ -12,7 +12,7 @@ defineProps<{
     <IconBadge
       class="inline-flex whitespace-nowrap"
       data-testid="assigned-person"
-      :icon="IconPermIdentity"
+      :icon="IconPerson"
       :label="name || '-'"
     />
   </div>

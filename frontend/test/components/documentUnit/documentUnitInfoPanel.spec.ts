@@ -178,6 +178,6 @@ describe("documentUnit InfoPanel", () => {
     expect(screen.queryByText("Blockiert")).not.toBeInTheDocument()
     expect(await screen.findByText("Fertig")).toBeInTheDocument()
     expect(screen.queryByText("F")).not.toBeInTheDocument()
-    expect(await screen.findByText("Test User")).toBeInTheDocument()
+    expect(await screen.findByText("TU")).toBeInTheDocument()
   })
 })
