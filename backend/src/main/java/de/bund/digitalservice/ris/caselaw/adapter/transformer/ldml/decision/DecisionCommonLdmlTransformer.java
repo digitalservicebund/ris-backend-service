@@ -58,7 +58,7 @@ public abstract class DecisionCommonLdmlTransformer
     this.htmlTransformer = new HtmlTransformer(documentBuilderFactory);
   }
 
-  public CaseLawLdml transformToLdml(Decision decision) throws LdmlTransformationException {
+  public CaseLawLdml transformToLdml(Decision decision) {
     try {
       return CaseLawLdml.builder().judgment(buildJudgment(decision)).build();
     } catch (ValidationException e) {
