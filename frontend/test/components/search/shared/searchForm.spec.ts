@@ -5,12 +5,13 @@ import { config } from "@vue/test-utils"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import InputText from "primevue/inputtext"
-import { afterEach, beforeEach, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import SearchForm from "@/components/search/shared/SearchForm.vue"
 import { Court } from "@/domain/court"
 import { Kind } from "@/domain/documentationUnitKind"
 import PendingProceeding from "@/domain/pendingProceeding"
+import ProcessStep from "@/domain/processStep"
 import authService from "@/services/authService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
@@ -27,9 +28,16 @@ const server = setupServer(
   http.get("/api/v1/caselaw/documentunits/search", () => {
     return HttpResponse.json([new PendingProceeding("uuid")])
   }),
+  http.get("/api/v1/caselaw/processsteps", () => {
+    return HttpResponse.json([
+      { uuid: "a", abbreviation: "A", name: "Step A" },
+      { uuid: "b", abbreviation: "B", name: "Step B" },
+    ] as ProcessStep[])
+  }),
 )
 
 function renderComponent(
+  kind: Kind,
   { isInternal }: { isInternal: boolean } = { isInternal: true },
 ) {
   const user = userEvent.setup()
@@ -42,7 +50,7 @@ function renderComponent(
     user,
     ...render(SearchForm, {
       props: {
-        kind: Kind.PENDING_PROCEEDING,
+        kind,
       },
       global: {
         directives: { "ctrl-enter": onSearchShortcutDirective },
@@ -95,14 +103,56 @@ describe("Documentunit Search", () => {
     }),
   )
 
-  test("renders all input fields", async () => {
-    renderComponent()
+  const kinds = [
+    { kind: Kind.PENDING_PROCEEDING, dateLabel: "Mitteilungsdatum" },
+    { kind: Kind.DECISION, dateLabel: "Entscheidungsdatum" },
+  ]
 
-    expect(screen.getByLabelText("Aktenzeichen Suche")).toBeInTheDocument()
-    expect(screen.getByLabelText("Gerichtstyp Suche")).toBeInTheDocument()
-    expect(screen.getByLabelText("Gerichtsort Suche")).toBeInTheDocument()
-    expect(screen.getByLabelText("Dokumentnummer Suche")).toBeInTheDocument()
-    expect(screen.getByLabelText("Status Suche")).toBeInTheDocument()
+  kinds.forEach(({ kind }) =>
+    test(`renders all commin input fields for ${kind}`, async () => {
+      renderComponent(kind)
+      expect(screen.getByLabelText("Aktenzeichen Suche")).toBeInTheDocument()
+      expect(screen.getByLabelText("Gerichtstyp Suche")).toBeInTheDocument()
+      expect(screen.getByLabelText("Gerichtsort Suche")).toBeInTheDocument()
+      expect(screen.getByLabelText("Dokumentnummer Suche")).toBeInTheDocument()
+      expect(screen.getByLabelText("Status Suche")).toBeInTheDocument()
+    }),
+  )
+
+  test("renders all specific input fields for decisions", async () => {
+    const { user } = renderComponent(Kind.DECISION)
+    expect(
+      screen.getByLabelText("Nur meine Dokstelle Filter"),
+    ).toBeInTheDocument()
+
+    // don't show own doc office only inputs
+    expect(
+      screen.queryByLabelText("jDV Übergabedatum Suche"),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Terminiert Filter")).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Prozessschritt")).not.toBeInTheDocument()
+
+    // show own doc office only inputs as soon as checkbox is clicked
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(screen.getByLabelText("jDV Übergabedatum Suche")).toBeInTheDocument()
+    expect(screen.getByLabelText("Terminiert Filter")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
+    ).toBeInTheDocument()
+    expect(screen.getByLabelText("Prozessschritt")).toBeInTheDocument()
+  })
+
+  test("renders all specific input fields for pending proceedings", async () => {
+    renderComponent(Kind.PENDING_PROCEEDING)
     expect(
       screen.getByLabelText("Erledigungsmitteilung Suche"),
     ).toBeInTheDocument()
@@ -114,40 +164,75 @@ describe("Documentunit Search", () => {
       screen.getByLabelText("Mitteilungsdatum Suche Ende"),
     ).toBeInTheDocument()
     expect(screen.getByLabelText("Erledigt Filter")).toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Nur meine Dokstelle Filter"),
+    ).not.toBeInTheDocument()
   })
 
-  test("emits 'search' event when valid search is submitted", async () => {
-    const { user, emitted } = renderComponent()
+  kinds.forEach(({ kind }) =>
+    test(`emits 'search' event when valid ${kind} search is submitted`, async () => {
+      const { user, emitted } = renderComponent(kind)
 
-    await user.type(screen.getByLabelText("Aktenzeichen Suche"), "12345")
-    await user.keyboard("{Control>}{Enter}")
+      await user.type(screen.getByLabelText("Aktenzeichen Suche"), "12345")
+      await user.keyboard("{Control>}{Enter}")
 
-    expect(emitted().search).toBeTruthy()
-  })
+      expect(emitted().search).toBeTruthy()
+    }),
+  )
 
-  test("emits 'search' event again when same search is repeated", async () => {
-    const { user, emitted } = renderComponent()
+  kinds.forEach(({ kind }) =>
+    test(`emits 'search' event again when same ${kind} search is repeated`, async () => {
+      const { user, emitted } = renderComponent(kind)
 
-    await user.type(screen.getByLabelText("Aktenzeichen Suche"), "12345")
-    await user.keyboard("{Control>}{Enter}")
-    const initialCount = emitted().search.length
+      await user.type(screen.getByLabelText("Aktenzeichen Suche"), "12345")
+      await user.keyboard("{Control>}{Enter}")
+      const initialCount = emitted().search.length
 
-    await user.click(screen.getByText("Ergebnisse zeigen"))
-    expect(emitted().search.length).toBe(initialCount + 1)
-  })
+      await user.click(screen.getByText("Ergebnisse zeigen"))
+      expect(emitted().search.length).toBe(initialCount + 1)
+    }),
+  )
 
-  test("resets form and emits 'resetSearchResults' on reset", async () => {
-    const { user, emitted } = renderComponent()
+  kinds.forEach(({ kind, dateLabel }) =>
+    test(`resets common fields in ${kind} form and emits 'resetSearchResults' on reset`, async () => {
+      const { user, emitted } = renderComponent(kind)
 
-    await user.type(screen.getByLabelText("Aktenzeichen Suche"), "12345")
-    await user.type(screen.getByLabelText("Gerichtstyp Suche"), "BGH")
-    await user.type(screen.getByLabelText("Gerichtsort Suche"), "DEU")
-    await user.type(screen.getByLabelText("Dokumentnummer Suche"), "DOKNUMMER")
-    await user
-      .click(screen.getByLabelText("Status Suche"))
-      .then(
-        async () => await user.click(screen.getByLabelText("Veröffentlicht")),
+      await user.type(screen.getByLabelText("Aktenzeichen Suche"), "12345")
+      await user.type(screen.getByLabelText("Gerichtstyp Suche"), "BGH")
+      await user.type(screen.getByLabelText("Gerichtsort Suche"), "DEU")
+      await user.type(
+        screen.getByLabelText("Dokumentnummer Suche"),
+        "DOKNUMMER",
       )
+      await user
+        .click(screen.getByLabelText("Status Suche"))
+        .then(
+          async () => await user.click(screen.getByLabelText("Veröffentlicht")),
+        )
+
+      await user.type(screen.getByLabelText(dateLabel + " Suche"), "05.05.2005")
+      await user.type(
+        screen.getByLabelText(dateLabel + " Suche Ende"),
+        "01.01.2010",
+      )
+      await user.click(screen.getByLabelText("Suche zurücksetzen"))
+
+      expect(emitted().resetSearchResults).toBeTruthy()
+      expect(screen.getByLabelText("Aktenzeichen Suche")).toHaveValue("")
+      expect(screen.getByLabelText("Gerichtstyp Suche")).toHaveValue("")
+      expect(screen.getByLabelText("Gerichtsort Suche")).toHaveValue("")
+      expect(screen.getByLabelText("Dokumentnummer Suche")).toHaveValue("")
+      expect(screen.getByLabelText("Status Suche").textContent).equals(
+        "Bitte auswählen",
+      )
+      expect(screen.getByLabelText(dateLabel + " Suche")).toHaveValue("")
+      expect(screen.getByLabelText(dateLabel + " Suche Ende")).toHaveValue("")
+    }),
+  )
+
+  test(`resets pending proceeding form fields and emits 'resetSearchResults' on reset`, async () => {
+    const { user, emitted } = renderComponent(Kind.PENDING_PROCEEDING)
+
     await user.type(
       screen.getByLabelText("Erledigungsmitteilung Suche"),
       "11.11.2011",
@@ -156,28 +241,12 @@ describe("Documentunit Search", () => {
       screen.getByLabelText("Erledigungsmitteilung Suche Ende"),
       "12.11.2020",
     )
-    await user.type(
-      screen.getByLabelText("Mitteilungsdatum Suche"),
-      "05.05.2005",
-    )
-    await user.type(
-      screen.getByLabelText("Mitteilungsdatum Suche Ende"),
-      "01.01.2010",
-    )
     await user.click(screen.getByLabelText("Erledigt Filter"))
 
     await user.click(screen.getByLabelText("Suche zurücksetzen"))
 
     expect(emitted().resetSearchResults).toBeTruthy()
-    expect(screen.getByLabelText("Aktenzeichen Suche")).toHaveValue("")
-    expect(screen.getByLabelText("Gerichtstyp Suche")).toHaveValue("")
-    expect(screen.getByLabelText("Gerichtsort Suche")).toHaveValue("")
-    expect(screen.getByLabelText("Dokumentnummer Suche")).toHaveValue("")
-    expect(screen.getByLabelText("Status Suche").textContent).equals(
-      "Bitte auswählen",
-    )
-    expect(screen.getByLabelText("Mitteilungsdatum Suche")).toHaveValue("")
-    expect(screen.getByLabelText("Mitteilungsdatum Suche Ende")).toHaveValue("")
+
     expect(screen.getByLabelText("Erledigungsmitteilung Suche")).toHaveValue("")
     expect(
       screen.getByLabelText("Erledigungsmitteilung Suche Ende"),
@@ -185,106 +254,144 @@ describe("Documentunit Search", () => {
     expect(screen.getByLabelText("Erledigt Filter")).not.toBeChecked()
   })
 
-  test("validates date range and shows error if end date is before start date", async () => {
-    const { user } = renderComponent()
+  test(`resets decision form fields and emits 'resetSearchResults' on reset`, async () => {
+    const { user, emitted } = renderComponent(Kind.DECISION)
 
-    const startDateInput = screen.getByLabelText("Mitteilungsdatum Suche")
-    const endDateInput = screen.getByLabelText("Mitteilungsdatum Suche Ende")
-
-    await user.type(startDateInput, "01.01.2025")
-    await user.type(endDateInput, "01.01.2023")
-
-    await user.keyboard("{Control>}{Enter}")
-
-    expect(
-      screen.getByText("Enddatum darf nicht vor Startdatum liegen"),
-    ).toBeInTheDocument()
-  })
-
-  test("validates resolution date range and shows error if end date is before start date", async () => {
-    const { user } = renderComponent()
-
-    const startDateInput = screen.getByLabelText("Erledigungsmitteilung Suche")
-    const endDateInput = screen.getByLabelText(
-      "Erledigungsmitteilung Suche Ende",
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    await user
+      .click(screen.getByLabelText("Prozessschritt"))
+      .then(async () => await user.click(screen.getByLabelText("Step A")))
+    await user.type(
+      screen.getByLabelText("jDV Übergabedatum Suche"),
+      "11.11.2011",
+    )
+    await user.click(screen.getByLabelText("Terminiert Filter"))
+    await user.click(
+      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+    )
+    await user.click(
+      screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     )
 
-    await user.type(startDateInput, "01.01.2025")
-    await user.type(endDateInput, "01.01.2023")
+    await user.click(screen.getByLabelText("Suche zurücksetzen"))
 
-    await user.keyboard("{Control>}{Enter}")
+    expect(emitted().resetSearchResults).toBeTruthy()
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
 
+    expect(screen.getByLabelText("jDV Übergabedatum Suche")).toHaveValue("")
+    expect(screen.getByLabelText("Prozessschritt").textContent).equals(" ")
+    expect(screen.getByLabelText("Terminiert Filter")).not.toBeChecked()
     expect(
-      screen.getByText("Enddatum darf nicht vor Startdatum liegen"),
-    ).toBeInTheDocument()
-  })
-
-  it("displays error message when no search item is entered", async () => {
-    // given
-    const { user } = renderComponent()
-    const startDateInput = screen.getByLabelText("Mitteilungsdatum Suche")
-    await user.click(startDateInput)
-
-    // when
-    await user.keyboard("{Control>}{Enter}")
-
-    // then
+      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+    ).not.toBeChecked()
     expect(
-      screen.getByText("Geben Sie mindestens ein Suchkriterium ein"),
-    ).toBeInTheDocument()
+      screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
+    ).not.toBeChecked()
   })
 
-  it("displays error message when invalid date is entered", async () => {
-    // given
-    const { user } = renderComponent()
-    const startDateInput = screen.getByLabelText("Mitteilungsdatum Suche")
-    await user.type(startDateInput, "99.99.9999")
+  test(`resets own doc office fields when check box is unchecked`, async () => {
+    const { user } = renderComponent(Kind.DECISION)
 
-    // when
-    await user.keyboard("{Control>}{Enter}")
-
-    // then
-    expect(screen.getByText("Kein valides Datum")).toBeInTheDocument()
-  })
-
-  it("displays error message when invalid resolution date is entered", async () => {
-    // given
-    const { user } = renderComponent()
-    const startDateInput = screen.getByLabelText("Mitteilungsdatum Suche")
-    await user.type(startDateInput, "99.99.9999")
-
-    // when
-    await user.keyboard("{Control>}{Enter}")
-
-    // then
-    expect(screen.getByText("Kein valides Datum")).toBeInTheDocument()
-  })
-
-  it("displays error message when start date is missing", async () => {
-    // given
-    const { user } = renderComponent()
-    const endDateInput = screen.getByLabelText("Mitteilungsdatum Suche Ende")
-    await user.type(endDateInput, "01.01.2000")
-
-    // when
-    await user.keyboard("{Control>}{Enter}")
-
-    // then
-    expect(screen.getByText("Startdatum fehlt")).toBeInTheDocument()
-  })
-
-  it("displays error message when start resolution date is missing", async () => {
-    // given
-    const { user } = renderComponent()
-    const endDateInput = screen.getByLabelText(
-      "Erledigungsmitteilung Suche Ende",
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    await user.type(
+      screen.getByLabelText("jDV Übergabedatum Suche"),
+      "11.11.2011",
     )
-    await user.type(endDateInput, "01.01.2000")
+    await user.click(screen.getByLabelText("Terminiert Filter"))
+    await user.click(
+      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+    )
+    await user.click(
+      screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
+    )
 
-    // when
-    await user.keyboard("{Control>}{Enter}")
+    // hide fields
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    // show fields
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
 
-    // then
-    expect(screen.getByText("Startdatum fehlt")).toBeInTheDocument()
+    expect(screen.getByLabelText("jDV Übergabedatum Suche")).toHaveValue("")
+    expect(screen.getByLabelText("Terminiert Filter")).not.toBeChecked()
+    expect(
+      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+    ).not.toBeChecked()
+    expect(
+      screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
+    ).not.toBeChecked()
   })
+
+  kinds
+    .concat({
+      kind: Kind.PENDING_PROCEEDING,
+      dateLabel: "Erledigungsmitteilung",
+    })
+    .forEach(({ kind, dateLabel }) =>
+      test(`validates ${kind} ${dateLabel} date range and shows error if end date is before start date`, async () => {
+        const { user } = renderComponent(kind)
+
+        const startDateInput = screen.getByLabelText(dateLabel + " Suche")
+        const endDateInput = screen.getByLabelText(dateLabel + " Suche Ende")
+
+        await user.type(startDateInput, "01.01.2025")
+        await user.type(endDateInput, "01.01.2023")
+
+        await user.keyboard("{Control>}{Enter}")
+
+        expect(
+          screen.getByText("Enddatum darf nicht vor Startdatum liegen"),
+        ).toBeInTheDocument()
+      }),
+    )
+
+  kinds.forEach(({ kind }) =>
+    it(`displays error message when no ${kind} search item is entered`, async () => {
+      // given
+      const { user } = renderComponent(kind)
+      const startDateInput = screen.getByLabelText("Aktenzeichen Suche")
+      await user.click(startDateInput)
+
+      // when
+      await user.keyboard("{Control>}{Enter}")
+
+      // then
+      expect(
+        screen.getByText("Geben Sie mindestens ein Suchkriterium ein"),
+      ).toBeInTheDocument()
+    }),
+  )
+
+  kinds.forEach(({ kind, dateLabel }) =>
+    it(`displays error message when invalid date is entered for ${kind}`, async () => {
+      // given
+      const { user } = renderComponent(kind)
+      const startDateInput = screen.getByLabelText(dateLabel + " Suche")
+      await user.type(startDateInput, "99.99.9999")
+
+      // when
+      await user.keyboard("{Control>}{Enter}")
+
+      // then
+      expect(screen.getByText("Kein valides Datum")).toBeInTheDocument()
+    }),
+  )
+
+  kinds
+    .concat({
+      kind: Kind.PENDING_PROCEEDING,
+      dateLabel: "Erledigungsmitteilung",
+    })
+    .forEach(({ kind, dateLabel }) =>
+      it("displays error message when start date is missing", async () => {
+        // given
+        const { user } = renderComponent(kind)
+        const endDateInput = screen.getByLabelText(dateLabel + " Suche Ende")
+        await user.type(endDateInput, "01.01.2000")
+
+        // when
+        await user.keyboard("{Control>}{Enter}")
+
+        // then
+        expect(screen.getByText("Startdatum fehlt")).toBeInTheDocument()
+      }),
+    )
 })
