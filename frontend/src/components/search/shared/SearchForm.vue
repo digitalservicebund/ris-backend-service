@@ -375,7 +375,7 @@ watch(
     data-testid="document-unit-search-entry-form"
   >
     <div
-      class="m-32 grid grid-cols-[minmax(80px,150px)_minmax(250px,1fr)_minmax(80px,150px)_minmax(250px,1fr)] gap-x-32 gap-y-16"
+      class="m-32 grid auto-rows-[48px] grid-cols-[minmax(80px,150px)_minmax(250px,1fr)_minmax(80px,150px)_minmax(250px,1fr)] gap-x-32 gap-y-16"
       :class="{
         'grid-layout-decision': isDecision,
         'grid-layout-pending-proceeding': isPendingProceeding,
@@ -555,7 +555,7 @@ watch(
       </div>
       <!-- Decision Specific Fields -->
       <template v-if="isDecision">
-        <div class="flex flex-row gap-10 py-12 [grid-area:own-docoffice]">
+        <div class="flex flex-row gap-10 [grid-area:own-docoffice]">
           <InputField
             id="documentationOffice"
             v-slot="{ id }"
@@ -737,7 +737,7 @@ watch(
             ></DateInput>
           </InputField>
         </div>
-        <div class="flex flex-row py-12 [grid-area:resolved-input]">
+        <div class="flex flex-row [grid-area:resolved-input]">
           <InputField
             id="resolved"
             v-slot="{ id }"
