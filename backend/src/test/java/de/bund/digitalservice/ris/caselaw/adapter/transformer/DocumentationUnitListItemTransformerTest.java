@@ -69,9 +69,9 @@ class DocumentationUnitListItemTransformerTest {
                 DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .processSteps(
                 List.of(
-                    previousDocumentationUnitProcessStepDTO,
                     currentDocumentationUnitProcessStepDTO,
-                    currentDocumentationUnitProcessStepDTO))
+                    currentDocumentationUnitProcessStepDTO,
+                    previousDocumentationUnitProcessStepDTO))
             .source(
                 List.of(
                     SourceDTO.builder().value(SourceValue.E).build(),
@@ -116,9 +116,11 @@ class DocumentationUnitListItemTransformerTest {
     assertThat(documentationUnitListItem.status().publicationStatus())
         .isEqualTo(PublicationStatus.PUBLISHED);
     assertThat(documentationUnitListItem.status().withError()).isFalse();
+    // current doc process step
     assertThat(
             documentationUnitListItem.currentDocumentationUnitProcessStep().getProcessStep().uuid())
         .isEqualTo(currentDocumentationUnitProcessStepDTO.getProcessStep().getId());
+    // previous process step
     assertThat(documentationUnitListItem.previousProcessStep().uuid())
         .isEqualTo(previousDocumentationUnitProcessStepId);
   }
