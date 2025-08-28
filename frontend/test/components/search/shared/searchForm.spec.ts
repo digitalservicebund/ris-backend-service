@@ -223,7 +223,7 @@ describe("Documentunit Search", () => {
       expect(screen.getByLabelText("Gerichtsort Suche")).toHaveValue("")
       expect(screen.getByLabelText("Dokumentnummer Suche")).toHaveValue("")
       expect(screen.getByLabelText("Status Suche").textContent).equals(
-        "Bitte auswählen",
+        "Nicht ausgewählt",
       )
       expect(screen.getByLabelText(dateLabel + " Suche")).toHaveValue("")
       expect(screen.getByLabelText(dateLabel + " Suche Ende")).toHaveValue("")
@@ -280,7 +280,7 @@ describe("Documentunit Search", () => {
 
     expect(screen.getByLabelText("jDV Übergabedatum Suche")).toHaveValue("")
     expect(screen.getByLabelText("Prozessschritt").textContent).equals(
-      "Bitte auswählen",
+      "Nicht ausgewählt",
     )
     expect(screen.getByLabelText("Terminiert Filter")).not.toBeChecked()
     expect(
