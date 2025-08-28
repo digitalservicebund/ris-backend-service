@@ -709,16 +709,17 @@ watch(
       </template>
 
       <!-- Common Search Button -->
-      <div class="flex flex-row justify-end gap-x-16 [grid-area:search-button]">
-        <Button
-          v-if="!isEmptySearch"
-          aria-label="Suche zurücksetzen"
-          class="ml-8 self-start"
-          label="Suche zurücksetzen"
-          text
-          @click="resetSearch"
-        ></Button>
-        <div class="flex flex-col gap-8">
+
+      <div class="flex flex-col gap-8 [grid-area:search-button]">
+        <div class="flex flex-row justify-end gap-x-16">
+          <Button
+            v-if="!isEmptySearch"
+            aria-label="Suche zurücksetzen"
+            class="ml-8 self-start"
+            label="Suche zurücksetzen"
+            text
+            @click="resetSearch"
+          ></Button>
           <Button
             :aria-label="
               isDecision
@@ -730,7 +731,8 @@ watch(
             label="Ergebnisse zeigen"
             @click="handleSearchButtonClicked"
           ></Button>
-
+        </div>
+        <div class="flex flex-row justify-end">
           <span
             v-if="submitButtonError"
             class="ris-label3-regular min-h-[1rem] text-red-800"
