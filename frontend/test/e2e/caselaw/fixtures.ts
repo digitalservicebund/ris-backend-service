@@ -858,7 +858,7 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
       // If the deletion fails with a 403, probably the docoffice ownership changed, we need to handle that gracefully and must be manually deleted in the test
       if (deleteResponse.status() === 403) {
         console.warn(
-          `Deletion failed with 403 for BGH user. Ownership likely changed. Document must be deleted manually.`,
+          `Deletion ${decision.documentNumber} failed with 403 for BGH user. Ownership likely changed. Document must be deleted manually.`,
         )
       } else {
         throw Error(
