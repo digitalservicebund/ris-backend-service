@@ -4785,7 +4785,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
       RisJsonPatch patch = new RisJsonPatch(0L, new JsonPatch(operations), Collections.emptyList());
 
-      // When: apply the patch
+      // When: Saving the patch without user
       risWebTestClient
           .withDefaultLogin(oidcLoggedInUserId)
           .patch()
@@ -4810,7 +4810,6 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                     .isEmpty();
               });
 
-      // Verify DB state
       TestTransaction.start();
       List<DocumentationUnitDTO> allDocumentationUnits = repository.findAll();
       assertThat(allDocumentationUnits).hasSize(1);
@@ -4818,14 +4817,14 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       DocumentationUnitDTO doc = allDocumentationUnits.get(0);
       assertThat(doc.getDocumentNumber()).isEqualTo(decision.documentNumber());
 
-      // current step remains the same
+      // Then: current step remains the same
       assertThat(doc.getCurrentProcessStep().getProcessStep().getName()).isEqualTo("Ersterfassung");
 
       // assert 2 total process steps:  the last without a user and the first with
       assertThat(doc.getProcessSteps()).hasSize(2);
       assertThat(doc.getProcessSteps().getFirst().getProcessStep().getName())
           .isEqualTo("Ersterfassung");
-      assertThat(doc.getProcessSteps().getFirst()).isNull();
+      assertThat(doc.getProcessSteps().getFirst().getUserId()).isNull();
       TestTransaction.end();
 
       var visibleUser = User.builder().documentationOffice(buildDSDocOffice()).build();
