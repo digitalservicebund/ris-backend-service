@@ -4546,6 +4546,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
                 assertThat(responsePatch.patch().getOperations()).hasSize(13);
 
+                // Assert previous step
                 assertThat(responsePatch.patch().getOperations())
                     .filteredOn(
                         op ->
@@ -4553,11 +4554,13 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                                 && "/previousProcessStep".equals(op.getPath()))
                     .first()
                     .satisfies(
-                        operation -> {
-                          assertThat(operation).isInstanceOf(ReplaceOperation.class);
-                          ReplaceOperation replaceOperation = (ReplaceOperation) operation;
-                          assertThat(replaceOperation.getValue().asText())
+                        op -> {
+                          assertThat(op).isInstanceOf(ReplaceOperation.class);
+                          ReplaceOperation repl = (ReplaceOperation) op;
+                          assertThat(repl.getValue().at("/name").asText())
                               .isEqualTo("Ersterfassung");
+
+                          assertThat(repl.getValue().at("/abbreviation").asText()).isEqualTo("EE");
                         });
 
                 // Assert new process step as last item in list
@@ -4652,7 +4655,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(
-              new ReplaceOperation("/currentProcessStep/user", userNode),
+              new ReplaceOperation("/currentDocumentationUnitProcessStep/user", userNode),
               new ReplaceOperation(
                   "/currentDocumentationUnitProcessStep/processStep/abbreviation",
                   new TextNode("FD")),
