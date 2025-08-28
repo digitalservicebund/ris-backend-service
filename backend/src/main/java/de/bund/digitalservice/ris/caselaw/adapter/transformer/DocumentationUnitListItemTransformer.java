@@ -169,7 +169,7 @@ public class DocumentationUnitListItemTransformer {
 
     return Optional.ofNullable(documentationUnitProcessStepsDTOs)
         .filter(steps -> !steps.isEmpty())
-        .map(List::getLast)
+        .map(List::getFirst)
         .map(DocumentationUnitProcessStepTransformer::toDomain)
         .orElse(null);
   }
