@@ -149,7 +149,7 @@ const withDuplicateWarning = computed({
 const processStepId = computed({
   get: () => query.value.processStepId,
   set: (data) => {
-    if (data) {
+    if (data && data !== "Bitte auswählen") {
       query.value.processStepId = data
     } else {
       delete query.value.processStepId
@@ -353,7 +353,9 @@ function handleSearch() {
 onMounted(async () => {
   const processStepsResponse = await processStepService.getProcessSteps()
   if (!processStepsResponse.error) {
-    processSteps.value = processStepsResponse.data
+    processSteps.value = [
+      { uuid: "Bitte auswählen", name: "Bitte auswählen" } as ProcessStep,
+    ].concat(processStepsResponse.data)
   }
 })
 
@@ -407,7 +409,7 @@ watch(
       </div>
 
       <div
-        class="ris-body1-regular items-center[grid-area:docnumber-label] flex flex-row"
+        class="ris-body1-regular flex flex-row items-center [grid-area:docnumber-label]"
       >
         Dokument&shy;nummer
       </div>
@@ -591,9 +593,11 @@ watch(
                 v-model="processStepId"
                 aria-label="Prozessschritt"
                 class="w-full"
+                default-value="Bitte auswählen"
                 option-label="name"
                 option-value="uuid"
                 :options="processSteps"
+                placeholder="Bitte auswählen"
               ></InputSelect>
             </InputField>
           </div>

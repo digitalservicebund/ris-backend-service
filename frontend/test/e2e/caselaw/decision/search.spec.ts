@@ -202,6 +202,61 @@ test.describe("Große Suche nach Entscheidungen", () => {
     await checkResultListContent(docUnitSearchResultsDateRange, page)
   })
 
+  test(
+    "Suche nach Prozessschritt",
+    {
+      tag: "@RISDEV-8718",
+    },
+    async ({ page, decisions }) => {
+      const { createdDecisions } = decisions
+      await openSearchWithFileNumberPrefix("e2e-", page)
+      await page.getByLabel("Nur meine Dokstelle Filter").click()
+
+      // all new doc units are created with step Ersterfassung
+      await test.step(`Wähle Schritt 'Ersterfassung'`, async () => {
+        await page.getByLabel("Prozessschritt").click()
+        await page
+          .getByRole("option", { name: "Ersterfassung", exact: true })
+          .click()
+      })
+      await triggerSearch(page)
+
+      await test.step(`Prüfe, dass Ergebnisse gefunden wurde`, async () => {
+        await expect(
+          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
+        ).toBeVisible()
+        await expect(
+          page.getByText(createdDecisions[0].documentNumber),
+        ).toBeVisible()
+      })
+
+      await test.step(`Wähle Schritt 'Fertig'`, async () => {
+        await page.getByLabel("Prozessschritt").click()
+        await page.getByRole("option", { name: "Fertig", exact: true }).click()
+      })
+      await triggerSearch(page)
+
+      await test.step(`Prüfe, dass keine Ergebnisse gefunden wurde`, async () => {
+        await expect(
+          page.getByText("Keine Suchergebnisse gefunden"),
+        ).toBeVisible()
+      })
+      await test.step(`Setze Schritt-Filter zurück`, async () => {
+        await page.getByLabel("Prozessschritt").click()
+        await page
+          .getByRole("option", { name: "Bitte auswählen", exact: true })
+          .click()
+      })
+      await triggerSearch(page)
+
+      await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
+        await expect(
+          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
+        ).toBeVisible()
+      })
+    },
+  )
+
   test("Datumsvalidierung", async ({ page }) => {
     await navigateToSearch(page)
     await test.step("Wähle Entscheidungsdatum Ende '02.01.2023' in Suche", async () => {
@@ -371,10 +426,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
   test(
     "Existierende Notiz wird in Suchergebnissen angezeigt",
     {
-      annotation: {
-        type: "story",
-        description: "RISDEV-4176",
-      },
+      tag: "@RISDEV-4176",
     },
     async ({ page, prefilledDocumentUnit }) => {
       await test.step("Notiz ausfüllen", async () => {

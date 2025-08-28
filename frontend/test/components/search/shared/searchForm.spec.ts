@@ -279,7 +279,9 @@ describe("Documentunit Search", () => {
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
 
     expect(screen.getByLabelText("jDV Übergabedatum Suche")).toHaveValue("")
-    expect(screen.getByLabelText("Prozessschritt").textContent).equals(" ")
+    expect(screen.getByLabelText("Prozessschritt").textContent).equals(
+      "Bitte auswählen",
+    )
     expect(screen.getByLabelText("Terminiert Filter")).not.toBeChecked()
     expect(
       screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
