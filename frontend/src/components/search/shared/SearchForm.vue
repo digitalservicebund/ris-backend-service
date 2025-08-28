@@ -3,14 +3,16 @@ import Button from "primevue/button"
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import InputSelect from "primevue/select"
-import { computed, ref, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { Kind } from "@/domain/documentationUnitKind"
+import ProcessStep from "@/domain/processStep"
 import { PublicationState } from "@/domain/publicationStatus"
+import processStepService from "@/services/processStepService"
 import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
 const props = defineProps<{
@@ -87,6 +89,7 @@ const myDocOfficeOnly = computed({
         delete query.value.myDocOfficeOnly
         delete query.value.scheduledOnly
         delete query.value.publicationDate
+        delete query.value.processStepId
         resetErrors("publicationDate") // Clear validation for publicationDate
       } else {
         query.value.myDocOfficeOnly = "true"
@@ -142,6 +145,19 @@ const withDuplicateWarning = computed({
     }
   },
 })
+
+const processStepId = computed({
+  get: () => query.value.processStepId,
+  set: (data) => {
+    if (data) {
+      query.value.processStepId = data
+    } else {
+      delete query.value.processStepId
+    }
+  },
+})
+
+const processSteps = ref<ProcessStep[]>()
 
 /**
  * Resets the search form, validation errors, and clears the query.
@@ -333,6 +349,13 @@ function handleSearch() {
     resetSearch()
   }
 }
+
+onMounted(async () => {
+  const processStepsResponse = await processStepService.getProcessSteps()
+  if (!processStepsResponse.error) {
+    processSteps.value = processStepsResponse.data
+  }
+})
 
 // Watch for route changes to update query and trigger search
 watch(
@@ -552,6 +575,30 @@ watch(
 
         <template v-if="myDocOfficeOnly">
           <div
+            class="ris-body1-regular flex flex-row items-center [grid-area:process-step-label]"
+          >
+            Schritt
+          </div>
+
+          <div class="flex flex-row gap-20 [grid-area:process-step-input]">
+            <InputField
+              id="processStep"
+              data-testid="process-step-input"
+              label="Prozessschritt"
+              visually-hide-label
+            >
+              <InputSelect
+                v-model="processStepId"
+                aria-label="Prozessschritt"
+                class="w-full"
+                option-label="name"
+                option-value="uuid"
+                :options="processSteps"
+              ></InputSelect>
+            </InputField>
+          </div>
+
+          <div
             class="ris-body1-regular flex flex-row items-center [grid-area:jdv-label]"
           >
             jDV Übergabe
@@ -761,7 +808,8 @@ watch(
     "court-label court-input status-label status-input"
     "date-label date-input . ."
     "own-docoffice own-docoffice . ."
-    "jdv-label jdv-input checkbox-label checkbox-group"
+    "process-step-label process-step-input jdv-label jdv-input"
+    ". . checkbox-label checkbox-group"
     ". . search-button search-button";
 }
 
