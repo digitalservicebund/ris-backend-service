@@ -375,7 +375,7 @@ watch(
     data-testid="document-unit-search-entry-form"
   >
     <div
-      class="m-32 grid grid-cols-[150px_1fr_150px_1fr] gap-x-40 gap-y-16"
+      class="m-32 grid grid-cols-[minmax(80px,150px)_minmax(250px,1fr)_minmax(80px,150px)_minmax(250px,1fr)] gap-x-32 gap-y-16"
       :class="{
         'grid-layout-decision': isDecision,
         'grid-layout-pending-proceeding': isPendingProceeding,
@@ -800,9 +800,6 @@ watch(
     "date-label date-input . ."
     "own-docoffice own-docoffice . ."
     ". . search-button search-button";
-  grid-template-columns:
-    fit-content(150px) minmax(200px, 1fr) fit-content(150px)
-    minmax(200px, 1fr);
 }
 
 .grid-layout-decision.is-own-docoffice {
@@ -814,9 +811,6 @@ watch(
     "process-step-label process-step-input jdv-label jdv-input"
     ". . checkbox-label checkbox-group"
     ". . search-button search-button";
-  grid-template-columns:
-    fit-content(150px) minmax(200px, 1fr) fit-content(150px)
-    minmax(200px, 1fr);
 }
 
 .grid-layout-pending-proceeding {
@@ -826,8 +820,5 @@ watch(
     "date-label date-input resolution-date-label resolution-date-input"
     ". . . resolved-input"
     ". . search-button search-button";
-  grid-template-columns:
-    fit-content(150px) minmax(200px, 1fr) fit-content(150px)
-    minmax(200px, 1fr);
 }
 </style>
