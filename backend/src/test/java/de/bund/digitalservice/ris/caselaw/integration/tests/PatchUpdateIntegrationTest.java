@@ -4768,6 +4768,81 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           .expectStatus()
           .isNotFound();
     }
+
+    @Test
+    @Transactional
+    void testPartialUpdateByUuid_withUserUpdateOnly_shouldNotChangeStep_andHaveNoPreviousStep() {
+      TestTransaction.flagForCommit();
+      TestTransaction.end();
+
+      // Given an existing doc unit with initial step "Ersterfassung" and a mocked logged-in user
+      Decision decision = generateEmptyDocumentationUnitWithMockedUser();
+      assertThat(decision.currentDocumentationUnitProcessStep().getProcessStep().name())
+          .isEqualTo("Ersterfassung");
+
+      List<JsonPatchOperation> operations =
+          List.of(new RemoveOperation("/currentDocumentationUnitProcessStep/user"));
+
+      RisJsonPatch patch = new RisJsonPatch(0L, new JsonPatch(operations), Collections.emptyList());
+
+      // When: apply the patch
+      risWebTestClient
+          .withDefaultLogin(oidcLoggedInUserId)
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
+          .bodyValue(patch)
+          .exchange()
+          .expectStatus()
+          .is2xxSuccessful()
+          .expectBody(RisJsonPatch.class)
+          .consumeWith(
+              response -> {
+                RisJsonPatch responsePatch = response.getResponseBody();
+                assertThat(responsePatch).isNotNull();
+                assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
+
+                // Then: no previousProcessStep is included when only the user changes
+                assertThat(responsePatch.patch().getOperations())
+                    .filteredOn(
+                        op ->
+                            "replace".equals(op.getOp())
+                                && "/previousProcessStep".equals(op.getPath()))
+                    .isEmpty();
+              });
+
+      // Verify DB state
+      TestTransaction.start();
+      List<DocumentationUnitDTO> allDocumentationUnits = repository.findAll();
+      assertThat(allDocumentationUnits).hasSize(1);
+
+      DocumentationUnitDTO doc = allDocumentationUnits.get(0);
+      assertThat(doc.getDocumentNumber()).isEqualTo(decision.documentNumber());
+
+      // current step remains the same
+      assertThat(doc.getCurrentProcessStep().getProcessStep().getName()).isEqualTo("Ersterfassung");
+
+      // assert 2 total process steps:  the last without a user and the first with
+      assertThat(doc.getProcessSteps()).hasSize(2);
+      assertThat(doc.getProcessSteps().getFirst().getProcessStep().getName())
+          .isEqualTo("Ersterfassung");
+      assertThat(doc.getProcessSteps().getFirst()).isNull();
+      TestTransaction.end();
+
+      var visibleUser = User.builder().documentationOffice(buildDSDocOffice()).build();
+      var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), visibleUser);
+
+      assertThat(logs).hasSize(2);
+      assertThat(logs)
+          .map(HistoryLog::eventType)
+          .containsExactly(HistoryLogEventType.PROCESS_STEP_USER, HistoryLogEventType.CREATE);
+
+      assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser");
+      assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS");
+
+      // Person removed -> no step change
+      assertThat(logs.get(0).description()).isEqualTo("Person entfernt: testUser");
+      assertThat(logs.get(1).description()).isEqualTo("Dokeinheit angelegt");
+    }
   }
 
   /** The patches will always include entries for lastUpdated fields of managementData. */
