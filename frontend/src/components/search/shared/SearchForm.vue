@@ -352,9 +352,7 @@ function handleSearch() {
 
 onMounted(async () => {
   const processStepsResponse = await processStepService.getProcessSteps()
-  if (processStepsResponse.error) {
-    // TODO
-  } else {
+  if (!processStepsResponse.error) {
     processSteps.value = processStepsResponse.data
   }
 })
