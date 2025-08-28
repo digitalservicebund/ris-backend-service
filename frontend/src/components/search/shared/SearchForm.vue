@@ -352,7 +352,7 @@ watch(
     data-testid="document-unit-search-entry-form"
   >
     <div
-      class="m-32 grid grid-cols-[minmax(80px,150px)_minmax(200px,1fr)_minmax(80px,150px)_minmax(200px,1fr)] gap-x-32 gap-y-16"
+      class="m-32 grid grid-cols-[minmax(80px,150px)_minmax(250px,1fr)_minmax(80px,150px)_minmax(250px,1fr)] gap-x-32 gap-y-16"
       :class="{
         'grid-layout-decision': isDecision,
         'grid-layout-pending-proceeding': isPendingProceeding,
