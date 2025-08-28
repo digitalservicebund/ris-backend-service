@@ -348,11 +348,11 @@ watch(
 <template>
   <div
     v-ctrl-enter="handleSearchButtonClicked"
-    class="mb-32 flex flex-col bg-blue-200 py-24"
+    class="mb-32 flex flex-col bg-blue-200"
     data-testid="document-unit-search-entry-form"
   >
     <div
-      class="m-40 grid grid-cols-[150px_1fr_150px_1fr] gap-y-20 lg:gap-x-40"
+      class="m-32 grid grid-cols-[150px_1fr_150px_1fr] gap-x-40 gap-y-16"
       :class="{
         'grid-layout-decision': isDecision,
         'grid-layout-pending-proceeding': isPendingProceeding,
@@ -709,13 +709,12 @@ watch(
       </template>
 
       <!-- Common Search Button -->
-      <div class="flex flex-row justify-end [grid-area:search-button]">
+      <div class="flex flex-row justify-end gap-x-16 [grid-area:search-button]">
         <Button
           v-if="!isEmptySearch"
           aria-label="Suche zurücksetzen"
           class="ml-8 self-start"
           label="Suche zurücksetzen"
-          size="small"
           text
           @click="resetSearch"
         ></Button>
@@ -729,7 +728,6 @@ watch(
             class="self-start"
             :disabled="isLoading"
             label="Ergebnisse zeigen"
-            size="small"
             @click="handleSearchButtonClicked"
           ></Button>
 
@@ -753,7 +751,9 @@ watch(
     "date-label date-input . ."
     "own-docoffice own-docoffice . ."
     ". . search-button search-button";
-  grid-template-columns: fit-content(150px) 1fr fit-content(150px) 1fr;
+  grid-template-columns:
+    fit-content(150px) minmax(200px, 1fr) fit-content(150px)
+    minmax(200px, 1fr);
 }
 
 .grid-layout-decision.is-own-docoffice {
@@ -764,7 +764,9 @@ watch(
     "own-docoffice own-docoffice . ."
     "jdv-label jdv-input checkbox-label checkbox-group"
     ". . search-button search-button";
-  grid-template-columns: fit-content(150px) 1fr fit-content(150px) 1fr;
+  grid-template-columns:
+    fit-content(150px) minmax(200px, 1fr) fit-content(150px)
+    minmax(200px, 1fr);
 }
 
 .grid-layout-pending-proceeding {
@@ -774,6 +776,8 @@ watch(
     "date-label date-input resolution-date-label resolution-date-input"
     ". . . resolved-input"
     ". . search-button search-button";
-  grid-template-columns: fit-content(150px) 1fr fit-content(150px) 1fr;
+  grid-template-columns:
+    fit-content(150px) minmax(200px, 1fr) fit-content(150px)
+    minmax(200px, 1fr);
 }
 </style>
