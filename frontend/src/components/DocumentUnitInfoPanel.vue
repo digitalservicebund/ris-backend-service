@@ -8,7 +8,6 @@ import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessSt
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
@@ -73,8 +72,7 @@ const managementDataRoute = computed(() => ({
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
 
-const processStepsEnabled =
-  useFeatureToggle("neuris.process-steps") && isDecision(props.documentUnit)
+const processStepsEnabled = isDecision(props.documentUnit)
 
 const showProcessStepDialog = ref(false)
 const toast = useToast()
@@ -126,8 +124,11 @@ watchEffect(() => {
         :process-steps="props.documentUnit.processSteps"
       />
       <IconBadge
+        v-if="props.documentUnit.currentProcessStep && processStepsEnabled"
         background-color="bg-white"
         border-color="border-gray-800"
+        class="px-8"
+        data-testid="info-panel-process-step-initials"
         :icon="IconPerson"
         :label="props.documentUnit.currentProcessStep?.user?.initials || '-'"
       />

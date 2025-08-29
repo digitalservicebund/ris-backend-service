@@ -10,7 +10,9 @@ import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { Kind } from "@/domain/documentationUnitKind"
+import ProcessStep from "@/domain/processStep"
 import { PublicationState } from "@/domain/publicationStatus"
+import processStepService from "@/services/processStepService"
 import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
 const props = defineProps<{
@@ -40,7 +42,7 @@ const isEmptySearch = computed(() => {
 const submitButtonError = ref<string | undefined>()
 
 const dropdownItems: DropdownItem[] = [
-  { label: "Alle", value: undefined },
+  { label: "Nicht ausgewählt", value: "Nicht ausgewählt" },
   { label: "Veröffentlicht", value: PublicationState.PUBLISHED },
   { label: "Unveröffentlicht", value: PublicationState.UNPUBLISHED },
   { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
@@ -63,9 +65,9 @@ const isResolved = computed({
 })
 
 const publicationStatus = computed({
-  get: () => query.value?.publicationStatus,
+  get: () => query.value?.publicationStatus || "Nicht ausgewählt",
   set: (data) => {
-    if (!data) {
+    if (!data || data === "Nicht ausgewählt") {
       delete query.value.publicationStatus
     } else {
       query.value.publicationStatus = data
@@ -87,6 +89,7 @@ const myDocOfficeOnly = computed({
         delete query.value.myDocOfficeOnly
         delete query.value.scheduledOnly
         delete query.value.publicationDate
+        processStep.value = "Nicht ausgewählt"
         resetErrors("publicationDate") // Clear validation for publicationDate
       } else {
         query.value.myDocOfficeOnly = "true"
@@ -142,6 +145,22 @@ const withDuplicateWarning = computed({
     }
   },
 })
+
+const processStep = ref<string>("Nicht ausgewählt")
+
+watch(processStep, async (newVal) => {
+  if (newVal && newVal !== "Nicht ausgewählt") {
+    query.value.processStep = newVal
+  } else {
+    delete query.value.processStep
+  }
+})
+
+const processSteps = ref<ProcessStep[]>([
+  { uuid: "Nicht ausgewählt", name: "Nicht ausgewählt" } as ProcessStep,
+])
+
+const processStepsLoading = ref<boolean>(false)
 
 /**
  * Resets the search form, validation errors, and clears the query.
@@ -334,6 +353,16 @@ function handleSearch() {
   }
 }
 
+async function fetchProcessSteps() {
+  if (processSteps.value.length > 1) return
+  processStepsLoading.value = true
+  const processStepsResponse = await processStepService.getProcessSteps()
+  if (!processStepsResponse.error) {
+    processSteps.value = processSteps.value.concat(processStepsResponse.data)
+  }
+  processStepsLoading.value = false
+}
+
 // Watch for route changes to update query and trigger search
 watch(
   route,
@@ -342,6 +371,19 @@ watch(
     handleSearch()
   },
   { deep: true },
+)
+
+watch(
+  [route, query],
+  async () => {
+    if (query.value.processStep) {
+      await fetchProcessSteps()
+      processStep.value = query.value.processStep
+    } else {
+      processStep.value = "Nicht ausgewählt"
+    }
+  },
+  { immediate: true },
 )
 </script>
 
@@ -352,7 +394,7 @@ watch(
     data-testid="document-unit-search-entry-form"
   >
     <div
-      class="m-32 grid grid-cols-[150px_1fr_150px_1fr] gap-x-40 gap-y-16"
+      class="m-40 grid auto-rows-[48px] grid-cols-[minmax(80px,150px)_minmax(250px,1fr)_minmax(80px,150px)_minmax(250px,1fr)] gap-x-32 gap-y-16"
       :class="{
         'grid-layout-decision': isDecision,
         'grid-layout-pending-proceeding': isPendingProceeding,
@@ -384,7 +426,7 @@ watch(
       </div>
 
       <div
-        class="ris-body1-regular items-center[grid-area:docnumber-label] flex flex-row"
+        class="ris-body1-regular flex flex-row items-center [grid-area:docnumber-label]"
       >
         Dokument&shy;nummer
       </div>
@@ -467,7 +509,6 @@ watch(
             option-label="label"
             option-value="value"
             :options="dropdownItems"
-            placeholder="Bitte auswählen"
             @focus="resetErrors(id as DocumentationUnitSearchParameter)"
           />
         </InputField>
@@ -532,7 +573,7 @@ watch(
       </div>
       <!-- Decision Specific Fields -->
       <template v-if="isDecision">
-        <div class="flex flex-row gap-10 py-12 [grid-area:own-docoffice]">
+        <div class="flex flex-row gap-10 [grid-area:own-docoffice]">
           <InputField
             id="documentationOffice"
             v-slot="{ id }"
@@ -551,6 +592,32 @@ watch(
         </div>
 
         <template v-if="myDocOfficeOnly">
+          <div
+            class="ris-body1-regular flex flex-row items-center [grid-area:process-step-label]"
+          >
+            Schritt
+          </div>
+
+          <div class="flex flex-row gap-20 [grid-area:process-step-input]">
+            <InputField
+              id="processStep"
+              data-testid="process-step-input"
+              label="Prozessschritt"
+              visually-hide-label
+            >
+              <InputSelect
+                v-model="processStep"
+                aria-label="Prozessschritt"
+                class="w-full"
+                :loading="processStepsLoading"
+                option-label="name"
+                option-value="name"
+                :options="processSteps"
+                @click="fetchProcessSteps"
+              ></InputSelect>
+            </InputField>
+          </div>
+
           <div
             class="ris-body1-regular flex flex-row items-center [grid-area:jdv-label]"
           >
@@ -690,7 +757,7 @@ watch(
             ></DateInput>
           </InputField>
         </div>
-        <div class="flex flex-row py-12 [grid-area:resolved-input]">
+        <div class="flex flex-row [grid-area:resolved-input]">
           <InputField
             id="resolved"
             v-slot="{ id }"
@@ -753,9 +820,6 @@ watch(
     "date-label date-input . ."
     "own-docoffice own-docoffice . ."
     ". . search-button search-button";
-  grid-template-columns:
-    fit-content(150px) minmax(200px, 1fr) fit-content(150px)
-    minmax(200px, 1fr);
 }
 
 .grid-layout-decision.is-own-docoffice {
@@ -764,11 +828,9 @@ watch(
     "court-label court-input status-label status-input"
     "date-label date-input . ."
     "own-docoffice own-docoffice . ."
-    "jdv-label jdv-input checkbox-label checkbox-group"
+    "process-step-label process-step-input jdv-label jdv-input"
+    ". . checkbox-label checkbox-group"
     ". . search-button search-button";
-  grid-template-columns:
-    fit-content(150px) minmax(200px, 1fr) fit-content(150px)
-    minmax(200px, 1fr);
 }
 
 .grid-layout-pending-proceeding {
@@ -778,8 +840,5 @@ watch(
     "date-label date-input resolution-date-label resolution-date-input"
     ". . . resolved-input"
     ". . search-button search-button";
-  grid-template-columns:
-    fit-content(150px) minmax(200px, 1fr) fit-content(150px)
-    minmax(200px, 1fr);
 }
 </style>

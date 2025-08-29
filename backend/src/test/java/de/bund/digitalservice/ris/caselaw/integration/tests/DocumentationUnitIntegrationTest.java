@@ -1022,7 +1022,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     // by process step
     searchInput =
-        DocumentationUnitSearchInput.builder().processStepId(neuProcessStep.getId()).build();
+        DocumentationUnitSearchInput.builder().processStep(neuProcessStep.getName()).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .contains("ABCD202300007", "UVWX202311090");
 
@@ -1369,8 +1369,8 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     if (searchInput.kind() != null) {
       queryParams.add("kind", searchInput.kind().toString());
     }
-    if (searchInput.processStepId() != null) {
-      queryParams.add("processStepId", searchInput.processStepId().toString());
+    if (searchInput.processStep() != null) {
+      queryParams.add("processStep", searchInput.processStep());
     }
 
     queryParams.add("myDocOfficeOnly", String.valueOf(searchInput.myDocOfficeOnly()));

@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml;
 
 import de.bund.digitalservice.ris.caselaw.adapter.PortalTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.decision.DecisionFullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.pendingproceeding.PendingProceedingFullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Decision;
@@ -29,8 +28,7 @@ public class FullLdmlTransformer implements PortalTransformer {
   }
 
   @Override
-  public CaseLawLdml transformToLdml(DocumentationUnit documentationUnit)
-      throws LdmlTransformationException {
+  public CaseLawLdml transformToLdml(DocumentationUnit documentationUnit) {
     if (documentationUnit instanceof Decision decision) {
       return decisionFullLdmlTransformer.transformToLdml(decision);
     } else if (documentationUnit instanceof PendingProceeding pendingProceeding) {
