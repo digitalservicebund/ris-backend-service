@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDecisionView from "@/components/HandoverDecisionView.vue"
 import { Decision } from "@/domain/decision"
+import { Env } from "@/domain/env"
 import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import { DuplicateRelationStatus } from "@/domain/managementData"
@@ -14,7 +15,6 @@ import handoverDocumentationUnitService from "@/services/handoverDocumentationUn
 import { ServiceResponse } from "@/services/httpClient"
 import languageToolService from "@/services/textCheckService"
 
-import { Env } from "@/types/env"
 import { TextCheckAllResponse } from "@/types/textCheck"
 import routes from "~/test-helper/routes"
 

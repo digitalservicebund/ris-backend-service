@@ -1,10 +1,10 @@
 import { createPinia, setActivePinia } from "pinia"
+import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
 import adminService from "@/services/adminService"
 import authService from "@/services/authService"
 import { ServiceResponse } from "@/services/httpClient"
 import useSessionStore from "@/stores/sessionStore"
-import { Env } from "@/types/env"
 
 vi.mock("@/services/authService")
 vi.mock("@/services/adminService")

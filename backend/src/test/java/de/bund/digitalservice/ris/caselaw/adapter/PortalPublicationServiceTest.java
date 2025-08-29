@@ -220,35 +220,6 @@ class PortalPublicationServiceTest {
           .withMessageContaining("Could not parse transformed LDML as string.");
     }
 
-    @Test
-    void publish_withPendingProceeding_shouldPublishSuccessfully()
-        throws DocumentationUnitNotExistsException {
-      User user = mock(User.class);
-      PendingProceeding pendingProceeding =
-          PendingProceeding.builder()
-              .uuid(UUID.randomUUID())
-              .documentNumber(testDocumentNumber)
-              .build();
-      when(documentationUnitRepository.findByUuid(pendingProceeding.uuid()))
-          .thenReturn(pendingProceeding);
-      when(portalTransformer.transformToLdml(any())).thenReturn(testLdml);
-      String transformed = "<akn:akomaNtoso />";
-      when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
-
-      subject.publishDocumentationUnit(testDocumentNumber);
-
-      verify(caseLawBucket).save(withPrefix(testDocumentNumber), transformed);
-      verify(historyLogService)
-          .saveHistoryLog(
-              pendingProceeding.uuid(),
-              user,
-              HistoryLogEventType.PORTAL_PUBLICATION,
-              "Dokeinheit im Portal veröffentlicht");
-      verify(documentationUnitRepository)
-          .updatePortalPublicationStatus(
-              pendingProceeding.uuid(), PortalPublicationStatus.PUBLISHED);
-    }
-
     @Nested
     class PublishDocumentationUnitWithChangeLog {
       @Test
@@ -279,18 +250,47 @@ class PortalPublicationServiceTest {
       }
 
       @Test
+      void publishDocumentationUnitWithChangelog_withPendingProceeding_shouldPublishSuccessfully()
+          throws DocumentationUnitNotExistsException {
+        User user = mock(User.class);
+        PendingProceeding pendingProceeding =
+            PendingProceeding.builder()
+                .uuid(UUID.randomUUID())
+                .documentNumber(testDocumentNumber)
+                .build();
+        when(documentationUnitRepository.findByUuid(pendingProceeding.uuid()))
+            .thenReturn(pendingProceeding);
+        when(portalTransformer.transformToLdml(any())).thenReturn(testLdml);
+        String transformed = "<akn:akomaNtoso />";
+        when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
+
+        subject.publishDocumentationUnitWithChangelog(pendingProceeding.uuid(), user);
+
+        verify(caseLawBucket).save(withPrefix(testDocumentNumber), transformed);
+        verify(historyLogService)
+            .saveHistoryLog(
+                pendingProceeding.uuid(),
+                user,
+                HistoryLogEventType.PORTAL_PUBLICATION,
+                "Dokeinheit im Portal veröffentlicht");
+        verify(documentationUnitRepository)
+            .updatePortalPublicationStatus(
+                pendingProceeding.uuid(), PortalPublicationStatus.PUBLISHED);
+      }
+
+      @Test
       void publishDocumentationUnitWithChangeLog_withRepublish_shouldPublishSuccessfully()
           throws DocumentationUnitNotExistsException {
         UUID documentationUnitId = UUID.randomUUID();
         String transformed = "<akn:akomaNtoso />";
         User user = mock(User.class);
-        testDocumentUnit =
+        Decision docUnit =
             testDocumentUnit.toBuilder()
                 .portalPublicationStatus(PortalPublicationStatus.PUBLISHED)
                 .build();
-        when(documentationUnitRepository.findByUuid(documentationUnitId))
-            .thenReturn(testDocumentUnit);
-        when(portalTransformer.transformToLdml(testDocumentUnit)).thenReturn(testLdml);
+
+        when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(docUnit);
+        when(portalTransformer.transformToLdml(docUnit)).thenReturn(testLdml);
         when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
 
         subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
@@ -298,14 +298,13 @@ class PortalPublicationServiceTest {
         verify(caseLawBucket).save(withPrefix(testDocumentNumber), transformed);
         verify(historyLogService)
             .saveHistoryLog(
-                testDocumentUnit.uuid(),
+                docUnit.uuid(),
                 user,
                 HistoryLogEventType.PORTAL_PUBLICATION,
                 "Dokeinheit im Portal veröffentlicht");
         verify(documentationUnitRepository, never())
-            .updatePortalPublicationStatus(
-                testDocumentUnit.uuid(), PortalPublicationStatus.PUBLISHED);
-        verify(documentationUnitRepository).savePublicationDateTime(testDocumentUnit.uuid());
+            .updatePortalPublicationStatus(docUnit.uuid(), PortalPublicationStatus.PUBLISHED);
+        verify(documentationUnitRepository).savePublicationDateTime(docUnit.uuid());
       }
 
       @Test

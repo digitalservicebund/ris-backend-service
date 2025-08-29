@@ -1,10 +1,10 @@
 import { useFavicon } from "@vueuse/core"
 import { defineStore } from "pinia"
 import { Ref, ref } from "vue"
+import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
 import adminService from "@/services/adminService"
 import authService from "@/services/authService"
-import { Env } from "@/types/env"
 import { getFavicon } from "@/utils/getFavicon"
 
 type SessionStore = {
