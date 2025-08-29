@@ -5,7 +5,9 @@ import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,18 +24,33 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AuthController {
 
-  private final UserService userService;
+  private final UserService keycloakUserService;
+  private final UserService databaseUserService;
   private final OAuthService oAuthService;
 
-  public AuthController(UserService userService, OAuthService oAuthService) {
-    this.userService = userService;
+  public AuthController(
+      @Qualifier("keycloakUserService") UserService keycloakUserService,
+      @Qualifier("databaseUserService") UserService databaseUserService,
+      OAuthService oAuthService) {
+    this.keycloakUserService = keycloakUserService;
+    this.databaseUserService = databaseUserService;
     this.oAuthService = oAuthService;
   }
 
   @GetMapping(value = "me", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<User> getUser(@AuthenticationPrincipal OidcUser oidcUser) {
-    return ResponseEntity.ok(userService.getUser(oidcUser));
+    User persistedUser = databaseUserService.getUser(oidcUser);
+    if (persistedUser != null) {
+      return ResponseEntity.ok(persistedUser);
+    }
+
+    List<User> users =
+        keycloakUserService.getUsers(oidcUser).stream()
+            .map(user -> (keycloakUserService.getUser(user.id())))
+            .toList();
+    databaseUserService.persistUsers(users);
+    return ResponseEntity.ok(databaseUserService.getUser(oidcUser));
   }
 
   /**

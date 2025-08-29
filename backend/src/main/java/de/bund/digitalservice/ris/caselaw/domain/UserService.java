@@ -1,22 +1,39 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-public interface UserService {
-  User getUser(OidcUser oidcUser);
+public abstract class UserService {
+  public abstract User getUser(OidcUser oidcUser);
 
-  Optional<UserGroup> getUserGroup(OidcUser oidcUser);
+  public abstract User getUser(UUID uuid);
 
-  DocumentationOffice getDocumentationOffice(OidcUser oidcUser);
+  public abstract List<User> getUsers(OidcUser oidcUser);
 
-  String getEmail(OidcUser oidcUser);
+  public abstract Optional<UserGroup> getUserGroup(OidcUser oidcUser);
 
-  Boolean isInternal(OidcUser oidcUser);
+  public abstract void persistUsers(List<User> users);
 
-  User getUser(UUID userId);
+  public DocumentationOffice getDocumentationOffice(OidcUser oidcUser) {
+    return getUser(oidcUser).documentationOffice();
+  }
 
-  List<User> getUsers(OidcUser oidcUser);
+  public String getEmail(OidcUser oidcUser) {
+    return oidcUser.getEmail();
+  }
+
+  public Boolean isInternal(OidcUser oidcUser) {
+    List<String> roles = oidcUser.getClaimAsStringList("roles");
+    if (roles != null) {
+      return roles.contains("Internal");
+    }
+    return false;
+  }
+
+  protected User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
+    return UserTransformer.transformToDomain(oidcUser, documentationOffice);
+  }
 }
