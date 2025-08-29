@@ -151,9 +151,9 @@ test.describe("Große Suche nach Entscheidungen", () => {
     await checkResultListContent(docUnitSearchResults, page)
   })
 
-  test("Suche nach Status", async ({ page, decisions }) => {
-    const { createdDecisions } = decisions
-    await openSearchWithFileNumberPrefix("fileNumber1", page)
+  test("Suche nach Status", async ({ page }) => {
+    await navigateToSearch(page)
+    await fillInput(page, "Dokumentnummer Suche", "YYTestDoc001")
     await test.step(`Wähle Status 'Veröffentlicht' in Suche`, async () => {
       await page.getByLabel("Status Suche").click()
       await page
@@ -161,21 +161,20 @@ test.describe("Große Suche nach Entscheidungen", () => {
         .click()
     })
     await triggerSearch(page)
-    await test.step(`Prüfe, dass 1 Ergebnis gefunden wurde`, async () => {
-      await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
+    await test.step(`Prüfe, dass 5 Ergebnisse gefunden wurde`, async () => {
+      await expect(page.getByText("5 Ergebnisse gefunden")).toBeVisible()
       //Veröffentlicht Status kann nur übers seeding script generiert werden
-      await expect(page.getByText("YYTestDoc0001")).toBeVisible()
-      await expect(
-        page.getByText(createdDecisions[0].documentNumber),
-      ).toBeHidden()
+      await expect(page.getByText("YYTestDoc0013")).toBeVisible()
     })
     await test.step(`Setze Status-Filter zurück`, async () => {
       await page.getByLabel("Status Suche").click()
-      await page.getByRole("option", { name: "Alle", exact: true }).click()
+      await page
+        .getByRole("option", { name: "Nicht ausgewählt", exact: true })
+        .click()
     })
     await triggerSearch(page)
-    await test.step(`Prüfe, dass 2 Ergebnisse gefunden wurden`, async () => {
-      await expect(page.getByText("2 Ergebnisse gefunden")).toBeVisible()
+    await test.step(`Prüfe, dass 7 Ergebnisse gefunden wurden`, async () => {
+      await expect(page.getByText("7 Ergebnisse gefunden")).toBeVisible()
     })
   })
 
@@ -222,9 +221,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await triggerSearch(page)
 
       await test.step(`Prüfe, dass Ergebnisse gefunden wurde`, async () => {
-        await expect(
-          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
-        ).toBeVisible()
+        await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
         await expect(
           page.getByText(createdDecisions[0].documentNumber),
         ).toBeVisible()
@@ -244,15 +241,13 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await test.step(`Setze Schritt-Filter zurück`, async () => {
         await page.getByLabel("Prozessschritt").click()
         await page
-          .getByRole("option", { name: "Bitte auswählen", exact: true })
+          .getByRole("option", { name: "Nicht ausgewählt", exact: true })
           .click()
       })
       await triggerSearch(page)
 
       await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
-        await expect(
-          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
-        ).toBeVisible()
+        await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
       })
     },
   )

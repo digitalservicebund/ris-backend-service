@@ -281,7 +281,7 @@ public class DocumentationUnitController {
       @RequestParam(value = "isResolved") Optional<Boolean> isResolved,
       @RequestParam(value = "inboxStatus") Optional<InboxStatus> inboxStatus,
       @RequestParam(value = "kind") Optional<Kind> kind,
-      @RequestParam(value = "processStepId") Optional<UUID> processStepId,
+      @RequestParam(value = "processStep") Optional<String> processStep,
       @RequestParam(value = "assignedToMe") Optional<Boolean> assignedToMe,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
@@ -305,7 +305,7 @@ public class DocumentationUnitController {
         isResolved,
         inboxStatus,
         kind,
-        processStepId,
+        processStep,
         assignedToMe);
   }
 

@@ -337,7 +337,7 @@ public class DocumentationUnitService {
       Optional<Boolean> isResolved,
       Optional<InboxStatus> inboxStatus,
       Optional<Kind> kind,
-      Optional<UUID> processStepId,
+      Optional<String> processStep,
       Optional<Boolean> assignedToMe) {
 
     DocumentationUnitSearchInput searchInput =
@@ -365,7 +365,7 @@ public class DocumentationUnitService {
             .resolutionDateEnd(resolutionDateEnd.orElse(null))
             .isResolved(isResolved.orElse(false))
             .kind(kind.orElse(null))
-            .processStepId(processStepId.orElse(null))
+            .processStep(processStep.orElse(null))
             .assignedToMe(assignedToMe.orElse(false))
             .build();
 

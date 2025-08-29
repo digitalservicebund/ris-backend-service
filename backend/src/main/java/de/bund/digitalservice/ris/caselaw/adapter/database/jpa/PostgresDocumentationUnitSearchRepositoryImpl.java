@@ -476,13 +476,13 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
   private List<Predicate> getProcessStepPredicates(
       SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
     List<Predicate> predicates = new ArrayList<>();
-    if (parameters.processStepId.isPresent()) {
+    if (parameters.processStep.isPresent()) {
       Predicate processStepPredicate =
           cb.equal(
               root.get(DocumentationUnitDTO_.currentProcessStep)
                   .get(DocumentationUnitProcessStepDTO_.processStep)
-                  .get(ProcessStepDTO_.id),
-              parameters.processStepId.get());
+                  .get(ProcessStepDTO_.name),
+              parameters.processStep.get());
       predicates.add(processStepPredicate);
     }
     return predicates;
@@ -538,7 +538,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .inboxStatus(Optional.ofNullable(searchInput.inboxStatus()))
         .documentationOfficeDTO(documentationOfficeDTO)
         .kind(Optional.ofNullable(searchInput.kind()))
-        .processStepId(Optional.ofNullable(searchInput.processStepId()))
+        .processStep(Optional.ofNullable(searchInput.processStep()))
         .build();
   }
 
@@ -562,6 +562,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       Optional<InboxStatus> inboxStatus,
       DocumentationOfficeDTO documentationOfficeDTO,
       Optional<Kind> kind,
-      Optional<UUID> processStepId,
+      Optional<String> processStep,
       boolean assignedToMe) {}
 }

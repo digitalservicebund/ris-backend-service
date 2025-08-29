@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=22.19.0"
   },
   "type": "module",
   "scripts": {
@@ -32,10 +32,10 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "^7.1.1",
-    "@digitalservicebund/ris-ui": "^3.11.1",
+    "@digitalservicebund/ris-ui": "^3.12.0",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
-    "@sentry/vue": "^10.7.0",
+    "@sentry/vue": "^10.8.0",
     "@tailwindcss/postcss": "^4.1.12",
     "@tiptap/extension-blockquote": "^2.26.1",
     "@tiptap/extension-bold": "^2.26.1",
@@ -67,7 +67,7 @@
     "@vueuse/core": "^13.8.0",
     "@vueuse/router": "^13.8.0",
     "axios": "^1.11.0",
-    "dayjs": "^1.11.14",
+    "dayjs": "^1.11.15",
     "fast-json-patch": "^3.1.1",
     "immer": "^10.1.1",
     "maska": "^3.2.0",
@@ -90,7 +90,7 @@
     "@namics/stylelint-bem": "^10.1.0",
     "@pinia/testing": "^1.0.2",
     "@playwright/test": "1.54.1",
-    "@sentry/vite-plugin": "^4.1.1",
+    "@sentry/vite-plugin": "^4.2.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/user-event": "^14.6.1",

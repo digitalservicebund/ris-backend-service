@@ -3,7 +3,7 @@ import Button from "primevue/button"
 import Checkbox from "primevue/checkbox"
 import InputText from "primevue/inputtext"
 import InputSelect from "primevue/select"
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
@@ -42,7 +42,7 @@ const isEmptySearch = computed(() => {
 const submitButtonError = ref<string | undefined>()
 
 const dropdownItems: DropdownItem[] = [
-  { label: "Alle", value: undefined },
+  { label: "Nicht ausgewählt", value: "Nicht ausgewählt" },
   { label: "Veröffentlicht", value: PublicationState.PUBLISHED },
   { label: "Unveröffentlicht", value: PublicationState.UNPUBLISHED },
   { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
@@ -65,9 +65,9 @@ const isResolved = computed({
 })
 
 const publicationStatus = computed({
-  get: () => query.value?.publicationStatus,
+  get: () => query.value?.publicationStatus || "Nicht ausgewählt",
   set: (data) => {
-    if (!data) {
+    if (!data || data === "Nicht ausgewählt") {
       delete query.value.publicationStatus
     } else {
       query.value.publicationStatus = data
@@ -89,7 +89,7 @@ const myDocOfficeOnly = computed({
         delete query.value.myDocOfficeOnly
         delete query.value.scheduledOnly
         delete query.value.publicationDate
-        delete query.value.processStepId
+        processStep.value = "Nicht ausgewählt"
         delete query.value.assignedToMe
         resetErrors("publicationDate") // Clear validation for publicationDate
       } else {
@@ -163,18 +163,34 @@ const withDuplicateWarning = computed({
   },
 })
 
-const processStepId = computed({
-  get: () => query.value.processStepId,
-  set: (data) => {
-    if (data && data !== "Bitte auswählen") {
-      query.value.processStepId = data
-    } else {
-      delete query.value.processStepId
-    }
-  },
+const processStep = ref<string>("Nicht ausgewählt")
+
+watch(processStep, async (newVal) => {
+  if (newVal && newVal !== "Nicht ausgewählt") {
+    query.value.processStep = newVal
+  } else {
+    delete query.value.processStep
+  }
 })
 
-const processSteps = ref<ProcessStep[]>()
+watch(
+  [route, query],
+  async () => {
+    if (query.value.processStep) {
+      await fetchProcessSteps()
+      processStep.value = query.value.processStep
+    } else {
+      processStep.value = "Nicht ausgewählt"
+    }
+  },
+  { immediate: true },
+)
+
+const processSteps = ref<ProcessStep[]>([
+  { uuid: "Nicht ausgewählt", name: "Nicht ausgewählt" } as ProcessStep,
+])
+
+const processStepsLoading = ref<boolean>(false)
 
 /**
  * Resets the search form, validation errors, and clears the query.
@@ -367,14 +383,15 @@ function handleSearch() {
   }
 }
 
-onMounted(async () => {
+async function fetchProcessSteps() {
+  if (processSteps.value.length > 1) return
+  processStepsLoading.value = true
   const processStepsResponse = await processStepService.getProcessSteps()
   if (!processStepsResponse.error) {
-    processSteps.value = [
-      { uuid: "Bitte auswählen", name: "Bitte auswählen" } as ProcessStep,
-    ].concat(processStepsResponse.data)
+    processSteps.value = processSteps.value.concat(processStepsResponse.data)
   }
-})
+  processStepsLoading.value = false
+}
 
 // Watch for route changes to update query and trigger search
 watch(
@@ -394,7 +411,7 @@ watch(
     data-testid="document-unit-search-entry-form"
   >
     <div
-      class="m-32 grid auto-rows-[48px] grid-cols-[minmax(80px,150px)_minmax(250px,1fr)_minmax(80px,150px)_minmax(250px,1fr)] gap-x-32 gap-y-16"
+      class="m-40 grid auto-rows-[48px] grid-cols-[minmax(80px,150px)_minmax(250px,1fr)_minmax(80px,150px)_minmax(250px,1fr)] gap-x-32 gap-y-16"
       :class="{
         'grid-layout-decision': isDecision,
         'grid-layout-pending-proceeding': isPendingProceeding,
@@ -509,7 +526,6 @@ watch(
             option-label="label"
             option-value="value"
             :options="dropdownItems"
-            placeholder="Bitte auswählen"
             @focus="resetErrors(id as DocumentationUnitSearchParameter)"
           />
         </InputField>
@@ -607,14 +623,14 @@ watch(
               visually-hide-label
             >
               <InputSelect
-                v-model="processStepId"
+                v-model="processStep"
                 aria-label="Prozessschritt"
                 class="w-full"
-                default-value="Bitte auswählen"
+                :loading="processStepsLoading"
                 option-label="name"
-                option-value="uuid"
+                option-value="name"
                 :options="processSteps"
-                placeholder="Bitte auswählen"
+                @click="fetchProcessSteps"
               ></InputSelect>
             </InputField>
           </div>
