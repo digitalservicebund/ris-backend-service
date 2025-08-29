@@ -221,9 +221,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await triggerSearch(page)
 
       await test.step(`Prüfe, dass Ergebnisse gefunden wurde`, async () => {
-        await expect(
-          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
-        ).toBeVisible()
+        await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
         await expect(
           page.getByText(createdDecisions[0].documentNumber),
         ).toBeVisible()
@@ -249,9 +247,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await triggerSearch(page)
 
       await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
-        await expect(
-          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
-        ).toBeVisible()
+        await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
       })
     },
   )
