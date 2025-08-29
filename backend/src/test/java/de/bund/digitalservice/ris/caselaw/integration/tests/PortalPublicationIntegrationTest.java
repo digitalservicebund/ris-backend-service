@@ -121,6 +121,62 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
     var updatedDto = repository.findById(dto.getId()).get();
     assertThat(updatedDto.getPortalPublicationStatus())
         .isEqualTo(PortalPublicationStatus.PUBLISHED);
+    assertThat(updatedDto.getManagementData().getFirstPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    assertThat(historyLogs)
+        .hasSize(2)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getUserId()).isEqualTo(userId);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit im Portal veröffentlicht");
+            },
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
+              assertThat(historyLog.getUserId()).isNull();
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
+            });
+  }
+
+  @Test
+  void testRepublishSuccessfully() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
+
+    UUID userId = UUID.randomUUID();
+    risWebTestClient
+        .withDefaultLogin(userId)
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    risWebTestClient
+        .withDefaultLogin(userId)
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    var updatedDto = repository.findById(dto.getId()).get();
+    assertThat(updatedDto.getPortalPublicationStatus())
+        .isEqualTo(PortalPublicationStatus.PUBLISHED);
+    assertThat(updatedDto.getManagementData().getFirstPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
 
     var historyLogs =
         historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());

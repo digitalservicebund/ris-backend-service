@@ -308,6 +308,36 @@ class PortalPublicationServiceTest {
       }
 
       @Test
+      void
+          publishDocumentationUnitWithChangeLog_withPublishAfterWithdraw_shouldPublishSuccessfully()
+              throws DocumentationUnitNotExistsException {
+        UUID documentationUnitId = UUID.randomUUID();
+        String transformed = "<akn:akomaNtoso />";
+        User user = mock(User.class);
+        Decision docUnit =
+            testDocumentUnit.toBuilder()
+                .portalPublicationStatus(PortalPublicationStatus.WITHDRAWN)
+                .build();
+
+        when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(docUnit);
+        when(portalTransformer.transformToLdml(docUnit)).thenReturn(testLdml);
+        when(xmlUtilService.ldmlToString(testLdml)).thenReturn(Optional.of(transformed));
+
+        subject.publishDocumentationUnitWithChangelog(documentationUnitId, user);
+
+        verify(caseLawBucket).save(withPrefix(testDocumentNumber), transformed);
+        verify(historyLogService)
+            .saveHistoryLog(
+                docUnit.uuid(),
+                user,
+                HistoryLogEventType.PORTAL_PUBLICATION,
+                "Dokeinheit im Portal veröffentlicht");
+        verify(documentationUnitRepository)
+            .updatePortalPublicationStatus(docUnit.uuid(), PortalPublicationStatus.PUBLISHED);
+        verify(documentationUnitRepository, never()).savePublicationDateTime(docUnit.uuid());
+      }
+
+      @Test
       void publishDocumentationUnitWithChangeLog_withFeatureDisabled_shouldNotPublish()
           throws DocumentationUnitNotExistsException {
         UUID documentationUnitId = UUID.randomUUID();
