@@ -328,7 +328,7 @@ describe("Documentunit Search", () => {
 
     expect(screen.getByLabelText("jDV Übergabedatum Suche")).toHaveValue("")
     expect(screen.getByLabelText("Prozessschritt").textContent).equals(
-      "Bitte auswählen",
+      "Nicht ausgewählt",
     )
     expect(screen.getByLabelText("Terminiert Filter")).not.toBeChecked()
     expect(
