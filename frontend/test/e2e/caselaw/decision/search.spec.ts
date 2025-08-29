@@ -253,7 +253,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
   )
 
   test(
-    "Suche nach 'Nur mir zugewiesen'",
+    "Suche nach 'Nur mir zugewiesen' und 'Niemandem zugewiesen'",
     {
       tag: "@RISDEV-8718",
     },
@@ -263,7 +263,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await page.getByLabel("Nur meine Dokstelle Filter").click()
 
       // all new doc units are created with my user assigned
-      await test.step(`Wähle 'Nur mir zugewiesen'`, async () => {
+      await test.step("Wähle 'Nur mir zugewiesen'", async () => {
         await page.getByLabel("Nur mir zugewiesen").click()
         await expect(page.getByLabel("Nur mir zugewiesen")).toBeChecked()
         await triggerSearch(page)
@@ -278,7 +278,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
         ).toBeVisible()
       })
 
-      await test.step(`Weise einen neuen Prozesschritt ohne Person`, async () => {
+      await test.step(`Weise einen neuen Prozesschritt zu, entferne Person`, async () => {
         await navigateToCategories(page, createdDecisions[0].documentNumber)
 
         await page
@@ -315,6 +315,30 @@ test.describe("Große Suche nach Entscheidungen", () => {
         await expect(
           page.getByText(createdDecisions[0].documentNumber),
         ).toBeHidden()
+      })
+
+      await test.step("Wähle 'Niemandem zugewiesen', resetted automatisch 'Nur mir zugewiesen'", async () => {
+        await page.getByLabel("Niemandem zugewiesen").click()
+        await expect(page.getByLabel("Niemandem zugewiesen")).toBeChecked()
+        await expect(page.getByLabel("Nur mir zugewiesen")).not.toBeChecked()
+        await triggerSearch(page)
+      })
+
+      await test.step("Erwarte Dokeinheit mit eben entfernter Person als Suchresultat", async () => {
+        await page.getByLabel("Niemandem zugewiesen").click()
+        await expect(page.getByLabel("Niemandem zugewiesen")).toBeChecked()
+        await expect(page.getByLabel("Nur mir zugewiesen")).not.toBeChecked()
+        await triggerSearch(page)
+        await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
+        await expect(
+          page.getByText(createdDecisions[0].documentNumber),
+        ).toBeVisible()
+      })
+
+      await test.step("Wähle 'Nur mir zugewiesen'', resetted automatisch 'Niemandem zugewiesen'", async () => {
+        await page.getByLabel("Nur mir zugewiesen").click()
+        await expect(page.getByLabel("Nur mir zugewiesen")).toBeChecked()
+        await expect(page.getByLabel("Niemandem zugewiesen")).not.toBeChecked()
       })
     },
   )

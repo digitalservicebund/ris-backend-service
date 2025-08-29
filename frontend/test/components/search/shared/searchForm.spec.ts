@@ -140,6 +140,9 @@ describe("Documentunit Search", () => {
     expect(
       screen.queryByLabelText("Nur mir zugewiesen"),
     ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Niemandem zugewiesen"),
+    ).not.toBeInTheDocument()
 
     // show own doc office only inputs as soon as checkbox is clicked
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
@@ -153,6 +156,7 @@ describe("Documentunit Search", () => {
     ).toBeInTheDocument()
     expect(screen.getByLabelText("Prozessschritt")).toBeInTheDocument()
     expect(screen.getByLabelText("Nur mir zugewiesen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Niemandem zugewiesen")).toBeInTheDocument()
   })
 
   test("renders all specific input fields for pending proceedings", async () => {
@@ -369,6 +373,20 @@ describe("Documentunit Search", () => {
     expect(
       screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     ).not.toBeChecked()
+  })
+
+  test(`clicking 'Niemandem zugewiesen' automatically resets 'Nur mir zugewiesen' and vice versa`, async () => {
+    const { user } = renderComponent(Kind.DECISION)
+
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+
+    await user.click(screen.getByLabelText("Nur mir zugewiesen"))
+    expect(screen.getByLabelText("Nur mir zugewiesen")).toBeChecked()
+    expect(screen.getByLabelText("Niemandem zugewiesen")).not.toBeChecked()
+
+    await user.click(screen.getByLabelText("Niemandem zugewiesen"))
+    expect(screen.getByLabelText("Nur mir zugewiesen")).not.toBeChecked()
+    expect(screen.getByLabelText("Niemandem zugewiesen")).toBeChecked()
   })
 
   kinds
