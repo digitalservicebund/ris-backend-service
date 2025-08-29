@@ -539,6 +539,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .documentationOfficeDTO(documentationOfficeDTO)
         .kind(Optional.ofNullable(searchInput.kind()))
         .processStep(Optional.ofNullable(searchInput.processStep()))
+        .assignedToMe(searchInput.assignedToMe())
         .build();
   }
 
