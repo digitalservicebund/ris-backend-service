@@ -252,7 +252,7 @@ class PortalPublicationServiceTest {
     @Nested
     class PublishDocumentationUnitWithChangeLog {
       @Test
-      void publishDocumentationUnitWithChangeLog_withUnpublishedStatus_shouldBeSuccess()
+      void publishDocumentationUnitWithChangeLog_withFirstPublish_shouldPublishSuccessfully()
           throws DocumentationUnitNotExistsException {
         UUID documentationUnitId = UUID.randomUUID();
         String transformed = "<akn:akomaNtoso />";
@@ -279,7 +279,7 @@ class PortalPublicationServiceTest {
       }
 
       @Test
-      void publishDocumentationUnitWithChangeLog_withPublishedStatus_shouldBeSuccessfull()
+      void publishDocumentationUnitWithChangeLog_withRepublish_shouldPublishSuccessfully()
           throws DocumentationUnitNotExistsException {
         UUID documentationUnitId = UUID.randomUUID();
         String transformed = "<akn:akomaNtoso />";
@@ -375,8 +375,9 @@ class PortalPublicationServiceTest {
 
       @Test
       @DisplayName("Should fail when changelog file cannot be created")
-      void publishDocumentationUnitWithChangeLog_withCreationError_shouldThrowPublishException()
-          throws DocumentationUnitNotExistsException, JsonProcessingException {
+      void
+          publishDocumentationUnitWithChangeLog_withChangelogFileCreationError_shouldThrowPublishException()
+              throws DocumentationUnitNotExistsException, JsonProcessingException {
         UUID documentationUnitId = UUID.randomUUID();
         User user = mock(User.class);
         when(documentationUnitRepository.findByUuid(documentationUnitId))
@@ -510,6 +511,7 @@ class PortalPublicationServiceTest {
                 "Dokeinheit wurde aus dem Portal zurückgezogen");
         verify(documentationUnitRepository)
             .updatePortalPublicationStatus(decision.uuid(), PortalPublicationStatus.WITHDRAWN);
+        verify(documentationUnitRepository, never()).savePublicationDateTime(decision.uuid());
       }
 
       @Test
