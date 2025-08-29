@@ -127,7 +127,7 @@ jobs:
           npm run coverage
         working-directory: ./frontend
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@786af10ed495f5fe0d685df87f5f8a075599aa85
+        uses: SonarSource/sonarqube-scan-action@1a6d90ebcb0e6a6b1d87e37ba693fe453195ae25
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
