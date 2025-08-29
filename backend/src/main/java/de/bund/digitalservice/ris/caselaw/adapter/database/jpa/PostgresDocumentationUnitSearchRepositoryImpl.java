@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -91,6 +92,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     predicates.addAll(getFileNumberPredicates(parameters, cq, cb, root));
     predicates.addAll(getDocUnitKindPredicates(parameters, cb, root));
     predicates.addAll(getProcessStepPredicates(parameters, cb, root));
+    predicates.addAll(getAssignedToMePredicates(parameters, cb, root, oidcUser));
 
     // Use cb.construct() to only select the DTO projection instead of the full entity
     cq.select(root).where(predicates.toArray(new Predicate[0]));
@@ -250,6 +252,24 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
               root.get(DocumentationUnitDTO_.documentationOffice),
               parameters.documentationOfficeDTO);
       predicates.add(myDocOfficePredicate);
+    }
+    return predicates;
+  }
+
+  private List<Predicate> getAssignedToMePredicates(
+      SearchParameters parameters,
+      HibernateCriteriaBuilder cb,
+      Root<DocumentationUnitDTO> root,
+      OidcUser oidcUser) {
+    List<Predicate> predicates = new ArrayList<>();
+    User user = userService.getUser(oidcUser);
+    if (parameters.assignedToMe) {
+      Predicate assignedToMePredicate =
+          cb.equal(
+              root.get(DocumentationUnitDTO_.currentProcessStep)
+                  .get(DocumentationUnitProcessStepDTO_.userId),
+              user.id());
+      predicates.add(assignedToMePredicate);
     }
     return predicates;
   }
@@ -519,6 +539,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .documentationOfficeDTO(documentationOfficeDTO)
         .kind(Optional.ofNullable(searchInput.kind()))
         .processStep(Optional.ofNullable(searchInput.processStep()))
+        .assignedToMe(searchInput.assignedToMe())
         .build();
   }
 
@@ -542,5 +563,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       Optional<InboxStatus> inboxStatus,
       DocumentationOfficeDTO documentationOfficeDTO,
       Optional<Kind> kind,
-      Optional<String> processStep) {}
+      Optional<String> processStep,
+      boolean assignedToMe) {}
 }
