@@ -171,7 +171,9 @@ test.describe("Große Suche nach Entscheidungen", () => {
     })
     await test.step(`Setze Status-Filter zurück`, async () => {
       await page.getByLabel("Status Suche").click()
-      await page.getByRole("option", { name: "Alle", exact: true }).click()
+      await page
+        .getByRole("option", { name: "Nicht ausgewählt", exact: true })
+        .click()
     })
     await triggerSearch(page)
     await test.step(`Prüfe, dass 2 Ergebnisse gefunden wurden`, async () => {
@@ -244,7 +246,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await test.step(`Setze Schritt-Filter zurück`, async () => {
         await page.getByLabel("Prozessschritt").click()
         await page
-          .getByRole("option", { name: "Bitte auswählen", exact: true })
+          .getByRole("option", { name: "Nicht ausgewählt", exact: true })
           .click()
       })
       await triggerSearch(page)
