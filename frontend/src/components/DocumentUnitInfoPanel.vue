@@ -73,7 +73,8 @@ const managementDataRoute = computed(() => ({
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
 
-const processStepsEnabled = useFeatureToggle("neuris.process-steps")
+const processStepsEnabled =
+  useFeatureToggle("neuris.process-steps") && isDecision(props.documentUnit)
 
 const showProcessStepDialog = ref(false)
 const toast = useToast()
@@ -125,11 +126,13 @@ watchEffect(() => {
         :process-steps="props.documentUnit.processSteps"
       />
       <IconBadge
-        v-if="props.documentUnit.currentProcessStep?.user"
+        v-if="props.documentUnit.currentProcessStep && processStepsEnabled"
         background-color="bg-white"
         border-color="border-gray-800"
+        class="px-8"
+        data-testid="info-panel-process-step-initials"
         :icon="IconPerson"
-        :label="props.documentUnit.currentProcessStep.user.name"
+        :label="props.documentUnit.currentProcessStep?.user?.initials || '-'"
       />
     </div>
 

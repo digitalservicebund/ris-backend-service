@@ -96,14 +96,14 @@ test.describe(
       await checkStyleOfFirstParagraph(editor)
 
       await test.step("Select all text", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
       })
 
       await clickRemoveBorderNumberButton(page)
 
       await checkAllBorderNumbersAreRemoved(editor)
 
-      await reinsertAllBorderNumbers(page)
+      await reinsertAllBorderNumbers(editor)
 
       await checkAllBorderNumbersAreVisible(editor)
 
@@ -120,7 +120,7 @@ test.describe(
 
       await checkOtherBorderNumbersAreRecalculated(editor)
 
-      await reinsertAllBorderNumbers(page)
+      await reinsertAllBorderNumbers(editor)
 
       await checkAllBorderNumbersAreVisible(editor)
 
@@ -138,7 +138,7 @@ test.describe(
 
       await checkOtherBorderNumbersAreRecalculated(editor)
 
-      await reinsertAllBorderNumbers(page)
+      await reinsertAllBorderNumbers(editor)
 
       await checkAllBorderNumbersAreVisible(editor)
 
@@ -157,7 +157,7 @@ test.describe(
 
       await checkOtherBorderNumbersAreRecalculated(editor)
 
-      await reinsertAllBorderNumbers(page)
+      await reinsertAllBorderNumbers(editor)
 
       await checkAllBorderNumbersAreVisible(editor)
 
@@ -281,7 +281,7 @@ test.describe(
       await checkAllParagraphsAreVisible(editor)
 
       await test.step("Select all text", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
       })
 
       await clickAddBorderNumberButton(page)
@@ -312,7 +312,7 @@ test.describe(
 
       // Gründe
       await clickCategoryButton("Gründe", page)
-      const reasons = page.getByTestId("Gründe")
+      const editor = page.getByTestId("Gründe")
 
       await test.step("Add three paragraphs into 'Gründe'", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -323,15 +323,15 @@ test.describe(
         await page.keyboard.press("Enter")
       })
 
-      await checkAllParagraphsAreVisible(reasons)
+      await checkAllParagraphsAreVisible(editor)
 
       await test.step("Select all text", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
       })
 
       await clickAddBorderNumberButton(page)
 
-      await checkAllBorderNumbersAreVisible(reasons)
+      await checkAllBorderNumbersAreVisible(editor)
 
       // Abweichende Meinung
       await clickCategoryButton("Abweichende Meinung", page)
@@ -349,7 +349,7 @@ test.describe(
       await checkAllParagraphsAreVisible(dissentingOpinion)
 
       await test.step("Select all text", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
       })
 
       await clickAddBorderNumberButton(page)
@@ -382,7 +382,7 @@ test.describe(
       await checkAllParagraphsAreVisible(otherLongText)
 
       await test.step("Select all text", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
       })
 
       await clickAddBorderNumberButton(page)
@@ -408,7 +408,7 @@ test.describe(
 
       // Tatbestand
       await clickCategoryButton("Tatbestand", page)
-      const casefacts = page.getByTestId("Tatbestand")
+      const editor = page.getByTestId("Tatbestand")
 
       await test.step("Add three paragraphs into 'Tatbestand'", async () => {
         await page.keyboard.insertText(firstParagraph)
@@ -419,15 +419,15 @@ test.describe(
         await page.keyboard.press("Enter")
       })
 
-      await checkAllParagraphsAreVisible(casefacts)
+      await checkAllParagraphsAreVisible(editor)
 
       await test.step("Select all text", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
       })
 
       await clickAddBorderNumberButton(page)
 
-      await checkAllBorderNumbersAreVisible(casefacts)
+      await checkAllBorderNumbersAreVisible(editor)
 
       // Entscheidungsgründe
       await clickCategoryButton("Entscheidungsgründe", page)
@@ -445,7 +445,7 @@ test.describe(
       await checkAllParagraphsAreVisible(decisionReasons)
 
       await test.step("Select all text", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
       })
 
       await clickAddBorderNumberButton(page)
@@ -478,7 +478,7 @@ test.describe(
       await checkAllParagraphsAreVisible(dissentingOpinion)
 
       await test.step("Select all text", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
       })
 
       await clickAddBorderNumberButton(page)
@@ -511,7 +511,7 @@ test.describe(
       await checkAllParagraphsAreVisible(otherLongText)
 
       await test.step("Select all text", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
       })
 
       await clickAddBorderNumberButton(page)
@@ -603,12 +603,12 @@ test.describe(
       })
 
       await test.step("Add border numbers to the paragraphs", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
         await page.keyboard.press(`ControlOrMeta+Alt+.`)
       })
 
       await test.step("Copy paragraphs with border numbers", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
         await page.keyboard.press(`ControlOrMeta+C`)
       })
 
@@ -649,12 +649,12 @@ test.describe(
       })
 
       await test.step("Add border numbers to the paragraphs", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
         await page.keyboard.press(`ControlOrMeta+Alt+.`)
       })
 
       await test.step("Copy paragraphs with border numbers", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
         await page.keyboard.press(`ControlOrMeta+C`)
       })
 
@@ -712,7 +712,7 @@ test.describe(
       await checkAllParagraphsAreVisible(editor)
 
       await test.step("Select all text", async () => {
-        await selectAllViaKeyboard(page)
+        await selectAllViaKeyboard(editor)
       })
 
       await clickAddBorderNumberButton(page)
@@ -760,11 +760,11 @@ async function clickAddBorderNumberButton(page: Page) {
   })
 }
 
-async function reinsertAllBorderNumbers(page: Page) {
+async function reinsertAllBorderNumbers(editor: Locator) {
   await test.step("Reinsert all border numbers", async () => {
-    await selectAllViaKeyboard(page)
-    await page.keyboard.press(`Delete`)
-    await page.keyboard.press(`ControlOrMeta+V`)
+    await selectAllViaKeyboard(editor)
+    await editor.press(`Delete`)
+    await editor.press(`ControlOrMeta+V`)
   })
 }
 
@@ -825,8 +825,11 @@ async function waitForSelectionTimeout(page: Page) {
   await page.waitForTimeout(100)
 }
 
-async function selectAllViaKeyboard(page: Page) {
-  await page.keyboard.press(`ControlOrMeta+A`)
+async function selectAllViaKeyboard(editor: Locator) {
+  await editor.focus()
+  await editor.press(`ControlOrMeta+A`)
   // With the latest Chromium versions, the selection promise seems to return without the selection being applied.
-  await page.waitForFunction(() => window.getSelection()?.toString()?.length)
+  await editor
+    .page()
+    .waitForFunction(() => window.getSelection()?.toString()?.length)
 }

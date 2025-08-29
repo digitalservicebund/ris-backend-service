@@ -1,4 +1,4 @@
-FROM node:22.18.0
+FROM node:22.19.0
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm update --location=global npm && npm install

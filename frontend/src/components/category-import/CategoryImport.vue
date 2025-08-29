@@ -11,6 +11,7 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import ActiveCitation from "@/domain/activeCitation"
+import { ContentRelatedIndexing } from "@/domain/contentRelatedIndexing"
 import { allLabels, contentRelatedIndexingLabels } from "@/domain/decision"
 import { DocumentationUnit } from "@/domain/documentationUnit"
 import NormReference from "@/domain/normReference"
@@ -453,8 +454,17 @@ function importContextRelatedIndexing<
   let source = sourceDocumentUnit.value?.contentRelatedIndexing[key]
 
   if (typeof source === "object" && "id" in source) {
-    // If the category is an editable list, we need to remove the existing id => interpreted as new entry.
+    // We need to remove the existing id => interpreted as new entry.
     source = { ...source, id: undefined }
+  }
+
+  if (typeof source === "object" && Array.isArray(source)) {
+    // If the category is an editable list, we need to remove the existing id => interpreted as new entry.
+    source = source.map((entry) =>
+      typeof entry === "object" && "id" in entry
+        ? { ...entry, id: undefined }
+        : entry,
+    ) as ContentRelatedIndexing[K]
   }
 
   if (targetDocumentUnit.value)

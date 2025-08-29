@@ -13,7 +13,7 @@ below.
 ### Necessary tools:**
 
 - [lefthook](https://github.com/evilmartians/lefthook#install) - manages our git hooks
-- [Github CLI](https://cli.github.com/) - used by lefthook to check for pipeline status before push
+- [GitHub CLI](https://cli.github.com/) - used by lefthook to check for pipeline status before push
 - [docker](https://docs.docker.com/get-docker/) - our container runtime (on macOS, the easiest way
   is to use [Docker Desktop](https://www.docker.com/products/docker-desktop/))
 - [1Password CLI](https://developer.1password.com/docs/cli/get-started/) - to access secrets
