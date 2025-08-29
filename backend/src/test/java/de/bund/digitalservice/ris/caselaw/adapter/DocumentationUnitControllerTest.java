@@ -774,6 +774,8 @@ class DocumentationUnitControllerTest {
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
             Optional.empty()))
         .thenReturn(new PageImpl<>(List.of(), pageRequest, 0));
 
@@ -789,6 +791,8 @@ class DocumentationUnitControllerTest {
         .searchByDocumentationUnitSearchInput(
             eq(pageRequest),
             any(OidcUser.class),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
             eq(Optional.empty()),
             eq(Optional.empty()),
             eq(Optional.empty()),

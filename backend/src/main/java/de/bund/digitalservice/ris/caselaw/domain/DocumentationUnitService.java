@@ -337,7 +337,9 @@ public class DocumentationUnitService {
       Optional<Boolean> isResolved,
       Optional<InboxStatus> inboxStatus,
       Optional<Kind> kind,
-      Optional<String> processStep) {
+      Optional<String> processStep,
+      Optional<Boolean> assignedToMe,
+      Optional<Boolean> unassigned) {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
@@ -365,6 +367,8 @@ public class DocumentationUnitService {
             .isResolved(isResolved.orElse(false))
             .kind(kind.orElse(null))
             .processStep(processStep.orElse(null))
+            .assignedToMe(assignedToMe.orElse(false))
+            .unassigned(unassigned.orElse(false))
             .build();
 
     Slice<DocumentationUnitListItem> documentationUnitListItems;

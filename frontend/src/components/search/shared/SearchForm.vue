@@ -90,6 +90,8 @@ const myDocOfficeOnly = computed({
         delete query.value.scheduledOnly
         delete query.value.publicationDate
         processStep.value = "Nicht ausgewählt"
+        delete query.value.assignedToMe
+        delete query.value.unassigned
         resetErrors("publicationDate") // Clear validation for publicationDate
       } else {
         query.value.myDocOfficeOnly = "true"
@@ -125,6 +127,40 @@ const withError = computed({
         delete query.value.withError
       } else {
         query.value.withError = "true"
+      }
+    }
+  },
+})
+
+const assignedToMe = computed({
+  get: () =>
+    isDecision.value && query.value?.assignedToMe
+      ? JSON.parse(query.value.assignedToMe)
+      : false,
+  set: (data) => {
+    if (isDecision.value) {
+      if (!data) {
+        delete query.value.assignedToMe
+      } else {
+        query.value.assignedToMe = "true"
+        if (query.value.unassigned) delete query.value.unassigned
+      }
+    }
+  },
+})
+
+const unassigned = computed({
+  get: () =>
+    isDecision.value && query.value?.unassigned
+      ? JSON.parse(query.value.unassigned)
+      : false,
+  set: (data) => {
+    if (isDecision.value) {
+      if (!data) {
+        delete query.value.unassigned
+      } else {
+        query.value.unassigned = "true"
+        if (query.value.assignedToMe) delete query.value.assignedToMe
       }
     }
   },
@@ -664,12 +700,51 @@ watch(
           </div>
 
           <div
-            class="ris-body1-regular flex flex-row items-center [grid-area:checkbox-label]"
+            class="ris-body1-regular flex flex-row items-center [grid-area:assignee-label]"
+          >
+            Person
+          </div>
+
+          <div class="flex flex-row gap-20 [grid-area:assignee-input]">
+            <InputField
+              id="assignedToMe"
+              v-slot="{ id }"
+              label="Nur mir zugewiesen"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="assignedToMe"
+                aria-label="Nur mir zugewiesen"
+                binary
+                :input-id="id"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              />
+            </InputField>
+            <InputField
+              id="unassigned"
+              v-slot="{ id }"
+              label="Niemandem zugewiesen"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="unassigned"
+                aria-label="Niemandem zugewiesen"
+                binary
+                :input-id="id"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              />
+            </InputField>
+          </div>
+
+          <div
+            class="ris-body1-regular flex flex-row items-center [grid-area:error-label]"
           >
             Fehler
           </div>
 
-          <div class="flex flex-row gap-20 [grid-area:checkbox-group]">
+          <div class="flex flex-row gap-20 [grid-area:error-input]">
             <InputField
               id="withErrorsOnly"
               v-slot="{ id }"
@@ -829,7 +904,7 @@ watch(
     "date-label date-input . ."
     "own-docoffice own-docoffice . ."
     "process-step-label process-step-input jdv-label jdv-input"
-    ". . checkbox-label checkbox-group"
+    "assignee-label assignee-input error-label error-input"
     ". . search-button search-button";
 }
 

@@ -282,6 +282,8 @@ public class DocumentationUnitController {
       @RequestParam(value = "inboxStatus") Optional<InboxStatus> inboxStatus,
       @RequestParam(value = "kind") Optional<Kind> kind,
       @RequestParam(value = "processStep") Optional<String> processStep,
+      @RequestParam(value = "assignedToMe") Optional<Boolean> assignedToMe,
+      @RequestParam(value = "unassigned") Optional<Boolean> unassigned,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     return service.searchByDocumentationUnitSearchInput(
@@ -304,7 +306,9 @@ public class DocumentationUnitController {
         isResolved,
         inboxStatus,
         kind,
-        processStep);
+        processStep,
+        assignedToMe,
+        unassigned);
   }
 
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
