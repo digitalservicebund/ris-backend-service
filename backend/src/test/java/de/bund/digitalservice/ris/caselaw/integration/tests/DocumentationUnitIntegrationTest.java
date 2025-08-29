@@ -1401,7 +1401,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     List<DocumentationUnitListItem> content =
         risWebTestClient
-            .withDefaultLogin()
+            .withDefaultLogin(oidcLoggedInUserId)
             .get()
             .uri(uri)
             .exchange()
