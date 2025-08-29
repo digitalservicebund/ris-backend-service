@@ -306,7 +306,7 @@ describe("documentUnit list", () => {
           id: "id",
           uuid: "1",
           documentNumber: "123",
-          lastPublicationDateTime: "2000-01-23T23:00:00",
+          lastHandoverDateTime: "2000-01-23T23:00:00",
         },
       ],
       showPublicationDate: true,

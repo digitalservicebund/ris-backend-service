@@ -335,7 +335,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
 
     if (entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)) {
       var docUnit = repository.findById(entityId).orElseThrow();
-      assertThat(docUnit.getLastPublicationDateTime())
+      assertThat(docUnit.getLastHandoverDateTime())
           .isCloseTo(LocalDateTime.now(), within(5, ChronoUnit.SECONDS));
       assertThat(docUnit.getInboxStatus()).isNull();
 

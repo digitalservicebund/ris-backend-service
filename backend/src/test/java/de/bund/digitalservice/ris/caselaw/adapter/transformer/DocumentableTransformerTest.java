@@ -140,7 +140,7 @@ class DocumentableTransformerTest {
 
       // Assert
       assertNull(builder.build().getScheduledPublicationDateTime());
-      assertNull(builder.build().getLastPublicationDateTime());
+      assertNull(builder.build().getLastHandoverDateTime());
       assertNull(builder.build().getScheduledByEmail());
     }
 
@@ -163,7 +163,7 @@ class DocumentableTransformerTest {
 
       // Assert
       assertThat(builder.build().getScheduledPublicationDateTime()).isNotNull();
-      assertThat(builder.build().getLastPublicationDateTime()).isNotNull();
+      assertThat(builder.build().getLastHandoverDateTime()).isNotNull();
       assertThat(builder.build().getScheduledByEmail()).isEqualTo("test@test.de");
     }
 
@@ -178,7 +178,7 @@ class DocumentableTransformerTest {
 
       // Assert
       assertNull(builder.build().getScheduledPublicationDateTime());
-      assertNull(builder.build().getLastPublicationDateTime());
+      assertNull(builder.build().getLastHandoverDateTime());
       assertNull(builder.build().getScheduledByEmail());
     }
   }

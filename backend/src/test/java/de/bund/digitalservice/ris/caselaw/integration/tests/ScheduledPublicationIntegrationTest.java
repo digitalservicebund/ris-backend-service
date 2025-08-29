@@ -93,14 +93,14 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
               var publishedDocUnit = docUnitRepository.findById(docUnitDueNow.getId()).get();
               assertThat(publishedDocUnit.getScheduledByEmail()).isNull();
               assertThat(publishedDocUnit.getScheduledPublicationDateTime()).isNull();
-              assertThat(publishedDocUnit.getLastPublicationDateTime())
+              assertThat(publishedDocUnit.getLastHandoverDateTime())
                   .isCloseTo(now, byLessThan(60, ChronoUnit.SECONDS));
 
               var failedDocUnit =
                   docUnitRepository.findById(docUnitWithFailingXmlExport.getId()).get();
               assertThat(failedDocUnit.getScheduledByEmail()).isNull();
               assertThat(failedDocUnit.getScheduledPublicationDateTime()).isNull();
-              assertThat(failedDocUnit.getLastPublicationDateTime())
+              assertThat(failedDocUnit.getLastHandoverDateTime())
                   .isCloseTo(now, byLessThan(60, ChronoUnit.SECONDS));
 
               var scheduledDocUnit =
@@ -111,7 +111,7 @@ class ScheduledPublicationIntegrationTest extends BaseIntegrationTest {
                   .isCloseTo(
                       docUnitScheduledForFuture.getScheduledPublicationDateTime(),
                       byLessThan(1, ChronoUnit.SECONDS));
-              assertThat(scheduledDocUnit.getLastPublicationDateTime()).isNull();
+              assertThat(scheduledDocUnit.getLastHandoverDateTime()).isNull();
             });
 
     assertThat(docUnitRepository.findAll()).hasSize(3);

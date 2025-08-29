@@ -39,10 +39,10 @@ const useSessionStore = defineStore("session", (): SessionStore => {
 
   async function initSession(): Promise<void> {
     env.value = await fetchEnv()
-    useFavicon(getFavicon(env.value))
+    useFavicon(getFavicon(env.value?.environment))
   }
 
-  return { user, env, isAuthenticated, initSession }
+  return { user, env: env, isAuthenticated, initSession }
 })
 
 export default useSessionStore

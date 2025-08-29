@@ -66,18 +66,19 @@ describe("Session store", () => {
     },
   )
 
-  it.each(["staging", "uat", "production"] as Env[])(
-    "sets and returns the correct env",
-    async (environment: Env) => {
-      vi.mocked(adminService).getEnv.mockResolvedValue({
-        status: 200,
-        data: environment,
-      })
+  it.each([
+    { environment: "staging" },
+    { environment: "uat" },
+    { environment: "production" },
+  ] as Env[])("sets and returns the correct env", async (env: Env) => {
+    vi.mocked(adminService).getEnv.mockResolvedValue({
+      status: 200,
+      data: env,
+    })
 
-      const session = useSessionStore()
-      await session.initSession()
+    const session = useSessionStore()
+    await session.initSession()
 
-      expect(session.env).toEqual(environment)
-    },
-  )
+    expect(session.env?.environment).toEqual(env.environment)
+  })
 })

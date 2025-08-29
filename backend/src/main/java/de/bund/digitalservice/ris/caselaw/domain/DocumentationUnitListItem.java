@@ -41,7 +41,7 @@ public record DocumentationUnitListItem(
     LocalDate decisionDate,
     LocalDate resolutionDate,
     Instant createdAt,
-    LocalDateTime lastPublicationDateTime,
+    LocalDateTime lastHandoverDateTime,
     LocalDateTime scheduledPublicationDateTime,
     String appraisalBody,
     Boolean hasHeadnoteOrPrinciple,

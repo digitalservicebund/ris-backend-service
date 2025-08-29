@@ -434,7 +434,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
           repository,
           DecisionDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
-              .lastPublicationDateTime(date)
+              .lastHandoverDateTime(date)
               .scheduledPublicationDateTime(scheduledPublicationDates.get(index))
               .documentationOffice(docOfficeDTO));
       index++;
@@ -474,7 +474,7 @@ class DocumentationUnitSearchIntegrationTest extends BaseIntegrationTest {
             null,
             null);
     assertThat(responseBody)
-        .extracting("lastPublicationDateTime")
+        .extracting("lastHandoverDateTime")
         .containsExactly(
             null,
             LocalDateTime.of(2022, 1, 23, 8, 5),

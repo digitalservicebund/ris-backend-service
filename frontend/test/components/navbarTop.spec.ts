@@ -15,7 +15,7 @@ function renderComponent(options?: { env?: Env; activeUser?: User }) {
         createTestingPinia({
           initialState: {
             session: {
-              env: options?.env ?? "uat",
+              env: options?.env ?? { environment: "uat" },
               user: options?.activeUser || {
                 name: "user",
                 documentationOffice: { abbreviation: "DS" },
@@ -75,7 +75,7 @@ describe("navbar top", () => {
 
   test("navbar top should be rendered with user and doc office badge", async () => {
     renderComponent({
-      env: "staging",
+      env: { environment: "staging" },
       activeUser: {
         name: "Test User",
         documentationOffice: { abbreviation: "fooDocumentationOffice" },
@@ -86,7 +86,7 @@ describe("navbar top", () => {
     const sessionStore = useSessionStore()
     await sessionStore.initSession()
 
-    expect(sessionStore.env).toBe("staging")
+    expect(sessionStore.env?.environment).toBe("staging")
     expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
     expect(screen.getByText("Vorgänge")).toBeInTheDocument()
     expect(screen.getByText("des Bundes")).toBeInTheDocument()
@@ -94,5 +94,46 @@ describe("navbar top", () => {
     expect(
       screen.getByText("fooDocumentationOffice | Staging"),
     ).toBeInTheDocument()
+  })
+  const badgeCases = [
+    {
+      env: { environment: "staging" } as Env,
+      user: {
+        name: "Test User",
+        documentationOffice: { abbreviation: "DS" },
+        initials: "TU",
+      },
+      expected: { label: "DS | Staging", color: "bg-red-300" },
+    },
+    {
+      env: { environment: "uat" } as Env,
+      user: {
+        name: "Test User",
+        documentationOffice: { abbreviation: "BGH" },
+        initials: "TU",
+      },
+      expected: { label: "BGH | UAT", color: "bg-yellow-300" },
+    },
+    {
+      env: { environment: "production" } as Env,
+      user: {
+        name: "Test User",
+        documentationOffice: { abbreviation: "BFH" },
+        initials: "TU",
+      },
+      expected: { label: "BFH", color: "bg-blue-300" },
+    },
+  ]
+  badgeCases.forEach(({ env, user, expected }) => {
+    it(`should display correct badge for env '${env.environment}' and docOffice '${user.documentationOffice?.abbreviation}'`, async () => {
+      renderComponent({
+        env: env,
+        activeUser: user,
+      })
+
+      expect(screen.getByText(expected.label)).toBeInTheDocument()
+      const badgeElem = screen.getByTestId("navbar-top-badge")
+      expect(badgeElem).toHaveClass(expected.color)
+    })
   })
 })

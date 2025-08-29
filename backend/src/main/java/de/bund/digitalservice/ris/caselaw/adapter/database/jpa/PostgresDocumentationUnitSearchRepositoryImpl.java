@@ -327,7 +327,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
           cb.equal(scheduledPublicationDateTime, parameters.publicationDate.get());
 
       Expression<Date> lastPublicationDateTime =
-          getDateOnly(cb, root.get(DocumentationUnitDTO_.lastPublicationDateTime));
+          getDateOnly(cb, root.get(DocumentationUnitDTO_.lastHandoverDateTime));
       Predicate lastDatePredicate =
           cb.equal(lastPublicationDateTime, parameters.publicationDate.get());
 
@@ -477,7 +477,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
           cb.desc(root.get(DocumentationUnitDTO_.scheduledPublicationDateTime))
               .nullPrecedence(NullPrecedence.LAST));
       orderCriteria.add(
-          cb.desc(root.get(DocumentationUnitDTO_.lastPublicationDateTime))
+          cb.desc(root.get(DocumentationUnitDTO_.lastHandoverDateTime))
               .nullPrecedence(NullPrecedence.LAST));
     }
 

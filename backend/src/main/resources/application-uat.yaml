@@ -15,6 +15,7 @@ sentry:
 
 neuris:
   environment: uat
+  portalUrl: https://ris-portal.uat.ds4g.net/
   document-number-patterns:
     BGH: KORE7****1YYY # results in e.g. KORE 7 0001 1024
     BVerfG: KVRE*****YY41 # results in e.g. KVRE 00001 24 41

@@ -478,10 +478,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return;
     }
 
-    if (docUnitDTO.getManagementData() == null) {
-      docUnitDTO.setManagementData(new ManagementDataDTO());
-      docUnitDTO.getManagementData().setDocumentationUnit(docUnitDTO);
-    }
+    setManagementData(docUnitDTO);
 
     DocumentationOfficeDTO docOffice =
         DocumentationOfficeTransformer.transformToDTO(currentUser.documentationOffice());
@@ -491,6 +488,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     docUnitDTO.getManagementData().setLastUpdatedBySystemName(null);
     docUnitDTO.getManagementData().setLastUpdatedByDocumentationOffice(docOffice);
     docUnitDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
+  }
+
+  private static void setManagementData(DocumentationUnitDTO docUnitDTO) {
+    ManagementDataDTO managementData = docUnitDTO.getManagementData();
+    if (managementData == null) {
+      managementData =
+          ManagementDataDTO.builder().id(docUnitDTO.getId()).documentationUnit(docUnitDTO).build();
+      docUnitDTO.setManagementData(managementData);
+    }
   }
 
   @Override
@@ -805,7 +811,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void saveSuccessfulPublication(UUID uuid) {
+  public void saveSuccessfulHandover(UUID uuid) {
     if (uuid == null) {
       return;
     }
@@ -815,7 +821,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return;
     }
     var documentationUnitDTO = documentationUnitDTOOptional.get();
-    documentationUnitDTO.setLastPublicationDateTime(LocalDateTime.now());
+    documentationUnitDTO.setLastHandoverDateTime(LocalDateTime.now());
     documentationUnitDTO.setInboxStatus(null);
     repository.save(documentationUnitDTO);
   }
@@ -1050,13 +1056,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         repository.findById(documentationUnitId).orElse(null);
     if (documentationUnitDTO == null) {
       log.info(
-          "Can't update portal publiation status for documentation unti with id: {}",
+          "Can't update portal publication status for documentation unit with id: {}",
           documentationUnitId);
       return;
     }
     var oldStatus = documentationUnitDTO.getPortalPublicationStatus();
 
     setLastUpdated(null, documentationUnitDTO);
+    savePublicationDateTime(documentationUnitId);
 
     historyLogService.saveHistoryLog(
         documentationUnitId,
@@ -1072,5 +1079,34 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           pendingProceedingDTO.toBuilder().portalPublicationStatus(newStatus).build();
     }
     repository.save(documentationUnitDTO);
+  }
+
+  @Override
+  public void savePublicationDateTime(UUID documentationUnitId) {
+    repository
+        .findById(documentationUnitId)
+        .ifPresentOrElse(
+            documentationUnitDTO -> {
+              setPublicationDateTime(documentationUnitDTO);
+              repository.save(documentationUnitDTO);
+            },
+            () ->
+                log.info(
+                    "Can't set publication date time for documentation unit with id: {}",
+                    documentationUnitId));
+  }
+
+  private void setPublicationDateTime(DocumentationUnitDTO documentationUnitDTO) {
+    setManagementData(documentationUnitDTO);
+
+    Instant now = Instant.now();
+    var isFirstPublication =
+        documentationUnitDTO.getManagementData().getFirstPublishedAtDateTime() == null;
+    if (isFirstPublication) {
+      documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
+      documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
+    } else {
+      documentationUnitDTO.getManagementData().setFirstPublishedAtDateTime(now);
+    }
   }
 }

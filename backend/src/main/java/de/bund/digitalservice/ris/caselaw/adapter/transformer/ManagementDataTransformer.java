@@ -70,7 +70,7 @@ public class ManagementDataTransformer {
         Optional.ofNullable(documentationUnitDTO.getManagementData());
 
     return ManagementData.builder()
-        .lastPublicationDateTime(documentationUnitDTO.getLastPublicationDateTime())
+        .lastPublicationDateTime(documentationUnitDTO.getLastHandoverDateTime())
         .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
         .scheduledByEmail(documentationUnitDTO.getScheduledByEmail())
         .borderNumbers(borderNumbers)

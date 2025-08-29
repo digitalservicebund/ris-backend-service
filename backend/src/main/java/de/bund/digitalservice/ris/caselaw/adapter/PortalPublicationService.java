@@ -296,11 +296,22 @@ public class PortalPublicationService {
 
   private void updatePortalPublicationStatus(
       DocumentationUnit documentationUnit, PortalPublicationStatus newStatus, User user) {
-    var oldStatus = documentationUnit.portalPublicationStatus();
-    if (newStatus.equals(oldStatus)) {
-      return;
+
+    boolean statusUnchanged = newStatus.equals(documentationUnit.portalPublicationStatus());
+    boolean isPublishAction = newStatus.equals(PortalPublicationStatus.PUBLISHED);
+
+    if (statusUnchanged && isPublishAction) {
+      documentationUnitRepository.savePublicationDateTime(documentationUnit.uuid());
+    } else if (!statusUnchanged) {
+      documentationUnitRepository.updatePortalPublicationStatus(
+          documentationUnit.uuid(), newStatus);
     }
-    documentationUnitRepository.updatePortalPublicationStatus(documentationUnit.uuid(), newStatus);
+
+    addHistoryLog(documentationUnit, newStatus, user);
+  }
+
+  private void addHistoryLog(
+      DocumentationUnit documentationUnit, PortalPublicationStatus newStatus, User user) {
     String historyLogMessage;
     if (PortalPublicationStatus.PUBLISHED.equals(newStatus)) {
       historyLogMessage = "Dokeinheit im Portal veröffentlicht";

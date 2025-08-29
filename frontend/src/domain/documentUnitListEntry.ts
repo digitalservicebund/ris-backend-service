@@ -11,7 +11,7 @@ export default class DocumentUnitListEntry {
   decisionDate?: string
   resolutionDate?: string
   createdAt?: string
-  lastPublicationDateTime?: string
+  lastHandoverDateTime?: string
   scheduledPublicationDateTime?: string
   status?: PublicationStatus
   fileNumber?: string
