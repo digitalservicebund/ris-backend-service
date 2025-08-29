@@ -1,7 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,5 +25,34 @@ public class ProcessStepTransformer {
         .name(domain.name())
         .abbreviation(domain.abbreviation())
         .build();
+  }
+
+  /**
+   * Iterate backwards to find the previous process if the process id is different then the last one
+   *
+   * @param documentationUnitProcessStepsDTOs of the list item
+   * @return the previous unique process step
+   */
+  public static ProcessStep getPreviousProcessStep(
+      List<DocumentationUnitProcessStepDTO> documentationUnitProcessStepsDTOs) {
+
+    if (documentationUnitProcessStepsDTOs == null || documentationUnitProcessStepsDTOs.size() < 2) {
+      return null;
+    }
+
+    UUID currentProcessStepId =
+        Optional.ofNullable(documentationUnitProcessStepsDTOs.getFirst())
+            .map(DocumentationUnitProcessStepDTO::getProcessStep)
+            .map(ProcessStepDTO::getId)
+            .orElse(null);
+
+    for (int i = 1; i < documentationUnitProcessStepsDTOs.size(); i++) {
+      ProcessStepDTO stepDto = documentationUnitProcessStepsDTOs.get(i).getProcessStep();
+      if (stepDto != null && !Objects.equals(stepDto.getId(), currentProcessStepId)) {
+        return ProcessStepTransformer.toDomain(stepDto);
+      }
+    }
+
+    return null;
   }
 }

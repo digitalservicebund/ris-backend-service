@@ -11,6 +11,7 @@ import LegalForce from "@/domain/legalForce"
 import { ManagementData } from "@/domain/managementData"
 import NormReference from "@/domain/normReference"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
+import ProcessStep from "@/domain/processStep"
 import { PublicationStatus } from "@/domain/publicationStatus"
 import SingleNorm from "@/domain/singleNorm"
 
@@ -52,7 +53,8 @@ export default class PendingProceeding {
     borderNumbers: [],
     duplicateRelations: [],
   }
-  public currentProcessStep?: DocumentationUnitProcessStep
+  public currentDocumentationUnitProcessStep?: DocumentationUnitProcessStep
+  public previousProcessStep?: ProcessStep
   public processSteps?: DocumentationUnitProcessStep[]
 
   public isEditable?: boolean

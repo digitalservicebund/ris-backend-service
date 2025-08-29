@@ -1089,7 +1089,7 @@ class DocumentationUnitServiceTest {
                     .documentationOffice(docOffice)
                     .build())
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
-            .currentProcessStep(processStep1)
+            .currentDocumentationUnitProcessStep(processStep1)
             .processSteps(List.of(processStep1, processStepOtherDocOffice, processStep2))
             .build();
     when(userService.getUser(oidcUser)).thenReturn(user);
@@ -1144,7 +1144,7 @@ class DocumentationUnitServiceTest {
                     .documentationOffice(docOffice)
                     .build())
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
-            .currentProcessStep(processStep1)
+            .currentDocumentationUnitProcessStep(processStep1)
             .processSteps(
                 List.of(
                     processStep1, processStepOtherDocOffice, processStep2, processStepWithoutUser))
@@ -1202,7 +1202,7 @@ class DocumentationUnitServiceTest {
                     .documentationOffice(docOffice)
                     .build())
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
-            .currentProcessStep(processStep1)
+            .currentDocumentationUnitProcessStep(processStep1)
             .processSteps(
                 List.of(
                     processStep1,

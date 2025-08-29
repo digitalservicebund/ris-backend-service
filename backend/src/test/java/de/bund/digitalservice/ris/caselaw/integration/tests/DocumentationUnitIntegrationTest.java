@@ -251,7 +251,12 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               assertThat(response.getResponseBody().coreData().fileNumbers()).hasSize(1);
               assertThat(response.getResponseBody().coreData().fileNumbers().getFirst())
                   .isEqualTo("abc");
-              assertThat(response.getResponseBody().currentProcessStep().getProcessStep().name())
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .currentDocumentationUnitProcessStep()
+                          .getProcessStep()
+                          .name())
                   .isEqualTo("Ersterfassung");
             });
 
@@ -2336,7 +2341,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .returnResult()
             .getResponseBody();
 
-    assertThat(createdDocUnit.currentProcessStep().getProcessStep().name())
+    assertThat(createdDocUnit.currentDocumentationUnitProcessStep().getProcessStep().name())
         .isEqualTo("Ersterfassung");
     List<DocumentationUnitProcessStep> processSteps = createdDocUnit.processSteps();
     assertThat(processSteps).hasSize(1);

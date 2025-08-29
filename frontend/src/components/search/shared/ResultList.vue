@@ -10,7 +10,7 @@ import DataTable from "primevue/datatable"
 import { computed, ref, onMounted, onUnmounted } from "vue"
 
 import AssigneeBadge from "@/components/AssigneeBadge.vue"
-import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
+import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 
@@ -304,15 +304,20 @@ onUnmounted(() => {
 
         <Column v-if="isDecision" header="Schritt">
           <template #body="{ data: item }">
-            <CurrentAndLastProcessStepBadge
-              :process-steps="item.processSteps"
+            <CurrentAndPreviousProcessStepBadge
+              :current-process-step="
+                item.currentDocumentationUnitProcessStep?.processStep
+              "
+              :previous-process-step="item.previousProcessStep"
             />
           </template>
         </Column>
 
         <Column v-if="isDecision" header="Person">
           <template #body="{ data: item }">
-            <AssigneeBadge :name="item?.currentProcessStep?.user?.initials" />
+            <AssigneeBadge
+              :name="item?.currentDocumentationUnitProcessStep?.user?.initials"
+            />
           </template>
         </Column>
 

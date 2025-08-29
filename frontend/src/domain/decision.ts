@@ -14,6 +14,7 @@ import NormReference from "@/domain/normReference"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import PreviousDecision from "@/domain/previousDecision"
+import ProcessStep from "@/domain/processStep"
 import { PublicationStatus } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import SingleNorm from "@/domain/singleNorm"
@@ -110,7 +111,8 @@ export class Decision {
     duplicateRelations: [],
   }
   public inboxStatus?: InboxStatus
-  public currentProcessStep?: DocumentationUnitProcessStep
+  public currentDocumentationUnitProcessStep?: DocumentationUnitProcessStep
+  public previousProcessStep?: ProcessStep
   public processSteps?: DocumentationUnitProcessStep[]
 
   static readonly requiredFields = [
