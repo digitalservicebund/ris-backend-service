@@ -35,7 +35,7 @@
     "@digitalservicebund/ris-ui": "^3.12.0",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
-    "@sentry/vue": "^10.7.0",
+    "@sentry/vue": "^10.8.0",
     "@tailwindcss/postcss": "^4.1.12",
     "@tiptap/extension-blockquote": "^2.26.1",
     "@tiptap/extension-bold": "^2.26.1",
