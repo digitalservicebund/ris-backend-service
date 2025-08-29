@@ -8,7 +8,6 @@ import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessSt
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
@@ -73,8 +72,7 @@ const managementDataRoute = computed(() => ({
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
 
-const processStepsEnabled =
-  useFeatureToggle("neuris.process-steps") && isDecision(props.documentUnit)
+const processStepsEnabled = isDecision(props.documentUnit)
 
 const showProcessStepDialog = ref(false)
 const toast = useToast()
