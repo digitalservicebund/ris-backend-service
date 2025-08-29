@@ -95,4 +95,45 @@ describe("navbar top", () => {
       screen.getByText("fooDocumentationOffice | Staging"),
     ).toBeInTheDocument()
   })
+  const badgeCases = [
+    {
+      env: { environment: "staging" } as Env,
+      user: {
+        name: "Test User",
+        documentationOffice: { abbreviation: "DS" },
+        initials: "TU",
+      },
+      expected: { label: "DS | Staging", color: "bg-red-300" },
+    },
+    {
+      env: { environment: "uat" } as Env,
+      user: {
+        name: "Test User",
+        documentationOffice: { abbreviation: "BGH" },
+        initials: "TU",
+      },
+      expected: { label: "BGH | UAT", color: "bg-yellow-300" },
+    },
+    {
+      env: { environment: "production" } as Env,
+      user: {
+        name: "Test User",
+        documentationOffice: { abbreviation: "BFH" },
+        initials: "TU",
+      },
+      expected: { label: "BFH", color: "bg-blue-300" },
+    },
+  ]
+  badgeCases.forEach(({ env, user, expected }) => {
+    it(`should display correct badge for env '${env.environment}' and docOffice '${user.documentationOffice?.abbreviation}'`, async () => {
+      renderComponent({
+        env: env,
+        activeUser: user,
+      })
+
+      expect(screen.getByText(expected.label)).toBeInTheDocument()
+      const badgeElem = screen.getByTestId("navbar-top-badge")
+      expect(badgeElem).toHaveClass(expected.color)
+    })
+  })
 })

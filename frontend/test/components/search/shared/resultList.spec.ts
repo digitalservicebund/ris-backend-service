@@ -111,4 +111,37 @@ describe("Search Result List", () => {
     expect(rowWithProcessStep).toHaveTextContent("Ersterfassung")
     expect(rowWithProcessStep).toHaveTextContent("TN")
   })
+
+  it("displays scheduledPublicationDateTime/lastHandoverDateTime", async () => {
+    const entryWithScheduledPublication = new DocumentUnitListEntry({
+      uuid: "3",
+      scheduledPublicationDateTime: "2025-12-31T17:45:00Z",
+      lastHandoverDateTime: undefined,
+    })
+
+    const entryWithLastHandover = new DocumentUnitListEntry({
+      uuid: "4",
+      scheduledPublicationDateTime: undefined,
+      lastHandoverDateTime: "2022-02-01T06:00:00Z",
+    })
+
+    const pageEntries: Page<DocumentUnitListEntry> = {
+      content: [entryWithScheduledPublication, entryWithLastHandover],
+      size: 2,
+      number: 0,
+      numberOfElements: 2,
+      first: true,
+      last: false,
+      empty: false,
+    }
+
+    renderComponent({
+      kind: Kind.DECISION,
+      pageEntries,
+      showPublicationDate: true,
+    })
+
+    expect(screen.getByText(/31\.12\.2025 18:45/)).toBeInTheDocument()
+    expect(screen.getByText(/01\.02\.2022 07:00/)).toBeInTheDocument()
+  })
 })
