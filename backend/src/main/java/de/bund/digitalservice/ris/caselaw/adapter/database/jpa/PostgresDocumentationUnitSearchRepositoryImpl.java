@@ -93,6 +93,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     predicates.addAll(getDocUnitKindPredicates(parameters, cb, root));
     predicates.addAll(getProcessStepPredicates(parameters, cb, root));
     predicates.addAll(getAssignedToMePredicates(parameters, cb, root, oidcUser));
+    predicates.addAll(getUnassignedPredicates(parameters, cb, root));
 
     // Use cb.construct() to only select the DTO projection instead of the full entity
     cq.select(root).where(predicates.toArray(new Predicate[0]));
@@ -270,6 +271,19 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
                   .get(DocumentationUnitProcessStepDTO_.userId),
               user.id());
       predicates.add(assignedToMePredicate);
+    }
+    return predicates;
+  }
+
+  private List<Predicate> getUnassignedPredicates(
+      SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
+    List<Predicate> predicates = new ArrayList<>();
+    if (parameters.unassigned) {
+      Predicate unassignedPredicate =
+          cb.isNull(
+              root.get(DocumentationUnitDTO_.currentProcessStep)
+                  .get(DocumentationUnitProcessStepDTO_.userId));
+      predicates.add(unassignedPredicate);
     }
     return predicates;
   }
@@ -540,6 +554,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .kind(Optional.ofNullable(searchInput.kind()))
         .processStep(Optional.ofNullable(searchInput.processStep()))
         .assignedToMe(searchInput.assignedToMe())
+        .unassigned(searchInput.unassigned())
         .build();
   }
 
@@ -564,5 +579,6 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       DocumentationOfficeDTO documentationOfficeDTO,
       Optional<Kind> kind,
       Optional<String> processStep,
-      boolean assignedToMe) {}
+      boolean assignedToMe,
+      boolean unassigned) {}
 }
