@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -16,10 +17,9 @@ public interface DocumentationUnitHistoryLogRepository {
    * Find all history logs for a documentation unit by its id
    *
    * @param documentationUnitId the id of the documentation unit
-   * @param user logged-in user for checking view permissions
    * @return a list of history logs for this documentation unit
    */
-  List<HistoryLog> findByDocumentationUnitId(UUID documentationUnitId, User user);
+  List<HistoryLogDTO> findByDocumentationUnitId(UUID documentationUnitId);
 
   /**
    * Find all history logs for a documentation unit by its id for a certain duration

@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -23,61 +22,63 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
   private final DatabaseDocumentationUnitHistoryLogRepository databaseRepository;
   private final DatabaseHistoryLogDocumentationUnitProcessStepRepository
       historyLogDocumentationUnitProcessStepRepository;
-  private final UserService userService;
 
   public PostgresDocumentationUnitHistoryLogRepositoryImpl(
       DatabaseDocumentationUnitHistoryLogRepository databaseRepository,
-      UserService userService,
       DatabaseHistoryLogDocumentationUnitProcessStepRepository
           historyLogDocumentationUnitProcessStepRepository) {
     this.databaseRepository = databaseRepository;
-    this.userService = userService;
     this.historyLogDocumentationUnitProcessStepRepository =
         historyLogDocumentationUnitProcessStepRepository;
   }
 
-  @Transactional
   @Override
-  public List<HistoryLog> findByDocumentationUnitId(
-      UUID documentationUnitId, @Nullable User currentUser) {
-
-    List<HistoryLogDTO> historyLogDTOs =
-        databaseRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId);
-
-    return historyLogDTOs.stream()
-        .map(
-            dto -> {
-              User creatorUser = userService.getUser(dto.getUserId());
-              User fromUser = null;
-              User toUser = null;
-
-              if (dto.getEventType() == HistoryLogEventType.PROCESS_STEP_USER) {
-                HistoryLogDocumentationUnitProcessStepDTO historyLogProcessStepDTO =
-                    historyLogDocumentationUnitProcessStepRepository
-                        .findByHistoryLogId(dto.getId())
-                        .orElse(null);
-                if (historyLogProcessStepDTO != null) {
-                  fromUser =
-                      Optional.ofNullable(
-                              historyLogProcessStepDTO.getFromDocumentationUnitProcessStep())
-                          .map(DocumentationUnitProcessStepDTO::getUserId)
-                          .map(userService::getUser)
-                          .orElse(null);
-
-                  toUser =
-                      Optional.ofNullable(
-                              historyLogProcessStepDTO.getToDocumentationUnitProcessStep())
-                          .map(DocumentationUnitProcessStepDTO::getUserId)
-                          .map(userService::getUser)
-                          .orElse(null);
-                }
-              }
-
-              return HistoryLogTransformer.transformToDomain(
-                  dto, currentUser, creatorUser, fromUser, toUser);
-            })
-        .toList();
+  public List<HistoryLogDTO> findByDocumentationUnitId(UUID documentationUnitId) {
+    return databaseRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId);
   }
+
+  //  @Transactional
+  //  @Override
+  //  public List<HistoryLog> findByDocumentationUnitId(
+  //      UUID documentationUnitId, @Nullable User currentUser) {
+  //
+  //    List<HistoryLogDTO> historyLogDTOs =
+  //        databaseRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(documentationUnitId);
+  //
+  //    return historyLogDTOs.stream()
+  //        .map(
+  //            dto -> {
+  //              User creatorUser = userService.getUser(dto.getUserId());
+  //              User fromUser = null;
+  //              User toUser = null;
+  //
+  //              if (dto.getEventType() == HistoryLogEventType.PROCESS_STEP_USER) {
+  //                HistoryLogDocumentationUnitProcessStepDTO historyLogProcessStepDTO =
+  //                    historyLogDocumentationUnitProcessStepRepository
+  //                        .findByHistoryLogId(dto.getId())
+  //                        .orElse(null);
+  //                if (historyLogProcessStepDTO != null) {
+  //                  fromUser =
+  //                      Optional.ofNullable(
+  //                              historyLogProcessStepDTO.getFromDocumentationUnitProcessStep())
+  //                          .map(DocumentationUnitProcessStepDTO::getUserId)
+  //                          .map(userService::getUser)
+  //                          .orElse(null);
+  //
+  //                  toUser =
+  //                      Optional.ofNullable(
+  //                              historyLogProcessStepDTO.getToDocumentationUnitProcessStep())
+  //                          .map(DocumentationUnitProcessStepDTO::getUserId)
+  //                          .map(userService::getUser)
+  //                          .orElse(null);
+  //                }
+  //              }
+  //
+  //              return HistoryLogTransformer.transformToDomain(
+  //                  dto, currentUser, creatorUser, fromUser, toUser);
+  //            })
+  //        .toList();
+  //  }
 
   @Override
   public Optional<HistoryLog> findUpdateLogForDuration(

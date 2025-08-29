@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.HistoryLogTransformer;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -14,13 +16,56 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class DocumentationUnitHistoryLogService {
   private final DocumentationUnitHistoryLogRepository repository;
+  private final HistoryLogDocumentationUnitProcessStepRepository
+      historyLogDocumentationUnitProcessStepRepository;
+  private final UserService userService;
 
-  public DocumentationUnitHistoryLogService(DocumentationUnitHistoryLogRepository repository) {
+  public DocumentationUnitHistoryLogService(
+      DocumentationUnitHistoryLogRepository repository,
+      HistoryLogDocumentationUnitProcessStepRepository
+          historyLogDocumentationUnitProcessStepRepository,
+      UserService userService) {
     this.repository = repository;
+    this.historyLogDocumentationUnitProcessStepRepository =
+        historyLogDocumentationUnitProcessStepRepository;
+    this.userService = userService;
   }
 
-  public List<HistoryLog> getHistoryLogs(UUID documentationUnitId, User user) {
-    return repository.findByDocumentationUnitId(documentationUnitId, user);
+  @Transactional(readOnly = true)
+  public List<HistoryLog> getHistoryLogs(UUID documentationUnitId, User currentUser) {
+    List<HistoryLogDTO> historyLogDTOs = repository.findByDocumentationUnitId(documentationUnitId);
+
+    return historyLogDTOs.stream().map(dto -> enrichAndTransform(dto, currentUser)).toList();
+  }
+
+  private HistoryLog enrichAndTransform(HistoryLogDTO dto, User currentUser) {
+    User creatorUser = userService.getUser(dto.getUserId());
+    User fromUser = null;
+    User toUser = null;
+
+    if (dto.getEventType() == HistoryLogEventType.PROCESS_STEP_USER) {
+      HistoryLogDocumentationUnitProcessStep historyLogProcessStep =
+          historyLogDocumentationUnitProcessStepRepository
+              .findByHistoryLogId(dto.getId())
+              .orElse(null);
+      if (historyLogProcessStep != null) {
+        fromUser =
+            Optional.ofNullable(historyLogProcessStep.getFromDocumentationUnitProcessStep())
+                .map(DocumentationUnitProcessStep::getUser)
+                .map(User::id)
+                .map(userService::getUser)
+                .orElse(null);
+
+        toUser =
+            Optional.ofNullable(historyLogProcessStep.getToDocumentationUnitProcessStep())
+                .map(DocumentationUnitProcessStep::getUser)
+                .map(User::id)
+                .map(userService::getUser)
+                .orElse(null);
+      }
+    }
+
+    return HistoryLogTransformer.transformToDomain(dto, currentUser, creatorUser, fromUser, toUser);
   }
 
   public void saveHistoryLog(
