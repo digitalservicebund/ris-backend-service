@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 public record User(
     UUID id,
     String name,
+    String firstName,
+    String lastName,
     String email,
     DocumentationOffice documentationOffice,
     List<String> roles,

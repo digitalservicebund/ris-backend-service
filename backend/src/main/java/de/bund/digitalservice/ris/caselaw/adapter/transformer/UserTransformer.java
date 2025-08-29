@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.BareUserApiResponse;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.Collections;
@@ -23,6 +24,8 @@ public class UserTransformer {
     return User.builder()
         .id(bareUser.uuid())
         .name(getFullName(firstNames, lastNames))
+        .firstName(String.join(" ", firstNames))
+        .lastName(String.join(" ", lastNames))
         .email(bareUser.email())
         .initials(getInitials(firstNames, lastNames))
         .documentationOffice(documentationOffice)
@@ -36,11 +39,30 @@ public class UserTransformer {
   public static User transformToDomain(OidcUser oidcUser, DocumentationOffice documentationOffice) {
     return User.builder()
         .name(oidcUser.getAttribute("name"))
+        .firstName(oidcUser.getGivenName())
+        .lastName(oidcUser.getFamilyName())
         .id(getUserId(oidcUser))
         .email(oidcUser.getEmail())
         .documentationOffice(documentationOffice)
         .roles(oidcUser.getClaimAsStringList("roles"))
         .initials(getInitials(oidcUser.getGivenName(), oidcUser.getFamilyName()))
+        .build();
+  }
+
+  public static User transformToDomain(UserDTO userDTO) {
+    if (userDTO == null) {
+      return null;
+    }
+    String firstName = userDTO.getFirstName();
+    String lastName = userDTO.getLastName();
+    return User.builder()
+        .id(userDTO.getId())
+        .name(getFullName(List.of(firstName), List.of(lastName)))
+        .firstName(userDTO.getFirstName())
+        .lastName(userDTO.getLastName())
+        .initials(getInitials(firstName, lastName))
+        .documentationOffice(
+            DocumentationOfficeTransformer.transformToDomain(userDTO.getDocumentationOffice()))
         .build();
   }
 
@@ -100,5 +122,16 @@ public class UserTransformer {
         .map(OidcUser::getSubject)
         .map(UUID::fromString)
         .orElse(null);
+  }
+
+  public static UserDTO transformToDTO(User user) {
+    return UserDTO.builder()
+        .firstName(user.firstName())
+        .lastName(user.lastName())
+        .documentationOffice(
+            DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
+        .isActive(true)
+        .isDeleted(false)
+        .build();
   }
 }

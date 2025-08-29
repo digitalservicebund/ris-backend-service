@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserApiService;
@@ -12,13 +11,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 @Service
-public class KeycloakUserService implements UserService {
+public class KeycloakUserService extends UserService {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
   private final UserGroupService userGroupService;
   private final UserApiService userApiService;
@@ -30,7 +30,8 @@ public class KeycloakUserService implements UserService {
 
   @Override
   public User getUser(OidcUser oidcUser) {
-    return extractDocumentationOffice(oidcUser)
+    return getUserGroup(oidcUser)
+        .map(UserGroup::docOffice)
         .map(documentationOffice -> createUser(oidcUser, documentationOffice))
         .orElse(createUser(oidcUser, null));
   }
@@ -41,21 +42,8 @@ public class KeycloakUserService implements UserService {
   }
 
   @Override
-  public String getEmail(OidcUser oidcUser) {
-    return oidcUser.getEmail();
-  }
-
-  @Override
-  public Boolean isInternal(OidcUser oidcUser) {
-    List<String> roles = oidcUser.getClaimAsStringList("roles");
-    if (roles != null) {
-      return roles.contains("Internal");
-    }
-    return false;
-  }
-
-  @Override
   public User getUser(UUID uuid) {
+    LOGGER.info("Fetching user with uuid {}", uuid);
     return userApiService.getUser(uuid);
   }
 
@@ -64,6 +52,7 @@ public class KeycloakUserService implements UserService {
     try {
       var optionalUserGroup = getUserGroup(oidcUser);
       if (optionalUserGroup.isPresent()) {
+        LOGGER.info("Fetching users with same office as {}", oidcUser.getFullName());
         return userApiService.getUsers(optionalUserGroup.get().userGroupPathName());
       } else {
         return Collections.emptyList();
@@ -88,11 +77,9 @@ public class KeycloakUserService implements UserService {
     return matchingUserGroup;
   }
 
-  private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
-    return UserTransformer.transformToDomain(oidcUser, documentationOffice);
-  }
-
-  private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
-    return getUserGroup(oidcUser).map(UserGroup::docOffice);
+  @Override
+  public void persistUsers(List<User> users) {
+    throw new NotImplementedException(
+        "We can't persist users in Keycloak. Use DatabaseUserService instead.");
   }
 }
