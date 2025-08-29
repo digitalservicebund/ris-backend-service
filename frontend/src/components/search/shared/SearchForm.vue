@@ -67,7 +67,7 @@ const isResolved = computed({
 const publicationStatus = computed({
   get: () => query.value?.publicationStatus || "Nicht ausgewählt",
   set: (data) => {
-    if (!data) {
+    if (!data || data === "Nicht ausgewählt") {
       delete query.value.publicationStatus
     } else {
       query.value.publicationStatus = data
@@ -89,7 +89,7 @@ const myDocOfficeOnly = computed({
         delete query.value.myDocOfficeOnly
         delete query.value.scheduledOnly
         delete query.value.publicationDate
-        delete query.value.processStepId
+        processStep.value = "Nicht ausgewählt"
         resetErrors("publicationDate") // Clear validation for publicationDate
       } else {
         query.value.myDocOfficeOnly = "true"
@@ -146,20 +146,33 @@ const withDuplicateWarning = computed({
   },
 })
 
-const processStepId = computed({
-  get: () => query.value.processStepId,
-  set: (data) => {
-    if (data && data !== "Nicht ausgewählt") {
-      query.value.processStepId = data
+const processStep = ref<string>("Nicht ausgewählt")
+
+watch(processStep, async (newVal) => {
+  if (newVal && newVal !== "Nicht ausgewählt") {
+    query.value.processStep = newVal
+  } else {
+    delete query.value.processStep
+  }
+})
+
+watch(
+  [route, query],
+  async () => {
+    if (query.value.processStep) {
+      await fetchProcessSteps()
+      processStep.value = query.value.processStep
     } else {
-      delete query.value.processStepId
+      processStep.value = "Nicht ausgewählt"
     }
   },
-})
+  { immediate: true },
+)
 
 const processSteps = ref<ProcessStep[]>([
   { uuid: "Nicht ausgewählt", name: "Nicht ausgewählt" } as ProcessStep,
 ])
+
 const processStepsLoading = ref<boolean>(false)
 
 /**
@@ -353,7 +366,7 @@ function handleSearch() {
   }
 }
 
-async function onProcessStepFilterClick() {
+async function fetchProcessSteps() {
   if (processSteps.value.length > 1) return
   processStepsLoading.value = true
   const processStepsResponse = await processStepService.getProcessSteps()
@@ -492,7 +505,6 @@ watch(
             :id="id"
             v-model="publicationStatus"
             aria-label="Status Suche"
-            default-value="Nicht ausgewählt"
             fluid
             option-label="label"
             option-value="value"
@@ -594,15 +606,14 @@ watch(
               visually-hide-label
             >
               <InputSelect
-                v-model="processStepId"
+                v-model="processStep"
                 aria-label="Prozessschritt"
                 class="w-full"
-                default-value="Nicht ausgewählt"
                 :loading="processStepsLoading"
                 option-label="name"
-                option-value="uuid"
+                option-value="name"
                 :options="processSteps"
-                @click="onProcessStepFilterClick"
+                @click="fetchProcessSteps"
               ></InputSelect>
             </InputField>
           </div>
