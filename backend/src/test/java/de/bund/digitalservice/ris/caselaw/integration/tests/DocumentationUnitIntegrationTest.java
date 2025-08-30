@@ -887,6 +887,14 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             ersterfassungProcessStep,
             neuProcessStep,
             neuProcessStep);
+    List<UUID> users =
+        List.of(
+            oidcLoggedInUserId,
+            oidcLoggedInUserId,
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            UUID.randomUUID());
 
     for (int i = 0; i < 6; i++) {
 
@@ -915,6 +923,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                   .processSteps(
                       List.of(
                           DocumentationUnitProcessStepDTO.builder()
+                              .userId(users.get(i))
                               .processStep(processSteps.get(i))
                               .createdAt(LocalDateTime.now())
                               .build())),
@@ -1025,6 +1034,11 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         DocumentationUnitSearchInput.builder().processStep(neuProcessStep.getName()).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .contains("ABCD202300007", "UVWX202311090");
+
+    // by assignedToMe
+    searchInput = DocumentationUnitSearchInput.builder().assignedToMe(true).build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains("ABCD202300007", "EFGH202200123");
 
     // all combined
     searchInput =
@@ -1374,6 +1388,10 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     }
 
     queryParams.add("myDocOfficeOnly", String.valueOf(searchInput.myDocOfficeOnly()));
+
+    if (searchInput.assignedToMe()) {
+      queryParams.add("assignedToMe", String.valueOf(true));
+    }
     URI uri =
         new DefaultUriBuilderFactory()
             .builder()
@@ -1383,7 +1401,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     List<DocumentationUnitListItem> content =
         risWebTestClient
-            .withDefaultLogin()
+            .withDefaultLogin(oidcLoggedInUserId)
             .get()
             .uri(uri)
             .exchange()

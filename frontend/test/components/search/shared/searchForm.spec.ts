@@ -137,6 +137,9 @@ describe("Documentunit Search", () => {
       screen.queryByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     ).not.toBeInTheDocument()
     expect(screen.queryByLabelText("Prozessschritt")).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Nur mir zugewiesen"),
+    ).not.toBeInTheDocument()
 
     // show own doc office only inputs as soon as checkbox is clicked
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
@@ -149,6 +152,7 @@ describe("Documentunit Search", () => {
       screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     ).toBeInTheDocument()
     expect(screen.getByLabelText("Prozessschritt")).toBeInTheDocument()
+    expect(screen.getByLabelText("Nur mir zugewiesen")).toBeInTheDocument()
   })
 
   test("renders all specific input fields for pending proceedings", async () => {
@@ -272,6 +276,8 @@ describe("Documentunit Search", () => {
     await user.click(
       screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     )
+    await user.click(screen.getByLabelText("Nur mir zugewiesen"))
+    expect(screen.getByLabelText("Nur mir zugewiesen")).toBeChecked()
 
     await user.click(screen.getByLabelText("Suche zurücksetzen"))
 
@@ -289,12 +295,16 @@ describe("Documentunit Search", () => {
     expect(
       screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     ).not.toBeChecked()
+    expect(screen.getByLabelText("Nur mir zugewiesen")).not.toBeChecked()
   })
 
   test(`resets own doc office fields when check box is unchecked`, async () => {
     const { user } = renderComponent(Kind.DECISION)
 
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    await user
+      .click(screen.getByLabelText("Prozessschritt"))
+      .then(async () => await user.click(screen.getByLabelText("Step A")))
     await user.type(
       screen.getByLabelText("jDV Übergabedatum Suche"),
       "11.11.2011",
@@ -306,13 +316,22 @@ describe("Documentunit Search", () => {
     await user.click(
       screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     )
+    await user.click(screen.getByLabelText("Nur mir zugewiesen"))
+    expect(screen.getByLabelText("Nur mir zugewiesen")).toBeChecked()
 
     // hide fields
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(
+      screen.getByLabelText("Nur meine Dokstelle Filter"),
+    ).not.toBeChecked()
     // show fields
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeChecked()
 
     expect(screen.getByLabelText("jDV Übergabedatum Suche")).toHaveValue("")
+    expect(screen.getByLabelText("Prozessschritt").textContent).equals(
+      "Nicht ausgewählt",
+    )
     expect(screen.getByLabelText("Terminiert Filter")).not.toBeChecked()
     expect(
       screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
@@ -320,6 +339,7 @@ describe("Documentunit Search", () => {
     expect(
       screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     ).not.toBeChecked()
+    expect(screen.getByLabelText("Nur mir zugewiesen")).not.toBeChecked()
   })
 
   kinds
