@@ -262,8 +262,8 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       Root<DocumentationUnitDTO> root,
       OidcUser oidcUser) {
     List<Predicate> predicates = new ArrayList<>();
-    User user = userService.getUser(oidcUser);
     if (parameters.assignedToMe) {
+      User user = userService.getUser(oidcUser);
       Predicate assignedToMePredicate =
           cb.equal(
               root.get(DocumentationUnitDTO_.currentProcessStep)
