@@ -25,7 +25,7 @@ const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision>
 }
 const session = useSessionStore()
-const isUat = computed(() => session.env?.environment === "staging")
+const isUat = computed(() => session.env?.environment === "uat")
 const uatMessage = {
   title:
     "UAT veröffentlicht Dokeinheiten in ein Testportal, nicht das öffentliche Portal.",
