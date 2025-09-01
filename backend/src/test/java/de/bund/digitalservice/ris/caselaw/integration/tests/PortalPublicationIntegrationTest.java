@@ -22,10 +22,18 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
+import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -33,6 +41,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -46,6 +55,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -56,6 +66,10 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Import({PortalPublicationIntegrationTest.PortalPublicationConfig.class})
+@Sql(scripts = {"classpath:courts_init.sql"})
+@Sql(
+    scripts = {"classpath:courts_cleanup.sql"},
+    executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
   @TestConfiguration
@@ -75,6 +89,7 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentationUnitHistoryLogRepository historyLogRepository;
+  @Autowired private DocumentationUnitService documentationUnitService;
 
   @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
@@ -94,14 +109,17 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @AfterEach
   void cleanUp() {
     repository.deleteAll();
+    databaseCourtRepository.deleteAll();
+    databaseDocumentTypeRepository.deleteAll();
+    historyLogRepository.deleteAll();
   }
 
   @Test
   void testPublishSuccessfully() {
-    DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
-
     UUID userId = UUID.randomUUID();
+    DecisionDTO dto =
+        buildValidDecisionWithManagementData(userId, PortalPublicationStatus.UNPUBLISHED);
+
     risWebTestClient
         .withDefaultLogin(userId)
         .put()
@@ -115,7 +133,66 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
     verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
 
     var capturedRequests = captor.getAllValues();
-    assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
+    assertThat(capturedRequests.get(0).key())
+        .isEqualTo(dto.getDocumentNumber() + "/" + dto.getDocumentNumber() + ".xml");
+    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
+
+    var updatedDto = repository.findById(dto.getId()).get();
+    assertThat(updatedDto.getPortalPublicationStatus())
+        .isEqualTo(PortalPublicationStatus.PUBLISHED);
+    assertThat(updatedDto.getManagementData().getFirstPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    assertThat(historyLogs)
+        .hasSize(3)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getUserId()).isEqualTo(userId);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit im Portal veröffentlicht");
+            },
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
+              assertThat(historyLog.getUserId()).isNull();
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
+            },
+            historyLog -> {
+              assertThat(historyLog.getEventType()).isEqualTo(HistoryLogEventType.CREATE);
+              assertThat(historyLog.getUserId()).isEqualTo(userId);
+              assertThat(historyLog.getDescription()).isEqualTo("Dokeinheit angelegt");
+            });
+  }
+
+  @Test
+  void testRepublishSuccessfully() {
+    UUID userId = UUID.randomUUID();
+    DecisionDTO dto =
+        buildValidDecisionWithManagementData(userId, PortalPublicationStatus.PUBLISHED);
+
+    risWebTestClient
+        .withDefaultLogin(userId)
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
+
+    verify(s3Client, times(2)).putObject(captor.capture(), any(RequestBody.class));
+
+    var capturedRequests = captor.getAllValues();
+    assertThat(capturedRequests.get(0).key())
+        .isEqualTo(dto.getDocumentNumber() + "/" + dto.getDocumentNumber() + ".xml");
     assertThat(capturedRequests.get(1).key()).contains("changelogs/");
 
     var updatedDto = repository.findById(dto.getId()).get();
@@ -139,64 +216,9 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
                   .isEqualTo("Dokeinheit im Portal veröffentlicht");
             },
             historyLog -> {
-              assertThat(historyLog.getEventType())
-                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
-              assertThat(historyLog.getUserId()).isNull();
-              assertThat(historyLog.getDescription())
-                  .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
-            });
-  }
-
-  @Test
-  void testRepublishSuccessfully() {
-    DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
-
-    UUID userId = UUID.randomUUID();
-    risWebTestClient
-        .withDefaultLogin(userId)
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    risWebTestClient
-        .withDefaultLogin(userId)
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    var updatedDto = repository.findById(dto.getId()).get();
-    assertThat(updatedDto.getPortalPublicationStatus())
-        .isEqualTo(PortalPublicationStatus.PUBLISHED);
-    assertThat(updatedDto.getManagementData().getFirstPublishedAtDateTime())
-        .isBetween(Instant.now().minusSeconds(10), Instant.now());
-    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
-        .isBetween(Instant.now().minusSeconds(10), Instant.now());
-
-    var historyLogs =
-        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
-    assertThat(historyLogs)
-        .hasSize(2)
-        .satisfiesExactly(
-            historyLog -> {
-              assertThat(historyLog.getEventType())
-                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getEventType()).isEqualTo(HistoryLogEventType.CREATE);
               assertThat(historyLog.getUserId()).isEqualTo(userId);
-              assertThat(historyLog.getDescription())
-                  .isEqualTo("Dokeinheit im Portal veröffentlicht");
-            },
-            historyLog -> {
-              assertThat(historyLog.getEventType())
-                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
-              assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
-              assertThat(historyLog.getUserId()).isNull();
-              assertThat(historyLog.getDescription())
-                  .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
+              assertThat(historyLog.getDescription()).isEqualTo("Dokeinheit angelegt");
             });
   }
 
@@ -485,5 +507,38 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
         .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
         .attachments(attachments)
         .grounds("lorem ipsum dolor sit amet");
+  }
+
+  private DecisionDTO buildValidDecisionWithManagementData(
+      UUID userId, PortalPublicationStatus status) {
+    DocumentationOffice docOffice =
+        DocumentationOfficeTransformer.transformToDomain(documentationOffice);
+    CourtDTO courtDTO =
+        databaseCourtRepository
+            .findById(UUID.fromString("46301f85-9bd2-4690-a67f-f9fdfe725de3"))
+            .get();
+    var documentTypeDTO =
+        databaseDocumentTypeRepository.saveAndFlush(
+            DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
+    DocumentationUnit documentationUnit =
+        documentationUnitService.generateNewDocumentationUnit(
+            User.builder().id(userId).name("Test User").documentationOffice(docOffice).build(),
+            Optional.of(
+                DocumentationUnitCreationParameters.builder()
+                    .documentType(DocumentTypeTransformer.transformToDomain(documentTypeDTO))
+                    .court(CourtTransformer.transformToDomain(courtDTO))
+                    .decisionDate(LocalDate.now())
+                    .documentationOffice(docOffice)
+                    .fileNumber("fileNumber")
+                    .build()),
+            Kind.DECISION);
+
+    DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
+    if (dto instanceof DecisionDTO decisionDTO) {
+      decisionDTO.setPortalPublicationStatus(status);
+      decisionDTO.setGrounds("Gründe");
+      return repository.save(decisionDTO);
+    }
+    return null;
   }
 }

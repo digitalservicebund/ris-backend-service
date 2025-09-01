@@ -1103,10 +1103,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     var isFirstPublication =
         documentationUnitDTO.getManagementData().getFirstPublishedAtDateTime() == null;
     if (isFirstPublication) {
-      documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
+      documentationUnitDTO.getManagementData().setFirstPublishedAtDateTime(now);
       documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
     } else {
-      documentationUnitDTO.getManagementData().setFirstPublishedAtDateTime(now);
+      documentationUnitDTO.getManagementData().setLastPublishedAtDateTime(now);
     }
   }
 }
