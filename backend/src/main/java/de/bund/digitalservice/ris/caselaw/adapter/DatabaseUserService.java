@@ -9,14 +9,18 @@ import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
@@ -27,20 +31,41 @@ public class DatabaseUserService extends UserService {
 
   private final UserRepository userRepository;
   private final DatabaseUserGroupRepository databaseUserGroupRepository;
+  private final KeycloakUserService keycloakUserService;
 
   public DatabaseUserService(
-      UserRepository userRepository, DatabaseUserGroupRepository databaseUserGroupRepository) {
+      UserRepository userRepository,
+      DatabaseUserGroupRepository databaseUserGroupRepository,
+      KeycloakUserService keycloakUserService) {
     this.userRepository = userRepository;
     this.databaseUserGroupRepository = databaseUserGroupRepository;
+    this.keycloakUserService = keycloakUserService;
+  }
+
+  @Scheduled(cron = "0 0 4 * * *", zone = "Europe/Berlin")
+  @SchedulerLock(name = "duplicate-check-job", lockAtMostFor = "PT15M")
+  @Transactional
+  public void fetchUsersFromKeycloak() {
+    databaseUserGroupRepository
+        .findAll()
+        .forEach(
+            userGroupDTO ->
+                persistUsersOfDocOffice(
+                    keycloakUserService.getUsers(
+                        UserGroupTransformer.transformToDomain(userGroupDTO)),
+                    userGroupDTO.getDocumentationOffice()));
   }
 
   @Override
   public User getUser(OidcUser oidcUser) {
     return UserTransformer.transformToDomain(
-        userRepository.findByFirstNameAndLastNameAndDocumentationOffice(
-            oidcUser.getGivenName(),
-            oidcUser.getFamilyName(),
-            extractDocumentationOffice(oidcUser).orElse(null)));
+        userRepository
+            .findByExternalId(UserTransformer.getOidcUserId(oidcUser))
+            .orElse(
+                userRepository
+                    .saveOrUpdate(
+                        UserTransformer.transformToDTO(keycloakUserService.getUser(oidcUser)))
+                    .orElse(null)));
   }
 
   @Override
@@ -50,7 +75,8 @@ public class DatabaseUserService extends UserService {
 
   @Override
   public List<User> getUsers(OidcUser oidcUser) {
-    return extractDocumentationOffice(oidcUser)
+    return getUserGroupDTO(oidcUser)
+        .map(UserGroupDTO::getDocumentationOffice)
         .map(
             officeDTO ->
                 userRepository.getAllUsersForDocumentationOffice(officeDTO).stream()
@@ -65,12 +91,19 @@ public class DatabaseUserService extends UserService {
         UserGroupTransformer.transformToDomain(getUserGroupDTO(oidcUser).orElse(null)));
   }
 
-  @Override
-  public void persistUsers(List<User> users) {
-    userRepository.saveAll(users.stream().map(UserTransformer::transformToDTO).toList());
+  public void persistUsersOfDocOffice(
+      List<User> users, @NotNull DocumentationOfficeDTO documentationOffice) {
+    userRepository.saveOrUpdate(
+        users.stream()
+            .map(
+                user ->
+                    UserTransformer.transformToDTO(user).toBuilder()
+                        .documentationOffice(documentationOffice)
+                        .build())
+            .toList());
   }
 
-  public Optional<UserGroupDTO> getUserGroupDTO(OidcUser oidcUser) {
+  private Optional<UserGroupDTO> getUserGroupDTO(OidcUser oidcUser) {
     List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
     var matchingUserGroup =
         databaseUserGroupRepository.findAll().stream()
@@ -81,9 +114,5 @@ public class DatabaseUserService extends UserService {
           "No doc office user group associated with given Keycloak user groups: {}", userGroups);
     }
     return matchingUserGroup;
-  }
-
-  private Optional<DocumentationOfficeDTO> extractDocumentationOffice(OidcUser oidcUser) {
-    return getUserGroupDTO(oidcUser).map(UserGroupDTO::getDocumentationOffice);
   }
 }

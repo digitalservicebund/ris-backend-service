@@ -15,8 +15,6 @@ public abstract class UserService {
 
   public abstract Optional<UserGroup> getUserGroup(OidcUser oidcUser);
 
-  public abstract void persistUsers(List<User> users);
-
   public DocumentationOffice getDocumentationOffice(OidcUser oidcUser) {
     return getUser(oidcUser).documentationOffice();
   }

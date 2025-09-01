@@ -54,14 +54,15 @@ public class BareIdUserApiService implements UserApiService {
   }
 
   @Override
-  public User getUser(UUID userId) {
+  public User getUser(UUID externalId) {
     try {
 
       HttpHeaders headers = new HttpHeaders();
       headers.setBearerAuth(bareIdUserApiTokenService.getAccessToken().getTokenValue());
       HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(headers);
 
-      String url = String.format("https://api.bare.id/user/v1/%s/users/%s", bareidInstance, userId);
+      String url =
+          String.format("https://api.bare.id/user/v1/%s/users/%s", bareidInstance, externalId);
 
       ResponseEntity<BareUserApiResponse.UserApiResponse> response =
           restTemplate.exchange(
@@ -78,7 +79,8 @@ public class BareIdUserApiService implements UserApiService {
       HttpEntity<MultiValueMap<String, String>> groupsRequest = new HttpEntity<>(groupsHeaders);
 
       String groupURL =
-          String.format("https://api.bare.id/user/v1/%s/users/%s/groups", bareidInstance, userId);
+          String.format(
+              "https://api.bare.id/user/v1/%s/users/%s/groups", bareidInstance, externalId);
       ResponseEntity<BareUserApiResponse.GroupResponse> groupsResponse =
           restTemplate.exchange(
               groupURL, HttpMethod.GET, groupsRequest, BareUserApiResponse.GroupResponse.class);
@@ -93,7 +95,7 @@ public class BareIdUserApiService implements UserApiService {
       return UserTransformer.transformToDomain(responseBody.user(), docOffice);
 
     } catch (Exception e) {
-      return User.builder().id(userId).build();
+      return User.builder().externalId(externalId).build();
     }
   }
 

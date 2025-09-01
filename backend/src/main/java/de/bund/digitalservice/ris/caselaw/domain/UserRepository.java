@@ -14,8 +14,9 @@ public interface UserRepository {
 
   List<UserDTO> getAllUsersForDocumentationOffice(DocumentationOfficeDTO documentationOffice);
 
-  void saveAll(List<UserDTO> userDTOs);
+  void saveOrUpdate(List<UserDTO> userDTOs);
 
-  UserDTO findByFirstNameAndLastNameAndDocumentationOffice(
-      String givenName, String familyName, DocumentationOfficeDTO documentationOfficeDTO);
+  Optional<UserDTO> saveOrUpdate(UserDTO userDTOs);
+
+  Optional<UserDTO> findByExternalId(UUID externalId);
 }

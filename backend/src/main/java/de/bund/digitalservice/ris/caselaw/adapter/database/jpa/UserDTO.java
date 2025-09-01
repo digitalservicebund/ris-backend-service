@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,16 +20,15 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Builder
+@Builder(toBuilder = true)
 @Entity
-@Table(
-    schema = "incremental_migration",
-    name = "user",
-    uniqueConstraints =
-        @UniqueConstraint(columnNames = {"first_name", "last_name", "documentation_office_id"}))
+@Table(schema = "incremental_migration", name = "user")
 public class UserDTO {
 
   @Id @GeneratedValue private UUID id;
+
+  @Column(name = "external_id")
+  private UUID externalId;
 
   @Column(name = "first_name")
   private String firstName;

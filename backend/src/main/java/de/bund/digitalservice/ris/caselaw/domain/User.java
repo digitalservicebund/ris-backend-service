@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 @Builder
 public record User(
     UUID id,
+    UUID externalId,
     String name,
     String firstName,
     String lastName,

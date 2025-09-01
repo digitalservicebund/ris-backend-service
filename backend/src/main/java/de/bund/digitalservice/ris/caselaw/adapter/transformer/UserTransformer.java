@@ -22,7 +22,7 @@ public class UserTransformer {
     List<String> lastNames = getValues(bareUser.attributes(), "lastName");
 
     return User.builder()
-        .id(bareUser.uuid())
+        .externalId(bareUser.uuid())
         .name(getFullName(firstNames, lastNames))
         .firstName(String.join(" ", firstNames))
         .lastName(String.join(" ", lastNames))
@@ -41,7 +41,7 @@ public class UserTransformer {
         .name(oidcUser.getAttribute("name"))
         .firstName(oidcUser.getGivenName())
         .lastName(oidcUser.getFamilyName())
-        .id(getUserId(oidcUser))
+        .externalId(getOidcUserId(oidcUser))
         .email(oidcUser.getEmail())
         .documentationOffice(documentationOffice)
         .roles(oidcUser.getClaimAsStringList("roles"))
@@ -57,6 +57,7 @@ public class UserTransformer {
     String lastName = userDTO.getLastName();
     return User.builder()
         .id(userDTO.getId())
+        .externalId(userDTO.getExternalId())
         .name(getFullName(List.of(firstName), List.of(lastName)))
         .firstName(userDTO.getFirstName())
         .lastName(userDTO.getLastName())
@@ -117,7 +118,7 @@ public class UserTransformer {
     return attributes.get(key).values();
   }
 
-  public static UUID getUserId(OidcUser oidcUser) {
+  public static UUID getOidcUserId(OidcUser oidcUser) {
     return Optional.ofNullable(oidcUser)
         .map(OidcUser::getSubject)
         .map(UUID::fromString)
@@ -128,6 +129,8 @@ public class UserTransformer {
     return UserDTO.builder()
         .firstName(user.firstName())
         .lastName(user.lastName())
+        .externalId(user.externalId())
+        .id(user.id())
         .documentationOffice(
             DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
         .isActive(true)

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -49,14 +48,19 @@ public class KeycloakUserService extends UserService {
 
   @Override
   public List<User> getUsers(OidcUser oidcUser) {
+    var optionalUserGroup = getUserGroup(oidcUser);
+    if (optionalUserGroup.isPresent()) {
+      return getUsers(optionalUserGroup.get());
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  public List<User> getUsers(UserGroup group) {
     try {
-      var optionalUserGroup = getUserGroup(oidcUser);
-      if (optionalUserGroup.isPresent()) {
-        LOGGER.info("Fetching users with same office as {}", oidcUser.getFullName());
-        return userApiService.getUsers(optionalUserGroup.get().userGroupPathName());
-      } else {
-        return Collections.emptyList();
-      }
+      LOGGER.info("Fetching all users for group {}", group.userGroupPathName());
+      return userApiService.getUsers(group.userGroupPathName());
+
     } catch (Exception e) {
       LOGGER.error("Error reading group user information: ", e);
       return Collections.emptyList();
@@ -75,11 +79,5 @@ public class KeycloakUserService extends UserService {
           "No doc office user group associated with given Keycloak user groups: {}", userGroups);
     }
     return matchingUserGroup;
-  }
-
-  @Override
-  public void persistUsers(List<User> users) {
-    throw new NotImplementedException(
-        "We can't persist users in Keycloak. Use DatabaseUserService instead.");
   }
 }

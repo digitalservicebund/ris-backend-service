@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Repository;
 
 /** Implementation of the DocumentationUnitProcessStepRepository for the Postgres database */
@@ -34,22 +33,21 @@ public class PostgresUserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public void saveAll(List<UserDTO> userDTOs) {
-    try {
-      repository.saveAll(userDTOs);
-    } catch (JpaSystemException e) {
-      if (e.getMessage().contains("name_and_docoffice_unique")) {
-        log.debug(
-            "Expected exception due to unique constraint on first name, last name, and documentation office",
-            e);
-      } else throw e;
-    }
+  public void saveOrUpdate(List<UserDTO> userDTOs) {
+    userDTOs.forEach(this::saveOrUpdate);
   }
 
   @Override
-  public UserDTO findByFirstNameAndLastNameAndDocumentationOffice(
-      String givenName, String familyName, DocumentationOfficeDTO documentationOfficeDTO) {
-    return repository.findByFirstNameAndLastNameAndDocumentationOffice(
-        givenName, familyName, documentationOfficeDTO);
+  public Optional<UserDTO> saveOrUpdate(UserDTO user) {
+    // make sure to update the user's data (e.g. first name, last name) if they exist
+    repository
+        .findByExternalId(user.getExternalId())
+        .ifPresent(userDTO -> user.setId(userDTO.getId()));
+    return Optional.of(repository.save(user));
+  }
+
+  @Override
+  public Optional<UserDTO> findByExternalId(UUID externalId) {
+    return repository.findByExternalId(externalId);
   }
 }
