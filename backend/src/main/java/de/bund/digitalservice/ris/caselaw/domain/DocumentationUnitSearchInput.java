@@ -25,4 +25,5 @@ public record DocumentationUnitSearchInput(
     InboxStatus inboxStatus,
     Kind kind,
     String processStep,
-    boolean assignedToMe) {}
+    boolean assignedToMe,
+    boolean unassigned) {}

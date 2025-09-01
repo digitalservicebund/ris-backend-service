@@ -254,6 +254,16 @@ test.describe("document unit search queries", () => {
       maxDuration: 800, // last max 799, average 505, min 463
       minResults: 3,
     },
+    {
+      title: "with unassigned",
+      parameter: {
+        myDocOfficeOnly: "true",
+        unassigned: "true",
+        kind: "DECISION",
+      },
+      maxDuration: 800, // last max 799, average 505, min 463
+      minResults: 3,
+    },
   ]
 
   const externalConfigurations = testConfigurations.filter(

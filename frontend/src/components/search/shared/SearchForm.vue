@@ -91,6 +91,7 @@ const myDocOfficeOnly = computed({
         delete query.value.publicationDate
         processStep.value = "Nicht ausgewählt"
         delete query.value.assignedToMe
+        delete query.value.unassigned
         resetErrors("publicationDate") // Clear validation for publicationDate
       } else {
         query.value.myDocOfficeOnly = "true"
@@ -142,6 +143,24 @@ const assignedToMe = computed({
         delete query.value.assignedToMe
       } else {
         query.value.assignedToMe = "true"
+        if (query.value.unassigned) delete query.value.unassigned
+      }
+    }
+  },
+})
+
+const unassigned = computed({
+  get: () =>
+    isDecision.value && query.value?.unassigned
+      ? JSON.parse(query.value.unassigned)
+      : false,
+  set: (data) => {
+    if (isDecision.value) {
+      if (!data) {
+        delete query.value.unassigned
+      } else {
+        query.value.unassigned = "true"
+        if (query.value.assignedToMe) delete query.value.assignedToMe
       }
     }
   },
@@ -697,6 +716,21 @@ watch(
               <Checkbox
                 v-model="assignedToMe"
                 aria-label="Nur mir zugewiesen"
+                binary
+                :input-id="id"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              />
+            </InputField>
+            <InputField
+              id="unassigned"
+              v-slot="{ id }"
+              label="Niemandem zugewiesen"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="unassigned"
+                aria-label="Niemandem zugewiesen"
                 binary
                 :input-id="id"
                 @focus="resetErrors(id as DocumentationUnitSearchParameter)"

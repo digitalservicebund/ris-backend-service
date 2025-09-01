@@ -96,6 +96,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -887,14 +888,15 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             ersterfassungProcessStep,
             neuProcessStep,
             neuProcessStep);
+
     List<UUID> users =
-        List.of(
+        Arrays.asList(
             oidcLoggedInUserId,
             oidcLoggedInUserId,
             UUID.randomUUID(),
+            null,
             UUID.randomUUID(),
-            UUID.randomUUID(),
-            UUID.randomUUID());
+            null);
 
     for (int i = 0; i < 6; i++) {
 
@@ -1039,6 +1041,11 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     searchInput = DocumentationUnitSearchInput.builder().assignedToMe(true).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .contains("ABCD202300007", "EFGH202200123");
+
+    // by unassigned
+    searchInput = DocumentationUnitSearchInput.builder().unassigned(true).build();
+    // the 4th and the 6th docnumber are unassigned, but only the 4th is my docoffice
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).contains("MNOP202300099");
 
     // all combined
     searchInput =
@@ -1392,6 +1399,11 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     if (searchInput.assignedToMe()) {
       queryParams.add("assignedToMe", String.valueOf(true));
     }
+
+    if (searchInput.unassigned()) {
+      queryParams.add("unassigned", String.valueOf(true));
+    }
+
     URI uri =
         new DefaultUriBuilderFactory()
             .builder()

@@ -17,3 +17,4 @@ export type DocumentationUnitSearchParameter =
   | "isResolved"
   | "processStep"
   | "assignedToMe"
+  | "unassigned"
