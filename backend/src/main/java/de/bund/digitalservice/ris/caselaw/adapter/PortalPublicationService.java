@@ -83,6 +83,11 @@ public class PortalPublicationService {
     try {
       DocumentationUnit documentationUnit =
           documentationUnitRepository.findByUuid(documentationUnitId);
+      log.atInfo()
+          .setMessage("Publishing doc unit...")
+          .addKeyValue("documentNumber", documentationUnit.documentNumber())
+          .addKeyValue("id", documentationUnitId)
+          .log();
       var result = publishToBucket(documentationUnit);
       uploadChangelogWithdrawOnFailure(documentationUnit, result);
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
@@ -147,6 +152,11 @@ public class PortalPublicationService {
       throws DocumentationUnitNotExistsException {
     try {
       var documentationUnit = documentationUnitRepository.findByUuid(documentationUnitId);
+      log.atInfo()
+          .setMessage("Withdrawing doc unit...")
+          .addKeyValue("documentNumber", documentationUnit.documentNumber())
+          .addKeyValue("id", documentationUnitId)
+          .log();
       var result = withdrawDocumentationUnit(documentationUnit.documentNumber());
       uploadDeletionChangelog(result.deletedPaths());
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, user);

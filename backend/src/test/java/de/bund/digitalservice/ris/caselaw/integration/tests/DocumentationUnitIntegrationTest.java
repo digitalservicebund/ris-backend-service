@@ -74,6 +74,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -328,6 +329,37 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     assertThat(repository.findAll()).isEmpty();
     assertThat(originalXmlRepository.findAll()).isEmpty();
+  }
+
+  @Test
+  void deletePortalPublishedDocumentationUnit_shouldThrow() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "XXRE0******YY"));
+    when(documentNumberPatternConfig.hasValidPattern(anyString(), anyString()))
+        .thenReturn(Boolean.TRUE);
+
+    var response = generateNewDecision();
+    UUID docUnitId = response.getResponseBody().uuid();
+
+    Optional<DocumentationUnitDTO> docUnit = repository.findById(docUnitId);
+    docUnit.get().setPortalPublicationStatus(PortalPublicationStatus.PUBLISHED);
+    repository.save(docUnit.get());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + docUnitId)
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectBody(String.class)
+        .consumeWith(
+            result ->
+                assertThat(result.getResponseBody())
+                    .isEqualTo(
+                        "Die Dokumentationseinheit konnte nicht gelöscht werden, da Sie im Portal veröffentlicht ist.\nSie muss zuerst zurückgezogen werden."));
+
+    assertThat(repository.findAll()).hasSize(1);
   }
 
   @Test
@@ -1538,7 +1570,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         .uri("/api/v1/caselaw/documentunits/" + referencedDTO.getId())
         .exchange()
         .expectStatus()
-        .is5xxServerError();
+        .isBadRequest();
 
     List<DeletedDocumentationUnitDTO> allDeletedIds = deletedDocumentationIdsRepository.findAll();
     assertThat(allDeletedIds).isEmpty();

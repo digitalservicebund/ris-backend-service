@@ -579,6 +579,13 @@ public class DocumentationUnitService {
   public String deleteByUuid(UUID documentationUnitId) throws DocumentationUnitNotExistsException {
 
     DocumentationUnit docUnit = getByUuid(documentationUnitId);
+
+    log.atInfo()
+        .setMessage("Deleting doc unit...")
+        .addKeyValue("documentNumber", docUnit.documentNumber())
+        .addKeyValue("id", documentationUnitId)
+        .log();
+
     Map<RelatedDocumentationType, Long> relatedEntities =
         repository.getAllRelatedDocumentationUnitsByDocumentNumber(docUnit.documentNumber());
 
@@ -593,6 +600,16 @@ public class DocumentationUnitService {
 
       throw new DocumentationUnitDeletionException(
           "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities);
+    }
+
+    if (PortalPublicationStatus.PUBLISHED.equals(docUnit.portalPublicationStatus())) {
+      log.atInfo()
+          .setMessage("Doc unit deletion was prohibited because it is published in the portal.")
+          .addKeyValue("documentNumber", docUnit.documentNumber())
+          .addKeyValue("docUnitId", documentationUnitId)
+          .log();
+      throw new DocumentationUnitDeletionException(
+          "Die Dokumentationseinheit konnte nicht gelöscht werden, da Sie im Portal veröffentlicht ist.\nSie muss zuerst zurückgezogen werden.");
     }
 
     log.debug("Deleting DocumentationUnitDTO " + documentationUnitId);
