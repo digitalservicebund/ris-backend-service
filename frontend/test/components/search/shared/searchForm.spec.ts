@@ -417,17 +417,32 @@ describe("Documentunit Search", () => {
       }),
     )
 
-  test(`clicking 'Niemandem zugewiesen' automatically resets 'Nur mir zugewiesen' and vice versa`, async () => {
-    const { user } = renderComponent(Kind.DECISION)
+  test(`clicking 'Niemandem zugewiesen' automatically resets 'Nur mir zugewiesen' and vice versa and deletes query parameters`, async () => {
+    const { user, router } = renderComponent(Kind.DECISION)
 
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
 
+    // 'Nur mir zugewiesen' -> 'Niemandem zugewiesen'
     await user.click(screen.getByLabelText("Nur mir zugewiesen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
     expect(screen.getByLabelText("Nur mir zugewiesen")).toBeChecked()
     expect(screen.getByLabelText("Niemandem zugewiesen")).not.toBeChecked()
+    expect(router.currentRoute.value.query.assignedToMe).toBe("true")
+    expect(router.currentRoute.value.query.unassigned).toBeUndefined()
 
     await user.click(screen.getByLabelText("Niemandem zugewiesen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
     expect(screen.getByLabelText("Nur mir zugewiesen")).not.toBeChecked()
     expect(screen.getByLabelText("Niemandem zugewiesen")).toBeChecked()
+    expect(router.currentRoute.value.query.unassigned).toBe("true")
+    expect(router.currentRoute.value.query.assignedToMe).toBeUndefined()
+
+    // 'Niemandem zugewiesen' -> 'Nur mir zugewiesen'
+    await user.click(screen.getByLabelText("Nur mir zugewiesen"))
+    await user.click(screen.getByText("Ergebnisse zeigen"))
+    expect(screen.getByLabelText("Nur mir zugewiesen")).toBeChecked()
+    expect(screen.getByLabelText("Niemandem zugewiesen")).not.toBeChecked()
+    expect(router.currentRoute.value.query.assignedToMe).toBe("true")
+    expect(router.currentRoute.value.query.unassigned).toBeUndefined()
   })
 })
