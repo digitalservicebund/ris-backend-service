@@ -156,19 +156,6 @@ watch(processStep, async (newVal) => {
   }
 })
 
-watch(
-  [route, query],
-  async () => {
-    if (query.value.processStep) {
-      await fetchProcessSteps()
-      processStep.value = query.value.processStep
-    } else {
-      processStep.value = "Nicht ausgewählt"
-    }
-  },
-  { immediate: true },
-)
-
 const processSteps = ref<ProcessStep[]>([
   { uuid: "Nicht ausgewählt", name: "Nicht ausgewählt" } as ProcessStep,
 ])
@@ -384,6 +371,19 @@ watch(
     handleSearch()
   },
   { deep: true },
+)
+
+watch(
+  [route, query],
+  async () => {
+    if (query.value.processStep) {
+      await fetchProcessSteps()
+      processStep.value = query.value.processStep
+    } else {
+      processStep.value = "Nicht ausgewählt"
+    }
+  },
+  { immediate: true },
 )
 </script>
 
