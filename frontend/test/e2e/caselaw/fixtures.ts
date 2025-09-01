@@ -1051,8 +1051,32 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
 
     if (!response.ok()) {
-      throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
+      console.log(
+        `References in Edition with number ${edition.id} couldn't be deleted:
+      ${response.status()} ${response.statusText()}, retrying deletion of references...`,
+      )
+      // Retry after a random delay between 0.1s and 2s
+      const retryWaitDuration = Math.floor(Math.random() * 1_900) + 100
+      await new Promise((resolve) => setTimeout(resolve, retryWaitDuration))
+      const retryResponse = await request.put(
+        `api/v1/caselaw/legalperiodicaledition`,
+        {
+          data: {
+            legalPeriodical: edition.legalPeriodical,
+            id: edition.id,
+            prefix: edition.prefix,
+            suffix: edition.suffix,
+            name: "NAME",
+            references: [],
+          },
+          headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+        },
+      )
+
+      if (!retryResponse.ok()) {
+        throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
       ${response.status()} ${response.statusText()}`)
+      }
     }
 
     const deleteResponse = await request.delete(
@@ -1194,8 +1218,32 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
 
     if (!response.ok()) {
-      throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
+      console.log(
+        `References in Edition with number ${edition.id} couldn't be deleted:
+      ${response.status()} ${response.statusText()}, retrying deletion of references...`,
+      )
+      // Retry after a random delay between 0.1s and 2s
+      const retryWaitDuration = Math.floor(Math.random() * 1_900) + 100
+      await new Promise((resolve) => setTimeout(resolve, retryWaitDuration))
+      const retryResponse = await request.put(
+        `api/v1/caselaw/legalperiodicaledition`,
+        {
+          data: {
+            legalPeriodical: edition.legalPeriodical,
+            id: edition.id,
+            prefix: edition.prefix,
+            suffix: edition.suffix,
+            name: "NAME",
+            references: [],
+          },
+          headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+        },
+      )
+
+      if (!retryResponse.ok()) {
+        throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
       ${response.status()} ${response.statusText()}`)
+      }
     }
 
     const deleteResponse = await request.delete(
