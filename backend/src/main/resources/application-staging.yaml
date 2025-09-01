@@ -12,6 +12,10 @@ spring:
       host: redis
       username: redis
 
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+
 database:
   seed: true
 

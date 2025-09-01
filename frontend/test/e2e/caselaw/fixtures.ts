@@ -95,6 +95,15 @@ async function deleteWithRetry(
 }
 
 export const caselawTest = test.extend<MyFixtures & MyOptions>({
+  context: async ({ browser }, use, testInfo) => {
+    const context = await browser.newContext()
+    // The current test name will be added to all logs, see MdcLoggingFilter.java
+    await context.setExtraHTTPHeaders({
+      "X-Test-Name": testInfo.titlePath.join(" > "),
+    })
+    await use(context)
+    await context.close()
+  },
   documentNumber: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
