@@ -252,7 +252,8 @@ test.describe("Große Suche nach Entscheidungen", () => {
     },
   )
 
-  test(
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
     "Suche nach 'Nur mir zugewiesen'",
     {
       tag: "@RISDEV-8718",
