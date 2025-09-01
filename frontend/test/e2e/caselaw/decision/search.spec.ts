@@ -692,5 +692,9 @@ test.describe("Große Suche nach Entscheidungen", () => {
           .getByTestId("chip-value"),
       ).toHaveText(fileNumber)
     })
+
+    await test.step("Lösche Entscheidung", async () => {
+      await deleteDocumentUnit(page, documentNumberToBeDeleted!)
+    })
   })
 })
