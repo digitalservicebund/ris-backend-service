@@ -248,6 +248,46 @@ test.describe("Große Suche nach Entscheidungen", () => {
 
       await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
         await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
+        await expect(
+          page.getByText(createdDecisions[0].documentNumber),
+        ).toBeVisible()
+      })
+
+      await test.step(`Weise einen neuen Prozesschritt ohne Person`, async () => {
+        await navigateToCategories(page, createdDecisions[0].documentNumber)
+
+        await page
+          .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
+          .click()
+        const dialog = page.getByRole("dialog")
+        await expect(dialog).toBeVisible()
+        await expect(
+          dialog.getByText("Dokumentationseinheit weitergeben"),
+        ).toBeVisible()
+        await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
+        await expect(dialog.getByText("Fachdokumentation")).toBeVisible()
+        await expect(dialog.getByText("Neue Person")).toBeVisible()
+        await dialog.getByLabel("Dropdown öffnen").click()
+
+        await dialog
+          .getByRole("button", {
+            name: "Weitergeben",
+          })
+          .click()
+
+        await expect(dialog).toBeHidden()
+      })
+
+      await test.step(`Prüfe, dass Ergebnisse die zugewiesene Dokumentationseinheit nicht mehr enthalten`, async () => {
+        await openSearchWithFileNumberPrefix("e2e-", page)
+        await page.getByLabel("Nur meine Dokstelle Filter").click()
+        await page.getByLabel("Nur mir zugewiesen").click()
+        await expect(page.getByLabel("Nur mir zugewiesen")).toBeChecked()
+        await triggerSearch(page)
+        await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
+        await expect(
+          page.getByText(createdDecisions[0].documentNumber),
+        ).toBeHidden()
       })
     },
   )

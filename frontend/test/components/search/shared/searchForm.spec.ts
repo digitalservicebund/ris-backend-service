@@ -359,13 +359,22 @@ describe("Documentunit Search", () => {
     await user.click(
       screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     )
+    await user.click(screen.getByLabelText("Nur mir zugewiesen"))
+    expect(screen.getByLabelText("Nur mir zugewiesen")).toBeChecked()
 
     // hide fields
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(
+      screen.getByLabelText("Nur meine Dokstelle Filter"),
+    ).not.toBeChecked()
     // show fields
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeChecked()
 
     expect(screen.getByLabelText("jDV Übergabedatum Suche")).toHaveValue("")
+    expect(screen.getByLabelText("Prozessschritt").textContent).equals(
+      "Nicht ausgewählt",
+    )
     expect(screen.getByLabelText("Terminiert Filter")).not.toBeChecked()
     expect(
       screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
@@ -373,6 +382,7 @@ describe("Documentunit Search", () => {
     expect(
       screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     ).not.toBeChecked()
+    expect(screen.getByLabelText("Nur mir zugewiesen")).not.toBeChecked()
   })
 
   test(`clicking 'Niemandem zugewiesen' automatically resets 'Nur mir zugewiesen' and vice versa`, async () => {
