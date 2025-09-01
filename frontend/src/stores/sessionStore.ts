@@ -42,7 +42,7 @@ const useSessionStore = defineStore("session", (): SessionStore => {
     useFavicon(getFavicon(env.value?.environment))
   }
 
-  return { user, env: env, isAuthenticated, initSession }
+  return { user, env, isAuthenticated, initSession }
 })
 
 export default useSessionStore

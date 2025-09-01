@@ -35,7 +35,7 @@ const lastUpdatedAt = computed(() =>
 const firstPublishedAt = computed(() => {
   // We don't display the firstPublishedAtDateTime yet as it represents the portal publication
   // and not the jdv handover (next line can be removed once jdv handover will be removed)
-  return "-"
+  return "–"
   // return formatTimestamp(documentUnit?.managementData?.firstPublishedAtDateTime)
 })
 

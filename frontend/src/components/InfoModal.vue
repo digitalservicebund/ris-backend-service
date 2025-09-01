@@ -101,7 +101,8 @@ watch(
           rel="noopener noreferrer"
           target="_blank"
           >{{ link.displayText }}</a
-        >.
+        >
+        <div v-if="link !== undefined">.</div>
       </div>
     </div>
   </div>
