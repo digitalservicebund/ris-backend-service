@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -82,6 +83,15 @@ public class DatabaseUserGroupService implements UserGroupService {
   @Override
   public List<UserGroup> getAllUserGroups() {
     return this.userGroups.stream().map(UserGroupTransformer::transformToDomain).toList();
+  }
+
+  /** TODO */
+  @Override
+  public Optional<UserGroup> getFirstUserGroup(List<String> userGroups) {
+    return this.userGroups.stream()
+        .filter(group -> userGroups.contains(group.getUserGroupPathName()))
+        .findFirst()
+        .map(UserGroupTransformer::transformToDomain);
   }
 
   /**

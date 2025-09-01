@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
-/** Implementation of the DocumentationUnitProcessStepRepository for the Postgres database */
+/** Implementation of the UserRepository for the Postgres database */
 @Repository
 @Slf4j
 @Primary

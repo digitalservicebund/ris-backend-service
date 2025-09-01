@@ -22,6 +22,8 @@ import org.testcontainers.shaded.org.checkerframework.checker.nullness.qual.Null
 
 public class AuthUtils {
 
+  public static final UUID USER_UUID = UUID.fromString("1be0bb1a-c196-484a-addf-822f2ab557f7");
+
   // Updated to accept a nullable userId
   public static OidcLoginRequestPostProcessor getMockLogin(@Nullable UUID userId) {
     return getMockLoginWithDocOffice("/DS", "Internal", userId);
@@ -45,7 +47,7 @@ public class AuthUtils {
                       claims.put("name", "testUser"); // This is the name from OIDC token
                       claims.put("email", "test@test.com");
                       // If userId is null, generate a random one
-                      claims.put("sub", (userId != null ? userId : UUID.randomUUID()).toString());
+                      claims.put("sub", (userId != null ? userId : USER_UUID).toString());
                     }));
   }
 

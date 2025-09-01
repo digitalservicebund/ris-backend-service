@@ -1,20 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserGroupTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
@@ -30,65 +28,68 @@ public class DatabaseUserService extends UserService {
   private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseUserService.class);
 
   private final UserRepository userRepository;
-  private final DatabaseUserGroupRepository databaseUserGroupRepository;
   private final KeycloakUserService keycloakUserService;
 
   public DatabaseUserService(
+      UserGroupService userGroupService,
       UserRepository userRepository,
-      DatabaseUserGroupRepository databaseUserGroupRepository,
       KeycloakUserService keycloakUserService) {
+    super(userGroupService);
     this.userRepository = userRepository;
-    this.databaseUserGroupRepository = databaseUserGroupRepository;
     this.keycloakUserService = keycloakUserService;
   }
 
+  /** Nightly fetches users from the Keycloak User Service and persists them */
   @Scheduled(cron = "0 0 4 * * *", zone = "Europe/Berlin")
-  @SchedulerLock(name = "duplicate-check-job", lockAtMostFor = "PT15M")
+  @SchedulerLock(name = "fetch-users-from-api", lockAtMostFor = "PT5M")
   @Transactional
-  public void fetchUsersFromKeycloak() {
-    databaseUserGroupRepository
-        .findAll()
+  public void fetchAndPersistUsersFromKeycloak() {
+    userGroupService
+        .getAllUserGroups()
         .forEach(
-            userGroupDTO ->
+            userGroup ->
                 persistUsersOfDocOffice(
-                    keycloakUserService.getUsers(
-                        UserGroupTransformer.transformToDomain(userGroupDTO)),
-                    userGroupDTO.getDocumentationOffice()));
+                    keycloakUserService.fetchUsers(userGroup),
+                    DocumentationOfficeTransformer.transformToDTO(userGroup.docOffice())));
   }
 
+  /**
+   * Get user domain object from oidc user by their id
+   *
+   * @param oidcUser
+   * @return
+   */
   @Override
   public User getUser(OidcUser oidcUser) {
     return UserTransformer.transformToDomain(
         userRepository
             .findByExternalId(UserTransformer.getOidcUserId(oidcUser))
-            .orElse(
-                userRepository
-                    .saveOrUpdate(
-                        UserTransformer.transformToDTO(keycloakUserService.getUser(oidcUser)))
-                    .orElse(null)));
+            .orElseGet(() -> fetchAndPersistUser(oidcUser)));
   }
 
+  /**
+   * Get user by database uuid or, if not exists, by external id
+   *
+   * @param uuid the user's id or external id
+   * @return the user
+   */
   @Override
   public User getUser(UUID uuid) {
-    return UserTransformer.transformToDomain(userRepository.getUser(uuid).orElse(null));
+    return UserTransformer.transformToDomain(
+        userRepository.getUser(uuid).orElse(userRepository.findByExternalId(uuid).orElse(null)));
   }
 
   @Override
-  public List<User> getUsers(OidcUser oidcUser) {
-    return getUserGroupDTO(oidcUser)
-        .map(UserGroupDTO::getDocumentationOffice)
+  public List<User> getAllUsersOfSameGroup(OidcUser oidcUser) {
+    return getUserGroup(oidcUser)
+        .map(UserGroup::docOffice)
+        .map(DocumentationOfficeTransformer::transformToDTO)
         .map(
             officeDTO ->
                 userRepository.getAllUsersForDocumentationOffice(officeDTO).stream()
                     .map(UserTransformer::transformToDomain)
                     .toList())
         .orElse(Collections.emptyList());
-  }
-
-  @Override
-  public Optional<UserGroup> getUserGroup(OidcUser oidcUser) {
-    return Optional.ofNullable(
-        UserGroupTransformer.transformToDomain(getUserGroupDTO(oidcUser).orElse(null)));
   }
 
   public void persistUsersOfDocOffice(
@@ -103,16 +104,15 @@ public class DatabaseUserService extends UserService {
             .toList());
   }
 
-  private Optional<UserGroupDTO> getUserGroupDTO(OidcUser oidcUser) {
-    List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
-    var matchingUserGroup =
-        databaseUserGroupRepository.findAll().stream()
-            .filter(group -> userGroups.contains(group.getUserGroupPathName()))
-            .findFirst();
-    if (matchingUserGroup.isEmpty()) {
-      LOGGER.warn(
-          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
-    }
-    return matchingUserGroup;
+  /**
+   * Fetches the oidc user from the keycloak service and persists them
+   *
+   * @param oidcUser the oidc user
+   * @return the persisted user
+   */
+  public UserDTO fetchAndPersistUser(OidcUser oidcUser) {
+    return userRepository
+        .saveOrUpdate(UserTransformer.transformToDTO(keycloakUserService.getUser(oidcUser)))
+        .orElse(null);
   }
 }

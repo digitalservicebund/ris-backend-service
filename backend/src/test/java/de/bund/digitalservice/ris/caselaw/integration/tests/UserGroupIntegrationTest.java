@@ -17,7 +17,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
-@Sql(scripts = {"classpath:doc_office_init.sql", "classpath:user_group_init.sql"})
+@Sql(
+    scripts = {
+      "classpath:doc_office_init.sql",
+      "classpath:user_group_init.sql",
+      "classpath:user_init.sql"
+    })
 @Sql(
     scripts = {"classpath:procedures_cleanup.sql"},
     executionPhase = AFTER_TEST_METHOD)

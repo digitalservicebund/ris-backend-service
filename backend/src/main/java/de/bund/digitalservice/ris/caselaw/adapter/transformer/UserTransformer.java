@@ -131,6 +131,7 @@ public class UserTransformer {
         .lastName(user.lastName())
         .externalId(user.externalId())
         .id(user.id())
+        .externalId(user.externalId())
         .documentationOffice(
             DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
         .isActive(true)
