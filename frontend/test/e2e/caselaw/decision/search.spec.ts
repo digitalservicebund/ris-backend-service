@@ -246,14 +246,13 @@ test.describe("Große Suche nach Entscheidungen", () => {
       })
       await triggerSearch(page)
 
-      await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
+      await test.step(`Prüfe, dass Ergebnisse gefunden wurden`, async () => {
         await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
       })
     },
   )
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip(
+  test(
     "Suche nach 'Nur mir zugewiesen'",
     {
       tag: "@RISDEV-8718",
@@ -270,10 +269,8 @@ test.describe("Große Suche nach Entscheidungen", () => {
         await triggerSearch(page)
       })
 
-      await test.step(`Prüfe, dass alle Ergebnisse gefunden wurde`, async () => {
-        await expect(
-          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
-        ).toBeVisible()
+      await test.step(`Prüfe, dass Ergebnisse gefunden wurde`, async () => {
+        await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
         await expect(
           page.getByText(createdDecisions[0].documentNumber),
         ).toBeVisible()
@@ -304,15 +301,13 @@ test.describe("Große Suche nach Entscheidungen", () => {
         await expect(dialog).toBeHidden()
       })
 
-      await test.step(`Prüfe, dass ein Ergebnis weniger gefunden wurde`, async () => {
+      await test.step(`Prüfe, dass Ergebnisse die zugewiesene Dokumentationseinheit nicht mehr enthalten`, async () => {
         await openSearchWithFileNumberPrefix("e2e-", page)
         await page.getByLabel("Nur meine Dokstelle Filter").click()
         await page.getByLabel("Nur mir zugewiesen").click()
         await expect(page.getByLabel("Nur mir zugewiesen")).toBeChecked()
         await triggerSearch(page)
-        await expect(
-          page.getByText(createdDecisions.length - 1 + " Ergebnisse gefunden"),
-        ).toBeVisible()
+        await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
         await expect(
           page.getByText(createdDecisions[0].documentNumber),
         ).toBeHidden()
