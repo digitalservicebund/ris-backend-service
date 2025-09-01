@@ -1044,8 +1044,11 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     // by unassigned
     searchInput = DocumentationUnitSearchInput.builder().unassigned(true).build();
-    // the 4th and the 6th docnumber are unassigned, but only the 4th is my docoffice
-    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).contains("MNOP202300099");
+    // 4th (my docoffice) and the 6th (other docoffice but published)
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains("MNOP202300099", "UVWX202311090");
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .doesNotContain("ABCD202300007", "EFGH202200123", "IJKL202101234", "QRST202200102");
 
     // all combined
     searchInput =

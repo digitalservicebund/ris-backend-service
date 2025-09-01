@@ -362,13 +362,9 @@ test.describe("Große Suche nach Entscheidungen", () => {
         await page.getByLabel("Niemandem zugewiesen").click()
         await expect(page.getByLabel("Niemandem zugewiesen")).toBeChecked()
         await expect(page.getByLabel("Nur mir zugewiesen")).not.toBeChecked()
-        await triggerSearch(page)
       })
 
       await test.step("Erwarte Dokeinheit mit eben entfernter Person als Suchresultat", async () => {
-        await page.getByLabel("Niemandem zugewiesen").click()
-        await expect(page.getByLabel("Niemandem zugewiesen")).toBeChecked()
-        await expect(page.getByLabel("Nur mir zugewiesen")).not.toBeChecked()
         await triggerSearch(page)
         await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
         await expect(

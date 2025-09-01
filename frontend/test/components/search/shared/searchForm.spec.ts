@@ -140,6 +140,9 @@ describe("Documentunit Search", () => {
     expect(
       screen.queryByLabelText("Nur mir zugewiesen"),
     ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Niemandem zugewiesen"),
+    ).not.toBeInTheDocument()
 
     // show own doc office only inputs as soon as checkbox is clicked
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
@@ -153,6 +156,7 @@ describe("Documentunit Search", () => {
     ).toBeInTheDocument()
     expect(screen.getByLabelText("Prozessschritt")).toBeInTheDocument()
     expect(screen.getByLabelText("Nur mir zugewiesen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Niemandem zugewiesen")).toBeInTheDocument()
   })
 
   test("renders all specific input fields for pending proceedings", async () => {
@@ -296,6 +300,20 @@ describe("Documentunit Search", () => {
       screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     ).not.toBeChecked()
     expect(screen.getByLabelText("Nur mir zugewiesen")).not.toBeChecked()
+
+    // Also check for unassigned filter
+    await user.click(screen.getByLabelText("Niemandem zugewiesen"))
+    expect(screen.getByLabelText("Niemandem zugewiesen")).toBeChecked()
+
+    // hide fields
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(
+      screen.getByLabelText("Nur meine Dokstelle Filter"),
+    ).not.toBeChecked()
+    // show fields
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeChecked()
+    expect(screen.queryByLabelText("Niemandem zugewiesen")).not.toBeChecked()
   })
 
   test(`resets own doc office fields when check box is unchecked`, async () => {
@@ -340,6 +358,20 @@ describe("Documentunit Search", () => {
       screen.getByLabelText("Dokumentationseinheiten mit Dublettenverdacht"),
     ).not.toBeChecked()
     expect(screen.getByLabelText("Nur mir zugewiesen")).not.toBeChecked()
+
+    // Also check for unassigned filter
+    await user.click(screen.getByLabelText("Niemandem zugewiesen"))
+    expect(screen.getByLabelText("Niemandem zugewiesen")).toBeChecked()
+
+    // hide fields
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(
+      screen.getByLabelText("Nur meine Dokstelle Filter"),
+    ).not.toBeChecked()
+    // show fields
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeChecked()
+    expect(screen.queryByLabelText("Niemandem zugewiesen")).not.toBeChecked()
   })
 
   kinds
