@@ -29,6 +29,7 @@ class MdcLoggingFilter extends OncePerRequestFilter {
     try {
       setSessionIdFromCookie(request);
       setRequestIdFromHeader(request, response);
+      setTestNameFromHeader(request);
       setUserGroupFromAuthentication();
     } catch (Exception e) {
       logger.error("Failed to set MDC context", e);
@@ -65,6 +66,13 @@ class MdcLoggingFilter extends OncePerRequestFilter {
         Optional.ofNullable(request.getHeader("X-Request-ID")).orElse(UUID.randomUUID().toString());
     MDC.put("request_id", requestId);
     response.setHeader("X-Request-ID", requestId);
+  }
+
+  private void setTestNameFromHeader(@NotNull HttpServletRequest request) {
+    String testName = request.getHeader("X-Test-Name");
+    if (testName != null) {
+      MDC.put("test_name", testName);
+    }
   }
 
   /**

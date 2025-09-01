@@ -100,6 +100,25 @@ class MdcLoggingFilterTest {
   }
 
   @Test
+  void shouldLogTestNameFromHeader() throws Exception {
+
+    String testName =
+        "caselaw/decision/categories/collective-agreements.spec.ts > Collective Agreements (Tarifvertrag) > saving and exporting collective agreement";
+    request.addHeader("x-test-name", testName);
+
+    // MDC will be cleared after filter chain, so we need to check inside the chain
+    FilterChain spyingChain =
+        (req, res) -> {
+          assertThat(MDC.get("test_name")).isEqualTo(testName);
+          assertThat(MDC.getCopyOfContextMap()).hasSize(2);
+        };
+
+    filter.doFilter(request, response, spyingChain);
+
+    assertThat(MDC.getCopyOfContextMap()).isNull();
+  }
+
+  @Test
   void shouldExtractDocOfficeWhenLoggedIn() throws Exception {
 
     OidcUser oidcUser = mock(OidcUser.class);
