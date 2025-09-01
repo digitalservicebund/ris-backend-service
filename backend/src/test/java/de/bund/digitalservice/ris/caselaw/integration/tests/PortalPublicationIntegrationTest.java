@@ -24,7 +24,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.FullLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -76,7 +75,6 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentationUnitHistoryLogRepository historyLogRepository;
-  @Autowired private DocumentationUnitService documentationUnitService;
 
   @MockitoBean(name = "portalS3Client")
   private S3Client s3Client;
@@ -96,9 +94,6 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
   @AfterEach
   void cleanUp() {
     repository.deleteAll();
-    databaseCourtRepository.deleteAll();
-    databaseDocumentTypeRepository.deleteAll();
-    historyLogRepository.deleteAll();
   }
 
   @Test
