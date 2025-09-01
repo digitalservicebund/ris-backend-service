@@ -478,7 +478,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return;
     }
 
-    setManagementData(docUnitDTO);
+    if (docUnitDTO.getManagementData() == null) {
+      docUnitDTO.setManagementData(new ManagementDataDTO());
+      docUnitDTO.getManagementData().setDocumentationUnit(docUnitDTO);
+    }
 
     DocumentationOfficeDTO docOffice =
         DocumentationOfficeTransformer.transformToDTO(currentUser.documentationOffice());
@@ -488,15 +491,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     docUnitDTO.getManagementData().setLastUpdatedBySystemName(null);
     docUnitDTO.getManagementData().setLastUpdatedByDocumentationOffice(docOffice);
     docUnitDTO.getManagementData().setLastUpdatedAtDateTime(Instant.now());
-  }
-
-  private static void setManagementData(DocumentationUnitDTO docUnitDTO) {
-    ManagementDataDTO managementData = docUnitDTO.getManagementData();
-    if (managementData == null) {
-      managementData =
-          ManagementDataDTO.builder().id(docUnitDTO.getId()).documentationUnit(docUnitDTO).build();
-      docUnitDTO.setManagementData(managementData);
-    }
   }
 
   @Override
@@ -1097,7 +1091,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   private void setPublicationDateTime(DocumentationUnitDTO documentationUnitDTO) {
-    setManagementData(documentationUnitDTO);
+    if (documentationUnitDTO.getManagementData() == null) {
+      documentationUnitDTO.setManagementData(new ManagementDataDTO());
+      documentationUnitDTO.getManagementData().setDocumentationUnit(documentationUnitDTO);
+    }
 
     Instant now = Instant.now();
     var isFirstPublication =

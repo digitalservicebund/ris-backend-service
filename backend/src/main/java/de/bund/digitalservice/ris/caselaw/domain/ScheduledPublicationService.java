@@ -48,7 +48,7 @@ public class ScheduledPublicationService {
     for (var docUnit : scheduledDocUnitsDueNow) {
       // We will continue processing on any exceptions that are thrown.
       handoverDocument(docUnit);
-      savePublicationDates(docUnit);
+      saveHandoverDates(docUnit);
     }
   }
 
@@ -88,9 +88,9 @@ Technischer Fehler: %s""")
     }
   }
 
-  private void savePublicationDates(Decision docUnit) {
+  private void saveHandoverDates(Decision docUnit) {
     try {
-      var updatedDocUnit = setPublicationDates(docUnit);
+      var updatedDocUnit = setHandoverDates(docUnit);
       docUnitRepository.save(updatedDocUnit);
     } catch (Exception e) {
       // No rethrow: continue with other doc units, even if save fails for this one.
@@ -98,12 +98,12 @@ Technischer Fehler: %s""")
     }
   }
 
-  private Decision setPublicationDates(Decision docUnit) {
+  private Decision setHandoverDates(Decision docUnit) {
     return docUnit.toBuilder()
         .managementData(
             docUnit.managementData().toBuilder()
                 .scheduledPublicationDateTime(null)
-                .lastPublicationDateTime(LocalDateTime.now())
+                .lastHandoverDateTime(LocalDateTime.now())
                 .scheduledByEmail(null)
                 .build())
         .build();

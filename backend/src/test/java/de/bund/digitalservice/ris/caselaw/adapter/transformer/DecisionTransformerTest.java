@@ -1279,7 +1279,7 @@ class DecisionTransformerTest {
   }
 
   @Test
-  void testTransformLastPublicationDate_withDate_shouldAddLastPublicationDate() {
+  void testTransformLastHandoverDate_withDate_shouldAddLastHandoverDate() {
     DecisionDTO decisionDTO =
         generateSimpleDTOBuilder()
             .lastHandoverDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
@@ -1287,17 +1287,16 @@ class DecisionTransformerTest {
 
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
-    assertThat(decision.managementData().lastPublicationDateTime())
-        .isEqualTo("2022-01-23T18:25:14");
+    assertThat(decision.managementData().lastHandoverDateTime()).isEqualTo("2022-01-23T18:25:14");
   }
 
   @Test
-  void testTransformLastPublicationDate_withoutDate_shouldNotAddLastPublicationDate() {
+  void testTransformLastHandoverDate_withoutDate_shouldNotAddLastHandoverDate() {
     DecisionDTO decisionDTO = generateSimpleDTOBuilder().lastHandoverDateTime(null).build();
 
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
-    assertThat(decision.managementData().lastPublicationDateTime()).isNull();
+    assertThat(decision.managementData().lastHandoverDateTime()).isNull();
   }
 
   @Test
@@ -1840,7 +1839,7 @@ class DecisionTransformerTest {
         .managementData(
             ManagementData.builder()
                 .scheduledPublicationDateTime(null)
-                .lastPublicationDateTime(null)
+                .lastHandoverDateTime(null)
                 .borderNumbers(Collections.emptyList())
                 .duplicateRelations(List.of())
                 .build())

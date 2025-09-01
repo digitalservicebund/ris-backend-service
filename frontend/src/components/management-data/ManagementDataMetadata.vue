@@ -32,9 +32,12 @@ const createdAt = computed(() =>
 const lastUpdatedAt = computed(() =>
   formatTimestamp(documentUnit?.managementData?.lastUpdatedAtDateTime),
 )
-const firstPublishedAt = computed(() =>
-  formatTimestamp(documentUnit?.managementData?.firstPublishedAtDateTime),
-)
+const firstPublishedAt = computed(() => {
+  // We don't display the firstPublishedAtDateTime yet as it represents the portal publication
+  // and not the jdv handover (next line can be removed once jdv handover will be removed)
+  return "-"
+  // return formatTimestamp(documentUnit?.managementData?.firstPublishedAtDateTime)
+})
 
 const formatTimestamp = (date?: string) =>
   date ? DateUtil.formatDateTime(date) : "–"

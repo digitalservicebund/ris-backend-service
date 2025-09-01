@@ -153,7 +153,7 @@ class DocumentableTransformerTest {
                   ManagementData.builder()
                       .scheduledPublicationDateTime(LocalDateTime.now())
                       .scheduledByEmail("test@test.de")
-                      .lastPublicationDateTime(LocalDateTime.now())
+                      .lastHandoverDateTime(LocalDateTime.now())
                       .build())
               .build();
       var builder = DecisionDTO.builder().build().toBuilder();
