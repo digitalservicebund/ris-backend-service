@@ -14,7 +14,7 @@ spring:
 
 logging:
   level:
-    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    de.bund.digitalservice.ris.caselaw.config.CaselawRequestLoggingFilter: DEBUG
 
 database:
   seed: true
