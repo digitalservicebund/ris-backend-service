@@ -16,3 +16,5 @@ export type DocumentationUnitSearchParameter =
   | "resolutionDateEnd"
   | "isResolved"
   | "processStep"
+  | "assignedToMe"
+  | "unassigned"

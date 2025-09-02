@@ -128,7 +128,7 @@ public interface DocumentationUnitRepository {
    *
    * @param uuid the UUID of the documentation unit to update
    */
-  void saveSuccessfulPublication(UUID uuid);
+  void saveSuccessfulHandover(UUID uuid);
 
   /**
    * Save the newly assigned documentation office of a documentation unit
@@ -183,4 +183,6 @@ public interface DocumentationUnitRepository {
   Set<String> findAllPublishedDocumentNumbers();
 
   void updatePortalPublicationStatus(UUID documentationUnitId, PortalPublicationStatus newStatus);
+
+  void savePublicationDateTime(UUID documentationUnitId);
 }

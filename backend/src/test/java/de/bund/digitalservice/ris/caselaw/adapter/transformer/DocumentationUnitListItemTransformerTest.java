@@ -8,8 +8,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingProceedingDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
@@ -28,6 +30,29 @@ class DocumentationUnitListItemTransformerTest {
   @Test
   void testTransformToDomain_withDecision_shouldTransformAllFields() {
     UUID id = UUID.randomUUID();
+
+    UUID previousDocumentationUnitProcessStepId = UUID.randomUUID();
+
+    var previousDocumentationUnitProcessStepDTO =
+        DocumentationUnitProcessStepDTO.builder()
+            .processStep(
+                ProcessStepDTO.builder()
+                    .id(previousDocumentationUnitProcessStepId)
+                    .name("Ersterfassung")
+                    .abbreviation("EE")
+                    .build())
+            .build();
+
+    var currentDocumentationUnitProcessStepDTO =
+        DocumentationUnitProcessStepDTO.builder()
+            .processStep(
+                ProcessStepDTO.builder()
+                    .id(UUID.randomUUID())
+                    .name("QS Formal")
+                    .abbreviation("QS")
+                    .build())
+            .build();
+
     DocumentationUnitListItemDTO currentDto =
         DecisionDTO.builder()
             .id(id)
@@ -37,11 +62,16 @@ class DocumentationUnitListItemTransformerTest {
             .fileNumbers(List.of(FileNumberDTO.builder().value("1 BvR 1234/19").build()))
             .date(LocalDate.parse("2021-01-01"))
             .scheduledPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
-            .lastPublicationDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
+            .lastHandoverDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
             .judicialBody("1. Senat")
             .headnote("headnote")
             .creatingDocumentationOffice(
                 DocumentationOfficeDTO.builder().abbreviation("DS").build())
+            .processSteps(
+                List.of(
+                    currentDocumentationUnitProcessStepDTO,
+                    currentDocumentationUnitProcessStepDTO,
+                    previousDocumentationUnitProcessStepDTO))
             .source(
                 List.of(
                     SourceDTO.builder().value(SourceValue.E).build(),
@@ -74,7 +104,7 @@ class DocumentationUnitListItemTransformerTest {
     assertThat(documentationUnitListItem.decisionDate()).isEqualTo(LocalDate.parse("2021-01-01"));
     assertThat(documentationUnitListItem.scheduledPublicationDateTime())
         .isEqualTo(LocalDateTime.parse("2022-01-23T18:25:14"));
-    assertThat(documentationUnitListItem.lastPublicationDateTime())
+    assertThat(documentationUnitListItem.lastHandoverDateTime())
         .isEqualTo(LocalDateTime.parse("2022-01-22T18:27:18"));
     assertThat(documentationUnitListItem.appraisalBody()).isEqualTo("1. Senat");
     assertThat(documentationUnitListItem.hasHeadnoteOrPrinciple()).isTrue();
@@ -86,6 +116,13 @@ class DocumentationUnitListItemTransformerTest {
     assertThat(documentationUnitListItem.status().publicationStatus())
         .isEqualTo(PublicationStatus.PUBLISHED);
     assertThat(documentationUnitListItem.status().withError()).isFalse();
+    // current doc process step
+    assertThat(
+            documentationUnitListItem.currentDocumentationUnitProcessStep().getProcessStep().uuid())
+        .isEqualTo(currentDocumentationUnitProcessStepDTO.getProcessStep().getId());
+    // previous process step
+    assertThat(documentationUnitListItem.previousProcessStep().uuid())
+        .isEqualTo(previousDocumentationUnitProcessStepId);
   }
 
   @Test
@@ -101,7 +138,7 @@ class DocumentationUnitListItemTransformerTest {
             .judicialBody("1. Senat")
             .resolutionNote("resolutionNode")
             .scheduledPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
-            .lastPublicationDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
+            .lastHandoverDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
             .isResolved(true)
             .legalIssue("legalIssue")
             .admissionOfAppeal("admissionOfAppeal")
@@ -133,7 +170,7 @@ class DocumentationUnitListItemTransformerTest {
     assertThat(documentationUnitListItem.fileNumber()).isEqualTo("1 BvR 1234/19");
     assertThat(documentationUnitListItem.decisionDate()).isEqualTo(LocalDate.parse("2021-01-01"));
     assertThat(documentationUnitListItem.scheduledPublicationDateTime()).isNull();
-    assertThat(documentationUnitListItem.lastPublicationDateTime()).isNull();
+    assertThat(documentationUnitListItem.lastHandoverDateTime()).isNull();
     assertThat(documentationUnitListItem.appraisalBody()).isEqualTo("1. Senat");
     assertThat(documentationUnitListItem.hasHeadnoteOrPrinciple()).isFalse();
     // status

@@ -48,7 +48,7 @@ public class DatabaseUserService extends UserService {
         .forEach(
             userGroup ->
                 persistUsersOfDocOffice(
-                    keycloakUserService.getAllUsersOfSameGroup(userGroup), userGroup.docOffice()));
+                    keycloakUserService.getUsersInSameDocOffice(userGroup), userGroup.docOffice()));
   }
 
   /**
@@ -81,7 +81,7 @@ public class DatabaseUserService extends UserService {
   }
 
   @Override
-  public List<User> getAllUsersOfSameGroup(UserGroup userGroup) {
+  public List<User> getUsersInSameDocOffice(UserGroup userGroup) {
     if (userGroup == null || userGroup.docOffice() == null) {
       return Collections.emptyList();
     }

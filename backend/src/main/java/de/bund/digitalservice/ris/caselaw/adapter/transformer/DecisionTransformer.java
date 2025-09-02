@@ -574,8 +574,10 @@ public class DecisionTransformer extends DocumentableTransformer {
         .ensuingDecisions(buildEnsuingDecisions(decisionDTO))
         .status(getStatus(decisionDTO))
         .inboxStatus(decisionDTO.getInboxStatus())
-        .currentProcessStep(
+        .currentDocumentationUnitProcessStep(
             DocumentationUnitProcessStepTransformer.toDomain(decisionDTO.getCurrentProcessStep()))
+        .previousProcessStep(
+            ProcessStepTransformer.getPreviousProcessStep(decisionDTO.getProcessSteps()))
         .processSteps(
             decisionDTO.getProcessSteps().stream()
                 .map(DocumentationUnitProcessStepTransformer::toDomain)

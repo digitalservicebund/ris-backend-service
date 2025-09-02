@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "../../fixtures"
+import { deleteDocumentUnit } from "../../utils/documentation-unit-api-util"
 import {
   navigateToCategories,
   navigateToInbox,
@@ -18,7 +19,7 @@ test.describe(
       pageWithBghUser,
     }) => {
       let documentNumber: string
-      const fileNumber = "e2e_" + generateString()
+      const fileNumber = generateString()
       await navigateToSearch(page)
       await test.step("Erstelle neue Dokumentationseinheit", async () => {
         await page
@@ -129,6 +130,10 @@ test.describe(
         await navigateToInbox(pageWithBghUser)
         await expect(pageWithBghUser.getByText(documentNumber)).toBeVisible()
         await expect(pageWithBghUser.getByText(fileNumber)).toBeVisible()
+      })
+
+      await test.step("Lösche Fremdanlage", async () => {
+        await deleteDocumentUnit(pageWithBghUser, documentNumber)
       })
     })
   },

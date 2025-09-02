@@ -5,11 +5,15 @@ import { computed, Ref, ref } from "vue"
 import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import PortalPublicationStatusBadge from "@/components/publication/PortalPublicationStatusBadge.vue"
+import UatTestPortalInfo from "@/components/publication/UatTestPortalInfo.vue"
 import { Decision } from "@/domain/decision"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import { ResponseError } from "@/services/httpClient"
 import publishDocumentationUnitService from "@/services/publishDocumentationUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import useSessionStore from "@/stores/sessionStore"
+import DateUtil from "@/utils/dateUtil"
+import IconInfoOutline from "~icons/mdi/information-outline"
 
 const props = defineProps<{
   isPublishable: boolean
@@ -20,6 +24,10 @@ const store = useDocumentUnitStore()
 const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision>
 }
+const session = useSessionStore()
+const linkToPortal = computed(
+  () => session.env?.portalUrl + "/case-law/" + decision.value.documentNumber,
+)
 
 const docUnitPublicationError = ref<ResponseError | null>(null)
 
@@ -38,6 +46,7 @@ const checkWarningsAndPublishDocUnit = async () => {
 }
 
 const isPublishing = ref(false)
+const isPublished = ref(false)
 const publishDocUnit = async () => {
   showPublicationWarningModal.value = false
   docUnitPublicationError.value = null
@@ -48,9 +57,12 @@ const publishDocUnit = async () => {
   docUnitPublicationError.value = error ?? null
   await store.loadDocumentUnit(decision.value.documentNumber)
   isPublishing.value = false
+  isPublished.value = error == null
+  isWithdrawn.value = false
 }
 
 const isWithdrawing = ref(false)
+const isWithdrawn = ref(false)
 const withdrawDocUnit = async () => {
   docUnitPublicationError.value = null
   isWithdrawing.value = true
@@ -60,16 +72,76 @@ const withdrawDocUnit = async () => {
   docUnitPublicationError.value = error ?? null
   await store.loadDocumentUnit(decision.value.documentNumber)
   isWithdrawing.value = false
+  isPublished.value = false
+  isWithdrawn.value = error == null
 }
+
+const lastPublishedAt = computed(() => {
+  if (decision.value.managementData.lastPublishedAtDateTime) {
+    return DateUtil.formatDateTime(
+      decision.value.managementData.lastPublishedAtDateTime,
+    )
+  }
+  return "-"
+})
 </script>
 
 <template>
   <div class="flex flex-col gap-24">
     <div class="flex flex-col gap-16">
+      <UatTestPortalInfo />
       <h3 class="ris-label1-bold">Aktueller Status Portal</h3>
       <PortalPublicationStatusBadge
         :status="decision.portalPublicationStatus"
       />
+      <div
+        v-if="
+          decision.portalPublicationStatus ===
+            PortalPublicationStatus.PUBLISHED ||
+          decision.portalPublicationStatus === PortalPublicationStatus.WITHDRAWN
+        "
+        class="flex flex-row items-center gap-8"
+      >
+        <IconInfoOutline class="text-grey-900" />
+        <a
+          class="ris-link1-regular whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+          :href="linkToPortal"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Portalseite der Dokumentationseinheit
+        </a>
+        <div
+          v-if="
+            decision.portalPublicationStatus ===
+            PortalPublicationStatus.WITHDRAWN
+          "
+        >
+          wurde entfernt
+        </div>
+      </div>
+
+      <div v-if="isPublished || isWithdrawn" class="flex flex-row gap-8">
+        <IconInfoOutline class="text-grey-900" />
+        <p>
+          Das Hochladen der Stammdaten und der Informationen im Portal-Tab
+          „Details“ dauert etwa 2 Minuten.
+        </p>
+      </div>
+      <div
+        v-if="
+          decision.portalPublicationStatus ===
+            PortalPublicationStatus.PUBLISHED ||
+          decision.portalPublicationStatus === PortalPublicationStatus.WITHDRAWN
+        "
+        class="flex flex-row gap-8"
+      >
+        <IconInfoOutline class="text-grey-900" />
+        <p>
+          Zuletzt veröffentlicht am:
+          {{ lastPublishedAt }}
+        </p>
+      </div>
     </div>
     <InfoModal
       v-if="docUnitPublicationError"

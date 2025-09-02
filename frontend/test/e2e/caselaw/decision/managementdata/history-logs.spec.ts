@@ -15,7 +15,10 @@ import {
   expectHistoryCount,
   expectHistoryLogRow,
 } from "../../utils/e2e-utils"
-import { deleteAllProcedures } from "~/e2e/caselaw/utils/documentation-unit-api-util"
+import {
+  deleteAllProcedures,
+  deleteDocumentUnit,
+} from "~/e2e/caselaw/utils/documentation-unit-api-util"
 import { generateString } from "~/test-helper/dataGenerators"
 
 /* eslint-disable playwright/expect-expect */
@@ -267,6 +270,10 @@ test.describe("Historie in Verwaltungsdaten", { tag: ["@RISDEV-7248"] }, () => {
         // "BGH (BGH testUser)",
         `Status geändert: Fremdanlage → Unveröffentlicht`,
       )
+    })
+
+    await test.step("Lösche Fremdanlage für BGH", async () => {
+      await deleteDocumentUnit(pageWithBghUser, documentNumber)
     })
   })
 

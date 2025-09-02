@@ -52,7 +52,7 @@ public class KeycloakUserService extends UserService {
   }
 
   @Override
-  public List<User> getAllUsersOfSameGroup(UserGroup userGroup) {
+  public List<User> getUsersInSameDocOffice(UserGroup userGroup) {
     if (userGroup == null || userGroup.userGroupPathName() == null) {
       return Collections.emptyList();
     }

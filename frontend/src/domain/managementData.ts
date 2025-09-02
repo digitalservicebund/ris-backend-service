@@ -17,6 +17,7 @@ export type DuplicateRelation = {
 }
 
 export type ManagementData = {
+  lastHandoverDateTime?: string // jdv Handover
   scheduledPublicationDateTime?: string
   scheduledByEmail?: string
   duplicateRelations: DuplicateRelation[]
@@ -28,4 +29,5 @@ export type ManagementData = {
   createdByName?: string
   createdByDocOffice?: string
   firstPublishedAtDateTime?: string
+  lastPublishedAtDateTime?: string // Portal publication
 }

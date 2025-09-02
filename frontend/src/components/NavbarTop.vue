@@ -15,12 +15,12 @@ const badge = computed(() => {
   const docOffice = session.user?.documentationOffice
     ? session.user.documentationOffice.abbreviation
     : undefined
-  if (session.env == "staging") {
+  if (session.env?.environment == "staging") {
     return {
       color: "bg-red-300",
       label: docOffice ? `${docOffice} | Staging` : "",
     }
-  } else if (session.env == "uat") {
+  } else if (session.env?.environment == "uat") {
     return {
       color: "bg-yellow-300",
       label: docOffice ? `${docOffice} | UAT` : "",
@@ -99,6 +99,7 @@ const badge = computed(() => {
               <IconBadge
                 v-if="session.user.documentationOffice"
                 :background-color="badge.color"
+                data-testid="navbar-top-badge"
                 :label="badge.label"
               />
             </FlexItem>

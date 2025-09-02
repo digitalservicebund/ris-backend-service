@@ -67,6 +67,7 @@ public class SecurityConfig {
             csrf ->
                 csrf.csrfTokenRepository(tokenRepository).csrfTokenRequestHandler(requestHandler))
         .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+        .addFilterAfter(new MdcLoggingFilter(), BasicAuthenticationFilter.class)
         .headers(
             httpSecurityHeadersConfigurer ->
                 httpSecurityHeadersConfigurer

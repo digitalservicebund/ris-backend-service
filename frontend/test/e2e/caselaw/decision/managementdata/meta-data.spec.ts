@@ -1,6 +1,7 @@
 import { expect, Page } from "@playwright/test"
 import dayjs from "dayjs"
 import { caselawTest as test } from "../../fixtures"
+import { deleteDocumentUnit } from "../../utils/documentation-unit-api-util"
 import {
   fillInput,
   navigateToCategories,
@@ -135,6 +136,10 @@ test.describe("Wichtigste Verwaltungsdaten", { tag: ["@RISDEV-7247"] }, () => {
       /^\d{2}\.\d{2}\.\d{4} um \d{2}:\d{2} Uhr$/,
     )
     await expectLastUpdatedBy(pageWithBghUser, "DS")
+
+    await test.step("Lösche Fremdanlage für BGH", async () => {
+      await deleteDocumentUnit(pageWithBghUser, documentNumber)
+    })
   })
 
   async function expectCreatedAt(page: Page, createdAt: RegExp) {

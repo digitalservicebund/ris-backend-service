@@ -74,6 +74,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -96,6 +97,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -179,6 +181,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         .thenReturn(
             User.builder()
                 .id(oidcLoggedInUserId)
+                .externalId(oidcLoggedInUserId)
                 .name("test User") // This name matches the 'name' claim in AuthUtils.getMockLogin
                 .documentationOffice(docOffice)
                 .build());
@@ -251,7 +254,12 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               assertThat(response.getResponseBody().coreData().fileNumbers()).hasSize(1);
               assertThat(response.getResponseBody().coreData().fileNumbers().getFirst())
                   .isEqualTo("abc");
-              assertThat(response.getResponseBody().currentProcessStep().getProcessStep().name())
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .currentDocumentationUnitProcessStep()
+                          .getProcessStep()
+                          .name())
                   .isEqualTo("Ersterfassung");
             });
 
@@ -327,6 +335,37 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     assertThat(repository.findAll()).isEmpty();
     assertThat(originalXmlRepository.findAll()).isEmpty();
+  }
+
+  @Test
+  void deletePortalPublishedDocumentationUnit_shouldThrow() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "XXRE0******YY"));
+    when(documentNumberPatternConfig.hasValidPattern(anyString(), anyString()))
+        .thenReturn(Boolean.TRUE);
+
+    var response = generateNewDecision();
+    UUID docUnitId = response.getResponseBody().uuid();
+
+    Optional<DocumentationUnitDTO> docUnit = repository.findById(docUnitId);
+    docUnit.get().setPortalPublicationStatus(PortalPublicationStatus.PUBLISHED);
+    repository.save(docUnit.get());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + docUnitId)
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectBody(String.class)
+        .consumeWith(
+            result ->
+                assertThat(result.getResponseBody())
+                    .isEqualTo(
+                        "Die Dokumentationseinheit konnte nicht gelöscht werden, da Sie im Portal veröffentlicht ist.\nSie muss zuerst zurückgezogen werden."));
+
+    assertThat(repository.findAll()).hasSize(1);
   }
 
   @Test
@@ -888,6 +927,15 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             neuProcessStep,
             neuProcessStep);
 
+    List<UUID> users =
+        Arrays.asList(
+            oidcLoggedInUserId,
+            oidcLoggedInUserId,
+            UUID.randomUUID(),
+            null,
+            UUID.randomUUID(),
+            null);
+
     for (int i = 0; i < 6; i++) {
 
       CourtDTO court =
@@ -915,6 +963,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
                   .processSteps(
                       List.of(
                           DocumentationUnitProcessStepDTO.builder()
+                              .userId(users.get(i))
                               .processStep(processSteps.get(i))
                               .createdAt(LocalDateTime.now())
                               .build())),
@@ -1025,6 +1074,19 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         DocumentationUnitSearchInput.builder().processStep(neuProcessStep.getName()).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .contains("ABCD202300007", "UVWX202311090");
+
+    // by assignedToMe
+    searchInput = DocumentationUnitSearchInput.builder().assignedToMe(true).build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains("ABCD202300007", "EFGH202200123");
+
+    // by unassigned
+    searchInput = DocumentationUnitSearchInput.builder().unassigned(true).build();
+    // 4th (my docoffice) and the 6th (other docoffice but published)
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .contains("MNOP202300099", "UVWX202311090");
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .doesNotContain("ABCD202300007", "EFGH202200123", "IJKL202101234", "QRST202200102");
 
     // all combined
     searchInput =
@@ -1374,6 +1436,15 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     }
 
     queryParams.add("myDocOfficeOnly", String.valueOf(searchInput.myDocOfficeOnly()));
+
+    if (searchInput.assignedToMe()) {
+      queryParams.add("assignedToMe", String.valueOf(true));
+    }
+
+    if (searchInput.unassigned()) {
+      queryParams.add("unassigned", String.valueOf(true));
+    }
+
     URI uri =
         new DefaultUriBuilderFactory()
             .builder()
@@ -1383,7 +1454,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
 
     List<DocumentationUnitListItem> content =
         risWebTestClient
-            .withDefaultLogin()
+            .withDefaultLogin(oidcLoggedInUserId)
             .get()
             .uri(uri)
             .exchange()
@@ -1505,7 +1576,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         .uri("/api/v1/caselaw/documentunits/" + referencedDTO.getId())
         .exchange()
         .expectStatus()
-        .is5xxServerError();
+        .isBadRequest();
 
     List<DeletedDocumentationUnitDTO> allDeletedIds = deletedDocumentationIdsRepository.findAll();
     assertThat(allDeletedIds).isEmpty();
@@ -2336,7 +2407,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .returnResult()
             .getResponseBody();
 
-    assertThat(createdDocUnit.currentProcessStep().getProcessStep().name())
+    assertThat(createdDocUnit.currentDocumentationUnitProcessStep().getProcessStep().name())
         .isEqualTo("Ersterfassung");
     List<DocumentationUnitProcessStep> processSteps = createdDocUnit.processSteps();
     assertThat(processSteps).hasSize(1);

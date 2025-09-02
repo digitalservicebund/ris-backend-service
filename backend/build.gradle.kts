@@ -186,7 +186,7 @@ dependencies {
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.44")
 
-    implementation(platform("software.amazon.awssdk:bom:2.32.31"))
+    implementation(platform("software.amazon.awssdk:bom:2.33.0"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -210,9 +210,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    // implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.90")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.90")
     // for local development:
-     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.90.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.90.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
@@ -256,7 +256,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.27.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.28.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

@@ -22,8 +22,13 @@ test.describe("Große Suche nach Entscheidungen", () => {
     decisionsToBeCreated: [
       // Reverse sorting: date DESC, docNumber DESC
       [
-        { coreData: { court: { label: "BFH" } } },
-        { coreData: { court: { label: "AG Aachen" } } },
+        { coreData: { decisionDate: "2021-01-01", court: { label: "BFH" } } },
+        {
+          coreData: {
+            decisionDate: "2022-01-01",
+            court: { label: "AG Aachen" },
+          },
+        },
         { coreData: { decisionDate: "2023-01-01" } },
         { coreData: { decisionDate: "2023-01-02" } },
         { coreData: { decisionDate: "2023-01-31" } },
@@ -196,7 +201,8 @@ test.describe("Große Suche nach Entscheidungen", () => {
     await triggerSearch(page)
     const docUnitSearchResultsDateRange = createdDecisions.filter(
       (p) =>
-        p.coreData.decisionDate && p.coreData.decisionDate !== "2023-01-01",
+        (p.coreData.decisionDate && p.coreData.decisionDate === "2023-01-02") ||
+        (p.coreData.decisionDate && p.coreData.decisionDate === "2023-01-31"),
     )
     await checkResultListContent(docUnitSearchResultsDateRange, page)
   })
@@ -207,8 +213,8 @@ test.describe("Große Suche nach Entscheidungen", () => {
       tag: "@RISDEV-8718",
     },
     async ({ page, decisions }) => {
-      const { createdDecisions } = decisions
-      await openSearchWithFileNumberPrefix("e2e-", page)
+      const { fileNumberPrefix, createdDecisions } = decisions
+      await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
       await page.getByLabel("Nur meine Dokstelle Filter").click()
 
       // all new doc units are created with step Ersterfassung
@@ -220,8 +226,10 @@ test.describe("Große Suche nach Entscheidungen", () => {
       })
       await triggerSearch(page)
 
-      await test.step(`Prüfe, dass Ergebnisse gefunden wurde`, async () => {
-        await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
+      await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
+        await expect(
+          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
+        ).toBeVisible()
         await expect(
           page.getByText(createdDecisions[0].documentNumber),
         ).toBeVisible()
@@ -247,7 +255,136 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await triggerSearch(page)
 
       await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
+        await expect(
+          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
+        ).toBeVisible()
+        await expect(
+          page.getByText(createdDecisions[0].documentNumber),
+        ).toBeVisible()
+      })
+
+      await test.step(`Weise einen neuen Prozesschritt ohne Person`, async () => {
+        await navigateToCategories(page, createdDecisions[0].documentNumber)
+
+        await page
+          .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
+          .click()
+        const dialog = page.getByRole("dialog")
+        await expect(dialog).toBeVisible()
+        await expect(
+          dialog.getByText("Dokumentationseinheit weitergeben"),
+        ).toBeVisible()
+        await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
+        await expect(dialog.getByText("Fachdokumentation")).toBeVisible()
+        await expect(dialog.getByText("Neue Person")).toBeVisible()
+        await dialog.getByLabel("Dropdown öffnen").click()
+
+        await dialog
+          .getByRole("button", {
+            name: "Weitergeben",
+          })
+          .click()
+
+        await expect(dialog).toBeHidden()
+      })
+
+      await test.step(`Prüfe, dass Ergebnisse die zugewiesene Dokumentationseinheit nicht mehr enthalten`, async () => {
+        await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+        await page.getByLabel("Nur meine Dokstelle Filter").click()
+        await page.getByLabel("Nur mir zugewiesen").click()
+        await expect(page.getByLabel("Nur mir zugewiesen")).toBeChecked()
+        await triggerSearch(page)
         await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
+        await expect(
+          page.getByText(createdDecisions[0].documentNumber),
+        ).toBeHidden()
+      })
+    },
+  )
+
+  test(
+    "Suche nach 'Nur mir zugewiesen' und 'Niemandem zugewiesen'",
+    {
+      tag: "@RISDEV-8718",
+    },
+    async ({ page, decisions }) => {
+      const { fileNumberPrefix, createdDecisions } = decisions
+      await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+      await page.getByLabel("Nur meine Dokstelle Filter").click()
+
+      // all new doc units are created with my user assigned
+      await test.step("Wähle 'Nur mir zugewiesen'", async () => {
+        await page.getByLabel("Nur mir zugewiesen").click()
+        await expect(page.getByLabel("Nur mir zugewiesen")).toBeChecked()
+        await triggerSearch(page)
+      })
+
+      await test.step(`Prüfe, dass alle Ergebnisse gefunden wurde`, async () => {
+        await expect(
+          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
+        ).toBeVisible()
+        await expect(
+          page.getByText(createdDecisions[0].documentNumber),
+        ).toBeVisible()
+      })
+
+      await test.step(`Weise einen neuen Prozesschritt zu, entferne Person`, async () => {
+        await navigateToCategories(page, createdDecisions[0].documentNumber)
+
+        await page
+          .getByRole("button", { name: "Dokumentationseinheit weitergeben" })
+          .click()
+        const dialog = page.getByRole("dialog")
+        await expect(dialog).toBeVisible()
+        await expect(
+          dialog.getByText("Dokumentationseinheit weitergeben"),
+        ).toBeVisible()
+        await expect(dialog.getByText("Neuer Schritt")).toBeVisible()
+        await expect(dialog.getByText("Fachdokumentation")).toBeVisible()
+        await expect(dialog.getByText("Neue Person")).toBeVisible()
+        await dialog.getByLabel("Dropdown öffnen").click()
+
+        await dialog
+          .getByRole("button", {
+            name: "Weitergeben",
+          })
+          .click()
+
+        await expect(dialog).toBeHidden()
+      })
+
+      await test.step(`Prüfe, dass ein Ergebnis weniger gefunden wurde`, async () => {
+        await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
+        await page.getByLabel("Nur meine Dokstelle Filter").click()
+        await page.getByLabel("Nur mir zugewiesen").click()
+        await expect(page.getByLabel("Nur mir zugewiesen")).toBeChecked()
+        await triggerSearch(page)
+        await expect(
+          page.getByText(createdDecisions.length - 1 + " Ergebnisse gefunden"),
+        ).toBeVisible()
+        await expect(
+          page.getByText(createdDecisions[0].documentNumber),
+        ).toBeHidden()
+      })
+
+      await test.step("Wähle 'Niemandem zugewiesen', resetted automatisch 'Nur mir zugewiesen'", async () => {
+        await page.getByLabel("Niemandem zugewiesen").click()
+        await expect(page.getByLabel("Niemandem zugewiesen")).toBeChecked()
+        await expect(page.getByLabel("Nur mir zugewiesen")).not.toBeChecked()
+      })
+
+      await test.step("Erwarte Dokeinheit mit eben entfernter Person als Suchresultat", async () => {
+        await triggerSearch(page)
+        await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
+        await expect(
+          page.getByText(createdDecisions[0].documentNumber),
+        ).toBeVisible()
+      })
+
+      await test.step("Wähle 'Nur mir zugewiesen'', resetted automatisch 'Niemandem zugewiesen'", async () => {
+        await page.getByLabel("Nur mir zugewiesen").click()
+        await expect(page.getByLabel("Nur mir zugewiesen")).toBeChecked()
+        await expect(page.getByLabel("Niemandem zugewiesen")).not.toBeChecked()
       })
     },
   )
@@ -559,6 +696,10 @@ test.describe("Große Suche nach Entscheidungen", () => {
           .getByTestId("chips-input-wrapper_fileNumber")
           .getByTestId("chip-value"),
       ).toHaveText(fileNumber)
+    })
+
+    await test.step("Lösche Entscheidung", async () => {
+      await deleteDocumentUnit(page, documentNumberToBeDeleted!)
     })
   })
 })

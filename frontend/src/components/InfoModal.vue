@@ -85,9 +85,12 @@ watch(
           </li>
         </ul>
       </div>
-      <span v-else class="ris-label2-regular">{{
-        isArray ? descriptionRef[0] : descriptionRef
-      }}</span>
+      <div v-else class="flex flex-row items-center">
+        <span class="ris-label2-regular"
+          >{{ isArray ? descriptionRef[0] : descriptionRef }}
+        </span>
+        <slot name="link" />
+      </div>
     </div>
   </div>
 </template>

@@ -100,10 +100,10 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
 
   @Test
   void testPublishSuccessfully() {
+    UUID userId = UUID.randomUUID();
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
 
-    UUID userId = UUID.fromString("88888888-5555-4444-4444-121212121212");
     risWebTestClient
         .withDefaultLogin(userId)
         .put()
@@ -123,6 +123,12 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
     var updatedDto = repository.findById(dto.getId()).get();
     assertThat(updatedDto.getPortalPublicationStatus())
         .isEqualTo(PortalPublicationStatus.PUBLISHED);
+    assertThat(updatedDto.getManagementData().getFirstPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isEqualTo(updatedDto.getManagementData().getFirstPublishedAtDateTime());
 
     var historyLogs =
         historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
@@ -130,6 +136,75 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
     assertThat(historyLogs)
         .hasSize(2)
         .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getUserId()).isEqualTo(userDbId);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit im Portal veröffentlicht");
+            },
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getSystemName()).isEqualTo("NeuRIS");
+              assertThat(historyLog.getUserId()).isNull();
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Status im Portal geändert: Unveröffentlicht → Veröffentlicht");
+            });
+  }
+
+  @Test
+  void testRepublishSuccessfully() {
+    UUID userId = UUID.randomUUID();
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
+
+    risWebTestClient
+        .withDefaultLogin(userId)
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    risWebTestClient
+        .withDefaultLogin(userId)
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
+
+    verify(s3Client, times(4)).putObject(captor.capture(), any(RequestBody.class));
+
+    var capturedRequests = captor.getAllValues();
+    assertThat(capturedRequests.get(0).key()).isEqualTo("1234567890123/1234567890123.xml");
+    assertThat(capturedRequests.get(1).key()).contains("changelogs/");
+
+    var updatedDto = repository.findById(dto.getId()).get();
+    assertThat(updatedDto.getPortalPublicationStatus())
+        .isEqualTo(PortalPublicationStatus.PUBLISHED);
+    assertThat(updatedDto.getManagementData().getFirstPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isAfter(updatedDto.getManagementData().getFirstPublishedAtDateTime());
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    var userDbId = databaseUserRepository.findByExternalId(userId).get().getId();
+    assertThat(historyLogs)
+        .hasSize(3)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getUserId()).isEqualTo(userDbId);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit im Portal veröffentlicht");
+            },
             historyLog -> {
               assertThat(historyLog.getEventType())
                   .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);

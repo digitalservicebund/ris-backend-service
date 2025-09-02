@@ -64,7 +64,7 @@ public class PendingProceedingDTO extends DocumentationUnitDTO {
   }
 
   @Override
-  public LocalDateTime getLastPublicationDateTime() {
+  public LocalDateTime getLastHandoverDateTime() {
     return null;
   }
 

@@ -4,7 +4,7 @@ import Button from "primevue/button"
 import { useToast } from "primevue/usetoast"
 import { computed, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
-import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
+import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
@@ -119,18 +119,28 @@ watchEffect(() => {
         icon-color="text-red-900"
         label="Fehler"
       />
-      <CurrentAndLastProcessStepBadge
+
+      <CurrentAndPreviousProcessStepBadge
         v-if="processStepsEnabled"
-        :process-steps="props.documentUnit.processSteps"
+        :current-process-step="
+          props.documentUnit.currentDocumentationUnitProcessStep?.processStep
+        "
+        :previous-process-step="props.documentUnit.previousProcessStep"
       />
       <IconBadge
-        v-if="props.documentUnit.currentProcessStep && processStepsEnabled"
+        v-if="
+          props.documentUnit.currentDocumentationUnitProcessStep &&
+          processStepsEnabled
+        "
         background-color="bg-white"
         border-color="border-gray-800"
         class="px-8"
         data-testid="info-panel-process-step-initials"
         :icon="IconPerson"
-        :label="props.documentUnit.currentProcessStep?.user?.initials || '-'"
+        :label="
+          props.documentUnit.currentDocumentationUnitProcessStep?.user
+            ?.initials || '-'
+        "
       />
     </div>
 

@@ -94,7 +94,7 @@ class DecisionTransformerTest {
     assertThat(decisionDTO.getJudicialBody()).isNull();
     assertThat(decisionDTO.getDate()).isNull();
     assertThat(decisionDTO.getScheduledPublicationDateTime()).isNull();
-    assertThat(decisionDTO.getLastPublicationDateTime()).isNull();
+    assertThat(decisionDTO.getLastHandoverDateTime()).isNull();
     assertThat(decisionDTO.getCourt()).isNull();
     assertThat(decisionDTO.getDocumentType()).isNull();
     assertThat(decisionDTO.getDocumentationOffice()).isNull();
@@ -1279,25 +1279,24 @@ class DecisionTransformerTest {
   }
 
   @Test
-  void testTransformLastPublicationDate_withDate_shouldAddLastPublicationDate() {
+  void testTransformLastHandoverDate_withDate_shouldAddLastHandoverDate() {
     DecisionDTO decisionDTO =
         generateSimpleDTOBuilder()
-            .lastPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
+            .lastHandoverDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
             .build();
 
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
-    assertThat(decision.managementData().lastPublicationDateTime())
-        .isEqualTo("2022-01-23T18:25:14");
+    assertThat(decision.managementData().lastHandoverDateTime()).isEqualTo("2022-01-23T18:25:14");
   }
 
   @Test
-  void testTransformLastPublicationDate_withoutDate_shouldNotAddLastPublicationDate() {
-    DecisionDTO decisionDTO = generateSimpleDTOBuilder().lastPublicationDateTime(null).build();
+  void testTransformLastHandoverDate_withoutDate_shouldNotAddLastHandoverDate() {
+    DecisionDTO decisionDTO = generateSimpleDTOBuilder().lastHandoverDateTime(null).build();
 
     Decision decision = DecisionTransformer.transformToDomain(decisionDTO);
 
-    assertThat(decision.managementData().lastPublicationDateTime()).isNull();
+    assertThat(decision.managementData().lastHandoverDateTime()).isNull();
   }
 
   @Test
@@ -1840,7 +1839,7 @@ class DecisionTransformerTest {
         .managementData(
             ManagementData.builder()
                 .scheduledPublicationDateTime(null)
-                .lastPublicationDateTime(null)
+                .lastHandoverDateTime(null)
                 .borderNumbers(Collections.emptyList())
                 .duplicateRelations(List.of())
                 .build())

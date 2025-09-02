@@ -21,7 +21,11 @@ public abstract class UserService {
 
   public abstract User getUser(UUID uuid);
 
-  public abstract List<User> getAllUsersOfSameGroup(UserGroup userGroup);
+  public abstract List<User> getUsersInSameDocOffice(UserGroup userGroup);
+
+  public List<User> getUsersInSameDocOffice(OidcUser oidcUser) {
+    return getUsersInSameDocOffice(getUserGroup(oidcUser).orElse(null));
+  }
 
   public DocumentationOffice getDocumentationOffice(OidcUser oidcUser) {
     User user = getUser(oidcUser);

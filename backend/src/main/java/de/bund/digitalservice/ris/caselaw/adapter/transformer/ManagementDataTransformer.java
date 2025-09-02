@@ -70,7 +70,7 @@ public class ManagementDataTransformer {
         Optional.ofNullable(documentationUnitDTO.getManagementData());
 
     return ManagementData.builder()
-        .lastPublicationDateTime(documentationUnitDTO.getLastPublicationDateTime())
+        .lastHandoverDateTime(documentationUnitDTO.getLastHandoverDateTime())
         .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
         .scheduledByEmail(documentationUnitDTO.getScheduledByEmail())
         .borderNumbers(borderNumbers)
@@ -101,6 +101,8 @@ public class ManagementDataTransformer {
                 .map(ManagementDataDTO::getCreatedByDocumentationOffice)
                 .map(DocumentationOfficeDTO::getAbbreviation)
                 .orElse(null))
+        .lastPublishedAtDateTime(
+            managementDataOptional.map(ManagementDataDTO::getLastPublishedAtDateTime).orElse(null))
         .firstPublishedAtDateTime(
             managementDataOptional.map(ManagementDataDTO::getFirstPublishedAtDateTime).orElse(null))
         .build();
