@@ -11,25 +11,27 @@ import {
   DuplicateRelation,
   DuplicateRelationStatus,
 } from "@/domain/managementData"
+import ProcessStep from "@/domain/processStep"
 import routes from "~/test-helper/routes"
 
-const currentProcessStep: DocumentationUnitProcessStep = {
+const currentDocumentationUnitProcessStep: DocumentationUnitProcessStep = {
   id: "c-id",
   createdAt: new Date(),
   processStep: { uuid: "fertig-id", name: "Fertig", abbreviation: "F" },
   user: { id: "user-id", name: "Test User", initials: "TU" },
 }
 
+const previousProcesStep: ProcessStep = {
+  uuid: "blockiert-id",
+  name: "Blockiert",
+  abbreviation: "B",
+}
 const docUnitProcessSteps: DocumentationUnitProcessStep[] = [
-  currentProcessStep,
+  currentDocumentationUnitProcessStep,
   {
     id: "b-id",
     createdAt: new Date(),
-    processStep: {
-      uuid: "blockiert-id",
-      name: "Blockiert",
-      abbreviation: "B",
-    },
+    processStep: previousProcesStep,
   },
   {
     id: "a-id",
@@ -65,7 +67,8 @@ function renderComponent(options?: {
       borderNumbers: [],
       duplicateRelations: options?.duplicateRelations ?? [],
     },
-    currentProcessStep: currentProcessStep,
+    currentDocumentationUnitProcessStep: currentDocumentationUnitProcessStep,
+    previousProcessStep: previousProcesStep,
     processSteps: docUnitProcessSteps,
   })
 

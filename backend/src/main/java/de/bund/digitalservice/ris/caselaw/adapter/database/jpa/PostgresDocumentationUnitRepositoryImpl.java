@@ -563,7 +563,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       @Nullable User currentUser) {
 
     DocumentationUnitProcessStep currentDocunitProcessStepFromFrontend =
-        documentationUnit.currentProcessStep();
+        documentationUnit.currentDocumentationUnitProcessStep();
     DocumentationUnitProcessStepDTO currentDocumentationUnitProcessStepDTOFromDB =
         documentationUnitDTO.getCurrentProcessStep();
 

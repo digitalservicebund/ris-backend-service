@@ -488,10 +488,10 @@ public class DocumentationUnitService {
 
     return documentationUnitListItems.map(
         item -> {
-          Optional.ofNullable(item.currentProcessStep())
+          Optional.ofNullable(item.currentDocumentationUnitProcessStep())
               .map(DocumentationUnitProcessStep::getUser)
               .map(user -> userIdMap.get(user.id()))
-              .ifPresent(user -> item.currentProcessStep().setUser(user));
+              .ifPresent(user -> item.currentDocumentationUnitProcessStep().setUser(user));
           return item;
         });
   }
@@ -546,11 +546,13 @@ public class DocumentationUnitService {
       return;
     }
 
-    if (documentable.currentProcessStep() != null
-        && documentable.currentProcessStep().getUser() != null) {
+    if (documentable.currentDocumentationUnitProcessStep() != null
+        && documentable.currentDocumentationUnitProcessStep().getUser() != null) {
       documentable
-          .currentProcessStep()
-          .setUser(userService.getUser(documentable.currentProcessStep().getUser().id()));
+          .currentDocumentationUnitProcessStep()
+          .setUser(
+              userService.getUser(
+                  documentable.currentDocumentationUnitProcessStep().getUser().id()));
     }
 
     if (documentable.processSteps() != null) {
@@ -854,7 +856,7 @@ public class DocumentationUnitService {
       repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
       decision =
           decision.toBuilder()
-              .currentProcessStep(
+              .currentDocumentationUnitProcessStep(
                   DocumentationUnitProcessStep.builder()
                       .id(UUID.randomUUID())
                       .createdAt(LocalDateTime.now())

@@ -4508,22 +4508,25 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       TestTransaction.end();
 
       Decision decision = generateEmptyDocumentationUnitWithMockedUser();
-      assertThat(decision.currentProcessStep().getProcessStep().name()).isEqualTo("Ersterfassung");
+      assertThat(decision.currentDocumentationUnitProcessStep().getProcessStep().name())
+          .isEqualTo("Ersterfassung");
       ProcessStepDTO fachdokumentationProcessStep =
           processStepRepository.findByName("Fachdokumentation").orElseThrow();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/abbreviation", new TextNode("FD")),
+                  "/currentDocumentationUnitProcessStep/processStep/abbreviation",
+                  new TextNode("FD")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/name", new TextNode("Fachdokumentation")),
+                  "/currentDocumentationUnitProcessStep/processStep/name",
+                  new TextNode("Fachdokumentation")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/uuid",
+                  "/currentDocumentationUnitProcessStep/processStep/uuid",
                   new TextNode(fachdokumentationProcessStep.getId().toString())),
-              new RemoveOperation("/currentProcessStep/createdAt"),
-              new RemoveOperation("/currentProcessStep/user"),
-              new RemoveOperation("/currentProcessStep/id"));
+              new RemoveOperation("/currentDocumentationUnitProcessStep/createdAt"),
+              new RemoveOperation("/currentDocumentationUnitProcessStep/user"),
+              new RemoveOperation("/currentDocumentationUnitProcessStep/id"));
       RisJsonPatch patchUser1 =
           new RisJsonPatch(0L, new JsonPatch(operationsUser1), Collections.emptyList());
 
@@ -4541,7 +4544,24 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                 RisJsonPatch responsePatch = response.getResponseBody();
                 assertThat(responsePatch).isNotNull();
                 assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
-                assertThat(responsePatch.patch().getOperations()).hasSize(12);
+                assertThat(responsePatch.patch().getOperations()).hasSize(13);
+
+                // Assert previous step
+                assertThat(responsePatch.patch().getOperations())
+                    .filteredOn(
+                        op ->
+                            "replace".equals(op.getOp())
+                                && "/previousProcessStep".equals(op.getPath()))
+                    .first()
+                    .satisfies(
+                        op -> {
+                          assertThat(op).isInstanceOf(ReplaceOperation.class);
+                          ReplaceOperation repl = (ReplaceOperation) op;
+                          assertThat(repl.getValue().at("/name").asText())
+                              .isEqualTo("Ersterfassung");
+
+                          assertThat(repl.getValue().at("/abbreviation").asText()).isEqualTo("EE");
+                        });
 
                 // Assert new process step as last item in list
                 assertThat(responsePatch.patch().getOperations())
@@ -4615,7 +4635,8 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       TestTransaction.end();
 
       Decision decision = generateEmptyDocumentationUnitWithMockedUser();
-      assertThat(decision.currentProcessStep().getProcessStep().name()).isEqualTo("Ersterfassung");
+      assertThat(decision.currentDocumentationUnitProcessStep().getProcessStep().name())
+          .isEqualTo("Ersterfassung");
       ProcessStepDTO fachdokumentationProcessStep =
           processStepRepository.findByName("Fachdokumentation").orElseThrow();
 
@@ -4634,13 +4655,15 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(
-              new ReplaceOperation("/currentProcessStep/user", userNode),
+              new ReplaceOperation("/currentDocumentationUnitProcessStep/user", userNode),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/abbreviation", new TextNode("FD")),
+                  "/currentDocumentationUnitProcessStep/processStep/abbreviation",
+                  new TextNode("FD")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/name", new TextNode("Fachdokumentation")),
+                  "/currentDocumentationUnitProcessStep/processStep/name",
+                  new TextNode("Fachdokumentation")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/uuid",
+                  "/currentDocumentationUnitProcessStep/processStep/uuid",
                   new TextNode(fachdokumentationProcessStep.getId().toString())));
 
       RisJsonPatch patchUser1 =
@@ -4716,20 +4739,23 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
       TestTransaction.end();
 
       Decision decision = generateEmptyDocumentationUnit();
-      assertThat(decision.currentProcessStep().getProcessStep().name()).isEqualTo("Ersterfassung");
+      assertThat(decision.currentDocumentationUnitProcessStep().getProcessStep().name())
+          .isEqualTo("Ersterfassung");
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/abbreviation", new TextNode("B")),
+                  "/currentDocumentationUnitProcessStep/processStep/abbreviation",
+                  new TextNode("B")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/name", new TextNode("Blockiert")),
+                  "/currentDocumentationUnitProcessStep/processStep/name",
+                  new TextNode("Blockiert")),
               new ReplaceOperation(
-                  "/currentProcessStep/processStep/uuid",
+                  "/currentDocumentationUnitProcessStep/processStep/uuid",
                   new TextNode(UUID.randomUUID().toString())),
-              new RemoveOperation("/currentProcessStep/createdAt"),
-              new RemoveOperation("/currentProcessStep/user"),
-              new RemoveOperation("/currentProcessStep/id"));
+              new RemoveOperation("/currentDocumentationUnitProcessStep/createdAt"),
+              new RemoveOperation("/currentDocumentationUnitProcessStep/user"),
+              new RemoveOperation("/currentDocumentationUnitProcessStep/id"));
       RisJsonPatch patchUser1 =
           new RisJsonPatch(0L, new JsonPatch(operationsUser1), Collections.emptyList());
 
@@ -4741,6 +4767,80 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           .exchange()
           .expectStatus()
           .isNotFound();
+    }
+
+    @Test
+    @Transactional
+    void testPartialUpdateByUuid_withUserUpdateOnly_shouldNotChangeStep_andHaveNoPreviousStep() {
+      TestTransaction.flagForCommit();
+      TestTransaction.end();
+
+      // Given an existing doc unit with initial step "Ersterfassung" and a mocked logged-in user
+      Decision decision = generateEmptyDocumentationUnitWithMockedUser();
+      assertThat(decision.currentDocumentationUnitProcessStep().getProcessStep().name())
+          .isEqualTo("Ersterfassung");
+
+      List<JsonPatchOperation> operations =
+          List.of(new RemoveOperation("/currentDocumentationUnitProcessStep/user"));
+
+      RisJsonPatch patch = new RisJsonPatch(0L, new JsonPatch(operations), Collections.emptyList());
+
+      // When: Saving the patch without user
+      risWebTestClient
+          .withDefaultLogin(oidcLoggedInUserId)
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/" + decision.uuid())
+          .bodyValue(patch)
+          .exchange()
+          .expectStatus()
+          .is2xxSuccessful()
+          .expectBody(RisJsonPatch.class)
+          .consumeWith(
+              response -> {
+                RisJsonPatch responsePatch = response.getResponseBody();
+                assertThat(responsePatch).isNotNull();
+                assertThat(responsePatch.documentationUnitVersion()).isEqualTo(1L);
+
+                // Then: no previousProcessStep is included when only the user changes
+                assertThat(responsePatch.patch().getOperations())
+                    .filteredOn(
+                        op ->
+                            "replace".equals(op.getOp())
+                                && "/previousProcessStep".equals(op.getPath()))
+                    .isEmpty();
+              });
+
+      TestTransaction.start();
+      List<DocumentationUnitDTO> allDocumentationUnits = repository.findAll();
+      assertThat(allDocumentationUnits).hasSize(1);
+
+      DocumentationUnitDTO doc = allDocumentationUnits.get(0);
+      assertThat(doc.getDocumentNumber()).isEqualTo(decision.documentNumber());
+
+      // Then: current step remains the same
+      assertThat(doc.getCurrentProcessStep().getProcessStep().getName()).isEqualTo("Ersterfassung");
+
+      // assert 2 total process steps:  the last without a user and the first with
+      assertThat(doc.getProcessSteps()).hasSize(2);
+      assertThat(doc.getProcessSteps().getFirst().getProcessStep().getName())
+          .isEqualTo("Ersterfassung");
+      assertThat(doc.getProcessSteps().getFirst().getUserId()).isNull();
+      TestTransaction.end();
+
+      var visibleUser = User.builder().documentationOffice(buildDSDocOffice()).build();
+      var logs = documentationUnitHistoryLogService.getHistoryLogs(decision.uuid(), visibleUser);
+
+      assertThat(logs).hasSize(2);
+      assertThat(logs)
+          .map(HistoryLog::eventType)
+          .containsExactly(HistoryLogEventType.PROCESS_STEP_USER, HistoryLogEventType.CREATE);
+
+      assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser");
+      assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS");
+
+      // Person removed -> no step change
+      assertThat(logs.get(0).description()).isEqualTo("Person entfernt: testUser");
+      assertThat(logs.get(1).description()).isEqualTo("Dokeinheit angelegt");
     }
   }
 
