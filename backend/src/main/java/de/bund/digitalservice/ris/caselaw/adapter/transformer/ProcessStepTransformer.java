@@ -4,8 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ProcessStep;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
@@ -41,18 +39,14 @@ public class ProcessStepTransformer {
     }
 
     UUID currentProcessStepId =
-        Optional.ofNullable(documentationUnitProcessStepsDTOs.getFirst())
+        documentationUnitProcessStepsDTOs.getFirst().getProcessStep().getId();
+
+    return toDomain(
+        documentationUnitProcessStepsDTOs.stream()
+            .skip(1) // Start from the second item
+            .filter(item -> item.getProcessStep().getId() != currentProcessStepId)
+            .findFirst()
             .map(DocumentationUnitProcessStepDTO::getProcessStep)
-            .map(ProcessStepDTO::getId)
-            .orElse(null);
-
-    for (int i = 1; i < documentationUnitProcessStepsDTOs.size(); i++) {
-      ProcessStepDTO stepDto = documentationUnitProcessStepsDTOs.get(i).getProcessStep();
-      if (stepDto != null && !Objects.equals(stepDto.getId(), currentProcessStepId)) {
-        return ProcessStepTransformer.toDomain(stepDto);
-      }
-    }
-
-    return null;
+            .orElse(null));
   }
 }
