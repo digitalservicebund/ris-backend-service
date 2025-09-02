@@ -9,16 +9,11 @@ const props = withDefaults(
     title: string
     description?: string | string[]
     status?: InfoStatus
-    link?: {
-      displayText: string
-      url?: string
-    }
   }>(),
   {
     ariaLabel: "Infomodal",
     description: "",
     status: InfoStatus.ERROR,
-    link: undefined,
   },
 )
 
@@ -94,15 +89,7 @@ watch(
         <span class="ris-label2-regular"
           >{{ isArray ? descriptionRef[0] : descriptionRef }}
         </span>
-        <a
-          v-if="link !== undefined"
-          class="ris-link2-regular whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
-          :href="link.url"
-          rel="noopener noreferrer"
-          target="_blank"
-          >{{ link.displayText }}</a
-        >
-        <div v-if="link !== undefined">.</div>
+        <slot name="link" />
       </div>
     </div>
   </div>

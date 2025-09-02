@@ -43,7 +43,7 @@ database:
   seed: true
 neuris:
   environment: staging
-  portalUrl: https://ris-portal.dev.ds4g.net/
+  portalUrl: https://ris-portal.dev.ds4g.net
 
 languagetool:
   url: http://localhost:8181/v2/check

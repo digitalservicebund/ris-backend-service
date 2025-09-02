@@ -2,10 +2,10 @@
 import { storeToRefs } from "pinia"
 import Button from "primevue/button"
 import { computed, Ref, ref } from "vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import PortalPublicationStatusBadge from "@/components/publication/PortalPublicationStatusBadge.vue"
+import UatTestPortalInfo from "@/components/publication/UatTestPortalInfo.vue"
 import { Decision } from "@/domain/decision"
 import { PortalPublicationStatus } from "@/domain/portalPublicationStatus"
 import { ResponseError } from "@/services/httpClient"
@@ -25,18 +25,9 @@ const { documentUnit: decision } = storeToRefs(store) as {
   documentUnit: Ref<Decision>
 }
 const session = useSessionStore()
-const isUat = computed(() => session.env?.environment === "uat")
-const uatMessage = {
-  title:
-    "UAT veröffentlicht Dokeinheiten in ein Testportal, nicht das öffentliche Portal.",
-  description: "Dies ist zugänglich unter: ",
-}
 const linkToPortal = computed(
   () => session.env?.portalUrl + "/case-law/" + decision.value.documentNumber,
 )
-const uatLink = computed(() => {
-  return { url: session.env?.portalUrl, displayText: "Link zum UAT-Portal" }
-})
 
 const docUnitPublicationError = ref<ResponseError | null>(null)
 
@@ -98,14 +89,7 @@ const lastPublishedAt = computed(() => {
 <template>
   <div class="flex flex-col gap-24">
     <div class="flex flex-col gap-16">
-      <InfoModal
-        v-if="isUat"
-        aria-label="Information Testportal in UAT"
-        class="mt-8"
-        v-bind="uatMessage"
-        :link="uatLink"
-        :status="InfoStatus.INFO"
-      />
+      <UatTestPortalInfo />
       <h3 class="ris-label1-bold">Aktueller Status Portal</h3>
       <PortalPublicationStatusBadge
         :status="decision.portalPublicationStatus"
@@ -141,7 +125,7 @@ const lastPublishedAt = computed(() => {
         <IconErrorOutline class="text-grey-900" />
         <p>
           Das Hochladen der Stammdaten und der Informationen im Portal-Tab
-          „Details“ kann bis zu 2 Minuten dauern.
+          „Details“ dauert etwa 2 Minuten.
         </p>
       </div>
       <div

@@ -125,6 +125,8 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
     assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isEqualTo(updatedDto.getManagementData().getFirstPublishedAtDateTime());
 
     var historyLogs =
         historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
@@ -185,7 +187,8 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
     assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
-
+    assertThat(updatedDto.getManagementData().getLastPublishedAtDateTime())
+        .isAfter(updatedDto.getManagementData().getFirstPublishedAtDateTime());
     var historyLogs =
         historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
     assertThat(historyLogs)

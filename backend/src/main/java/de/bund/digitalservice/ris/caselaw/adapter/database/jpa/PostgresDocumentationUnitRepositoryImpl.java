@@ -1085,9 +1085,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               repository.save(documentationUnitDTO);
             },
             () ->
-                log.info(
-                    "Can't set publication date time for documentation unit with id: {}",
-                    documentationUnitId));
+                log.atError()
+                    .setMessage("Can't set publication date time for documentation unit")
+                    .addKeyValue("id", documentationUnitId)
+                    .log());
   }
 
   private void setPublicationDateTime(DocumentationUnitDTO documentationUnitDTO) {

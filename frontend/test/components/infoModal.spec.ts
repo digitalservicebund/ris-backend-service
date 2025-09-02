@@ -37,10 +37,14 @@ describe("InfoModal", () => {
       props: {
         title: "foo",
         description: "bar",
-        link: {
-          displayText: "zum externen Link",
-          url: "https://example.com",
-        },
+      },
+      slots: {
+        link: `<a
+        href="https://example.com"
+        class="ris-link2-regular"
+        target="_blank"
+        rel="noopener noreferrer"
+      >zum externen Link</a>`,
       },
     })
 
@@ -59,10 +63,9 @@ describe("InfoModal", () => {
       props: {
         title: "foo",
         description: ["eins", "zwei"],
-        link: {
-          displayText: "zum externen Link",
-          url: "https://example.com",
-        },
+      },
+      slots: {
+        link: `<a>zum externen Link</a>`,
       },
     })
     screen.getByText("foo")

@@ -75,28 +75,6 @@ describe("PublicationActions", () => {
         screen.queryByRole("button", { name: "Zurückziehen" }),
       ).not.toBeInTheDocument()
     })
-
-    it("shows UAT InfoModal with link in uat", async () => {
-      setActivePinia(
-        createTestingPinia({
-          initialState: {
-            session: {
-              env: { environment: "uat", portalUrl: "https://uat.example" },
-            },
-          },
-        }),
-      )
-
-      mockDocUnitStore(PortalPublicationStatus.UNPUBLISHED)
-      await renderComponent({ isPublishable: true, publicationWarnings: [] })
-
-      expect(
-        screen.getByText(/UAT veröffentlicht Dokeinheiten/i),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByRole("link", { name: "Link zum UAT-Portal" }),
-      ).toHaveAttribute("href", "https://uat.example")
-    })
   })
 
   describe("Status: Published", () => {
@@ -196,31 +174,9 @@ describe("PublicationActions", () => {
       await flushPromises()
       expect(
         screen.getByText(
-          "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ kann bis zu 2 Minuten dauern.",
+          "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ dauert etwa 2 Minuten.",
         ),
       ).toBeInTheDocument()
-    })
-
-    it("shows UAT InfoModal with link in uat", async () => {
-      setActivePinia(
-        createTestingPinia({
-          initialState: {
-            session: {
-              env: { environment: "uat", portalUrl: "https://uat.example" },
-            },
-          },
-        }),
-      )
-
-      mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
-      await renderComponent({ isPublishable: true, publicationWarnings: [] })
-
-      expect(
-        screen.getByText(/UAT veröffentlicht Dokeinheiten/i),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByRole("link", { name: "Link zum UAT-Portal" }),
-      ).toHaveAttribute("href", "https://uat.example")
     })
   })
 
@@ -307,31 +263,9 @@ describe("PublicationActions", () => {
       await flushPromises()
       expect(
         screen.getByText(
-          "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ kann bis zu 2 Minuten dauern.",
+          "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ dauert etwa 2 Minuten.",
         ),
       ).toBeInTheDocument()
-    })
-
-    it("shows UAT InfoModal with link in uat", async () => {
-      setActivePinia(
-        createTestingPinia({
-          initialState: {
-            session: {
-              env: { environment: "uat", portalUrl: "https://uat.example" },
-            },
-          },
-        }),
-      )
-
-      mockDocUnitStore(PortalPublicationStatus.WITHDRAWN)
-      await renderComponent({ isPublishable: true, publicationWarnings: [] })
-
-      expect(
-        screen.getByText(/UAT veröffentlicht Dokeinheiten/i),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByRole("link", { name: "Link zum UAT-Portal" }),
-      ).toHaveAttribute("href", "https://uat.example")
     })
   })
 })
