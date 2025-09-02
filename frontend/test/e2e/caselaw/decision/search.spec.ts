@@ -292,15 +292,14 @@ test.describe("Große Suche nach Entscheidungen", () => {
     },
   )
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip(
+  test(
     "Suche nach 'Nur mir zugewiesen' und 'Niemandem zugewiesen'",
     {
       tag: "@RISDEV-8718",
     },
     async ({ page, decisions }) => {
-      const { createdDecisions } = decisions
-      await openSearchWithFileNumberPrefix("e2e-", page)
+      const { fileNumberPrefix, createdDecisions } = decisions
+      await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
       await page.getByLabel("Nur meine Dokstelle Filter").click()
 
       // all new doc units are created with my user assigned
