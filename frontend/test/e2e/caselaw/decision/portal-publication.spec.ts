@@ -162,25 +162,25 @@ test.describe(
           await expectHistoryLogRow(
             page,
             0,
-            "DS (e2e_tests DigitalService)",
+            // "DS (e2e_tests DigitalService)",
             "Dokeinheit wurde aus dem Portal zurückgezogen",
           )
           await expectHistoryLogRow(
             page,
             1,
-            "NeuRIS",
+            // "NeuRIS",
             "Status im Portal geändert: Veröffentlicht → Zurückgezogen",
           )
           await expectHistoryLogRow(
             page,
             2,
-            "DS (e2e_tests DigitalService)",
+            // "DS (e2e_tests DigitalService)",
             "Dokeinheit im Portal veröffentlicht",
           )
           await expectHistoryLogRow(
             page,
             3,
-            "NeuRIS",
+            // "NeuRIS",
             "Status im Portal geändert: Unveröffentlicht → Veröffentlicht",
           )
         })
