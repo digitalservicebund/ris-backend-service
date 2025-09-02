@@ -22,8 +22,13 @@ test.describe("Große Suche nach Entscheidungen", () => {
     decisionsToBeCreated: [
       // Reverse sorting: date DESC, docNumber DESC
       [
-        { coreData: { court: { label: "BFH" } } },
-        { coreData: { court: { label: "AG Aachen" } } },
+        { coreData: { decisionDate: "2021-01-01", court: { label: "BFH" } } },
+        {
+          coreData: {
+            decisionDate: "2022-01-01",
+            court: { label: "AG Aachen" },
+          },
+        },
         { coreData: { decisionDate: "2023-01-01" } },
         { coreData: { decisionDate: "2023-01-02" } },
         { coreData: { decisionDate: "2023-01-31" } },
@@ -196,7 +201,8 @@ test.describe("Große Suche nach Entscheidungen", () => {
     await triggerSearch(page)
     const docUnitSearchResultsDateRange = createdDecisions.filter(
       (p) =>
-        p.coreData.decisionDate && p.coreData.decisionDate !== "2023-01-01",
+        (p.coreData.decisionDate && p.coreData.decisionDate === "2023-01-02") ||
+        (p.coreData.decisionDate && p.coreData.decisionDate === "2023-01-31"),
     )
     await checkResultListContent(docUnitSearchResultsDateRange, page)
   })
