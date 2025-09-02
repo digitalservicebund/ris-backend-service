@@ -1136,7 +1136,7 @@ class ManagementDataTransformerTest {
 
   @Builder(toBuilder = true)
   public record CreationParameters(
-      LocalDateTime lastPublicationDateTime,
+      LocalDateTime lastHandoverDateTime,
       LocalDateTime scheduledPublicationDateTime,
       String scheduledByEmail,
       List<DuplicateRelation> duplicateRelations,
@@ -1149,11 +1149,11 @@ class ManagementDataTransformerTest {
       UUID lastUpdatedByUserId,
       Instant lastUpdatedAtDateTime,
       String lastUpdatedByName,
-      Instant firstPublishedAtDateTime) {}
+      Instant firstPublishedAtDateTime,
+      Instant lastPublicationDateTime) {}
 
   private ManagementData generateManagementData(Optional<CreationParameters> parameters) {
     return ManagementData.builder()
-        .lastPublicationDateTime(parameters.get().lastPublicationDateTime)
         .scheduledPublicationDateTime(parameters.get().scheduledPublicationDateTime)
         .scheduledByEmail(parameters.get().scheduledByEmail)
         .borderNumbers(Optional.ofNullable(parameters.get().borderNumbers).orElse(List.of()))
@@ -1166,6 +1166,7 @@ class ManagementDataTransformerTest {
         .createdByName(parameters.get().createdByName)
         .createdByDocOffice(parameters.get().createdByDocumentationOffice)
         .firstPublishedAtDateTime(parameters.get().firstPublishedAtDateTime)
+        .lastPublishedAtDateTime(parameters.get().lastPublicationDateTime)
         .build();
   }
 }

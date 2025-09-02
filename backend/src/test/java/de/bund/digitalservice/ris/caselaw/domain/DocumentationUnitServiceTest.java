@@ -931,12 +931,12 @@ class DocumentationUnitServiceTest {
   }
 
   @Test
-  void test_saveSuccessfulPublicationDateTime_shouldSaveLastPublication() {
+  void test_saveSuccessfulPublicationDateTime_shouldSaveLastHandover() {
     Decision decision = Decision.builder().build();
 
-    service.saveSuccessfulPublication(decision.uuid());
+    service.saveSuccessfulHandover(decision.uuid());
 
-    verify(repository, times(1)).saveSuccessfulPublication(decision.uuid());
+    verify(repository, times(1)).saveSuccessfulHandover(decision.uuid());
   }
 
   @Test

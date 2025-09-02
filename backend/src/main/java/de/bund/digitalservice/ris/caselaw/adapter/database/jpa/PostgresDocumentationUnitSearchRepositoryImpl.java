@@ -84,7 +84,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     predicates.addAll(getScheduledOnlyPredicates(parameters, cb, root));
     predicates.addAll(getErrorPredicates(parameters, cb, root));
     predicates.addAll(getStatusPredicates(parameters, cb, root));
-    predicates.addAll(getPublicationDatePredicates(parameters, cb, root));
+    predicates.addAll(getHandoverDatePredicates(parameters, cb, root));
     predicates.addAll(getInboxStatusPredicates(parameters, cb, root));
     predicates.addAll(getDuplicateWarningPredicates(parameters, cq, cb, root));
     predicates.addAll(getResolutionDatePredicates(parameters, cb, root));
@@ -351,19 +351,18 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     return predicates;
   }
 
-  private List<Predicate> getPublicationDatePredicates(
+  private List<Predicate> getHandoverDatePredicates(
       SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
     List<Predicate> predicates = new ArrayList<>();
-    if (parameters.publicationDate.isPresent()) {
+    if (parameters.handoverDate.isPresent()) {
       Expression<Date> scheduledPublicationDateTime =
           getDateOnly(cb, root.get(DocumentationUnitDTO_.scheduledPublicationDateTime));
       Predicate scheduledDatePredicate =
-          cb.equal(scheduledPublicationDateTime, parameters.publicationDate.get());
+          cb.equal(scheduledPublicationDateTime, parameters.handoverDate.get());
 
-      Expression<Date> lastPublicationDateTime =
-          getDateOnly(cb, root.get(DocumentationUnitDTO_.lastPublicationDateTime));
-      Predicate lastDatePredicate =
-          cb.equal(lastPublicationDateTime, parameters.publicationDate.get());
+      Expression<Date> lastHandoverDateTime =
+          getDateOnly(cb, root.get(DocumentationUnitDTO_.lastHandoverDateTime));
+      Predicate lastDatePredicate = cb.equal(lastHandoverDateTime, parameters.handoverDate.get());
 
       Predicate publicationDatePredicate = cb.or(scheduledDatePredicate, lastDatePredicate);
       predicates.add(publicationDatePredicate);
@@ -506,12 +505,12 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
   private List<Order> getOrderCriteria(
       SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
     List<Order> orderCriteria = new ArrayList<>();
-    if (parameters.scheduledOnly || parameters.publicationDate.isPresent()) {
+    if (parameters.scheduledOnly || parameters.handoverDate.isPresent()) {
       orderCriteria.add(
           cb.desc(root.get(DocumentationUnitDTO_.scheduledPublicationDateTime))
               .nullPrecedence(NullPrecedence.LAST));
       orderCriteria.add(
-          cb.desc(root.get(DocumentationUnitDTO_.lastPublicationDateTime))
+          cb.desc(root.get(DocumentationUnitDTO_.lastHandoverDateTime))
               .nullPrecedence(NullPrecedence.LAST));
     }
 
@@ -540,7 +539,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .fileNumber(Optional.ofNullable(searchInput.fileNumber()))
         .decisionDate(Optional.ofNullable(searchInput.decisionDate()))
         .decisionDateEnd(Optional.ofNullable(searchInput.decisionDateEnd()))
-        .publicationDate(Optional.ofNullable(searchInput.publicationDate()))
+        .handoverDate(Optional.ofNullable(searchInput.publicationDate()))
         .publicationStatus(Optional.ofNullable(status))
         .scheduledOnly(searchInput.scheduledOnly())
         .withError(withError)
@@ -566,7 +565,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       Optional<String> fileNumber,
       Optional<LocalDate> decisionDate,
       Optional<LocalDate> decisionDateEnd,
-      Optional<LocalDate> publicationDate,
+      Optional<LocalDate> handoverDate,
       Optional<PublicationStatus> publicationStatus,
       boolean scheduledOnly,
       boolean withError,

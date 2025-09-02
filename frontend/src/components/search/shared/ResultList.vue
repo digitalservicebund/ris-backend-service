@@ -100,7 +100,7 @@ const schedulingTooltip = (publicationDate?: string) =>
 
 const publicationDate = (listEntry: DocumentUnitListEntry) => {
   const date =
-    listEntry.scheduledPublicationDateTime ?? listEntry.lastPublicationDateTime
+    listEntry.scheduledPublicationDateTime ?? listEntry.lastHandoverDateTime
   if (date) {
     return dayjs.utc(date).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")
   } else {

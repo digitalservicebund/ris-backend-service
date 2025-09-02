@@ -90,7 +90,7 @@ describe("ManagementDataMetadata", () => {
     expect(within(firstPublishedAt).getByText("–")).toBeInTheDocument()
   })
 
-  it("should show date time for firstPublishedAtDateTime", async () => {
+  it("should hide date time for firstPublishedAtDateTime", async () => {
     const docUnit = mockDecision({
       managementData: { firstPublishedAtDateTime: "2025-07-31T08:00:00Z" },
     })
@@ -100,9 +100,7 @@ describe("ManagementDataMetadata", () => {
     expect(
       within(lastUpdated).getByText("Erstveröffentlichung am"),
     ).toBeInTheDocument()
-    expect(
-      within(lastUpdated).getByText("31.07.2025 um 10:00 Uhr"),
-    ).toBeInTheDocument()
+    expect(within(lastUpdated).getByText("–")).toBeInTheDocument()
   })
 
   it("should not show procedure for pending proceeding", async () => {

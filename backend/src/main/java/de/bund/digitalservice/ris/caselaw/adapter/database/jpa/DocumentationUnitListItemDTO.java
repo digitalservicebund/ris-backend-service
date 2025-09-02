@@ -29,7 +29,7 @@ public interface DocumentationUnitListItemDTO {
 
   ManagementDataDTO getManagementData();
 
-  LocalDateTime getLastPublicationDateTime();
+  LocalDateTime getLastHandoverDateTime();
 
   LocalDateTime getScheduledPublicationDateTime();
 

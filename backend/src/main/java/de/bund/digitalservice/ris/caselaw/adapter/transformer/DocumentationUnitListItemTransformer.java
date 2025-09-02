@@ -48,7 +48,7 @@ public class DocumentationUnitListItemTransformer {
         .resolutionDate(documentationUnitListItemDTO.getResolutionDate())
         .scheduledPublicationDateTime(
             documentationUnitListItemDTO.getScheduledPublicationDateTime())
-        .lastPublicationDateTime(documentationUnitListItemDTO.getLastPublicationDateTime())
+        .lastHandoverDateTime(documentationUnitListItemDTO.getLastHandoverDateTime())
         .appraisalBody(documentationUnitListItemDTO.getJudicialBody())
         .hasHeadnoteOrPrinciple(hasHeadnoteOrPrinciple(documentationUnitListItemDTO))
         .hasAttachments(

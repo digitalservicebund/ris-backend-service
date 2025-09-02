@@ -584,7 +584,7 @@ const isPublishable = computed<boolean>(
       />
 
       <InfoModal
-        v-if="env === 'uat'"
+        v-if="env?.environment === 'uat'"
         :description="[
           'Dokumentationseinheiten werden in der jDV ohne Dokumentnummer erstellt',
           'Diese sind auffindbar über Gericht=VGH Mannheim und Aktenzeichen und/oder Entscheidungsdatum der Entscheidung',

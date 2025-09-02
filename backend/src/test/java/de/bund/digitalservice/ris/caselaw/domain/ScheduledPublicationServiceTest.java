@@ -79,7 +79,7 @@ class ScheduledPublicationServiceTest {
   }
 
   @Test
-  void shouldStillSavePublicationDatesWhenHandoverIsUnsuccessful()
+  void shouldStillSaveHandoverDatesWhenHandoverIsUnsuccessful()
       throws DocumentationUnitNotExistsException {
     var publishedDocUnit = this.createDocUnit(pastDate, pastDate);
     var unpublishedDocUnit = this.createDocUnit(null, pastDate);
@@ -98,8 +98,7 @@ class ScheduledPublicationServiceTest {
   }
 
   @Test
-  void shouldStillSavePublicationDatesWhenHandoverFails()
-      throws DocumentationUnitNotExistsException {
+  void shouldStillSaveHandoverDatesWhenHandoverFails() throws DocumentationUnitNotExistsException {
     var publishedDocUnit = this.createDocUnit(pastDate, pastDate);
     var unpublishedDocUnit = this.createDocUnit(null, pastDate);
     when(this.docUnitRepository.getScheduledDocumentationUnitsDueNow())
@@ -139,7 +138,7 @@ class ScheduledPublicationServiceTest {
   }
 
   private Decision createDocUnit(
-      LocalDateTime lastPublicationDateTime, LocalDateTime scheduledPublicationDateTime) {
+      LocalDateTime lastHandoverDateTime, LocalDateTime scheduledPublicationDateTime) {
     docUnitCounter++;
     String docNumber = String.format("KORE12345%05d", docUnitCounter);
     return Decision.builder()
@@ -148,7 +147,7 @@ class ScheduledPublicationServiceTest {
         .managementData(
             ManagementData.builder()
                 .borderNumbers(Collections.emptyList())
-                .lastPublicationDateTime(lastPublicationDateTime)
+                .lastHandoverDateTime(lastHandoverDateTime)
                 .scheduledPublicationDateTime(scheduledPublicationDateTime)
                 .scheduledByEmail(docUnitCounter + "@example.local")
                 .duplicateRelations(List.of())
@@ -171,8 +170,7 @@ class ScheduledPublicationServiceTest {
 
   private boolean werePublicationDatesSet(Decision actualDocUnit) {
     boolean wasPublishedWithin5Seconds =
-        Duration.between(
-                    LocalDateTime.now(), actualDocUnit.managementData().lastPublicationDateTime())
+        Duration.between(LocalDateTime.now(), actualDocUnit.managementData().lastHandoverDateTime())
                 .abs()
                 .getSeconds()
             < 5;
@@ -185,7 +183,7 @@ class ScheduledPublicationServiceTest {
     return expectedDocUnit.toBuilder()
         .managementData(
             expectedDocUnit.managementData().toBuilder()
-                .lastPublicationDateTime(null)
+                .lastHandoverDateTime(null)
                 .scheduledPublicationDateTime(null)
                 .build())
         .build()
@@ -193,7 +191,7 @@ class ScheduledPublicationServiceTest {
             actualDocUnit.toBuilder()
                 .managementData(
                     expectedDocUnit.managementData().toBuilder()
-                        .lastPublicationDateTime(null)
+                        .lastHandoverDateTime(null)
                         .scheduledPublicationDateTime(null)
                         .build())
                 .build());
