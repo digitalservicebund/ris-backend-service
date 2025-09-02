@@ -34,7 +34,7 @@ public class UserController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestParam(value = "q") Optional<String> searchStr) {
 
-    var users = service.getUsers(oidcUser);
+    var users = service.getUsersInSameDocOffice(oidcUser);
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
       String search = searchStr.get().toLowerCase();
       return users.stream()

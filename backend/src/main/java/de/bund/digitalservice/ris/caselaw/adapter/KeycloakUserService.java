@@ -60,7 +60,7 @@ public class KeycloakUserService implements UserService {
   }
 
   @Override
-  public List<User> getUsers(OidcUser oidcUser) {
+  public List<User> getUsersInSameDocOffice(OidcUser oidcUser) {
     try {
       var optionalUserGroup = getUserGroup(oidcUser);
       if (optionalUserGroup.isPresent()) {
