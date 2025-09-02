@@ -24,4 +24,6 @@ public record DocumentationUnitSearchInput(
     boolean isResolved,
     InboxStatus inboxStatus,
     Kind kind,
-    UUID processStepId) {}
+    String processStep,
+    boolean assignedToMe,
+    boolean unassigned) {}

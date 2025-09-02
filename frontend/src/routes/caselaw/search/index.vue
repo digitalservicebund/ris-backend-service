@@ -57,12 +57,14 @@ const handleNewDocumentationUnitClick = async () => {
 </script>
 
 <template>
-  <div class="m-24 flex flex-col">
+  <div class="flex w-full flex-col p-24">
     <div class="mb-16 flex w-full justify-end">
+      <h1 class="sr-only">Suche</h1>
       <Button
         v-if="isInternalUser"
         class="z-10"
         :label="buttonLabel"
+        severity="secondary"
         @click="handleNewDocumentationUnitClick"
       ></Button>
     </div>

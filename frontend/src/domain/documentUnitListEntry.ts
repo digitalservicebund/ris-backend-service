@@ -2,6 +2,7 @@ import { Court } from "@/domain/court"
 import DocumentationOffice from "@/domain/documentationOffice"
 import DocumentationUnitProcessStep from "@/domain/documentationUnitProcessStep"
 import { DocumentType } from "@/domain/documentType"
+import ProcessStep from "@/domain/processStep"
 import { PublicationStatus } from "@/domain/publicationStatus"
 
 export default class DocumentUnitListEntry {
@@ -11,7 +12,7 @@ export default class DocumentUnitListEntry {
   decisionDate?: string
   resolutionDate?: string
   createdAt?: string
-  lastPublicationDateTime?: string
+  lastHandoverDateTime?: string
   scheduledPublicationDateTime?: string
   status?: PublicationStatus
   fileNumber?: string
@@ -25,8 +26,8 @@ export default class DocumentUnitListEntry {
   isEditable?: boolean
   source?: string
   creatingDocumentationOffice?: DocumentationOffice
-  currentProcessStep?: DocumentationUnitProcessStep
-  processSteps?: DocumentationUnitProcessStep[]
+  currentDocumentationUnitProcessStep?: DocumentationUnitProcessStep
+  previousProcessStep?: ProcessStep
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)

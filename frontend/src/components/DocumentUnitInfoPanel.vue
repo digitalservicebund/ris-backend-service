@@ -4,11 +4,10 @@ import Button from "primevue/button"
 import { useToast } from "primevue/usetoast"
 import { computed, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
-import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
+import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import UpdateProcessStepDialog from "@/components/UpdateProcessStepDialog.vue"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { DocumentationUnit } from "@/domain/documentationUnit"
@@ -73,7 +72,7 @@ const managementDataRoute = computed(() => ({
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
 
-const processStepsEnabled = useFeatureToggle("neuris.process-steps")
+const processStepsEnabled = isDecision(props.documentUnit)
 
 const showProcessStepDialog = ref(false)
 const toast = useToast()
@@ -120,16 +119,28 @@ watchEffect(() => {
         icon-color="text-red-900"
         label="Fehler"
       />
-      <CurrentAndLastProcessStepBadge
+
+      <CurrentAndPreviousProcessStepBadge
         v-if="processStepsEnabled"
-        :process-steps="props.documentUnit.processSteps"
+        :current-process-step="
+          props.documentUnit.currentDocumentationUnitProcessStep?.processStep
+        "
+        :previous-process-step="props.documentUnit.previousProcessStep"
       />
       <IconBadge
-        v-if="props.documentUnit.currentProcessStep?.user"
+        v-if="
+          props.documentUnit.currentDocumentationUnitProcessStep &&
+          processStepsEnabled
+        "
         background-color="bg-white"
         border-color="border-gray-800"
+        class="px-8"
+        data-testid="info-panel-process-step-initials"
         :icon="IconPerson"
-        :label="props.documentUnit.currentProcessStep.user.name"
+        :label="
+          props.documentUnit.currentDocumentationUnitProcessStep?.user
+            ?.initials || '-'
+        "
       />
     </div>
 

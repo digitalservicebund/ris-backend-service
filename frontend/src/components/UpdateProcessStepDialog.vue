@@ -64,7 +64,7 @@ const selectedUser = computed({
 
 async function updateProcessStep(): Promise<void> {
   if (nextProcessStep.value) {
-    documentUnit.value!.currentProcessStep = {
+    documentUnit.value!.currentDocumentationUnitProcessStep = {
       processStep: nextProcessStep.value,
       user: nextProcessStepUser.value,
     }
@@ -202,11 +202,7 @@ watch(
 
         <Column field="user.name" header="Person">
           <template #body="{ data: item }">
-            <AssigneeBadge
-              :name="
-                item.user && item.user.initials ? item.user.initials : undefined
-              "
-            />
+            <AssigneeBadge :name="item?.user?.initials" />
           </template>
         </Column>
         <template #empty>Keine Prozessschritte</template>

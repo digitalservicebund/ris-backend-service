@@ -67,4 +67,7 @@ public class ManagementDataDTO {
 
   @Column(name = "first_published_at_date_time")
   private Instant firstPublishedAtDateTime;
+
+  @Column(name = "last_published_at_date_time")
+  private Instant lastPublishedAtDateTime;
 }

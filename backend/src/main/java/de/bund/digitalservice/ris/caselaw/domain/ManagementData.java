@@ -10,7 +10,7 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record ManagementData(
-    @PastOrPresent LocalDateTime lastPublicationDateTime,
+    @PastOrPresent LocalDateTime lastHandoverDateTime,
     @Future LocalDateTime scheduledPublicationDateTime,
     @Email String scheduledByEmail,
     List<DuplicateRelation> duplicateRelations,
@@ -21,4 +21,5 @@ public record ManagementData(
     Instant createdAtDateTime,
     String createdByName,
     String createdByDocOffice,
-    Instant firstPublishedAtDateTime) {}
+    Instant firstPublishedAtDateTime,
+    Instant lastPublishedAtDateTime) {}

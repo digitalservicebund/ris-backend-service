@@ -34,16 +34,14 @@ public class UserController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestParam(value = "q") Optional<String> searchStr) {
 
-    var users = service.getUsers(oidcUser);
+    var users = service.getUsersInSameDocOffice(oidcUser);
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
       String search = searchStr.get().toLowerCase();
       return users.stream()
           .filter(
               user ->
-                  (user.email() != null && user.email().startsWith(search))
-                      || (user.initials() != null
-                          && user.initials().toLowerCase().startsWith(search))
-                      || (user.name() != null && user.name().toLowerCase().startsWith(search)))
+                  (user.initials() != null && user.initials().toLowerCase().contains(search))
+                      || (user.name() != null && user.name().toLowerCase().contains(search)))
           .toList();
     }
 

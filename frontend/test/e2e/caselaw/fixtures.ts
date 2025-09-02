@@ -22,6 +22,7 @@ type MyFixtures = {
   secondPrefilledDocumentUnit: Decision
   linkedDocumentNumber: string
   pageWithBghUser: Page
+  decisionBgh: Decision
   pageWithBfhUser: Page
   pageWithExternalUser: Page
   prefilledDocumentUnitBgh: Decision
@@ -94,6 +95,15 @@ async function deleteWithRetry(
 }
 
 export const caselawTest = test.extend<MyFixtures & MyOptions>({
+  context: async ({ browser }, use, testInfo) => {
+    const context = await browser.newContext()
+    // The current test name will be added to all logs, see MdcLoggingFilter.java
+    await context.setExtraHTTPHeaders({
+      "X-Test-Name": testInfo.titlePath.join(" > "),
+    })
+    await use(context)
+    await context.close()
+  },
   documentNumber: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
@@ -826,6 +836,48 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     }
   },
 
+  decisionBgh: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      storageState: `test/e2e/caselaw/.auth/user_bgh.json`,
+    })
+    const request = context.request
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    })
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create prefilledDocumentUnit: ${response.status()} ${response.statusText()}`,
+      )
+    }
+
+    const decision = await response.json()
+
+    await use(decision)
+
+    // Teardown: Attempt to delete with the BGH user context first
+    const deleteResponse = await context.request.delete(
+      `/api/v1/caselaw/documentunits/${decision.uuid}`,
+      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    )
+
+    if (!deleteResponse.ok()) {
+      // If the deletion fails with a 403, probably the docoffice ownership changed, we need to handle that gracefully and must be manually deleted in the test
+      if (deleteResponse.status() === 403) {
+        console.warn(
+          `Deletion ${decision.documentNumber} failed with 403 for BGH user. Ownership likely changed. Document must be deleted manually.`,
+        )
+      } else {
+        throw Error(
+          `DocumentUnit with number ${decision.documentNumber} couldn't be deleted:
+          ${deleteResponse.status()} ${deleteResponse.statusText()}`,
+        )
+      }
+    }
+  },
+
   edition: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
@@ -1008,8 +1060,32 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
 
     if (!response.ok()) {
-      throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
+      console.log(
+        `References in Edition with number ${edition.id} couldn't be deleted:
+      ${response.status()} ${response.statusText()}, retrying deletion of references...`,
+      )
+      // Retry after a random delay between 0.1s and 2s
+      const retryWaitDuration = Math.floor(Math.random() * 1_900) + 100
+      await new Promise((resolve) => setTimeout(resolve, retryWaitDuration))
+      const retryResponse = await request.put(
+        `api/v1/caselaw/legalperiodicaledition`,
+        {
+          data: {
+            legalPeriodical: edition.legalPeriodical,
+            id: edition.id,
+            prefix: edition.prefix,
+            suffix: edition.suffix,
+            name: "NAME",
+            references: [],
+          },
+          headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+        },
+      )
+
+      if (!retryResponse.ok()) {
+        throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
       ${response.status()} ${response.statusText()}`)
+      }
     }
 
     const deleteResponse = await request.delete(
@@ -1151,8 +1227,32 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
     )
 
     if (!response.ok()) {
-      throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
+      console.log(
+        `References in Edition with number ${edition.id} couldn't be deleted:
+      ${response.status()} ${response.statusText()}, retrying deletion of references...`,
+      )
+      // Retry after a random delay between 0.1s and 2s
+      const retryWaitDuration = Math.floor(Math.random() * 1_900) + 100
+      await new Promise((resolve) => setTimeout(resolve, retryWaitDuration))
+      const retryResponse = await request.put(
+        `api/v1/caselaw/legalperiodicaledition`,
+        {
+          data: {
+            legalPeriodical: edition.legalPeriodical,
+            id: edition.id,
+            prefix: edition.prefix,
+            suffix: edition.suffix,
+            name: "NAME",
+            references: [],
+          },
+          headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+        },
+      )
+
+      if (!retryResponse.ok()) {
+        throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
       ${response.status()} ${response.statusText()}`)
+      }
     }
 
     const deleteResponse = await request.delete(

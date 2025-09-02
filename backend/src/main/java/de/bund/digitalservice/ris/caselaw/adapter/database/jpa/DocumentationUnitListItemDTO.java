@@ -29,7 +29,7 @@ public interface DocumentationUnitListItemDTO {
 
   ManagementDataDTO getManagementData();
 
-  LocalDateTime getLastPublicationDateTime();
+  LocalDateTime getLastHandoverDateTime();
 
   LocalDateTime getScheduledPublicationDateTime();
 
@@ -48,8 +48,6 @@ public interface DocumentationUnitListItemDTO {
   ProcedureDTO getProcedure();
 
   List<SourceDTO> getSource();
-
-  DocumentationUnitProcessStepDTO getCurrentProcessStep();
 
   List<DocumentationUnitProcessStepDTO> getProcessSteps();
 }

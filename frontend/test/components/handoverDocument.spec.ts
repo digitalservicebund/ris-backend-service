@@ -796,7 +796,7 @@ describe("HandoverDocumentationUnitView:", () => {
 describe("renders uat test mode hint", () => {
   it("only in uat", async () => {
     renderComponent({
-      env: "uat",
+      env: { environment: "uat" },
     })
     expect(
       screen.getByText("UAT Testmodus für die Übergabe an die jDV"),
@@ -805,7 +805,7 @@ describe("renders uat test mode hint", () => {
 
   it("not in prod", async () => {
     renderComponent({
-      env: "production",
+      env: { environment: "production" },
     })
     expect(
       screen.queryByText("UAT Testmodus für die Übergabe an die jDV"),

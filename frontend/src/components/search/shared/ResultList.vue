@@ -10,7 +10,7 @@ import DataTable from "primevue/datatable"
 import { computed, ref, onMounted, onUnmounted } from "vue"
 
 import AssigneeBadge from "@/components/AssigneeBadge.vue"
-import CurrentAndLastProcessStepBadge from "@/components/CurrentAndLastProcessStepBadge.vue"
+import CurrentAndPreviousProcessStepBadge from "@/components/CurrentAndPreviousProcessStepBadge.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 
@@ -100,7 +100,7 @@ const schedulingTooltip = (publicationDate?: string) =>
 
 const publicationDate = (listEntry: DocumentUnitListEntry) => {
   const date =
-    listEntry.scheduledPublicationDateTime ?? listEntry.lastPublicationDateTime
+    listEntry.scheduledPublicationDateTime ?? listEntry.lastHandoverDateTime
   if (date) {
     return dayjs.utc(date).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")
   } else {
@@ -149,12 +149,7 @@ onUnmounted(() => {
       :page="pageEntries"
       @update-page="emit('updatePage', $event)"
     >
-      <DataTable
-        class="w-[95vw]"
-        :loading="loading"
-        :pt="stickyHeaderPT"
-        :value="entries"
-      >
+      <DataTable :loading="loading" :pt="stickyHeaderPT" :value="entries">
         <Column field="documentNumber" header="Dokumentnummer">
           <template #body="{ data: item }">
             <div class="flex flex-row items-center gap-8">
@@ -309,8 +304,11 @@ onUnmounted(() => {
 
         <Column v-if="isDecision" header="Schritt">
           <template #body="{ data: item }">
-            <CurrentAndLastProcessStepBadge
-              :process-steps="item.processSteps"
+            <CurrentAndPreviousProcessStepBadge
+              :current-process-step="
+                item.currentDocumentationUnitProcessStep?.processStep
+              "
+              :previous-process-step="item.previousProcessStep"
             />
           </template>
         </Column>
@@ -318,13 +316,7 @@ onUnmounted(() => {
         <Column v-if="isDecision" header="Person">
           <template #body="{ data: item }">
             <AssigneeBadge
-              :name="
-                item.currentProcessStep &&
-                item.currentProcessStep.user &&
-                item.currentProcessStep.user.initials
-                  ? item.currentProcessStep.user.initials
-                  : undefined
-              "
+              :name="item?.currentDocumentationUnitProcessStep?.user?.initials"
             />
           </template>
         </Column>

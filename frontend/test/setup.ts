@@ -27,7 +27,7 @@ failOnConsole({
   shouldFailOnDebug: true,
   shouldFailOnError: true,
   shouldFailOnInfo: true,
-  shouldFailOnLog: false,
+  shouldFailOnLog: true,
   shouldFailOnWarn: true,
 })
 useFeatureToggleServiceMock()

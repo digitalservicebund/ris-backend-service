@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.InboxStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Kind;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -83,7 +84,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     predicates.addAll(getScheduledOnlyPredicates(parameters, cb, root));
     predicates.addAll(getErrorPredicates(parameters, cb, root));
     predicates.addAll(getStatusPredicates(parameters, cb, root));
-    predicates.addAll(getPublicationDatePredicates(parameters, cb, root));
+    predicates.addAll(getHandoverDatePredicates(parameters, cb, root));
     predicates.addAll(getInboxStatusPredicates(parameters, cb, root));
     predicates.addAll(getDuplicateWarningPredicates(parameters, cq, cb, root));
     predicates.addAll(getResolutionDatePredicates(parameters, cb, root));
@@ -91,6 +92,8 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     predicates.addAll(getFileNumberPredicates(parameters, cq, cb, root));
     predicates.addAll(getDocUnitKindPredicates(parameters, cb, root));
     predicates.addAll(getProcessStepPredicates(parameters, cb, root));
+    predicates.addAll(getAssignedToMePredicates(parameters, cb, root, oidcUser));
+    predicates.addAll(getUnassignedPredicates(parameters, cb, root));
 
     // Use cb.construct() to only select the DTO projection instead of the full entity
     cq.select(root).where(predicates.toArray(new Predicate[0]));
@@ -254,6 +257,37 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     return predicates;
   }
 
+  private List<Predicate> getAssignedToMePredicates(
+      SearchParameters parameters,
+      HibernateCriteriaBuilder cb,
+      Root<DocumentationUnitDTO> root,
+      OidcUser oidcUser) {
+    List<Predicate> predicates = new ArrayList<>();
+    if (parameters.assignedToMe) {
+      User user = userService.getUser(oidcUser);
+      Predicate assignedToMePredicate =
+          cb.equal(
+              root.get(DocumentationUnitDTO_.currentProcessStep)
+                  .get(DocumentationUnitProcessStepDTO_.userId),
+              user.id());
+      predicates.add(assignedToMePredicate);
+    }
+    return predicates;
+  }
+
+  private List<Predicate> getUnassignedPredicates(
+      SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
+    List<Predicate> predicates = new ArrayList<>();
+    if (parameters.unassigned) {
+      Predicate unassignedPredicate =
+          cb.isNull(
+              root.get(DocumentationUnitDTO_.currentProcessStep)
+                  .get(DocumentationUnitProcessStepDTO_.userId));
+      predicates.add(unassignedPredicate);
+    }
+    return predicates;
+  }
+
   private List<Predicate> getScheduledOnlyPredicates(
       SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
     List<Predicate> predicates = new ArrayList<>();
@@ -317,19 +351,18 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
     return predicates;
   }
 
-  private List<Predicate> getPublicationDatePredicates(
+  private List<Predicate> getHandoverDatePredicates(
       SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
     List<Predicate> predicates = new ArrayList<>();
-    if (parameters.publicationDate.isPresent()) {
+    if (parameters.handoverDate.isPresent()) {
       Expression<Date> scheduledPublicationDateTime =
           getDateOnly(cb, root.get(DocumentationUnitDTO_.scheduledPublicationDateTime));
       Predicate scheduledDatePredicate =
-          cb.equal(scheduledPublicationDateTime, parameters.publicationDate.get());
+          cb.equal(scheduledPublicationDateTime, parameters.handoverDate.get());
 
-      Expression<Date> lastPublicationDateTime =
-          getDateOnly(cb, root.get(DocumentationUnitDTO_.lastPublicationDateTime));
-      Predicate lastDatePredicate =
-          cb.equal(lastPublicationDateTime, parameters.publicationDate.get());
+      Expression<Date> lastHandoverDateTime =
+          getDateOnly(cb, root.get(DocumentationUnitDTO_.lastHandoverDateTime));
+      Predicate lastDatePredicate = cb.equal(lastHandoverDateTime, parameters.handoverDate.get());
 
       Predicate publicationDatePredicate = cb.or(scheduledDatePredicate, lastDatePredicate);
       predicates.add(publicationDatePredicate);
@@ -456,13 +489,13 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
   private List<Predicate> getProcessStepPredicates(
       SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
     List<Predicate> predicates = new ArrayList<>();
-    if (parameters.processStepId.isPresent()) {
+    if (parameters.processStep.isPresent()) {
       Predicate processStepPredicate =
           cb.equal(
               root.get(DocumentationUnitDTO_.currentProcessStep)
                   .get(DocumentationUnitProcessStepDTO_.processStep)
-                  .get(ProcessStepDTO_.id),
-              parameters.processStepId.get());
+                  .get(ProcessStepDTO_.name),
+              parameters.processStep.get());
       predicates.add(processStepPredicate);
     }
     return predicates;
@@ -472,12 +505,12 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
   private List<Order> getOrderCriteria(
       SearchParameters parameters, HibernateCriteriaBuilder cb, Root<DocumentationUnitDTO> root) {
     List<Order> orderCriteria = new ArrayList<>();
-    if (parameters.scheduledOnly || parameters.publicationDate.isPresent()) {
+    if (parameters.scheduledOnly || parameters.handoverDate.isPresent()) {
       orderCriteria.add(
           cb.desc(root.get(DocumentationUnitDTO_.scheduledPublicationDateTime))
               .nullPrecedence(NullPrecedence.LAST));
       orderCriteria.add(
-          cb.desc(root.get(DocumentationUnitDTO_.lastPublicationDateTime))
+          cb.desc(root.get(DocumentationUnitDTO_.lastHandoverDateTime))
               .nullPrecedence(NullPrecedence.LAST));
     }
 
@@ -506,7 +539,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .fileNumber(Optional.ofNullable(searchInput.fileNumber()))
         .decisionDate(Optional.ofNullable(searchInput.decisionDate()))
         .decisionDateEnd(Optional.ofNullable(searchInput.decisionDateEnd()))
-        .publicationDate(Optional.ofNullable(searchInput.publicationDate()))
+        .handoverDate(Optional.ofNullable(searchInput.publicationDate()))
         .publicationStatus(Optional.ofNullable(status))
         .scheduledOnly(searchInput.scheduledOnly())
         .withError(withError)
@@ -518,7 +551,9 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
         .inboxStatus(Optional.ofNullable(searchInput.inboxStatus()))
         .documentationOfficeDTO(documentationOfficeDTO)
         .kind(Optional.ofNullable(searchInput.kind()))
-        .processStepId(Optional.ofNullable(searchInput.processStepId()))
+        .processStep(Optional.ofNullable(searchInput.processStep()))
+        .assignedToMe(searchInput.assignedToMe())
+        .unassigned(searchInput.unassigned())
         .build();
   }
 
@@ -530,7 +565,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       Optional<String> fileNumber,
       Optional<LocalDate> decisionDate,
       Optional<LocalDate> decisionDateEnd,
-      Optional<LocalDate> publicationDate,
+      Optional<LocalDate> handoverDate,
       Optional<PublicationStatus> publicationStatus,
       boolean scheduledOnly,
       boolean withError,
@@ -542,5 +577,7 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       Optional<InboxStatus> inboxStatus,
       DocumentationOfficeDTO documentationOfficeDTO,
       Optional<Kind> kind,
-      Optional<UUID> processStepId) {}
+      Optional<String> processStep,
+      boolean assignedToMe,
+      boolean unassigned) {}
 }

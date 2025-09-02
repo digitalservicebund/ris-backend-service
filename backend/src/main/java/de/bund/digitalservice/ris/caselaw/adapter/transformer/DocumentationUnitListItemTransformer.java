@@ -1,12 +1,17 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import static de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcessStepTransformer.getPreviousProcessStep;
+
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ManagementDataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitProcessStep;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit.RelatedDocumentationUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +48,7 @@ public class DocumentationUnitListItemTransformer {
         .resolutionDate(documentationUnitListItemDTO.getResolutionDate())
         .scheduledPublicationDateTime(
             documentationUnitListItemDTO.getScheduledPublicationDateTime())
-        .lastPublicationDateTime(documentationUnitListItemDTO.getLastPublicationDateTime())
+        .lastHandoverDateTime(documentationUnitListItemDTO.getLastHandoverDateTime())
         .appraisalBody(documentationUnitListItemDTO.getJudicialBody())
         .hasHeadnoteOrPrinciple(hasHeadnoteOrPrinciple(documentationUnitListItemDTO))
         .hasAttachments(
@@ -65,9 +70,8 @@ public class DocumentationUnitListItemTransformer {
                 : documentationUnitListItemDTO.getFileNumbers().get(0).getValue())
         .status(StatusTransformer.transformToDomain(documentationUnitListItemDTO.getStatus()))
         .note(documentationUnitListItemDTO.getNote())
-        .currentProcessStep(
-            DocumentationUnitProcessStepTransformer.toDomain(
-                documentationUnitListItemDTO.getCurrentProcessStep()))
+        .currentDocumentationUnitProcessStep(
+            getCurrentDocumentationUnitProcessStep(documentationUnitListItemDTO.getProcessSteps()))
         .creatingDocumentationOffice(
             documentationUnitListItemDTO.getCreatingDocumentationOffice() == null
                 ? null
@@ -93,10 +97,8 @@ public class DocumentationUnitListItemTransformer {
                                         + referenceDTO.getCitation())
                             .orElse(String.valueOf(source.getValue())))
                 .collect(Collectors.joining(", ")))
-        .processSteps(
-            documentationUnitListItemDTO.getProcessSteps().stream()
-                .map(DocumentationUnitProcessStepTransformer::toDomain)
-                .toList());
+        .previousProcessStep(
+            getPreviousProcessStep(documentationUnitListItemDTO.getProcessSteps()));
 
     ManagementDataDTO managementData = documentationUnitListItemDTO.getManagementData();
     if (managementData != null) {
@@ -160,6 +162,16 @@ public class DocumentationUnitListItemTransformer {
     }
 
     return builder.build();
+  }
+
+  private static DocumentationUnitProcessStep getCurrentDocumentationUnitProcessStep(
+      List<DocumentationUnitProcessStepDTO> documentationUnitProcessStepsDTOs) {
+
+    return Optional.ofNullable(documentationUnitProcessStepsDTOs)
+        .filter(steps -> !steps.isEmpty())
+        .map(List::getFirst)
+        .map(DocumentationUnitProcessStepTransformer::toDomain)
+        .orElse(null);
   }
 
   private static Status getStatus(DocumentationUnitListItemDTO documentationUnitListItemDTO) {

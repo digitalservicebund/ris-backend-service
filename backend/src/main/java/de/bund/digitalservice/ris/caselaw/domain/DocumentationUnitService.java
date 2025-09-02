@@ -338,7 +338,9 @@ public class DocumentationUnitService {
       Optional<Boolean> isResolved,
       Optional<InboxStatus> inboxStatus,
       Optional<Kind> kind,
-      Optional<UUID> processStepId) {
+      Optional<String> processStep,
+      Optional<Boolean> assignedToMe,
+      Optional<Boolean> unassigned) {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
@@ -365,7 +367,9 @@ public class DocumentationUnitService {
             .resolutionDateEnd(resolutionDateEnd.orElse(null))
             .isResolved(isResolved.orElse(false))
             .kind(kind.orElse(null))
-            .processStepId(processStepId.orElse(null))
+            .processStep(processStep.orElse(null))
+            .assignedToMe(assignedToMe.orElse(false))
+            .unassigned(unassigned.orElse(false))
             .build();
 
     Slice<DocumentationUnitListItem> documentationUnitListItems;
@@ -406,8 +410,8 @@ public class DocumentationUnitService {
         oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));
   }
 
-  public void saveSuccessfulPublication(UUID uuid) {
-    repository.saveSuccessfulPublication(uuid);
+  public void saveSuccessfulHandover(UUID uuid) {
+    repository.saveSuccessfulHandover(uuid);
   }
 
   private DocumentationUnitListItem addPermissions(
@@ -478,16 +482,19 @@ public class DocumentationUnitService {
   private Slice<DocumentationUnitListItem> retrieveCurrentProcessStepUser(
       Slice<DocumentationUnitListItem> documentationUnitListItems, OidcUser oidcUser) {
 
+    // In case user is in two groups take the first
     Map<UUID, User> userIdMap =
-        userService.getUsers(oidcUser).stream()
-            .collect(Collectors.toMap(User::id, Function.identity()));
+        userService.getUsersInSameDocOffice(oidcUser).stream()
+            .collect(
+                Collectors.toMap(
+                    User::id, Function.identity(), (user, sameReferencedUser) -> user));
 
     return documentationUnitListItems.map(
         item -> {
-          Optional.ofNullable(item.currentProcessStep())
+          Optional.ofNullable(item.currentDocumentationUnitProcessStep())
               .map(DocumentationUnitProcessStep::getUser)
               .map(user -> userIdMap.get(user.id()))
-              .ifPresent(user -> item.currentProcessStep().setUser(user));
+              .ifPresent(user -> item.currentDocumentationUnitProcessStep().setUser(user));
           return item;
         });
   }
@@ -542,11 +549,13 @@ public class DocumentationUnitService {
       return;
     }
 
-    if (documentable.currentProcessStep() != null
-        && documentable.currentProcessStep().getUser() != null) {
+    if (documentable.currentDocumentationUnitProcessStep() != null
+        && documentable.currentDocumentationUnitProcessStep().getUser() != null) {
       documentable
-          .currentProcessStep()
-          .setUser(userService.getUser(documentable.currentProcessStep().getUser().id()));
+          .currentDocumentationUnitProcessStep()
+          .setUser(
+              userService.getUser(
+                  documentable.currentDocumentationUnitProcessStep().getUser().id()));
     }
 
     if (documentable.processSteps() != null) {
@@ -575,6 +584,13 @@ public class DocumentationUnitService {
   public String deleteByUuid(UUID documentationUnitId) throws DocumentationUnitNotExistsException {
 
     DocumentationUnit docUnit = getByUuid(documentationUnitId);
+
+    log.atInfo()
+        .setMessage("Deleting doc unit...")
+        .addKeyValue("documentNumber", docUnit.documentNumber())
+        .addKeyValue("id", documentationUnitId)
+        .log();
+
     Map<RelatedDocumentationType, Long> relatedEntities =
         repository.getAllRelatedDocumentationUnitsByDocumentNumber(docUnit.documentNumber());
 
@@ -589,6 +605,16 @@ public class DocumentationUnitService {
 
       throw new DocumentationUnitDeletionException(
           "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities);
+    }
+
+    if (PortalPublicationStatus.PUBLISHED.equals(docUnit.portalPublicationStatus())) {
+      log.atInfo()
+          .setMessage("Doc unit deletion was prohibited because it is published in the portal.")
+          .addKeyValue("documentNumber", docUnit.documentNumber())
+          .addKeyValue("docUnitId", documentationUnitId)
+          .log();
+      throw new DocumentationUnitDeletionException(
+          "Die Dokumentationseinheit konnte nicht gelöscht werden, da Sie im Portal veröffentlicht ist.\nSie muss zuerst zurückgezogen werden.");
     }
 
     log.debug("Deleting DocumentationUnitDTO " + documentationUnitId);
@@ -850,7 +876,7 @@ public class DocumentationUnitService {
       repository.saveDocumentationOffice(documentationUnitId, documentationOffice, user);
       decision =
           decision.toBuilder()
-              .currentProcessStep(
+              .currentDocumentationUnitProcessStep(
                   DocumentationUnitProcessStep.builder()
                       .id(UUID.randomUUID())
                       .createdAt(LocalDateTime.now())

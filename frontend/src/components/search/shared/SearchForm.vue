@@ -10,7 +10,9 @@ import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { Kind } from "@/domain/documentationUnitKind"
+import ProcessStep from "@/domain/processStep"
 import { PublicationState } from "@/domain/publicationStatus"
+import processStepService from "@/services/processStepService"
 import { DocumentationUnitSearchParameter } from "@/types/documentationUnitSearchParameter"
 
 const props = defineProps<{
@@ -40,7 +42,7 @@ const isEmptySearch = computed(() => {
 const submitButtonError = ref<string | undefined>()
 
 const dropdownItems: DropdownItem[] = [
-  { label: "Alle", value: undefined },
+  { label: "Nicht ausgewählt", value: "Nicht ausgewählt" },
   { label: "Veröffentlicht", value: PublicationState.PUBLISHED },
   { label: "Unveröffentlicht", value: PublicationState.UNPUBLISHED },
   { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
@@ -63,9 +65,9 @@ const isResolved = computed({
 })
 
 const publicationStatus = computed({
-  get: () => query.value?.publicationStatus,
+  get: () => query.value?.publicationStatus || "Nicht ausgewählt",
   set: (data) => {
-    if (!data) {
+    if (!data || data === "Nicht ausgewählt") {
       delete query.value.publicationStatus
     } else {
       query.value.publicationStatus = data
@@ -87,6 +89,9 @@ const myDocOfficeOnly = computed({
         delete query.value.myDocOfficeOnly
         delete query.value.scheduledOnly
         delete query.value.publicationDate
+        processStep.value = "Nicht ausgewählt"
+        delete query.value.assignedToMe
+        delete query.value.unassigned
         resetErrors("publicationDate") // Clear validation for publicationDate
       } else {
         query.value.myDocOfficeOnly = "true"
@@ -127,6 +132,40 @@ const withError = computed({
   },
 })
 
+const assignedToMe = computed({
+  get: () =>
+    isDecision.value && query.value?.assignedToMe
+      ? JSON.parse(query.value.assignedToMe)
+      : false,
+  set: (data) => {
+    if (isDecision.value) {
+      if (!data) {
+        delete query.value.assignedToMe
+      } else {
+        query.value.assignedToMe = "true"
+        if (query.value.unassigned) delete query.value.unassigned
+      }
+    }
+  },
+})
+
+const unassigned = computed({
+  get: () =>
+    isDecision.value && query.value?.unassigned
+      ? JSON.parse(query.value.unassigned)
+      : false,
+  set: (data) => {
+    if (isDecision.value) {
+      if (!data) {
+        delete query.value.unassigned
+      } else {
+        query.value.unassigned = "true"
+        if (query.value.assignedToMe) delete query.value.assignedToMe
+      }
+    }
+  },
+})
+
 const withDuplicateWarning = computed({
   get: () =>
     isDecision.value && query.value?.withDuplicateWarning
@@ -142,6 +181,22 @@ const withDuplicateWarning = computed({
     }
   },
 })
+
+const processStep = ref<string>("Nicht ausgewählt")
+
+watch(processStep, async (newVal) => {
+  if (newVal && newVal !== "Nicht ausgewählt") {
+    query.value.processStep = newVal
+  } else {
+    delete query.value.processStep
+  }
+})
+
+const processSteps = ref<ProcessStep[]>([
+  { uuid: "Nicht ausgewählt", name: "Nicht ausgewählt" } as ProcessStep,
+])
+
+const processStepsLoading = ref<boolean>(false)
 
 /**
  * Resets the search form, validation errors, and clears the query.
@@ -334,6 +389,16 @@ function handleSearch() {
   }
 }
 
+async function fetchProcessSteps() {
+  if (processSteps.value.length > 1) return
+  processStepsLoading.value = true
+  const processStepsResponse = await processStepService.getProcessSteps()
+  if (!processStepsResponse.error) {
+    processSteps.value = processSteps.value.concat(processStepsResponse.data)
+  }
+  processStepsLoading.value = false
+}
+
 // Watch for route changes to update query and trigger search
 watch(
   route,
@@ -343,19 +408,33 @@ watch(
   },
   { deep: true },
 )
+
+watch(
+  [route, query],
+  async () => {
+    if (query.value.processStep) {
+      await fetchProcessSteps()
+      processStep.value = query.value.processStep
+    } else {
+      processStep.value = "Nicht ausgewählt"
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
   <div
     v-ctrl-enter="handleSearchButtonClicked"
-    class="mb-32 flex flex-col bg-blue-200 py-24"
+    class="mb-32 flex flex-col bg-blue-200"
     data-testid="document-unit-search-entry-form"
   >
     <div
-      class="m-40 grid grid-cols-[150px_1fr_150px_1fr] gap-y-20 lg:gap-x-40"
+      class="m-40 grid auto-rows-[48px] grid-cols-[minmax(80px,150px)_minmax(250px,1fr)_minmax(80px,150px)_minmax(250px,1fr)] gap-x-32 gap-y-16"
       :class="{
         'grid-layout-decision': isDecision,
         'grid-layout-pending-proceeding': isPendingProceeding,
+        'is-own-docoffice': myDocOfficeOnly,
       }"
     >
       <!-- Common Fields for Decisions and Pending Proceeding-->
@@ -381,6 +460,30 @@ watch(
           ></InputText>
         </InputField>
       </div>
+
+      <div
+        class="ris-body1-regular flex flex-row items-center [grid-area:docnumber-label]"
+      >
+        Dokument&shy;nummer
+      </div>
+      <div class="[grid-area:docnumber-input]">
+        <InputField
+          id="documentNumber"
+          v-slot="{ id }"
+          label="Dokumentnummer"
+          visually-hide-label
+        >
+          <InputText
+            :id="id"
+            v-model="query.documentNumber"
+            aria-label="Dokumentnummer Suche"
+            fluid
+            size="small"
+            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+          ></InputText>
+        </InputField>
+      </div>
+
       <div
         class="ris-body1-regular flex flex-row items-center [grid-area:court-label]"
       >
@@ -423,29 +526,6 @@ watch(
       </div>
 
       <div
-        class="ris-body1-regular items-center[grid-area:docnumber-label] flex flex-row"
-      >
-        Dokumentnummer
-      </div>
-      <div class="[grid-area:docnumber-input]">
-        <InputField
-          id="documentNumber"
-          v-slot="{ id }"
-          label="Dokumentnummer"
-          visually-hide-label
-        >
-          <InputText
-            :id="id"
-            v-model="query.documentNumber"
-            aria-label="Dokumentnummer Suche"
-            fluid
-            size="small"
-            @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-          ></InputText>
-        </InputField>
-      </div>
-
-      <div
         class="ris-body1-regular flex flex-row items-center [grid-area:status-label]"
       >
         Status
@@ -465,7 +545,6 @@ watch(
             option-label="label"
             option-value="value"
             :options="dropdownItems"
-            placeholder="Bitte auswählen"
             @focus="resetErrors(id as DocumentationUnitSearchParameter)"
           />
         </InputField>
@@ -474,14 +553,14 @@ watch(
       <div
         class="ris-body1-regular flex flex-row items-center [grid-area:date-label]"
       >
-        {{ isDecision ? "Datum" : "Mitteilungsdatum" }}
+        {{ isDecision ? "Datum" : "Mitteilungs&shy;datum" }}
       </div>
       <div class="flex flex-row gap-10 [grid-area:date-input]">
         <InputField
           id="decisionDate"
           v-slot="{ id, hasError }"
           data-testid="decision-date-input"
-          :label="isDecision ? 'Datum' : 'Mitteilungsdatum'"
+          :label="isDecision ? 'Datum' : 'Mitteilungs&shy;datum'"
           :validation-error="validationStore.getByField('decisionDate')"
           visually-hide-label
         >
@@ -528,59 +607,9 @@ watch(
           ></DateInput>
         </InputField>
       </div>
-
       <!-- Decision Specific Fields -->
       <template v-if="isDecision">
-        <div
-          v-if="myDocOfficeOnly"
-          class="ris-body1-regular flex flex-row items-center [grid-area:jdv-label]"
-        >
-          jDV Übergabe
-        </div>
-
-        <div
-          v-if="myDocOfficeOnly"
-          class="flex flex-row gap-20 [grid-area:jdv-input]"
-        >
-          <InputField
-            id="publicationDate"
-            v-slot="{ id, hasError }"
-            data-testid="publication-date-input"
-            label="jDV Übergabedatum"
-            :validation-error="validationStore.getByField('publicationDate')"
-            visually-hide-label
-          >
-            <DateInput
-              :id="id"
-              v-model="query.publicationDate"
-              aria-label="jDV Übergabedatum Suche"
-              :has-error="hasError"
-              is-future-date
-              @blur="validateSearchInput"
-              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-              @update:validation-error="
-                (validationError: ValidationError | undefined) =>
-                  handleLocalInputError(validationError, id)
-              "
-            ></DateInput>
-          </InputField>
-          <InputField
-            id="scheduled"
-            v-slot="{ id }"
-            label="Nur terminiert"
-            label-class="ris-label1-regular"
-            :label-position="LabelPosition.RIGHT"
-          >
-            <Checkbox
-              v-model="scheduledOnly"
-              aria-label="Terminiert Filter"
-              binary
-              :input-id="id"
-            />
-          </InputField>
-        </div>
-
-        <div class="flex flex-row gap-20 [grid-area:checkbox-group]">
+        <div class="flex flex-row gap-10 [grid-area:own-docoffice]">
           <InputField
             id="documentationOffice"
             v-slot="{ id }"
@@ -596,39 +625,158 @@ watch(
               @focus="resetErrors(id as DocumentationUnitSearchParameter)"
             />
           </InputField>
-          <InputField
-            v-if="myDocOfficeOnly"
-            id="withErrorsOnly"
-            v-slot="{ id }"
-            label="Nur Fehler"
-            label-class="ris-label1-regular"
-            :label-position="LabelPosition.RIGHT"
-          >
-            <Checkbox
-              v-model="withError"
-              aria-label="Nur fehlerhafte Dokumentationseinheiten"
-              binary
-              :input-id="id"
-              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-            />
-          </InputField>
-          <InputField
-            v-if="myDocOfficeOnly"
-            id="withDuplicateWaring"
-            v-slot="{ id }"
-            label="Dublettenverdacht"
-            label-class="ris-label1-regular"
-            :label-position="LabelPosition.RIGHT"
-          >
-            <Checkbox
-              v-model="withDuplicateWarning"
-              aria-label="Dokumentationseinheiten mit Dublettenverdacht"
-              binary
-              :input-id="id"
-              @focus="resetErrors(id as DocumentationUnitSearchParameter)"
-            />
-          </InputField>
         </div>
+
+        <template v-if="myDocOfficeOnly">
+          <div
+            class="ris-body1-regular flex flex-row items-center [grid-area:process-step-label]"
+          >
+            Schritt
+          </div>
+
+          <div class="flex flex-row gap-20 [grid-area:process-step-input]">
+            <InputField
+              id="processStep"
+              data-testid="process-step-input"
+              label="Prozessschritt"
+              visually-hide-label
+            >
+              <InputSelect
+                v-model="processStep"
+                aria-label="Prozessschritt"
+                class="w-full"
+                :loading="processStepsLoading"
+                option-label="name"
+                option-value="name"
+                :options="processSteps"
+                @click="fetchProcessSteps"
+              ></InputSelect>
+            </InputField>
+          </div>
+
+          <div
+            class="ris-body1-regular flex flex-row items-center [grid-area:jdv-label]"
+          >
+            jDV Übergabe
+          </div>
+
+          <div class="flex flex-row gap-20 [grid-area:jdv-input]">
+            <InputField
+              id="publicationDate"
+              v-slot="{ id, hasError }"
+              data-testid="publication-date-input"
+              label="jDV Übergabedatum"
+              :validation-error="validationStore.getByField('publicationDate')"
+              visually-hide-label
+            >
+              <DateInput
+                :id="id"
+                v-model="query.publicationDate"
+                aria-label="jDV Übergabedatum Suche"
+                :has-error="hasError"
+                is-future-date
+                @blur="validateSearchInput"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+                @update:validation-error="
+                  (validationError: ValidationError | undefined) =>
+                    handleLocalInputError(validationError, id)
+                "
+              ></DateInput>
+            </InputField>
+            <InputField
+              id="scheduled"
+              v-slot="{ id }"
+              label="Nur terminiert"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="scheduledOnly"
+                aria-label="Terminiert Filter"
+                binary
+                :input-id="id"
+              />
+            </InputField>
+          </div>
+
+          <div
+            class="ris-body1-regular flex flex-row items-center [grid-area:assignee-label]"
+          >
+            Person
+          </div>
+
+          <div class="flex flex-row gap-20 [grid-area:assignee-input]">
+            <InputField
+              id="assignedToMe"
+              v-slot="{ id }"
+              label="Nur mir zugewiesen"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="assignedToMe"
+                aria-label="Nur mir zugewiesen"
+                binary
+                :input-id="id"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              />
+            </InputField>
+            <InputField
+              id="unassigned"
+              v-slot="{ id }"
+              label="Niemandem zugewiesen"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="unassigned"
+                aria-label="Niemandem zugewiesen"
+                binary
+                :input-id="id"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              />
+            </InputField>
+          </div>
+
+          <div
+            class="ris-body1-regular flex flex-row items-center [grid-area:error-label]"
+          >
+            Fehler
+          </div>
+
+          <div class="flex flex-row gap-20 [grid-area:error-input]">
+            <InputField
+              id="withErrorsOnly"
+              v-slot="{ id }"
+              label="Nur Fehler"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="withError"
+                aria-label="Nur fehlerhafte Dokumentationseinheiten"
+                binary
+                :input-id="id"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              />
+            </InputField>
+            <InputField
+              id="withDuplicateWaring"
+              v-slot="{ id }"
+              label="Dubletten&shy;verdacht"
+              label-class="ris-label1-regular"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <Checkbox
+                v-model="withDuplicateWarning"
+                aria-label="Dokumentationseinheiten mit Dublettenverdacht"
+                binary
+                :input-id="id"
+                @focus="resetErrors(id as DocumentationUnitSearchParameter)"
+              />
+            </InputField>
+          </div>
+        </template>
       </template>
 
       <!-- Pending Proceeding Specific Fields -->
@@ -636,14 +784,14 @@ watch(
         <div
           class="ris-body1-regular 8 flex flex-row items-center [grid-area:resolution-date-label]"
         >
-          Erledigungsmitteilung
+          Erledigungs&shy;mitteilung
         </div>
         <div class="flex flex-row gap-10 [grid-area:resolution-date-input]">
           <InputField
             id="resolutionDate"
             v-slot="{ id, hasError }"
             data-testid="resolution-date-input"
-            label="Erledigungsmitteilung"
+            label="Erledigungs&shy;mitteilung"
             :validation-error="validationStore.getByField('resolutionDate')"
             visually-hide-label
           >
@@ -703,8 +851,17 @@ watch(
       </template>
 
       <!-- Common Search Button -->
-      <div class="flex flex-row [grid-area:search-button]">
-        <div class="flex flex-col gap-8">
+
+      <div class="flex flex-col gap-8 [grid-area:search-button]">
+        <div class="flex flex-row justify-end gap-x-16">
+          <Button
+            v-if="!isEmptySearch"
+            aria-label="Suche zurücksetzen"
+            class="ml-8 self-start"
+            label="Suche zurücksetzen"
+            text
+            @click="resetSearch"
+          ></Button>
           <Button
             :aria-label="
               isDecision
@@ -713,11 +870,11 @@ watch(
             "
             class="self-start"
             :disabled="isLoading"
-            label="Ergebnisse anzeigen"
-            size="small"
+            label="Ergebnisse zeigen"
             @click="handleSearchButtonClicked"
           ></Button>
-
+        </div>
+        <div class="flex flex-row justify-end">
           <span
             v-if="submitButtonError"
             class="ris-label3-regular min-h-[1rem] text-red-800"
@@ -725,16 +882,6 @@ watch(
             {{ submitButtonError }}
           </span>
         </div>
-
-        <Button
-          v-if="!isEmptySearch"
-          aria-label="Suche zurücksetzen"
-          class="ml-8 self-start"
-          label="Suche zurücksetzen"
-          size="small"
-          text
-          @click="resetSearch"
-        ></Button>
       </div>
     </div>
   </div>
@@ -745,9 +892,20 @@ watch(
   grid-template-areas:
     "az-label az-input docnumber-label docnumber-input"
     "court-label court-input status-label status-input"
-    "date-label date-input . checkbox-group"
-    "jdv-label jdv-input . search-button";
-  grid-template-rows: auto auto auto auto;
+    "date-label date-input . ."
+    "own-docoffice own-docoffice . ."
+    ". . search-button search-button";
+}
+
+.grid-layout-decision.is-own-docoffice {
+  grid-template-areas:
+    "az-label az-input docnumber-label docnumber-input"
+    "court-label court-input status-label status-input"
+    "date-label date-input . ."
+    "own-docoffice own-docoffice . ."
+    "process-step-label process-step-input jdv-label jdv-input"
+    "assignee-label assignee-input error-label error-input"
+    ". . search-button search-button";
 }
 
 .grid-layout-pending-proceeding {
@@ -756,7 +914,6 @@ watch(
     "court-label court-input status-label status-input"
     "date-label date-input resolution-date-label resolution-date-input"
     ". . . resolved-input"
-    ". . . search-button";
-  grid-template-rows: auto auto auto auto auto;
+    ". . search-button search-button";
 }
 </style>

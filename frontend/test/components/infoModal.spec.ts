@@ -14,6 +14,7 @@ describe("InfoModal", () => {
     screen.getByText("foo")
     screen.getByText("bar")
     expect(screen.getByLabelText("foo icon")).toBeInTheDocument()
+    expect(screen.queryByText("zum externen Link")).not.toBeInTheDocument()
   })
 
   test("renders infomodal: succeed", () => {
@@ -28,5 +29,49 @@ describe("InfoModal", () => {
     screen.getByText("foo")
     screen.getByText("bar")
     expect(screen.getByLabelText("foo icon")).toBeInTheDocument()
+    expect(screen.queryByText("zum externen Link")).not.toBeInTheDocument()
+  })
+
+  test("renders info modal with link", () => {
+    render(InfoModal, {
+      props: {
+        title: "foo",
+        description: "bar",
+      },
+      slots: {
+        link: `<a
+        href="https://example.com"
+        class="ris-link2-regular"
+        target="_blank"
+        rel="noopener noreferrer"
+      >zum externen Link</a>`,
+      },
+    })
+
+    screen.getByText("foo")
+    screen.getByText("bar")
+    expect(screen.getByText("zum externen Link")).toBeInTheDocument()
+    const linkEl = screen.getByRole("link", { name: "zum externen Link" })
+    expect(linkEl).toBeInTheDocument()
+    expect(linkEl).toHaveAttribute("href", "https://example.com")
+    expect(linkEl).toHaveAttribute("target", "_blank")
+    expect(linkEl).toHaveAttribute("rel", "noopener noreferrer")
+  })
+
+  test("renders info modal with array description and without link", () => {
+    render(InfoModal, {
+      props: {
+        title: "foo",
+        description: ["eins", "zwei"],
+      },
+      slots: {
+        link: `<a>zum externen Link</a>`,
+      },
+    })
+    screen.getByText("foo")
+    screen.getByText("eins")
+    screen.getByText("zwei")
+
+    expect(screen.queryByText("zum externen Link")).not.toBeInTheDocument()
   })
 })

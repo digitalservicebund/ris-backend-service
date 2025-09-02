@@ -317,7 +317,6 @@ test.describe(
         await expect(
           pageWithBfhUser.getByText("Keine Suchergebnisse gefunden"),
         ).toBeVisible()
-        documentNumberToBeDeleted = undefined
       })
     })
 
@@ -377,6 +376,9 @@ test.describe(
             .getByTestId("chip-value"),
         ).toHaveText(fileNumber)
       })
+      await test.step("Lösche Entscheidung", async () => {
+        await deleteDocumentUnit(pageWithBfhUser, documentNumberToBeDeleted!)
+      })
     })
 
     test("BGH kann Tab Anhängige Verfahren nicht aufrufen", async ({
@@ -389,12 +391,6 @@ test.describe(
         ).toBeHidden()
         await expect(pageWithBghUser.getByRole("tablist")).toBeHidden()
       })
-    })
-
-    test.afterEach(async ({ pageWithBfhUser }) => {
-      if (documentNumberToBeDeleted) {
-        await deleteDocumentUnit(pageWithBfhUser, documentNumberToBeDeleted)
-      }
     })
   },
 )

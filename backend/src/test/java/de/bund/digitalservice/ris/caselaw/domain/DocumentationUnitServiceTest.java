@@ -824,6 +824,8 @@ class DocumentationUnitServiceTest {
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty());
     verify(docUnitSearchRepository)
         .searchByDocumentationUnitSearchInput(documentationUnitSearchInput, pageRequest, oidcUser);
@@ -850,6 +852,8 @@ class DocumentationUnitServiceTest {
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courttype\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courtlocation\u180Ewith\u2060spaces"),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
@@ -927,12 +931,12 @@ class DocumentationUnitServiceTest {
   }
 
   @Test
-  void test_saveSuccessfulPublicationDateTime_shouldSaveLastPublication() {
+  void test_saveSuccessfulPublicationDateTime_shouldSaveLastHandover() {
     Decision decision = Decision.builder().build();
 
-    service.saveSuccessfulPublication(decision.uuid());
+    service.saveSuccessfulHandover(decision.uuid());
 
-    verify(repository, times(1)).saveSuccessfulPublication(decision.uuid());
+    verify(repository, times(1)).saveSuccessfulHandover(decision.uuid());
   }
 
   @Test
@@ -1089,7 +1093,7 @@ class DocumentationUnitServiceTest {
                     .documentationOffice(docOffice)
                     .build())
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
-            .currentProcessStep(processStep1)
+            .currentDocumentationUnitProcessStep(processStep1)
             .processSteps(List.of(processStep1, processStepOtherDocOffice, processStep2))
             .build();
     when(userService.getUser(oidcUser)).thenReturn(user);
@@ -1144,7 +1148,7 @@ class DocumentationUnitServiceTest {
                     .documentationOffice(docOffice)
                     .build())
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
-            .currentProcessStep(processStep1)
+            .currentDocumentationUnitProcessStep(processStep1)
             .processSteps(
                 List.of(
                     processStep1, processStepOtherDocOffice, processStep2, processStepWithoutUser))
@@ -1202,7 +1206,7 @@ class DocumentationUnitServiceTest {
                     .documentationOffice(docOffice)
                     .build())
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
-            .currentProcessStep(processStep1)
+            .currentDocumentationUnitProcessStep(processStep1)
             .processSteps(
                 List.of(
                     processStep1,

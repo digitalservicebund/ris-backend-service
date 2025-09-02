@@ -281,7 +281,9 @@ public class DocumentationUnitController {
       @RequestParam(value = "isResolved") Optional<Boolean> isResolved,
       @RequestParam(value = "inboxStatus") Optional<InboxStatus> inboxStatus,
       @RequestParam(value = "kind") Optional<Kind> kind,
-      @RequestParam(value = "processStepId") Optional<UUID> processStepId,
+      @RequestParam(value = "processStep") Optional<String> processStep,
+      @RequestParam(value = "assignedToMe") Optional<Boolean> assignedToMe,
+      @RequestParam(value = "unassigned") Optional<Boolean> unassigned,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     return service.searchByDocumentationUnitSearchInput(
@@ -304,7 +306,9 @@ public class DocumentationUnitController {
         isResolved,
         inboxStatus,
         kind,
-        processStepId);
+        processStep,
+        assignedToMe,
+        unassigned);
   }
 
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -338,7 +342,7 @@ public class DocumentationUnitController {
       var str = service.deleteByUuid(uuid);
       return ResponseEntity.status(HttpStatus.OK).body(str);
     } catch (DocumentationUnitNotExistsException | DocumentationUnitDeletionException ex) {
-      return ResponseEntity.internalServerError().body(ex.getMessage());
+      return ResponseEntity.badRequest().body(ex.getMessage());
     }
   }
 
@@ -430,7 +434,7 @@ public class DocumentationUnitController {
         log.warn("Failed to send mail for documentation unit {}", uuid);
         return ResponseEntity.unprocessableEntity().body(handoverMail);
       }
-      service.saveSuccessfulPublication(uuid);
+      service.saveSuccessfulHandover(uuid);
       return ResponseEntity.ok(handoverMail);
     } catch (DocumentationUnitNotExistsException | HandoverException e) {
       log.error("Error handing over documentation unit '{}' as email", uuid, e);

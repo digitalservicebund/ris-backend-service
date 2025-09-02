@@ -125,7 +125,7 @@ describe("management data", () => {
 
     documentUnit.value = {
       ...store.documentUnit,
-      currentProcessStep: {
+      currentDocumentationUnitProcessStep: {
         processStep: {
           uuid: "123",
           name: "test step",

@@ -724,6 +724,9 @@ test.describe("category import", () => {
         await expect(
           page.getByText("Test Definition2", { exact: true }),
         ).toBeVisible()
+        await expect(page.getByText("2", { exact: true })).toMatchAriaSnapshot(
+          `- text: ⚠Rd 2`,
+        )
       })
 
       await test.step("show success badge", async () => {
@@ -741,7 +744,7 @@ test.describe("category import", () => {
   // Fremdsprachige Fassung
   test(
     "import foreignLanguageVersions",
-    { tag: ["@RISDEV-8469"] },
+    { tag: ["@RISDEV-8557"] },
     async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
       await navigateToCategoryImport(page, linkedDocumentNumber)
 

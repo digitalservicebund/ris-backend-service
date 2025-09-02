@@ -25,6 +25,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -75,6 +76,7 @@ public class PortalPublicationService {
    * @throws PublishException if the LDML could not be saved in the bucket
    * @throws ChangelogException if the changelog cannot be generated or saved
    */
+  @Transactional
   public void publishDocumentationUnitWithChangelog(UUID documentationUnitId, User user)
       throws DocumentationUnitNotExistsException {
     if (!featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
@@ -83,6 +85,11 @@ public class PortalPublicationService {
     try {
       DocumentationUnit documentationUnit =
           documentationUnitRepository.findByUuid(documentationUnitId);
+      log.atInfo()
+          .setMessage("Publishing doc unit...")
+          .addKeyValue("documentNumber", documentationUnit.documentNumber())
+          .addKeyValue("id", documentationUnitId)
+          .log();
       var result = publishToBucket(documentationUnit);
       uploadChangelogWithdrawOnFailure(documentationUnit, result);
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.PUBLISHED, user);
@@ -147,6 +154,11 @@ public class PortalPublicationService {
       throws DocumentationUnitNotExistsException {
     try {
       var documentationUnit = documentationUnitRepository.findByUuid(documentationUnitId);
+      log.atInfo()
+          .setMessage("Withdrawing doc unit...")
+          .addKeyValue("documentNumber", documentationUnit.documentNumber())
+          .addKeyValue("id", documentationUnitId)
+          .log();
       var result = withdrawDocumentationUnit(documentationUnit.documentNumber());
       uploadDeletionChangelog(result.deletedPaths());
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, user);
@@ -296,11 +308,22 @@ public class PortalPublicationService {
 
   private void updatePortalPublicationStatus(
       DocumentationUnit documentationUnit, PortalPublicationStatus newStatus, User user) {
-    var oldStatus = documentationUnit.portalPublicationStatus();
-    if (newStatus.equals(oldStatus)) {
-      return;
+
+    boolean statusUnchanged = newStatus.equals(documentationUnit.portalPublicationStatus());
+    boolean isPublishAction = newStatus.equals(PortalPublicationStatus.PUBLISHED);
+
+    if (statusUnchanged && isPublishAction) {
+      documentationUnitRepository.savePublicationDateTime(documentationUnit.uuid());
+    } else if (!statusUnchanged) {
+      documentationUnitRepository.updatePortalPublicationStatus(
+          documentationUnit.uuid(), newStatus);
     }
-    documentationUnitRepository.updatePortalPublicationStatus(documentationUnit.uuid(), newStatus);
+
+    addHistoryLog(documentationUnit, newStatus, user);
+  }
+
+  private void addHistoryLog(
+      DocumentationUnit documentationUnit, PortalPublicationStatus newStatus, User user) {
     String historyLogMessage;
     if (PortalPublicationStatus.PUBLISHED.equals(newStatus)) {
       historyLogMessage = "Dokeinheit im Portal veröffentlicht";

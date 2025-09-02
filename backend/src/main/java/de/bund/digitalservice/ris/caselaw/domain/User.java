@@ -11,4 +11,10 @@ public record User(
     String email,
     DocumentationOffice documentationOffice,
     List<String> roles,
-    String initials) {}
+    String initials) {
+
+  @Override
+  public String toString() {
+    return "User[id=%s]".formatted(id);
+  }
+}

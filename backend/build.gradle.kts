@@ -13,7 +13,7 @@ plugins {
     id("org.springframework.boot") version "3.5.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "7.2.1"
-    id("org.sonarqube") version "6.3.0.5676"
+    id("org.sonarqube") version "6.3.1.5724"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
@@ -186,7 +186,7 @@ dependencies {
     // CVE-2025-48988 (found in 10.1.41 used by spring-boot-starter-web:3.5.0.)
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.44")
 
-    implementation(platform("software.amazon.awssdk:bom:2.32.30"))
+    implementation(platform("software.amazon.awssdk:bom:2.33.0"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -197,7 +197,7 @@ dependencies {
     implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7")
     implementation("net.sf.saxon:Saxon-HE:12.8")
 
-    implementation("jakarta.mail:jakarta.mail-api:2.1.3")
+    implementation("jakarta.mail:jakarta.mail-api:2.1.4")
     implementation("org.eclipse.angus:angus-mail:2.0.4")
     implementation("com.icegreen:greenmail:2.1.5")
 
@@ -210,14 +210,14 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.87")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.89")
     // for local development:
 //     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.85.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.19.2")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.2")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.2")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.20.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.20")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.20.0")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
@@ -256,7 +256,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.27.Final")
+    annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.28.Final")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 }

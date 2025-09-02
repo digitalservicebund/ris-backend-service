@@ -18,5 +18,5 @@ public interface UserService {
 
   User getUser(UUID userId);
 
-  List<User> getUsers(OidcUser oidcUser);
+  List<User> getUsersInSameDocOffice(OidcUser oidcUser);
 }
