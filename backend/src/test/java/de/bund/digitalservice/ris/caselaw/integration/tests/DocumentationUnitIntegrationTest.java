@@ -179,7 +179,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
         .thenReturn(
             User.builder()
                 .id(oidcLoggedInUserId)
-                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
+                .name("test User") // This name matches the 'name' claim in AuthUtils.getMockLogin
                 .documentationOffice(docOffice)
                 .build());
   }
@@ -214,7 +214,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.CREATE);
     assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
     assertThat(historyLogs.getFirst().description()).isEqualTo("Dokeinheit angelegt");
-    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
+    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("test User");
     assertThat(historyLogs.getFirst().createdAt())
         .isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
   }
@@ -1577,7 +1577,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(createdManagementData.createdByDocOffice()).isEqualTo("DS");
     assertThat(createdManagementData.createdAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
-    assertThat(createdManagementData.createdByName()).isEqualTo("testUser");
+    assertThat(createdManagementData.createdByName()).isEqualTo("test User");
 
     var docUnitGetSameDocOffice =
         risWebTestClient
@@ -1595,7 +1595,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(managementDataSameDocOffice.createdByDocOffice()).isEqualTo("DS");
     assertThat(managementDataSameDocOffice.createdAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
-    assertThat(managementDataSameDocOffice.createdByName()).isEqualTo("testUser");
+    assertThat(managementDataSameDocOffice.createdByName()).isEqualTo("test User");
   }
 
   @Test
@@ -1610,7 +1610,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(createdManagementData.createdByDocOffice()).isEqualTo("DS");
     assertThat(createdManagementData.createdAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
-    assertThat(createdManagementData.createdByName()).isEqualTo("testUser");
+    assertThat(createdManagementData.createdByName()).isEqualTo("test User");
 
     // Publish the doc unit so that other doc office can access it
     var status =
@@ -1787,7 +1787,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(historyLogs.getFirst().createdAt())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
     assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
-    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
+    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("test User");
     assertThat(historyLogs.getFirst().description())
         .isEqualTo("Status geändert: Fremdanlage → Unveröffentlicht");
     assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.STATUS);
@@ -2046,7 +2046,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               assertThat(documentationUnitDTO.get().getManagementData().getLastUpdatedAtDateTime())
                   .isBetween(Instant.now().minusSeconds(10), Instant.now());
               assertThat(documentationUnitDTO.get().getManagementData().getLastUpdatedByUserName())
-                  .isEqualTo("testUser");
+                  .isEqualTo("test User");
               assertThat(documentationUnitDTO.get().getManagementData().getLastUpdatedByUserId())
                   .isNotNull();
               assertThat(documentationUnitDTO.get().getInboxStatus())

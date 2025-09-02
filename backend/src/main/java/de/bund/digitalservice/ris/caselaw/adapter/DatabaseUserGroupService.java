@@ -88,10 +88,9 @@ public class DatabaseUserGroupService implements UserGroupService {
   /** TODO */
   @Override
   public Optional<UserGroup> getFirstUserGroup(List<String> userGroups) {
-    return this.userGroups.stream()
-        .filter(group -> userGroups.contains(group.getUserGroupPathName()))
-        .findFirst()
-        .map(UserGroupTransformer::transformToDomain);
+    return getAllUserGroups().stream()
+        .filter(group -> userGroups.contains(group.userGroupPathName()))
+        .findFirst();
   }
 
   /**

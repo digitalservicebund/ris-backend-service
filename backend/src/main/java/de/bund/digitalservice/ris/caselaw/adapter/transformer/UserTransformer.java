@@ -68,12 +68,17 @@ public class UserTransformer {
   }
 
   private static String getFullName(List<String> firstNames, List<String> lastNames) {
-    if (firstNames.isEmpty() && lastNames.isEmpty()) {
+    if ((firstNames == null || firstNames.isEmpty())
+        && (lastNames == null || lastNames.isEmpty())) {
       return null;
     }
 
     return String.join(
-        " ", java.util.stream.Stream.concat(firstNames.stream(), lastNames.stream()).toList());
+        " ",
+        java.util.stream.Stream.concat(
+                Optional.ofNullable(firstNames).orElse(Collections.emptyList()).stream(),
+                Optional.ofNullable(lastNames).orElse(Collections.emptyList()).stream())
+            .toList());
   }
 
   private static String getInitials(String firstName, String lastName) {
@@ -126,6 +131,9 @@ public class UserTransformer {
   }
 
   public static UserDTO transformToDTO(User user) {
+    if (user == null) {
+      return null;
+    }
     return UserDTO.builder()
         .firstName(user.firstName())
         .lastName(user.lastName())

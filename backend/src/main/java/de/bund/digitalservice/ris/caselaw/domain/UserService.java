@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 public abstract class UserService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
   protected final UserGroupService userGroupService;
 
@@ -22,10 +21,15 @@ public abstract class UserService {
 
   public abstract User getUser(UUID uuid);
 
-  public abstract List<User> getAllUsersOfSameGroup(OidcUser oidcUser);
+  public abstract List<User> getAllUsersOfSameGroup(UserGroup userGroup);
 
   public DocumentationOffice getDocumentationOffice(OidcUser oidcUser) {
-    return getUser(oidcUser).documentationOffice();
+    User user = getUser(oidcUser);
+    if (user == null) return null;
+    if (user.documentationOffice() == null) {
+      LOGGER.warn("No doc office associated with user: {}", user.name());
+    }
+    return user.documentationOffice();
   }
 
   public String getEmail(OidcUser oidcUser) {

@@ -95,7 +95,7 @@ class BareIdUserApiServiceTest {
     Assertions.assertEquals("Foo Taxpayer", userResult.name());
     Assertions.assertEquals("FT", userResult.initials());
     Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
-    Assertions.assertEquals(userId, userResult.id());
+    Assertions.assertEquals(userId, userResult.externalId());
   }
 
   @Test
@@ -115,7 +115,7 @@ class BareIdUserApiServiceTest {
 
     var userResult = bareIdUserApiService.getUser(userId);
 
-    Assertions.assertEquals(userId, userResult.id());
+    Assertions.assertEquals(userId, userResult.externalId());
     Assertions.assertNull(userResult.name());
   }
 
@@ -142,7 +142,7 @@ class BareIdUserApiServiceTest {
 
     Assertions.assertNull(userResult.name());
     Assertions.assertEquals("e2e_tests_bfh@digitalservice.bund.de", userResult.email());
-    Assertions.assertEquals(userId, userResult.id());
+    Assertions.assertEquals(userId, userResult.externalId());
   }
 
   private BareUserApiResponse.BareUser generateBareUser(

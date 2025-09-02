@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -21,8 +22,6 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.testcontainers.shaded.org.checkerframework.checker.nullness.qual.Nullable;
 
 public class AuthUtils {
-
-  public static final UUID USER_UUID = UUID.fromString("1be0bb1a-c196-484a-addf-822f2ab557f7");
 
   // Updated to accept a nullable userId
   public static OidcLoginRequestPostProcessor getMockLogin(@Nullable UUID userId) {
@@ -46,8 +45,10 @@ public class AuthUtils {
                       claims.put("roles", Collections.singletonList(role));
                       claims.put("name", "testUser"); // This is the name from OIDC token
                       claims.put("email", "test@test.com");
+                      claims.put("given_name", "test");
+                      claims.put("family_name", "User");
                       // If userId is null, generate a random one
-                      claims.put("sub", (userId != null ? userId : USER_UUID).toString());
+                      claims.put("sub", (userId != null ? userId : UUID.randomUUID()).toString());
                     }));
   }
 
@@ -165,6 +166,16 @@ public class AuthUtils {
                     .build()))
         .when(userGroupService)
         .getAllUserGroups();
+
+    doAnswer(
+            invocation -> {
+              List<String> userGroups = invocation.getArgument(0);
+              return userGroupService.getAllUserGroups().stream()
+                  .filter(group -> userGroups.contains(group.userGroupPathName()))
+                  .findFirst();
+            })
+        .when(userGroupService)
+        .getFirstUserGroup(anyList());
   }
 
   /**

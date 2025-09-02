@@ -5,7 +5,7 @@ import java.util.UUID;
 import lombok.Builder;
 import org.jetbrains.annotations.NotNull;
 
-@Builder
+@Builder(toBuilder = true)
 public record User(
     UUID id,
     UUID externalId,

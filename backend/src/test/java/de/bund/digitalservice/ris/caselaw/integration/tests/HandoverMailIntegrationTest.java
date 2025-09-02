@@ -102,7 +102,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
         .thenReturn(
             User.builder()
                 .id(oidcLoggedInUserId)
-                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
+                .name("test User") // This name matches the 'name' claim in AuthUtils.getMockLogin
                 .documentationOffice(DocumentationOfficeTransformer.transformToDomain(docOffice))
                 .build());
 
@@ -342,7 +342,7 @@ class HandoverMailIntegrationTest extends BaseIntegrationTest {
       var logs = docUnitHistoryLogService.getHistoryLogs(entityId, user);
       assertThat(logs).hasSize(1);
       assertThat(logs.getFirst().description()).isEqualTo("Dokeinheit an jDV übergeben");
-      assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");
+      assertThat(logs.getFirst().createdBy()).isEqualTo("test User");
       assertThat(logs.getFirst().eventType()).isEqualTo(HistoryLogEventType.HANDOVER);
       assertThat(logs.getFirst().createdAt())
           .isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));

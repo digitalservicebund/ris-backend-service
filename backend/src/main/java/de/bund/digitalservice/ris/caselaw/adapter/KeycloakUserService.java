@@ -33,7 +33,11 @@ public class KeycloakUserService extends UserService {
    */
   @Override
   public User getUser(OidcUser oidcUser) {
-    return UserTransformer.transformToDomain(oidcUser, getDocumentationOffice(oidcUser));
+    DocumentationOffice documentationOffice = getDocumentationOffice(oidcUser);
+    if (documentationOffice == null) {
+      return null;
+    }
+    return UserTransformer.transformToDomain(oidcUser, documentationOffice);
   }
 
   @Override
@@ -48,20 +52,13 @@ public class KeycloakUserService extends UserService {
   }
 
   @Override
-  public List<User> getAllUsersOfSameGroup(OidcUser oidcUser) {
-    var optionalUserGroup = getUserGroup(oidcUser);
-    if (optionalUserGroup.isPresent()) {
-      return fetchUsers(optionalUserGroup.get());
-    } else {
+  public List<User> getAllUsersOfSameGroup(UserGroup userGroup) {
+    if (userGroup == null || userGroup.userGroupPathName() == null) {
       return Collections.emptyList();
     }
-  }
-
-  public List<User> fetchUsers(UserGroup group) {
     try {
-      LOGGER.info("Fetching all users for group {}", group.userGroupPathName());
-      return userApiService.getUsers(group.userGroupPathName());
-
+      LOGGER.info("Fetching all users for group {}", userGroup.userGroupPathName());
+      return userApiService.getUsers(userGroup.userGroupPathName());
     } catch (Exception e) {
       LOGGER.error("Error reading group user information: ", e);
       return Collections.emptyList();

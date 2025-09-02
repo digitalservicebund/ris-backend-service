@@ -23,7 +23,7 @@ class AuthIntegrationTest extends BaseIntegrationTest {
         .expectBody(User.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody().name()).isEqualTo("testUser");
+              assertThat(response.getResponseBody().name()).isEqualTo("test User");
               assertThat(response.getResponseBody().documentationOffice().abbreviation())
                   .isEqualTo("DS");
             });
@@ -42,7 +42,7 @@ class AuthIntegrationTest extends BaseIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().name()).isEqualTo("testUser");
+              assertThat(response.getResponseBody().name()).isEqualTo("test User");
               assertThat(response.getResponseBody().documentationOffice().abbreviation())
                   .isEqualTo("CC-RIS");
             });
@@ -56,9 +56,6 @@ class AuthIntegrationTest extends BaseIntegrationTest {
         .uri("/api/v1/auth/me")
         .exchange()
         .expectStatus()
-        .isOk()
-        .expectBody(User.class)
-        .consumeWith(
-            response -> assertThat(response.getResponseBody().name()).isEqualTo("testUser"));
+        .is4xxClientError();
   }
 }

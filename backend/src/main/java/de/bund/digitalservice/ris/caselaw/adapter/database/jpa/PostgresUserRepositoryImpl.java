@@ -1,5 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -22,32 +26,39 @@ public class PostgresUserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public Optional<UserDTO> getUser(UUID uuid) {
-    return repository.findById(uuid);
+  public Optional<User> getUser(UUID uuid) {
+    return repository.findById(uuid).map(UserTransformer::transformToDomain);
   }
 
   @Override
-  public List<UserDTO> getAllUsersForDocumentationOffice(
-      DocumentationOfficeDTO documentationOffice) {
-    return repository.findByDocumentationOffice(documentationOffice);
+  public List<User> getAllUsersForDocumentationOffice(DocumentationOffice documentationOffice) {
+    return repository
+        .findByDocumentationOffice(
+            DocumentationOfficeTransformer.transformToDTO(documentationOffice))
+        .stream()
+        .map(UserTransformer::transformToDomain)
+        .toList();
   }
 
   @Override
-  public void saveOrUpdate(List<UserDTO> userDTOs) {
-    userDTOs.forEach(this::saveOrUpdate);
+  public void saveOrUpdate(List<User> users) {
+    users.forEach(this::saveOrUpdate);
   }
 
   @Override
-  public Optional<UserDTO> saveOrUpdate(UserDTO user) {
+  public Optional<User> saveOrUpdate(User user) {
+    if (user == null) return Optional.empty();
     // make sure to update the user's data (e.g. first name, last name) if they exist
     repository
-        .findByExternalId(user.getExternalId())
-        .ifPresent(userDTO -> user.setId(userDTO.getId()));
-    return Optional.of(repository.save(user));
+        .findByExternalId(user.externalId())
+        .ifPresent(userDTO -> userDTO.setExternalId(userDTO.getExternalId()));
+
+    return Optional.of(
+        UserTransformer.transformToDomain(repository.save(UserTransformer.transformToDTO(user))));
   }
 
   @Override
-  public Optional<UserDTO> findByExternalId(UUID externalId) {
-    return repository.findByExternalId(externalId);
+  public Optional<User> findByExternalId(UUID externalId) {
+    return repository.findByExternalId(externalId).map(UserTransformer::transformToDomain);
   }
 }

@@ -34,7 +34,7 @@ public class UserController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestParam(value = "q") Optional<String> searchStr) {
 
-    var users = service.getAllUsersOfSameGroup(oidcUser);
+    var users = service.getAllUsersOfSameGroup(service.getUserGroup(oidcUser).orElse(null));
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
       String search = searchStr.get().toLowerCase();
       return users.stream()

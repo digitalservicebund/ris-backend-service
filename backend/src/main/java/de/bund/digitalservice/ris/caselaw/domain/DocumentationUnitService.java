@@ -478,7 +478,11 @@ public class DocumentationUnitService {
       Slice<DocumentationUnitListItem> documentationUnitListItems, OidcUser oidcUser) {
 
     Map<UUID, User> userIdMap = new HashMap<>();
-    for (User user : userService.getAllUsersOfSameGroup(oidcUser)) {
+    Optional<UserGroup> userGroup = userService.getUserGroup(oidcUser);
+    if (userGroup.isEmpty()) {
+      return documentationUnitListItems;
+    }
+    for (User user : userService.getAllUsersOfSameGroup(userGroup.orElse(null))) {
       userIdMap.put(user.id(), user);
     }
 

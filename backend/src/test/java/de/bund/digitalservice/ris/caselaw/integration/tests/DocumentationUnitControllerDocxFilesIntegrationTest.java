@@ -127,7 +127,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     assertThat(logs)
         .map(HistoryLog::eventType)
         .containsExactly(HistoryLogEventType.UPDATE, HistoryLogEventType.FILES);
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser");
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("test User", "test User");
     assertThat(logs.get(1).description()).isEqualTo("Word-Dokument hinzugefügt");
   }
 
@@ -164,7 +164,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
             .getResponseBody();
 
     ManagementData managementData = docUnit.managementData();
-    assertThat(managementData.lastUpdatedByName()).isEqualTo("testUser");
+    assertThat(managementData.lastUpdatedByName()).isEqualTo("test User");
     assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
     assertThat(managementData.lastUpdatedAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
@@ -445,7 +445,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
 
     // Assert
     ManagementData managementData = docUnit.managementData();
-    assertThat(managementData.lastUpdatedByName()).isEqualTo("testUser");
+    assertThat(managementData.lastUpdatedByName()).isEqualTo("test User");
     assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
     assertThat(managementData.lastUpdatedAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
@@ -454,7 +454,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     var logs = historyLogService.getHistoryLogs(dto.getId(), user);
     assertThat(logs).hasSize(1);
     assertThat(logs.getFirst().eventType()).isEqualTo(HistoryLogEventType.FILES);
-    assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");
+    assertThat(logs.getFirst().createdBy()).isEqualTo("test User");
     assertThat(logs.getFirst().description()).isEqualTo("Word-Dokument gelöscht");
   }
 
