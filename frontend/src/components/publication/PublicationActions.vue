@@ -13,7 +13,7 @@ import publishDocumentationUnitService from "@/services/publishDocumentationUnit
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import useSessionStore from "@/stores/sessionStore"
 import DateUtil from "@/utils/dateUtil"
-import IconErrorOutline from "~icons/ic/baseline-error-outline"
+import IconInfoOutline from "~icons/mdi/information-outline"
 
 const props = defineProps<{
   isPublishable: boolean
@@ -102,7 +102,7 @@ const lastPublishedAt = computed(() => {
         "
         class="flex flex-row items-center gap-8"
       >
-        <IconErrorOutline class="text-grey-900" />
+        <IconInfoOutline class="text-grey-900" />
         <a
           class="ris-link1-regular whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
           :href="linkToPortal"
@@ -122,7 +122,7 @@ const lastPublishedAt = computed(() => {
       </div>
 
       <div v-if="isPublished || isWithdrawn" class="flex flex-row gap-8">
-        <IconErrorOutline class="text-grey-900" />
+        <IconInfoOutline class="text-grey-900" />
         <p>
           Das Hochladen der Stammdaten und der Informationen im Portal-Tab
           „Details“ dauert etwa 2 Minuten.
@@ -136,7 +136,7 @@ const lastPublishedAt = computed(() => {
         "
         class="flex flex-row gap-8"
       >
-        <IconErrorOutline class="text-grey-900" />
+        <IconInfoOutline class="text-grey-900" />
         <p>
           Zuletzt veröffentlicht am:
           {{ lastPublishedAt }}
