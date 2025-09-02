@@ -342,7 +342,7 @@ public class DocumentationUnitController {
       var str = service.deleteByUuid(uuid);
       return ResponseEntity.status(HttpStatus.OK).body(str);
     } catch (DocumentationUnitNotExistsException | DocumentationUnitDeletionException ex) {
-      return ResponseEntity.internalServerError().body(ex.getMessage());
+      return ResponseEntity.badRequest().body(ex.getMessage());
     }
   }
 
