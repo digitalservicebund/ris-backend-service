@@ -1,10 +1,10 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
-  navigateToCategories,
-  navigateToPreview,
-  navigateToHandover,
   handoverDocumentationUnit,
+  navigateToCategories,
+  navigateToHandover,
+  navigateToPreview,
   save,
 } from "~/e2e/caselaw/utils/e2e-utils"
 
@@ -23,6 +23,15 @@ test.describe(
       { tag: ["@RISDEV-6383"] },
       async ({ page, documentNumber }) => {
         await navigateToCategories(page, documentNumber)
+
+        await test.step("Eingangsart Eingabefeld mit Hinweis wird angezeigt", async () => {
+          await expect(page.getByLabel("Eingangsart")).toBeVisible()
+          await expect(
+            page.getByText(
+              "Papier, BLK-DB-Schnittstelle, EUR-LEX-Schnittstelle, E-Mail",
+            ),
+          ).toBeVisible()
+        })
 
         await test.step("Neu hinzugefügte Eingangsarten sind sichtbar", async () => {
           await page.getByLabel("Eingangsart", { exact: true }).fill("E-Mail")
