@@ -20,6 +20,10 @@ test.describe(
       await test.step("Upload image in attachments tab", async () => {
         await navigateToAttachments(page, prefilledDocumentUnit.documentNumber)
         await uploadTestfile(page, "sample-image-formats.docx")
+        // Wait for transformed docx to be loaded to avoid NS_BINDING_ABORTED errors in firefox
+        await expect(
+          page.getByText("jpg:Word rotated 90 degrees"),
+        ).toBeVisible()
       })
 
       await test.step("Navigate to categories", async () => {
