@@ -1,12 +1,14 @@
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "../../../fixtures"
 import {
+  fillInput,
   handoverDocumentationUnit,
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
   save,
 } from "~/e2e/caselaw/utils/e2e-utils"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("deviating document numbers", () => {
   test(
@@ -133,6 +135,38 @@ test.describe("deviating document numbers", () => {
         await expect(
           page.getByText("<begriff>XXRE222222222</begriff>"),
         ).toBeVisible()
+      })
+    },
+  )
+
+  test(
+    "Dok-Einheit kann über die Abweichende Dokumentnummer in der Suche gefunden werden",
+    { tag: ["@RISDEV-652"] },
+    async ({ page, documentNumber }) => {
+      await navigateToCategories(page, documentNumber)
+      const deviatingDocumentNumber = generateString({ length: 13 })
+
+      await test.step("Enter and save deviating document number", async () => {
+        const inputField = page.getByLabel("Abweichende Dokumentnummer", {
+          exact: true,
+        })
+        await inputField.fill(deviatingDocumentNumber)
+        await page.keyboard.press("Enter")
+        await save(page)
+
+        const chipsLocator = page.getByTestId("chip")
+        const chips = await chipsLocator.all()
+        await expect(chipsLocator).toHaveCount(1)
+        await expect(chips[0].getByTestId("chip-value")).toHaveText(
+          deviatingDocumentNumber,
+        )
+      })
+
+      await test.step("Search for deviating document number and check that doc unit is displayed", async () => {
+        await page.getByTestId("search-navbar-button").click()
+        await fillInput(page, "Dokumentnummer Suche", deviatingDocumentNumber)
+        await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+        await expect(page.getByText(documentNumber)).toBeVisible()
       })
     },
   )
