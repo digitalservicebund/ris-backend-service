@@ -130,7 +130,10 @@ watchEffect(() => {
         :previous-process-step="props.documentUnit.previousProcessStep"
       />
       <IconBadge
-        v-if="props.documentUnit.currentProcessStep && processStepsEnabled"
+        v-if="
+          props.documentUnit.currentDocumentationUnitProcessStep &&
+          processStepsEnabled
+        "
         background-color="bg-white"
         border-color="border-gray-800"
         class="px-8"
