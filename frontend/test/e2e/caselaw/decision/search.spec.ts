@@ -207,8 +207,8 @@ test.describe("Große Suche nach Entscheidungen", () => {
       tag: "@RISDEV-8718",
     },
     async ({ page, decisions }) => {
-      const { createdDecisions } = decisions
-      await openSearchWithFileNumberPrefix("e2e-", page)
+      const { fileNumberPrefix, createdDecisions } = decisions
+      await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
       await page.getByLabel("Nur meine Dokstelle Filter").click()
 
       // all new doc units are created with step Ersterfassung
@@ -220,8 +220,10 @@ test.describe("Große Suche nach Entscheidungen", () => {
       })
       await triggerSearch(page)
 
-      await test.step(`Prüfe, dass Ergebnisse gefunden wurde`, async () => {
-        await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
+      await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
+        await expect(
+          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
+        ).toBeVisible()
         await expect(
           page.getByText(createdDecisions[0].documentNumber),
         ).toBeVisible()
@@ -247,7 +249,9 @@ test.describe("Große Suche nach Entscheidungen", () => {
       await triggerSearch(page)
 
       await test.step(`Prüfe, dass alle Ergebnisse gefunden wurden`, async () => {
-        await expect(page.getByText("Ergebnisse gefunden")).toBeVisible()
+        await expect(
+          page.getByText(createdDecisions.length + " Ergebnisse gefunden"),
+        ).toBeVisible()
         await expect(
           page.getByText(createdDecisions[0].documentNumber),
         ).toBeVisible()
@@ -279,7 +283,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
       })
 
       await test.step(`Prüfe, dass Ergebnisse die zugewiesene Dokumentationseinheit nicht mehr enthalten`, async () => {
-        await openSearchWithFileNumberPrefix("e2e-", page)
+        await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
         await page.getByLabel("Nur meine Dokstelle Filter").click()
         await page.getByLabel("Nur mir zugewiesen").click()
         await expect(page.getByLabel("Nur mir zugewiesen")).toBeChecked()
@@ -344,7 +348,7 @@ test.describe("Große Suche nach Entscheidungen", () => {
       })
 
       await test.step(`Prüfe, dass ein Ergebnis weniger gefunden wurde`, async () => {
-        await openSearchWithFileNumberPrefix("e2e-", page)
+        await openSearchWithFileNumberPrefix(fileNumberPrefix, page)
         await page.getByLabel("Nur meine Dokstelle Filter").click()
         await page.getByLabel("Nur mir zugewiesen").click()
         await expect(page.getByLabel("Nur mir zugewiesen")).toBeChecked()
