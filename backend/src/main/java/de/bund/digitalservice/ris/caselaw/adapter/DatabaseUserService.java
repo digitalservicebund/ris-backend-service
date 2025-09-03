@@ -66,12 +66,11 @@ public class DatabaseUserService extends UserService {
   }
 
   /**
-   * Aim to get the user
+   * Aim to get the user from the database
    *
    * <ol>
    *   <li>By database uuid or, if not exists,
-   *   <li>By external id or, if not exists,
-   *   <li>From the keycloak user service and persist it if found
+   *   <li>By external id or, if not exists, null
    * </ol>
    *
    * @param uuid the user's id or external id
@@ -84,15 +83,7 @@ public class DatabaseUserService extends UserService {
     }
     return userRepository
         .getUser(uuid)
-        .orElseGet(
-            () ->
-                userRepository
-                    .findByExternalId(uuid)
-                    .orElseGet(
-                        () ->
-                            userRepository
-                                .saveOrUpdate((keycloakUserService.getUser(uuid)))
-                                .orElse(null)));
+        .orElseGet(() -> userRepository.findByExternalId(uuid).orElse(null));
   }
 
   /**

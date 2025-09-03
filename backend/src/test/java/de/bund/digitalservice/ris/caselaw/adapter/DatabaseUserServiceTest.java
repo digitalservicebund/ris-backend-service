@@ -174,14 +174,12 @@ class DatabaseUserServiceTest {
   void testGetUserByUUID_withUserNotInDatabaseAndKeycloak_shouldReturnNull() {
     when(userRepository.getUser(USER_UUID)).thenReturn(Optional.empty());
     when(userRepository.findByExternalId(USER_UUID)).thenReturn(Optional.empty());
-    when(keycloakUserService.getUser(USER_UUID)).thenReturn(null);
 
     User retrievedUser = databaseUserService.getUser(USER_UUID);
 
     assertNull(retrievedUser);
     verify(userRepository, times(1)).getUser(eq(USER_UUID));
     verify(userRepository, times(1)).findByExternalId(eq(USER_UUID));
-    verify(keycloakUserService, times(1)).getUser(eq(USER_UUID));
     verify(userRepository, never()).saveOrUpdate(any(User.class));
   }
 
