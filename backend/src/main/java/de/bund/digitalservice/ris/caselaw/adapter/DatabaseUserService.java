@@ -11,8 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 @Service
 @Primary
 public class DatabaseUserService extends UserService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseUserService.class);
 
   private final UserRepository userRepository;
   private final UserService keycloakUserService;
@@ -55,7 +52,7 @@ public class DatabaseUserService extends UserService {
 
   /**
    * Retrieve user by the oidc user's id. First attempt to find in database. If it can't be found,
-   * request from keycloak API and persist.
+   * request from keycloak user service and persist it if found.
    *
    * @param oidcUser the oidc user
    * @return the user domain object
@@ -69,7 +66,13 @@ public class DatabaseUserService extends UserService {
   }
 
   /**
-   * Get user by database uuid or, if not exists, by external id
+   * Aim to get the user
+   *
+   * <ol>
+   *   <li>By database uuid or, if not exists,
+   *   <li>By external id or, if not exists,
+   *   <li>From the keycloak user service and persist it if found
+   * </ol>
    *
    * @param uuid the user's id or external id
    * @return the user
@@ -81,7 +84,14 @@ public class DatabaseUserService extends UserService {
     }
     return userRepository
         .getUser(uuid)
-        .orElse(userRepository.findByExternalId(uuid).orElse(keycloakUserService.getUser(uuid)));
+        .orElse(
+            userRepository
+                .findByExternalId(uuid)
+                .orElseGet(
+                    () ->
+                        userRepository
+                            .saveOrUpdate((keycloakUserService.getUser(uuid)))
+                            .orElse(null)));
   }
 
   /**
