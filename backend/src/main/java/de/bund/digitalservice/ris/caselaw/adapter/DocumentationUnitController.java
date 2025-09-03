@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import com.gravity9.jsonpatch.JsonPatch;
 import de.bund.digitalservice.ris.caselaw.adapter.eurlex.EurLexSOAPSearchService;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
@@ -372,7 +371,7 @@ public class DocumentationUnitController {
   }
 
   /**
-   * Update a documentation unit with a {@link JsonPatch} object.
+   * Update a documentation unit with a {@link com.gravity9.jsonpatch.JsonPatch} object.
    *
    * @param uuid id of the documentation unit
    * @param patch patch with the change operations
