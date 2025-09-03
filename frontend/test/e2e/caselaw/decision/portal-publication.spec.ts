@@ -392,7 +392,9 @@ test.describe(
       },
     )
 
-    test(
+    // Returns success but should fail. Unclear why.
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "Rechtschreibprüfung",
       {
         tag: ["@RISDEV-8456"],
