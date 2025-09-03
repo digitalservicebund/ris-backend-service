@@ -27,6 +27,7 @@ public class PostgresUserRepositoryImpl implements UserRepository {
 
   @Override
   public Optional<User> getUser(UUID uuid) {
+    if (uuid == null) return Optional.empty();
     return repository.findById(uuid).map(UserTransformer::transformToDomain);
   }
 

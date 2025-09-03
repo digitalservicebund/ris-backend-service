@@ -4,12 +4,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.BareUserApiResponse;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 public class UserTransformer {
@@ -23,7 +26,9 @@ public class UserTransformer {
 
     return User.builder()
         .externalId(bareUser.uuid())
-        .name(getFullName(firstNames, lastNames))
+        .name(
+            getFullName(
+                Stream.concat(firstNames.stream(), lastNames.stream()).toArray(String[]::new)))
         .firstName(String.join(" ", firstNames))
         .lastName(String.join(" ", lastNames))
         .email(bareUser.email())
@@ -58,7 +63,7 @@ public class UserTransformer {
     return User.builder()
         .id(userDTO.getId())
         .externalId(userDTO.getExternalId())
-        .name(getFullName(List.of(firstName), List.of(lastName)))
+        .name(getFullName(firstName, lastName))
         .firstName(userDTO.getFirstName())
         .lastName(userDTO.getLastName())
         .initials(getInitials(firstName, lastName))
@@ -67,18 +72,12 @@ public class UserTransformer {
         .build();
   }
 
-  private static String getFullName(List<String> firstNames, List<String> lastNames) {
-    if ((firstNames == null || firstNames.isEmpty())
-        && (lastNames == null || lastNames.isEmpty())) {
-      return null;
-    }
-
-    return String.join(
-        " ",
-        java.util.stream.Stream.concat(
-                Optional.ofNullable(firstNames).orElse(Collections.emptyList()).stream(),
-                Optional.ofNullable(lastNames).orElse(Collections.emptyList()).stream())
-            .toList());
+  private static String getFullName(String... names) {
+    return Arrays.stream(names)
+        .filter(Objects::nonNull)
+        .filter(s -> !s.isEmpty())
+        .collect(
+            Collectors.collectingAndThen(Collectors.joining(" "), s -> s.isEmpty() ? null : s));
   }
 
   private static String getInitials(String firstName, String lastName) {

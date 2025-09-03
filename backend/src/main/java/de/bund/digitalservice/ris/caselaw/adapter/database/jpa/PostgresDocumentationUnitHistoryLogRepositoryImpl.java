@@ -60,14 +60,16 @@ public class PostgresDocumentationUnitHistoryLogRepositoryImpl
                   fromUser =
                       Optional.ofNullable(
                               historyLogProcessStepDTO.getFromDocumentationUnitProcessStep())
-                          .map(DocumentationUnitProcessStepDTO::getUserId)
+                          .map(DocumentationUnitProcessStepDTO::getUser)
+                          .map(UserDTO::getId)
                           .map(userService::getUser)
                           .orElse(null);
 
                   toUser =
                       Optional.ofNullable(
                               historyLogProcessStepDTO.getToDocumentationUnitProcessStep())
-                          .map(DocumentationUnitProcessStepDTO::getUserId)
+                          .map(DocumentationUnitProcessStepDTO::getUser)
+                          .map(UserDTO::getId)
                           .map(userService::getUser)
                           .orElse(null);
                 }

@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDocumentationUnitProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
@@ -140,21 +141,21 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(ersterfassungProcessStep)
-            .userId(user1IdDS)
+            .user(UserDTO.builder().id(user1IdDS).build())
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step2DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .userId(user2IdDS)
+            .user(UserDTO.builder().id(user2IdDS).build())
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step3DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .userId(null)
+            .user(null)
             .createdAt(now)
             .build();
     documentationUnitProcessStepRepository.save(step1DTO);
@@ -262,21 +263,21 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(ersterfassungProcessStep)
-            .userId(user1IdDS)
+            .user(UserDTO.builder().id(user1IdDS).build())
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step2DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .userId(user2IdDS)
+            .user(UserDTO.builder().id(user2IdDS).build())
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step3DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .userId(null)
+            .user(null)
             .createdAt(now)
             .build();
     documentationUnitProcessStepRepository.save(step1DTO);
@@ -386,21 +387,21 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(ersterfassungProcessStep)
-            .userId(userNullId)
+            .user(UserDTO.builder().id(userNullId).build())
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step2DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .userId(userNullId)
+            .user(UserDTO.builder().id(userNullId).build())
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step3DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .userId(null)
+            .user(null)
             .createdAt(now)
             .build();
 

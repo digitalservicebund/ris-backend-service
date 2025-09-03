@@ -24,8 +24,9 @@ import lombok.NoArgsConstructor;
 public class DocumentationUnitProcessStepDTO {
   @Id @GeneratedValue private UUID id;
 
-  @Column(name = "user_id")
-  private UUID userId;
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "user_id")
+  private UserDTO user;
 
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;

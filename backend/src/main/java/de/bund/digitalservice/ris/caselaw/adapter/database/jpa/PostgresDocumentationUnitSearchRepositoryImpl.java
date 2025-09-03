@@ -268,7 +268,8 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       Predicate assignedToMePredicate =
           cb.equal(
               root.get(DocumentationUnitDTO_.currentProcessStep)
-                  .get(DocumentationUnitProcessStepDTO_.userId),
+                  .get(DocumentationUnitProcessStepDTO_.user)
+                  .get(UserDTO_.id),
               user.id());
       predicates.add(assignedToMePredicate);
     }
@@ -282,7 +283,8 @@ public class PostgresDocumentationUnitSearchRepositoryImpl
       Predicate unassignedPredicate =
           cb.isNull(
               root.get(DocumentationUnitDTO_.currentProcessStep)
-                  .get(DocumentationUnitProcessStepDTO_.userId));
+                  .get(DocumentationUnitProcessStepDTO_.user)
+                  .get(UserDTO_.id));
       predicates.add(unassignedPredicate);
     }
     return predicates;

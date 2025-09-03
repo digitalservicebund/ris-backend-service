@@ -1,14 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -47,8 +45,12 @@ public class DatabaseUserService extends UserService {
         .getAllUserGroups()
         .forEach(
             userGroup ->
-                persistUsersOfDocOffice(
-                    keycloakUserService.getUsersInSameDocOffice(userGroup), userGroup.docOffice()));
+                userRepository.saveOrUpdate(
+                    keycloakUserService.getUsersInSameDocOffice(userGroup).stream()
+                        .map(
+                            user ->
+                                user.toBuilder().documentationOffice(userGroup.docOffice()).build())
+                        .toList()));
   }
 
   /**
@@ -61,7 +63,8 @@ public class DatabaseUserService extends UserService {
   public User getUser(OidcUser oidcUser) {
     return userRepository
         .findByExternalId(UserTransformer.getOidcUserId(oidcUser))
-        .orElseGet(() -> fetchAndPersistUser(oidcUser));
+        .orElseGet(
+            () -> userRepository.saveOrUpdate(keycloakUserService.getUser(oidcUser)).orElse(null));
   }
 
   /**
@@ -87,23 +90,5 @@ public class DatabaseUserService extends UserService {
     }
     return userRepository.getAllUsersForDocumentationOffice(userGroup.docOffice()).stream()
         .toList();
-  }
-
-  private void persistUsersOfDocOffice(
-      List<User> users, @NotNull DocumentationOffice documentationOffice) {
-    userRepository.saveOrUpdate(
-        users.stream()
-            .map(user -> user.toBuilder().documentationOffice(documentationOffice).build())
-            .toList());
-  }
-
-  /**
-   * Fetches the oidc user from the keycloak service and persists them
-   *
-   * @param oidcUser the oidc user
-   * @return the persisted user
-   */
-  private User fetchAndPersistUser(OidcUser oidcUser) {
-    return userRepository.saveOrUpdate(keycloakUserService.getUser(oidcUser)).orElse(null);
   }
 }
