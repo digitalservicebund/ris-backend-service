@@ -426,9 +426,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
             HistoryLogEventType.UPDATE,
             HistoryLogEventType.SCHEDULED_PUBLICATION,
             HistoryLogEventType.CREATE);
-    assertThat(logs)
-        .map(HistoryLog::createdBy)
-        .containsExactly("testUser", "testUser", "test User");
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser", "testUser");
     assertThat(logs).map(HistoryLog::documentationOffice).containsExactly("DS", "DS", "DS");
     assertThat(logs.get(0).description()).isEqualTo("Dokeinheit bearbeitet");
     assertThat(logs.get(1).description()).isEqualTo("Terminierte Abgabe gelöscht");
@@ -487,7 +485,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -534,7 +532,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
@@ -589,7 +587,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
@@ -643,7 +641,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
@@ -698,7 +696,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
@@ -759,7 +757,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
@@ -818,7 +816,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
     }
@@ -883,7 +881,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
 
       RisJsonPatch patchUser2 =
@@ -930,7 +928,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
@@ -991,7 +989,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
@@ -1045,7 +1043,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
@@ -1107,7 +1105,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
@@ -1173,7 +1171,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
 
@@ -1203,7 +1201,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath())
                     .isEqualTo("/managementData/lastUpdatedByName");
-                assertThat(replaceOperation.getValue().textValue()).isEqualTo("test User");
+                assertThat(replaceOperation.getValue().textValue()).isEqualTo("testUser");
 
                 operation = responsePatch.patch().getOperations().get(1);
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
@@ -1246,7 +1244,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
@@ -1309,7 +1307,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -1359,7 +1357,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
@@ -1417,7 +1415,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -1471,7 +1469,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
@@ -1536,7 +1534,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
@@ -1599,7 +1597,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -1659,7 +1657,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
     }
@@ -1725,7 +1723,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -1797,7 +1795,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
@@ -1859,7 +1857,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -1908,7 +1906,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
@@ -1962,7 +1960,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
@@ -2032,7 +2030,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -2089,7 +2087,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertThat(documentationUnitDTO.getFileNumbers()).isEmpty();
       TestTransaction.end();
@@ -2666,7 +2664,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -2724,7 +2722,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
     }
@@ -2789,7 +2787,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
 
       List<JsonPatchOperation> operationsUser2 =
@@ -2841,7 +2839,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
@@ -2897,7 +2895,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
@@ -2966,7 +2964,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -3025,7 +3023,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
@@ -3091,7 +3089,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
 
       JsonNode court2AsNode = objectMapper.convertValue(Court.builder().build(), JsonNode.class);
@@ -3158,7 +3156,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
   }
@@ -3865,7 +3863,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -3921,7 +3919,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
 
@@ -3994,7 +3992,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -4053,7 +4051,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
           Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
@@ -4115,7 +4113,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       assertOnSavedPatchEntry(
           patches.get(1).getPatch(),
           Map.of("op", "add", "path", "/coreData/ecli", "value", "ecliUser2"),
@@ -4196,7 +4194,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -4261,7 +4259,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
     }
@@ -4343,7 +4341,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
 
@@ -4417,7 +4415,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
       TestTransaction.end();
     }
   }
@@ -4506,7 +4504,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
           Map.of("op", "replace", "path", "/managementData/lastUpdatedByDocOffice", "value", "DS"),
           Map.of("op", "replace", "path", "/managementData/lastUpdatedAtDateTime"),
           Map.of(
-              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "test User"));
+              "op", "replace", "path", "/managementData/lastUpdatedByName", "value", "testUser"));
 
       TestTransaction.end();
     }
@@ -4948,7 +4946,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
         {
           "op": "replace",
           "path": "/managementData/lastUpdatedByName",
-          "value": "test User"
+          "value": "testUser"
         }
         """,
         """
@@ -4999,7 +4997,7 @@ class PatchUpdateIntegrationTest extends BaseIntegrationTest {
         {
           "op": "replace",
           "path": "/managementData/lastUpdatedByName",
-          "value": "test User"
+          "value": "testUser"
         }
         """);
   }

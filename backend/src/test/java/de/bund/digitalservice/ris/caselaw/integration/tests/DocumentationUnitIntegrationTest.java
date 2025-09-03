@@ -159,7 +159,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
   @MockitoBean private HandoverReportRepository handoverReportRepository;
   @MockitoBean DocumentNumberPatternConfig documentNumberPatternConfig;
   @MockitoSpyBean private UserService userService;
-  public static final UUID USER_ID = UUID.randomUUID();
   private final UUID oidcLoggedInUserId = UUID.randomUUID();
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
@@ -182,18 +181,6 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
             .findByName("Ersterfassung")
             .orElseThrow(
                 () -> new AssertionError("Process step 'Ersterfassung' not found in repository."));
-
-    // Mock the UserService.getUser(UUID) for the OIDC logged-in user
-    // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
-    // We need this to assert on history logs
-    when(userService.getUser(oidcLoggedInUserId))
-        .thenReturn(
-            User.builder()
-                .id(USER_ID)
-                .externalId(oidcLoggedInUserId)
-                .name("test User") // This name matches the 'name' claim in AuthUtils.getMockLogin
-                .documentationOffice(docOffice)
-                .build());
   }
 
   @AfterEach
@@ -226,7 +213,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.CREATE);
     assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
     assertThat(historyLogs.getFirst().description()).isEqualTo("Dokeinheit angelegt");
-    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("test User");
+    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
     assertThat(historyLogs.getFirst().createdAt())
         .isCloseTo(Instant.now(), within(5, ChronoUnit.SECONDS));
   }
@@ -1674,7 +1661,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(createdManagementData.createdByDocOffice()).isEqualTo("DS");
     assertThat(createdManagementData.createdAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
-    assertThat(createdManagementData.createdByName()).isEqualTo("test User");
+    assertThat(createdManagementData.createdByName()).isEqualTo("testUser");
 
     var docUnitGetSameDocOffice =
         risWebTestClient
@@ -1692,7 +1679,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(managementDataSameDocOffice.createdByDocOffice()).isEqualTo("DS");
     assertThat(managementDataSameDocOffice.createdAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
-    assertThat(managementDataSameDocOffice.createdByName()).isEqualTo("test User");
+    assertThat(managementDataSameDocOffice.createdByName()).isEqualTo("testUser");
   }
 
   @Test
@@ -1707,7 +1694,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(createdManagementData.createdByDocOffice()).isEqualTo("DS");
     assertThat(createdManagementData.createdAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
-    assertThat(createdManagementData.createdByName()).isEqualTo("test User");
+    assertThat(createdManagementData.createdByName()).isEqualTo("testUser");
 
     // Publish the doc unit so that other doc office can access it
     var status =
@@ -1884,7 +1871,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
     assertThat(historyLogs.getFirst().createdAt())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
     assertThat(historyLogs.getFirst().documentationOffice()).isEqualTo("DS");
-    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("test User");
+    assertThat(historyLogs.getFirst().createdBy()).isEqualTo("testUser");
     assertThat(historyLogs.getFirst().description())
         .isEqualTo("Status geändert: Fremdanlage → Unveröffentlicht");
     assertThat(historyLogs.getFirst().eventType()).isEqualTo(HistoryLogEventType.STATUS);
@@ -2143,7 +2130,7 @@ class DocumentationUnitIntegrationTest extends BaseIntegrationTest {
               assertThat(documentationUnitDTO.get().getManagementData().getLastUpdatedAtDateTime())
                   .isBetween(Instant.now().minusSeconds(10), Instant.now());
               assertThat(documentationUnitDTO.get().getManagementData().getLastUpdatedByUserName())
-                  .isEqualTo("test User");
+                  .isEqualTo("testUser");
               assertThat(documentationUnitDTO.get().getManagementData().getLastUpdatedByUserId())
                   .isNotNull();
               assertThat(documentationUnitDTO.get().getInboxStatus())

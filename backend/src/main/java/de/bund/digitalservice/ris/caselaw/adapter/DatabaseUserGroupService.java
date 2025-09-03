@@ -90,11 +90,9 @@ public class DatabaseUserGroupService implements UserGroupService {
    * UserGroup user group}. Examples:
    *
    * <ol>
-   *   <li>Known user groups: /ABC/DEF, /HIJ/KLM | provided user group: /HIJ/KLM, /OPQ -> result:
-   *       /HIJ/KLM
-   *   <li>Known user groups: /ABC/DEF, /HIJ, /OPQ | provided user group: /HIJ/KLM, /OPQ -> result:
-   *       /HIJ/KLM
-   *   <li>Known user groups: /ABC/DEF, /HIJ, /OPQ | provided user group: /ABC, /OPQ -> result: /OPQ
+   *   <li>Known groups: /ABC/DEF, /HIJ/KLM | provided groups: /HIJ/KLM, /OPQ -> result: /HIJ/KLM
+   *   <li>Known groups: /HIJ, /HIJ/LKM, /OPQ | provided groups: /HIJ/KLM, /OPQ -> result: /HIJ
+   *   <li>Known groups: /ABC/DEF, /HIJ, /OPQ | provided groups: /ABC, /OPQ -> result: /OPQ
    * </ol>
    *
    * @param userGroups the {@link UserGroup user groups} to match against the known {@link UserGroup

@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class DocumentationUnitProcessStepDTO {
   @Id @GeneratedValue private UUID id;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne
   @JoinColumn(name = "user_id")
   private UserDTO user;
 

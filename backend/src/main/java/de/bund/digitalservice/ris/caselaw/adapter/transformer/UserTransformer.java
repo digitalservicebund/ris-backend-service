@@ -64,8 +64,8 @@ public class UserTransformer {
         .id(userDTO.getId())
         .externalId(userDTO.getExternalId())
         .name(getFullName(firstName, lastName))
-        .firstName(userDTO.getFirstName())
-        .lastName(userDTO.getLastName())
+        .firstName(firstName)
+        .lastName(lastName)
         .initials(getInitials(firstName, lastName))
         .documentationOffice(
             DocumentationOfficeTransformer.transformToDomain(userDTO.getDocumentationOffice()))

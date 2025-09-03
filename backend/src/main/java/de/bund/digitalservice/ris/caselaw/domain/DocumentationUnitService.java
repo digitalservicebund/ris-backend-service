@@ -288,7 +288,6 @@ public class DocumentationUnitService {
     }
     duplicateCheckService.checkDuplicates(docUnit.documentNumber());
 
-    retrieveProcessStepsUsers(newDocumentationUnit);
     return (Decision) newDocumentationUnit;
   }
 
@@ -448,7 +447,6 @@ public class DocumentationUnitService {
 
     var documentable = repository.findByDocumentNumber(documentNumber, user);
 
-    retrieveProcessStepsUsers(documentable);
     documentable = filterProcessStepsOfOtherDocumentationOffices(documentable, user);
 
     switch (documentable) {
@@ -542,32 +540,6 @@ public class DocumentationUnitService {
     }
 
     return documentable;
-  }
-
-  private void retrieveProcessStepsUsers(DocumentationUnit documentable) {
-    if (documentable == null) {
-      return;
-    }
-
-    if (documentable.currentDocumentationUnitProcessStep() != null
-        && documentable.currentDocumentationUnitProcessStep().getUser() != null) {
-      documentable
-          .currentDocumentationUnitProcessStep()
-          .setUser(
-              userService.getUser(
-                  documentable.currentDocumentationUnitProcessStep().getUser().id()));
-    }
-
-    if (documentable.processSteps() != null) {
-      documentable
-          .processSteps()
-          .forEach(
-              processStep -> {
-                if (processStep.getUser() != null) {
-                  processStep.setUser(userService.getUser(processStep.getUser().id()));
-                }
-              });
-    }
   }
 
   public DocumentationUnit getByUuid(UUID documentationUnitId)
@@ -716,9 +688,6 @@ public class DocumentationUnitService {
 
         DocumentationUnit updatedDocumentationUnit =
             updateDocumentationUnit(user, patchedDocumentationUnit, duplicateCheckStatus);
-
-        retrieveProcessStepsUsers(updatedDocumentationUnit);
-        retrieveProcessStepsUsers(patchedDocumentationUnitWithBase64Images);
 
         toFrontendJsonPatch =
             patchMapperService.getDiffPatch(

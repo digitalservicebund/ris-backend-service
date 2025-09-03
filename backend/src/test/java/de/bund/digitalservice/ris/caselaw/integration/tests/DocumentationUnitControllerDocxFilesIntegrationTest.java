@@ -24,7 +24,6 @@ import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -65,7 +64,6 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
   @Autowired private AttachmentRepository attachmentRepository;
   @MockitoSpyBean private DocumentationUnitDocxMetadataInitializationService service;
   @Autowired private DocumentationUnitHistoryLogService historyLogService;
-  @MockitoSpyBean private UserService userService;
   private final UUID oidcLoggedInUserId = UUID.randomUUID();
   private final DocumentationOffice docOffice = buildDSDocOffice();
 
@@ -78,16 +76,6 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
   @BeforeEach
   void setUp() {
     dsDocOffice = documentationOfficeRepository.findByAbbreviation("DS");
-    // Mock the UserService.getUser(UUID) for the OIDC logged-in user
-    // This user's ID will be put into the OIDC token's 'sub' claim by AuthUtils.getMockLogin
-    // We need this to assert on history logs
-    when(userService.getUser(oidcLoggedInUserId))
-        .thenReturn(
-            User.builder()
-                .id(oidcLoggedInUserId)
-                .name("testUser") // This name matches the 'name' claim in AuthUtils.getMockLogin
-                .documentationOffice(docOffice)
-                .build());
   }
 
   @AfterEach
@@ -127,7 +115,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     assertThat(logs)
         .map(HistoryLog::eventType)
         .containsExactly(HistoryLogEventType.UPDATE, HistoryLogEventType.FILES);
-    assertThat(logs).map(HistoryLog::createdBy).containsExactly("test User", "test User");
+    assertThat(logs).map(HistoryLog::createdBy).containsExactly("testUser", "testUser");
     assertThat(logs.get(1).description()).isEqualTo("Word-Dokument hinzugefügt");
   }
 
@@ -164,7 +152,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
             .getResponseBody();
 
     ManagementData managementData = docUnit.managementData();
-    assertThat(managementData.lastUpdatedByName()).isEqualTo("test User");
+    assertThat(managementData.lastUpdatedByName()).isEqualTo("testUser");
     assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
     assertThat(managementData.lastUpdatedAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
@@ -445,7 +433,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
 
     // Assert
     ManagementData managementData = docUnit.managementData();
-    assertThat(managementData.lastUpdatedByName()).isEqualTo("test User");
+    assertThat(managementData.lastUpdatedByName()).isEqualTo("testUser");
     assertThat(managementData.lastUpdatedByDocOffice()).isEqualTo("DS");
     assertThat(managementData.lastUpdatedAtDateTime())
         .isBetween(Instant.now().minusSeconds(10), Instant.now());
@@ -454,7 +442,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest extends BaseIntegratio
     var logs = historyLogService.getHistoryLogs(dto.getId(), user);
     assertThat(logs).hasSize(1);
     assertThat(logs.getFirst().eventType()).isEqualTo(HistoryLogEventType.FILES);
-    assertThat(logs.getFirst().createdBy()).isEqualTo("test User");
+    assertThat(logs.getFirst().createdBy()).isEqualTo("testUser");
     assertThat(logs.getFirst().description()).isEqualTo("Word-Dokument gelöscht");
   }
 
