@@ -84,14 +84,15 @@ public class DatabaseUserService extends UserService {
     }
     return userRepository
         .getUser(uuid)
-        .orElse(
-            userRepository
-                .findByExternalId(uuid)
-                .orElseGet(
-                    () ->
-                        userRepository
-                            .saveOrUpdate((keycloakUserService.getUser(uuid)))
-                            .orElse(null)));
+        .orElseGet(
+            () ->
+                userRepository
+                    .findByExternalId(uuid)
+                    .orElseGet(
+                        () ->
+                            userRepository
+                                .saveOrUpdate((keycloakUserService.getUser(uuid)))
+                                .orElse(null)));
   }
 
   /**
