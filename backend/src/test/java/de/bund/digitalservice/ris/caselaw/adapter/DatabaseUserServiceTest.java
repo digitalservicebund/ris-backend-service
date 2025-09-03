@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -98,7 +97,7 @@ class DatabaseUserServiceTest {
     User retrievedUser = databaseUserService.getUser(oidcUser);
 
     assertEquals(user, retrievedUser);
-    verify(userRepository, times(1)).findByExternalId(eq(EXTERNAL_ID));
+    verify(userRepository, times(1)).findByExternalId(EXTERNAL_ID);
     verify(keycloakUserService, never()).getUser(any(OidcUser.class));
     verify(userRepository, never()).saveOrUpdate(any(User.class));
   }
@@ -119,9 +118,9 @@ class DatabaseUserServiceTest {
     User retrievedUser = databaseUserService.getUser(oidcUser);
 
     assertEquals(user, retrievedUser);
-    verify(userRepository, times(1)).findByExternalId(eq(EXTERNAL_ID));
-    verify(keycloakUserService, times(1)).getUser(eq(oidcUser));
-    verify(userRepository, times(1)).saveOrUpdate(eq(user));
+    verify(userRepository, times(1)).findByExternalId(EXTERNAL_ID);
+    verify(keycloakUserService, times(1)).getUser(oidcUser);
+    verify(userRepository, times(1)).saveOrUpdate(user);
   }
 
   @Test
@@ -139,8 +138,8 @@ class DatabaseUserServiceTest {
     User retrievedUser = databaseUserService.getUser(oidcUser);
 
     assertNull(retrievedUser);
-    verify(userRepository, times(1)).findByExternalId(eq(EXTERNAL_ID));
-    verify(keycloakUserService, times(1)).getUser(eq(oidcUser));
+    verify(userRepository, times(1)).findByExternalId(EXTERNAL_ID);
+    verify(keycloakUserService, times(1)).getUser(oidcUser);
   }
 
   @Test
@@ -150,7 +149,7 @@ class DatabaseUserServiceTest {
     User retrievedUser = databaseUserService.getUser(USER_UUID);
 
     assertEquals(user, retrievedUser);
-    verify(userRepository, times(1)).getUser(eq(USER_UUID));
+    verify(userRepository, times(1)).getUser(USER_UUID);
     verify(userRepository, never()).findByExternalId(any(UUID.class));
     verify(keycloakUserService, never()).getUser(any(UUID.class));
     verify(userRepository, never()).saveOrUpdate(any(User.class));
@@ -164,8 +163,8 @@ class DatabaseUserServiceTest {
     User retrievedUser = databaseUserService.getUser(USER_UUID);
 
     assertEquals(user, retrievedUser);
-    verify(userRepository, times(1)).getUser(eq(USER_UUID));
-    verify(userRepository, times(1)).findByExternalId(eq(USER_UUID));
+    verify(userRepository, times(1)).getUser(USER_UUID);
+    verify(userRepository, times(1)).findByExternalId(USER_UUID);
     verify(keycloakUserService, never()).getUser(any(UUID.class));
     verify(userRepository, never()).saveOrUpdate(any(User.class));
   }
@@ -178,8 +177,8 @@ class DatabaseUserServiceTest {
     User retrievedUser = databaseUserService.getUser(USER_UUID);
 
     assertNull(retrievedUser);
-    verify(userRepository, times(1)).getUser(eq(USER_UUID));
-    verify(userRepository, times(1)).findByExternalId(eq(USER_UUID));
+    verify(userRepository, times(1)).getUser(USER_UUID);
+    verify(userRepository, times(1)).findByExternalId(USER_UUID);
     verify(userRepository, never()).saveOrUpdate(any(User.class));
   }
 
@@ -199,7 +198,7 @@ class DatabaseUserServiceTest {
     List<User> retrievedUsers = databaseUserService.getUsersInSameDocOffice(userGroup);
 
     assertEquals(users, retrievedUsers);
-    verify(userRepository, times(1)).getAllUsersForDocumentationOffice(eq(userGroup.docOffice()));
+    verify(userRepository, times(1)).getAllUsersForDocumentationOffice(userGroup.docOffice());
   }
 
   @Test
