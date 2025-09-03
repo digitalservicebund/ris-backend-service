@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHistoryLogDocumentationUnitProcessStepRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcessStepRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcessStepDTO;
@@ -21,7 +22,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HistoryLogDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcessStepDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLog;
 import de.bund.digitalservice.ris.caselaw.domain.HistoryLogEventType;
 import de.bund.digitalservice.ris.caselaw.domain.User;
@@ -48,8 +48,8 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
       databaseHistoryLogDocumentationUnitProcessStepRepository;
 
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  @Autowired private DocumentationUnitService documentationUnitService;
   @Autowired private DatabaseProcessStepRepository processStepRepository;
+  @Autowired private DatabaseUserRepository userRepository;
 
   @Autowired
   private DatabaseDocumentationUnitProcessStepRepository documentationUnitProcessStepRepository;
@@ -76,14 +76,6 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
   private final UUID userNullId = UUID.randomUUID();
 
-  private final UUID user1IdDS = UUID.randomUUID();
-  private final User user1DS =
-      User.builder().id(user1IdDS).name("user1").documentationOffice(docOfficeDS).build();
-
-  private final UUID user2IdDS = UUID.randomUUID();
-  private final User user2DS =
-      User.builder().id(user2IdDS).name("user2").documentationOffice(docOfficeDS).build();
-
   private ProcessStepDTO ersterfassungProcessStep;
   private ProcessStepDTO qsformalProcessStep;
   private DocumentationUnitDTO testDocumentationUnitDS;
@@ -93,19 +85,36 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
   private DocumentationOfficeDTO documentationOfficeBGH;
   private static final String HISTORY_LOG_ENDPOINT = "/api/v1/caselaw/documentunits/";
 
+  private UserDTO user1IdDS;
+  private UserDTO user2IdDS;
+
   @BeforeEach
   void setUp() {
     documentationOfficeDS =
         documentationOfficeRepository.findByAbbreviation(docOfficeDS.abbreviation());
     documentationOfficeBGH =
         documentationOfficeRepository.findByAbbreviation(docOfficeBGH.abbreviation());
-    // Mock the userService to return fake User objects
+    // Mock the userService to return fake User objects for the history logs
     when(userService.getUser(creatorUserIdDS)).thenReturn(creatorUserDS);
     when(userService.getUser(creatorUserIdBGH)).thenReturn(creatorUserBGH);
-    when(userService.getUser(user1IdDS)).thenReturn(user1DS);
-    when(userService.getUser(user2IdDS)).thenReturn(user2DS);
-    when(userService.getUser(user2IdDS)).thenReturn(user2DS);
-    when(userService.getUser(userNullId)).thenReturn(null);
+
+    user1IdDS =
+        userRepository.save(
+            UserDTO.builder()
+                .externalId(UUID.randomUUID())
+                .firstName("user")
+                .lastName("1")
+                .documentationOffice(documentationOfficeDS)
+                .build());
+
+    user2IdDS =
+        userRepository.save(
+            UserDTO.builder()
+                .externalId(UUID.randomUUID())
+                .firstName("user")
+                .lastName("2")
+                .documentationOffice(documentationOfficeDS)
+                .build());
 
     ersterfassungProcessStep =
         processStepRepository
@@ -141,14 +150,14 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(ersterfassungProcessStep)
-            .user(UserDTO.builder().id(user1IdDS).build())
+            .user(user1IdDS)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step2DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .user(UserDTO.builder().id(user2IdDS).build())
+            .user(user2IdDS)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step3DTO =
@@ -231,12 +240,12 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
     // Order is now descending, by created at
     assertThat(log1.createdBy()).isEqualTo("testUserDS");
     assertThat(log1.documentationOffice()).isEqualTo("DS");
-    assertThat(log1.description()).isEqualTo("Person entfernt: user2");
+    assertThat(log1.description()).isEqualTo("Person entfernt: user 2");
     assertThat(log1.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
 
     assertThat(log2.createdBy()).isEqualTo("testUserDS");
     assertThat(log2.documentationOffice()).isEqualTo("DS");
-    assertThat(log2.description()).isEqualTo("Person geändert: user1 → user2");
+    assertThat(log2.description()).isEqualTo("Person geändert: user 1 → user 2");
     assertThat(log2.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
 
     assertThat(log3.createdBy()).isEqualTo("testUserDS");
@@ -246,7 +255,7 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
 
     assertThat(log4.createdBy()).isEqualTo("testUserDS");
     assertThat(log4.documentationOffice()).isEqualTo("DS");
-    assertThat(log4.description()).isEqualTo("Person gesetzt: user1");
+    assertThat(log4.description()).isEqualTo("Person gesetzt: user 1");
     assertThat(log4.eventType()).isEqualTo(HistoryLogEventType.PROCESS_STEP_USER);
 
     assertThat(log5.createdBy()).isEqualTo("testUserDS");
@@ -263,14 +272,14 @@ class DocumentationUnitHistoryLogProcessStepIntegrationTest extends BaseIntegrat
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(ersterfassungProcessStep)
-            .user(UserDTO.builder().id(user1IdDS).build())
+            .user(user1IdDS)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step2DTO =
         DocumentationUnitProcessStepDTO.builder()
             .documentationUnit(testDocumentationUnitDS)
             .processStep(qsformalProcessStep)
-            .user(UserDTO.builder().id(user2IdDS).build())
+            .user(user2IdDS)
             .createdAt(now)
             .build();
     DocumentationUnitProcessStepDTO step3DTO =

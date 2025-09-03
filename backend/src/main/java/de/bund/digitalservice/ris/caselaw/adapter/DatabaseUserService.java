@@ -54,10 +54,11 @@ public class DatabaseUserService extends UserService {
   }
 
   /**
-   * Get user domain object from oidc user by their id
+   * Retrieve user by the oidc user's id. First attempt to find in database. If it can't be found,
+   * request from keycloak API and persist.
    *
-   * @param oidcUser
-   * @return
+   * @param oidcUser the oidc user
+   * @return the user domain object
    */
   @Override
   public User getUser(OidcUser oidcUser) {
@@ -83,6 +84,12 @@ public class DatabaseUserService extends UserService {
         .orElse(userRepository.findByExternalId(uuid).orElse(keycloakUserService.getUser(uuid)));
   }
 
+  /**
+   * Get all users from database that belong to the same UserGroup
+   *
+   * @param userGroup the user group
+   * @return all users found in the same group
+   */
   @Override
   public List<User> getUsersInSameDocOffice(UserGroup userGroup) {
     if (userGroup == null || userGroup.docOffice() == null) {
