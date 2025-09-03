@@ -66,11 +66,18 @@ async function deleteWithRetry(
   csrfToken: Cookie | undefined,
   documentNumber: string,
 ) {
+  const headers = { "X-XSRF-TOKEN": csrfToken?.value ?? "" }
+
+  // Published doc units cannot be deleted, so we try to unpublish first. Will also work for unpublished doc units.
+  await request
+    .put(`/api/v1/caselaw/documentunits/${uuid}/withdraw`, { headers })
+    .catch(() =>
+      console.error("Failed to withdraw doc unit: " + documentNumber),
+    )
+
   const deleteResponse = await request.delete(
     `/api/v1/caselaw/documentunits/${uuid}`,
-    {
-      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-    },
+    { headers },
   )
 
   if (!deleteResponse.ok()) {
@@ -82,9 +89,7 @@ async function deleteWithRetry(
     await new Promise((resolve) => setTimeout(resolve, retryWaitDuration))
     const retryDeleteResponse = await request.delete(
       `/api/v1/caselaw/documentunits/${uuid}`,
-      {
-        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
-      },
+      { headers },
     )
 
     if (!retryDeleteResponse.ok()) {
@@ -1376,6 +1381,16 @@ export const caselawTest = test.extend<MyFixtures & MyOptions>({
           `api/v1/caselaw/courts?q=${courtLabel}&sz=1&pg=0`,
         )
         targetDecision.coreData!.court = await courtResponse
+          .json()
+          .then((json) => json?.[0])
+      }
+
+      const docTypeLabel = targetDecision.coreData?.documentType?.label
+      if (docTypeLabel) {
+        const documentTypeResponse = await request.get(
+          `api/v1/caselaw/documenttypes?q=${docTypeLabel}`,
+        )
+        targetDecision.coreData!.documentType = await documentTypeResponse
           .json()
           .then((json) => json?.[0])
       }

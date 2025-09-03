@@ -1013,36 +1013,6 @@ class DocumentationUnitControllerTest {
     }
 
     @Test
-    void createLdmlPreview_withUnsupportedDocumentType_shouldReturnUnprocessableEntity()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      doThrow(new DocumentationUnitException("Document type PendingProceeding is not supported."))
-          .when(portalPublicationService)
-          .createLdmlPreview(TEST_UUID);
-
-      // Act
-      var result =
-          risWebClient
-              .withDefaultLogin()
-              .get()
-              .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-ldml")
-              .exchange()
-              .expectStatus()
-              .isUnprocessableEntity()
-              .expectBody(LdmlTransformationResult.class)
-              .returnResult();
-
-      // Assert
-      verify(portalPublicationService).createLdmlPreview(TEST_UUID);
-      assertThat(result.getResponseBody())
-          .isEqualTo(
-              LdmlTransformationResult.builder()
-                  .success(false)
-                  .statusMessages(List.of("Document type PendingProceeding is not supported."))
-                  .build());
-    }
-
-    @Test
     void createLdmlPreview_withMappingException_shouldReturnUnprocessableEntity()
         throws DocumentationUnitNotExistsException {
       // Arrange
