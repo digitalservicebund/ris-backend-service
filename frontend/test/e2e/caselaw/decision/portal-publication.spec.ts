@@ -65,7 +65,7 @@ test.describe(
       {
         tag: ["@RISDEV-8456", "@RISDEV-8460"],
       },
-      async ({ page, prefilledDocumentUnit }) => {
+      async ({ page, prefilledDocumentUnit, baseURL }) => {
         await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
 
         await test.step("Anzeige einer Unveröffentlichten Dok-Einheit mit allen Checks und ohne Fehler", async () => {
@@ -121,6 +121,34 @@ test.describe(
           ).toBeVisible()
         })
 
+        await test.step("Es wird auf die Portalseite verlinkt", async () => {
+          await expect(
+            page.getByRole("link", {
+              name: "Portalseite der Dokumentationseinheit",
+            }),
+          ).toHaveAttribute(
+            "href",
+            `https://ris-portal.dev.ds4g.net/case-law/${prefilledDocumentUnit.documentNumber}`,
+          )
+        })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
+            const portalPage = await page.context().newPage()
+            await portalPage.goto(
+              `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
+            )
+            // eslint-disable-next-line playwright/no-conditional-expect
+            await expect(
+              portalPage.getByRole("heading", {
+                name: "BGH - Beschluss vom 01.01.2023",
+              }),
+            ).toBeVisible()
+          })
+        }
+
         await test.step("Erfolgreiches Zurückziehen ändert den Status", async () => {
           await page.getByRole("button", { name: "Zurückziehen" }).click()
           await expect(
@@ -130,6 +158,23 @@ test.describe(
             page.getByRole("button", { name: "Zurückziehen" }),
           ).toBeHidden()
         })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist nicht mehr per Portal-API abrufbar", async () => {
+            const portalPage = await page.context().newPage()
+            await portalPage.goto(
+              `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
+            )
+            // eslint-disable-next-line playwright/no-conditional-expect
+            await expect(
+              portalPage.getByRole("heading", {
+                name: "Diese Seite existiert nicht",
+              }),
+            ).toBeVisible()
+          })
+        }
 
         await test.step("Veröffentlichen und Zurückziehen wird in der Historie geloggt", async () => {
           await navigateToManagementData(
