@@ -155,7 +155,7 @@ describe("PublicationActions", () => {
       await flushPromises()
       expect(
         screen.getByText(
-          "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ dauert etwa 2 Minuten.",
+          "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ dauert ungefähr 5 Minuten.",
         ),
       ).toBeInTheDocument()
     })

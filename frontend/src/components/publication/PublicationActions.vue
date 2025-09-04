@@ -125,7 +125,7 @@ const lastPublishedAt = computed(() => {
         <IconInfoOutline class="text-grey-900" />
         <p>
           Das Hochladen der Stammdaten und der Informationen im Portal-Tab
-          „Details“ dauert etwa 2 Minuten.
+          „Details“ dauert ungefähr 5 Minuten.
         </p>
       </div>
       <div
