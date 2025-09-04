@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublication
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PortalPublicationJobRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ldml.ReducedLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.PortalPublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationJobType;
 import java.io.IOException;
@@ -179,6 +180,11 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
 
     assertThat(portalPublicationJobRepository.findAll())
         .allMatch(job -> job.getPublicationJobStatus() == SUCCESS);
+    assertThat(
+            repository.findAll().stream()
+                .map(DocumentationUnitDTO::getPortalPublicationStatus)
+                .toList())
+        .isEqualTo(List.of(PortalPublicationStatus.PUBLISHED, PortalPublicationStatus.WITHDRAWN));
   }
 
   @Test
