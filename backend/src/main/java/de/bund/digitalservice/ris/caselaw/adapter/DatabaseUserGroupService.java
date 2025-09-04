@@ -86,13 +86,13 @@ public class DatabaseUserGroupService implements UserGroupService {
   }
 
   /**
-   * Returns the first match where a provided {@link UserGroup user group} contains a known {@link
-   * UserGroup user group}. Examples:
+   * Returns the first match where a provided list of {@link UserGroup user groups} contains a known
+   * {@link UserGroup user group}. Examples:
    *
    * <ol>
    *   <li>Known groups: /ABC/DEF, /HIJ/KLM | provided groups: /HIJ/KLM, /OPQ -> result: /HIJ/KLM
-   *   <li>Known groups: /HIJ, /HIJ/LKM, /OPQ | provided groups: /HIJ/KLM, /OPQ -> result: /HIJ
-   *   <li>Known groups: /ABC/DEF, /HIJ, /OPQ | provided groups: /ABC, /OPQ -> result: /OPQ
+   *   <li>Known groups: /ABC/DEF, /HIJ/KLM | provided groups: /HIJ/KLM, /ABC/DEF -> result:
+   *       /ABC/DEF
    * </ol>
    *
    * @param userGroups the {@link UserGroup user groups} to match against the known {@link UserGroup

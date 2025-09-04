@@ -47,7 +47,7 @@ public class KeycloakUserService extends UserService {
 
   @Override
   public User getUser(UUID uuid) {
-    LOGGER.info("Fetching user with uuid {}", uuid);
+    LOGGER.atInfo().setMessage("Fetching user with uuid").addKeyValue("id", uuid).log();
     return userApiService.getUser(uuid);
   }
 
@@ -57,10 +57,19 @@ public class KeycloakUserService extends UserService {
       return Collections.emptyList();
     }
     try {
-      LOGGER.info("Fetching all users for group {}", userGroup.userGroupPathName());
+      LOGGER
+          .atInfo()
+          .setMessage("Fetching all users for group")
+          .addKeyValue("name", userGroup.userGroupPathName())
+          .log();
       return userApiService.getUsers(userGroup.userGroupPathName());
     } catch (Exception e) {
-      LOGGER.error("Error reading group user information: ", e);
+      LOGGER
+          .atError()
+          .setMessage("Error reading group user information")
+          .setCause(e)
+          .addKeyValue("name", userGroup.userGroupPathName())
+          .log();
       return Collections.emptyList();
     }
   }

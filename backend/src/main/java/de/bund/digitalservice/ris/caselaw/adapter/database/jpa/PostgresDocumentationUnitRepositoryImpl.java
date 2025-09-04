@@ -670,19 +670,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return true;
     }
 
-    if (currentDocumentationUnitProcessStepDTOFromDB.getUser() != null
-        && currentDocunitProcessStepFromFrontend.getUser() == null) {
-      return true;
-    }
-    UUID lastUserId =
-        currentDocunitProcessStepFromFrontend.getUser() != null
-            ? currentDocunitProcessStepFromFrontend.getUser().id()
-            : null;
+    UserDTO currentUserInDb = currentDocumentationUnitProcessStepDTOFromDB.getUser();
+    User currentUserFromFrontend = currentDocunitProcessStepFromFrontend.getUser();
 
-    UUID currentUserId =
-        currentDocumentationUnitProcessStepDTOFromDB.getUser() != null
-            ? currentDocumentationUnitProcessStepDTOFromDB.getUser().getId()
-            : null;
+    UUID lastUserId = currentUserFromFrontend != null ? currentUserFromFrontend.id() : null;
+
+    UUID currentUserId = currentUserInDb != null ? currentUserInDb.getId() : null;
     // If User id has changed in process step
     return !Objects.equals(currentUserId, lastUserId);
   }

@@ -13,12 +13,17 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroup
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserGroupTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -176,5 +181,51 @@ class DatabaseUserGroupServiceTest {
             .map(UserGroupTransformer::transformToDomain)
             .toList();
     assertThat(this.service.getAllUserGroups()).isEqualTo(expectedGroups);
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideUserGroupMatchingTestData")
+  void shouldReturnFirstMatchingUserGroup(
+      List<String> knownUserGroups, List<String> providedUserGroups, String expectedMatch) {
+    doReturn(
+            knownUserGroups.stream()
+                .map(
+                    pathName ->
+                        UserGroupDTO.builder()
+                            .documentationOffice(dsDocOffice)
+                            .isInternal(true)
+                            .userGroupPathName(pathName)
+                            .build())
+                .toList())
+        .when(this.groupRepository)
+        .findAll();
+
+    this.service = new DatabaseUserGroupService(groupRepository, officeRepository, List.of());
+    this.service.onApplicationEvent(null);
+
+    var result =
+        this.service.getFirstUserGroup(providedUserGroups).map(UserGroup::userGroupPathName);
+
+    assertThat(result).isEqualTo(Optional.ofNullable(expectedMatch));
+  }
+
+  private static Stream<Arguments> provideUserGroupMatchingTestData() {
+    return Stream.of(
+        // Exact match at the beginning of the list
+        Arguments.of(List.of("/A", "/B", "/C"), List.of("/A", "/D"), "/A"),
+        // Exact match in the middle of the list
+        Arguments.of(List.of("/A", "/B", "/C"), List.of("/D", "/B"), "/B"),
+        // Exact match at the end of the list
+        Arguments.of(List.of("/A", "/B", "/C"), List.of("/D", "/C"), "/C"),
+        // Fist match, beginning with the provided groups is returned
+        Arguments.of(List.of("/A", "/B"), List.of("/B", "/A"), "/A"),
+        // No match found
+        Arguments.of(List.of("/A", "/B"), List.of("/C", "/D"), null),
+        // Empty provided groups list
+        Arguments.of(List.of("/A", "/B"), List.of(), null),
+        // Empty known groups list
+        Arguments.of(List.of(), List.of("/A", "/B"), null),
+        // Case sensitivity check
+        Arguments.of(List.of("/a"), List.of("/A"), null));
   }
 }
