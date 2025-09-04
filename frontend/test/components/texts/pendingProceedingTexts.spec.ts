@@ -40,7 +40,7 @@ async function renderComponent(
         [
           createTestingPinia({
             initialState: {
-              session: { user: { roles: ["Internal"] } },
+              session: { user: { internal: true } },
               docunitStore: {
                 documentUnit: new PendingProceeding("foo", {
                   documentNumber: "1234567891234",

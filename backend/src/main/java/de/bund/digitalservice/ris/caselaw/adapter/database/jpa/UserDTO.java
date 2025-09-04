@@ -45,4 +45,7 @@ public class UserDTO {
 
   @Column(name = "is_deleted")
   private boolean isDeleted;
+
+  @Column(name = "internal")
+  private boolean internal;
 }

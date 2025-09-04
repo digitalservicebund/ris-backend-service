@@ -86,13 +86,13 @@ public class BareIdUserApiService implements UserApiService {
         throw new UserApiException("User group could not be found");
       }
 
-      DocumentationOffice docOffice =
-          getDocumentationOfficeFromGroups(groupsResponse.getBody().groups())
-              .map(UserGroup::docOffice)
-              .orElse(null);
+      Optional<UserGroup> group =
+          getDocumentationOfficeFromGroups(groupsResponse.getBody().groups());
+      DocumentationOffice docOffice = group.map(UserGroup::docOffice).orElse(null);
+      Boolean internal = group.map(UserGroup::isInternal).orElse(null);
       // --- END get docoffice for user ---
 
-      return UserTransformer.transformToDomain(responseBody.user(), docOffice);
+      return UserTransformer.transformToDomain(responseBody.user(), docOffice, internal);
 
     } catch (Exception e) {
       return User.builder().externalId(externalId).build();

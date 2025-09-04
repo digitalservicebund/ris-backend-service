@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -13,7 +12,7 @@ public record User(
     String lastName,
     String email,
     DocumentationOffice documentationOffice,
-    List<String> roles,
+    boolean internal,
     String initials) {
 
   @Override

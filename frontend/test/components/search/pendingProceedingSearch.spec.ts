@@ -60,7 +60,7 @@ function renderComponent(
           createTestingPinia({
             initialState: {
               session: {
-                user: { roles: [isInternal ? "Internal" : "External"] },
+                user: { internal: isInternal },
               },
             },
           }),

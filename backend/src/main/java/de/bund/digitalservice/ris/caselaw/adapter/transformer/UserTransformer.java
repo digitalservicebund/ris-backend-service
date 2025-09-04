@@ -20,7 +20,9 @@ public class UserTransformer {
   private UserTransformer() {}
 
   public static User transformToDomain(
-      BareUserApiResponse.BareUser bareUser, DocumentationOffice documentationOffice) {
+      BareUserApiResponse.BareUser bareUser,
+      DocumentationOffice documentationOffice,
+      boolean internal) {
     List<String> firstNames = getValues(bareUser.attributes(), "firstName");
     List<String> lastNames = getValues(bareUser.attributes(), "lastName");
 
@@ -34,11 +36,12 @@ public class UserTransformer {
         .email(bareUser.email())
         .initials(getInitials(firstNames, lastNames))
         .documentationOffice(documentationOffice)
+        .internal(internal)
         .build();
   }
 
   public static User transformToDomain(BareUserApiResponse.BareUser bareUser) {
-    return transformToDomain(bareUser, null);
+    return transformToDomain(bareUser, null, false);
   }
 
   public static User transformToDomain(OidcUser oidcUser, DocumentationOffice documentationOffice) {
@@ -49,7 +52,7 @@ public class UserTransformer {
         .externalId(getOidcUserId(oidcUser))
         .email(oidcUser.getEmail())
         .documentationOffice(documentationOffice)
-        .roles(oidcUser.getClaimAsStringList("roles"))
+        .internal(oidcUser.getClaimAsStringList("roles").contains("Internal"))
         .initials(getInitials(oidcUser.getGivenName(), oidcUser.getFamilyName()))
         .build();
   }
@@ -67,6 +70,7 @@ public class UserTransformer {
         .firstName(firstName)
         .lastName(lastName)
         .initials(getInitials(firstName, lastName))
+        .internal(userDTO.isInternal())
         .documentationOffice(
             DocumentationOfficeTransformer.transformToDomain(userDTO.getDocumentationOffice()))
         .build();
@@ -141,6 +145,7 @@ public class UserTransformer {
         .externalId(user.externalId())
         .documentationOffice(
             DocumentationOfficeTransformer.transformToDTO(user.documentationOffice()))
+        .internal(user.internal())
         .isActive(true)
         .isDeleted(false)
         .build();
