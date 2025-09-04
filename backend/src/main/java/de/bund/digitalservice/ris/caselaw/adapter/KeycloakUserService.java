@@ -62,7 +62,10 @@ public class KeycloakUserService implements UserService {
   @Override
   public List<User> getUsersInSameDocOffice(OidcUser oidcUser) {
     try {
-      var optionalUserGroup = getUserGroup(oidcUser);
+      var optionalUserGroup =
+          userGroupService.getDocumentationOfficeFromGroupPathNames(
+              Objects.requireNonNull(oidcUser.getAttribute("groups")));
+
       if (optionalUserGroup.isPresent()) {
         return userApiService.getUsers(optionalUserGroup.get().userGroupPathName());
       } else {
@@ -74,6 +77,7 @@ public class KeycloakUserService implements UserService {
     }
   }
 
+  // TODO: Can we use the user group api for it? and remove this
   @Override
   public Optional<UserGroup> getUserGroup(OidcUser oidcUser) {
     List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));

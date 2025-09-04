@@ -6,10 +6,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserGroupTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -82,6 +84,29 @@ public class DatabaseUserGroupService implements UserGroupService {
   @Override
   public List<UserGroup> getAllUserGroups() {
     return this.userGroups.stream().map(UserGroupTransformer::transformToDomain).toList();
+  }
+
+  @Override
+  public Optional<UserGroup> getDocumentationOfficeFromGroupPathNames(
+      List<String> userGroupPathNames) {
+    var uniqueDocOffices =
+        this.getAllUserGroups().stream()
+            .filter(group -> userGroupPathNames.contains(group.userGroupPathName()))
+            .distinct()
+            .toList();
+
+    if (uniqueDocOffices.isEmpty()) {
+      LOGGER.warn(
+          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
+      return Optional.empty();
+    }
+
+    if (uniqueDocOffices.size() > 1) {
+      LOGGER.warn(
+          "More then one doc office associated with given Keycloak user groups: {}", userGroups);
+      throw new UserApiException("Multiple doc offices found for user.");
+    }
+    return uniqueDocOffices.stream().findFirst();
   }
 
   /**
