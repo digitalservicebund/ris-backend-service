@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,12 +51,16 @@ class UserControllerTest {
 
   private final List<User> testUsers = generateTestUsers();
 
-  @Test
-  void testGetUsers_shouldSucceed() {
+  @BeforeEach
+  void setUp() {
 
     doReturn(Optional.of(UserGroup.builder().userGroupPathName("test").build()))
-        .when(userService)
-        .getUserGroup(any(OidcUser.class));
+        .when(userGroupService)
+        .getDocumentationOfficeFromGroupPathNames(anyList());
+  }
+
+  @Test
+  void testGetUsers_shouldSucceed() {
 
     when(userApiService.getUsers(anyString())).thenReturn(testUsers);
 
@@ -77,7 +82,9 @@ class UserControllerTest {
   @Test
   void testGetUsers_shouldReturnEmptyList_onFailed() {
 
-    doReturn(Optional.empty()).when(userService).getUserGroup(any(OidcUser.class));
+    doReturn(Optional.empty())
+        .when(userGroupService)
+        .getDocumentationOfficeFromGroupPathNames(anyList());
 
     var result =
         risWebClient
@@ -96,10 +103,6 @@ class UserControllerTest {
 
   @Test
   void testGetUsersWithFilter_withEmptyString_shouldReturnAllUsers() {
-
-    doReturn(Optional.of(UserGroup.builder().userGroupPathName("test").build()))
-        .when(userService)
-        .getUserGroup(any(OidcUser.class));
 
     when(userApiService.getUsers(anyString())).thenReturn(testUsers);
 
@@ -125,10 +128,6 @@ class UserControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"ch", "CH", "clara hoff", "Clara H", "Hoff"})
   void testGetUsersWithFilter_shouldReturnEmptyList_onFailed(String queryFilter) {
-
-    doReturn(Optional.of(UserGroup.builder().userGroupPathName("test").build()))
-        .when(userService)
-        .getUserGroup(any(OidcUser.class));
 
     when(userApiService.getUsers(anyString())).thenReturn(testUsers);
 
