@@ -137,7 +137,7 @@ describe("PublicationActions", () => {
       await renderComponent({ isPublishable: true, publicationWarnings: [] })
 
       expect(
-        screen.queryByText(/Das Hochladen der Stammdaten.*2 Minuten/),
+        screen.queryByText(/Das Hochladen der Stammdaten.*5 Minuten/),
       ).not.toBeInTheDocument()
     })
 
@@ -618,7 +618,7 @@ describe("PublicationActions", () => {
       await renderComponent({ isPublishable: true, publicationWarnings: [] })
 
       expect(
-        screen.queryByText(/Das Hochladen der Stammdaten.*2 Minuten/),
+        screen.queryByText(/Das Hochladen der Stammdaten.*5 Minuten/),
       ).not.toBeInTheDocument()
     })
 
@@ -635,7 +635,7 @@ describe("PublicationActions", () => {
       )
       await flushPromises()
       expect(
-        screen.queryByText(/Das Hochladen der Stammdaten.*2 Minuten/),
+        screen.queryByText(/Das Hochladen der Stammdaten.*5 Minuten/),
       ).not.toBeInTheDocument()
     })
   })
