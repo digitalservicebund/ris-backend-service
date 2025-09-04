@@ -89,7 +89,7 @@ public class BareIdUserApiService implements UserApiService {
       Optional<UserGroup> group =
           getDocumentationOfficeFromGroups(groupsResponse.getBody().groups());
       DocumentationOffice docOffice = group.map(UserGroup::docOffice).orElse(null);
-      Boolean internal = group.map(UserGroup::isInternal).orElse(null);
+      boolean internal = group.map(UserGroup::isInternal).orElse(false);
       // --- END get docoffice for user ---
 
       return UserTransformer.transformToDomain(responseBody.user(), docOffice, internal);
