@@ -46,7 +46,6 @@ public class AuthUtils {
                       claims.put("name", "testUser"); // This is the name from OIDC token
                       claims.put("email", "test@test.com");
                       claims.put("given_name", "testUser");
-                      // claims.put("family_name", "User");
                       // If userId is null, generate a random one
                       claims.put("sub", (userId != null ? userId : UUID.randomUUID()).toString());
                     }));

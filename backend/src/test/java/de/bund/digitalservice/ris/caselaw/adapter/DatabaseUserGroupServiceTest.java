@@ -50,13 +50,6 @@ class DatabaseUserGroupServiceTest {
           .isInternal(false)
           .build();
 
-  private final UserGroupFromConfig bghGroupConfig =
-      UserGroupFromConfig.builder()
-          .docOfficeAbbreviation("BGH")
-          .userGroupPathName("/BGH")
-          .isInternal(true)
-          .build();
-
   private final DocumentationOfficeDTO dsDocOffice =
       DocumentationOfficeDTO.builder().abbreviation("DS").id(UUID.randomUUID()).build();
   private final DocumentationOfficeDTO bghDocOffice =

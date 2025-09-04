@@ -16,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +63,7 @@ class DatabaseUserServiceTest {
           .build();
 
   @BeforeEach
-  void setup() throws DocumentationUnitNotExistsException {
+  void setup() {
     databaseUserService =
         new DatabaseUserService(userGroupService, userRepository, keycloakUserService);
     databaseUserService.onApplicationEvent(null);
