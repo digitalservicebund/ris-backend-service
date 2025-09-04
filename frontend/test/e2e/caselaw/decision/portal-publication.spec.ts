@@ -117,18 +117,58 @@ test.describe(
             page.getByTestId("portal-publication-status-badge"),
           ).toHaveText("Veröffentlicht")
           await expect(
-            page.getByRole("button", { name: "Zurückziehen" }),
-          ).toBeVisible()
-        })
-
-        await test.step("Es wird auf die Portalseite verlinkt", async () => {
-          await expect(
             page.getByRole("link", {
               name: "Portalseite der Dokumentationseinheit",
             }),
           ).toHaveAttribute(
             "href",
             `https://ris-portal.dev.ds4g.net/case-law/${prefilledDocumentUnit.documentNumber}`,
+          )
+          await expect(
+            page.getByText(
+              "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ dauert ungefähr 5 Minuten.",
+            ),
+          ).toBeVisible()
+          await expect(
+            page.getByText("Zuletzt veröffentlicht am:"),
+          ).toBeVisible()
+          await expect(
+            page.getByRole("button", { name: "Zurückziehen" }),
+          ).toBeVisible()
+        })
+
+        await test.step("Hinweis auf verzögerte Veröffentlichung wird nach Reload ausgeblendet", async () => {
+          await page.reload()
+          await expect(
+            page.getByText(
+              "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ dauert ungefähr 5 Minuten.",
+            ),
+          ).toBeHidden()
+        })
+
+        await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
+          await navigateToManagementData(
+            page,
+            prefilledDocumentUnit.documentNumber,
+          )
+
+          await page
+            .getByRole("button", { name: "Dokumentationseinheit löschen" })
+            .click()
+
+          await page
+            .getByRole("button", { name: "Löschen", exact: true })
+            .click()
+
+          await expect(
+            page.getByText(
+              "Die Dokumentationseinheit konnte nicht gelöscht werden, da Sie im Portal veröffentlicht ist.",
+            ),
+          ).toBeVisible()
+
+          await navigateToPublication(
+            page,
+            prefilledDocumentUnit.documentNumber,
           )
         })
 
