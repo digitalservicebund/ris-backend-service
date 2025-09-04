@@ -9,8 +9,8 @@ public record User(
     UUID id,
     UUID externalId,
     String name,
-    String firstName, // TODO delete?
-    String lastName, // TODO delete?
+    String firstName,
+    String lastName,
     String email,
     DocumentationOffice documentationOffice,
     List<String> roles,
