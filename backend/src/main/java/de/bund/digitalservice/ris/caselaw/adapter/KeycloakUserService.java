@@ -77,7 +77,6 @@ public class KeycloakUserService implements UserService {
     }
   }
 
-  // TODO: Can we use the user group api for it? and remove this
   @Override
   public Optional<UserGroup> getUserGroup(OidcUser oidcUser) {
     List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
