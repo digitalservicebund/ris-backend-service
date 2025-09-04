@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test"
+import { expect, Page } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   expectHistoryLogRow,
@@ -140,10 +140,13 @@ test.describe(
             await portalPage.goto(
               `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
             )
+
+            await loginToPortal(portalPage)
+
             // eslint-disable-next-line playwright/no-conditional-expect
             await expect(
               portalPage.getByRole("heading", {
-                name: "BGH - Beschluss vom 01.01.2023",
+                name: "testHeadline",
               }),
             ).toBeVisible()
           })
@@ -169,9 +172,7 @@ test.describe(
             )
             // eslint-disable-next-line playwright/no-conditional-expect
             await expect(
-              portalPage.getByRole("heading", {
-                name: "Diese Seite existiert nicht",
-              }),
+              portalPage.getByText("Diese Seite existiert nicht"),
             ).toBeVisible()
           })
         }
@@ -514,3 +515,9 @@ test.describe(
     )
   },
 )
+
+async function loginToPortal(portalPage: Page) {
+  await portalPage.fill("#username", process.env.E2E_TEST_USER as string)
+  await portalPage.fill("#password", process.env.E2E_TEST_PASSWORD as string)
+  await portalPage.locator("input#kc-login").click()
+}
