@@ -56,26 +56,6 @@ test.describe(
               documentType: { label: "Beschluss", jurisShortcut: "Bes" },
             },
           },
-          {
-            coreData: {
-              court: { label: "BGH" },
-              decisionDate: "2023-01-01",
-              documentType: { label: "Beschluss", jurisShortcut: "Bes" },
-            },
-            shortTexts: {
-              otherHeadnote: "das wort hat einen Flerher",
-            },
-            longTexts: {
-              tenor: "das wort hat einen Flerher",
-            },
-          },
-          {
-            coreData: {
-              court: { label: "BVerwG" },
-              decisionDate: "2025-05-22",
-              documentType: { label: "Beschluss", jurisShortcut: "Bes" },
-            },
-          },
         ],
         { scope: "test" },
       ],
@@ -331,7 +311,6 @@ test.describe(
           await expect(page.getByText("<akn:num>2</akn:num>")).toBeVisible()
           await expect(page.getByText("<akn:num>3</akn:num>")).toBeVisible()
           await expect(page.getByText("<akn:num>4</akn:num>")).toBeVisible()
-          //todo: is there a better way to check this? regex seemed very complex for ldml
         })
 
         await test.step("Randnummern und Links werden unter Rubriken korrekt angezeigt", async () => {
@@ -393,25 +372,34 @@ test.describe(
     )
 
     // Returns success but should fail. Unclear why.
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
+
+    test(
       "Rechtschreibprüfung",
       {
         tag: ["@RISDEV-8456"],
       },
-      async ({ page, decisions, baseURL }) => {
+      async ({ page, prefilledDocumentUnit, baseURL }) => {
         // eslint-disable-next-line playwright/no-skipped-test
         test.skip(
           baseURL === "http://127.0.0.1",
           "Skipping this test on local execution, as there is no languagetool running",
         )
 
-        const { createdDecisions } = decisions
-        const decision = createdDecisions[3]
+        await test.step("Fehlerhaften Text eingeben und speichern", async () => {
+          await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
+          await page
+            .getByRole("button", { name: "Gründe", exact: true })
+            .click()
+          await page.getByTestId("Gründe").click()
+          await page.keyboard.type(`das wort ist flasch geschrieben`)
+          await save(page)
+        })
 
-        await navigateToPublication(page, decision.documentNumber)
-
-        await test.step("Rechtschreibfehler werden angezeigt", async () => {
+        await test.step("Rechtschreibfehler werden auf Veröffentlichungsseite angezeigt", async () => {
+          await navigateToPublication(
+            page,
+            prefilledDocumentUnit.documentNumber,
+          )
           const textcheck = page.getByLabel("Rechtschreibprüfung")
 
           await expect(
@@ -424,6 +412,14 @@ test.describe(
           await expect(
             page.getByText("Es wurden Rechtschreibfehler identifiziert:"),
           ).toBeVisible()
+        })
+
+        await test.step("Veröffentlichung ist trotz Rechtschreibfehler möglich", async () => {
+          await page.getByRole("button", { name: "Veröffentlichen" }).click()
+
+          await expect(
+            page.getByTestId("portal-publication-status-badge"),
+          ).toHaveText("Veröffentlicht")
         })
       },
     )
