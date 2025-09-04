@@ -62,7 +62,10 @@ public class KeycloakUserService implements UserService {
   @Override
   public List<User> getUsersInSameDocOffice(OidcUser oidcUser) {
     try {
-      var optionalUserGroup = getUserGroup(oidcUser);
+      var optionalUserGroup =
+          userGroupService.getDocumentationOfficeFromGroupPathNames(
+              Objects.requireNonNull(oidcUser.getAttribute("groups")));
+
       if (optionalUserGroup.isPresent()) {
         return userApiService.getUsers(optionalUserGroup.get().userGroupPathName());
       } else {

@@ -13,10 +13,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroup
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserGroupTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.annotation.Import;
@@ -42,6 +44,13 @@ class DatabaseUserGroupServiceTest {
           .docOfficeAbbreviation("DS")
           .userGroupPathName("/DS")
           .isInternal(false)
+          .build();
+
+  private final UserGroupFromConfig bghGroupConfig =
+      UserGroupFromConfig.builder()
+          .docOfficeAbbreviation("BGH")
+          .userGroupPathName("/BGH")
+          .isInternal(true)
           .build();
 
   private final DocumentationOfficeDTO dsDocOffice =
@@ -176,5 +185,60 @@ class DatabaseUserGroupServiceTest {
             .map(UserGroupTransformer::transformToDomain)
             .toList();
     assertThat(this.service.getAllUserGroups()).isEqualTo(expectedGroups);
+  }
+
+  @Nested
+  class GetDocumentationOfficeFromGroupPathNamesTests {
+
+    @Test
+    void shouldReturnEmptyWhenNoMatchingGroup() {
+
+      doReturn(List.of(bghInternalGroupDTO)).when(groupRepository).findAll();
+      doReturn(List.of(bghDocOffice)).when(officeRepository).findAll();
+
+      service =
+          new DatabaseUserGroupService(groupRepository, officeRepository, List.of(bghGroupConfig));
+
+      service.onApplicationEvent(null);
+
+      var result = service.getDocumentationOfficeFromGroupPathNames(List.of("/DS"));
+      assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldReturnSingleMatchingGroup() {
+      doReturn(List.of(dsInternalGroupDTO)).when(groupRepository).findAll();
+      doReturn(List.of(dsDocOffice)).when(officeRepository).findAll();
+
+      service =
+          new DatabaseUserGroupService(
+              groupRepository, officeRepository, List.of(dsInternalGroupConfig));
+
+      service.onApplicationEvent(null);
+
+      var result = service.getDocumentationOfficeFromGroupPathNames(List.of("/DS"));
+
+      var expected = UserGroupTransformer.transformToDomain(dsInternalGroupDTO);
+
+      assertThat(result).isPresent().hasValue(expected);
+    }
+
+    @Test
+    void shouldThrowWhenMoreThanOneMatchingGroup() {
+      doReturn(List.of(dsInternalGroupDTO, dsExternalGroupDTO)).when(groupRepository).findAll();
+      doReturn(List.of(dsDocOffice)).when(officeRepository).findAll();
+
+      service =
+          new DatabaseUserGroupService(
+              groupRepository,
+              officeRepository,
+              List.of(dsInternalGroupConfig, dsExternalGroupConfig));
+
+      service.onApplicationEvent(null);
+      var pathNames = List.of("/DS");
+
+      assertThatThrownBy(() -> service.getDocumentationOfficeFromGroupPathNames(pathNames))
+          .isInstanceOf(UserApiException.class);
+    }
   }
 }
