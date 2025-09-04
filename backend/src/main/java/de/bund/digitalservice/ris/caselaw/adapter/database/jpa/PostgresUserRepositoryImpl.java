@@ -56,7 +56,7 @@ public class PostgresUserRepositoryImpl implements UserRepository {
     if (user == null) return Optional.empty();
 
     // TODO make sure to update the user's data (e.g. first name, last name) if they exist
-    UserDTO existing = repository.findByExternalId(user.externalId()).get();
+    // UserDTO existing = repository.findByExternalId(user.externalId()).get();
 
     return Optional.of(
         UserTransformer.transformToDomain(repository.save(UserTransformer.transformToDTO(user))));
