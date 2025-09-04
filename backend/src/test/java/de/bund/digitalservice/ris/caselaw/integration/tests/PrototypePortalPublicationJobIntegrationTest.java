@@ -184,7 +184,8 @@ class PrototypePortalPublicationJobIntegrationTest extends BaseIntegrationTest {
             repository.findAll().stream()
                 .map(DocumentationUnitDTO::getPortalPublicationStatus)
                 .toList())
-        .isEqualTo(List.of(PortalPublicationStatus.PUBLISHED, PortalPublicationStatus.WITHDRAWN));
+        .containsExactlyInAnyOrder(
+            PortalPublicationStatus.PUBLISHED, PortalPublicationStatus.WITHDRAWN);
   }
 
   @Test
