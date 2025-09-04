@@ -622,7 +622,7 @@ describe("PublicationActions", () => {
       ).not.toBeInTheDocument()
     })
 
-    it("shows hint for withdrawn doc unit after successful withdraw", async () => {
+    it("shows no hint for withdrawn doc unit after successful withdraw", async () => {
       mockDocUnitStore(PortalPublicationStatus.PUBLISHED)
       withdrawMock.mockResolvedValue({
         status: 200,
@@ -635,10 +635,8 @@ describe("PublicationActions", () => {
       )
       await flushPromises()
       expect(
-        screen.getByText(
-          "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ dauert etwa 2 Minuten.",
-        ),
-      ).toBeInTheDocument()
+        screen.queryByText(/Das Hochladen der Stammdaten.*2 Minuten/),
+      ).not.toBeInTheDocument()
     })
   })
 })

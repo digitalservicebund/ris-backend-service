@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -92,16 +93,20 @@ public class PortalSanityCheckService {
             "Document numbers found in Portal but not in Rechtsprechung im Internet: {}",
             inPortalNotInRii.stream().map(Object::toString).collect(Collectors.joining(", ")));
         log.info("Deleting documents not in Rechtsprechung im Internet...");
-        try {
-          inPortalNotInRii.forEach(portalPublicationService::withdrawDocumentationUnit);
-          portalPublicationService.uploadDeletionChangelog(
-              inPortalNotInRii.stream().map(documentNumber -> documentNumber + ".xml").toList());
-
-        } catch (PublishException e) {
-          log.error(
-              "Deleting documents not in Rechtsprechung im Internet failed with exception: {}",
-              e.getMessage());
-        }
+        inPortalNotInRii.forEach(
+            docNumber -> {
+              try {
+                portalPublicationService.withdrawDocumentationUnit(docNumber);
+                portalPublicationService.uploadDeletionChangelog(
+                    inPortalNotInRii.stream()
+                        .map(documentNumber -> documentNumber + ".xml")
+                        .toList());
+              } catch (PublishException | DocumentationUnitNotExistsException e) {
+                log.error(
+                    "Deleting documents not in Rechtsprechung im Internet failed with exception: {}",
+                    e.getMessage());
+              }
+            });
       }
     }
   }

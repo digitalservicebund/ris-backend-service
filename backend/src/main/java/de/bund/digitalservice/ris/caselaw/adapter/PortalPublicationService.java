@@ -129,7 +129,16 @@ public class PortalPublicationService {
    *
    * @param documentNumber the document number of the documentation unit to be withdrawn.
    */
-  public PortalPublicationResult withdrawDocumentationUnit(String documentNumber) {
+  public PortalPublicationResult withdrawDocumentationUnit(String documentNumber)
+      throws DocumentationUnitNotExistsException {
+    DocumentationUnit documentationUnit =
+        documentationUnitRepository.findByDocumentNumber(documentNumber);
+    var result = withdraw(documentNumber);
+    updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, null);
+    return result;
+  }
+
+  private PortalPublicationResult withdraw(String documentNumber) {
     try {
       var deletableFiles = portalBucket.getAllFilenamesByPath(documentNumber + "/");
       deletableFiles.forEach(portalBucket::delete);
@@ -159,7 +168,7 @@ public class PortalPublicationService {
           .addKeyValue("documentNumber", documentationUnit.documentNumber())
           .addKeyValue("id", documentationUnitId)
           .log();
-      var result = withdrawDocumentationUnit(documentationUnit.documentNumber());
+      var result = withdraw(documentationUnit.documentNumber());
       uploadDeletionChangelog(result.deletedPaths());
       updatePortalPublicationStatus(documentationUnit, PortalPublicationStatus.WITHDRAWN, user);
     } catch (Exception e) {
@@ -278,7 +287,7 @@ public class PortalPublicationService {
       uploadChangelog(result.changedPaths(), result.deletedPaths());
     } catch (Exception e) {
       log.error("Could not upload changelog file.");
-      withdrawDocumentationUnit(documentationUnit.documentNumber());
+      withdraw(documentationUnit.documentNumber());
       throw new PublishException("Could not save changelog to bucket.", e);
     }
   }

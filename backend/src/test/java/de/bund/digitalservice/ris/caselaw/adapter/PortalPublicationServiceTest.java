@@ -483,7 +483,9 @@ class PortalPublicationServiceTest {
     @Nested
     class WithdrawDocumentationUnit {
       @Test
-      void withdraw_shouldDeleteFromBucket() {
+      void withdraw_shouldDeleteFromBucket() throws DocumentationUnitNotExistsException {
+        when(documentationUnitRepository.findByDocumentNumber(testDocumentUnit.documentNumber()))
+            .thenReturn(testDocumentUnit);
         when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
             .thenReturn(List.of(withPrefix(testDocumentNumber)));
 
