@@ -704,6 +704,8 @@ test.describe("core data", () => {
 
       await test.step("check celex number is not editable", async () => {
         const celexNumber = page.getByLabel("Celex-Nummer", { exact: true })
+        await expect(celexNumber).toBeVisible()
+        await expect(celexNumber).toHaveValue("abc")
         await expect(celexNumber).not.toBeEditable()
         await expect(celexNumber).toHaveAttribute("readonly")
       })

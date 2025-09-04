@@ -594,7 +594,7 @@ public class DocumentationUnitController {
       return ResponseEntity.ok(result);
     } catch (DocumentationUnitNotExistsException e) {
       return ResponseEntity.notFound().build();
-    } catch (LdmlTransformationException | DocumentationUnitException | MappingException e) {
+    } catch (LdmlTransformationException | MappingException e) {
       var result =
           LdmlTransformationResult.builder()
               .success(false)

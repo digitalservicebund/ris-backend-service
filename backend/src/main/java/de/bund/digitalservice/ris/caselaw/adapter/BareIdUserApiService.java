@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,7 +32,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @Slf4j
 public class BareIdUserApiService implements UserApiService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(BareIdUserApiService.class);
+
   private final BareIdUserApiTokenService bareIdUserApiTokenService;
   private final UserGroupService userGroupService;
 
@@ -89,7 +87,9 @@ public class BareIdUserApiService implements UserApiService {
       }
 
       DocumentationOffice docOffice =
-          getDocumentationOfficeFromGroups(groupsResponse.getBody().groups()).orElse(null);
+          getDocumentationOfficeFromGroups(groupsResponse.getBody().groups())
+              .map(UserGroup::docOffice)
+              .orElse(null);
       // --- END get docoffice for user ---
 
       return UserTransformer.transformToDomain(responseBody.user(), docOffice);
@@ -202,28 +202,10 @@ public class BareIdUserApiService implements UserApiService {
         .toList();
   }
 
-  private Optional<DocumentationOffice> getDocumentationOfficeFromGroups(
+  private Optional<UserGroup> getDocumentationOfficeFromGroups(
       List<BareUserApiResponse.Group> userGroups) {
     List<String> userGroupPaths = userGroups.stream().map(BareUserApiResponse.Group::path).toList();
 
-    var uniqueDocOffices =
-        this.userGroupService.getAllUserGroups().stream()
-            .filter(group -> userGroupPaths.contains(group.userGroupPathName()))
-            .map(UserGroup::docOffice)
-            .distinct()
-            .toList();
-
-    if (uniqueDocOffices.isEmpty()) {
-      LOGGER.warn(
-          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
-      return Optional.empty();
-    }
-
-    if (uniqueDocOffices.size() > 1) {
-      LOGGER.warn(
-          "More then one doc office associated with given Keycloak user groups: {}", userGroups);
-      throw new UserApiException("Multiple doc offices found for user.");
-    }
-    return uniqueDocOffices.stream().findFirst();
+    return this.userGroupService.getDocumentationOfficeFromGroupPathNames(userGroupPaths);
   }
 }

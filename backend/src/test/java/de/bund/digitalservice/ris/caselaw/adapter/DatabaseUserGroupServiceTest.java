@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroup
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.UserGroupTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.UserApiException;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -47,6 +48,13 @@ class DatabaseUserGroupServiceTest {
           .docOfficeAbbreviation("DS")
           .userGroupPathName("/DS")
           .isInternal(false)
+          .build();
+
+  private final UserGroupFromConfig bghGroupConfig =
+      UserGroupFromConfig.builder()
+          .docOfficeAbbreviation("BGH")
+          .userGroupPathName("/BGH")
+          .isInternal(true)
           .build();
 
   private final DocumentationOfficeDTO dsDocOffice =
@@ -204,7 +212,9 @@ class DatabaseUserGroupServiceTest {
     this.service.onApplicationEvent(null);
 
     var result =
-        this.service.getFirstUserGroup(providedUserGroups).map(UserGroup::userGroupPathName);
+        this.service
+            .getDocumentationOfficeFromGroupPathNames(providedUserGroups)
+            .map(UserGroup::userGroupPathName);
 
     assertThat(result).isEqualTo(Optional.ofNullable(expectedMatch));
   }
@@ -217,8 +227,6 @@ class DatabaseUserGroupServiceTest {
         Arguments.of(List.of("/A", "/B", "/C"), List.of("/D", "/B"), "/B"),
         // Exact match at the end of the list
         Arguments.of(List.of("/A", "/B", "/C"), List.of("/D", "/C"), "/C"),
-        // Fist match, beginning with the provided groups is returned
-        Arguments.of(List.of("/A", "/B"), List.of("/B", "/A"), "/A"),
         // No match found
         Arguments.of(List.of("/A", "/B"), List.of("/C", "/D"), null),
         // Empty provided groups list
@@ -227,5 +235,23 @@ class DatabaseUserGroupServiceTest {
         Arguments.of(List.of(), List.of("/A", "/B"), null),
         // Case sensitivity check
         Arguments.of(List.of("/a"), List.of("/A"), null));
+  }
+
+  @Test
+  void shouldThrowWhenMoreThanOneMatchingGroup() {
+    doReturn(List.of(dsInternalGroupDTO, dsExternalGroupDTO)).when(groupRepository).findAll();
+    doReturn(List.of(dsDocOffice)).when(officeRepository).findAll();
+
+    service =
+        new DatabaseUserGroupService(
+            groupRepository,
+            officeRepository,
+            List.of(dsInternalGroupConfig, dsExternalGroupConfig));
+
+    service.onApplicationEvent(null);
+    var pathNames = List.of("/DS");
+
+    assertThatThrownBy(() -> service.getDocumentationOfficeFromGroupPathNames(pathNames))
+        .isInstanceOf(UserApiException.class);
   }
 }

@@ -175,7 +175,7 @@ public class AuthUtils {
                   .findFirst();
             })
         .when(userGroupService)
-        .getFirstUserGroup(anyList());
+        .getDocumentationOfficeFromGroupPathNames(anyList());
   }
 
   /**

@@ -375,7 +375,7 @@ class PortalPublicationServiceTest {
                 documentationUnitId,
                 user,
                 HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht veröffentlicht werden");
+                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
@@ -399,7 +399,7 @@ class PortalPublicationServiceTest {
                 documentationUnitId,
                 user,
                 HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht veröffentlicht werden");
+                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
@@ -428,7 +428,7 @@ class PortalPublicationServiceTest {
                 documentationUnitId,
                 user,
                 HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht veröffentlicht werden");
+                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
@@ -458,7 +458,7 @@ class PortalPublicationServiceTest {
                 documentationUnitId,
                 user,
                 HistoryLogEventType.PORTAL_PUBLICATION,
-                "Dokeinheit konnte nicht veröffentlicht werden");
+                "Dokeinheit konnte nicht im Portal veröffentlicht werden");
       }
 
       @Test
