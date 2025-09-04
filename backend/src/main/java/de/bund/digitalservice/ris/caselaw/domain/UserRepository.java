@@ -10,6 +10,8 @@ public interface UserRepository {
 
   Optional<User> getUser(UUID uuid);
 
+  long getCount();
+
   List<User> getAllUsersForDocumentationOffice(DocumentationOffice documentationOffice);
 
   void saveOrUpdate(List<User> userDTOs);

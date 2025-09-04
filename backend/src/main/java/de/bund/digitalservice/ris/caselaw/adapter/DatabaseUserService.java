@@ -6,13 +6,13 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import jakarta.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
@@ -33,10 +33,17 @@ public class DatabaseUserService extends UserService {
     this.keycloakUserService = keycloakUserService;
   }
 
+  /** On application start, we want to check if the user table is empty and if so, initialize */
+  @EventListener
+  public void onApplicationEvent() {
+    if (userRepository.getCount() == 0) {
+      fetchAndPersistUsersFromKeycloak();
+    }
+  }
+
   /** Nightly fetches users from the Keycloak User Service and persists them */
   @Scheduled(cron = "0 0 4 * * *", zone = "Europe/Berlin")
   @SchedulerLock(name = "fetch-users-from-api", lockAtMostFor = "PT5M")
-  @Transactional
   public void fetchAndPersistUsersFromKeycloak() {
     userGroupService
         .getAllUserGroups()

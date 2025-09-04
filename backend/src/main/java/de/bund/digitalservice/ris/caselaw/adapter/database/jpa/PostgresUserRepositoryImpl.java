@@ -32,6 +32,11 @@ public class PostgresUserRepositoryImpl implements UserRepository {
   }
 
   @Override
+  public long getCount() {
+    return repository.count();
+  }
+
+  @Override
   public List<User> getAllUsersForDocumentationOffice(DocumentationOffice documentationOffice) {
     return repository
         .findByDocumentationOffice(
