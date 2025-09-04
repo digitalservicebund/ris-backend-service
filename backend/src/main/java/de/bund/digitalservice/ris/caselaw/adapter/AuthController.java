@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +26,8 @@ public class AuthController {
   private final UserService userService;
   private final OAuthService oAuthService;
 
-  public AuthController(UserService userService, OAuthService oAuthService) {
+  public AuthController(
+      @Qualifier("keycloakUserService") UserService userService, OAuthService oAuthService) {
     this.userService = userService;
     this.oAuthService = oAuthService;
   }
