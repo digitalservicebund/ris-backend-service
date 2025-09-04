@@ -492,6 +492,9 @@ class PortalPublicationServiceTest {
         subject.withdrawDocumentationUnit(testDocumentNumber);
 
         verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
+        verify(documentationUnitRepository)
+            .updatePortalPublicationStatus(
+                testDocumentUnit.uuid(), PortalPublicationStatus.WITHDRAWN);
       }
 
       @Test
@@ -503,6 +506,9 @@ class PortalPublicationServiceTest {
         assertThatExceptionOfType(PublishException.class)
             .isThrownBy(() -> subject.withdrawDocumentationUnit(testDocumentNumber))
             .withMessageContaining("Could not delete LDML from bucket.");
+        verify(documentationUnitRepository, never())
+            .updatePortalPublicationStatus(
+                testDocumentUnit.uuid(), PortalPublicationStatus.WITHDRAWN);
       }
     }
 
