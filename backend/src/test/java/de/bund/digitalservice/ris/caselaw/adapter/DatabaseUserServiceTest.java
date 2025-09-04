@@ -16,10 +16,12 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -61,9 +63,11 @@ class DatabaseUserServiceTest {
           .docOffice(DocumentationOffice.builder().abbreviation("BVerwG").build())
           .build();
 
-  public DatabaseUserServiceTest() {
-    this.databaseUserService =
+  @BeforeEach
+  void setup() throws DocumentationUnitNotExistsException {
+    databaseUserService =
         new DatabaseUserService(userGroupService, userRepository, keycloakUserService);
+    databaseUserService.onApplicationEvent(null);
   }
 
   @Test

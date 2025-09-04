@@ -12,6 +12,7 @@ import java.util.UUID;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -35,7 +36,7 @@ public class DatabaseUserService extends UserService {
 
   /** On application start, we want to check if the user table is empty and if so, initialize */
   @EventListener
-  public void onApplicationEvent() {
+  public void onApplicationEvent(ContextRefreshedEvent event) {
     if (userRepository.getCount() == 0) {
       fetchAndPersistUsersFromKeycloak();
     }
