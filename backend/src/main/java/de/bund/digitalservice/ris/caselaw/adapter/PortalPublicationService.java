@@ -76,7 +76,12 @@ public class PortalPublicationService {
    * @throws PublishException if the LDML could not be saved in the bucket
    * @throws ChangelogException if the changelog cannot be generated or saved
    */
-  @Transactional
+  @Transactional(
+      noRollbackFor = {
+        LdmlTransformationException.class,
+        PublishException.class,
+        ChangelogException.class
+      })
   public void publishDocumentationUnitWithChangelog(UUID documentationUnitId, User user)
       throws DocumentationUnitNotExistsException {
     if (!featureToggleService.isEnabled(PUBLICATION_FEATURE_FLAG)) {
@@ -176,7 +181,7 @@ public class PortalPublicationService {
           documentationUnitId,
           user,
           HistoryLogEventType.PORTAL_PUBLICATION,
-          "Dokeinheit konnte nicht zurückgezogen werden");
+          "Dokeinheit konnte nicht aus dem Portal zurückgezogen werden");
       throw e;
     }
   }

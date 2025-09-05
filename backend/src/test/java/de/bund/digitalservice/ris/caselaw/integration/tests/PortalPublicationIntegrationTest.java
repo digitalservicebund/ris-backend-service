@@ -235,6 +235,18 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
             response ->
                 assertThat(response.getResponseBody().message())
                     .contains("LDML validation failed."));
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    assertThat(historyLogs)
+        .hasSize(1)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit konnte nicht im Portal veröffentlicht werden");
+            });
   }
 
   @Test
@@ -255,6 +267,18 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
             response ->
                 assertThat(response.getResponseBody().message())
                     .contains("Missing judgment body."));
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    assertThat(historyLogs)
+        .hasSize(1)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit konnte nicht im Portal veröffentlicht werden");
+            });
   }
 
   @Test
@@ -277,6 +301,18 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
             response ->
                 assertThat(response.getResponseBody().message())
                     .contains("Could not save LDML to bucket."));
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    assertThat(historyLogs)
+        .hasSize(1)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit konnte nicht im Portal veröffentlicht werden");
+            });
   }
 
   @Test
@@ -470,6 +506,40 @@ class PortalPublicationIntegrationTest extends BaseIntegrationTest {
               assertThat(historyLog.getUserId()).isNull();
               assertThat(historyLog.getDescription())
                   .isEqualTo("Status im Portal geändert: Veröffentlicht → Zurückgezogen");
+            });
+  }
+
+  @Test
+  void testWithdrawFailsWhenS3ClientThrowsException() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSaveDecision(repository, buildValidDocumentationUnit());
+
+    when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
+        .thenThrow(S3Exception.class);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/withdraw")
+        .exchange()
+        .expectStatus()
+        .is5xxServerError()
+        .expectBody(CaselawExceptionHandler.ApiError.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().message())
+                    .contains("Could not create changelog file"));
+
+    var historyLogs =
+        historyLogRepository.findByDocumentationUnitIdOrderByCreatedAtDesc(dto.getId());
+    assertThat(historyLogs)
+        .hasSize(1)
+        .satisfiesExactly(
+            historyLog -> {
+              assertThat(historyLog.getEventType())
+                  .isEqualTo(HistoryLogEventType.PORTAL_PUBLICATION);
+              assertThat(historyLog.getDescription())
+                  .isEqualTo("Dokeinheit konnte nicht aus dem Portal zurückgezogen werden");
             });
   }
 
