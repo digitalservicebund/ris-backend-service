@@ -165,33 +165,21 @@ test.describe("edit pending proceeding", () => {
     'Bearbeitung der Rubrik "Schlagwörter" in einem anhängigen Verfahren',
     { tag: ["@RISDEV-7774", "@RISDEV-9006"] },
     async ({ page, pendingProceeding }) => {
-      const keywords = [
+      const keywordsBase = [
         "Größer > als",
         "”Test-Case_01”",
         "'Dev@Ops2025'",
         "User*Role+Admin",
         "Security~Patch_#9",
         "Compliance=ISO27001",
-        "Prod:Release;V2.0",
       ]
-      const newKeywords = [
-        "Größer > als",
-        "”Test-Case_01”",
-        "'Dev@Ops2025'",
-        "User*Role+Admin",
-        "Security~Patch_#9",
-        "Compliance=ISO27001",
-        "Special_Quotes",
-      ]
+      const keywords = [...keywordsBase, "Prod:Release;V2.0"]
+      const newKeywords = [...keywordsBase, "Special_Quotes"]
       const newKeywordsAlphabetically = [
-        "'Dev@Ops2025'",
-        "”Test-Case_01”",
-        "Compliance=ISO27001",
-        "Größer > als",
-        "Security~Patch_#9",
+        ...keywordsBase,
         "Special_Quotes",
-        "User*Role+Admin",
-      ]
+      ].sort((a, b) => a.localeCompare(b))
+
       await test.step("Navigiere zu Rubriken", async () => {
         await navigateToCategories(page, pendingProceeding.documentNumber, {
           type: "pending-proceeding",
@@ -364,7 +352,7 @@ test.describe("edit pending proceeding", () => {
         )
         await expect(listItems).toHaveCount(1)
         const actualTexts = await listItems.allTextContents()
-        expect(actualTexts[0]).toEqual("TestDuplicat?")
+        expect(actualTexts).toEqual(["TestDuplicat?"])
       })
 
       await test.step("In der Vorschau ist das Schlagwort nur einmal aufgelistet.", async () => {
