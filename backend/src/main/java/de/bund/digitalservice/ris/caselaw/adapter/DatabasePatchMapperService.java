@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.image.ImageUtil;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -231,56 +232,89 @@ public class DatabasePatchMapperService implements PatchMapperService {
   @Override
   public JsonPatch extractAndStoreBase64Images(
       JsonPatch patch, DocumentationUnit documentationUnit, User user) {
-    List<JsonPatchOperation> operations = new ArrayList<>();
+    List<JsonPatchOperation> updatedOperations = new ArrayList<>();
 
     patch
         .getOperations()
         .forEach(
             operation -> {
               if (operation instanceof PathValueOperation valueOperation
-                  && valueOperation.getValue() instanceof TextNode valueNode) {
+                  && valueOperation.getValue() instanceof TextNode textNode) {
                 try {
-                  String originalText = valueNode.textValue();
-                  Document document = Jsoup.parse(originalText);
-                  document.outputSettings().prettyPrint(false);
+                  String originalHtmlContent = textNode.textValue();
+                  Document parsedDocument = Jsoup.parse(originalHtmlContent);
+                  parsedDocument.outputSettings().prettyPrint(false);
+                  List<Element> base64ImageElements =
+                      ImageUtil.extractBase64ImageTags(parsedDocument);
 
-                  var elements = ImageUtil.extractBase64ImageTags(document);
+                  String updatedHtmlContent = originalHtmlContent;
 
-                  for (Element base64ImageTag : elements) {
-                    HttpHeaders headers = new HttpHeaders();
-                    String fileName = "." + ImageUtil.getFileExtension(base64ImageTag);
-                    headers.set("X-Filename", fileName);
+                  for (Element base64ImageElement : base64ImageElements) {
+                    String originalImageHtml = base64ImageElement.outerHtml();
 
-                    MediaType contentType = MediaTypeFactory.getMediaType(fileName).orElse(null);
-                    headers.setContentType(contentType);
+                    HttpHeaders attachmentHeaders = createHttpHeadersForImage(base64ImageElement);
 
-                    var byteBuffer = ImageUtil.encodeToBytes(base64ImageTag);
-                    Attachment attachment =
+                    ByteBuffer imageBytes = ImageUtil.encodeToBytes(base64ImageElement);
+                    Attachment savedAttachment =
                         attachmentService.attachFileToDocumentationUnit(
-                            documentationUnit.uuid(), byteBuffer, headers, null);
+                            documentationUnit.uuid(), imageBytes, attachmentHeaders, null);
 
-                    base64ImageTag.replaceWith(
+                    Element newImageElement =
                         ImageUtil.createImageElementWithNewSrc(
-                            base64ImageTag, attachment.name(), documentationUnit.documentNumber()));
+                            base64ImageElement,
+                            savedAttachment.name(),
+                            documentationUnit.documentNumber());
+
+                    String newImageHtml = newImageElement.outerHtml();
+
+                    updatedHtmlContent =
+                        updatedHtmlContent.replace(originalImageHtml, newImageHtml);
                   }
-                  if (operation instanceof AddOperation) {
-                    operations.add(
-                        new AddOperation(
-                            valueOperation.getPath(), new TextNode(document.body().html())));
-                  } else if (operation instanceof ReplaceOperation) {
-                    operations.add(
-                        new ReplaceOperation(
-                            valueOperation.getPath(), new TextNode(document.body().html())));
-                  }
+
+                  JsonPatchOperation newOperation =
+                      createAppropriatePatchOperation(
+                          operation, valueOperation.getPath(), updatedHtmlContent);
+
+                  updatedOperations.add(newOperation);
+
                 } catch (Exception e) {
-                  log.info("Could not process image: ", e);
-                  operations.add(operation);
+                  log.atInfo()
+                      .setMessage("Image processing failed, keeping original operation.")
+                      .setCause(e)
+                      .addKeyValue("id", documentationUnit.uuid())
+                      .log();
+                  updatedOperations.add(operation);
                 }
               } else {
-                operations.add(operation);
+                updatedOperations.add(operation);
               }
             });
 
-    return new JsonPatch(operations);
+    return new JsonPatch(updatedOperations);
+  }
+
+  private HttpHeaders createHttpHeadersForImage(Element imageElement) {
+    HttpHeaders headers = new HttpHeaders();
+    String fileExtension = "." + ImageUtil.getFileExtension(imageElement);
+    headers.set("X-Filename", fileExtension);
+
+    MediaType contentType = MediaTypeFactory.getMediaType(fileExtension).orElse(null);
+    headers.setContentType(contentType);
+
+    return headers;
+  }
+
+  private JsonPatchOperation createAppropriatePatchOperation(
+      JsonPatchOperation originalOperation, String path, String content) {
+
+    TextNode contentNode = new TextNode(content);
+
+    if (originalOperation instanceof AddOperation) {
+      return new AddOperation(path, contentNode);
+    } else if (originalOperation instanceof ReplaceOperation) {
+      return new ReplaceOperation(path, contentNode);
+    } else {
+      return originalOperation;
+    }
   }
 }
