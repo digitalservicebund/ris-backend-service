@@ -570,6 +570,12 @@ class PortalPublicationServiceTest {
         assertThatExceptionOfType(PublishException.class)
             .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
             .withMessageContaining("Could not delete LDML from bucket.");
+        verify(historyLogService)
+            .saveHistoryLog(
+                uuid,
+                user,
+                HistoryLogEventType.PORTAL_PUBLICATION,
+                "Dokeinheit konnte nicht aus dem Portal zurückgezogen werden");
       }
 
       @Test
@@ -591,6 +597,12 @@ class PortalPublicationServiceTest {
         assertThatExceptionOfType(ChangelogException.class)
             .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
             .withMessageContaining("Could not create changelog file");
+        verify(historyLogService)
+            .saveHistoryLog(
+                uuid,
+                user,
+                HistoryLogEventType.PORTAL_PUBLICATION,
+                "Dokeinheit konnte nicht aus dem Portal zurückgezogen werden");
       }
 
       @Test
@@ -605,6 +617,12 @@ class PortalPublicationServiceTest {
         assertThatExceptionOfType(DocumentationUnitNotExistsException.class)
             .isThrownBy(() -> subject.withdrawDocumentationUnitWithChangelog(uuid, user))
             .withMessageContaining("Documentation unit does not exist");
+        verify(historyLogService)
+            .saveHistoryLog(
+                uuid,
+                user,
+                HistoryLogEventType.PORTAL_PUBLICATION,
+                "Dokeinheit konnte nicht aus dem Portal zurückgezogen werden");
       }
     }
 
