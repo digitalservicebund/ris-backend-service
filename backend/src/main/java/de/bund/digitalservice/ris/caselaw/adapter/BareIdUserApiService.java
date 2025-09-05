@@ -100,7 +100,7 @@ public class BareIdUserApiService implements UserApiService {
   }
 
   @Override
-  public List<User> getUsers(String userGroupPathName) { // /caselaw/BGH/Intern
+  public List<User> getUsers(String userGroupPathName) {
     if (StringUtils.isNullOrBlank(userGroupPathName)) {
       throw new UserApiException("User group path is empty or blank");
     }
@@ -130,10 +130,10 @@ public class BareIdUserApiService implements UserApiService {
     List<User> users = new ArrayList<>();
     if (group.path().equals(groupName)) {
       users.addAll(getUsers(group.uuid()));
-      return users;
-    }
-    for (BareUserApiResponse.Group child : getGroupChildren(group.uuid())) {
-      users.addAll(getUsersRecursively(child, groupName));
+    } else {
+      for (BareUserApiResponse.Group child : getGroupChildren(group.uuid())) {
+        users.addAll(getUsersRecursively(child, groupName));
+      }
     }
     return users;
   }
