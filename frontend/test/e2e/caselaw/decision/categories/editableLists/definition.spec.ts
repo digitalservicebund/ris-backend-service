@@ -94,6 +94,20 @@ test.describe(
           /<zuordnung>\s*\d*\s*<aspekt>Definition<\/aspekt>\s*\d*\s*<begriff>Sachgesamtheit\|Randnummer=1<\/begriff>\s*\d*\s*<\/zuordnung>/
         expect(innerText).toMatch(regexWithBorderNumber)
       })
+
+      await test.step("Bei gelöschter Randnummer wird der Eintrag als fehlerhaft markiert", async () => {
+        await navigateToCategories(page, documentNumber)
+        await page.getByTestId("Gründe").click()
+        await page.keyboard.press(`ControlOrMeta+Alt+-`)
+        await save(page)
+        await expect(
+          page
+            .getByTestId("Definitionen")
+            .locator("span", { hasText: "1", hasNotText: "|" }),
+        ).toHaveClass(
+          'text-red-900 bg-red-200 before:content-["⚠Rd_"] pr-2 pl-2',
+        )
+      })
     })
 
     test("Definition editieren und löschen", async ({
