@@ -4,13 +4,17 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.gravity9.jsonpatch.AddOperation;
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.PathValueOperation;
+import com.gravity9.jsonpatch.RemoveOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
@@ -19,8 +23,10 @@ import de.bund.digitalservice.ris.caselaw.domain.Decision;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -155,5 +161,109 @@ class DatabasePatchMapperServiceTest {
     String resultHtml = ((PathValueOperation) op).getValue().textValue();
 
     assertEquals(html, resultHtml);
+  }
+
+  @Test
+  void extractAndStoreBase64Images_handlesMultipleImageTags() {
+    String textWithSpecialCharacters =
+        "& > Test-Case_01 Dev@Ops2025' User*Role+Admin Security~Patch_#9 Prod:Release;V2.0 ?";
+    String html =
+        "<p>"
+            + getDefaultImageTag().outerHtml()
+            + textWithSpecialCharacters
+            + getDefaultImageTag().outerHtml()
+            + "</p>";
+    JsonPatch patch = new JsonPatch(List.of(new ReplaceOperation("/foo", new TextNode(html))));
+
+    DocumentationUnit docUnit =
+        Decision.builder().uuid(UUID.randomUUID()).documentNumber("YYMultipleImagesDoc").build();
+
+    Attachment attachment = Attachment.builder().name("testfile.png").build();
+    when(attachmentService.attachFileToDocumentationUnit(
+            any(), any(ByteBuffer.class), any(HttpHeaders.class), any()))
+        .thenReturn(attachment);
+
+    JsonPatch result = service.extractAndStoreBase64Images(patch, docUnit, User.builder().build());
+
+    String resultHtml = ((PathValueOperation) result.getOperations().get(0)).getValue().textValue();
+    assertThat(resultHtml).doesNotContain("data:image");
+    assertThat(resultHtml).contains(textWithSpecialCharacters);
+    assertThat(resultHtml)
+        .contains("src=\"/api/v1/caselaw/documentunits/YYMultipleImagesDoc/image/testfile.png\"");
+    assertThat(
+            StringUtils.countMatches(
+                resultHtml,
+                "src=\"/api/v1/caselaw/documentunits/YYMultipleImagesDoc/image/testfile.png\""))
+        .isEqualTo(2);
+  }
+
+  @Test
+  void extractAndStoreBase64Images_shouldHandleAddOperation() {
+    String html = "<p>" + getDefaultImageTag().outerHtml() + "</p>";
+    JsonPatch patch = new JsonPatch(List.of(new AddOperation("/foo", new TextNode(html))));
+
+    DocumentationUnit docUnit =
+        Decision.builder().uuid(UUID.randomUUID()).documentNumber("YYAddOpDoc").build();
+
+    Attachment attachment = Attachment.builder().name("testaddop.png").build();
+
+    when(attachmentService.attachFileToDocumentationUnit(
+            any(), any(ByteBuffer.class), any(HttpHeaders.class), any()))
+        .thenReturn(attachment);
+
+    JsonPatch result = service.extractAndStoreBase64Images(patch, docUnit, User.builder().build());
+
+    assertThat(result.getOperations()).hasSize(1);
+    JsonPatchOperation op = result.getOperations().get(0);
+    assertThat(op).isInstanceOf(AddOperation.class);
+
+    String newHtml = ((PathValueOperation) op).getValue().textValue();
+    assertThat(newHtml).doesNotContain("data:image");
+    assertThat(newHtml)
+        .contains("src=\"/api/v1/caselaw/documentunits/YYAddOpDoc/image/testaddop.png\"");
+  }
+
+  @Test
+  void extractAndStoreBase64Images_shouldHandleOtherOperation() {
+    JsonPatch patch = new JsonPatch(List.of(new RemoveOperation("/foo")));
+
+    DocumentationUnit docUnit =
+        Decision.builder().uuid(UUID.randomUUID()).documentNumber("YYAddOpDoc").build();
+
+    JsonPatch result = service.extractAndStoreBase64Images(patch, docUnit, User.builder().build());
+
+    assertThat(result.getOperations()).hasSize(1);
+    JsonPatchOperation op = result.getOperations().get(0);
+    assertThat(op).isInstanceOf(RemoveOperation.class);
+    verify(attachmentService, never())
+        .attachFileToDocumentationUnit(any(), any(ByteBuffer.class), any(HttpHeaders.class), any());
+  }
+
+  @Test
+  void extractAndStoreBase64Images_shouldHandleEmptyPatch() {
+    JsonPatch patch = new JsonPatch(Collections.emptyList());
+
+    DocumentationUnit docUnit =
+        Decision.builder().uuid(UUID.randomUUID()).documentNumber("YYEmptyDoc").build();
+
+    JsonPatch result = service.extractAndStoreBase64Images(patch, docUnit, User.builder().build());
+
+    assertThat(result.getOperations()).isEmpty();
+  }
+
+  @Test
+  void extractAndStoreBase64Images_invalidHtml_shouldKeepOriginal() {
+    String invalidHtml = "<p><b>This is broken";
+    JsonPatch patch =
+        new JsonPatch(List.of(new ReplaceOperation("/foo", new TextNode(invalidHtml))));
+
+    DocumentationUnit docUnit =
+        Decision.builder().uuid(UUID.randomUUID()).documentNumber("YYInvalidHtmlDoc").build();
+
+    JsonPatch result = service.extractAndStoreBase64Images(patch, docUnit, User.builder().build());
+
+    assertThat(result.getOperations()).hasSize(1);
+    String resultHtml = ((PathValueOperation) result.getOperations().get(0)).getValue().textValue();
+    assertEquals(invalidHtml, resultHtml);
   }
 }
