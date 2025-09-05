@@ -96,8 +96,9 @@ class DatabasePatchMapperServiceTest {
 
   @Test
   void extractAndStoreBase64Images_withSpecialCharactersInText_shouldKeepText() {
-    String html =
-        "<p>This is & and this is <" + getDefaultImageTag().outerHtml() + " and this ></p>";
+    String textWithSpecialCharacters =
+        "< & > Test-Case_01 Dev@Ops2025' User*Role+Admin Security~Patch_#9 Prod:Release;V2.0 ?";
+    String html = "<p>" + textWithSpecialCharacters + getDefaultImageTag().outerHtml() + "</p>";
     JsonPatch patch = new JsonPatch(List.of(new ReplaceOperation("/foo", new TextNode(html))));
 
     DocumentationUnit docUnit =
@@ -121,7 +122,9 @@ class DatabasePatchMapperServiceTest {
     assertThat(newHtml).doesNotContain("data:image");
 
     assertEquals(
-        "<p>This is & and this is <<img class=\"inline align-baseline\" src=\"/api/v1/caselaw/documentunits/YYTestDoc0001/image/2e7e7908-faa3-4aca-a0ff-4bfa4dcf316a.png\" alt=\"Smallest base64 image\" width=\"82\" height=\"80\"> and this ></p>",
+        "<p>"
+            + textWithSpecialCharacters
+            + "<img class=\"inline align-baseline\" src=\"/api/v1/caselaw/documentunits/YYTestDoc0001/image/2e7e7908-faa3-4aca-a0ff-4bfa4dcf316a.png\" alt=\"Smallest base64 image\" width=\"82\" height=\"80\"></p>",
         newHtml);
   }
 
@@ -146,7 +149,12 @@ class DatabasePatchMapperServiceTest {
 
   @Test
   void extractAndStoreBase64Images_withoutImageTagsAndWithSpecialCharactersInText_shouldKeepText() {
-    final String html = "<p>Content without an image tag but with & and with < and >!</p>";
+    String textWithSpecialCharacters =
+        "< & > Test-Case_01 Dev@Ops2025' User*Role+Admin Security~Patch_#9 Prod:Release;V2.0 ?";
+    final String html =
+        "<p>Content without an image tag but with special characters: "
+            + textWithSpecialCharacters
+            + "</p>";
     JsonPatch patch = new JsonPatch(List.of(new ReplaceOperation("/foo", new TextNode(html))));
 
     DocumentationUnit docUnit =
@@ -166,7 +174,7 @@ class DatabasePatchMapperServiceTest {
   @Test
   void extractAndStoreBase64Images_handlesMultipleImageTags() {
     String textWithSpecialCharacters =
-        "& > Test-Case_01 Dev@Ops2025' User*Role+Admin Security~Patch_#9 Prod:Release;V2.0 ?";
+        "< & > Test-Case_01 Dev@Ops2025' User*Role+Admin Security~Patch_#9 Prod:Release;V2.0 ?";
     String html =
         "<p>"
             + getDefaultImageTag().outerHtml()
