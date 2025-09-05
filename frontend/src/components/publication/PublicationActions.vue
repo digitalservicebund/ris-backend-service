@@ -121,11 +121,11 @@ const lastPublishedAt = computed(() => {
         </div>
       </div>
 
-      <div v-if="isPublished || isWithdrawn" class="flex flex-row gap-8">
+      <div v-if="isPublished" class="flex flex-row gap-8">
         <IconInfoOutline class="text-grey-900" />
         <p>
           Das Hochladen der Stammdaten und der Informationen im Portal-Tab
-          „Details“ dauert etwa 2 Minuten.
+          „Details“ dauert ungefähr 5 Minuten.
         </p>
       </div>
       <div

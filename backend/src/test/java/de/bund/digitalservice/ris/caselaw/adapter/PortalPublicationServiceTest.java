@@ -483,13 +483,18 @@ class PortalPublicationServiceTest {
     @Nested
     class WithdrawDocumentationUnit {
       @Test
-      void withdraw_shouldDeleteFromBucket() {
+      void withdraw_shouldDeleteFromBucket() throws DocumentationUnitNotExistsException {
+        when(documentationUnitRepository.findByDocumentNumber(testDocumentUnit.documentNumber()))
+            .thenReturn(testDocumentUnit);
         when(caseLawBucket.getAllFilenamesByPath(testDocumentNumber + "/"))
             .thenReturn(List.of(withPrefix(testDocumentNumber)));
 
         subject.withdrawDocumentationUnit(testDocumentNumber);
 
         verify(caseLawBucket).delete(withPrefix(testDocumentNumber));
+        verify(documentationUnitRepository)
+            .updatePortalPublicationStatus(
+                testDocumentUnit.uuid(), PortalPublicationStatus.WITHDRAWN);
       }
 
       @Test
@@ -501,6 +506,9 @@ class PortalPublicationServiceTest {
         assertThatExceptionOfType(PublishException.class)
             .isThrownBy(() -> subject.withdrawDocumentationUnit(testDocumentNumber))
             .withMessageContaining("Could not delete LDML from bucket.");
+        verify(documentationUnitRepository, never())
+            .updatePortalPublicationStatus(
+                testDocumentUnit.uuid(), PortalPublicationStatus.WITHDRAWN);
       }
     }
 

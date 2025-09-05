@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test"
+import { expect, Page } from "@playwright/test"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import {
   expectHistoryLogRow,
@@ -56,26 +56,6 @@ test.describe(
               documentType: { label: "Beschluss", jurisShortcut: "Bes" },
             },
           },
-          {
-            coreData: {
-              court: { label: "BGH" },
-              decisionDate: "2023-01-01",
-              documentType: { label: "Beschluss", jurisShortcut: "Bes" },
-            },
-            shortTexts: {
-              otherHeadnote: "das wort hat einen Flerher",
-            },
-            longTexts: {
-              tenor: "das wort hat einen Flerher",
-            },
-          },
-          {
-            coreData: {
-              court: { label: "BVerwG" },
-              decisionDate: "2025-05-22",
-              documentType: { label: "Beschluss", jurisShortcut: "Bes" },
-            },
-          },
         ],
         { scope: "test" },
       ],
@@ -85,7 +65,7 @@ test.describe(
       {
         tag: ["@RISDEV-8456", "@RISDEV-8460"],
       },
-      async ({ page, prefilledDocumentUnit }) => {
+      async ({ page, prefilledDocumentUnit, baseURL }) => {
         await navigateToPublication(page, prefilledDocumentUnit.documentNumber)
 
         await test.step("Anzeige einer Unveröffentlichten Dok-Einheit mit allen Checks und ohne Fehler", async () => {
@@ -137,9 +117,80 @@ test.describe(
             page.getByTestId("portal-publication-status-badge"),
           ).toHaveText("Veröffentlicht")
           await expect(
+            page.getByRole("link", {
+              name: "Portalseite der Dokumentationseinheit",
+            }),
+          ).toHaveAttribute(
+            "href",
+            `https://ris-portal.dev.ds4g.net/case-law/${prefilledDocumentUnit.documentNumber}`,
+          )
+          await expect(
+            page.getByText(
+              "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ dauert ungefähr 5 Minuten.",
+            ),
+          ).toBeVisible()
+          await expect(
+            page.getByText("Zuletzt veröffentlicht am:"),
+          ).toBeVisible()
+          await expect(
             page.getByRole("button", { name: "Zurückziehen" }),
           ).toBeVisible()
         })
+
+        await test.step("Hinweis auf verzögerte Veröffentlichung wird nach Reload ausgeblendet", async () => {
+          await page.reload()
+          await expect(
+            page.getByText(
+              "Das Hochladen der Stammdaten und der Informationen im Portal-Tab „Details“ dauert ungefähr 5 Minuten.",
+            ),
+          ).toBeHidden()
+        })
+
+        await test.step("Eine veröffentlichte Dokumentationseinheit kann nicht gelöscht werden", async () => {
+          await navigateToManagementData(
+            page,
+            prefilledDocumentUnit.documentNumber,
+          )
+
+          await page
+            .getByRole("button", { name: "Dokumentationseinheit löschen" })
+            .click()
+
+          await page
+            .getByRole("button", { name: "Löschen", exact: true })
+            .click()
+
+          await expect(
+            page.getByText(
+              "Die Dokumentationseinheit konnte nicht gelöscht werden, da Sie im Portal veröffentlicht ist.",
+            ),
+          ).toBeVisible()
+
+          await navigateToPublication(
+            page,
+            prefilledDocumentUnit.documentNumber,
+          )
+        })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist per Portal-API abrufbar", async () => {
+            const portalPage = await page.context().newPage()
+            await portalPage.goto(
+              `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
+            )
+
+            await loginToPortal(portalPage)
+
+            // eslint-disable-next-line playwright/no-conditional-expect
+            await expect(
+              portalPage.getByRole("heading", {
+                name: "testHeadline",
+              }),
+            ).toBeVisible()
+          })
+        }
 
         await test.step("Erfolgreiches Zurückziehen ändert den Status", async () => {
           await page.getByRole("button", { name: "Zurückziehen" }).click()
@@ -150,6 +201,21 @@ test.describe(
             page.getByRole("button", { name: "Zurückziehen" }),
           ).toBeHidden()
         })
+
+        // Portal is not available in local environment
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (baseURL !== "http://127.0.0.1") {
+          await test.step("Die Entscheidung ist nicht mehr per Portal-API abrufbar", async () => {
+            const portalPage = await page.context().newPage()
+            await portalPage.goto(
+              `https://ris-portal.dev.ds4g.net/api/v1/case-law/${prefilledDocumentUnit.documentNumber}.html`,
+            )
+            // eslint-disable-next-line playwright/no-conditional-expect
+            await expect(
+              portalPage.getByText("Diese Seite existiert nicht"),
+            ).toBeVisible()
+          })
+        }
 
         await test.step("Veröffentlichen und Zurückziehen wird in der Historie geloggt", async () => {
           await navigateToManagementData(
@@ -331,7 +397,6 @@ test.describe(
           await expect(page.getByText("<akn:num>2</akn:num>")).toBeVisible()
           await expect(page.getByText("<akn:num>3</akn:num>")).toBeVisible()
           await expect(page.getByText("<akn:num>4</akn:num>")).toBeVisible()
-          //todo: is there a better way to check this? regex seemed very complex for ldml
         })
 
         await test.step("Randnummern und Links werden unter Rubriken korrekt angezeigt", async () => {
@@ -393,25 +458,34 @@ test.describe(
     )
 
     // Returns success but should fail. Unclear why.
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
+
+    test(
       "Rechtschreibprüfung",
       {
         tag: ["@RISDEV-8456"],
       },
-      async ({ page, decisions, baseURL }) => {
+      async ({ page, prefilledDocumentUnit, baseURL }) => {
         // eslint-disable-next-line playwright/no-skipped-test
         test.skip(
           baseURL === "http://127.0.0.1",
           "Skipping this test on local execution, as there is no languagetool running",
         )
 
-        const { createdDecisions } = decisions
-        const decision = createdDecisions[3]
+        await test.step("Fehlerhaften Text eingeben und speichern", async () => {
+          await navigateToCategories(page, prefilledDocumentUnit.documentNumber)
+          await page
+            .getByRole("button", { name: "Gründe", exact: true })
+            .click()
+          await page.getByTestId("Gründe").click()
+          await page.keyboard.type(`das wort ist flasch geschrieben`)
+          await save(page)
+        })
 
-        await navigateToPublication(page, decision.documentNumber)
-
-        await test.step("Rechtschreibfehler werden angezeigt", async () => {
+        await test.step("Rechtschreibfehler werden auf Veröffentlichungsseite angezeigt", async () => {
+          await navigateToPublication(
+            page,
+            prefilledDocumentUnit.documentNumber,
+          )
           const textcheck = page.getByLabel("Rechtschreibprüfung")
 
           await expect(
@@ -424,6 +498,14 @@ test.describe(
           await expect(
             page.getByText("Es wurden Rechtschreibfehler identifiziert:"),
           ).toBeVisible()
+        })
+
+        await test.step("Veröffentlichung ist trotz Rechtschreibfehler möglich", async () => {
+          await page.getByRole("button", { name: "Veröffentlichen" }).click()
+
+          await expect(
+            page.getByTestId("portal-publication-status-badge"),
+          ).toHaveText("Veröffentlicht")
         })
       },
     )
@@ -473,3 +555,9 @@ test.describe(
     )
   },
 )
+
+async function loginToPortal(portalPage: Page) {
+  await portalPage.fill("#username", process.env.E2E_TEST_USER as string)
+  await portalPage.fill("#password", process.env.E2E_TEST_PASSWORD as string)
+  await portalPage.locator("input#kc-login").click()
+}
