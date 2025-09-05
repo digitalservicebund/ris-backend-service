@@ -96,6 +96,7 @@ class DatabasePatchMapperServiceTest {
 
   @Test
   void extractAndStoreBase64Images_withSpecialCharactersInText_shouldKeepText() {
+    // Arrange
     String textWithSpecialCharacters =
         "< & > Test-Case_01 Dev@Ops2025' User*Role+Admin Security~Patch_#9 Prod:Release;V2.0 ?";
     String html = "<p>" + textWithSpecialCharacters + getDefaultImageTag().outerHtml() + "</p>";
@@ -111,8 +112,10 @@ class DatabasePatchMapperServiceTest {
             any(), any(ByteBuffer.class), any(HttpHeaders.class), any()))
         .thenReturn(attachment);
 
+    // Act
     JsonPatch result = service.extractAndStoreBase64Images(patch, docUnit, User.builder().build());
 
+    // Assert
     assertThat(result.getOperations()).hasSize(1);
     JsonPatchOperation op = result.getOperations().get(0);
     assertThat(op).isInstanceOf(ReplaceOperation.class);
