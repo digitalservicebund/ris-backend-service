@@ -73,4 +73,27 @@ public class KeycloakUserService extends UserService {
       return Collections.emptyList();
     }
   }
+
+  @Override
+  public List<User> getUsersInGroup(UserGroup userGroup) {
+    if (userGroup == null || userGroup.userGroupPathName() == null) {
+      return Collections.emptyList();
+    }
+    try {
+      LOGGER
+          .atInfo()
+          .setMessage("Fetching all users for group")
+          .addKeyValue("name", userGroup.userGroupPathName())
+          .log();
+      return userApiService.getUsersInGroup(userGroup.userGroupPathName());
+    } catch (Exception e) {
+      LOGGER
+          .atError()
+          .setMessage("Error reading group user information")
+          .setCause(e)
+          .addKeyValue("name", userGroup.userGroupPathName())
+          .log();
+      return Collections.emptyList();
+    }
+  }
 }

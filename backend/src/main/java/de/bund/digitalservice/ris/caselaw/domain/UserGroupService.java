@@ -14,4 +14,6 @@ public interface UserGroupService {
   Optional<UserGroup> getDocumentationOfficeFromGroupPathNames(List<String> userGroupPathNames);
 
   List<UserGroup> getExternalUserGroups(DocumentationOffice documentationOffice);
+
+  List<UserGroup> getAllGroupsForDocumentationOffice(DocumentationOffice office);
 }

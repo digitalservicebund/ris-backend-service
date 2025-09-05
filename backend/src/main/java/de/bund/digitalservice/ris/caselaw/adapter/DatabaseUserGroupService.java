@@ -143,6 +143,14 @@ public class DatabaseUserGroupService implements UserGroupService {
         .toList();
   }
 
+  @Override
+  public List<UserGroup> getAllGroupsForDocumentationOffice(
+      DocumentationOffice documentationOffice) {
+    return getAllUserGroups().stream()
+        .filter(group -> group.docOffice().equals(documentationOffice))
+        .toList();
+  }
+
   private boolean isGroupNotInDatabase(UserGroupFromConfig groupFromConfig) {
     return this.userGroups.stream()
         .noneMatch(groupFromDb -> isConfigEqualToGroupFromDb(groupFromConfig, groupFromDb));

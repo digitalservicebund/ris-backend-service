@@ -100,7 +100,7 @@ public class BareIdUserApiService implements UserApiService {
   }
 
   @Override
-  public List<User> getUsers(String userGroupPathName) {
+  public List<User> getUsers(String userGroupPathName) { // /caselaw/BGH/Intern
     if (StringUtils.isNullOrBlank(userGroupPathName)) {
       throw new UserApiException("User group path is empty or blank");
     }
@@ -123,18 +123,17 @@ public class BareIdUserApiService implements UserApiService {
         getGroupByName(getGroupChildren(current.uuid()), userGroupsPathSegments.get(1));
 
     // Get all users under the  court
-    return getUsersRecursively(court);
+    return getUsersRecursively(court, userGroupPathName);
   }
 
-  private List<User> getUsersRecursively(BareUserApiResponse.Group group) {
+  private List<User> getUsersRecursively(BareUserApiResponse.Group group, String groupName) {
     List<User> users = new ArrayList<>();
-    try {
+    if (group.path().equals(groupName)) {
       users.addAll(getUsers(group.uuid()));
-    } catch (UserApiException exception) {
-      log.error("Error while fetching users: ", exception);
+      return users;
     }
     for (BareUserApiResponse.Group child : getGroupChildren(group.uuid())) {
-      users.addAll(getUsersRecursively(child));
+      users.addAll(getUsersRecursively(child, groupName));
     }
     return users;
   }
@@ -200,6 +199,11 @@ public class BareIdUserApiService implements UserApiService {
     return subGroupResponse.getBody().users().stream()
         .map(UserTransformer::transformToDomain)
         .toList();
+  }
+
+  @Override
+  public List<User> getUsersInGroup(String userGroupPathName) {
+    return List.of();
   }
 
   private Optional<UserGroup> getDocumentationOfficeFromGroups(
