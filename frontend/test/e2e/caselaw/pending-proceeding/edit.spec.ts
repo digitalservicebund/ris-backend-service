@@ -160,4 +160,222 @@ test.describe("edit pending proceeding", () => {
       await save(page)
     },
   )
+
+  test(
+    'Bearbeitung der Rubrik "Schlagwörter" in einem anhängigen Verfahren',
+    { tag: ["@RISDEV-7774", "@RISDEV-9006"] },
+    async ({ page, pendingProceeding }) => {
+      const keywords = [
+        "Größer > als",
+        "”Test-Case_01”",
+        "'Dev@Ops2025'",
+        "User*Role+Admin",
+        "Security~Patch_#9",
+        "Compliance=ISO27001",
+        "Prod:Release;V2.0",
+      ]
+      const newKeywords = [
+        "Größer > als",
+        "”Test-Case_01”",
+        "'Dev@Ops2025'",
+        "User*Role+Admin",
+        "Security~Patch_#9",
+        "Compliance=ISO27001",
+        "Special_Quotes",
+      ]
+      const newKeywordsAlphabetically = [
+        "'Dev@Ops2025'",
+        "”Test-Case_01”",
+        "Compliance=ISO27001",
+        "Größer > als",
+        "Security~Patch_#9",
+        "Special_Quotes",
+        "User*Role+Admin",
+      ]
+      await test.step("Navigiere zu Rubriken", async () => {
+        await navigateToCategories(page, pendingProceeding.documentNumber, {
+          type: "pending-proceeding",
+        })
+      })
+
+      await test.step("Klicke in der linken Navigationsleiste auf „Inhaltliche Erschließung”.", async () => {
+        await page
+          .getByRole("link", { name: "Inhaltliche Erschließung" })
+          .click()
+        await expect(
+          page.getByRole("heading", { name: "Inhaltliche Erschließung" }),
+        ).toBeInViewport()
+      })
+
+      await test.step("Trage „Dies & Das” als Schlagwort ein und klicke anschließend auf „Übernehmen”.", async () => {
+        const button = page
+          .getByTestId("category-wrapper-button")
+          .getByText(/Schlagwörter/)
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.getByLabel("Schlagwörter Input").fill("Dies & Das")
+        await page.getByLabel("Schlagwörter übernehmen").click()
+        await save(page)
+      })
+
+      await test.step("In der Vorschau steht „Dies & Das”.", async () => {
+        await page.getByLabel("Seitenpanel öffnen").click()
+        const preview = page.getByTestId("preview")
+        await expect(preview.getByText(/Dies & Das/i)).toBeVisible()
+      })
+
+      await test.step(
+        "Trage die Wörter „Größer > als“, „”Test-Case_01”“, „'Dev@Ops2025'“, „User*Role+Admin“," +
+          " „Security~Patch_#9“, „Compliance=ISO27001“ und „Prod:Release;V2.0“ als Schlagwörter ein.",
+        async () => {
+          await page.getByLabel("Schlagwörter bearbeiten").click()
+          const input = page.getByLabel("Schlagwörter Input")
+          await input.clear()
+          await input.click()
+
+          for (const keyword of keywords) {
+            await page.keyboard.type(keyword)
+            await page.keyboard.press("Enter")
+          }
+          await page.getByLabel("Schlagwörter übernehmen").click()
+          await save(page)
+        },
+      )
+
+      await test.step("Die Schlagwörter werden korrekt aufgelistet", async () => {
+        const keywordContainer = page.getByTestId("keywords")
+        const listItems = keywordContainer.locator(
+          "ul.m-0.flex.flex-row.flex-wrap.gap-8.p-0 > li",
+        )
+        await expect(listItems).toHaveCount(keywords.length)
+        const actualTexts = await listItems.allTextContents()
+        expect(actualTexts).toEqual(keywords)
+      })
+
+      await test.step("In der Vorschau stehen alle Schlagwörter korrekt", async () => {
+        const preview = page.getByTestId("preview")
+        const actualKeywords = preview.locator(
+          "div.ris-body1-regular.text-black > div",
+        )
+        await expect(actualKeywords).toHaveCount(keywords.length)
+        const actualTexts = await actualKeywords.allTextContents()
+        expect(actualTexts).toEqual(keywords)
+      })
+
+      await test.step("Ersetze das Schlagwort „Prod:Release;V2.0“ durch das Schlagwort „Special_Quotes”.", async () => {
+        await page.getByLabel("Schlagwörter bearbeiten").click()
+        const input = page.getByLabel("Schlagwörter Input")
+        await input.click()
+        const currentValue = await input.inputValue()
+        const newValue = currentValue.replace(
+          "Prod:Release;V2.0",
+          "Special_Quotes",
+        )
+        await input.fill(newValue)
+        await page.getByLabel("Schlagwörter übernehmen").click()
+        await save(page)
+      })
+
+      await test.step("Die neuen Schlagwörter werden korrekt aufgelistet.", async () => {
+        const keywordContainer = page.getByTestId("keywords")
+        const listItems = keywordContainer.locator(
+          "ul.m-0.flex.flex-row.flex-wrap.gap-8.p-0 > li",
+        )
+        await expect(listItems).toHaveCount(newKeywords.length)
+        const actualTexts = await listItems.allTextContents()
+        expect(actualTexts).toEqual(newKeywords)
+      })
+
+      await test.step("In der Vorschau stehen alle neuen Schlagwörter korrekt.", async () => {
+        const preview = page.getByTestId("preview")
+        const actualKeywords = preview.locator(
+          "div.ris-body1-regular.text-black > div",
+        )
+        await expect(actualKeywords).toHaveCount(newKeywords.length)
+        const actualTexts = await actualKeywords.allTextContents()
+        expect(actualTexts).toEqual(newKeywords)
+      })
+
+      await test.step("Die Schlagwörter werden alphabetisch sortiert übernommen.", async () => {
+        await page.getByLabel("Schlagwörter bearbeiten").click()
+        await page.getByLabel("Alphabetisch sortieren").click()
+        await page.getByLabel("Schlagwörter übernehmen").click()
+        await save(page)
+      })
+
+      await test.step("Die Schlagwörter werden korrekt alphabetisch aufgelistet.", async () => {
+        const keywordContainer = page.getByTestId("keywords")
+        const listItems = keywordContainer.locator(
+          "ul.m-0.flex.flex-row.flex-wrap.gap-8.p-0 > li",
+        )
+        await expect(listItems).toHaveCount(newKeywordsAlphabetically.length)
+        const actualTexts = await listItems.allTextContents()
+        expect(actualTexts).toEqual(newKeywordsAlphabetically)
+      })
+
+      await test.step("In der Vorschau stehen alle Schlagwörter alphabetisch korrekt.", async () => {
+        const preview = page.getByTestId("preview")
+        const actualKeywords = preview.locator(
+          "div.ris-body1-regular.text-black > div",
+        )
+        await expect(actualKeywords).toHaveCount(
+          newKeywordsAlphabetically.length,
+        )
+        const actualTexts = await actualKeywords.allTextContents()
+        expect(actualTexts).toEqual(newKeywordsAlphabetically)
+      })
+
+      await test.step("Lösche alle Schlagwörter.", async () => {
+        await page.getByLabel("Schlagwörter bearbeiten").click()
+        await page.getByLabel("Schlagwörter Input").clear()
+        await page.getByLabel("Schlagwörter übernehmen").click()
+        await save(page)
+      })
+
+      await test.step("Die Schlagwörter sind aus der Liste und der Vorschau entfernt.", async () => {
+        const keywordContainer = page.getByTestId("keywords")
+        await expect(keywordContainer).toBeHidden()
+        await expect(
+          page.getByTestId("category-wrapper-button").getByText(/Schlagwörter/),
+        ).toBeVisible()
+        await expect(
+          page.getByTestId("preview").getByText("Schlagwörter"),
+        ).toBeHidden()
+      })
+
+      await test.step("Das Schlagwort „TestDuplicat?“ wird zwei mal eingetragen.", async () => {
+        await page
+          .getByTestId("category-wrapper-button")
+          .getByText(/Schlagwörter/)
+          .click()
+        const input = page.getByLabel("Schlagwörter Input")
+        await input.click()
+        await page.keyboard.type("TestDuplicat?")
+        await page.keyboard.press("Enter")
+        await page.keyboard.type("TestDuplicat?")
+        await page.getByLabel("Schlagwörter übernehmen").click()
+        await save(page)
+      })
+
+      await test.step("Das Schlagwort wird nur einmal aufgelistet.", async () => {
+        const keywordContainer = page.getByTestId("keywords")
+        const listItems = keywordContainer.locator(
+          "ul.m-0.flex.flex-row.flex-wrap.gap-8.p-0 > li",
+        )
+        await expect(listItems).toHaveCount(1)
+        const actualTexts = await listItems.allTextContents()
+        expect(actualTexts[0]).toEqual("TestDuplicat?")
+      })
+
+      await test.step("In der Vorschau ist das Schlagwort nur einmal aufgelistet.", async () => {
+        const preview = page.getByTestId("preview")
+        const actualKeywords = preview.locator(
+          "div.ris-body1-regular.text-black > div",
+        )
+        await expect(actualKeywords).toHaveCount(1)
+        const actualTexts = await actualKeywords.allTextContents()
+        expect(actualTexts).toEqual(["TestDuplicat?"])
+      })
+    },
+  )
 })
