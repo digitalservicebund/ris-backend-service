@@ -172,10 +172,18 @@ dependencies {
     implementation("net.minidev:json-smart:2.6.0")
 
     // CVE-2025-58056
+    // should be fixed with a new amazon version.
+    // please take a look every time to remove this as soon as possible!
     implementation("io.netty:netty-handler:4.2.5.Final")
-
-    // CVE-2025-58056
     implementation("io.netty:netty-codec-http2:4.2.5.Final")
+    implementation("io.netty:netty-buffer:4.2.5.Final")
+    implementation("io.netty:netty-codec-http:4.2.5.Final")
+    implementation("io.netty:netty-codec:4.2.5.Final")
+    implementation("io.netty:netty-common:4.2.5.Final")
+    implementation("io.netty:netty-resolver:4.2.5.Final")
+    implementation("io.netty:netty-transport:4.2.5.Final")
+    implementation("io.netty:netty-transport-classes-epoll:4.2.5.Final")
+    implementation("io.netty:netty-transport-native-unix-common:4.2.5.Final")
 
     implementation("org.postgresql:postgresql:42.7.7")
 
